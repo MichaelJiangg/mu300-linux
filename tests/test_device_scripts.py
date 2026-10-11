@@ -584,6 +584,34 @@ at() {
         self.assertRegex(radio, r'(?m)^t=\S* +registered\b')
         self.assertIn('reasserting', radio)
 
+    def test_a_down_cancels_the_bring_up(self):
+        """kanoqwq 25f8d0c: a down while up runs used to be ignored - the bring-up went on and put the bearer back
+        up after it. Now the bring-up stops at its next wait or step; a context it activated it deactivates."""
+        env = dict(MU300_NETIFD=1, MU300_AT_DEV='/dev/null', MU300_URC_LOG=self.tmp / 'none', MU300_CFUN_WAIT=0)
+        flag = f'{self.tmp}/run/mu300-mobile-data-down'
+        # during the registration wait: no context is activated at all
+        r, sent = self.lib(f'(sleep 1; : > "{flag}") &\nup_locked', MU300_REGISTER_WAIT=20, CEREG='+CEREG: 2,2',
+                           **env)
+        cmds = [s.split(' ', 1)[1] for s in sent]
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn('cancelled by mobile-data down', r.stderr)
+        self.assertNotIn('IP=', r.stdout)
+        self.assertFalse([c for c in cmds if c.startswith('AT+CGACT')], cmds)
+        self.assertLess(int(sent[-1].split(' ', 1)[0]), 5, sent)
+        self.assertIn('cancelled at registration', (self.tmp / 'run' / 'mu300' / 'radio.log').read_text())
+        # while the address is awaited, and when the data call is made: the context goes down again
+        for step, addr_after in (('AT+CGACT=1,1', 99), ('AT+CGDATA=', 1)):
+            with self.subTest(step=step):
+                modem = self.MODEM.replace('at() {\n', f'at() {{\n    case $1 in {step}*) : > "{flag}" ;; esac\n')
+                r, sent = self.lib('up_locked', modem=modem, CEREG='+CEREG: 2,1,"1A2B","0123ABCD",7',
+                                   ADDR_AFTER=addr_after, MU300_ADDR_WAIT_FIRST=4, MU300_ADDR_WAIT_RETRY=4, **env)
+                cmds = [s.split(' ', 1)[1] for s in sent]
+                self.assertEqual(r.returncode, 1, r.stdout)
+                self.assertNotIn('IP=', r.stdout)
+                self.assertEqual(cmds[-1], 'AT+CGACT=0,1', cmds)
+                self.assertEqual(cmds.count('AT+CGACT=1,1'), 1, cmds)     # no reassert after the down
+                (self.tmp / 'run' / 'mu300-mobile-data-down').unlink(missing_ok=True)
+
     def test_sipa_dele_between_registration_and_cgact(self):
         """K47: the IPA delegate is loaded by the dial itself, after the registration and before the PDP context
         (AT+CGACT=1), with a 20 s wait; when it does not load, the dial stops there and activates nothing; once it

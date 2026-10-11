@@ -497,6 +497,7 @@ wait_registered() {
         next=$((SECONDS + 5))
     fi
     while [ "$SECONDS" -lt "$deadline" ]; do
+        down_asked && return 1
         size=$(fsize "$URCLOG")
         [ "$size" -lt "$seen" ] && seen=0   # mu300-atd started the log over at its size cap
         if [ "$size" -gt "$seen" ] && tail -c +"$((seen + 1))" "$URCLOG" 2>/dev/null | is_registered urc; then
@@ -518,6 +519,7 @@ fetch_addr() {
     local end=$((SECONDS + ${1:-8})) line am
     rdp=
     while [ "$SECONDS" -lt "$end" ]; do
+        down_asked && return 1
         line=$(at "AT+CGCONTRDP=$CID" 4 2>/dev/null | grep '^+CGCONTRDP:' | head -n 1 || true)
         am=$(echo "$line" | cut -d, -f4 | tr -d '"')
         case $am in
@@ -547,6 +549,19 @@ tty_setup() {
 # R35): the old directory with a pid file had the same empty-pid moment, in which a waiter removed a lock that had
 # just been taken. A new name for the same reason as RADIOLOCK's.
 UPLOCK=/run/mu300-mobile-data-up.owner
+
+# A "mobile-data down" while a bring-up runs (netifd's teardown, the user, mu300-power) only sets the flag: the
+# bring-up owns the AT channel, so down leaves the context alone. The bring-up looks at the flag at every wait and
+# before every step that changes something, and stops there; a context it already activated it deactivates itself.
+# It used to go on to the end and put the bearer back up after the down (kanoqwq/mu300-linux@25f8d0c). up_locked
+# removes the flag when it starts, so only a down asked for after that counts.
+down_asked() { [ -e /run/mu300-mobile-data-down ]; }
+cancel_up() {  # cancel_up STAGE [active]: end this bring-up because a down was asked for
+    radio_say "bring-up cancelled at $1: mobile-data down was asked for"
+    [ "${2:-}" != active ] || at "AT+CGACT=0,$CID" 5 >/dev/null 2>&1 || true
+    echo "the bring-up was cancelled by mobile-data down" >&2
+    exit 1
+}
 up() {
     # mu300-power holds the modem down (suspend off): no dial, not even netifd's, until resume (which sets _resuming)
     if [ "$(cat "$SUSPEND" 2>/dev/null || true)" = off ] && [ -z "${_resuming:-}" ]; then
@@ -590,6 +605,7 @@ up_locked() {
         exit 1
     fi
     mark dial-radio-on-done
+    down_asked && cancel_up radio-on
     # K58: the IMS bearer SMS uses, which Android's RIL switches on. Idempotent, and nothing here waits for IMS.
     at 'AT+CAVIMS=1' 5 >/dev/null || true
     # A modem reset during this wait is not repaired inside this attempt (the old loop re-ran radio_on every 10 s;
@@ -598,6 +614,7 @@ up_locked() {
     # on from inside this wait could also cut across the LuCI plugin's lock replay, which takes the radio down on
     # purpose.
     if ! wait_registered; then
+        down_asked && cancel_up registration
         radio_say "not registered after ${MU300_REGISTER_WAIT:-60} s"
         led error
         echo "not registered on the network" >&2
@@ -640,6 +657,7 @@ up_locked() {
     # CGACT=1 on an active context (a reconnect) changes nothing. mu300-at exits 0 on any final result code,
     # ERROR included, so only a channel that does not answer (a timeout) ends the bring-up here; an ERROR shows up
     # as the missing address below.
+    down_asked && cancel_up activation
     at "AT+CGACT=1,$CID" 20 >/dev/null
     mark dial-pdp-active
     # An active context is not an address yet. Reassert CGACT=1 once - idempotent, it nudges the context without
@@ -647,9 +665,11 @@ up_locked() {
     # silenced the AT channel and left the WAN pending for minutes. Both waits are bounded: 16 s of budget by
     # default; with each phase's last query overrunning (fetch_addr) and the reassert's own 8 s, about 36 s at worst.
     if ! fetch_addr "${MU300_ADDR_WAIT_FIRST:-8}"; then
+        down_asked && cancel_up address active
         radio_say "context active but no address after ${MU300_ADDR_WAIT_FIRST:-8} s; reasserting AT+CGACT=1 once"
         at "AT+CGACT=1,$CID" 8 >/dev/null || true
         if ! fetch_addr "${MU300_ADDR_WAIT_RETRY:-8}"; then
+            down_asked && cancel_up address active
             radio_say "still no address after the reassert"
             echo "no IPv4 address from AT+CGCONTRDP" >&2
             exit 1
@@ -667,6 +687,8 @@ up_locked() {
     # ten to twenty seconds later. With the old eight-second budget the reply arrived after we had given up, so
     # the next command read it instead of its own and the whole channel looked dead for a while.
     at "AT+CGDATA=\"M-ETHER\",$CID" 45 | grep -q CONNECT || echo "AT+CGDATA did not answer CONNECT" >&2
+    # the last point before the interface, the routes and the NAT (or netifd) are set up
+    down_asked && cancel_up data active
     prefix=$(mask2prefix "$mask")
     iid=$(v6_iid)
     # Without an IPv6 address from the network, switch IPv6 off on this interface, as Android does: otherwise it
