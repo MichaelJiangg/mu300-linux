@@ -30,6 +30,11 @@ done
 rm -rf $R && mkdir -p $R
 tar -xf /w/base.tar -C $R
 cp -a /w/overlay/. $R/
+# the Android vendor daemons' own system account (android-run, ueventd-perms.sh): Android's system user is uid 1000,
+# which here is ubuntu's. mu300-update carries the image's system accounts into an updated system, so updated
+# systems have it too (android-vendor-start makes it on one that does not).
+grep -q '^mu300vnd:' $R/etc/passwd || useradd --root $R --system --user-group --no-create-home --home-dir /nonexistent \
+    --shell /usr/sbin/nologin --comment 'MU300 Android vendor daemons' mu300vnd
 # /lib is a symlink to usr/lib on Ubuntu; always write through usr/lib
 mkdir -p $R/usr/lib/modules/$KREL/extra
 cp /kmods/*.ko $R/usr/lib/modules/$KREL/extra/
