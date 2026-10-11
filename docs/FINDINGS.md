@@ -3735,8 +3735,11 @@ Fix (`mu300-update`, `mu300-os`):
   (`accounts_into`). The same kind gets the merge an update does (hashes, the users added on the device); across
   kinds only the password crosses, the way the installer's `PWHASH` seeds both: the Ubuntu `ubuntu` user's hash
   onto OpenWrt's `root`, root's onto Ubuntu's `ubuntu` (Ubuntu's root stays locked). It prints "accounts and
-  passwords carried over from the running <os>"; a running system with no usable hash to give leaves the image's
-  accounts and says to run `mu300-update accounts <os>` once there is one.
+  passwords carried over from the running <os>". It fails closed, as the installer does with `PWHASH`: a running
+  system with no usable hash to give means the system is not added at all (an empty hash is no credential, and
+  a system that boots with one is open to any login path that does not refuse it) - set a password there, then
+  apply again. The scratch copies of shadow and gshadow the merge writes are made under umask 077, in the
+  target's own etc, and none stays behind on a failure.
 - `mu300-update accounts <os>...` does the same on demand (a system added by an earlier updater, or after a
   password change); without a name it is still the boot-time merge from `<os>.old` (mu300-accounts.service).
 - `mu300-os <os>` refuses a system nobody can log in to - OpenWrt: `root` without a `$id$...` hash (empty, `*`,

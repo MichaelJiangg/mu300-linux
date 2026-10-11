@@ -335,9 +335,11 @@ hash_of() { sed -n "s/^$2:\([^:]*\):.*/\1/p" "$1/etc/shadow" 2>/dev/null | head 
 # a hash someone can log in with: crypt's $id$...; empty, * and ! are refused by dropbear, rpcd and sshd alike
 usable_hash() { case $1 in '$'?*) return 0 ;; esac; return 1; }
 # set_hash ROOT USER HASH: USER's password in ROOT's shadow, written the way merge_accounts writes (a copy with the
-# file's owner and mode, renamed into place)
+# file's owner and mode, renamed into place, in the target's own etc). The scratch copy holds every hash, so it is
+# made under umask 077 (the caller's umask - root's is usually 022 - would make it world-readable for a moment);
+# what replaces shadow is the cp -p copy, with shadow's own owner and mode. Nothing stays behind on a failure.
 set_hash() {
-    awk -F: -v OFS=: -v u="$2" -v h="$3" '$1 == u { $2 = h } { print }' "$1/etc/shadow" > "$1/etc/shadow.mu300" ||
+    ( umask 077; awk -F: -v OFS=: -v u="$2" -v h="$3" '$1 == u { $2 = h } { print }' "$1/etc/shadow" > "$1/etc/shadow.mu300" ) ||
         { rm -f "$1/etc/shadow.mu300"; return 1; }
     cp -p "$1/etc/shadow" "$1/etc/shadow.mu300-new" && cat "$1/etc/shadow.mu300" > "$1/etc/shadow.mu300-new" && sync &&
         mv -f "$1/etc/shadow.mu300-new" "$1/etc/shadow" || { rm -f "$1/etc/shadow.mu300" "$1/etc/shadow.mu300-new"; return 1; }
@@ -355,7 +357,8 @@ accounts_into() {
     _rk=$(os_kind "$_ro") _ru=$(pw_user "$(os_kind "$_ro")") _nu=$(pw_user "$_k")
     [ -f "$_n/etc/shadow" ] || { echo "$2: no etc/shadow; its accounts stay the image's" >&2; return 1; }
     if [ "$_k" = "$_rk" ]; then
-        merge_accounts "$_r" "$_n" || { echo "$2: could not carry the accounts over; the image's default password applies" >&2; return 1; }
+        # under umask 077, as set_hash: the merge's scratch copies of shadow and gshadow hold every hash
+        ( umask 077; merge_accounts "$_r" "$_n" ) || { echo "$2: could not carry the accounts over; the image's default password applies" >&2; return 1; }
     else
         _h=$(hash_of "$_r" "$_ru")
         usable_hash "$_h" || { echo "$2: the running $_ro has no usable password for $_ru to give $_nu; $2 keeps the image's accounts" >&2; return 1; }
@@ -666,10 +669,14 @@ apply_one() {  # apply_one OS TAG   (a system not on the disk is added: the imag
 
     if [ -n "$add" ]; then
         # nothing of its own to keep: the vendor files come from the systems already here, the accounts from the
-        # running one (an added system used to keep the image's empty root password, which no login accepts: #167)
+        # running one (an added system used to keep the image's empty root password, which no login accepts: #167).
+        # Fail closed, as the installer does with PWHASH: a system whose login account would have no password of
+        # its own is not put on the disk at all - an empty hash is no credential, and a system that boots with
+        # one is open to any login path that does not refuse it
         say "$os: the vendor files and the accounts of this device"
         vendor_from "$os" "$new" || { rm -rf "$new"; die "$os: copying the vendor files failed, nothing was changed"; }
-        accounts_into "$new" "$os" || echo "$os: run mu300-update accounts $os before mu300-os $os" >&2
+        accounts_into "$new" "$os" ||
+            { rm -rf "$new"; die "$os: $(pw_user "$(os_kind "$os")") would have no password of its own; $os was not added. Set a password on the running system (passwd), then run mu300-update apply $os again"; }
         say "$os: putting it in place"
         sync
         mv "$new" "$old" || { rm -rf "$new"; die "could not put $os in place"; }

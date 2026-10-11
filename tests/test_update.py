@@ -990,17 +990,53 @@ class AddedSystem(UpdateBase):
             self.assertNotIn('kaan', sh)
             self.assertFalse((self.disk / 'ubuntu/etc/.mu300-accounts-from-image').exists())
 
-    def test_a_running_system_without_a_password_leaves_the_image_in_place_and_says_so(self):
+    def test_a_running_system_without_a_password_adds_nothing(self):
+        # fail closed, as the installer does with PWHASH: an empty hash is no credential, so a system whose root
+        # would keep the image's is not put on the disk at all
         self.ubuntu(hash='!')
         for shell in self.each_shell():
-            shutil.rmtree(self.disk / 'openwrt-luci', ignore_errors=True)
             self.image('openwrt-luci')
             r = self.add(shell, 'openwrt-luci', 'ubuntu')
-            self.assertEqual(r.returncode, 0, r.stderr)       # the system is added all the same, and the user told
-            self.assertIn('no usable password', r.stderr)
-            self.assertIn('run mu300-update accounts openwrt-luci before mu300-os openwrt-luci', r.stderr)
+            self.assertEqual(r.returncode, 1, r.stdout)
+            self.assertIn('the running ubuntu has no usable password for ubuntu to give root', r.stderr)
+            self.assertIn('root would have no password of its own; openwrt-luci was not added', r.stderr)
+            self.assertIn('passwd', r.stderr)
             self.assertNotIn('carried over', r.stdout)
-            self.assertEqual(self.shadow('openwrt-luci')['root'], '')
+            self.assertFalse((self.disk / 'openwrt-luci').exists())
+            self.assertFalse((self.disk / 'openwrt-luci.new').exists())
+
+    def test_the_scratch_copies_of_shadow_are_private_and_gone_on_a_failure(self):
+        # the copy awk writes holds every hash: made under umask 077 whatever the caller's (root's is 022), in the
+        # target's own etc; the files keep their modes; no hash is printed; a failed step leaves no copy behind
+        self.ubuntu()
+        self.openwrt()
+        self.openwrt('openwrt-luci', hash='')
+        (self.disk / 'openwrt-luci/etc/passwd').chmod(0o644)
+        modes = self.tmp / 'modes'
+        self.stub('awk', f'for last; do :; done\nls -l "$last.mu300" | cut -c1-10 >> "{modes}"\nexec /usr/bin/awk "$@"')
+        for shell in self.each_shell():
+            for running, n in (('ubuntu', 1), ('openwrt', 4)):     # the password alone, or the whole merge
+                modes.unlink(missing_ok=True)
+                (self.disk / 'openwrt-luci/etc/shadow').write_text('root:::0:99999:7:::\n')
+                r = self.up(shell, 'umask 022; accounts openwrt-luci', MU300_ROOT=self.disk / running)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertEqual(modes.read_text().splitlines(), ['-rw-------'] * n, running)
+                self.assertNotIn('$6$', r.stdout + r.stderr)
+                self.assertEqual((self.disk / 'openwrt-luci/etc/shadow').stat().st_mode & 0o777, 0o640)
+                self.assertEqual((self.disk / 'openwrt-luci/etc/passwd').stat().st_mode & 0o777, 0o644)
+                self.assertEqual(sorted(os.listdir(self.disk / 'openwrt-luci/etc')),
+                                 ['group', 'gshadow', 'openwrt_release', 'passwd', 'shadow'])
+            for stub in ('awk', 'sync'):
+                self.stub(stub, 'exit 1')
+                (self.disk / 'openwrt-luci/etc/shadow').write_text('root:::0:99999:7:::\n')
+                r = self.up(shell, 'accounts openwrt-luci', MU300_ROOT=self.disk / 'ubuntu')
+                self.assertEqual(r.returncode, 1, stub)
+                self.assertIn('could not write root', r.stderr)
+                self.assertEqual(self.shadow('openwrt-luci')['root'], '')
+                self.assertEqual(sorted(os.listdir(self.disk / 'openwrt-luci/etc')),
+                                 ['group', 'gshadow', 'openwrt_release', 'passwd', 'shadow'], stub)
+                (self.stubs / stub).unlink()
+            self.stub('awk', f'for last; do :; done\nls -l "$last.mu300" | cut -c1-10 >> "{modes}"\nexec /usr/bin/awk "$@"')
 
     def test_accounts_command_syncs_a_system_on_demand(self):
         self.ubuntu()
