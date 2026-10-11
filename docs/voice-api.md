@@ -97,13 +97,19 @@ Each prints one JSON line and exits 0 on success, 1 on failure (2: a usage error
 * `call` sends `ATD<number>;` (a voice call) and returns once the modem took it; `id` is the new call's id when
   AT+CLCC already shows it. The call's progress (dialing, alerting, active, ended) comes as events. No `*` or
   `#` in a number (MMI/USSD codes are not calls; tones go by `dtmf`), no spaces, dashes, CLIR prefixes (`*31#`,
-  `#31#`) or suffixes, no non-ASCII digits: refused, not cleaned up. Emergency numbers are refused - a script or a
-  remote SIP client must not be able to dial them: a fixed list (112, 911, 999, 000, 08, 110, 118, 119, 100-108,
-  122, 155-158, 177, 184, ...), the network's (`AT+CEN?`) and the SIM's (EF_ECC, `AT+CRSM`) when the modem gives
-  them, each as dialled, with a national 0, and after a `+`/`00` and a country code (`+90112`, `0090112`). With
-  `CALL_ALLOW="..."` in voice.conf, `call` places only the numbers listed there, exactly as written - the setting
-  for a service that calls a few known numbers. Every argument is checked exactly as it goes into the AT command;
-  a refused value is never echoed back.
+  `#31#`, `*67`) or suffixes, no non-ASCII digits: refused, not cleaned up. Then two more layers, both failing
+  closed (a check that cannot run refuses the call):
+  * **`CALL_ALLOW`** in `/etc/mu300/voice.conf`: the numbers `call` may dial, space-separated, exactly as they
+    will be given. Empty, or no voice.conf: **no number is called** - configure the numbers your service calls
+    (a SIP trunk's outbound numbers, a test line), or `CALL_ALLOW=any` to lift this layer.
+  * **emergency numbers, never**, even when listed: a fixed list (112, 911, 999, 000, 08, 110, 118, 119,
+    100-108, 122, 155-158, 177, 184, ...) plus the network's (`AT+CEN?`) and the SIM's (EF_ECC through
+    `AT+CRSM`), read from the modem before every call - if the modem does not give them, the call is refused
+    (`the emergency lists could not be read from the modem`). A number matches as dialled, with a national 0, or
+    after a `+` / `00` / `0` prefix and up to three digits of country or trunk code (`+90112`, `0090112`,
+    `090112`).
+
+  Every argument is checked exactly as it goes into the AT command; a refused value is never echoed back.
 * `answer` answers the incoming call (`ATA`), or a waiting one (`AT+CHLD=2`: the active call goes on hold). With
   an `ID`, only that call. `--wait S` waits up to S seconds for one to ring first.
 * `hangup` ends every call (`AT+CHUP`, also rejects a ringing one), or with an `ID` that call alone

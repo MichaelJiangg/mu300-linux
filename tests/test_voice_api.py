@@ -25,8 +25,7 @@ NUM = '+905321234540'
 INCOMING = f'+CLCC: 1,1,4,0,0,"{NUM}",145\nOK\n'
 ACTIVE = f'+CLCC: 1,1,0,0,0,"{NUM}",145\nOK\n'
 NONE = 'OK\n'
-ECC_QUERIES = ['AT+CEN?', 'AT+CRSM=176,28599,0,0,15', 'AT+CRSM=178,28599,1,4,0', 'AT+CRSM=178,28599,2,4,0',
-               'AT+CRSM=178,28599,3,4,0']
+ECC_QUERIES = ['AT+CEN?', 'AT+CRSM=178,28599,1,4,0']
 
 # AT+CLCC answers from $STUBLOG/clcc.1, .2, ... in turn (the last one again after the end); any other command
 # answers with $STUBLOG/reply when there is one, else OK. Every command goes to $STUBLOG/at.log.
@@ -58,7 +57,9 @@ class VoiceTest(ShellTest):
         self.group = grp.getgrgid(os.getgid()).gr_name
         self.groupfile = self.tmp / 'group'
         self.groupfile.write_text(f'{self.group}:x:{os.getgid()}:\n')
-        self.conf.write_text(f'VOICE_GROUP={self.group}\nWATCH_AUDIO=0\n')
+        self.conf.write_text(f'VOICE_GROUP={self.group}\nWATCH_AUDIO=0\nCALL_ALLOW=any\n')
+        # the modem's emergency lists, as a USIM without EF_ECC records answers: the network's list, then "no record"
+        (self.tmp / 'at.AT_CRSM_178_28599_1_4_0').write_text('+CRSM: 106,131\nOK\n')
 
     def clcc(self, *replies):
         for i, r in enumerate(replies, 1):
@@ -186,7 +187,7 @@ class Commands(VoiceTest):
             # every spelling: plain, with a country code, 00, a national 0; prefixes, separators, suffixes and
             # non-ASCII digits are refused before the list is even looked at
             for n in ('112', '+112', '911', '999', '155', '110', '000', '08', '122', '184', '+90112', '0090112',
-                      '0112', '+44999', '+9008', '1 1 2', '*31#112', '#31#911', '112;', '\u0661\u0661\u0662',
+                      '0112', '090112', '+44999', '+9008', '1 1 2', '*31#112', '#31#911', '112;', '\u0661\u0661\u0662',
                       '*67112', '112#', '(112)', '1-1-2', '+1911'):
                 with self.subTest(n=n):
                     self.reset()
@@ -197,17 +198,70 @@ class Commands(VoiceTest):
             self.clcc('+CLCC: 1,0,2,0,0,"4440000",129\nOK\n')
             self.assertEqual(self.voice(sh, 'call', '4440000').returncode, 0)
 
+    EMERGENCY_ERR = 'emergency numbers are not placed through mu300-voice'
+    LISTS_ERR = 'the emergency lists could not be read from the modem; not calling'
+
+    def at_reply(self, cmd, text):
+        name = 'at.' + ''.join(c if c.isalnum() else '_' for c in cmd)
+        p = self.tmp / name
+        if text is None:
+            p.unlink(missing_ok=True)
+        else:
+            p.write_text(text)
+
+    def call_error(self, sh, n):
+        self.reset()
+        r = self.voice(sh, 'call', n, '--json')
+        self.assertFalse([c for c in self.at_log() if c.startswith('ATD')], n)
+        return json.loads(r.stdout)['error'] if r.stdout else r.returncode
+
     def test_the_modems_own_emergency_lists(self):
-        # the network's +CEN2 and the SIM's EF_ECC (BCD, nibbles swapped: 99 F1 FF is 991)
-        (self.tmp / 'at.AT_CEN_').write_text('+CEN1: 1,260\n+CEN2: 1,"7777"\nOK\n')
-        (self.tmp / 'at.AT_CRSM_178_28599_1_4_0').write_text('+CRSM: 144,0,"99F1FF4100"\nOK\n')
+        # as F50-B's modem answers: unquoted. The network's +CEN2, the SIM's EF_ECC records (BCD, nibbles swapped:
+        # 99 F1 FF is 991), read until the SIM says there is no further record
+        self.at_reply('AT+CEN?', '+CEN1: 0,286,01F\n+CEN2: 4,110\n+CEN2: 1,7777\nOK\n')
+        self.at_reply('AT+CRSM=178,28599,1,4,0', '+CRSM: 144,0,FFFFFFFF\nOK\n')
+        self.at_reply('AT+CRSM=178,28599,2,4,0', '+CRSM: 144,0,99F1FF41\nOK\n')
+        self.at_reply('AT+CRSM=178,28599,3,4,0', '+CRSM: 106,131\nOK\n')
         for sh in self.each_shell():
-            for n in ('7777', '+907777', '991', '0991'):
+            for n in ('7777', '+907777', '07777', '991', '0991', '0090991'):
                 with self.subTest(n=n):
-                    self.reset()
-                    r = self.voice(sh, 'call', n, '--json')
-                    self.assertEqual(json.loads(r.stdout)['error'], 'emergency numbers are not placed through mu300-voice')
-                    self.assertFalse([c for c in self.at_log() if c.startswith('ATD')])
+                    self.assertEqual(self.call_error(sh, n), self.EMERGENCY_ERR)
+            self.reset()
+            self.assertEqual(self.voice(sh, 'call', '4440000').returncode, 0)
+        # a 2G SIM: EF_ECC is transparent, five numbers of 3 bytes
+        self.at_reply('AT+CRSM=178,28599,1,4,0', '+CRSM: 105,129\nOK\n')
+        self.at_reply('AT+CRSM=176,28599,0,0,0', '+CRSM: 144,0,"11F2FF55F5FFFFFFFFFFFFFFFFFFFF"\nOK\n')
+        for sh in self.each_shell():
+            self.assertEqual(self.call_error(sh, '555'), self.EMERGENCY_ERR)
+
+    def test_fails_closed(self):
+        # every way the modem's lists can be missing refuses the call, and so does no CALL_ALLOW
+        cases = [
+            ('AT+CEN?', 'ERROR\n'),                          # the network's list not given
+            ('AT+CEN?', '+CEN2: 1,7777\n'),                  # no final result
+            ('AT+CRSM=178,28599,1,4,0', 'OK\n'),             # no +CRSM line
+            ('AT+CRSM=178,28599,1,4,0', 'ERROR\n'),
+            ('AT+CRSM=178,28599,1,4,0', '+CRSM: 0,0\nOK\n'),  # neither "here it is" nor "there is none"
+            ('AT+CRSM=178,28599,1,4,0', '+CRSM: 105,129\nOK\n'),   # 2G fallback that fails in turn
+        ]
+        for sh in self.each_shell():
+            for cmd, reply in cases:
+                with self.subTest(cmd=cmd, reply=reply):
+                    self.at_reply(cmd, reply)
+                    self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
+                    self.at_reply(cmd, None)
+                    self.at_reply('AT+CRSM=178,28599,1,4,0', '+CRSM: 106,131\nOK\n')
+            # the AT channel itself failing
+            self.stub('mu300-at', 'echo "mu300-at: busy" >&2; exit 1')
+            self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
+            self.stub('mu300-at', STUB_AT)
+        for conf in ('VOICE_GROUP=x\n', 'CALL_ALLOW=\n', 'CALL_ALLOW=" "\n'):
+            self.conf.write_text(conf)
+            for sh in self.each_shell():
+                self.assertEqual(self.call_error(sh, '4440000'), 'not in CALL_ALLOW (voice.conf)')
+        self.conf.unlink()
+        for sh in self.each_shell():
+            self.assertEqual(self.call_error(sh, '4440000'), 'not in CALL_ALLOW (voice.conf)')
 
     def test_allow_list(self):
         self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="4440000 +905320000000"\n')
@@ -217,12 +271,13 @@ class Commands(VoiceTest):
             self.assertEqual(json.loads(r.stdout)['error'], 'not in CALL_ALLOW (voice.conf)')
             self.assertEqual(self.at_log(), [])
             self.assertEqual(self.voice(sh, 'call', '+905320000000', '--json').returncode, 0)
-            # an emergency number stays refused even when listed
-        self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="112"\n')
+            # exactly as written: another spelling of a listed number is not listed
+            self.assertEqual(self.call_error(sh, '905320000000'), 'not in CALL_ALLOW (voice.conf)')
+        # an emergency number stays refused even when listed
+        self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="112 0090112"\n')
         for sh in self.each_shell():
-            self.reset()
-            self.assertEqual(self.voice(sh, 'call', '112', '--json').returncode, 1)
-            self.assertFalse([c for c in self.at_log() if c.startswith('ATD')])
+            for n in ('112', '0090112'):
+                self.assertEqual(self.call_error(sh, n), self.EMERGENCY_ERR)
 
     def test_through_sudo_only_the_api_grammar(self):
         for sh in self.each_shell():
@@ -247,7 +302,7 @@ class Commands(VoiceTest):
     def test_call_modem_error(self):
         for sh in self.each_shell():
             self.reset()
-            (self.tmp / 'reply').write_text('+CME ERROR: 30\n')
+            self.at_reply('ATD+904440000;', '+CME ERROR: 30\n')
             r = self.voice(sh, 'call', '+904440000', '--json')
             self.assertEqual(r.returncode, 1)
             self.assertEqual(json.loads(r.stdout)['error'], '+CME ERROR: 30')
@@ -255,7 +310,7 @@ class Commands(VoiceTest):
             self.assertEqual(r.stdout, '')
             self.assertIn('+CME ERROR: 30', r.stderr)
             # mu300-at's own refusal, as a user without the right to the AT channel gets it
-            (self.tmp / 'reply').write_text('mu300-at: needs root (cannot write /run/mu300-at); try: sudo mu300-at\n')
+            self.at_reply('ATD+904440000;', 'mu300-at: needs root (cannot write /run/mu300-at); try: sudo mu300-at\n')
             r = self.voice(sh, 'call', '+904440000', '--json')
             self.assertEqual(json.loads(r.stdout)['error'], 'mu300-at: needs root')
 

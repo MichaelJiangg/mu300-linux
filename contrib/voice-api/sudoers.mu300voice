@@ -6,8 +6,8 @@
 # itself is. Run through sudo (SUDO_USER set) it accepts only
 #   status [--json] | call NUMBER [--json] | answer [ID] [--wait S] [--json] | hangup [ID] [--json] | dtmf DIGITS [--json]
 # and refuses everything else with exit 2 before the modem is touched: no --demo, no audio, watch, demo, tone or
-# echo, no unknown option or extra argument. NUMBER is 3-20 digits with at most a leading + and never an emergency
-# number, ID is 1-9, DIGITS are 0-9 * # A-D; each is checked exactly as it goes into the AT command. sudo resets the
+# echo, no unknown option or extra argument. NUMBER is 3-20 digits with at most a leading +, one of CALL_ALLOW in
+# /etc/mu300/voice.conf (none when unset) and never an emergency number, ID is 1-9, DIGITS are 0-9 * # A-D; each is checked exactly as it goes into the AT command. sudo resets the
 # environment, so no MU300_* variable (another voice.conf, another AT directory) reaches the command.
 # Not here, on purpose: mu300-at (the AT channel is the whole modem - radio, SIM, data). Uncomment the SMS line only
 # for a service that sends messages ("sms send" takes NUMBER TEXT and goes through the same checks as on the shell).
