@@ -191,6 +191,77 @@ class At(ShellTest):
                 self.assertEqual(self.at(shell, 'AT').returncode, 0)
             self.assertLess(time.monotonic() - t0, 3)
 
+    def test_timeout_is_whole_seconds(self):
+        """kanoqwq 25f8d0c: -t goes into arithmetic and into the request line; anything but 1-999 is refused."""
+        for shell in self.each_shell():
+            for bad in (['-t'], ['-t', '0', 'AT'], ['-t', 'x', 'AT'], ['-t', '1.5', 'AT'], ['-t', '1 2', 'AT']):
+                with self.subTest(args=bad):
+                    r = self.at(shell, *bad)
+                    self.assertEqual(r.returncode, 2, r.stderr)
+                    self.assertFalse((self.dir / 'lock').exists())
+
+    def test_a_line_feed_cannot_make_a_second_request(self):
+        """kanoqwq 25f8d0c: the fifo protocol is one line per request; a line feed in the command is refused before
+        anything is written (CR and Ctrl-Z stay allowed: AT+CMGS sends its PDU in the same request)."""
+        for shell in self.each_shell():
+            r = self.at(shell, '-t', 1, f'AT\n1 {self.tmp}/owned AT+CFUN=0')
+            self.assertEqual(r.returncode, 2, r.stderr)
+            self.assertIn('line feed', r.stderr)
+            self.assertFalse((self.dir / 'lock').exists())
+            self.assertFalse((self.tmp / 'owned').exists())
+            self.daemon('> \r\n+CMGS: 7\r\nOK\r\n')
+            r = self.at(shell, '-t', 2, 'AT+CMGS=12\r0011\x1a')
+            self.assertEqual(r.returncode, 0, r.stderr)
+
+    def test_lock_wait_is_in_seconds(self):
+        """kanoqwq 25f8d0c: the lock wait counted rounds of 0.1 s; with no sleep that takes a fraction each round was
+        a whole second, and MU300_AT_LOCK_WAIT=2 waited 20 s. Now it is 2 s of the clock."""
+        holder = subprocess.Popen(['sleep', '60'])
+        try:
+            self.stub('sleep', 'case $1 in *.*) exit 1 ;; esac\nexec /bin/sleep "$@"')
+            for shell in self.each_shell():
+                (self.dir / 'lock').mkdir(exist_ok=True)
+                (self.dir / 'lock' / 'pid').write_text(f'{holder.pid}\n')
+                t0 = time.monotonic()
+                r = self.script(shell, BIN / 'mu300-at', '-t', 1, 'AT', MU300_AT_DIR=self.dir,
+                                MU300_BUSYBOX=self.tmp / 'none', MU300_AT_LOCK_WAIT=2)
+                self.assertLess(time.monotonic() - t0, 5)
+                self.assertEqual(r.returncode, 1)
+                self.assertIn('busy', r.stderr)
+        finally:
+            holder.kill()
+            holder.wait()
+
+    def test_direct_path_needs_a_final_result_code(self):
+        """kanoqwq 25f8d0c: with no daemon the client opens the tty itself; silence there ended with status 0."""
+        master, slave = pty.openpty()
+        try:
+            (self.dir / 'cmd').unlink()
+            dev = os.ttyname(slave)
+            for shell in self.each_shell():
+                r = self.script(shell, BIN / 'mu300-at', '-t', 1, 'AT', MU300_AT_DIR=self.dir, MU300_AT_DEV=dev)
+                self.assertEqual(r.returncode, 1, r.stderr)
+                self.assertIn('no final response', r.stderr)
+                while select.select([master], [], [], 0.2)[0]:   # what the silent run sent, before the next one
+                    os.read(master, 256)
+
+                def modem():
+                    buf = b''
+                    while b'AT\r' not in buf:
+                        if not select.select([master], [], [], 10)[0]:
+                            return
+                        buf += os.read(master, 256)
+                    os.write(master, b'\r\nOK\r\n')
+                th = threading.Thread(target=modem, daemon=True)
+                th.start()
+                r = self.script(shell, BIN / 'mu300-at', '-t', 2, 'AT', MU300_AT_DIR=self.dir, MU300_AT_DEV=dev)
+                th.join(timeout=10)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertIn('OK', r.stdout)
+        finally:
+            os.close(master)
+            os.close(slave)
+
 
 class Atd(ShellTest):
     """mu300-atd on a pseudo terminal pair: the test is the modem (the pty master), the daemon runs for real."""
