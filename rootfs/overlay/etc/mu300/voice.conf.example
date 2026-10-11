@@ -1,5 +1,6 @@
 # Copy to /etc/mu300/voice.conf for mu300-voice (calls, events, call audio; docs/voice-api.md). Root's file: it is
-# read as shell by a command that runs as root.
+# read as shell by a command that runs as root, and only when root owns it and nobody else may write it (0644);
+# otherwise it is ignored, which for "call" means no number is allowed.
 #
 # The group whose members may read the call events (/run/mu300-voice/events.sock, events.jsonl) and use the audio
 # pipes. Create it (Ubuntu: groupadd --system mu300voice) and add the service's user to it; without it all of that

@@ -59,6 +59,7 @@ class VoiceTest(ShellTest):
         self.groupfile.write_text(f'{self.group}:x:{os.getgid()}:\n')
         self.conf.write_text(f'VOICE_GROUP={self.group}\nWATCH_AUDIO=0\nCALL_ALLOW=any\n')
         # the modem's emergency lists, as a USIM without EF_ECC records answers: the network's list, then "no record"
+        (self.tmp / 'at.AT_CEN_').write_text('+CEN1: 0,286,01F\n+CEN2: 0,112\nOK\n')
         (self.tmp / 'at.AT_CRSM_178_28599_1_4_0').write_text('+CRSM: 106,131\nOK\n')
 
     def clcc(self, *replies):
@@ -239,6 +240,7 @@ class Commands(VoiceTest):
         cases = [
             ('AT+CEN?', 'ERROR\n'),                          # the network's list not given
             ('AT+CEN?', '+CEN2: 1,7777\n'),                  # no final result
+            ('AT+CEN?', 'OK\n'),                             # no list at all: not the same as an empty one
             ('AT+CRSM=178,28599,1,4,0', 'OK\n'),             # no +CRSM line
             ('AT+CRSM=178,28599,1,4,0', 'ERROR\n'),
             ('AT+CRSM=178,28599,1,4,0', '+CRSM: 0,0\nOK\n'),  # neither "here it is" nor "there is none"
@@ -251,10 +253,27 @@ class Commands(VoiceTest):
                     self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
                     self.at_reply(cmd, None)
                     self.at_reply('AT+CRSM=178,28599,1,4,0', '+CRSM: 106,131\nOK\n')
-            # the AT channel itself failing
+            # the AT channel itself failing - and the built-in list is applied before the modem is even asked
             self.stub('mu300-at', 'echo "mu300-at: busy" >&2; exit 1')
             self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
+            self.assertEqual(self.call_error(sh, '+90112'), self.EMERGENCY_ERR)
             self.stub('mu300-at', STUB_AT)
+
+    def test_no_stale_state(self):
+        # a read that worked for the last call is never used for this one: the lists come from the modem afresh,
+        # and a failing read refuses the call even right after a good one
+        for sh in self.each_shell():
+            self.reset()
+            self.assertEqual(self.voice(sh, 'call', '4440000', '--json').returncode, 0)
+            self.at_reply('AT+CEN?', 'ERROR\n')
+            self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
+            self.at_reply('AT+CEN?', '+CEN1: 0,286,01F\nOK\n')
+            self.assertEqual(self.voice(sh, 'call', '4440000', '--json').returncode, 0)
+            self.at_reply('AT+CRSM=178,28599,1,4,0', 'ERROR\n')
+            self.assertEqual(self.call_error(sh, '4440000'), self.LISTS_ERR)
+            self.at_reply('AT+CRSM=178,28599,1,4,0', '+CRSM: 106,131\nOK\n')
+        # voice.conf as it is at the moment of the call: emptied, blanked, removed, or no longer safe to read
+        good = self.conf.read_text()
         for conf in ('VOICE_GROUP=x\n', 'CALL_ALLOW=\n', 'CALL_ALLOW=" "\n'):
             self.conf.write_text(conf)
             for sh in self.each_shell():
@@ -262,6 +281,19 @@ class Commands(VoiceTest):
         self.conf.unlink()
         for sh in self.each_shell():
             self.assertEqual(self.call_error(sh, '4440000'), 'not in CALL_ALLOW (voice.conf)')
+        # root reads voice.conf as shell: a file others may write is not read at all (so no CALL_ALLOW either)
+        self.conf.write_text(good)
+        for mode in (0o664, 0o646):
+            self.conf.chmod(mode)
+            for sh in self.each_shell():
+                self.reset()
+                r = self.voice(sh, 'call', '4440000', '--json')
+                self.assertEqual(json.loads(r.stdout)['error'], 'not in CALL_ALLOW (voice.conf)')
+                self.assertIn('not read', r.stderr)
+        self.conf.chmod(0o644)
+        for sh in self.each_shell():
+            self.reset()
+            self.assertEqual(self.voice(sh, 'call', '4440000', '--json').returncode, 0)
 
     def test_allow_list(self):
         self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="4440000 +905320000000"\n')
@@ -435,6 +467,24 @@ class Watch(VoiceTest):
                 r = self.watch(sh, 2)
                 self.assertFalse((self.tmp / 'hook.log').exists())
                 self.assertIn('none run', r.stderr)
+        finally:
+            os.chmod(self.hooks, 0o755)
+
+    def test_hook_directory_rechecked_at_every_event(self):
+        # the first event's hook opens the directory up; the second event's hooks must not run - the check is made
+        # at every run, not once when the watch started
+        self.hook('10-log.sh', self.HOOK + 'chmod 777 "$(dirname "$0")"\n')
+        try:
+            for sh in self.each_shell():
+                self.reset()
+                os.chmod(self.hooks, 0o755)
+                (self.tmp / 'hook.log').unlink(missing_ok=True)
+                self.clcc(INCOMING, ACTIVE, NONE)
+                r = self.watch(sh, 3)
+                self.assertEqual((self.tmp / 'hook.log').read_text().splitlines(), [f'incoming|none|1|in|{NUM}|call'])
+                self.assertIn('none run', r.stderr)
+                states = [json.loads(l)['state'] for l in (self.run_dir / 'events.jsonl').read_text().splitlines()]
+                self.assertEqual(states, ['incoming', 'active', 'ended'])
         finally:
             os.chmod(self.hooks, 0o755)
 

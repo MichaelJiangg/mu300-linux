@@ -56,9 +56,28 @@ AUDIO_PIPES=0
 # call: the only numbers it places (space-separated, exactly as given; "any": every number that is not an emergency
 # number); empty: none
 CALL_ALLOW=
-# shellcheck disable=SC1090
-[ -r "$CONF" ] && . "$CONF"
-case $VOICE_GROUP in [a-z_]*) case $VOICE_GROUP in *[!a-z0-9_-]*) VOICE_GROUP= ;; esac ;; *) VOICE_GROUP= ;; esac
+# voice.conf is shell, read by root: only a file root owns that nobody else may write is read (owner_safe, the same
+# test the hooks pass), and one that is missing, unreadable or not root's leaves CALL_ALLOW empty - no call.
+# load_conf runs now and again at the moment a call is placed, so a file changed or removed meanwhile counts, never
+# what was read at start.
+OWNER_UID=${MU300_VOICE_HOOK_UID:-0}
+owner_safe() {   # owner_safe PATH: owned by OWNER_UID (root), writable by nobody else
+    set -- $(ls -lnd "$1" 2>/dev/null)
+    [ "${3:-}" = "$OWNER_UID" ] || return 1
+    case $1 in ?????w*|????????w*) return 1 ;; esac
+}
+load_conf() {
+    CALL_ALLOW=
+    [ -e "$CONF" ] || return 0
+    if ! owner_safe "$CONF"; then
+        echo "mu300-voice: $CONF is not root's, or others may change it; not read" >&2
+        return 0
+    fi
+    # shellcheck disable=SC1090
+    [ -r "$CONF" ] && . "$CONF"
+    case $VOICE_GROUP in [a-z_]*) case $VOICE_GROUP in *[!a-z0-9_-]*) VOICE_GROUP= ;; esac ;; *) VOICE_GROUP= ;; esac
+}
+load_conf
 RATE=${MU300_VOICE_RATE:-8000}
 DIR=${MU300_AT_DIR:-/run/mu300-at}
 URCLOG=$DIR/urc/stty_nr0.log
@@ -73,7 +92,6 @@ SNAPSHOT=$TMP/state.json
 SOCK=$TMP/events.sock
 AUDIO_DIR=$TMP/audio
 HOOKS=${MU300_VOICE_HOOKS:-/etc/mu300/voice.d}
-HOOK_UID=${MU300_VOICE_HOOK_UID:-0}
 HOOK_TIMEOUT=${MU300_VOICE_HOOK_TIMEOUT:-30}
 # The scene and headset logs live in $TMP as well, and every file is created root-only (umask). Only what the API
 # hands out is opened to the group, one file at a time (share), and the directory lets the group in, not list.
@@ -452,12 +470,10 @@ events_stop() { events_up && kill "$(cat "$EV_PID")" 2>/dev/null; rm -f "$EV_PID
 # /dev/null and at most HOOK_TIMEOUT seconds. Their environment: CALL_EVENT=call, CALL_STATE, CALL_PREV_STATE,
 # CALL_ID, CALL_DIR, NUMBER (and CALL_NUMBER; empty when hidden), CALL_JSON (the event's line). One event's hooks
 # run after the last event's have finished, in the background: a slow hook delays the next hook, never the watch.
+# The directory and each hook are checked again at every run (hook_safe = owner_safe), never once at start: a
+# directory opened up after the watch began stops the hooks from then on.
 HOOK_SEQ=0
-hook_safe() {   # hook_safe PATH: owned by HOOK_UID (root), writable by nobody else
-    set -- $(ls -lnd "$1" 2>/dev/null)
-    [ "${3:-}" = "$HOOK_UID" ] || return 1
-    case $1 in ?????w*|????????w*) return 1 ;; esac
-}
+hook_safe() { owner_safe "$1"; }
 run_hooks() {   # run_hooks STATE PREV ID DIR NUMBER JSON
     [ -d "$HOOKS" ] || return 0
     HOOK_SEQ=$((HOOK_SEQ + 1))
@@ -764,9 +780,11 @@ ecc_digits() {   # ecc_digits HEX STEP -> the BCD numbers in HEX (3 bytes each, 
     }'
 }
 emergency_lists() {   # the network's and the SIM's emergency numbers, one per line; false when either is not known
-    # +CEN2: <category>,<number> (27.007 10.1.62); the reply must end in OK
+    # +CEN2: <category>,<number> (27.007 10.1.62); the reply must end in OK and carry the list (+CEN1 heads it even
+    # when it is empty) - a bare OK is a modem that did not answer the question, not an empty list
     r=$(at 'AT+CEN?' 5)
     printf '%s\n' "$r" | grep -q '^OK' || return 1
+    printf '%s\n' "$r" | grep -q '^+CEN[12]:' || return 1
     printf '%s\n' "$r" | sed -n 's/^+CEN2: *[0-9]* *, *"\{0,1\}\([0-9]*\)"\{0,1\}.*/\1/p'
     # EF_ECC (6FB7): on a USIM linear fixed, one number per record (the record's first 3 bytes), read until the SIM
     # says there is no further record; on a 2G SIM transparent, a run of 3-byte numbers
@@ -803,6 +821,8 @@ in_list() {   # in_list NUMBER LIST
     return 1
 }
 is_emergency() {   # is_emergency NUMBER: 0 an emergency number, 1 not, 2 the modem's lists could not be read
+    # Nothing is cached: the fixed list is applied first, whatever the modem does, and the modem's lists are read
+    # afresh for every call - an earlier successful read is never used in place of one that fails now.
     in_list "$1" "$EMERGENCY" && return 0
     l=$(emergency_lists) || return 2
     in_list "$1" "$(printf '%s\n' "$l" | tr '\n' ' ')" && return 0
@@ -873,6 +893,7 @@ call)
     opts "$@"
     api_only
     valid_number "$ARG" || result call false "not a number: 3 to 20 digits, a leading + allowed"
+    load_conf   # as it is now, not as it was when this started
     call_allowed "$ARG" || result call false "not in CALL_ALLOW (voice.conf)"
     is_emergency "$ARG"
     case $? in

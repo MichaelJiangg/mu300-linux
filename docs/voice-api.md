@@ -100,11 +100,15 @@ Each prints one JSON line and exits 0 on success, 1 on failure (2: a usage error
   `#31#`, `*67`) or suffixes, no non-ASCII digits: refused, not cleaned up. Then two more layers, both failing
   closed (a check that cannot run refuses the call):
   * **`CALL_ALLOW`** in `/etc/mu300/voice.conf`: the numbers `call` may dial, space-separated, exactly as they
-    will be given. Empty, or no voice.conf: **no number is called** - configure the numbers your service calls
-    (a SIP trunk's outbound numbers, a test line), or `CALL_ALLOW=any` to lift this layer.
+    will be given. Empty, or no voice.conf: **no number is called** - configure the numbers your service calls.
+    The file is read again at the moment of every call, never from what a running `watch` saw, and only when it
+    is root's and writable by nobody else (it is shell, read by root); otherwise it counts as absent. List the
+    numbers the service calls (a SIP trunk's outbound numbers, a test line), or `CALL_ALLOW=any` to lift this
+    layer.
   * **emergency numbers, never**, even when listed: a fixed list (112, 911, 999, 000, 08, 110, 118, 119,
     100-108, 122, 155-158, 177, 184, ...) plus the network's (`AT+CEN?`) and the SIM's (EF_ECC through
-    `AT+CRSM`), read from the modem before every call - if the modem does not give them, the call is refused
+    `AT+CRSM`), read from the modem afresh before every call, never cached - if the modem does not give them
+    now, the call is refused, whatever an earlier read said; the fixed list applies either way
     (`the emergency lists could not be read from the modem`). A number matches as dialled, with a national 0, or
     after a `+` / `00` / `0` prefix and up to three digits of country or trunk code (`+90112`, `0090112`,
     `090112`).
