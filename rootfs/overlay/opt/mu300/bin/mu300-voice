@@ -53,6 +53,8 @@ VOICE_GROUP=mu300voice
 # watch: put the DSP into every call (0: events and hooks only), and give it the two audio pipes
 WATCH_AUDIO=1
 AUDIO_PIPES=0
+# call: when set, the only numbers it places (space-separated, exactly as given)
+CALL_ALLOW=
 # shellcheck disable=SC1090
 [ -r "$CONF" ] && . "$CONF"
 case $VOICE_GROUP in [a-z_]*) case $VOICE_GROUP in *[!a-z0-9_-]*) VOICE_GROUP= ;; esac ;; *) VOICE_GROUP= ;; esac
@@ -728,11 +730,58 @@ valid_number() {
     [ ${#1} -ge 3 ] && [ ${#1} -le 20 ]
 }
 # Emergency numbers are not placed through this API: a script or a remote SIP client must not be able to call
-# them, and a modem places them even without a SIM. The common ones world-wide and Turkey's, with or without a +.
-is_emergency() {
-    case ${1#+} in
-        112|911|999|000|08|110|118|119|100|101|102|103|104|105|106|108|155|156|157|158|177|061|15|17|18) return 0 ;;
-    esac
+# them, and a modem places them even without a SIM. The check runs on the exact string ATD gets - valid_number has
+# already refused everything that is not plain ASCII digits with at most a leading + (no spaces, dashes, *31#/#31#
+# prefixes, ";" or suffixes, no non-ASCII digits), so there is no other spelling to normalise. What is left to
+# cover is a prefix: "0112", "+90112", "0090112" - so a number is refused when it is an emergency number, or one
+# with a national 0, or - international, after a + or 00 - one after up to three digits of country code (and an
+# optional national 0). Short international numbers that end like one are refused too; that is the price of not
+# guessing country codes.
+# The list: the common ones world-wide and Turkey's, plus the SIM's own (EF_ECC) and the network's (+CEN) when the
+# modem tells (emergency_lists, once per command).
+EMERGENCY='112 911 999 000 08 110 118 119 100 101 102 103 104 105 106 108 122 155 156 157 158 177 184 061 15 17 18'
+emergency_lists() {
+    # the network's list: +CEN2: <category>,<number> (27.007 10.1.62), where the modem has it
+    at 'AT+CEN?' 5 | sed -n 's/^+CEN2: *[0-9]*, *"\{0,1\}\([0-9]*\)"\{0,1\}.*/\1/p'
+    # the SIM's EF_ECC (6FB7): 3-byte BCD numbers, nibbles swapped, F-padded - transparent on a SIM, records on a USIM
+    for c in 'AT+CRSM=176,28599,0,0,15' 'AT+CRSM=178,28599,1,4,0' 'AT+CRSM=178,28599,2,4,0' 'AT+CRSM=178,28599,3,4,0'; do
+        at "$c" 5 | sed -n 's/^+CRSM: *144, *0, *"\([0-9A-Fa-f]*\)".*/\1/p'
+    done | awk '{
+        s = toupper($0); n = length(s)
+        # a record: the number is its first 3 bytes; a transparent file: 5 numbers of 3 bytes
+        for (o = 1; o + 5 <= n && o <= 30; o += 6) {
+            d = ""
+            for (i = o; i < o + 6; i += 2) {
+                lo = substr(s, i + 1, 1); hi = substr(s, i, 1)
+                if (lo == "F") break; d = d lo
+                if (hi == "F") break; d = d hi
+            }
+            if (d ~ /^[0-9]+$/) print d
+        }
+    }'
+}
+in_list() {   # in_list NUMBER LIST
+    # as dialled, and with a national 0
+    for e in $2; do case $1 in "$e"|"0$e") return 0 ;; esac; done
+    # international (+ or 00): after a country code of up to three digits, with or without the national 0
+    case $1 in +*) d=${1#+} ;; 00*) d=${1#00} ;; *) return 1 ;; esac
+    for cc in 0 1 2 3; do
+        r=$(printf '%s' "$d" | cut -c$((cc + 1))-)
+        for e in $2; do
+            case $r in "$e"|"0$e") return 0 ;; esac
+        done
+    done
+    return 1
+}
+is_emergency() {   # is_emergency NUMBER (already through valid_number): the fixed list, then the modem's
+    in_list "$1" "$EMERGENCY" && return 0
+    in_list "$1" "$(emergency_lists 2>/dev/null | tr '\n' ' ')"
+}
+# CALL_ALLOW (voice.conf): when set, the only numbers "call" places - exactly as written there, space-separated.
+# The safest setting for a service that only ever calls a few known numbers.
+call_allowed() {
+    [ -n "${CALL_ALLOW:-}" ] || return 0
+    for a in $CALL_ALLOW; do [ "$a" = "$1" ] && return 0; done
     return 1
 }
 # Through sudo (the mu300voice group's way in, contrib/voice-api/sudoers.mu300voice) only the API's own grammar is
@@ -796,6 +845,7 @@ call)
     opts "$@"
     api_only
     valid_number "$ARG" || result call false "not a number: 3 to 20 digits, a leading + allowed"
+    call_allowed "$ARG" || result call false "not in CALL_ALLOW (voice.conf)"
     is_emergency "$ARG" && result call false "emergency numbers are not placed through mu300-voice"
     r=$(at "ATD$ARG;" 20)
     printf '%s\n' "$r" | grep -q '^OK' || result call false "$(modem_error "$r")"

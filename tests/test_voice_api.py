@@ -25,6 +25,8 @@ NUM = '+905321234540'
 INCOMING = f'+CLCC: 1,1,4,0,0,"{NUM}",145\nOK\n'
 ACTIVE = f'+CLCC: 1,1,0,0,0,"{NUM}",145\nOK\n'
 NONE = 'OK\n'
+ECC_QUERIES = ['AT+CEN?', 'AT+CRSM=176,28599,0,0,15', 'AT+CRSM=178,28599,1,4,0', 'AT+CRSM=178,28599,2,4,0',
+               'AT+CRSM=178,28599,3,4,0']
 
 # AT+CLCC answers from $STUBLOG/clcc.1, .2, ... in turn (the last one again after the end); any other command
 # answers with $STUBLOG/reply when there is one, else OK. Every command goes to $STUBLOG/at.log.
@@ -37,7 +39,9 @@ AT+CLCC)
     if [ -f "$STUBLOG/clcc.$n" ]; then echo "$n" > "$STUBLOG/clcc.n"; else n=$((n - 1)); fi
     [ -f "$STUBLOG/clcc.$n" ] && cat "$STUBLOG/clcc.$n" || echo OK ;;
 *)
-    if [ -f "$STUBLOG/reply" ]; then cat "$STUBLOG/reply"; else echo OK; fi ;;
+    f=$STUBLOG/at.$(printf '%s' "$1" | tr -c 'A-Za-z0-9' _)
+    if [ -f "$f" ]; then cat "$f"
+    elif [ -f "$STUBLOG/reply" ]; then cat "$STUBLOG/reply"; else echo OK; fi ;;
 esac
 '''
 
@@ -145,7 +149,8 @@ class Commands(VoiceTest):
             r = self.voice(sh, 'call', '4440000', '--json')
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertEqual(json.loads(r.stdout), {'v': 1, 'action': 'call', 'ok': True, 'id': 1})
-            self.assertEqual(self.at_log(), ['ATD4440000;', 'AT+CLCC'])
+            # the modem's emergency lists are asked first (the network's, the SIM's), then the call
+            self.assertEqual(self.at_log(), ECC_QUERIES + ['ATD4440000;', 'AT+CLCC'])
 
     # refused by every command that puts its argument into an AT command
     INJECTIONS = ('123;+CFUN=0', '123\rAT+CFUN=0', '123\nAT+CFUN=0', '123"', "123'", '1 2', 'AT', '+', '+CFUN=0',
@@ -178,14 +183,46 @@ class Commands(VoiceTest):
 
     def test_emergency_numbers_are_not_called(self):
         for sh in self.each_shell():
-            for n in ('112', '+112', '911', '999', '155', '110', '000', '08'):
-                self.reset()
-                r = self.voice(sh, 'call', n, '--json')
-                self.assertEqual(r.returncode, 1, n)
-                self.assertEqual(self.at_log(), [], n)
+            # every spelling: plain, with a country code, 00, a national 0; prefixes, separators, suffixes and
+            # non-ASCII digits are refused before the list is even looked at
+            for n in ('112', '+112', '911', '999', '155', '110', '000', '08', '122', '184', '+90112', '0090112',
+                      '0112', '+44999', '+9008', '1 1 2', '*31#112', '#31#911', '112;', '\u0661\u0661\u0662',
+                      '*67112', '112#', '(112)', '1-1-2', '+1911'):
+                with self.subTest(n=n):
+                    self.reset()
+                    r = self.voice(sh, 'call', n, '--json')
+                    self.assertEqual(r.returncode, 1, n)
+                    self.assertFalse([c for c in self.at_log() if c.startswith('ATD')], n)
             self.reset()
             self.clcc('+CLCC: 1,0,2,0,0,"4440000",129\nOK\n')
             self.assertEqual(self.voice(sh, 'call', '4440000').returncode, 0)
+
+    def test_the_modems_own_emergency_lists(self):
+        # the network's +CEN2 and the SIM's EF_ECC (BCD, nibbles swapped: 99 F1 FF is 991)
+        (self.tmp / 'at.AT_CEN_').write_text('+CEN1: 1,260\n+CEN2: 1,"7777"\nOK\n')
+        (self.tmp / 'at.AT_CRSM_178_28599_1_4_0').write_text('+CRSM: 144,0,"99F1FF4100"\nOK\n')
+        for sh in self.each_shell():
+            for n in ('7777', '+907777', '991', '0991'):
+                with self.subTest(n=n):
+                    self.reset()
+                    r = self.voice(sh, 'call', n, '--json')
+                    self.assertEqual(json.loads(r.stdout)['error'], 'emergency numbers are not placed through mu300-voice')
+                    self.assertFalse([c for c in self.at_log() if c.startswith('ATD')])
+
+    def test_allow_list(self):
+        self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="4440000 +905320000000"\n')
+        for sh in self.each_shell():
+            self.reset()
+            r = self.voice(sh, 'call', '4440001', '--json')
+            self.assertEqual(json.loads(r.stdout)['error'], 'not in CALL_ALLOW (voice.conf)')
+            self.assertEqual(self.at_log(), [])
+            self.assertEqual(self.voice(sh, 'call', '+905320000000', '--json').returncode, 0)
+            # an emergency number stays refused even when listed
+        self.conf.write_text(self.conf.read_text() + 'CALL_ALLOW="112"\n')
+        for sh in self.each_shell():
+            self.reset()
+            self.assertEqual(self.voice(sh, 'call', '112', '--json').returncode, 1)
+            self.assertFalse([c for c in self.at_log() if c.startswith('ATD')])
 
     def test_through_sudo_only_the_api_grammar(self):
         for sh in self.each_shell():

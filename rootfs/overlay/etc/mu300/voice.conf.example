@@ -16,3 +16,7 @@
 # with output dsp give the call's audio as two pipes, /run/mu300-voice/audio/downlink and uplink.
 #WATCH_AUDIO=1
 #AUDIO_PIPES=0
+#
+# "mu300-voice call" places only these numbers (space-separated, exactly as they will be given); empty: any number
+# that is not an emergency number. Emergency numbers are refused either way.
+#CALL_ALLOW="4440000 +905320000000"
