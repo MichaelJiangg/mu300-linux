@@ -34,6 +34,7 @@ arch/*.tar.gz
 arch/ArchLinuxARM-*
 android/magisk/*.zip
 /tools/pcmhost/pcmhost
+/tools/voice-events/mu300-voice-events
 
 # built by tools/ctlset/build.sh
 tools/ctlset/ctlset

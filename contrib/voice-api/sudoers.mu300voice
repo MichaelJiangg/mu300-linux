@@ -1,0 +1,13 @@
+# Template: the call commands for the members of mu300voice, and nothing else, as root (systemd images; OpenWrt
+# has no sudo). Install with visudo's check:
+#   sudo install -m 440 sudoers.mu300voice /etc/sudoers.d/mu300voice && sudo visudo -c
+# Every argument is checked by the command itself (a number is digits, + * # only; an id is 1-9; DTMF is 0-9 * #
+# A-D), and sudo resets the environment, so no MU300_* variable reaches them. Not here, on purpose: mu300-at (the
+# AT channel is the whole modem - radio, SIM, data), "mu300-voice audio" and "watch" (the service's).
+# Uncomment the SMS line only for a service that sends messages.
+%mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/mu300-voice status --json, \
+                                 /opt/mu300/bin/mu300-voice call *, \
+                                 /opt/mu300/bin/mu300-voice answer *, /opt/mu300/bin/mu300-voice answer, \
+                                 /opt/mu300/bin/mu300-voice hangup *, /opt/mu300/bin/mu300-voice hangup, \
+                                 /opt/mu300/bin/mu300-voice dtmf *
+# %mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/sms send *

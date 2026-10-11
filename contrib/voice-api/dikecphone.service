@@ -1,0 +1,29 @@
+# Template: a voice service (here dikecphone's sipserver) on a systemd image, as a user of its own.
+#   sudo useradd --system --no-create-home --shell /usr/sbin/nologin dikecphone
+#   sudo groupadd --system mu300voice; sudo usermod -aG mu300voice,audio dikecphone
+#   sudo install -m 644 dikecphone.service /etc/systemd/system/ && sudo systemctl enable --now mu300-voice dikecphone
+# What the user gets (docs/voice-api.md): the event socket and feed and the audio pipes (mu300voice), the sound
+# card's devices for the ALSA way in (audio), and - only through sudoers.mu300voice - the call commands. It never
+# gets the modem's AT channel: that is root's (mu300-at), on purpose.
+[Unit]
+Description=dikecphone SIP server (voice API client)
+After=mu300-voice.service network-online.target
+Wants=mu300-voice.service
+
+[Service]
+User=dikecphone
+Group=dikecphone
+SupplementaryGroups=mu300voice audio
+ExecStart=/opt/dikecphone/sipserver :5060 callforward.local /var/lib/dikecphone/users.json
+Restart=on-failure
+RestartSec=5
+StateDirectory=dikecphone
+# 5060 is not a privileged port: no capabilities needed. Not NoNewPrivileges=yes: that would also stop the sudo
+# the call commands go through (sudoers.mu300voice); add it if the service does not place or answer calls.
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

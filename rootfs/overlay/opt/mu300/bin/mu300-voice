@@ -1,16 +1,21 @@
 #!/bin/sh
-# Voice calls with audio, over the AGDSP path.
+# Voice calls: place, answer and follow them, with their audio over the AGDSP path. This is also the local voice
+# API other services build on (a SIP server, a dialer): docs/voice-api.md has the contract - the commands and their
+# --json output, the events, the hooks, the audio endpoints and who may use which.
 #
-#   mu300-voice audio start [bt|dsp]  put the DSP into the call: the hostless call scene, profiles, routes, unmute
-#   mu300-voice audio stop            take it out again and put every control it touched back
-#   mu300-voice watch                 follow calls and do the above by itself (and drive a Bluetooth headset)
-#   mu300-voice answer [-t SECONDS]   wait for a call, answer it, then run the demo below
-#   mu300-voice call NUMBER           place a call, then run the demo
-#   mu300-voice demo                  on a call that is already up: play the melody, then echo
-#   mu300-voice tone [SECONDS]        play the melody into the call
-#   mu300-voice echo [SECONDS]        record that many seconds and play them back, for ever
-#   mu300-voice status                what a call and the audio path are doing
-#   mu300-voice hangup
+#   mu300-voice status [--json]                       the calls, and what the audio path is doing
+#   mu300-voice call NUMBER [--json] [--demo]         place a call (--demo: then play the melody and echo)
+#   mu300-voice answer [ID] [--wait SECONDS] [--json] [--demo]   answer the incoming (or the waiting) call
+#   mu300-voice hangup [ID] [--json]                  end every call, or only call ID
+#   mu300-voice dtmf DIGITS [--json]                  send tones into the call (0-9 * # A-D)
+#   mu300-voice watch                                 follow calls: events, hooks, the audio (the service)
+#   mu300-voice events                                print the current state, then every event (JSON lines)
+#   mu300-voice audio start [bt|dsp] [--pipes]        put the DSP into the call: scene, profiles, routes, unmute
+#   mu300-voice audio stop                            take it out again and put every control it touched back
+#   mu300-voice demo | tone [SECONDS] | echo [SECONDS]   on a call that is up: the melody, then echo
+#
+# "call" and "answer" used to wait for the call and then run the demo by themselves; now they do the one thing
+# their name says and return, and --demo (and answer's --wait, or -t) bring the old behaviour back.
 #
 # Outputs. This board has no speaker, earpiece or microphone, so a call's audio has two places to go:
 #
@@ -42,27 +47,67 @@ CONF=${MU300_VOICE_CONF:-/etc/mu300/voice.conf}
 BT_HEADSET=
 OUTPUT=
 VOLUME=6
+# the group whose members may read the events and use the audio pipes (docs/voice-api.md); without such a group
+# on the system everything below stays root's alone
+VOICE_GROUP=mu300voice
+# watch: put the DSP into every call (0: events and hooks only), and give it the two audio pipes
+WATCH_AUDIO=1
+AUDIO_PIPES=0
 # shellcheck disable=SC1090
 [ -r "$CONF" ] && . "$CONF"
+case $VOICE_GROUP in [a-z_]*) case $VOICE_GROUP in *[!a-z0-9_-]*) VOICE_GROUP= ;; esac ;; *) VOICE_GROUP= ;; esac
 RATE=${MU300_VOICE_RATE:-8000}
 DIR=${MU300_AT_DIR:-/run/mu300-at}
 URCLOG=$DIR/urc/stty_nr0.log
 TMP=${MU300_VOICE_TMP:-/run/mu300-voice}
 HFP_CTL=/run/mu300-hfp.ctl
-# root-only: the scene and headset logs live here
+ASOUND=${MU300_ASOUND:-/proc/asound}
+# The API's files, all in $TMP: the event feed (one JSON object per line), the state a new reader starts from, the
+# socket that serves both (tools/voice-events), the audio pipes. The hooks are root's, in /etc.
+FEED=$TMP/events.jsonl
+FEED_MAX=${MU300_VOICE_FEED_MAX:-16384}
+SNAPSHOT=$TMP/state.json
+SOCK=$TMP/events.sock
+AUDIO_DIR=$TMP/audio
+HOOKS=${MU300_VOICE_HOOKS:-/etc/mu300/voice.d}
+HOOK_UID=${MU300_VOICE_HOOK_UID:-0}
+HOOK_TIMEOUT=${MU300_VOICE_HOOK_TIMEOUT:-30}
+# The scene and headset logs live in $TMP as well, and every file is created root-only (umask). Only what the API
+# hands out is opened to the group, one file at a time (share), and the directory lets the group in, not list.
 umask 077
-mkdir -p "$TMP"
-chmod 700 "$TMP" 2>/dev/null
+mkdir -p "$TMP" 2>/dev/null
 
-card=$(awk '/sprdphone/ {print $1; exit}' /proc/asound/cards 2>/dev/null)
-[ -n "$card" ] || { echo "mu300-voice: the sound card is not registered; run mu300-audio-dsp load" >&2; exit 1; }
+grp_ok() { [ -n "$VOICE_GROUP" ] && grep -q "^$VOICE_GROUP:" "${MU300_GROUP_FILE:-/etc/group}" 2>/dev/null; }
+share() {   # share PATH MODE - MODE with the voice group, or the owner's part of it alone where there is no group
+    if grp_ok && chgrp "$VOICE_GROUP" "$1" 2>/dev/null && chmod "$2" "$1" 2>/dev/null; then return 0; fi
+    chmod "${2%??}00" "$1" 2>/dev/null
+}
+share "$TMP" 710
+
+# The sound card is looked for when audio is wanted, not before: calls, events and hooks work without it (a
+# kernel without the audio drivers, or before mu300-audio-dsp has bound the card).
+card=; VOICE=; PLAY=; CAP=
 # by name, not number: the device numbers are not the same on every build of the card
-pcmdev() { awk -F': ' -v n="$1 " 'index($2, n) == 1 { split($1, a, "-"); print a[2] + 0; exit }' /proc/asound/pcm; }
-VOICE=$(pcmdev FE_ST_VOICE); VOICE=${VOICE:-5}
-PLAY=hw:$card,$(pcmdev FE_ST_VOICE_PCM_P || true)
-CAP=hw:$card,$(pcmdev FE_ST_VOICE_C || true)
-[ "$PLAY" = "hw:$card," ] && PLAY=hw:$card,53
-[ "$CAP" = "hw:$card," ] && CAP=hw:$card,9
+pcmdev() { awk -F': ' -v n="$1 " 'index($2, n) == 1 { split($1, a, "-"); print a[2] + 0; exit }' "$ASOUND/pcm"; }
+find_card() {
+    [ -n "$card" ] && return 0
+    card=$(awk '/sprdphone/ {print $1; exit}' "$ASOUND/cards" 2>/dev/null)
+    [ -n "$card" ] || return 1
+    VOICE=$(pcmdev FE_ST_VOICE); VOICE=${VOICE:-5}
+    PLAY=hw:$card,$(pcmdev FE_ST_VOICE_PCM_P || true)
+    CAP=hw:$card,$(pcmdev FE_ST_VOICE_C || true)
+    [ "$PLAY" = "hw:$card," ] && PLAY=hw:$card,53
+    [ "$CAP" = "hw:$card," ] && CAP=hw:$card,9
+    return 0
+}
+need_card() { find_card || { echo "mu300-voice: the sound card is not registered; run mu300-audio-dsp load" >&2; exit 1; }; }
+
+# a fraction of a second where some sleep can do it (the static busybox next to us can; see mu300-at), else 1 s
+bb=${MU300_BUSYBOX:-/opt/mu300/bin/busybox}
+nap() {
+    if [ -x "$bb" ]; then "$bb" sleep "$1" 2>/dev/null || sleep 1
+    else sleep "$1" 2>/dev/null || sleep 1; fi
+}
 
 at() { mu300-at -t "${2:-10}" "$1" 2>&1; }
 # Phone numbers never reach a log in full: every run of five or more digits (with its +) keeps the two digits after
@@ -80,7 +125,8 @@ mask() {
         print out $0
     }'
 }
-log() { echo "mu300-voice: $*" | mask; }
+# on stderr: stdout is the commands' answers (--json)
+log() { echo "mu300-voice: $*" | mask >&2; }
 
 # --- mixer, with an undo log ---------------------------------------------------------------------------------
 # Every control the call touches is read before its first write and put back by "audio stop", so a call leaves
@@ -106,6 +152,7 @@ put() {   # put NAME VALUE - a missing control is reported once and skipped: not
 }
 restore() {
     [ -f "$SAVED" ] || return 0
+    find_card || return 0
     # newest first, so a control written twice ends at its oldest value
     sed '1!G;h;$!d' "$SAVED" | while IFS= read -r line; do
         name=${line%%=*}; val=${line#*=}
@@ -180,9 +227,11 @@ unmute_dl() { put 'VBC DAC1 DSP MDG Set' 0,1024; put VBC_DL_MUTE disable; log "d
 
 SCENE_PID=$TMP/scene.pid
 scene_running() { [ -f "$SCENE_PID" ] && kill -0 "$(cat "$SCENE_PID")" 2>/dev/null; }
-audio_start() {   # audio_start OUTPUT
+audio_start() {   # audio_start OUTPUT [PIPES] - PIPES 1: the two audio pipes as well (output dsp only)
     out=${1:-${OUTPUT:-dsp}}
-    scene_running && { log "audio already running ($(cat "$TMP/output" 2>/dev/null))"; return 0; }
+    case $out in bt|dsp) ;; *) log "no output '$out' (bt or dsp)" >&2; return 2 ;; esac
+    find_card || { log "the sound card is not registered; run mu300-audio-dsp load" >&2; return 1; }
+    scene_running &&{ log "audio already running ($(cat "$TMP/output" 2>/dev/null))"; return 0; }
     command -v pcmhost >/dev/null 2>&1 || { log "no pcmhost (tools/pcmhost); the call scene cannot start" >&2; return 1; }
     rm -f "$SAVED"
     echo "$out" > "$TMP/output"
@@ -196,7 +245,7 @@ audio_start() {   # audio_start OUTPUT
     while ! grep -q '^started' "$TMP/scene.log" 2>/dev/null; do
         scene_running || { log "the call scene did not start: $(tail -1 "$TMP/scene.log")" >&2; audio_stop; return 1; }
         n=$((n + 1)); [ "$n" -gt 50 ] && { log "the call scene did not start in 5 s" >&2; audio_stop; return 1; }
-        sleep 0.1
+        nap 0.1
     done
     # the vendor applies the parameters again once both directions run - and the Bluetooth rate again too, which
     # only takes after the scene is RUNNING (kanoqwq/e5-linux FINDINGS 59: set before, the BT side ran 3x slow)
@@ -204,16 +253,83 @@ audio_start() {   # audio_start OUTPUT
     [ "$out" = bt ] && bt_rate
     unmute_dl
     log "VOICE-RUNNING hw:$card,$VOICE both directions, ${RATE} Hz, output $out"
+    [ "${2:-0}" = 1 ] && [ "$out" = dsp ] && pipes_start
+    emit "$(printf '{"v":1,"event":"audio","time":%s,"state":"up","audio":%s}' "$(date +%s)" "$(audio_json)")"
+    return 0
 }
 audio_stop() {
+    was=
     if [ -f "$SCENE_PID" ]; then
+        was=1
         kill "$(cat "$SCENE_PID")" 2>/dev/null
-        n=0; while scene_running && [ "$n" -lt 30 ]; do sleep 0.1; n=$((n + 1)); done
+        n=0; while scene_running && [ "$n" -lt 30 ]; do nap 0.1; n=$((n + 1)); done
         rm -f "$SCENE_PID"
     fi
+    pipes_stop
     restore
     rm -f "$TMP/output"
     log "VOICE-STOPPED; the controls are back as they were"
+    [ -n "$was" ] && emit "$(printf '{"v":1,"event":"audio","time":%s,"state":"down","audio":%s}' "$(date +%s)" "$(audio_json)")"
+    return 0
+}
+
+# --- the call's audio as two pipes (output dsp) ------------------------------------------------------------------
+# For a service that would rather not open ALSA itself: while the scene runs, $AUDIO_DIR/downlink is what the far
+# end says and $AUDIO_DIR/uplink is what it hears, raw S16_LE mono at $RATE in 20 ms periods. Each side is an
+# arecord/aplay that (re)opens its fifo when a reader or writer comes, so a client may come and go during a call.
+# The ALSA devices themselves (status --json: playback, capture) are the other way in, with the least latency; a
+# client uses one or the other, since each device takes one stream.
+PERIOD=$((160 * RATE / 8000)); BUFFER=$((960 * RATE / 8000))
+pipes_start() {
+    find_card || return 1
+    mkdir -p "$AUDIO_DIR" && share "$AUDIO_DIR" 710
+    rm -f "$AUDIO_DIR/downlink" "$AUDIO_DIR/uplink"
+    mkfifo "$AUDIO_DIR/downlink" "$AUDIO_DIR/uplink" || { log "audio pipes: mkfifo failed" >&2; return 1; }
+    # the group reads the downlink and writes the uplink, and nothing else
+    share "$AUDIO_DIR/downlink" 640; share "$AUDIO_DIR/uplink" 620
+    (
+        while scene_running; do
+            arecord -D "$CAP" -t raw -f S16_LE -r "$RATE" -c 1 -q --period-size="$PERIOD" --buffer-size="$BUFFER" \
+                > "$AUDIO_DIR/downlink" 2>>"$TMP/pipes.log"
+            nap 0.2
+        done
+    ) &
+    echo $! > "$TMP/pipe-down.pid"
+    (
+        while scene_running; do
+            aplay -D "$PLAY" -t raw -f S16_LE -r "$RATE" -c 1 -q --period-size="$PERIOD" --buffer-size="$BUFFER" \
+                < "$AUDIO_DIR/uplink" 2>>"$TMP/pipes.log"
+            nap 0.2
+        done
+    ) &
+    echo $! > "$TMP/pipe-up.pid"
+    log "audio pipes: $AUDIO_DIR/downlink (read), $AUDIO_DIR/uplink (write), S16_LE ${RATE} Hz mono"
+}
+pipes_stop() {
+    for f in "$TMP/pipe-down.pid" "$TMP/pipe-up.pid"; do
+        [ -f "$f" ] || continue
+        p=$(cat "$f")
+        # the arecord/aplay first (or the shell blocked opening the fifo for one), then the loop, then a child it
+        # may have started in between
+        pkill -P "$p" 2>/dev/null; kill "$p" 2>/dev/null; pkill -P "$p" 2>/dev/null
+        rm -f "$f"
+    done
+    rm -rf "$AUDIO_DIR"
+}
+audio_json() {   # the audio part of status --json and of the audio events
+    if find_card; then
+        if scene_running; then
+            o=$(cat "$TMP/output" 2>/dev/null); case $o in bt|dsp) ;; *) o=dsp ;; esac
+            running=true; o="\"$o\""
+        else running=false; o=null; fi
+        pipes=null
+        [ -p "$AUDIO_DIR/downlink" ] && pipes="{\"downlink\":\"$AUDIO_DIR/downlink\",\"uplink\":\"$AUDIO_DIR/uplink\"}"
+        printf '{"available":true,"running":%s,"output":%s,"format":"S16_LE","rate":%s,"channels":1,"period_frames":%s,"playback":"%s","capture":"%s","pipes":%s}' \
+            "$running" "$o" "$RATE" "$PERIOD" "$PLAY" "$CAP" "$pipes"
+    else
+        printf '{"available":false,"running":false,"output":null,"format":"S16_LE","rate":%s,"channels":1,"period_frames":%s,"playback":null,"capture":null,"pipes":null}' \
+            "$RATE" "$PERIOD"
+    fi
 }
 
 # The DSP says which bandwidth the network gave the call (NB/WB/SWB/FB) on the voice pipe: 20 bytes, u16 command,
@@ -264,45 +380,214 @@ hfp_disconnect() {
 }
 
 # --- following calls -----------------------------------------------------------------------------------------
-# +CLCC: <idx>,<dir>,<stat>,<mode>,... with stat 0 active, 1 held, 2 dialling, 3 alerting, 4 incoming, 5 waiting.
-# This never places, answers or ends a call by itself; only the headset's own buttons do, and only when pressed.
-watch() {
-    pipe_watch
-    trap 'audio_stop; hfp_disconnect; [ -f "$PIPE_PID" ] && kill "$(cat "$PIPE_PID")" 2>/dev/null; exit 0' INT TERM
-    log "watching calls (output ${OUTPUT:-auto}, headset ${BT_HEADSET:-none})"
-    last=; ring=0
-    while :; do
-        clcc=$(at 'AT+CLCC' 8 | grep '^+CLCC:' | grep ',0,' | head -1)
-        stat=$(echo "$clcc" | cut -d, -f3)
-        number=$(echo "$clcc" | cut -d'"' -f2)
-        [ "$stat" != "$last" ] && log "call state: ${stat:-none} ${number:+($number)}"
-        case $stat in
-            0|1|2|3)
-                if ! scene_running; then
-                    out=${OUTPUT:-}
-                    [ -z "$out" ] && { [ -n "$BT_HEADSET" ] && out=bt || out=dsp; }
-                    if [ "$out" = bt ] && ! hfp_connect; then out=dsp; fi
-                    audio_start "$out" || true
-                fi
-                if [ "$(cat "$TMP/output" 2>/dev/null)" = bt ]; then
-                    case $stat in 2) hfp setup 2 ;; 3) hfp setup 3 ;; *) hfp call 1; hfp setup 0 ;; esac
-                    hfp sco on
-                fi ;;
-            4|5)
-                if [ -n "$BT_HEADSET" ] && hfp_connect; then
-                    hfp setup 1
-                    now=$(date +%s); [ $((now - ring)) -ge 3 ] && { hfp "ring $number"; ring=$now; }
-                fi ;;
-            *)
-                if [ -n "$last" ]; then
-                    scene_running && audio_stop
-                    hfp sco off; hfp call 0; hfp setup 0
-                    hfp_disconnect
-                fi ;;
-        esac
-        last=$stat
-        sleep "${MU300_VOICE_POLL:-1}"
+# +CLCC: <id>,<dir>,<stat>,<mode>,<mpty>[,<number>,<type>...] with stat 0 active, 1 held, 2 dialling, 3 alerting,
+# 4 incoming, 5 waiting. clcc_parse turns a reply into one line per voice call (mode 0; data and fax are not ours):
+#   ID DIR STATE MPTY NUMBER     e.g. "1 in incoming 0 +905321234540" - DIR in|out, MPTY 0|1, NUMBER - when hidden
+# The number keeps only what a number has (digits, + * #), at most 32 of them: it goes into JSON, into the hooks'
+# environment and into AT commands, and the modem's text is not trusted to be a number.
+clcc_parse() {
+    awk -F, '/^\+CLCC:/ {
+        sub(/^\+CLCC: */, "")
+        if ($4 + 0 != 0) next
+        split("active held dialing alerting incoming waiting", S, " ")
+        st = $3; gsub(/ /, "", st)
+        state = (st ~ /^[0-5]$/) ? S[st + 1] : "unknown"
+        num = $6; gsub(/[^0-9+*#]/, "", num); if (num == "") num = "-"
+        print $1 + 0, ($2 + 0 == 1 ? "in" : "out"), state, ($5 + 0 == 1 ? 1 : 0), substr(num, 1, 32)
+    }'
+}
+calls=
+read_calls() {   # read_calls -> $calls (clcc_parse lines); false when the modem did not answer
+    r=$(at 'AT+CLCC' 8)
+    printf '%s\n' "$r" | grep -q '^OK' || return 1
+    calls=$(printf '%s\n' "$r" | clcc_parse)
+    return 0
+}
+calls_json() {   # calls_json LINES -> a JSON array of calls
+    printf '%s\n' "$1" | awk 'BEGIN { printf "[" }
+        NF >= 5 { printf "%s{\"id\":%d,\"dir\":\"%s\",\"state\":\"%s\",\"number\":%s,\"multiparty\":%s}", (n++ ? "," : ""),
+                  $1, $2, $3, ($5 == "-" ? "null" : "\"" $5 "\""), ($4 == 1 ? "true" : "false") }
+        END { printf "]" }'
+}
+status_json() {   # status_json EVENT TIME MODEM-OK - the calls in $calls
+    sock=false; [ -S "$SOCK" ] && sock=true
+    printf '{"v":1,"event":"%s","time":%s,"modem":%s,"calls":%s,"audio":%s,"api":{"socket":"%s","socket_up":%s,"feed":"%s","hooks":"%s"}}\n' \
+        "$1" "$2" "$3" "$(calls_json "$calls")" "$(audio_json)" "$SOCK" "$sock" "$FEED" "$HOOKS"
+}
+
+# --- the events ------------------------------------------------------------------------------------------------
+# Every event is one line of JSON appended to $FEED (in RAM, the group may read it, at most $FEED_MAX bytes: when
+# full it moves to $FEED.1 and a new one starts) - the API's record of what happened, not a log, so the numbers
+# are in it in full; the logs never have them. tools/voice-events serves the feed on $SOCK, starting each reader
+# with $SNAPSHOT (status --json as of the last change).
+emit() {
+    if [ ! -f "$FEED" ] || [ "$(wc -c < "$FEED")" -ge "$FEED_MAX" ]; then
+        [ -f "$FEED" ] && mv -f "$FEED" "$FEED.1"
+        : > "$FEED"; share "$FEED" 640
+    fi
+    printf '%s\n' "$1" >> "$FEED"
+}
+snapshot() {   # snapshot MODEM-OK - rewrite $SNAPSHOT when something in it changed
+    s=$(status_json snapshot 0 "$1")
+    [ "$s" = "${SNAP_LAST:-}" ] && return 0
+    SNAP_LAST=$s
+    status_json snapshot "$(date +%s)" "$1" > "$SNAPSHOT.new" && share "$SNAPSHOT.new" 640 && mv -f "$SNAPSHOT.new" "$SNAPSHOT"
+}
+EV_PID=$TMP/events.pid
+events_up() { [ -f "$EV_PID" ] && kill -0 "$(cat "$EV_PID")" 2>/dev/null; }
+events_start() {
+    events_up && return 0
+    command -v mu300-voice-events >/dev/null 2>&1 || return 1
+    grp=; grp_ok && grp=$VOICE_GROUP
+    mu300-voice-events "$SOCK" "$FEED" "$SNAPSHOT" $grp >> "$TMP/events-server.log" 2>&1 &
+    echo $! > "$EV_PID"
+}
+events_stop() { events_up && kill "$(cat "$EV_PID")" 2>/dev/null; rm -f "$EV_PID" "$SOCK"; }
+
+# The hooks: every executable /etc/mu300/voice.d/*.sh, in name order, once per call event, as root - so only
+# files root owns and nobody else may change are run (the directory too), each with stdin, stdout and stderr on
+# /dev/null and at most HOOK_TIMEOUT seconds. Their environment: CALL_EVENT=call, CALL_STATE, CALL_PREV_STATE,
+# CALL_ID, CALL_DIR, NUMBER (and CALL_NUMBER; empty when hidden), CALL_JSON (the event's line). One event's hooks
+# run after the last event's have finished, in the background: a slow hook delays the next hook, never the watch.
+HOOK_SEQ=0
+hook_safe() {   # hook_safe PATH: owned by HOOK_UID (root), writable by nobody else
+    set -- $(ls -lnd "$1" 2>/dev/null)
+    [ "${3:-}" = "$HOOK_UID" ] || return 1
+    case $1 in ?????w*|????????w*) return 1 ;; esac
+}
+run_hooks() {   # run_hooks STATE PREV ID DIR NUMBER JSON
+    [ -d "$HOOKS" ] || return 0
+    HOOK_SEQ=$((HOOK_SEQ + 1))
+    (
+        seq=$HOOK_SEQ; n=0
+        while [ "$(cat "$TMP/hooks.done" 2>/dev/null)" != $((seq - 1)) ] && [ "$n" -lt 1200 ]; do nap 0.1; n=$((n + 1)); done
+        if hook_safe "$HOOKS"; then
+            to=; command -v timeout >/dev/null 2>&1 && to="timeout $HOOK_TIMEOUT"
+            for h in "$HOOKS"/*.sh; do
+                [ -f "$h" ] && [ -x "$h" ] || continue
+                hook_safe "$h" || { log "hook ${h##*/} not run: not root's, or others may change it"; continue; }
+                CALL_EVENT=call CALL_STATE=$1 CALL_PREV_STATE=$2 CALL_ID=$3 CALL_DIR=$4 NUMBER=$5 CALL_NUMBER=$5 \
+                    CALL_JSON=$6 $to "$h" </dev/null >/dev/null 2>&1
+                rc=$?; [ "$rc" = 0 ] || log "hook ${h##*/}: exit $rc"
+            done
+        else
+            log "hooks: $HOOKS is not root's, or others may change it; none run"
+        fi
+        echo "$seq" > "$TMP/hooks.done"
+    ) &
+}
+call_event() {   # call_event STATE PREV ID DIR NUMBER MPTY
+    num=null; [ "$5" != - ] && num="\"$5\""
+    mp=false; [ "$6" = 1 ] && mp=true
+    j=$(printf '{"v":1,"event":"call","time":%s,"id":%s,"state":"%s","prev":"%s","dir":"%s","number":%s,"multiparty":%s}' \
+        "$(date +%s)" "$3" "$1" "$2" "$4" "$num" "$mp")
+    emit "$j"
+    log "call $3 ($4): $2 -> $1$([ "$5" != - ] && echo " $5")"
+    run_hooks "$1" "$2" "$3" "$4" "${5#-}" "$j"
+}
+diff_calls() {   # diff_calls BEFORE NOW - an event for each call that is new, changed state or has gone
+    while read -r id dir st mp num; do
+        [ -n "$id" ] || continue
+        old=$(printf '%s\n' "$1" | awk -v i="$id" '$1 == i { print $3; exit }')
+        [ "$old" = "$st" ] || call_event "$st" "${old:-none}" "$id" "$dir" "$num" "$mp"
+    done <<EOF
+$2
+EOF
+    while read -r id dir st mp num; do
+        [ -n "$id" ] || continue
+        printf '%s\n' "$2" | awk -v i="$id" '$1 == i { f = 1 } END { exit !f }' && continue
+        call_event ended "$st" "$id" "$dir" "$num" "$mp"
+    done <<EOF
+$1
+EOF
+}
+
+# Until the next round: POLL seconds with a call (1), IDLE_POLL without (3) - and at once when the modem says
+# something on nr0 (RING, +CLIP, NO CARRIER...), which mu300-atd writes to $URCLOG: an incoming call is seen within
+# a tick, without asking the modem every second all day.
+urc_sig() { { wc -c < "$URCLOG"; } 2>/dev/null || echo 0; }
+wait_round() {
+    w=${MU300_VOICE_POLL:-1}; [ -z "$calls" ] && w=${MU300_VOICE_IDLE_POLL:-3}
+    tick=${MU300_VOICE_TICK:-0.25}
+    sig=$(urc_sig); i=0
+    while [ "$i" -lt $((w * 4)) ]; do
+        nap "$tick"
+        [ "$(urc_sig)" != "$sig" ] && break
+        i=$((i + 1))
     done
+}
+
+# Follow the calls: an event (feed, socket, hooks) for every change, the DSP and the headset by the first call's
+# state. This never places, answers or ends a call by itself; only the headset's own buttons do, when pressed.
+# One watch at a time ($TMP/watch.pid): a second one would emit every event twice.
+WATCH_PID=$TMP/watch.pid
+watch_up() { [ -f "$WATCH_PID" ] && [ "$(cat "$WATCH_PID")" != $$ ] && kill -0 "$(cat "$WATCH_PID")" 2>/dev/null; }
+watch_exit() {
+    scene_running && audio_stop
+    hfp_disconnect
+    [ -f "$PIPE_PID" ] && kill "$(cat "$PIPE_PID")" 2>/dev/null
+    events_stop
+    rm -f "$WATCH_PID"
+    exit 0
+}
+watch() {
+    watch_up && { echo "mu300-voice: already watching (pid $(cat "$WATCH_PID"))" >&2; exit 1; }
+    echo $$ > "$WATCH_PID"
+    echo 0 > "$TMP/hooks.done"
+    [ "$WATCH_AUDIO" = 1 ] && pipe_watch
+    trap watch_exit INT TERM
+    events_start || log "no mu300-voice-events (tools/voice-events): no event socket; the events are in $FEED"
+    log "watching calls (output ${OUTPUT:-auto}, headset ${BT_HEADSET:-none}, audio $([ "$WATCH_AUDIO" = 1 ] && echo on || echo off))"
+    # caller id on nr0 (+CLIP), which also wakes wait_round for a ring
+    at 'AT+CLIP=1' 8 >/dev/null
+    prev=; last=; ring=0; failed=; rounds=0
+    while :; do
+        if read_calls; then
+            diff_calls "$prev" "$calls"
+            prev=$calls
+            # the first call drives the audio (awk, not "set -- $calls": a number like *100# would be a glob)
+            stat=$(printf '%s\n' "$calls" | awk 'NF { print $3; exit }')
+            number=$(printf '%s\n' "$calls" | awk 'NF { print $5; exit }')
+            case $stat in
+                active|held|dialing|alerting)
+                    if [ "$WATCH_AUDIO" = 1 ] && [ -z "$failed" ] && ! scene_running && find_card; then
+                        out=${OUTPUT:-}
+                        [ -z "$out" ] && { [ -n "$BT_HEADSET" ] && out=bt || out=dsp; }
+                        if [ "$out" = bt ] && ! hfp_connect; then out=dsp; fi
+                        # once per call: a scene that will not start is not retried every second
+                        audio_start "$out" "$AUDIO_PIPES" || failed=1
+                    fi
+                    if [ "$(cat "$TMP/output" 2>/dev/null)" = bt ]; then
+                        case $stat in dialing) hfp setup 2 ;; alerting) hfp setup 3 ;; *) hfp call 1; hfp setup 0 ;; esac
+                        hfp sco on
+                    fi ;;
+                incoming|waiting)
+                    if [ "$WATCH_AUDIO" = 1 ] && [ -n "$BT_HEADSET" ] && hfp_connect; then
+                        hfp setup 1
+                        now=$(date +%s); [ $((now - ring)) -ge 3 ] && { hfp "ring ${number#-}"; ring=$now; }
+                    fi ;;
+                *)
+                    failed=
+                    if [ -n "$last" ]; then
+                        scene_running && audio_stop
+                        hfp sco off; hfp call 0; hfp setup 0
+                        hfp_disconnect
+                    fi ;;
+            esac
+            last=$stat
+            snapshot true
+        else
+            # no answer is not "no call": nothing changes until the modem answers again
+            snapshot false
+        fi
+        events_up || events_start
+        rounds=$((rounds + 1))
+        [ -n "${MU300_VOICE_ROUNDS:-}" ] && [ "$rounds" -ge "$MU300_VOICE_ROUNDS" ] && break
+        wait_round
+    done
+    # (tests) let the last hooks finish
+    n=0; while [ "$(cat "$TMP/hooks.done" 2>/dev/null)" != "$HOOK_SEQ" ] && [ "$n" -lt 100 ]; do nap 0.1; n=$((n + 1)); done
+    watch_exit
 }
 
 # --- the AP's taps on a call (output dsp) ----------------------------------------------------------------------
@@ -395,63 +680,180 @@ demo() {
     echo_loop "${1:-5}"
 }
 
-case "${1:-status}" in
+# --- the commands ----------------------------------------------------------------------------------------------
+usage() { grep '^#   mu300-voice ' "$0" | sed 's/^# \{0,3\}//' >&2; exit 2; }
+# The options of the call commands, in any order: --json, --demo, --wait SECONDS (-t), and one ID or NUMBER.
+JSON=0; DEMO=0; WAIT=; ARG=
+opts() {
+    while [ $# -gt 0 ]; do
+        case $1 in
+            --json) JSON=1 ;;
+            --demo) DEMO=1 ;;
+            --wait|-t) [ $# -ge 2 ] || usage; WAIT=$2; shift ;;
+            -*) usage ;;
+            *) [ -z "$ARG" ] || usage; ARG=$1 ;;
+        esac
+        shift
+    done
+    case $WAIT in ''|[0-9]|[0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9][0-9][0-9]) ;; *) usage ;; esac
+}
+# result ACTION true|false [ERROR] [EXTRA-JSON] - the answer of a call command: one JSON line with --json, the
+# error alone on stderr without; the exit status says the same. ERROR is ours or the modem's result code, never
+# free text from elsewhere, and EXTRA starts with a comma.
+result() {
+    if [ "$JSON" = 1 ]; then
+        if [ "$2" = true ]; then printf '{"v":1,"action":"%s","ok":true%s}\n' "$1" "${4:-}"
+        else printf '{"v":1,"action":"%s","ok":false,"error":"%s"%s}\n' "$1" "$3" "${4:-}"; fi
+    elif [ "$2" != true ]; then
+        echo "mu300-voice: $1: $3" | mask >&2
+    fi
+    [ "$2" = true ] && return 0
+    exit 1
+}
+# the final result of a modem reply, as an error: "+CME ERROR: 30", "NO CARRIER"; else what mu300-at said instead
+# ("mu300-at: busy", "mu300-at: needs root"), up to its first parenthesis or semicolon; else that there was nothing
+modem_error() {
+    e=$(printf '%s\n' "$1" | grep -E '^(ERROR|\+CME ERROR|\+CMS ERROR|NO CARRIER|BUSY|NO ANSWER|NO DIALTONE)' | head -1 |
+        tr -cd 'A-Za-z0-9 +:_.-')
+    [ -n "$e" ] || e=$(printf '%s\n' "$1" | grep '^mu300-at: ' | head -1 | sed 's/[(;].*//; s/ *$//' | tr -cd 'A-Za-z0-9 +:_.-')
+    echo "${e:-no answer from the modem}"
+}
+is_id() { case $1 in [1-9]) return 0 ;; esac; return 1; }
+# Only a call's own id reaches an AT command, and only a number made of digits (with a leading +, and * #) reaches
+# ATD: anything else would be sent to the modem as it is, and "ATD1;+CFUN=0" is two commands.
+valid_number() {
+    case $1 in ''|*[!0-9+*#]*|?*+*) return 1 ;; esac
+    [ ${#1} -le 32 ]
+}
+# Leave the DSP to watch where it runs; a command on its own stops the scene once no call is left.
+audio_after_hangup() {
+    watch_up && return 0
+    scene_running || return 0
+    read_calls && [ -z "$calls" ] && audio_stop >/dev/null
+}
+
+cmd=${1:-status}
+[ $# -gt 0 ] && shift
+case $cmd in
 audio)
-    case "${2:-}" in
-        start) audio_start "${3:-}" ;;
+    case "${1:-}" in
+        start)
+            out=; pipes=0
+            shift
+            for a in "$@"; do case $a in --pipes) pipes=1 ;; bt|dsp) out=$a ;; *) usage ;; esac; done
+            audio_start "$out" "$pipes" ;;
         stop) audio_stop ;;
-        *) echo "usage: mu300-voice audio start [bt|dsp] | audio stop" >&2; exit 2 ;;
+        *) usage ;;
     esac ;;
 
 watch) watch ;;
 
-answer)
-    wait=300
-    [ "${2:-}" = -t ] && wait=$3
-    at 'AT+CLIP=1' 8 >/dev/null
-    [ -f "$URCLOG" ] || { echo "mu300-voice: no $URCLOG - mu300-atd is not draining nr0" >&2; exit 1; }
-    mark=$(wc -l < "$URCLOG")
-    echo "waiting up to ${wait}s for a call..."
-    end=$(( $(date +%s) + wait ))
-    while [ "$(date +%s)" -lt "$end" ]; do
-        line=$(tail -n +$((mark + 1)) "$URCLOG" 2>/dev/null | grep -m1 -E '^(RING|\+CLIP:)')
-        if [ -n "$line" ]; then
-            echo "incoming: $line" | mask
-            at 'ATA' 15
-            sleep 2
-            in_call || { echo "mu300-voice: the call did not connect" >&2; exit 1; }
-            echo "answered"
-            audio_start dsp
-            demo "${4:-5}"
-            exit 0
-        fi
-        sleep 1
-    done
-    echo "mu300-voice: nobody called within ${wait}s" >&2
-    exit 1 ;;
-
-call)
-    num=${2:?usage: mu300-voice call NUMBER}
-    at "ATD$num;" 20
-    sleep 5
-    in_call || { echo "mu300-voice: the call did not connect" >&2; exit 1; }
-    audio_start dsp
-    demo "${3:-5}" ;;
-
-demo)   demo "${2:-5}" ;;
-tone)   scene_running || audio_start dsp; tone "${2:-1}" ;;
-echo)   scene_running || audio_start dsp; echo_loop "${2:-5}" ;;
-hangup) at 'AT+CHUP' 10; audio_stop ;;
+events)
+    # what a reader of the socket gets, for a reader without one: the state, then each event as it comes
+    cat "$SNAPSHOT" 2>/dev/null || { read_calls && status_json snapshot "$(date +%s)" true; }
+    [ -f "$FEED" ] || { : > "$FEED" 2>/dev/null && share "$FEED" 640; }
+    exec tail -n 0 -F "$FEED" 2>/dev/null ;;
 
 status)
+    opts "$@"
+    if [ "$JSON" = 1 ]; then
+        if read_calls; then status_json status "$(date +%s)" true; else status_json status "$(date +%s)" false; exit 1; fi
+        exit 0
+    fi
     echo "call:     $(at 'AT+CLCC' 8 | tr '\n' ' ' | mask)"
-    echo "scene:    $(scene_running && echo "running, output $(cat "$TMP/output")" || echo "not running") (hw:$card,$VOICE)"
-    echo "playback: $PLAY (FE_ST_VOICE_PCM_P)"
-    echo "capture:  $CAP (FE_ST_VOICE_C)"
+    if find_card; then
+        echo "scene:    $(scene_running && echo "running, output $(cat "$TMP/output")" || echo "not running") (hw:$card,$VOICE)"
+        echo "playback: $PLAY (FE_ST_VOICE_PCM_P)"
+        echo "capture:  $CAP (FE_ST_VOICE_C)"
+    else
+        echo "scene:    no sound card (mu300-audio-dsp load)"
+    fi
     echo "headset:  ${BT_HEADSET:-none set in $CONF}$(hfp_up && echo ', connected')"
+    echo "events:   $FEED$([ -S "$SOCK" ] && echo ", $SOCK")$(watch_up || echo ' (mu300-voice watch is not running)')"
     mu300-audio-dsp status 2>/dev/null | sed -n 's/^dsp:/dsp:     /p' ;;
 
-*)
-    sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
-    exit 2 ;;
+call)
+    opts "$@"
+    valid_number "$ARG" || result call false "not a number: digits, a leading +, * and # only, at most 32"
+    r=$(at "ATD$ARG;" 20)
+    printf '%s\n' "$r" | grep -q '^OK' || result call false "$(modem_error "$r")"
+    # the new call's id: the newest outgoing call that is being set up
+    id=
+    if read_calls; then
+        id=$(printf '%s\n' "$calls" | awk '$2 == "out" && ($3 == "dialing" || $3 == "alerting" || $3 == "active") { i = $1 } END { print i }')
+    fi
+    result call true "" "$([ -n "$id" ] && echo ",\"id\":$id")"
+    if [ "$DEMO" = 1 ]; then
+        need_card
+        sleep 5
+        in_call || { echo "mu300-voice: the call did not connect" >&2; exit 1; }
+        audio_start dsp
+        demo 5
+    fi ;;
+
+answer)
+    opts "$@"
+    [ -z "$ARG" ] || is_id "$ARG" || result answer false "not a call id: $ARG"
+    end=$(( $(date +%s) + ${WAIT:-0} ))
+    [ -n "$WAIT" ] && [ "$JSON" = 0 ] && echo "waiting up to ${WAIT}s for a call..." >&2
+    pick=
+    while :; do
+        if read_calls; then
+            pick=$(printf '%s\n' "$calls" | awk -v want="$ARG" '
+                ($3 == "incoming" || $3 == "waiting") && (want == "" || $1 == want) {
+                    if ($3 == "incoming" && inc == "") inc = $1 " " $3; else if (wai == "") wai = $1 " " $3 }
+                END { print (inc != "" ? inc : wai) }')
+        elif [ -z "$WAIT" ]; then
+            result answer false "no answer from the modem"
+        fi
+        [ -n "$pick" ] && break
+        [ "$(date +%s)" -ge "$end" ] && result answer false "no incoming call"
+        sleep 1
+    done
+    id=${pick% *}
+    log "answering call $id (${pick#* })"
+    # a waiting call is taken with the active one put on hold (AT+CHLD=2); the incoming one with ATA
+    if [ "${pick#* }" = waiting ]; then r=$(at 'AT+CHLD=2' 15); else r=$(at 'ATA' 15); fi
+    printf '%s\n' "$r" | grep -q '^OK' || result answer false "$(modem_error "$r")" ",\"id\":$id"
+    result answer true "" ",\"id\":$id"
+    if [ "$DEMO" = 1 ]; then
+        need_card
+        sleep 2
+        in_call || { echo "mu300-voice: the call did not connect" >&2; exit 1; }
+        audio_start dsp
+        demo 5
+    fi ;;
+
+hangup)
+    opts "$@"
+    if [ -n "$ARG" ]; then
+        is_id "$ARG" || result hangup false "not a call id: $ARG"
+        # release that call alone (3GPP 27.007 +CHLD=1x)
+        r=$(at "AT+CHLD=1$ARG" 10)
+    else
+        r=$(at 'AT+CHUP' 10)
+    fi
+    printf '%s\n' "$r" | grep -q '^OK' || result hangup false "$(modem_error "$r")"
+    audio_after_hangup
+    result hangup true "" "$([ -n "$ARG" ] && echo ",\"id\":$ARG")" ;;
+
+dtmf)
+    opts "$@"
+    case $ARG in ''|*[!0-9*#ABCDabcd]*) result dtmf false "not DTMF: 0-9 * # A-D only" ;; esac
+    [ ${#ARG} -le 32 ] || result dtmf false "at most 32 tones at a time"
+    d=$ARG; sent=0
+    while [ -n "$d" ]; do
+        c=${d%"${d#?}"}; d=${d#?}
+        c=$(printf '%s' "$c" | tr 'abcd' 'ABCD')
+        r=$(at "AT+VTS=$c" 5)
+        printf '%s\n' "$r" | grep -q '^OK' || result dtmf false "$(modem_error "$r")" ",\"sent\":$sent"
+        sent=$((sent + 1))
+    done
+    result dtmf true "" ",\"sent\":$sent" ;;
+
+demo)   need_card; demo "${1:-5}" ;;
+tone)   need_card; scene_running || audio_start dsp; tone "${1:-1}" ;;
+echo)   need_card; scene_running || audio_start dsp; echo_loop "${1:-5}" ;;
+
+*) usage ;;
 esac

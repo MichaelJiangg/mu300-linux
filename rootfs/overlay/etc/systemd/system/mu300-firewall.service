@@ -8,6 +8,10 @@ Wants=network-pre.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/sbin/nft -f /etc/mu300/firewall.nft
+# Drop-ins (/etc/mu300/firewall.d/*.nft, e.g. contrib/voice-api/sip-lan.nft), each loaded on its own after the base
+# rules and never in place of them: a broken one is reported and skipped ("-": the unit does not fail either), the
+# cellular side stays closed. "systemctl restart mu300-firewall" reloads the base rules and the drop-ins together.
+ExecStart=-/bin/sh -c 'for f in /etc/mu300/firewall.d/*.nft; do [ -f "$$f" ] || continue; /usr/sbin/nft -f "$$f" || echo "mu300-firewall: $$f did not load" >&2; done'
 
 [Install]
 WantedBy=sysinit.target

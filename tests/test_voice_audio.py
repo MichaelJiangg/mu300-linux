@@ -28,7 +28,8 @@ class Masking(unittest.TestCase):
         src = VOICE.read_text()
         script = shell_function(src, 'mask') + shell_function(src, 'log') + ''.join(
             'log %s\n' % repr(l).replace("'", "'") for l in lines)
-        return subprocess.run(['sh', '-c', script], capture_output=True, text=True, check=True).stdout
+        # log writes to stderr: stdout is the commands' answers (--json)
+        return subprocess.run(['sh', '-c', script], capture_output=True, text=True, check=True).stderr
 
     def test_numbers_masked(self):
         out = self.run_log('call state: 4 (+905321234540)',
@@ -51,13 +52,15 @@ class Masking(unittest.TestCase):
 
     def test_every_number_path_masked(self):
         src = VOICE.read_text()
-        self.assertIn('log() { echo "mu300-voice: $*" | mask; }', src)
-        self.assertIn('echo "incoming: $line" | mask', src)
+        self.assertIn('log() { echo "mu300-voice: $*" | mask >&2; }', src)
+        self.assertIn('echo "mu300-voice: $1: $3" | mask >&2', src)
         self.assertRegex(src, r"at 'AT\+CLCC' 8 \| tr '\\n' ' ' \| mask")
-        # the number only goes to the headset (ring), never to stdout unmasked
+        # the number only goes to the headset (ring) and to the API (events, hooks: tests/test_voice_api.py),
+        # never to a log unmasked
         for line in src.splitlines():
-            if '$number' in line and 'log ' not in line:
-                self.assertRegex(line, r'number=|hfp "ring \$number"')
+            if '$number' in line or '${number' in line:
+                if 'log ' not in line:
+                    self.assertRegex(line, r'number=|hfp "ring \$\{number#-\}"')
         self.assertIn('umask 077', src)
 
 

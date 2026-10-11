@@ -761,6 +761,9 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 * [`docs/FINDINGS.md`](docs/FINDINGS.md) — everything learned about this hardware and why each workaround exists.
 * [`docs/DISTROS.md`](docs/DISTROS.md) — running other distributions (ImmortalWrt, Arch Linux ARM, Debian, Kali; the
   Ubuntu image's `Dockerfile` takes another base with `--build-arg BASE=...`) and what the 5.4 kernel rules out.
+* [`docs/voice-api.md`](docs/voice-api.md) — the local voice API for a service on the device (a SIP server, a
+  dialer): call control with JSON answers, call events on a unix socket and as hooks, the call's audio, SMS, and
+  the LAN-only firewall drop-in.
 * [`upstream/`](upstream/) — the mainline kernel port, 6.18 LTS and 7.2.
 * [`tests/`](tests/README.md) — `cd tests && python3 -m unittest` runs them all (standard library only; `lz4` for
   the boot image tests), and `python3 tools/check-i18n.py` checks the installers' translations. CI

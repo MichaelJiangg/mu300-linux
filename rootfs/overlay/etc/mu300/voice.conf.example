@@ -1,0 +1,18 @@
+# Copy to /etc/mu300/voice.conf for mu300-voice (calls, events, call audio; docs/voice-api.md). Root's file: it is
+# read as shell by a command that runs as root.
+#
+# The group whose members may read the call events (/run/mu300-voice/events.sock, events.jsonl) and use the audio
+# pipes. Create it (Ubuntu: groupadd --system mu300voice) and add the service's user to it; without it all of that
+# stays root's alone.
+#VOICE_GROUP=mu300voice
+#
+# Where a call's audio goes: dsp (the AP's taps - what a SIP server needs) or bt (a paired headset, BT_HEADSET).
+# Empty: bt when BT_HEADSET is set, else dsp.
+#OUTPUT=dsp
+#BT_HEADSET=00:11:22:33:44:55
+#VOLUME=6
+#
+# watch: put the DSP into each call (0: events and hooks only, e.g. on a kernel without the audio drivers), and
+# with output dsp give the call's audio as two pipes, /run/mu300-voice/audio/downlink and uplink.
+#WATCH_AUDIO=1
+#AUDIO_PIPES=0

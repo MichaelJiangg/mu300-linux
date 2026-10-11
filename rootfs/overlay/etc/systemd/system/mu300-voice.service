@@ -1,0 +1,14 @@
+[Unit]
+Description=MU300 voice calls: events, hooks and call audio (mu300-voice watch; docs/voice-api.md)
+# Not enabled in the image: it asks the modem about calls every few seconds, which only a device that takes
+# calls needs. "systemctl enable --now mu300-voice" turns it on.
+After=mu300-atd.service mu300-audio.service
+Wants=mu300-atd.service
+
+[Service]
+ExecStart=/opt/mu300/bin/mu300-voice watch
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

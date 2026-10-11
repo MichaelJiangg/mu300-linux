@@ -1,0 +1,24 @@
+# A SIP server's ports, for the LAN only (Ubuntu and the other systemd images; OpenWrt: openwrt-fw4-sip-lan.sh).
+#   sudo install -m 644 sip-lan.nft /etc/mu300/firewall.d/50-sip-lan.nft && sudo systemctl restart mu300-firewall
+#
+# The base rules (/etc/mu300/firewall.nft) already close everything on the cellular side (sipa_eth*) and leave the
+# LAN open. What they do not close is any other way in: the Wi-Fi uplink (wifi-client's wlan0 when it is not a
+# hotspot), a VPN tunnel, a USB modem. This chain runs just before them and drops the SIP server's ports on every
+# interface but the LAN's - so the server may listen on 0.0.0.0 and still never answer the internet.
+# It only drops: nothing here opens a port that the base rules close.
+#
+# The ports are dikecphone's sipserver (SIP 5060 UDP/TCP, its LAN API 5080, provisioning 8088, RTP 20000-20200 and
+# 20400-20800); change them to your server's. The LAN is br-lan (USB and Wi-Fi clients; usb0/rndis0 before the
+# bridge is up).
+define LAN_IFACES = { "lo", "br-lan", "usb0", "rndis0" }
+define VOICE_UDP = { 5060, 20000-20200, 20400-20800 }
+define VOICE_TCP = { 5060, 5080, 8088 }
+
+table inet mu300_filter {
+    chain voice_lan_only {
+        type filter hook input priority filter - 1; policy accept;
+        iifname $LAN_IFACES return
+        udp dport $VOICE_UDP counter drop
+        tcp dport $VOICE_TCP counter drop
+    }
+}
