@@ -20,8 +20,9 @@
 #   AT+CESQ             RSRP/RSRQ indexes - the fallback when the engineering mode below says nothing
 #   AT+SPENGMD=0,6,0    Unisoc engineering: LTE serving cell (band/EARFCN/PCI/RSRP/RSRQ/bandwidth/ECI/TAC)
 #   AT+SPENGMD=0,14,1   NR serving cell (band/ARFCN/PCI/RSRP/RSRQ/SINR/MCS/BLER)
-#   AT+SPENGMD=0,6,6    LTE neighbour slots (8 x 12 fields, first 4 per slot are the reading)
-#   AT+SPQ5GNCELLEX     NR neighbour table with real per-cell SINR
+#   AT+SPENGMD=0,6,6    LTE neighbours (up to 8 comma blocks, first 4 values per block are the reading)
+#   AT+SPENGMD=0,14,2   NR neighbour arrays with each cell's band and SINR
+#   AT+SPQ5GNCELLEX     fallback NR neighbour table with real per-cell SINR (no band)
 #   AT+CGEQOSRDP=1      QCI + up/down AMBR of the active bearer
 # AT+SPENGMD=0,1,0 is NEVER sent: it switches the AT port into streaming mode and
 # kills the channel until the next reboot (V50 archive; blacklisted in the rpcd
@@ -142,7 +143,9 @@ IDENT_JSON=null
 # (No backslash line continuations inside the awk: comma-newline is portable,
 # busybox awk does not promise the GNU one.)
 sp_fragment() {  # sp_fragment MODE LINE [PHYLINE]  (MODE: lte | nr | ltenb)
-    [ -n "$2" ] || { echo null; return; }
+    # no line: null for a serving cell, nothing for the neighbour list (a "null" there became [null] in the page's
+    # neighbour table whenever the modem had no LTE neighbours to report; kanoqwq/mu300-linux@373e191)
+    [ -n "$2" ] || { [ "$1" = ltenb ] || echo null; return; }
     awk -v mode="$1" -v line="$2" -v phy="${3:-}" "$JSON_ESC"'
         function norm(l, arr,   s, n, i) {
             s = l; gsub(/\r/, "", s)
@@ -234,22 +237,63 @@ sp_fragment() {  # sp_fragment MODE LINE [PHYLINE]  (MODE: lte | nr | ltenb)
                 printf "{\"band\":%d,\"arfcn\":%d,\"pci\":%d,\"rsrp\":%s,\"rsrq\":%s,\"sinr\":%s,\"bw_mhz\":%s,\"gnb\":%s,\"cid\":%s,\"ul_mcs\":%s,\"dl_mcs\":%s,\"ul_bler\":%s,\"dl_bler\":%s}",
                     band, arfcn, pci, c1(f(t[3])), c1(f(t[4])), c1(f(t[15])), num(bw),
                     fs(t[8]), fs(t[9]), num(f(t[16])), num(f(t[17])), c1(f(t[18])), c1(f(t[19]))
-            } else {   # ltenb: eight 12-field slots, first four are EARFCN/PCI/RSRP/RSRQ
+            } else {   # ltenb: up to eight neighbours, first four values EARFCN/PCI/RSRP/RSRQ
+                # The modem writes each neighbour as one comma-separated block between the dashes
+                # ("1650,211,-9500,-800,...-46600,123,..."; kanoqwq/mu300-linux@373e191). Eight slots of
+                # twelve dash-separated fields, the layout this parser assumed before, are still read.
                 out = ""
+                csv = (index(t[0], ",") > 0)
                 for (s = 0; s < 8; s++) {
-                    b = s*12; if (b+3 >= n) break
-                    earfcn = f(t[b]); pci = f(t[b+1])
+                    if (csv) {
+                        if (s >= n) break
+                        if (split(t[s], row, ",") < 4) continue
+                        earfcn = f(row[1]); pci = f(row[2]); rsrp = f(row[3]); rsrq = f(row[4])
+                    } else {
+                        b = s*12; if (b+3 >= n) break
+                        earfcn = f(t[b]); pci = f(t[b+1]); rsrp = f(t[b+2]); rsrq = f(t[b+3])
+                    }
                     if (earfcn == 0 && pci == 0) continue
                     out = out sprintf("{\"rat\":\"lte\",\"band\":%d,\"arfcn\":%d,\"pci\":%d,\"rsrp\":%s,\"rsrq\":%s},",
-                        lteband(earfcn), earfcn, pci, c1(f(t[b+2])), c1(f(t[b+3])))
+                        lteband(earfcn), earfcn, pci, c1(rsrp), c1(rsrq))
                 }
                 sub(/,$/, "", out); print (out == "" ? "" : out)
             }
         }'
 }
 
-nr_neighbours() {  # SPQ5GNCELLEX CSV: serving 8-tuple, count at index 8, then 8-tuples (arfcn,pci,rsrp,rsrq,sinr,..)
+# nr_neighbours LINE [SOURCE]
+#   SOURCE spengmd: AT+SPENGMD=0,14,2, dash-separated comma arrays band/ARFCN/PCI/RSRP/RSRQ/SINR (centi-dB, "+" for
+#                   a negative value after the normalisation below): the modem's own band for every cell
+#                   (kanoqwq/mu300-linux@373e191)
+#   otherwise       SPQ5GNCELLEX CSV: serving 8-tuple, count at index 8, then 8-tuples (arfcn,pci,rsrp,rsrq,sinr,..),
+#                   no band: it is guessed from the ARFCN
+nr_neighbours() {
     [ -n "$1" ] || { echo ""; return; }
+    if [ "${2:-}" = spengmd ]; then
+        awk -v line="$1" '
+            function signed(v) { gsub(/\+/, "-", v); return v + 0 }
+            BEGIN {
+                gsub(/\r/, "", line); gsub(/ /, "", line)
+                gsub(/,-/, ",+", line); gsub(/--/, "-+", line); sub(/^-/, "+", line)
+                if (split(line, field, "-") < 6) exit
+                count = split(field[1], bands, ",")
+                a = split(field[2], arfcns, ","); if (a < count) count = a
+                a = split(field[3], pcis, ","); if (a < count) count = a
+                a = split(field[4], rsrps, ","); if (a < count) count = a
+                a = split(field[5], rsrqs, ","); if (a < count) count = a
+                a = split(field[6], sinrs, ","); if (a < count) count = a
+                out = ""
+                for (i = 1; i <= count && i <= 16; i++) {
+                    if (bands[i] !~ /^[0-9]+$/ || arfcns[i] !~ /^[0-9]+$/ || pcis[i] !~ /^[0-9]+$/) continue
+                    if (rsrps[i] !~ /^\+?[0-9]+$/ || rsrqs[i] !~ /^\+?[0-9]+$/ || sinrs[i] !~ /^\+?[0-9]+$/) continue
+                    if (bands[i] + 0 == 0 || arfcns[i] + 0 == 0) continue
+                    out = out sprintf("{\"rat\":\"nr\",\"band\":%d,\"arfcn\":%d,\"pci\":%d,\"rsrp\":%.1f,\"rsrq\":%.1f,\"sinr\":%.1f},",
+                        bands[i], arfcns[i], pcis[i], signed(rsrps[i]) / 100, signed(rsrqs[i]) / 100, signed(sinrs[i]) / 100)
+                }
+                sub(/,$/, "", out); print out
+            }'
+        return
+    fi
     awk -v line="$1" '
         function nrband(fr,   a,b,r,i,n) {
             n = split("1:422000-434000 3:361000-376000 5:173800-178800 8:185000-192000 28:151600-160600 40:460000-480000 41:499200-537999 78:620000-653333 77:620000-680000 79:693334-733333", a, " ")
@@ -399,7 +443,7 @@ R4=$(printf '%s\n' "$CEREG" | tr -d '"' | awk -F',' '{ gsub(/ /,"",$2); print $2
 R5=$(printf '%s\n' "$C5GREG" | tr -d '"' | awk -F',' '{ gsub(/ /,"",$2); print $2 }')
 REGISTERED=0
 case "$R4:$R5" in 1:*|5:*|10:*|*:1|*:5|*:10) REGISTERED=1 ;; esac
-SP_LTE=; SP_LTEPHY=; SP_NR=; SP_LN=; SP_NRNB=; QOS=; COPS=
+SP_LTE=; SP_LTEPHY=; SP_NR=; SP_LN=; SP_NRNB=; SP_NRNB_SOURCE=; QOS=; COPS=
 if [ "$REGISTERED" = 1 ]; then
     SP_LTE=$(at 'AT+SPENGMD=0,6,0' 2 | grep -v '^AT' | grep -- '-' | head -n1)
     SP_LTEPHY=$(at 'AT+SPENGMD=0,0,6' 2 | grep -v '^AT' | grep -- '-' | head -n1)
@@ -410,7 +454,13 @@ if [ "$MODE" = full ]; then
     OPN=$(operator_name "$COPS")
     if [ "$REGISTERED" = 1 ]; then
         SP_LN=$(at 'AT+SPENGMD=0,6,6' 2 | grep -v '^AT' | grep -- '-' | head -n1)
-        SP_NRNB=$(at 'AT+SPQ5GNCELLEX' 2 | sed -n 's/^+SPQ5GNCELLEX: *//p' | head -n1)
+        # the modem's own NR neighbour arrays first (they carry the band), SPQ5GNCELLEX when it has none
+        SP_NRNB=$(at 'AT+SPENGMD=0,14,2' 2 | grep -v '^AT' | grep -- '-' | head -n1)
+        SP_NRNB_SOURCE=spengmd
+        if [ -z "$SP_NRNB" ]; then
+            SP_NRNB=$(at 'AT+SPQ5GNCELLEX' 2 | sed -n 's/^+SPQ5GNCELLEX: *//p' | head -n1)
+            SP_NRNB_SOURCE=spq
+        fi
         QOS=$(at 'AT+CGEQOSRDP=1' 2 | sed -n 's/^+CGEQOSRDP: *//p' | head -n1)
     fi
     IDENT_AGE=999999
@@ -461,7 +511,7 @@ printf '{"ts":%d,"cfun":%s,"reg":%s,"reg5g":%s,"sig_src":"%s","sig":%s,"lte":%s,
 
 # the full tier: everything else the page needs only every few seconds
 LN=$(sp_fragment ltenb "$SP_LN")
-NN=$(nr_neighbours "$SP_NRNB")
+NN=$(nr_neighbours "$SP_NRNB" "$SP_NRNB_SOURCE")
 # one neighbour list, NR first (the page shows NR cells at the top)
 if [ -n "$NN" ] && [ -n "$LN" ]; then NEIGH="[$NN,$LN]"
 elif [ -n "$NN" ]; then NEIGH="[$NN]"
