@@ -3,6 +3,7 @@
 # ubuntu, openwrt, openwrt-luci, immortalwrt, arch, debian, kali ... all work the same way.
 #   mu300-os             show installed systems and the current choice
 #   mu300-os <name>      boot that system from now on (reboot to apply)
+#   mu300-os --force <name>   even one nobody can log in to yet (no usable password: mu300-update accounts <name>)
 # OpenWrt: od/timeout come from the static busybox in /opt/mu300/busybox-bin
 export PATH="$PATH:/opt/mu300/busybox-bin"
 set -e
@@ -30,6 +31,25 @@ systems() {
     done
 }
 
+# A system nobody can log in to is not switched to (issue #167): one that mu300-update added before it carried the
+# accounts over still has the image's root with an empty password, which dropbear, rpcd and sshd all refuse - the
+# only way back was the Android fallback. OpenWrt logs in as root, so root needs a hash (crypt's $id$...; empty, *
+# and ! are locked); elsewhere root is locked by design (Ubuntu's ubuntu user logs in), so any account with a hash
+# will do. A system without a readable etc/shadow is not judged.
+can_log_in() {
+    s=$DISK/$1/etc/shadow
+    [ -r "$s" ] || return 0
+    if [ -e "$DISK/$1/etc/openwrt_release" ]; then
+        h=$(sed -n 's/^root:\([^:]*\):.*/\1/p' "$s" | head -n1)
+        case $h in '$'?*) return 0 ;; esac
+        echo "mu300-os: $1 has no usable root password yet; run \`mu300-update accounts $1\` first (or mu300-os --force $1)" >&2
+    else
+        grep -q '^[^:]*:\$[^:]' "$s" && return 0
+        echo "mu300-os: $1 has no account with a usable password yet; run \`mu300-update accounts $1\` first (or mu300-os --force $1)" >&2
+    fi
+    return 1
+}
+
 list() {
     found=$(systems)
     if [ -n "$found" ]; then
@@ -46,25 +66,34 @@ list() {
     echo "boot-os: $(cat "$DISK/.mu300/boot-os" 2>/dev/null || echo 'ubuntu (default)')"
 }
 
-case "${1:-}" in
+FORCE=
+name=
+for a in "$@"; do
+    case $a in
+        --force) FORCE=1 ;;
+        -h|--help) sed -n '2,7s/^# \{0,1\}//p' "$0"; exit 0 ;;
+        *) [ -z "$name" ] || { echo "mu300-os: one system name at a time ($name, $a)" >&2; exit 1; }; name=$a ;;
+    esac
+done
+case "$name" in
     "") list ;;
-    -h|--help) sed -n '2,6s/^# \{0,1\}//p' "$0" ;;
     *)
         # a kept copy (openwrt.old ...) is not a system: init would not boot it either
-        case $1 in *.*|*/*) echo "$1 is not a system name (available: $(systems))" >&2; exit 1 ;; esac
-        if ! is_system "$1" && ! { [ "$1" = ubuntu ] && [ -x "$DISK/lib/systemd/systemd" ]; }; then
-            echo "$1 is not installed (available: $(systems))" >&2; exit 1
+        case $name in *.*|*/*) echo "$name is not a system name (available: $(systems))" >&2; exit 1 ;; esac
+        if ! is_system "$name" && ! { [ "$name" = ubuntu ] && [ -x "$DISK/lib/systemd/systemd" ]; }; then
+            echo "$name is not installed (available: $(systems))" >&2; exit 1
         fi
+        [ -n "$FORCE" ] || [ "$DISK" = / ] || can_log_in "$name"
         mkdir -p "$DISK/.mu300"
         # Whether Linux is the default boot is written per system (the initramfs reads it from the one it
         # boots), but it is a choice about the device. Carry it over, or switching from a system where it is on
         # to one where it never was makes the first reboot there land in Android.
-        if [ "$DISK" != / ] && [ -d "$DISK/$1/etc" ]; then
-            mkdir -p "$DISK/$1/etc/mu300"
-            if [ "$(cat "${MU300_SYSROOT:-}/etc/mu300/default-boot" 2>/dev/null)" = linux ]; then echo linux > "$DISK/$1/etc/mu300/default-boot"
-            else rm -f "$DISK/$1/etc/mu300/default-boot"; fi
+        if [ "$DISK" != / ] && [ -d "$DISK/$name/etc" ]; then
+            mkdir -p "$DISK/$name/etc/mu300"
+            if [ "$(cat "${MU300_SYSROOT:-}/etc/mu300/default-boot" 2>/dev/null)" = linux ]; then echo linux > "$DISK/$name/etc/mu300/default-boot"
+            else rm -f "$DISK/$name/etc/mu300/default-boot"; fi
         fi
-        echo "$1" > "$DISK/.mu300/boot-os.tmp" && mv "$DISK/.mu300/boot-os.tmp" "$DISK/.mu300/boot-os"
+        echo "$name" > "$DISK/.mu300/boot-os.tmp" && mv "$DISK/.mu300/boot-os.tmp" "$DISK/.mu300/boot-os"
         sync
-        echo "next Linux boot: $1 (reboot to apply)" ;;
+        echo "next Linux boot: $name (reboot to apply)" ;;
 esac

@@ -868,5 +868,188 @@ class Lock(UpdateBase):
         self.assertNotIn('going on without', src)
 
 
+class AddedSystem(UpdateBase):
+    """A system apply adds (not on the disk yet) and `accounts OS`: the running system's password reaches it, the
+    way the installer's PWHASH seeds both kinds - ubuntu's hash onto OpenWrt's root, root's onto Ubuntu's ubuntu
+    (issue #167: an added openwrt-luci kept the image's empty root, which no login accepts)."""
+    UBUNTU = '$6$ubuntu$hash'
+    OPENWRT = '$6$openwrt$hash'
+    IMAGE = {'ubuntu': {'etc/passwd': 'root:x:0:0::/root:/bin/bash\nubuntu:x:1000:1000::/home/ubuntu:/bin/bash\n',
+                        'etc/group': 'root:x:0:\nsudo:x:27:ubuntu\nubuntu:x:1000:\n',
+                        'etc/shadow': 'root:*:19000:0:99999:7:::\nubuntu:$6$image$ubuntu:19000:0:99999:7:::\n',
+                        'etc/gshadow': 'root:*::\nsudo:*::ubuntu\nubuntu:!::\n',
+                        'etc/.mu300-accounts-from-image': ''},
+             'openwrt': {'etc/passwd': 'root:x:0:0:root:/root:/bin/ash\n', 'etc/group': 'root:x:0:\n',
+                         'etc/shadow': 'root:::0:99999:7:::\n', 'etc/gshadow': 'root:::\n',
+                         'etc/openwrt_release': 'DISTRIB_ID=OpenWrt\n', 'etc/.mu300-accounts-from-image': ''}}
+
+    def setUp(self):
+        super().setUp()
+        shutil.rmtree(self.disk / 'ubuntu')
+        self.stage = self.disk / '.mu300-update'
+
+    def files(self, d, files):
+        for f, data in files.items():
+            (d / f).parent.mkdir(parents=True, exist_ok=True)
+            (d / f).write_text(data)
+        if (d / 'etc/shadow').exists():
+            (d / 'etc/shadow').chmod(0o640)
+
+    def system(self, name, files):
+        """A system on the fake disk: an init, and FILES (path: text)."""
+        d = self.disk / name
+        (d / 'sbin').mkdir(parents=True)
+        (d / 'sbin/init').write_text('#!/bin/sh\n'); (d / 'sbin/init').chmod(0o755)
+        self.files(d, files)
+        return d
+
+    def image(self, name, files=None):
+        """The release's tarball for NAME in the stage, with the image's accounts (and FILES)."""
+        img = self.tmp / f'img-{name}'
+        shutil.rmtree(img, ignore_errors=True)
+        (img / 'sbin').mkdir(parents=True)
+        (img / 'sbin/init').write_text('#!/bin/sh\n'); (img / 'sbin/init').chmod(0o755)
+        self.files(img, {**self.IMAGE['ubuntu' if name == 'ubuntu' else 'openwrt'], 'etc/mu300/image-version': 'v2\n',
+                         **(files or {})})
+        self.stage.mkdir(exist_ok=True)
+        subprocess.run(['tar', '-czf', str(self.stage / f'mu300-{name}-rootfs.tar.gz'), '-C', str(img), '.'], check=True)
+
+    def ubuntu(self, hash=UBUNTU, **files):
+        return self.system('ubuntu', {'etc/passwd': 'root:x:0:0::/root:/bin/bash\nubuntu:x:1000:1000::/home/ubuntu:/bin/bash\n'
+                                                    'kaan:x:1001:1001::/home/kaan:/bin/bash\n',
+                                      'etc/group': 'root:x:0:\nsudo:x:27:ubuntu,kaan\nubuntu:x:1000:\nkaan:x:1001:\n',
+                                      'etc/shadow': f'root:*:19000:0:99999:7:::\nubuntu:{hash}:19000:0:99999:7:::\n'
+                                                    'kaan:$6$kaan$hash:19000:0:99999:7:::\n',
+                                      'etc/gshadow': 'root:*::\nsudo:*::ubuntu,kaan\nubuntu:!::\nkaan:!::\n', **files})
+
+    def openwrt(self, name='openwrt', hash=OPENWRT, **files):
+        return self.system(name, {'etc/passwd': 'root:x:0:0:root:/root:/bin/ash\nkaan:x:1001:1001::/home/kaan:/bin/ash\n',
+                                  'etc/group': 'root:x:0:\nkaan:x:1001:\n',
+                                  'etc/shadow': f'root:{hash}:19000:0:99999:7:::\nkaan:$6$kaan$hash:19000:0:99999:7:::\n',
+                                  'etc/gshadow': 'root:::\nkaan:!::\n', 'etc/openwrt_release': 'DISTRIB_ID=OpenWrt\n', **files})
+
+    def shadow(self, name):
+        return {l.split(':')[0]: l.split(':')[1] for l in (self.disk / name / 'etc/shadow').read_text().splitlines()}
+
+    def add(self, shell, name, running):
+        return self.up(shell, f'is_root() {{ false; }}; apply_one {name} v2', MU300_ROOT=self.disk / running,
+                       **self.busybox_applets(shell))
+
+    def test_added_from_ubuntu_openwrts_root_gets_the_ubuntu_users_password(self):
+        self.ubuntu(**{'usr/lib/firmware/wcnmodem.bin': 'fw', 'usr/lib/modules/5.4.254/x.ko': 'ko',
+                       'opt/mu300/android/system/bin/cp_diskserver': 'vendor'})
+        for shell in self.each_shell():
+            shutil.rmtree(self.disk / 'openwrt-luci', ignore_errors=True)
+            self.image('openwrt-luci', {'lib/firmware/regulatory.db': 'image'})
+            r = self.add(shell, 'openwrt-luci', 'ubuntu')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('accounts and passwords carried over from the running ubuntu', r.stdout)
+            self.assertIn('openwrt-luci: added v2', r.stdout)
+            sh = self.shadow('openwrt-luci')
+            self.assertEqual(sh['root'], self.UBUNTU)
+            # the password crosses, not Ubuntu's accounts: root stays OpenWrt's only login
+            self.assertNotIn('kaan', sh)
+            self.assertNotIn('ubuntu', sh)
+            self.assertNotIn('ubuntu', (self.disk / 'openwrt-luci/etc/passwd').read_text())
+            self.assertFalse((self.disk / 'openwrt-luci/etc/.mu300-accounts-from-image').exists())
+            self.assertEqual((self.disk / 'openwrt-luci/etc/shadow').stat().st_mode & 0o777, 0o640)
+            self.assertFalse((self.disk / 'openwrt-luci.new').exists())
+            self.assertFalse((self.disk / 'openwrt-luci.old').exists())
+            # the vendor files of this device, from the system that has them (Ubuntu keeps them under usr/lib)
+            new = self.disk / 'openwrt-luci'
+            self.assertEqual((new / 'lib/firmware/wcnmodem.bin').read_text(), 'fw')
+            self.assertEqual((new / 'lib/firmware/regulatory.db').read_text(), 'image')
+            self.assertEqual((new / 'lib/modules/5.4.254/x.ko').read_text(), 'ko')
+            self.assertEqual((new / 'opt/mu300/android/system/bin/cp_diskserver').read_text(), 'vendor')
+
+    def test_added_from_openwrt_the_same_kind_gets_the_merge(self):
+        self.openwrt()
+        for shell in self.each_shell():
+            shutil.rmtree(self.disk / 'openwrt-luci', ignore_errors=True)
+            self.image('openwrt-luci')
+            r = self.add(shell, 'openwrt-luci', 'openwrt')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('accounts and passwords carried over from the running openwrt', r.stdout)
+            sh = self.shadow('openwrt-luci')
+            self.assertEqual(sh['root'], self.OPENWRT)
+            self.assertEqual(sh['kaan'], '$6$kaan$hash')
+            self.assertIn('kaan:x:1001:1001:', (self.disk / 'openwrt-luci/etc/passwd').read_text())
+            self.assertFalse((self.disk / 'openwrt-luci/etc/.mu300-accounts-from-image').exists())
+
+    def test_added_from_openwrt_ubuntus_user_gets_roots_password_and_root_stays_locked(self):
+        self.openwrt()
+        for shell in self.each_shell():
+            shutil.rmtree(self.disk / 'ubuntu', ignore_errors=True)
+            self.image('ubuntu')
+            r = self.add(shell, 'ubuntu', 'openwrt')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('accounts and passwords carried over from the running openwrt', r.stdout)
+            sh = self.shadow('ubuntu')
+            self.assertEqual(sh['ubuntu'], self.OPENWRT)
+            self.assertEqual(sh['root'], '*')
+            self.assertNotIn('kaan', sh)
+            self.assertFalse((self.disk / 'ubuntu/etc/.mu300-accounts-from-image').exists())
+
+    def test_a_running_system_without_a_password_leaves_the_image_in_place_and_says_so(self):
+        self.ubuntu(hash='!')
+        for shell in self.each_shell():
+            shutil.rmtree(self.disk / 'openwrt-luci', ignore_errors=True)
+            self.image('openwrt-luci')
+            r = self.add(shell, 'openwrt-luci', 'ubuntu')
+            self.assertEqual(r.returncode, 0, r.stderr)       # the system is added all the same, and the user told
+            self.assertIn('no usable password', r.stderr)
+            self.assertIn('run mu300-update accounts openwrt-luci before mu300-os openwrt-luci', r.stderr)
+            self.assertNotIn('carried over', r.stdout)
+            self.assertEqual(self.shadow('openwrt-luci')['root'], '')
+
+    def test_accounts_command_syncs_a_system_on_demand(self):
+        self.ubuntu()
+        self.openwrt('openwrt-luci', hash='')
+        self.openwrt('openwrt', hash='!')
+        for shell in self.each_shell():
+            r = self.up(shell, 'accounts openwrt-luci openwrt', MU300_ROOT=self.disk / 'ubuntu')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(r.stdout.count('accounts and passwords carried over from the running ubuntu'), 2)
+            self.assertEqual(self.shadow('openwrt-luci')['root'], self.UBUNTU)
+            self.assertEqual(self.shadow('openwrt')['root'], self.UBUNTU)
+            # the device's other accounts stay as they were
+            self.assertEqual(self.shadow('openwrt')['kaan'], '$6$kaan$hash')
+            for f in ('openwrt-luci', 'openwrt'):
+                (self.disk / f / 'etc/shadow').write_text('root:::0:99999:7:::\nkaan:$6$kaan$hash:19000:0:99999:7:::\n')
+
+    def test_accounts_command_refuses_what_it_cannot_sync(self):
+        self.ubuntu()
+        self.openwrt('openwrt-luci', hash='')
+        for shell in self.each_shell():
+            for args, msg in (('ubuntu', 'ubuntu is the running system'), ('arch', "unknown system 'arch'"),
+                              ('openwrt', 'openwrt is not installed')):
+                r = self.up(shell, f'accounts {args}', MU300_ROOT=self.disk / 'ubuntu')
+                self.assertEqual(r.returncode, 1, args)
+                self.assertIn(msg, r.stderr)
+            self.assertEqual(self.shadow('openwrt-luci')['root'], '')
+            # the running system has nothing to give: exit 1, the target untouched
+            (self.disk / 'ubuntu/etc/shadow').write_text('root:*:19000:0:99999:7:::\nubuntu:!:19000:0:99999:7:::\n')
+            r = self.up(shell, 'accounts openwrt-luci', MU300_ROOT=self.disk / 'ubuntu')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('the running ubuntu has no usable password for ubuntu to give root', r.stderr)
+            self.assertEqual(self.shadow('openwrt-luci')['root'], '')
+            (self.disk / 'ubuntu/etc/shadow').write_text(f'root:*:19000:0:99999:7:::\nubuntu:{self.UBUNTU}:19000:0:99999:7:::\n')
+            # without a name: the boot-time merge, which does nothing without the image's mark in /
+            r = self.up(shell, 'accounts', MU300_ROOT=self.disk / 'ubuntu')
+            self.assertEqual((r.returncode, r.stdout), (0, ''), r.stderr)
+
+    def test_apply_adds_a_named_system_that_is_not_on_the_disk(self):
+        src = (BIN / 'mu300-update').read_text()
+        body = src[src.index('\napply() {'):src.index('\n}\n', src.index('\napply() {'))]
+        self.assertNotIn('die "$os is not installed"', body)
+        self.assertIn('not on the disk yet; it is added', body)
+        self.assertIn('accounts [os ...]', src[src.index('usage: mu300-update'):])
+        self.assertLess(src.index('accounts) shift; accounts "$@"'), src.index('clean) clean'))
+        # the on-demand sync and the add share one function, and both tell the same line the boot merge does
+        fn = src[src.index('\naccounts_into() {'):src.index('\n}\n', src.index('\naccounts_into() {'))]
+        self.assertIn('merge_accounts "$_r" "$_n"', fn)
+        self.assertIn('echo "accounts and passwords carried over from the running $_ro"', fn)
+
+
 if __name__ == '__main__':
     unittest.main()

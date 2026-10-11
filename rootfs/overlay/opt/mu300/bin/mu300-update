@@ -4,7 +4,11 @@
 #   mu300-update version          what is installed (no network needed)
 #   mu300-update apply [OS...]    download, unpack and switch (default: every installed system), then the kernel and
 #                                 the boot image (MU300_UBUNTU=24.04|26.04: move Ubuntu to that release). Packages
-#                                 installed on the device are installed again at the first boot (--no-reinstall: not)
+#                                 installed on the device are installed again at the first boot (--no-reinstall: not).
+#                                 A system named here that is not on the disk is added, with this device's vendor
+#                                 files and the running system's accounts (mu300-os <name> then switches to it)
+#   mu300-update accounts OS...   the running system's accounts and password into those systems again (a system
+#                                 added before this was done, or after a password change here)
 #   mu300-update boot             only the kernel and the boot image
 #   mu300-update rollback [OS]    go back to the previous version kept as <os>.old
 #   mu300-update rollback-boot    go back to the previous boot image
@@ -324,15 +328,84 @@ merge_accounts() {  # merge_accounts OLD_ROOT NEW_ROOT   ("" is the running syst
     rm -f "$n$ACCOUNTS_MARK"
 }
 
-# at boot (mu300-accounts): a system that an older mu300-update installed still has the image's accounts, and the
-# system it replaced is still on the disk as <os>.old - take them from there before anyone can log in
-accounts() {
-    [ -e "$ACCOUNTS_MARK" ] || return 0
-    os=$(running_os)
-    if [ -f "$DISK/$os.old/etc/shadow" ]; then
-        merge_accounts "$DISK/$os.old" "" && echo "accounts and passwords carried over from the previous $os"
+# The account the installer gives the password to (PWHASH in tools/android-install.sh): ubuntu on Ubuntu (root
+# stays locked), root on OpenWrt. One password for every system means these two carry the same hash.
+pw_user() { case $1 in ubuntu) echo ubuntu ;; *) echo root ;; esac; }   # pw_user KIND
+hash_of() { sed -n "s/^$2:\([^:]*\):.*/\1/p" "$1/etc/shadow" 2>/dev/null | head -n1; }   # hash_of ROOT USER
+# a hash someone can log in with: crypt's $id$...; empty, * and ! are refused by dropbear, rpcd and sshd alike
+usable_hash() { case $1 in '$'?*) return 0 ;; esac; return 1; }
+# set_hash ROOT USER HASH: USER's password in ROOT's shadow, written the way merge_accounts writes (a copy with the
+# file's owner and mode, renamed into place)
+set_hash() {
+    awk -F: -v OFS=: -v u="$2" -v h="$3" '$1 == u { $2 = h } { print }' "$1/etc/shadow" > "$1/etc/shadow.mu300" ||
+        { rm -f "$1/etc/shadow.mu300"; return 1; }
+    cp -p "$1/etc/shadow" "$1/etc/shadow.mu300-new" && cat "$1/etc/shadow.mu300" > "$1/etc/shadow.mu300-new" && sync &&
+        mv -f "$1/etc/shadow.mu300-new" "$1/etc/shadow" || { rm -f "$1/etc/shadow.mu300" "$1/etc/shadow.mu300-new"; return 1; }
+    rm -f "$1/etc/shadow.mu300"
+}
+# accounts_into NEW OS: the running system's accounts into a system that has none of this device's yet - one just
+# added (no <os>.old to take them from; the image ships root with an empty password, which nothing accepts: #167)
+# or one synced on demand (mu300-update accounts OS). The same kind: the merge an update does (the hashes, the
+# users and groups added on the device). Across kinds the accounts differ (Ubuntu logs in as ubuntu with root
+# locked, OpenWrt as root), so only the password crosses: the running login account's hash onto the target's -
+# ubuntu's onto OpenWrt's root, root's onto Ubuntu's ubuntu - the two accounts the installer's PWHASH seeds.
+accounts_into() {
+    _n=$1 _k=$(os_kind "$2") || return 1
+    _ro=$(running_os) _r=${MU300_ROOT:-}
+    _rk=$(os_kind "$_ro") _ru=$(pw_user "$(os_kind "$_ro")") _nu=$(pw_user "$_k")
+    [ -f "$_n/etc/shadow" ] || { echo "$2: no etc/shadow; its accounts stay the image's" >&2; return 1; }
+    if [ "$_k" = "$_rk" ]; then
+        merge_accounts "$_r" "$_n" || { echo "$2: could not carry the accounts over; the image's default password applies" >&2; return 1; }
+    else
+        _h=$(hash_of "$_r" "$_ru")
+        usable_hash "$_h" || { echo "$2: the running $_ro has no usable password for $_ru to give $_nu; $2 keeps the image's accounts" >&2; return 1; }
+        set_hash "$_n" "$_nu" "$_h" || { echo "$2: could not write $_nu's password; the image's default applies" >&2; return 1; }
+        rm -f "$_n$ACCOUNTS_MARK"
     fi
-    rm -f "$ACCOUNTS_MARK"
+    usable_hash "$(hash_of "$_n" "$_nu")" ||
+        { echo "$2: $_nu still has no usable password (the running $_ro has none for $_ru); set one there, then mu300-update accounts $2" >&2; return 1; }
+    echo "accounts and passwords carried over from the running $_ro"
+}
+
+# accounts [OS...]: with names, the running system's accounts into those systems (accounts_into) - for a system
+# added before the updater carried them over (#167), or after a password change here. Alone, at boot
+# (mu300-accounts): a system that an older mu300-update installed still has the image's accounts, and the system
+# it replaced is still on the disk as <os>.old - take them from there before anyone can log in.
+accounts() {
+    if [ $# = 0 ]; then
+        [ -e "$ACCOUNTS_MARK" ] || return 0
+        os=$(running_os)
+        if [ -f "$DISK/$os.old/etc/shadow" ]; then
+            merge_accounts "$DISK/$os.old" "" && echo "accounts and passwords carried over from the previous $os"
+        fi
+        rm -f "$ACCOUNTS_MARK"
+        return 0
+    fi
+    mounted_disk
+    run=$(running_os)
+    for os in "$@"; do
+        os_kind "$os" >/dev/null || die "unknown system '$os'"
+        [ -d "$DISK/$os" ] || die "$os is not installed"
+        [ "$os" != "$run" ] || die "$os is the running system: its accounts are the ones the others get"
+        accounts_into "$DISK/$os" "$os" || die "$os: the accounts were not carried over"
+    done
+}
+
+# vendor_from OS NEW: the vendor files of a system just added, from the systems this device has (gaps only: what
+# the image ships stays). Ubuntu keeps firmware and modules under usr/lib (lib is a link to it), OpenWrt under lib,
+# so each path is looked for both ways.
+vendor_from() {
+    for _v in $(vendor_list "$1"); do
+        for _from in $(installed_systems); do
+            [ "$_from" != "$1" ] || continue
+            for _p in "$_v" "${_v#usr/}" "usr/${_v#usr/}"; do
+                [ -d "$DISK/$_from/$_p" ] || continue
+                mkdir -p "$2/$_v" || return 1
+                copy_missing "$DISK/$_from/$_p" "$2/$_v" || return 1
+                break
+            done
+        done
+    done
 }
 
 # --- user-packages begin
@@ -575,11 +648,11 @@ stale_config_clean() {
 }
 # --- user-packages end
 
-apply_one() {  # apply_one OS TAG
+apply_one() {  # apply_one OS TAG   (a system not on the disk is added: the image, this device's vendor files and accounts)
     os=$1 tag=$2
     old=$DISK/$os
     new=$DISK/$os.new
-    [ -d "$old" ] || die "$os is not installed"
+    add=; [ -d "$old" ] || add=1
     tarball=$(rootfs_asset "$os")
     tmp=$STAGE
     # downloaded and checked in apply() already, together with everything else this update needs
@@ -590,6 +663,21 @@ apply_one() {  # apply_one OS TAG
     untar -xzpf "$tmp/$tarball" -C "$new" || { rm -rf "$new" "$tmp/$tarball"; die "unpacking failed, nothing was changed"; }
     rm -f "$tmp/$tarball"
     [ -x "$new/sbin/init" ] || [ -L "$new/sbin/init" ] || [ -x "$new/bin/busybox" ] || { rm -rf "$new"; die "the unpacked system looks wrong, nothing was changed"; }
+
+    if [ -n "$add" ]; then
+        # nothing of its own to keep: the vendor files come from the systems already here, the accounts from the
+        # running one (an added system used to keep the image's empty root password, which no login accepts: #167)
+        say "$os: the vendor files and the accounts of this device"
+        vendor_from "$os" "$new" || { rm -rf "$new"; die "$os: copying the vendor files failed, nothing was changed"; }
+        accounts_into "$new" "$os" || echo "$os: run mu300-update accounts $os before mu300-os $os" >&2
+        say "$os: putting it in place"
+        sync
+        mv "$new" "$old" || { rm -rf "$new"; die "could not put $os in place"; }
+        sync
+        printf '%s: added %s\n' "$os" "$(cat "$old$VERSION_FILE" 2>/dev/null || echo unknown)"
+        ADDED="${ADDED:-}$os "
+        return 0
+    fi
 
     say "$os: keeping your settings and the vendor files"
     # etc/mu300 is kept as a whole (hotspot.conf, vpn.conf, ...), but the version of the image and its package lists
@@ -1851,12 +1939,15 @@ apply() {
     [ -n "$list" ] || list=$(installed_systems)
     BOOT_CHANGED=
     SYSTEM_CHANGED=
+    ADDED=
     [ "${MU300_UBUNTU:-}" = 26.04 ] && [ "$(kernel_choice)" = 5.4 ] &&
         die "$UBUNTU_2604_KERNEL. Change the kernel first: sudo mu300-update kernel 6.18 (or 7.2)"
     todo=
     for os in $list; do
         case $os in ubuntu|openwrt|openwrt-luci) ;; *) die "unknown system '$os'" ;; esac
-        [ -d "$DISK/$os" ] || die "$os is not installed"
+        # a system named here that is not on the disk is added: the release's image, with this device's vendor
+        # files and the running system's accounts; mu300-os switches to it afterwards
+        [ -d "$DISK/$os" ] || printf '%s: not on the disk yet; it is added\n' "$os"
         # already there: an older mu300-update installed this release's system, and this run is for the boot image
         # (moving Ubuntu to the other release with MU300_UBUNTU is an update even at the same tag)
         other=
@@ -1925,6 +2016,7 @@ apply() {
         *" $(running_os) "*) printf '\nReboot to start the updated %s. The previous version is kept: mu300-update rollback\n' "$(running_os)" ;;
         *) printf '\nDone. The updated system is used the next time you switch to it.\n' ;;
     esac
+    [ -z "$ADDED" ] || printf 'Added: %s- the password is the running system'"'"'s; switch with mu300-os <name> and reboot.\n' "$ADDED"
 }
 
 # <os>.broken is what a rollback left behind: the system it rolled back from, kept until the reboot because it may
@@ -1991,9 +2083,9 @@ case ${1:-check} in
     rollback) shift; rollback "$@" ;;
     rollback-boot) rollback_boot ;;
     kernel) shift; kernel_cmd "$@" ;;
-    accounts) accounts ;;
+    accounts) shift; accounts "$@" ;;
     clean) clean ;;
     notice) notice ;;
-    -h|--help|help) sed -n '2,19s/^# \{0,1\}//p' "$0" ;;
-    *) echo "usage: mu300-update check|version|apply [--no-reinstall] [ubuntu|openwrt|openwrt-luci ...]|boot|kernel [5.4|6.18|7.2]|rollback [os]|rollback-boot|clean|notice" >&2; exit 2 ;;
+    -h|--help|help) sed -n '2,23s/^# \{0,1\}//p' "$0" ;;
+    *) echo "usage: mu300-update check|version|apply [--no-reinstall] [ubuntu|openwrt|openwrt-luci ...]|boot|kernel [5.4|6.18|7.2]|rollback [os]|rollback-boot|accounts [os ...]|clean|notice" >&2; exit 2 ;;
 esac

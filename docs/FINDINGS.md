@@ -3717,3 +3717,32 @@ Fix (`upstream/modules/sprd_wlan_combo`):
   `timer_shutdown_sync` pass after the lock is dropped waits for it).
 
 Built for 6.18.56 and 7.2.10 (modules only). Device test: see the PR for #146.
+
+### 46. A system added later had no password (issue #167)
+
+Found on F50-B (installed with Ubuntu, `openwrt` and `openwrt-luci` put on the disk afterwards): `sudo mu300-os
+openwrt-luci && reboot` booted the panel system, LuCI served, and **no login worked** - root with the Ubuntu
+password, empty, `root`: refused by dropbear and by rpcd (`session.login` result 6) alike. The image ships
+`root:::0:99999:7:::`, an empty password, and `mu300-update` only ran `merge_accounts` for a system it *updated*
+(from `<os>.old`); a system *added* had nothing to merge from, so it kept the image's root. An empty hash is not a
+password anyone can type: dropbear, rpcd and sshd all refuse it. The only way back was the Android fallback (power
+cuts during boot) and editing `/.mu300/boot-os` from Android.
+
+Fix (`mu300-update`, `mu300-os`):
+- `mu300-update apply <os>` adds a system that is not on the disk (before, it died with "not installed"): the
+  release's image, the vendor files from the systems already here (gaps only; Ubuntu keeps firmware and modules
+  under `usr/lib`, OpenWrt under `lib`, both looked at), and the accounts from the *running* system
+  (`accounts_into`). The same kind gets the merge an update does (hashes, the users added on the device); across
+  kinds only the password crosses, the way the installer's `PWHASH` seeds both: the Ubuntu `ubuntu` user's hash
+  onto OpenWrt's `root`, root's onto Ubuntu's `ubuntu` (Ubuntu's root stays locked). It prints "accounts and
+  passwords carried over from the running <os>"; a running system with no usable hash to give leaves the image's
+  accounts and says to run `mu300-update accounts <os>` once there is one.
+- `mu300-update accounts <os>...` does the same on demand (a system added by an earlier updater, or after a
+  password change); without a name it is still the boot-time merge from `<os>.old` (mu300-accounts.service).
+- `mu300-os <os>` refuses a system nobody can log in to - OpenWrt: `root` without a `$id$...` hash (empty, `*`,
+  `!`); other kinds: no account with one - with "mu300-os <os> has no usable root password yet; run
+  `mu300-update accounts <os>` first". `--force` switches anyway; a system without a readable `etc/shadow` is not
+  judged (bootability over lockdown: the check never blocks what it cannot see).
+
+Tests: `tests/test_update.py` (`AddedSystem`), `tests/test_device_scripts.py` (`Os`). Not device-tested yet: the
+add path's vendor and module copy runs on a device for the first time with this change.

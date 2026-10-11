@@ -1590,6 +1590,56 @@ class Os(ShellTest):
             self.assertEqual(r.returncode, 1)
             self.assertFalse((self.disk / '.mu300' / 'boot-os').exists())
 
+    def shadow(self, name, text, openwrt=True):
+        (self.disk / name / 'etc' / 'shadow').write_text(text)
+        if openwrt:
+            (self.disk / name / 'etc' / 'openwrt_release').write_text('DISTRIB_ID=OpenWrt\n')
+
+    def test_a_system_nobody_can_log_in_to_is_refused_unless_forced(self):
+        # issue #167: an openwrt-luci that mu300-update added kept the image's empty root; dropbear and rpcd refuse
+        # it, and the switch locked the user out until the Android fallback
+        boot_os = self.disk / '.mu300' / 'boot-os'
+        for shell in self.each_shell():
+            boot_os.unlink(missing_ok=True)
+            for h in ('', '*', '!', '!$6$x$y'):
+                self.shadow('openwrt-luci', f'root:{h}:0:99999:7:::\nkaan:$6$kaan$hash:19000:0:99999:7:::\n')
+                r = self.os(shell, 'openwrt-luci')
+                self.assertEqual(r.returncode, 1, (shell, h))
+                self.assertIn('mu300-os: openwrt-luci has no usable root password yet; run `mu300-update accounts openwrt-luci` first', r.stderr)
+                self.assertFalse(boot_os.exists(), h)
+            for args in (('--force', 'openwrt-luci'), ('openwrt-luci', '--force')):
+                boot_os.unlink(missing_ok=True)
+                r = self.os(shell, *args)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertEqual(boot_os.read_text().strip(), 'openwrt-luci')
+            boot_os.unlink(missing_ok=True)
+            self.shadow('openwrt-luci', 'root:$6$salt$hash:19000:0:99999:7:::\n')
+            r = self.os(shell, 'openwrt-luci')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(boot_os.read_text().strip(), 'openwrt-luci')
+            self.assertNotIn('password', r.stderr)
+            # two names, or a name with a dot, are still refused
+            self.assertEqual(self.os(shell, 'openwrt-luci', 'openwrt').returncode, 1)
+
+    def test_a_system_whose_root_is_locked_by_design_needs_another_account(self):
+        # Ubuntu (and Arch, Debian...) log in as a user; root's * means nothing there
+        boot_os = self.disk / '.mu300' / 'boot-os'
+        for shell in self.each_shell():
+            boot_os.unlink(missing_ok=True)
+            self.shadow('ubuntu', 'root:*:19000:0:99999:7:::\nubuntu:$6$salt$hash:19000:0:99999:7:::\n', openwrt=False)
+            r = self.os(shell, 'ubuntu')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(boot_os.read_text().strip(), 'ubuntu')
+            boot_os.unlink()
+            self.shadow('ubuntu', 'root:*:19000:0:99999:7:::\nubuntu:!:19000:0:99999:7:::\n', openwrt=False)
+            r = self.os(shell, 'ubuntu')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('mu300-os: ubuntu has no account with a usable password yet; run `mu300-update accounts ubuntu` first', r.stderr)
+            self.assertFalse(boot_os.exists())
+            # no etc/shadow to judge by (a system of another kind, or one that cannot be read): not refused
+            (self.disk / 'ubuntu' / 'etc' / 'shadow').unlink()
+            self.assertEqual(self.os(shell, 'ubuntu').returncode, 0)
+
 
 class Led(ShellTest):
     # the U30 Air's: power is the battery LED's white (the PMIC's green channel), the network LED blue on 4G
