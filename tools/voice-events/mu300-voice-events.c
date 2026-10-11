@@ -134,7 +134,7 @@ static int listen_on(const char *path, const char *group)
 	mode_t old = umask(0177);
 	int r = bind(s, (struct sockaddr *)&a, sizeof a);
 	umask(old);
-	if (r < 0 || listen(s, 8) < 0) {
+	if (r < 0) {
 		perror("mu300-voice-events: bind");
 		close(s);
 		return -1;
@@ -143,6 +143,13 @@ static int listen_on(const char *path, const char *group)
 		struct group *g = getgrnam(group);
 		if (!g || chown(path, (uid_t)-1, g->gr_gid) < 0 || chmod(path, 0660) < 0)
 			fprintf(stderr, "mu300-voice-events: group %s not applied, the socket stays 0600\n", group);
+	}
+	/* only now: a reader that can connect finds the socket's mode final */
+	if (listen(s, 8) < 0) {
+		perror("mu300-voice-events: listen");
+		close(s);
+		unlink(path);
+		return -1;
 	}
 	return s;
 }

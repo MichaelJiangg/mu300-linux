@@ -147,14 +147,65 @@ class Commands(VoiceTest):
             self.assertEqual(json.loads(r.stdout), {'v': 1, 'action': 'call', 'ok': True, 'id': 1})
             self.assertEqual(self.at_log(), ['ATD4440000;', 'AT+CLCC'])
 
+    # refused by every command that puts its argument into an AT command
+    INJECTIONS = ('123;+CFUN=0', '123\rAT+CFUN=0', '123\nAT+CFUN=0', '123"', "123'", '1 2', 'AT', '+', '+CFUN=0',
+                  '1+2', '١٢٣', '123\x1a', '1;', '1\r')
+
     def test_call_refuses_what_is_not_a_number(self):
         for sh in self.each_shell():
-            for bad in ('1;+CFUN=0', '12+3', '', 'abc', '1' * 33, '1\r2', '-5'):
+            # and for a call also MMI codes, and too short or too long
+            for bad in self.INJECTIONS + ('*100#', '#31#5321234540', '12', '1' * 21, '12+3', '', 'abc', '-5'):
                 self.reset()
                 r = self.voice(sh, 'call', '--json', '--', bad) if bad.startswith('-') else \
                     self.voice(sh, 'call', bad, '--json')
                 self.assertNotEqual(r.returncode, 0, bad)
                 self.assertEqual(self.at_log(), [], bad)
+
+    def test_no_injection_reaches_the_modem(self):
+        for sh in self.each_shell():
+            for bad in self.INJECTIONS:
+                for cmd in ('dtmf', 'hangup', 'answer'):
+                    with self.subTest(cmd=cmd, bad=bad):
+                        self.reset()
+                        self.clcc(INCOMING)
+                        r = self.voice(sh, cmd, bad, '--json')
+                        self.assertNotEqual(r.returncode, 0)
+                        self.assertFalse([c for c in self.at_log() if c != 'AT+CLCC'])
+                        if r.stdout:
+                            # the answer stays one JSON object: the refused value is never echoed into it
+                            self.assertFalse(json.loads(r.stdout)['ok'])
+                            self.assertNotIn('CFUN', r.stdout)
+
+    def test_emergency_numbers_are_not_called(self):
+        for sh in self.each_shell():
+            for n in ('112', '+112', '911', '999', '155', '110', '000', '08'):
+                self.reset()
+                r = self.voice(sh, 'call', n, '--json')
+                self.assertEqual(r.returncode, 1, n)
+                self.assertEqual(self.at_log(), [], n)
+            self.reset()
+            self.clcc('+CLCC: 1,0,2,0,0,"4440000",129\nOK\n')
+            self.assertEqual(self.voice(sh, 'call', '4440000').returncode, 0)
+
+    def test_through_sudo_only_the_api_grammar(self):
+        for sh in self.each_shell():
+            for args in (('call', '4440000', '--json', '--demo'), ('answer', '--demo', '--json'), ('audio', 'start'),
+                         ('audio', 'stop'), ('watch',), ('demo',), ('tone',), ('echo',), ('events',),
+                         ('call', '4440000', '--json', '--conf', '/tmp/x'), ('dtmf', '1', '--json', 'extra')):
+                with self.subTest(args=args):
+                    self.reset()
+                    self.clcc(INCOMING)
+                    r = self.voice(sh, *args, SUDO_USER='dikecphone')
+                    self.assertEqual(r.returncode, 2, r.stderr)
+                    self.assertEqual(self.at_log(), [])
+            # the grammar itself still works through sudo
+            self.reset()
+            self.clcc(INCOMING)
+            r = self.voice(sh, 'answer', '1', '--json', SUDO_USER='dikecphone')
+            self.assertEqual(json.loads(r.stdout)['ok'], True)
+            self.reset()
+            r = self.voice(sh, 'dtmf', '12', '--json', SUDO_USER='dikecphone')
+            self.assertEqual(json.loads(r.stdout)['sent'], 2)
 
     def test_call_modem_error(self):
         for sh in self.each_shell():
@@ -354,7 +405,12 @@ class EventSocket(unittest.TestCase):
 
     def client(self):
         c = socket.socket(socket.AF_UNIX)
-        c.connect(str(self.sock))
+        for _ in range(100):    # the file exists from bind(), the socket listens a moment later
+            try:
+                c.connect(str(self.sock))
+                break
+            except (ConnectionRefusedError, FileNotFoundError):
+                time.sleep(0.02)
         c.settimeout(3)
         f = c.makefile('r')
         self.addCleanup(c.close)
@@ -366,8 +422,9 @@ class EventSocket(unittest.TestCase):
             f.write(''.join(l + '\n' for l in lines))
 
     def test_snapshot_then_lines_to_every_reader(self):
-        self.assertEqual(self.sock.stat().st_mode & 0o777, 0o660)
         a, fa = self.client()
+        # the mode is final before the first reader can connect
+        self.assertEqual(self.sock.stat().st_mode & 0o777, 0o660)
         b, fb = self.client()
         for f in (fa, fb):
             self.assertEqual(json.loads(f.readline())['event'], 'snapshot')

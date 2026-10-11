@@ -719,11 +719,30 @@ modem_error() {
     echo "${e:-no answer from the modem}"
 }
 is_id() { case $1 in [1-9]) return 0 ;; esac; return 1; }
-# Only a call's own id reaches an AT command, and only a number made of digits (with a leading +, and * #) reaches
-# ATD: anything else would be sent to the modem as it is, and "ATD1;+CFUN=0" is two commands.
+# Only a call's own id (1-9) reaches AT+CHLD, only 0-9 * # A-D reach AT+VTS, and only a number - digits with at
+# most a leading +, 3 to 20 of them - reaches ATD: anything else would be sent to the modem as it is, and
+# "ATD1;+CFUN=0" is two commands. No * or # in a number: those are MMI/USSD codes, not calls (tones go by dtmf).
+# Each value is checked exactly as it is put into the command; nothing is normalised after the check.
 valid_number() {
-    case $1 in ''|*[!0-9+*#]*|?*+*) return 1 ;; esac
-    [ ${#1} -le 32 ]
+    case $1 in ''|*[!0-9+]*|?*+*|+) return 1 ;; esac
+    [ ${#1} -ge 3 ] && [ ${#1} -le 20 ]
+}
+# Emergency numbers are not placed through this API: a script or a remote SIP client must not be able to call
+# them, and a modem places them even without a SIM. The common ones world-wide and Turkey's, with or without a +.
+is_emergency() {
+    case ${1#+} in
+        112|911|999|000|08|110|118|119|100|101|102|103|104|105|106|108|155|156|157|158|177|061|15|17|18) return 0 ;;
+    esac
+    return 1
+}
+# Through sudo (the mu300voice group's way in, contrib/voice-api/sudoers.mu300voice) only the API's own grammar is
+# accepted, whatever the sudoers wildcards let through: status --json, call NUMBER, answer [ID] [--wait S],
+# hangup [ID], dtmf DIGITS - no --demo (the audio test, which plays into the call and loops), no audio, watch,
+# demo, tone or echo. sudo has already reset the environment (no MU300_* variable, no other voice.conf).
+api_only() {
+    [ -n "${SUDO_USER:-}" ] && [ "${SUDO_USER:-}" != root ] || return 0
+    case $cmd in status|call|answer|hangup|dtmf) ;; *) echo "mu300-voice: through sudo only status, call, answer, hangup and dtmf" >&2; exit 2 ;; esac
+    [ "$DEMO" = 0 ] || { echo "mu300-voice: through sudo no --demo" >&2; exit 2; }
 }
 # Leave the DSP to watch where it runs; a command on its own stops the scene once no call is left.
 audio_after_hangup() {
@@ -734,6 +753,7 @@ audio_after_hangup() {
 
 cmd=${1:-status}
 [ $# -gt 0 ] && shift
+api_only
 case $cmd in
 audio)
     case "${1:-}" in
@@ -774,7 +794,9 @@ status)
 
 call)
     opts "$@"
-    valid_number "$ARG" || result call false "not a number: digits, a leading +, * and # only, at most 32"
+    api_only
+    valid_number "$ARG" || result call false "not a number: 3 to 20 digits, a leading + allowed"
+    is_emergency "$ARG" && result call false "emergency numbers are not placed through mu300-voice"
     r=$(at "ATD$ARG;" 20)
     printf '%s\n' "$r" | grep -q '^OK' || result call false "$(modem_error "$r")"
     # the new call's id: the newest outgoing call that is being set up
@@ -793,7 +815,8 @@ call)
 
 answer)
     opts "$@"
-    [ -z "$ARG" ] || is_id "$ARG" || result answer false "not a call id: $ARG"
+    api_only
+    [ -z "$ARG" ] || is_id "$ARG" || result answer false "not a call id (1-9)"
     end=$(( $(date +%s) + ${WAIT:-0} ))
     [ -n "$WAIT" ] && [ "$JSON" = 0 ] && echo "waiting up to ${WAIT}s for a call..." >&2
     pick=
@@ -827,7 +850,7 @@ answer)
 hangup)
     opts "$@"
     if [ -n "$ARG" ]; then
-        is_id "$ARG" || result hangup false "not a call id: $ARG"
+        is_id "$ARG" || result hangup false "not a call id (1-9)"
         # release that call alone (3GPP 27.007 +CHLD=1x)
         r=$(at "AT+CHLD=1$ARG" 10)
     else
@@ -844,7 +867,9 @@ dtmf)
     d=$ARG; sent=0
     while [ -n "$d" ]; do
         c=${d%"${d#?}"}; d=${d#?}
-        c=$(printf '%s' "$c" | tr 'abcd' 'ABCD')
+        case $c in a) c=A ;; b) c=B ;; c) c=C ;; d) c=D ;; esac
+        # exactly one of these, checked as it is sent
+        case $c in [0-9]|'*'|'#'|A|B|C|D) ;; *) result dtmf false "not DTMF: 0-9 * # A-D only" ",\"sent\":$sent" ;; esac
         r=$(at "AT+VTS=$c" 5)
         printf '%s\n' "$r" | grep -q '^OK' || result dtmf false "$(modem_error "$r")" ",\"sent\":$sent"
         sent=$((sent + 1))

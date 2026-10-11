@@ -34,9 +34,13 @@ Without the group every one of them is root's alone (0700/0600). The group name 
 
 The AT channel is not given to the group by any of this: an AT command can do anything to the modem (radio, SIM,
 data, SMS), so `mu300-at` stays root's. A service that is not root places and answers calls through the commands
-below, which check every argument, via sudo: `contrib/voice-api/sudoers.mu300voice` allows exactly `status --json`,
+below, which check every argument, via sudo: `contrib/voice-api/sudoers.mu300voice` allows `status --json`,
 `call`, `answer`, `hangup` and `dtmf` (and, commented out, `sms send`), and sudo's environment reset keeps every
-`MU300_*` variable away from them. OpenWrt has no sudo: there a service that places or answers calls runs as root.
+`MU300_*` variable away from them. sudoers wildcards also match extra words, so the grammar is enforced by
+`mu300-voice` itself: run through sudo (`SUDO_USER` set) it takes only `status`, `call NUMBER`, `answer [ID]
+[--wait S]`, `hangup [ID]`, `dtmf DIGITS` (each with `--json`) and refuses anything else - `--demo`, `audio`,
+`watch`, an unknown option, an extra argument - with exit 2 before the modem is touched. OpenWrt has no sudo: there
+a service that places or answers calls runs as root.
 
 Phone numbers are never written to a log in full - `mu300-voice` masks them (`+905321234540` -> `+90********40`)
 in everything it logs. The API itself carries them in full (that is its job: a dialer shows who is calling), in
@@ -76,7 +80,7 @@ the call commands use `mu300-voice` below rather than raw ATD/ATA/CHUP/VTS: it v
 ## (b) Call control
 
     mu300-voice status --json
-    mu300-voice call NUMBER --json          # NUMBER: digits, a leading +, * and #; at most 32
+    mu300-voice call NUMBER --json          # NUMBER: 3-20 digits, a leading + allowed; no emergency numbers
     mu300-voice answer [ID] [--wait SECONDS] --json
     mu300-voice hangup [ID] --json
     mu300-voice dtmf DIGITS --json          # 0-9 * # A-D, at most 32, one AT+VTS each
@@ -91,7 +95,10 @@ Each prints one JSON line and exits 0 on success, 1 on failure (2: a usage error
 `error` is mu300-voice's own text or the modem's final result code, never other text. What the commands do:
 
 * `call` sends `ATD<number>;` (a voice call) and returns once the modem took it; `id` is the new call's id when
-  AT+CLCC already shows it. The call's progress (dialing, alerting, active, ended) comes as events.
+  AT+CLCC already shows it. The call's progress (dialing, alerting, active, ended) comes as events. No `*` or
+  `#` in a number (MMI/USSD codes are not calls; tones go by `dtmf`), and emergency numbers (112, 911, 999, 155,
+  156, 110, 000, ... with or without +) are refused: a script or a remote SIP client must not be able to dial them.
+  Every argument is checked exactly as it goes into the AT command; a refused value is never echoed back.
 * `answer` answers the incoming call (`ATA`), or a waiting one (`AT+CHLD=2`: the active call goes on hold). With
   an `ID`, only that call. `--wait S` waits up to S seconds for one to ring first.
 * `hangup` ends every call (`AT+CHUP`, also rejects a ringing one), or with an `ID` that call alone
