@@ -294,7 +294,7 @@ merge_accounts() {  # merge_accounts OLD_ROOT NEW_ROOT   ("" is the running syst
     [ -f "$o/etc/shadow" ] && [ -f "$n/etc/shadow" ] || return 0
     for f in passwd group shadow gshadow; do
         [ -f "$o/etc/$f" ] && [ -f "$n/etc/$f" ] || continue
-        awk -F: -v OFS=: -v f="$f" -v op="$o/etc/passwd" -v og="$o/etc/group" '
+        ( umask 077; awk -F: -v OFS=: -v f="$f" -v op="$o/etc/passwd" -v og="$o/etc/group" '
             BEGIN {
                 while ((getline l < op) > 0) { split(l, a, ":"); if (a[3] >= 1000 && a[3] < 60000) lu[a[1]] = 1 }
                 while ((getline l < og) > 0) { split(l, a, ":"); if (a[3] >= 1000 && a[3] < 60000) lg[a[1]] = 1 }
@@ -316,9 +316,11 @@ merge_accounts() {  # merge_accounts OLD_ROOT NEW_ROOT   ("" is the running syst
                     if ((f == "passwd" || f == "shadow") && (x in lu)) print old[x]
                     if ((f == "group" || f == "gshadow") && (x in lg)) print old[x]
                 }
-            }' "$o/etc/$f" "$n/etc/$f" > "$n/etc/$f.mu300" || { rm -f "$n/etc/$f.mu300"; return 1; }
+            }' "$o/etc/$f" "$n/etc/$f" > "$n/etc/$f.mu300" ) || { rm -f "$n/etc/$f.mu300"; return 1; }
         # renamed into place, never rewritten: a crash (or a reader at boot) never sees a half-written passwd.
         # The copy made with cp -p keeps the file's owner and mode (shadow is root:shadow 0640; no stat on OpenWrt).
+        # The scratch copy awk writes holds every hash, so it is made under umask 077 (the subshell above: the
+        # caller's umask, root's 022, left it world-readable for a moment); what replaces the file is the cp -p copy.
         if [ -s "$n/etc/$f.mu300" ]; then
             cp -p "$n/etc/$f" "$n/etc/$f.mu300-new" && cat "$n/etc/$f.mu300" > "$n/etc/$f.mu300-new" && sync &&
                 mv -f "$n/etc/$f.mu300-new" "$n/etc/$f" || { rm -f "$n/etc/$f.mu300" "$n/etc/$f.mu300-new"; return 1; }
@@ -357,8 +359,7 @@ accounts_into() {
     _rk=$(os_kind "$_ro") _ru=$(pw_user "$(os_kind "$_ro")") _nu=$(pw_user "$_k")
     [ -f "$_n/etc/shadow" ] || { echo "$2: no etc/shadow; its accounts stay the image's" >&2; return 1; }
     if [ "$_k" = "$_rk" ]; then
-        # under umask 077, as set_hash: the merge's scratch copies of shadow and gshadow hold every hash
-        ( umask 077; merge_accounts "$_r" "$_n" ) || { echo "$2: could not carry the accounts over; the image's default password applies" >&2; return 1; }
+        merge_accounts "$_r" "$_n" || { echo "$2: could not carry the accounts over; the image's default password applies" >&2; return 1; }
     else
         _h=$(hash_of "$_r" "$_ru")
         usable_hash "$_h" || { echo "$2: the running $_ro has no usable password for $_ru to give $_nu; $2 keeps the image's accounts" >&2; return 1; }

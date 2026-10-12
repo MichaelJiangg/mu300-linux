@@ -525,7 +525,7 @@ merge_accounts() {  # merge_accounts OLD_ROOT NEW_ROOT   ("" is the running syst
     [ -f "$o/etc/shadow" ] && [ -f "$n/etc/shadow" ] || return 0
     for f in passwd group shadow gshadow; do
         [ -f "$o/etc/$f" ] && [ -f "$n/etc/$f" ] || continue
-        awk -F: -v OFS=: -v f="$f" -v op="$o/etc/passwd" -v og="$o/etc/group" '
+        ( umask 077; awk -F: -v OFS=: -v f="$f" -v op="$o/etc/passwd" -v og="$o/etc/group" '
             BEGIN {
                 while ((getline l < op) > 0) { split(l, a, ":"); if (a[3] >= 1000 && a[3] < 60000) lu[a[1]] = 1 }
                 while ((getline l < og) > 0) { split(l, a, ":"); if (a[3] >= 1000 && a[3] < 60000) lg[a[1]] = 1 }
@@ -547,9 +547,11 @@ merge_accounts() {  # merge_accounts OLD_ROOT NEW_ROOT   ("" is the running syst
                     if ((f == "passwd" || f == "shadow") && (x in lu)) print old[x]
                     if ((f == "group" || f == "gshadow") && (x in lg)) print old[x]
                 }
-            }' "$o/etc/$f" "$n/etc/$f" > "$n/etc/$f.mu300" || { rm -f "$n/etc/$f.mu300"; return 1; }
+            }' "$o/etc/$f" "$n/etc/$f" > "$n/etc/$f.mu300" ) || { rm -f "$n/etc/$f.mu300"; return 1; }
         # renamed into place, never rewritten: a crash (or a reader at boot) never sees a half-written passwd.
         # The copy made with cp -p keeps the file's owner and mode (shadow is root:shadow 0640; no stat on OpenWrt).
+        # The scratch copy awk writes holds every hash, so it is made under umask 077 (the subshell above: the
+        # caller's umask, root's 022, left it world-readable for a moment); what replaces the file is the cp -p copy.
         if [ -s "$n/etc/$f.mu300" ]; then
             cp -p "$n/etc/$f" "$n/etc/$f.mu300-new" && cat "$n/etc/$f.mu300" > "$n/etc/$f.mu300-new" && sync &&
                 mv -f "$n/etc/$f.mu300-new" "$n/etc/$f" || { rm -f "$n/etc/$f.mu300" "$n/etc/$f.mu300-new"; return 1; }

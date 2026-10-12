@@ -1074,6 +1074,26 @@ class AddedSystem(UpdateBase):
             r = self.up(shell, 'accounts', MU300_ROOT=self.disk / 'ubuntu')
             self.assertEqual((r.returncode, r.stdout), (0, ''), r.stderr)
 
+    def test_an_update_writes_private_scratch_copies_too(self):
+        # the umask is inside merge_accounts itself, so the update path (and the installer's byte-identical copy,
+        # test_android_install) gets the same: 0600 scratch copies under the caller's umask 022
+        self.openwrt()
+        modes = self.tmp / 'modes'
+        self.stub('awk', f'for last; do :; done\nls -l "$last.mu300" 2>/dev/null | cut -c1-10 >> "{modes}"\nexec /usr/bin/awk "$@"')
+        for shell in self.each_shell():
+            modes.unlink(missing_ok=True)
+            for d in ('openwrt.old', 'openwrt.new'):
+                shutil.rmtree(self.disk / d, ignore_errors=True)
+            self.image('openwrt')
+            r = self.up(shell, 'umask 022; is_root() { false; }; apply_one openwrt v2')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(modes.read_text().splitlines(), ['-rw-------'] * 4)
+            self.assertEqual(self.shadow('openwrt')['root'], self.OPENWRT)
+            self.assertEqual((self.disk / 'openwrt/etc/shadow').stat().st_mode & 0o777, 0o640)
+            self.assertNotIn('$6$', r.stdout + r.stderr)
+            for f in os.listdir(self.disk / 'openwrt/etc'):
+                self.assertNotIn('.mu300', f)
+
     def test_apply_adds_a_named_system_that_is_not_on_the_disk(self):
         src = (BIN / 'mu300-update').read_text()
         body = src[src.index('\napply() {'):src.index('\n}\n', src.index('\napply() {'))]
