@@ -122,6 +122,7 @@ what replaced it. The table below gives each section's state.
 | 54 | A webhook body of the user's own for SMS forwarding: values escaped for the type, never evaluated (#171) | current (unit tests; not sent from a device to a real service) |
 | 55 | Imported Android files nobody but root could read: the CP was never loaded (#127, #135, #170) | current (fixed; what differed between #170's boots is not known) |
 | 56 | The VPN page showed a refused config without its reason; the engines' own defects are in the VPN module's FINDINGS 26i-26m | current (fixed; measured on the U30 Air) |
+| 57 | A 64 GB unit whose partition table has `userdata` filling the disk, and no way to make room from Windows (#32) | current (fixed; unit tests against a table built from #9's figures, not measured on a device) |
 | 60 | `/run` takes files from every user: the daemons' directories there are checked, and a squatted name is put out of the way (review of #145/#149) | current (fixed for mu300-atd and mu300-voice, F50-B on 5.4 and 7.2.10); `/run` itself is still 1777 |
 | 61 | The voice API on a device: a grammar keyed on sudo locked the administrator out, events that needed root, state that outlived the watch (review of #149) | current (fixed; F50-B on 5.4 and 7.2.10, synthetic calls); no real call placed or answered |
 
@@ -264,8 +265,8 @@ Asked for often, because a smaller eMMC variant leaves less free space behind `u
   * Why only `userdata`: it is the **last** partition, so its end moves and nothing else does. Every other
     partition keeps its offset and the AVB descriptors and the boot chain stay valid. That is the entire
     safety argument, and it does not transfer to any other partition on these devices.
-  * `install.sh` offers it when there is no room, asks how many GiB to give Linux and keeps at least 4 GiB for
-    Android and 800 MiB for Linux, and requires ERASE to be typed. `uninstall.sh` offers to grow it back, off
+  * `install.sh` (and `install.ps1`, #57) offers it when there is no room, asks how many GiB to give Linux and
+    keeps at least 4 GiB for Android and 800 MiB for Linux, and requires ERASE to be typed. `uninstall.sh` offers to grow it back, off
     by default because on the 64 GB variant that would hand the factory gap to Android.
     `tools/resize-last-partition.py` does the edit: it validates both GPT copies and every CRC first, refuses
     if the named partition is not the last one, and re-reads what it produced before handing it over. The
@@ -4557,6 +4558,56 @@ as sing-box), `profile_check`, `use`, `status` with the exit address, `logs` per
 all as the page expects. `sub_add` takes https only, which could not be served on the test link (the CLI's
 `--insecure` did the subscriptions there). Not looked at in a browser: the pages themselves.
 
+### 57. A 64 GB unit whose partition table has userdata filling the disk, and no way to make room from Windows (#32)
+
+Reported in issue #32, in three lines and without a number from the device: on a 64 GB unit a vendor firmware image
+replaced the partition table by one in which `userdata` "fills the entire disk"; `install.ps1` refused it as a layout
+it does not know; and a 4096-sector alignment computation came out as -4 MiB. **Nothing here was measured on a
+device.** We have no unit with that table, and the issue has no `-Check` output, no sector and no name of the image.
+Not known: which image it was, where `userdata` begins in that table, whether it is the last entry, whether the other
+partitions are where the factory table has them, and whether the GPT's last usable LBA is the factory one.
+
+What the code says about it:
+
+* **The -4 MiB is the region arithmetic, and it is what a table that ends at the end of the eMMC gives.** Both
+  installers take the free region from the first 4096-sector (2 MiB) boundary behind the last partition - the next
+  one even when the partition ends on one - to the last boundary but one before the backup GPT (`region_probe` in
+  `tools/storage.sh`, the same two lines in `install.ps1`). With the figures of #9 (122159104 sectors, last usable
+  LBA 122155007) and `userdata` up to the last usable LBA, the partitions end at sector 122155008 = 29823 x 4096:
+  the start is 29824 x 4096 = 122159104, the end of the disk, and the end is 29822 x 4096 = 122150912, which is
+  8192 sectors or 4 MiB before it. Any table whose last partition ends in the last 2 MiB of this eMMC gives the
+  same -4 MiB, so the number fits the report and does not tell where exactly `userdata` ends.
+* When the issue was written, `install.ps1` printed that number ("only -4 MiB of free space after the last
+  partition: this device has a different layout") and `install.sh` went on to `offer_repartition`. Since the fix
+  for #65 a crossed region is an empty one in both, so Windows said "only 0 MiB" - and still had nothing to offer.
+  The arithmetic is now a function there (`FreeRegion`) with the layout above among its tests.
+* **`install.ps1` had no make-room path at all**; `offer_repartition` (#9b) existed in `install.sh` only. It now has
+  `OfferRepartition`, the same steps in the same order: the first 34 and the last 33 sectors of the eMMC are copied
+  to `work\gpt\gpt.head` and `gpt.tail` (that copy is the backup of the table) and nothing else is read;
+  `tools/resize-last-partition.py --show` checks both GPT copies and refuses when `userdata` is not the last
+  partition; at least 4 GiB stay with Android and Linux gets at least 800 MiB; the questions are the same (yes/no
+  with no as the default, the GiB for Linux, the word `ERASE` typed as it is); the backup GPT is written before the
+  primary; the table is read back and compared; the first 32 MiB of `userdata` are cleared so that Android formats
+  it; the device reboots and the installer is run again. Only those three writes exist: the two copies of the table
+  and the start of `userdata`. `-Check` prints the figures and writes nothing.
+* Two things the Windows path does that `install.sh` does not: it compares the SHA-256 of the two pushed files on
+  the device with the ones the tool made before `dd` writes them (a push that failed or stopped halfway would be
+  written as it is), and it deletes the table files of an earlier run before it reads the table, so one of them
+  cannot stand in for a read that failed. Neither was seen to go wrong; both are cheap.
+* A refusal now carries its figures: the eMMC's size in GiB and sectors, the sector the partitions end at, the free
+  MiB behind them, the 700 MiB needed there and what is missing; the tool's own reason when it refuses the table
+  ("the last partition is 'x', not 'userdata'", a CRC that does not match); and, when there is too little to
+  split, `userdata`'s sectors, the 4096 + 800 MiB needed and what is missing.
+
+What is tested, and what is not: `tests/fakegpt.py` builds the table of #9 with `userdata` extended to the last
+usable LBA (the other partitions' sizes are made up; only `userdata`'s sectors and the order matter), and the real
+tool edits it. `tests/test_resize_last_partition.py` checks that the edit changes `userdata`'s last sector and the
+CRCs and no other byte, and what is refused; `tests/installer.Tests.ps1` runs `OfferRepartition` under Windows
+PowerShell 5.1 and PowerShell 7 against three stubs for the device and checks every answer that must change
+nothing, the order of the writes, and the refusals. **Not run: `install.ps1` on a Windows machine against a
+device, and either installer on a unit with this table.** The shrink itself has been done on one 32 GB unit (#9b,
+issue #2); whether Android formats a 64 GB `userdata` that was shrunk this way after a vendor flash is not known.
+`uninstall.ps1` does not offer to grow `userdata` back; `uninstall.sh` does.
 
 ### 60. `/run` takes files from every user: the daemons' directories there are checked, and a squatted name is put out of the way (review of #145/#149)
 

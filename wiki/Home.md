@@ -56,6 +56,8 @@ kernels to choose from; 5G/LTE internet shared over Wi-Fi and USB; SSH, and `adb
 SMS and USSD; an optional VPN module; a web panel on Ubuntu too (Cockpit with an MU300 page, optional); a
 `raspi-config`-like menu called `mu300-toolkit`; automatic fallback to Android; updates on the device.
 
+**Follow the project:** releases and news are announced on the Telegram channel, [t.me/mu300project](https://t.me/mu300project).
+
 ## New in v2026.10.23
 
 The release of 2026-10-23 (a prerelease first, promoted once a board has run it). What it changes, and where to read

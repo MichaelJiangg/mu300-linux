@@ -28,3 +28,4 @@
 * [Website](https://kaandikec.com/mu300-linux/)
 * [README](https://github.com/dikeckaan/mu300-linux#readme)
 * [Releases](https://github.com/dikeckaan/mu300-linux/releases)
+* [Telegram channel](https://t.me/mu300project)
