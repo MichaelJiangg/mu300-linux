@@ -140,7 +140,16 @@ find_card() {
     [ "$CAP" = "hw:$card," ] && CAP=hw:$card,9
     return 0
 }
-need_card() { find_card || { echo "mu300-voice: the sound card is not registered; run mu300-audio-dsp load" >&2; exit 1; }; }
+# why there is none: on a kernel without the audio drivers (every mainline one, and 5.4 as released) there is nothing
+# to load, and saying "run mu300-audio-dsp load" there sends the reader after something that cannot work
+no_card() {
+    if [ -d "${MU300_MODULES:-/lib/modules}/$(uname -r)/audio" ]; then
+        echo "the sound card is not registered; run mu300-audio-dsp load"
+    else
+        echo "no call audio on this kernel ($(uname -r)): the audio drivers are for 5.4 and not in the releases (kernel/build-audio.sh)"
+    fi
+}
+need_card() { find_card || { echo "mu300-voice: $(no_card)" >&2; exit 1; }; }
 
 # a fraction of a second where some sleep can do it (the static busybox next to us can; see mu300-at), else 1 s
 bb=${MU300_BUSYBOX:-/opt/mu300/bin/busybox}
@@ -270,7 +279,7 @@ scene_running() { [ -f "$SCENE_PID" ] && kill -0 "$(cat "$SCENE_PID")" 2>/dev/nu
 audio_start() {   # audio_start OUTPUT [PIPES] - PIPES 1: the two audio pipes as well (output dsp only)
     out=${1:-${OUTPUT:-dsp}}
     case $out in bt|dsp) ;; *) log "no output '$out' (bt or dsp)" >&2; return 2 ;; esac
-    find_card || { log "the sound card is not registered; run mu300-audio-dsp load" >&2; return 1; }
+    find_card || { echo "mu300-voice: $(no_card)" >&2; return 1; }
     scene_running &&{ log "audio already running ($(cat "$TMP/output" 2>/dev/null))"; return 0; }
     command -v pcmhost >/dev/null 2>&1 || { log "no pcmhost (tools/pcmhost); the call scene cannot start" >&2; return 1; }
     rm -f "$SAVED"
@@ -915,7 +924,7 @@ status)
         echo "playback: $PLAY (FE_ST_VOICE_PCM_P)"
         echo "capture:  $CAP (FE_ST_VOICE_C)"
     else
-        echo "scene:    no sound card (mu300-audio-dsp load)"
+        echo "scene:    $(no_card)"
     fi
     echo "headset:  ${BT_HEADSET:-none set in $CONF}$(hfp_up && echo ', connected')"
     echo "events:   $FEED$([ -S "$SOCK" ] && echo ", $SOCK")$(watch_up || echo ' (mu300-voice watch is not running)')"

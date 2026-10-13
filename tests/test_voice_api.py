@@ -414,6 +414,23 @@ class Commands(VoiceTest):
             self.assertEqual(json.loads(r.stdout)['ok'], True, r.stderr)
             self.assertEqual(self.at_log(), ['AT+CLCC', 'AT+CLCC', 'ATA'])
 
+    def test_without_the_audio_drivers_it_says_so(self):
+        # a kernel with no audio modules (mainline, or 5.4 as released): unsupported, not "load the drivers"
+        mods = self.tmp / 'modules'
+        release = subprocess.run(['uname', '-r'], capture_output=True, text=True).stdout.strip()
+        for sh in self.each_shell():
+            self.reset()
+            for args in (('audio', 'start', 'dsp'), ('tone',), ('demo',)):
+                r = self.voice(sh, *args, MU300_MODULES=mods)
+                self.assertEqual(r.returncode, 1)
+                self.assertIn('no call audio on this kernel', r.stderr)
+                self.assertNotIn('mu300-audio-dsp load', r.stderr)
+            self.assertEqual(self.at_log(), [])
+            (mods / release / 'audio').mkdir(parents=True, exist_ok=True)
+            r = self.voice(sh, 'audio', 'start', 'dsp', MU300_MODULES=mods)
+            self.assertIn('run mu300-audio-dsp load', r.stderr)
+            shutil.rmtree(mods)
+
     def test_wait_is_a_plain_number(self):
         # 08 and 09 are not numbers to a shell's arithmetic: refused as usage, before the modem
         for sh in self.each_shell():

@@ -430,7 +430,7 @@ class Atd(ShellTest):
             self.assertFalse(self.dir.is_symlink())
             self.assertEqual(self.dir.stat().st_mode & 0o777, 0o755)
             self.assertEqual(list(elsewhere.iterdir()), [])
-            self.assertIn('was somebody else', self.err.read_text())
+            self.assertIn("was somebody else's", self.err.read_text())
             self.send(m, 'AT', b'\r\nOK\r\n')
             self.assertEqual(self.answer, 'OK\n')
 
