@@ -66,13 +66,16 @@ class VoiceTest(ShellTest):
         for i, r in enumerate(replies, 1):
             (self.tmp / f'clcc.{i}').write_text(r)
 
-    def voice(self, shell, *args, **env):
+    def voice_env(self, **env):
         e = dict(MU300_VOICE_TMP=self.run_dir, MU300_VOICE_CONF=self.conf, MU300_VOICE_HOOKS=self.hooks,
                  MU300_ASOUND=self.asound, MU300_GROUP_FILE=self.groupfile, MU300_AT_DIR=self.tmp / 'at',
                  MU300_BUSYBOX='/nonexistent', MU300_VOICE_HOOK_UID=os.getuid(), MU300_VOICE_TICK='0.02',
                  MU300_VOICE_POLL=1, MU300_VOICE_IDLE_POLL=1)
         e.update(env)
-        return self.script(shell, VOICE, *args, **e)
+        return e
+
+    def voice(self, shell, *args, **env):
+        return self.script(shell, VOICE, *args, **self.voice_env(**env))
 
     def at_log(self):
         p = self.tmp / 'at.log'
@@ -311,7 +314,7 @@ class Commands(VoiceTest):
             for n in ('112', '0090112'):
                 self.assertEqual(self.call_error(sh, n), self.EMERGENCY_ERR)
 
-    def test_through_sudo_only_the_api_grammar(self):
+    def test_as_the_api_only_the_api_grammar(self):
         for sh in self.each_shell():
             for args in (('call', '4440000', '--json', '--demo'), ('answer', '--demo', '--json'), ('audio', 'start'),
                          ('audio', 'stop'), ('watch',), ('demo',), ('tone',), ('echo',), ('events',),
@@ -319,36 +322,53 @@ class Commands(VoiceTest):
                 with self.subTest(args=args):
                     self.reset()
                     self.clcc(INCOMING)
-                    r = self.voice(sh, *args, SUDO_USER='dikecphone')
+                    r = self.voice(sh, *args, MU300_VOICE_API=1)
                     self.assertEqual(r.returncode, 2, r.stderr)
                     self.assertEqual(self.at_log(), [])
-            # the grammar itself still works through sudo
+            # the grammar itself still works
             self.reset()
             self.clcc(INCOMING)
-            r = self.voice(sh, 'answer', '1', '--json', SUDO_USER='dikecphone')
+            r = self.voice(sh, 'answer', '1', '--json', MU300_VOICE_API=1)
             self.assertEqual(json.loads(r.stdout)['ok'], True)
             self.reset()
-            r = self.voice(sh, 'dtmf', '12', '--json', SUDO_USER='dikecphone')
+            r = self.voice(sh, 'dtmf', '12', '--json', MU300_VOICE_API=1)
             self.assertEqual(json.loads(r.stdout)['sent'], 2)
+            # and it is that name which restricts, not sudo: the administrator's sudo is the whole command
+            self.reset()
+            self.clcc(NONE)
+            r = self.voice(sh, 'watch', SUDO_USER='ubuntu', MU300_VOICE_ROUNDS=1)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('watching calls', r.stderr)
 
-    def test_through_sudo_the_callers_environment_does_not_count(self):
-        """sudo_env_reset, which runs before anything reads the environment when sudo made us root: no MU300_*
-        variable is left (another voice.conf with CALL_ALLOW=any, another mu300-at directory), and the PATH every
-        command is found through is not the caller's."""
-        src = VOICE.read_text()
-        start = src.index('sudo_env_reset() {')
-        fn = src[start:src.index('\n}\n', start) + 3]
+    def test_the_api_command_takes_nothing_from_its_caller(self):
+        """mu300-voice-api, the one command sudoers.mu300voice allows: mu300-voice by its full path, in an empty
+        environment (no MU300_* variable - another voice.conf with CALL_ALLOW=any, another mu300-at - and no PATH of
+        the caller's), with the grammar switched on."""
+        api = BIN / 'mu300-voice-api'
+        src = api.read_text()
+        self.assertTrue(os.access(api, os.X_OK))
+        last = src.strip().splitlines()[-1]
+        self.assertEqual(last, 'exec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin MU300_VOICE_API=1 '
+                               '/opt/mu300/bin/mu300-voice "$@"')
+        # run for real, against this tree's mu300-voice: what arrives is the marker and that PATH, nothing else
+        probe = self.tmp / 'probe'
+        probe.write_text('#!/bin/sh\nenv | sort\nprintf "arg:%s\\n" "$@"\n')
+        probe.chmod(0o755)
+        copy = self.tmp / 'mu300-voice-api'
+        copy.write_text(src.replace('/opt/mu300/bin/mu300-voice "$@"', f'{probe} "$@"'))
         for sh in self.each_shell():
-            r = self.sh(sh, fn + 'sudo_env_reset; echo "$PATH"; env | grep -c "^MU300_"; echo "${OTHER:-}"',
-                        MU300_VOICE_CONF='/tmp/evil.conf', MU300_AT_DIR='/tmp/evil', MU300_BUSYBOX='/tmp/evil/bb',
-                        MU300_AT_LOCK_HELD='1', OTHER='kept')
-            self.assertEqual(r.stdout.splitlines(), ['/usr/sbin:/usr/bin:/sbin:/bin', '0', 'kept'], r.stderr)
-        # before the first use of either, and only for a caller that came through sudo as root
-        self.assertLess(src.index('    sudo_env_reset\nfi'), src.index('export PATH='))
-        self.assertLess(src.index('    sudo_env_reset\nfi'), src.index('CONF=${MU300_VOICE_CONF'))
-        self.assertIn('[ "$(/usr/bin/id -u 2>/dev/null)" = 0 ]', src)
-        # and the patterns that let a value into an AT command mean ASCII, whatever the locale
-        self.assertLess(src.index('LC_ALL=C; export LC_ALL'), src.index('CONF=${MU300_VOICE_CONF'))
+            r = self.script(sh, copy, 'call', '4440000;x', '--json', MU300_VOICE_CONF='/tmp/evil.conf',
+                            MU300_AT_DIR='/tmp/evil', MU300_AT_LOCK_HELD=1, SUDO_USER='dikecphone', LD_PRELOAD='',
+                            IFS=';')
+            lines = [l for l in r.stdout.splitlines() if not l.startswith(('PWD=', 'SHLVL=', '_=', 'OLDPWD='))]
+            self.assertEqual(lines, ['MU300_VOICE_API=1', 'PATH=/usr/sbin:/usr/bin:/sbin:/bin', 'arg:call',
+                                     'arg:4440000;x', 'arg:--json'], r.stderr)
+        # the patterns that let a value into an AT command mean ASCII, whatever the locale
+        voice = VOICE.read_text()
+        self.assertLess(voice.index('LC_ALL=C; export LC_ALL'), voice.index('CONF=${MU300_VOICE_CONF'))
+        # and the template gives the group that command and not mu300-voice itself
+        rules = [l for l in (TEMPLATES / 'sudoers.mu300voice').read_text().splitlines() if not l.startswith('#')]
+        self.assertEqual(rules, ['%mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/mu300-voice-api'])
 
     def test_call_modem_error(self):
         for sh in self.each_shell():
@@ -537,6 +557,38 @@ class Watch(VoiceTest):
             self.voice(sh, 'watch', MU300_VOICE_ROUNDS=1, MU300_GROUP_FILE=self.tmp / 'nogroup')
             self.assertEqual(self.run_dir.stat().st_mode & 0o777, 0o700)
             self.assertEqual((self.run_dir / 'events.jsonl').stat().st_mode & 0o777, 0o600)
+
+    def test_a_stopped_watch_leaves_no_state_and_the_feed_is_there_from_the_start(self):
+        for sh in self.each_shell():
+            self.reset()
+            self.clcc(NONE)
+            p = subprocess.Popen(sh + [str(VOICE), 'watch'], env=self.env(**self.voice_env()),
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                for _ in range(200):
+                    if (self.run_dir / 'state.json').exists():
+                        break
+                    time.sleep(0.05)
+                self.assertTrue((self.run_dir / 'state.json').exists())
+                p.terminate()
+                self.assertEqual(p.wait(timeout=20), 0)
+            finally:
+                if p.poll() is None:
+                    p.kill()
+            left = sorted(p.name for p in self.run_dir.iterdir())
+            # no state.json that would go on saying "socket_up": true, no pid file, no socket
+            self.assertEqual([n for n in left if n not in ('events.jsonl', 'events-server.log')], [], left)
+            feed = self.run_dir / 'events.jsonl'
+            self.assertEqual((feed.read_text(), feed.stat().st_mode & 0o777), ('', 0o640))
+
+    def test_events_needs_nothing_of_roots(self):
+        # "mu300-voice events" is for the voice group too: the SIM slot (mu300-sim's state is root's) is asked for by
+        # the watch alone, which reads the URC log, never at the top of the script
+        src = VOICE.read_text()
+        top_level = [l for l in src.splitlines() if 'mu300-sim active' in l and not l.startswith('    ')]
+        self.assertEqual(top_level, [])
+        body = src[src.index('\nwatch() {'):src.index('\n}\n', src.index('\nwatch() {'))]
+        self.assertIn('    urc_log\n', body)
 
     def test_feed_rotates(self):
         for sh in self.each_shell():

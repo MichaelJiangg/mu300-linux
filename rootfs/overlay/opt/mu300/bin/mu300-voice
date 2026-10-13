@@ -41,18 +41,6 @@
 # The melody is generated here rather than shipped: this repo carries no audio files, and busybox awk has
 # sin(), which is all a few notes need.
 set -u
-# Through sudo (the mu300voice group's way in) nothing of the caller's environment counts. sudo's own reset is the
-# first line of that; this is the second, for a sudoers that keeps the environment or has no secure_path: every
-# command below is found through PATH and every file through a MU300_* variable, so either one in the caller's
-# hand would be root. The PATH first - env and sed are looked up through it. Only as root, which is what sudo
-# makes of us (id by its full path, for the same reason).
-sudo_env_reset() {
-    PATH=/usr/sbin:/usr/bin:/sbin:/bin
-    for _v in $(env | sed -n 's/^\(MU300_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$_v"; done
-}
-if [ -n "${SUDO_USER:-}" ] && [ "${SUDO_USER:-}" != root ] && [ "$(/usr/bin/id -u 2>/dev/null)" = 0 ]; then
-    sudo_env_reset
-fi
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 # [0-9] below is the ten ASCII digits and nothing a locale adds to that range: what passes goes into an AT command
 LC_ALL=C; export LC_ALL
@@ -94,11 +82,17 @@ load_conf() {
 load_conf
 RATE=${MU300_VOICE_RATE:-8000}
 DIR=${MU300_AT_DIR:-/run/mu300-at}
-SIM_SLOT=0
-if [ -x /opt/mu300/bin/mu300-sim ]; then
-    SIM_SLOT=$(/opt/mu300/bin/mu300-sim active) || exit 1
-fi
-URCLOG=$DIR/urc/stty_nr$((SIM_SLOT * 3)).log
+# The modem's unsolicited lines are on the active SIM's first channel (nr0, or nr3 with the F50's internal SIM).
+# Asked for by the watch, which is the one that reads them, not at the top: mu300-sim's state is root's, and
+# "mu300-voice events" is also for a member of the voice group.
+URCLOG=
+urc_log() {
+    SIM_SLOT=0
+    if [ -x /opt/mu300/bin/mu300-sim ]; then
+        SIM_SLOT=$(/opt/mu300/bin/mu300-sim active) || exit 1
+    fi
+    URCLOG=$DIR/urc/stty_nr$((SIM_SLOT * 3)).log
+}
 TMP=${MU300_VOICE_TMP:-/run/mu300-voice}
 HFP_CTL=$TMP/hfp.ctl
 ASOUND=${MU300_ASOUND:-/proc/asound}
@@ -572,7 +566,7 @@ wait_round() {
 # One watch at a time ($TMP/watch.pid): a second one would emit every event twice.
 WATCH_PID=$TMP/watch.pid
 watch_up() { [ -f "$WATCH_PID" ] && [ "$(cat "$WATCH_PID")" != $$ ] && kill -0 "$(cat "$WATCH_PID")" 2>/dev/null; }
-watch_exit() {
+watch_exit() {   # watch_exit [keep] - keep: the state stays, for the tests to read
     scene_running && audio_stop
     hfp_disconnect
     # the dd that waits on the DSP's pipe first, then the loop around it
@@ -582,12 +576,17 @@ watch_exit() {
     fi
     events_stop
     rm -f "$WATCH_PID"
+    # the state is the watch's: without one it would go on saying what was true when it stopped
+    [ "${1:-}" = keep ] || rm -f "$SNAPSHOT" "$SNAPSHOT.new" "$TMP/hooks.done"
     exit 0
 }
 watch() {
     watch_up && { echo "mu300-voice: already watching (pid $(cat "$WATCH_PID"))" >&2; exit 1; }
     echo $$ > "$WATCH_PID"
     echo 0 > "$TMP/hooks.done"
+    urc_log
+    # the feed is there from the start, with its mode: a reader of the group follows it before the first event
+    [ -f "$FEED" ] || { : > "$FEED"; share "$FEED" 640; }
     [ "$WATCH_AUDIO" = 1 ] && pipe_watch
     trap watch_exit INT TERM
     events_start || log "no mu300-voice-events (tools/voice-events): no event socket; the events are in $FEED"
@@ -641,7 +640,7 @@ watch() {
     done
     # (tests) let the last hooks finish
     n=0; while [ "$(cat "$TMP/hooks.done" 2>/dev/null)" != "$HOOK_SEQ" ] && [ "$n" -lt 100 ]; do nap 0.1; n=$((n + 1)); done
-    watch_exit
+    watch_exit keep
 }
 
 # --- the AP's taps on a call (output dsp) ----------------------------------------------------------------------
@@ -868,15 +867,17 @@ call_allowed() {   # call_allowed NUMBER: in CALL_ALLOW, or CALL_ALLOW=any; noth
     case " ${CALL_ALLOW:-} " in *" any "*|*" $1 "*) return 0 ;; esac
     return 1
 }
-# Through sudo (the mu300voice group's way in, contrib/voice-api/sudoers.mu300voice) only the API's own grammar is
-# accepted, whatever the sudoers wildcards let through: status --json, call NUMBER, answer [ID] [--wait S],
-# hangup [ID], dtmf DIGITS - no --demo (the audio test, which plays into the call and loops), no audio, watch,
-# demo, tone or echo. The environment was reset before anything read it (sudo's reset, and sudo_env_reset at the
-# top): no MU300_* variable, no other voice.conf, no other PATH.
+# As mu300-voice-api (the mu300voice group's way in: the one command contrib/voice-api/sudoers.mu300voice allows,
+# which sets MU300_VOICE_API=1 and nothing else in an empty environment) only the API's own grammar is accepted:
+# status --json, call NUMBER, answer [ID] [--wait S], hangup [ID], dtmf DIGITS - no --demo (the audio test, which
+# plays into the call and loops), no audio, watch, events, demo, tone or echo. It is that name that restricts, not
+# sudo: the administrator's "sudo mu300-voice audio start bt" is the whole command (keyed on SUDO_USER, as this
+# first was, it refused him the audio commands, the watch and the events on a system where sudo is the only way
+# to be root).
 api_only() {
-    [ -n "${SUDO_USER:-}" ] && [ "${SUDO_USER:-}" != root ] || return 0
-    case $cmd in status|call|answer|hangup|dtmf) ;; *) echo "mu300-voice: through sudo only status, call, answer, hangup and dtmf" >&2; exit 2 ;; esac
-    [ "$DEMO" = 0 ] || { echo "mu300-voice: through sudo no --demo" >&2; exit 2; }
+    [ "${MU300_VOICE_API:-}" = 1 ] || return 0
+    case $cmd in status|call|answer|hangup|dtmf) ;; *) echo "mu300-voice-api: only status, call, answer, hangup and dtmf" >&2; exit 2 ;; esac
+    [ "$DEMO" = 0 ] || { echo "mu300-voice-api: no --demo" >&2; exit 2; }
 }
 # Leave the DSP to watch where it runs; a command on its own stops the scene once no call is left.
 audio_after_hangup() {

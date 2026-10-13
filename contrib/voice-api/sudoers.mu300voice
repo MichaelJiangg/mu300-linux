@@ -2,18 +2,16 @@
 # has no sudo). Install with visudo's check:
 #   sudo install -m 440 sudoers.mu300voice /etc/sudoers.d/mu300voice && sudo visudo -c
 #
-# sudoers wildcards match spaces and flags too, so these lines are not where the grammar is enforced: mu300-voice
-# itself is. Run through sudo (SUDO_USER set) it accepts only
+# sudoers wildcards match spaces and flags too, so this line is not where the grammar is enforced: the command is.
+# mu300-voice-api is mu300-voice in an empty environment (no MU300_* variable - another voice.conf, another AT
+# directory - and no PATH of the caller's, whatever this sudo keeps) that accepts only
 #   status [--json] | call NUMBER [--json] | answer [ID] [--wait S] [--json] | hangup [ID] [--json] | dtmf DIGITS [--json]
-# and refuses everything else with exit 2 before the modem is touched: no --demo, no audio, watch, demo, tone or
-# echo, no unknown option or extra argument. NUMBER is 3-20 digits with at most a leading +, one of CALL_ALLOW in
-# /etc/mu300/voice.conf (none when unset) and never an emergency number, ID is 1-9, DIGITS are 0-9 * # A-D; each is checked exactly as it goes into the AT command. sudo resets the
-# environment, so no MU300_* variable (another voice.conf, another AT directory) reaches the command.
+# and refuses everything else with exit 2 before the modem is touched: no --demo, no audio, watch, events, demo,
+# tone or echo, no unknown option or extra argument. NUMBER is 3-20 digits with at most a leading +, one of
+# CALL_ALLOW in /etc/mu300/voice.conf (none when unset) and never an emergency number, ID is 1-9, DIGITS are
+# 0-9 * # A-D; each is checked exactly as it goes into the AT command.
+# Never list mu300-voice itself here: that is the administrator's command, with the audio test and the watch.
 # Not here, on purpose: mu300-at (the AT channel is the whole modem - radio, SIM, data). Uncomment the SMS line only
 # for a service that sends messages ("sms send" takes NUMBER TEXT and goes through the same checks as on the shell).
-%mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/mu300-voice status --json, \
-                                 /opt/mu300/bin/mu300-voice call *, \
-                                 /opt/mu300/bin/mu300-voice answer *, /opt/mu300/bin/mu300-voice answer, \
-                                 /opt/mu300/bin/mu300-voice hangup *, /opt/mu300/bin/mu300-voice hangup, \
-                                 /opt/mu300/bin/mu300-voice dtmf *
+%mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/mu300-voice-api
 # %mu300voice ALL=(root) NOPASSWD: /opt/mu300/bin/sms send *

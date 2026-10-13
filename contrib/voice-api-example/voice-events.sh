@@ -2,7 +2,8 @@
 # A minimal shell client of the MU300 voice API (docs/voice-api.md): print every call event, and with --answer
 # answer each incoming call.
 #   voice-events.sh [--answer]
-# Run it as root, or as a member of mu300voice (--answer then goes through sudo: contrib/voice-api/sudoers.mu300voice).
+# Run it as root, or as a member of mu300voice (--answer then goes through sudo and mu300-voice-api:
+# contrib/voice-api/sudoers.mu300voice).
 # It reads the event socket when socat or an nc with -U is there, and "mu300-voice events" (the same lines, from the
 # feed file) when not. Each line is one JSON object; the fields read below are flat, so sed is enough here - a real
 # client should use a JSON parser.
@@ -31,7 +32,7 @@ stream | while IFS= read -r line; do
             echo "call $id ($(field dir "$line")): $prev -> $state ${number:-hidden}" | mask
             if [ "$answer" = 1 ] && [ "$state" = incoming ] && [ "$prev" = none ]; then
                 if [ "$(id -u)" = 0 ]; then "$VOICE" answer "$id" --json
-                else sudo -n "$VOICE" answer "$id" --json; fi
+                else sudo -n "$VOICE-api" answer "$id" --json; fi
             fi ;;
         audio) echo "audio $(field state "$line"): playback $(field playback "$line"), capture $(field capture "$line")" ;;
         snapshot) echo "now: $line" | mask ;;

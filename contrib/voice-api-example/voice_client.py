@@ -17,8 +17,9 @@ import subprocess
 import sys
 
 SOCKET = '/run/mu300-voice/events.sock'
-# by its full path: that is what sudoers.mu300voice allows
 VOICE = '/opt/mu300/bin/mu300-voice'
+# what a member of mu300voice runs through sudo, by its full path: that is what sudoers.mu300voice allows
+VOICE_API = '/opt/mu300/bin/mu300-voice-api'
 
 
 def mask(text):
@@ -68,7 +69,7 @@ def main():
         cmd = action(ev, args.answer)
         if cmd:
             if os.geteuid() != 0:
-                cmd = ['sudo', '-n'] + cmd
+                cmd = ['sudo', '-n', VOICE_API] + cmd[1:]
             r = subprocess.run(cmd, capture_output=True, text=True)
             print('  ->', r.stdout.strip() or r.stderr.strip(), flush=True)
     return 0

@@ -1,0 +1,16 @@
+#!/bin/sh
+# The voice API's call commands for a service that is not root (docs/voice-api.md): the one command
+# contrib/voice-api/sudoers.mu300voice lets the mu300voice group run as root.
+#
+#   mu300-voice-api status --json | call NUMBER --json | answer [ID] [--wait S] --json | hangup [ID] --json |
+#                   dtmf DIGITS --json
+#
+# It is mu300-voice with two things taken away. The grammar: MU300_VOICE_API=1 makes mu300-voice refuse everything
+# but the five commands above (no --demo, audio, watch, events, demo, tone, echo; no unknown option, no extra
+# argument) with exit 2 before the modem is touched. And the caller's environment, all of it: mu300-voice finds
+# every command through PATH and every file through a MU300_* variable, so either in the caller's hand would be
+# root - sudo's own reset is the first line of that, env -i here the second, for a sudoers that keeps the
+# environment or has no secure_path. Full paths for the same reason, not "$0"'s directory.
+#
+# The restriction is on this name, not on sudo: an administrator's "sudo mu300-voice watch" is the whole command.
+exec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin MU300_VOICE_API=1 /opt/mu300/bin/mu300-voice "$@"

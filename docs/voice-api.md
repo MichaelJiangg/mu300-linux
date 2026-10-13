@@ -7,8 +7,8 @@ JSON object carries `"v":1`, and a reader ignores objects with another `v` and f
 
 | | how | who |
 |---|---|---|
-| AT commands | `mu300-at` (nr1, the shared lock) | root |
-| call control | `mu300-voice call / answer / hangup / dtmf / status --json` | root; the `mu300voice` group through sudo |
+| AT commands | `mu300-at` (nr1 - nr4 with the F50's internal SIM selected - and the shared lock) | root |
+| call control | `mu300-voice call / answer / hangup / dtmf / status --json` | root; the `mu300voice` group as `sudo mu300-voice-api ...` |
 | call events | `/run/mu300-voice/events.sock`, `events.jsonl`, `state.json`, `mu300-voice events` | root, `mu300voice` |
 | call event hooks | `/etc/mu300/voice.d/*.sh` | root's files, run as root |
 | call audio | ALSA `hw:<card>,<FE_ST_VOICE_PCM_P>` / `hw:<card>,<FE_ST_VOICE_C>`, or the fifos `/run/mu300-voice/audio/{downlink,uplink}` | root, `audio` / `mu300voice` |
@@ -34,13 +34,24 @@ Without the group every one of them is root's alone (0700/0600). The group name 
 
 The AT channel is not given to the group by any of this: an AT command can do anything to the modem (radio, SIM,
 data, SMS), so `mu300-at` stays root's. A service that is not root places and answers calls through the commands
-below, which check every argument, via sudo: `contrib/voice-api/sudoers.mu300voice` allows `status --json`,
-`call`, `answer`, `hangup` and `dtmf` (and, commented out, `sms send`), and sudo's environment reset keeps every
-`MU300_*` variable away from them. sudoers wildcards also match extra words, so the grammar is enforced by
-`mu300-voice` itself: run through sudo (`SUDO_USER` set) it takes only `status`, `call NUMBER`, `answer [ID]
-[--wait S]`, `hangup [ID]`, `dtmf DIGITS` (each with `--json`) and refuses anything else - `--demo`, `audio`,
-`watch`, an unknown option, an extra argument - with exit 2 before the modem is touched. OpenWrt has no sudo: there
-a service that places or answers calls runs as root.
+below, which check every argument, as `sudo -n /opt/mu300/bin/mu300-voice-api ...`: that is the one command
+`contrib/voice-api/sudoers.mu300voice` allows the group (and, commented out, `sms send`). `mu300-voice-api` is
+`mu300-voice` with two things taken away:
+
+* the caller's environment, all of it (`env -i`): no `MU300_*` variable - another voice.conf, another AT
+  directory - and no `PATH` of the caller's reaches a command that runs as root, whatever the system's sudo keeps;
+* everything but the API's grammar: `status`, `call NUMBER`, `answer [ID] [--wait S]`, `hangup [ID]`,
+  `dtmf DIGITS` (each with `--json`). Anything else - `--demo`, `audio`, `watch`, `events`, an unknown option, an
+  extra argument - is refused with exit 2 before the modem is touched. sudoers wildcards match extra words, so the
+  grammar is enforced there, in the command, not in sudoers.
+
+The restriction is on that name, not on sudo: the administrator's `sudo mu300-voice watch` or `sudo mu300-voice
+audio start bt` is the whole command. Never put `mu300-voice` itself into a sudoers line for a service. OpenWrt has
+no sudo: there a service that places or answers calls runs as root (and may still call `mu300-voice-api` for the
+strict grammar).
+
+`/run` takes files from every user on these images, so `mu300-voice` uses `/run/mu300-voice` only when it is root's
+own directory that nobody else may write (not a symlink, not one somebody made first) and refuses to run otherwise.
 
 Phone numbers are never written to a log in full - `mu300-voice` masks them (`+905321234540` -> `+90********40`)
 in everything it logs. The API itself carries them in full (that is its job: a dialer shows who is calling), in
@@ -267,14 +278,14 @@ Nothing in the voice API itself listens on the network.
 * `contrib/voice-api/dikecphone.service`: a systemd unit for the service under its own user, with the
   `mu300voice` and `audio` groups, after `mu300-voice.service`.
 * `contrib/voice-api/dikecphone.init`: the procd init script for OpenWrt (root; START after mu300-voice).
-* `contrib/voice-api/sudoers.mu300voice`: the call commands for the group.
+* `contrib/voice-api/sudoers.mu300voice`: the call commands for the group (`mu300-voice-api`).
 
 ## Examples
 
 `contrib/voice-api-example/`:
 
 * `voice_client.py` - prints every event and, with `--answer`, answers each incoming call (`mu300-voice answer ID
-  --json`, through `sudo -n` when not root). Standard library only; the device images do not carry Python
+  --json`; `sudo -n mu300-voice-api answer ID --json` when not root). Standard library only; the device images do not carry Python
   (`apt install python3`), it is the reference for a client in any language.
 * `voice-events.sh` - the same in shell, from the socket (socat or `nc -U`) or `mu300-voice events`.
 * `10-log-call.sh` - a hook: one syslog line per call event, the number masked.
@@ -289,4 +300,5 @@ A first check on the device, without a call:
 * `pcmhost`, `ctlset`, `mu300-hfp` and `mu300-voice-events` are built by hand (`tools/*/build.sh`, static arm64,
   into `/opt/mu300/bin`), not by the release build.
 * No hold/swap/conference command: `mu300-at "AT+CHLD=..."` as root.
-* One SIM slot (the MU300 has one).
+* One SIM at a time: the slot chosen at boot (`mu300-sim`, docs/SIM-SELECTION.md); `mu300-at` and the URC log
+  follow it, and so does everything here.
