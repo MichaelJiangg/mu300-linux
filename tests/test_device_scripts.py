@@ -408,6 +408,14 @@ class Atd(ShellTest):
             self.assertFalse((self.dir / 'answer.1').exists())
             self.assertIn('malformed request', self.err.read_text())
 
+    def test_the_urc_logs_are_roots_alone(self):
+        """What the modem says unasked is the owner's to read and nobody else's: with caller id on (mu300-voice
+        watch) every ring puts the caller's number into this log."""
+        for shell in self.shells:
+            logs, m = self.start(shell)
+            self.assertEqual(logs, ['tty_nr0.log'])
+            self.assertEqual((self.dir / 'urc').stat().st_mode & 0o777, 0o700)
+
     def test_a_second_command_never_reaches_the_modem(self):
         """The daemon repeats mu300-at's one_request test: a CR outside AT+CMGS=N<CR>PDU<Ctrl-Z> is refused with an
         answer that has no final result code (so the client fails), and the modem never sees it."""

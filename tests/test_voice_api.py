@@ -331,6 +331,25 @@ class Commands(VoiceTest):
             r = self.voice(sh, 'dtmf', '12', '--json', SUDO_USER='dikecphone')
             self.assertEqual(json.loads(r.stdout)['sent'], 2)
 
+    def test_through_sudo_the_callers_environment_does_not_count(self):
+        """sudo_env_reset, which runs before anything reads the environment when sudo made us root: no MU300_*
+        variable is left (another voice.conf with CALL_ALLOW=any, another mu300-at directory), and the PATH every
+        command is found through is not the caller's."""
+        src = VOICE.read_text()
+        start = src.index('sudo_env_reset() {')
+        fn = src[start:src.index('\n}\n', start) + 3]
+        for sh in self.each_shell():
+            r = self.sh(sh, fn + 'sudo_env_reset; echo "$PATH"; env | grep -c "^MU300_"; echo "${OTHER:-}"',
+                        MU300_VOICE_CONF='/tmp/evil.conf', MU300_AT_DIR='/tmp/evil', MU300_BUSYBOX='/tmp/evil/bb',
+                        MU300_AT_LOCK_HELD='1', OTHER='kept')
+            self.assertEqual(r.stdout.splitlines(), ['/usr/sbin:/usr/bin:/sbin:/bin', '0', 'kept'], r.stderr)
+        # before the first use of either, and only for a caller that came through sudo as root
+        self.assertLess(src.index('    sudo_env_reset\nfi'), src.index('export PATH='))
+        self.assertLess(src.index('    sudo_env_reset\nfi'), src.index('CONF=${MU300_VOICE_CONF'))
+        self.assertIn('[ "$(/usr/bin/id -u 2>/dev/null)" = 0 ]', src)
+        # and the patterns that let a value into an AT command mean ASCII, whatever the locale
+        self.assertLess(src.index('LC_ALL=C; export LC_ALL'), src.index('CONF=${MU300_VOICE_CONF'))
+
     def test_call_modem_error(self):
         for sh in self.each_shell():
             self.reset()
@@ -373,6 +392,21 @@ class Commands(VoiceTest):
             r = self.voice(sh, 'answer', '--wait', '5', '--json')
             self.assertEqual(json.loads(r.stdout)['ok'], True, r.stderr)
             self.assertEqual(self.at_log(), ['AT+CLCC', 'AT+CLCC', 'ATA'])
+
+    def test_wait_is_a_plain_number(self):
+        # 08 and 09 are not numbers to a shell's arithmetic: refused as usage, before the modem
+        for sh in self.each_shell():
+            for w in ('08', '09', '007', '12345', '1x', '-1'):
+                with self.subTest(wait=w):
+                    self.reset()
+                    self.clcc(NONE)
+                    r = self.voice(sh, 'answer', '--wait', w, '--json')
+                    self.assertEqual(r.returncode, 2, r.stderr)
+                    self.assertEqual(self.at_log(), [])
+            self.reset()
+            self.clcc(NONE)
+            r = self.voice(sh, 'answer', '--wait', '0', '--json')
+            self.assertEqual(json.loads(r.stdout)['error'], 'no incoming call')
 
     def test_hangup_and_dtmf(self):
         for sh in self.each_shell():
