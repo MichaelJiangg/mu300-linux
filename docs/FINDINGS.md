@@ -122,6 +122,8 @@ what replaced it. The table below gives each section's state.
 | 54 | A webhook body of the user's own for SMS forwarding: values escaped for the type, never evaluated (#171) | current (unit tests; not sent from a device to a real service) |
 | 55 | Imported Android files nobody but root could read: the CP was never loaded (#127, #135, #170) | current (fixed; what differed between #170's boots is not known) |
 | 56 | The VPN page showed a refused config without its reason; the engines' own defects are in the VPN module's FINDINGS 26i-26m | current (fixed; measured on the U30 Air) |
+| 60 | `/run` takes files from every user: the daemons' directories there are checked, and a squatted name is put out of the way (review of #145/#149) | current (fixed for mu300-atd and mu300-voice, F50-B on 5.4 and 7.2.10); `/run` itself is still 1777 |
+| 61 | The voice API on a device: a grammar keyed on sudo locked the administrator out, events that needed root, state that outlived the watch (review of #149) | current (fixed; F50-B on 5.4 and 7.2.10, synthetic calls); no real call placed or answered |
 
 ## Hardware and firmware facts
 
@@ -1737,6 +1739,14 @@ headset, answers the AT setup, opens CVSD SCO when told, and turns the headset's
 
 Not measured yet, for want of the firmware on any test board: whether the 41S image runs the BT call scene under
 Linux, and whether the period timer moves `FE_VOICE_PCM_P` / `FE_VOICE_C`.
+
+2026-10-13, against v2026.10.23: the seven audio patches apply to the pristine realme tree in `build-audio.sh`'s
+order and all 23 modules build against the 5.4 tree (`sprd-dmaengine-pcm` with its `period_timer` parameter); they
+were not loaded on a board - the released 5.4 kernel has no audio modules, and no test board has the firmware. On
+F50-B the userspace was run on the released 5.4 and on 7.2.10: without the drivers `mu300-voice` says that this
+kernel has no call audio (it used to say "run mu300-audio-dsp load", which cannot work there), `mu300-hfp` refuses
+an address that is not bonded, and nothing is left running. The call itself, on a headset or through the taps, is
+still unmeasured.
 
 ## Bluetooth
 
@@ -4546,3 +4556,86 @@ as sing-box), `profile_check`, `use`, `status` with the exit address, `logs` per
 `sub_refresh` (one, due) with `job`, `latency` (one, all), `engine_remove` refused while in use, `profile_remove`:
 all as the page expects. `sub_add` takes https only, which could not be served on the test link (the CLI's
 `--insecure` did the subscriptions there). Not looked at in a browser: the pages themselves.
+
+
+### 60. `/run` takes files from every user: the daemons' directories there are checked, and a squatted name is put out of the way (review of #145/#149)
+
+Found while reviewing the call audio and voice API branches on F50-B (2026-10-13).
+
+* `boot/init` mounts `/run` as a plain tmpfs, which is mode 1777 - like `/tmp`, not the 0755 systemd would give it.
+  Any local user (a service account, the vendor daemons' own account of 41) can make `/run/<name>` before the
+  daemon that expects to own it: measured, an unprivileged user created a file there.
+* `mu300-voice` moved its state from `/tmp/mu300-voice` to `/run/mu300-voice`, which was the same exposure under
+  another name: pid files it kills, the mixer undo log it writes back, files root writes there. `mu300-atd` did
+  `mkdir -p /run/mu300-at` and looked no further: in a stranger's directory, or behind his symlink, the command
+  fifo is his to write (AT commands, as root's daemon) and every answer his to read.
+* `rootfs/overlay/opt/mu300/lib/run-dir.sh`, one helper for both so the two cannot drift: `run_dir_ours` (a real
+  directory, not a symlink; the daemon's own uid; not writable by group or others) and `run_dir_take`, which makes
+  the directory that - a plain `mkdir`, never `mkdir -p` (through a symlink that makes the directory where it
+  points). The first version of the check refused a foreign directory and stayed down until somebody removed it,
+  which turned the squat into a denial of service; the second removed it with `rm -rf`, which is a race - whoever
+  squatted can still write `/run`, and busybox's recursive remove walks by path. Now nothing depends on what was
+  seen and nothing is deleted recursively: a non-directory goes with `rm -f --`, an empty directory with `rmdir`
+  (neither follows a symlink at that name, each fails harmlessly on the other kind), a directory with contents is
+  moved whole into `/run/.<name>.foreign.<pid>` (made by `mkdir`: ours and 0700, or nothing is moved) and left
+  there to be looked at, and what counts in the end is the check again. A caller who is not the owner (a member
+  of the voice group running `mu300-voice events`) gets the check alone and never creates the directory.
+* The headset's control fifo moved from `/run/mu300-hfp.ctl` into `/run/mu300-voice`, and
+  `/etc/tmpfiles.d/mu300-run.conf` makes both directories at boot.
+* `/run/mu300-at/urc` is 0700 now: with caller id on (`AT+CLIP=1`, which `mu300-voice` sets) every ring writes
+  the caller's number into that log, which was world-readable. Every reader is root.
+
+Measured on F50-B as root under dash, bash and busybox ash: a directory made first by another user (with a fifo
+named `cmd` in it) and a symlink to `/etc` were both put out of the way, `/etc` untouched, the second call silent;
+`mu300-voice status` then answered. Open: `/run` is still 1777 - `mount -t tmpfs -o mode=755` in `boot/init` is
+the real fix, and it is a boot change that wants its own device test. `/run/mu300-at/answer.<pid>` and
+`/run/mu300/` are as they were.
+
+### 61. The voice API on a device: a grammar keyed on sudo locked the administrator out, events that needed root, state that outlived the watch (review of #149)
+
+The voice API (`docs/voice-api.md`) run on F50-B on 2026-10-13, v2026.10.23, on the released 5.4 kernel and on
+7.2.10, without a call: no number was dialled and no call answered. Calls were played by a stub `mu300-at` (the
+tests' own: AT+CLCC going none, incoming, active, none) under the real `mu300-voice watch` as root, under dash, bash
+and busybox ash. What that found, beyond 60:
+
+* **The administrator could not use it.** The API's grammar (status, call, answer, hangup, dtmf and nothing else)
+  was switched on by `SUDO_USER`, and on Ubuntu sudo is the only way to be root: `sudo mu300-voice watch`,
+  `audio start bt`, `tone`, and `sudo mu300-voice events` - the doc's own first check - were refused. The
+  restriction is on a name now: `mu300-voice-api`, the one command `contrib/voice-api/sudoers.mu300voice` gives the
+  group, runs `mu300-voice` by its full path with `env -i`, a fixed `PATH` and `MU300_VOICE_API=1`. That also
+  takes the caller's environment away without relying on the system's sudoers: `mu300-voice` finds every command
+  through `PATH` and every file through a `MU300_*` variable, and with `env_keep` or without `secure_path` either
+  one would have been root. Measured: a group member's `sudo -n mu300-voice-api watch` / `audio start` / `events`
+  / `--demo` / an extra argument exit 2, `sudo -n mu300-voice ...` and `mu300-at` are not allowed at all, and with
+  a planted `mu300-at`, `awk` and `env` first on `PATH` and another voice.conf in `MU300_VOICE_CONF` the wrapper
+  ran none of them.
+* **`mu300-voice events` needed root** once main's SIM selection was merged: the script asked `mu300-sim active`
+  at its top, whose state file is root's, and a member of the group got nothing. Only the watch asks now.
+* **State that outlived the watch.** After `systemctl stop mu300-voice`, `state.json` stayed and went on saying
+  `"socket_up":true`. It is removed on stop; the feed is created when the watch starts, 0640 with the group.
+* `answer --wait 08` reached shell arithmetic as an octal number; `[0-9]` in the argument checks is ASCII whatever
+  the locale (`LC_ALL=C`); the watch's `dd` on the DSP's pipe is ended with it.
+* On a kernel without the audio drivers `audio start`, `tone`, `demo` and `status` say that this kernel has no
+  call audio instead of "run mu300-audio-dsp load".
+
+What the device showed with that in place, the same on both kernels: `status --json` answers (`modem` true, no
+calls, `audio.available` false); `call` is refused before the modem for a number that is not one, for `;+CFUN=0`,
+spaces, `*100#`, and - with no voice.conf - for everything (`not in CALL_ALLOW`); `answer` says `no incoming call`,
+`hangup 2` and `dtmf 1` return the modem's `+CME ERROR`. The service: `/run/mu300-voice` 0710 root:mu300voice,
+`events.sock` 0660, `state.json` and `events.jsonl` 0640, everything else 0600; a member of the group reads the
+socket, the snapshot and `mu300-voice events`, `nobody` gets "Permission denied" on all three and cannot list the
+directory; `ss -lntup` shows no TCP or UDP listener, only the unix socket. Synthetic calls: three events on the
+socket and in the feed in order, the hook ran as uid 0 three times with the number, a hook others may write and
+one that is not root's did not run and the log says so, and the log has `+90********40`, never the number. With
+the watch running: ping over mobile data 0 % loss, `mu300-at` no slower (10 x AT+CSQ 2.5 s with and without),
+`sms list` and `sms json` answer, `mobile-data status` answers; with `/run/mu300-at/urc` 0700 as well. After the
+stop: no process, no AT lock, an empty feed and log file in the directory. The SIP drop-in: loaded after the base
+rules (nft 1.0.9, both kernels), a broken drop-in beside it reported and skipped with the base rules in place; a
+listener on 0.0.0.0:5060 (TCP and UDP) answered the LAN and loopback and did not answer a veth from another
+network namespace (the counters counted the drops), while port 5999 on the same veth did. The installed
+openwrt-luci has `wan` (sipa_eth0, sipa_eth8) with input REJECT and `lan` with ACCEPT, as the doc says; the fw4
+script was not run there.
+
+Not measured: a real call's CLCC sequence and timing, DTMF in a call, a waiting call, the audio (60's and 24c's
+limits), `mu300-voice` on a booted OpenWrt, and the feed with numbers in it staying in `/run/mu300-voice` after a
+stop (RAM, group-readable, at most 32 KiB) is as designed, not cleared.
