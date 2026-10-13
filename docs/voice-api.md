@@ -51,7 +51,9 @@ no sudo: there a service that places or answers calls runs as root (and may stil
 strict grammar).
 
 `/run` takes files from every user on these images, so `mu300-voice` uses `/run/mu300-voice` only when it is root's
-own directory that nobody else may write (not a symlink, not one somebody made first) and refuses to run otherwise.
+own directory that nobody else may write. systemd-tmpfiles makes it at boot; an entry of that name that is somebody
+else's (made first, or a symlink) is replaced by root's own and the log says so, and the same goes for
+`mu300-atd`'s `/run/mu300-at` (`/opt/mu300/lib/run-dir.sh`, one helper for both).
 
 Phone numbers are never written to a log in full - `mu300-voice` masks them (`+905321234540` -> `+90********40`)
 in everything it logs. The API itself carries them in full (that is its job: a dialer shows who is calling), in

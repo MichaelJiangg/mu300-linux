@@ -69,6 +69,7 @@ class VoiceTest(ShellTest):
     def voice_env(self, **env):
         e = dict(MU300_VOICE_TMP=self.run_dir, MU300_VOICE_CONF=self.conf, MU300_VOICE_HOOKS=self.hooks,
                  MU300_ASOUND=self.asound, MU300_GROUP_FILE=self.groupfile, MU300_AT_DIR=self.tmp / 'at',
+                 MU300_RUN_DIR_LIB=BIN.parent / 'lib' / 'run-dir.sh',
                  MU300_BUSYBOX='/nonexistent', MU300_VOICE_HOOK_UID=os.getuid(), MU300_VOICE_TICK='0.02',
                  MU300_VOICE_POLL=1, MU300_VOICE_IDLE_POLL=1)
         e.update(env)
