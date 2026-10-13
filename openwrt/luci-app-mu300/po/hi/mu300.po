@@ -42,8 +42,38 @@ msgstr "पावर"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300 नियंत्रण केंद्र: स्थिति डैशबोर्ड, नेटवर्क लॉक, AT टर्मिनल और SMS"
+msgid "Terminal"
+msgstr "टर्मिनल"
+
+msgid "Terminal settings"
+msgstr "टर्मिनल सेटिंग्स"
+
+msgid "Overview"
+msgstr "अवलोकन"
+
+msgid "Profiles"
+msgstr "प्रोफ़ाइल"
+
+msgid "Subscriptions"
+msgstr "सब्सक्रिप्शन"
+
+msgid "Engines"
+msgstr "इंजन"
+
+msgid "Settings"
+msgstr "सेटिंग्स"
+
+msgid "Logs"
+msgstr "लॉग"
+
+msgid "Packages after an update"
+msgstr "अपडेट के बाद पैकेज"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 कंट्रोल सेंटर: स्टेटस डैशबोर्ड, नेटवर्क लॉक, AT टर्मिनल, SMS और VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "टर्मिनल: ब्राउज़र में डिवाइस का root शेल"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "अज्ञात नंबर"
 
 msgid "Select"
 msgstr "चुनें"
+
+msgid "never"
+msgstr "कभी नहीं"
+
+msgid "just now"
+msgstr "अभी-अभी"
+
+msgid "%s ago"
+msgstr "%s पहले"
+
+msgid "Failed: %s"
+msgstr "विफल: %s"
+
+msgid "Management connection lost"
+msgstr "प्रबंधन कनेक्शन टूट गया"
+
+msgid "Installing the VPN module"
+msgstr "VPN मॉड्यूल इंस्टॉल हो रहा है"
+
+msgid "Installing the engine"
+msgstr "इंजन इंस्टॉल हो रहा है"
+
+msgid "Adding the subscription"
+msgstr "सब्सक्रिप्शन जोड़ा जा रहा है"
+
+msgid "Refreshing the subscriptions"
+msgstr "सब्सक्रिप्शन रीफ़्रेश हो रहे हैं"
+
+msgid "Testing the latency of every profile"
+msgstr "हर प्रोफ़ाइल की लेटेंसी जाँची जा रही है"
+
+msgid "Downloading the config"
+msgstr "कॉन्फ़िग डाउनलोड हो रहा है"
+
+msgid "Working…"
+msgstr "काम जारी है…"
+
+msgid "done"
+msgstr "पूरा हुआ"
+
+msgid "failed"
+msgstr "विफल"
+
+msgid "Verify the uploaded file"
+msgstr "अपलोड की गई फ़ाइल सत्यापित करें"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "अपलोड की गई फ़ाइल को VPN मॉड्यूल की नवीनतम रिलीज़ की HTTPS से डाउनलोड की गई SHA256SUMS से जाँचा जाता है। यदि यह संभव न हो (ऑफ़लाइन, पुरानी रिलीज़), तो इसे तभी इंस्टॉल किया जाता है जब आप असत्यापित फ़ाइल की अनुमति दें: तब यह बिना किसी जाँच के root के रूप में चलती है।"
+
+msgid "Install it even if it cannot be verified"
+msgstr "सत्यापित न हो सके तब भी इंस्टॉल करें"
+
+msgid "Install only a verified file"
+msgstr "केवल सत्यापित फ़ाइल इंस्टॉल करें"
+
+msgid "Upload failed: %s"
+msgstr "अपलोड विफल: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN मॉड्यूल इस पैनल के लिए बहुत पुराना है"
+
+msgid "The VPN module is not installed"
+msgstr "VPN मॉड्यूल इंस्टॉल नहीं है"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "इस पेज को मशीन-पठनीय mu300-vpn वाला VPN मॉड्यूल (मॉड्यूल v2 या नया) चाहिए। अपडेट करने से प्रोफ़ाइल और सेटिंग्स बनी रहती हैं।"
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN एक अलग मॉड्यूल है: kill switch और प्रोफ़ाइल के साथ mu300-vpn, और हर इंजन के लिए एक अलग एक्स्ट्रा (Xray, sing-box, mihomo, dae)। यह mu300-extra install vpn से इंस्टॉल होता है।"
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "डाउनलोड मॉड्यूल के लिए कुछ MB और हर इंजन के लिए दर्जनों MB तक का है: मोबाइल डेटा पर यह आपके प्लान से कटता है।"
+
+msgid "Update the VPN module"
+msgstr "VPN मॉड्यूल अपडेट करें"
+
+msgid "Install the VPN module"
+msgstr "VPN मॉड्यूल इंस्टॉल करें"
+
+msgid "Upload the file…"
+msgstr "फ़ाइल अपलोड करें…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "ऑफ़लाइन: VPN मॉड्यूल के रिलीज़ पेज से mu300-linux-vpn-core.tar.gz (या बंडल mu300-linux-vpn.tar.gz) अपलोड करें।"
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "यह नेटवर्क या फ़्रीक्वेंसी स्कैन है: इसमें एक से तीन मिनट लगते हैं, यह पूरे समय मॉडेम का AT चैनल घेरे रखता है, और इस बीच मोबाइल डेटा रुक सकता है। यह बैकग्राउंड में चलता है; पूरा होने पर जवाब यहाँ दिखेगा।"
@@ -207,14 +324,8 @@ msgstr "स्कैन के दौरान Wi-Fi हॉटस्पॉट �
 msgid "Scan anyway"
 msgstr "फिर भी स्कैन करें"
 
-msgid "Failed: %s"
-msgstr "विफल: %s"
-
 msgid "Saved"
 msgstr "सहेजा गया"
-
-msgid "Management connection lost"
-msgstr "प्रबंधन कनेक्शन टूट गया"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "थर्मल"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "कर्नेल के थर्मल ज़ोन, केवल पढ़ने के लिए। ट्रिप पॉइंट वाला ज़ोन अपने पैसिव ट्रिप पर उससे जुड़े कूलिंग उपकरणों को सीमित करता है; कूलिंग स्थिति 0 का अर्थ है कोई सीमा नहीं।"
+
+msgid "Zone"
+msgstr "ज़ोन"
+
+msgid "Temperature"
+msgstr "तापमान"
+
+msgid "Trip points"
+msgstr "ट्रिप पॉइंट"
+
+msgid "Cooling devices"
+msgstr "कूलिंग उपकरण"
 
 msgid "USB role"
 msgstr "USB भूमिका"
@@ -489,8 +618,17 @@ msgstr "बॉडी"
 msgid "Form (URL-encoded)"
 msgstr "फ़ॉर्म (URL-एन्कोडेड)"
 
+msgid "Plain text"
+msgstr "सादा पाठ"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "फ़ील्ड: sender, time, text, device, message (भरा हुआ टेम्पलेट)"
+
+msgid "Custom body"
+msgstr "कस्टम बॉडी"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "खाली: मानक फ़ील्ड (सादा पाठ: संदेश)। प्लेसहोल्डर: {sender}, {time}, {text}, {device}, {message}। हर मान चुने गए प्रकार के अनुसार एस्केप किया जाता है। यह बॉडी यहाँ फिर दिखाई जाती है: गोपनीय जानकारी पते या किसी हेडर में रखें।"
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "अतिरिक्त हेडर (प्रति पंक्ति एक \"Name: value\")"
@@ -651,6 +789,9 @@ msgstr "कुल भेजा गया"
 msgid "Used today"
 msgstr "आज उपयोग किया"
 
+msgid "SIM source"
+msgstr "SIM स्रोत"
+
 msgid "Session duration"
 msgstr "सत्र अवधि"
 
@@ -719,6 +860,9 @@ msgstr "मॉडेम"
 
 msgid "Carrier"
 msgstr "ऑपरेटर"
+
+msgid "Own number"
+msgstr "अपना नंबर"
 
 msgid "Module"
 msgstr "मॉड्यूल"
@@ -858,8 +1002,17 @@ msgstr "लॉक विफल: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "नेटवर्क लॉक स्वचालित पर रीसेट हो रहे हैं (SFUN रीस्टार्ट, लगभग 30 सेकंड)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "रीसेट विफल: %s. सहेजी गई लॉक सेटिंग्स रखी गईं।"
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "लॉक रीसेट समय पर पुष्ट नहीं हुआ; फिर भी स्विच किया जा रहा है।"
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "आंतरिक SIM चुना गया: रीबूट के बाद उपयोग में आएगा"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "आंतरिक SIM चुना गया, पर इस डिवाइस पर समर्थित नहीं है: बाहरी SIM उपयोग में है"
 
 msgid "Uptime %s"
 msgstr "अपटाइम %s"
@@ -990,9 +1143,6 @@ msgstr "भाषा पैक इंस्टॉल हो गया है"
 msgid "The language pack could not be installed"
 msgstr "भाषा पैक इंस्टॉल नहीं हो सका"
 
-msgid "Upload failed: %s"
-msgstr "अपलोड विफल: %s"
-
 msgid "Language of the browser"
 msgstr "ब्राउज़र की भाषा"
 
@@ -1013,9 +1163,6 @@ msgstr "भाषा पैक (mu300-extra-lang.tar.gz, लगभग 2 MB) LuCI
 
 msgid "Download from the release"
 msgstr "रिलीज़ से डाउनलोड करें"
-
-msgid "Upload the file…"
-msgstr "फ़ाइल अपलोड करें…"
 
 msgid "Release"
 msgstr "रिलीज़"
@@ -1209,6 +1356,9 @@ msgstr "स्थिति की पुष्टि हुई"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "वापस पढ़ने का समय समाप्त; “लॉक स्थिति रीफ़्रेश करें” चुनें"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "रीसेट सत्यापित: नेटवर्क मोड स्वचालित, EN-DC चालू, सभी बैंड, कोई सेल लॉक नहीं; सहेजी गई लॉक सेटिंग्स साफ़ कर दी गईं"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "लागू किया गया (EN-DC के लिए रेडियो स्टैक पुनः आरंभ की ज़रूरत नहीं)"
 
@@ -1235,6 +1385,114 @@ msgstr "स्वचालित (%d समर्थित)"
 
 msgid "%d locked: %s"
 msgstr "%d लॉक: %s"
+
+msgid "Repair DNS?"
+msgstr "DNS ठीक करें?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "यह उस पैकेज का DNS फ़ॉरवर्डर हटाता है जो अब इंस्टॉल नहीं है। अगर कोई और DNS सर्वर नहीं बचता, तो डिवाइस मोबाइल कनेक्शन के DNS सर्वर इस्तेमाल करता है: ऑपरेटर आपके खोजे गए नाम किसी भी प्रॉक्सी या VPN के बाहर देख सकता है।"
+
+msgid "Repair DNS"
+msgstr "DNS ठीक करें"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "डिवाइस पर इंस्टॉल किए गए पैकेज रिलीज़ इमेज का हिस्सा नहीं होते। अपडेट उन्हें दर्ज करता है, और नया सिस्टम पहली बार चालू होने पर, ऑनलाइन होते ही, उन्हें फिर से इंस्टॉल करता है। पैकेज वापस आने तक उसकी सेटिंग्स अलग रखी जाती हैं।"
+
+msgid "No packages to install again."
+msgstr "फिर से इंस्टॉल करने के लिए कोई पैकेज नहीं।"
+
+msgid "All back"
+msgstr "सभी वापस आ गए"
+
+msgid "Not installed yet"
+msgstr "अभी इंस्टॉल नहीं हुआ"
+
+msgid "Could not be installed again"
+msgstr "फिर से इंस्टॉल नहीं हो सका"
+
+msgid "Waiting for the internet"
+msgstr "इंटरनेट की प्रतीक्षा"
+
+msgid "Given up: no internet at five boots"
+msgstr "छोड़ दिया: पाँच बार चालू होने पर भी इंटरनेट नहीं"
+
+msgid "Skipped"
+msgstr "छोड़ा गया"
+
+msgid "Written down by the update from %s"
+msgstr "%s से हुए अपडेट ने दर्ज किया"
+
+msgid "Installed again"
+msgstr "फिर से इंस्टॉल हुए"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "इन्हें वहीं से खुद इंस्टॉल करें जहाँ से आपने लिया था (पैकेज फ़ाइल: apk add --allow-untrusted FILE.apk)।"
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "/etc/mu300/orphaned-config में अलग रखी सेटिंग्स"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS अब भी ऐसे पैकेज पर जाता है जो इंस्टॉल नहीं है: उसके ज़रिए डिवाइस के पास DNS नहीं है।"
+
+msgid "Try again"
+msgstr "फिर से कोशिश करें"
+
+msgid "Dismiss the note"
+msgstr "सूचना हटाएँ"
+
+msgid "started"
+msgstr "शुरू हुआ"
+
+msgid "asleep now (asked)"
+msgstr "अभी स्लीप (अनुरोध पर)"
+
+msgid "woken: power daemon stopping"
+msgstr "जागा: पावर सेवा रुक रही है"
+
+msgid "woken by a key"
+msgstr "एक बटन से जागा"
+
+msgid "woken by the Wi-Fi key"
+msgstr "Wi-Fi बटन से जागा"
+
+msgid "woken (mu300-power wake)"
+msgstr "जागा (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "USB पर कंप्यूटर से जागा"
+
+msgid "woken: plugged in"
+msgstr "जागा: चार्जर लगाया गया"
+
+msgid "woken by a Wi-Fi client"
+msgstr "Wi-Fi क्लाइंट से जागा"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "चार्जिंग बूट (चार्जर ने चालू किया)"
+
+msgid "the hotspot is down"
+msgstr "हॉटस्पॉट बंद है"
+
+msgid "the VPN is still stopped"
+msgstr "VPN अभी भी रुका है"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "विफल रिज़्यूम के बाद 5G (EN-DC) अभी भी बंद है"
+
+msgid "self-check: %s"
+msgstr "स्व-जाँच: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "स्लीप: %d मिनट से कोई क्लाइंट नहीं (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "स्लीप: प्रोफ़ाइल अब %s"
+
+msgid "woken by the %s key"
+msgstr "%s बटन से जागा"
+
+msgid "the modem is suspended (%s)"
+msgstr "मॉडेम निलंबित है (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "0 से %d के बीच की पूर्ण संख्या दर्ज करें"
@@ -1437,6 +1695,15 @@ msgstr "संदेश (भेजने के लिए Enter, नई पं�
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "भेजने के लिए AT+CMGS (PDU मोड) का उपयोग होता है; चैनल व्यस्त होने पर फिर से प्रयास करें। किसी एक संदेश को हटाने के लिए उसके बबल पर बने कूड़ेदान आइकन का उपयोग करें।"
 
+msgid "Sending…"
+msgstr "भेजा जा रहा है…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "भेजा गया; सूची जल्द ही रीफ़्रेश होगी।"
+
+msgid "Sending failed"
+msgstr "भेजना विफल"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "पृष्ठभूमि में SIM से सिंक किया जा रहा है (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "हटाया गया (केवल स्थानीय)"
 msgid "Enter both a number and a message."
 msgstr "नंबर और संदेश दोनों दर्ज करें।"
 
-msgid "Sending…"
-msgstr "भेजा जा रहा है…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "भेजा गया; सूची जल्द ही रीफ़्रेश होगी।"
-
-msgid "Sending failed"
-msgstr "भेजना विफल"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d संदेश, %d अपठित · %d बातचीत"
 
@@ -1502,6 +1760,39 @@ msgstr "अधूरा: %d / %d भाग पहुँचे"
 
 msgid "Delete"
 msgstr "हटाएँ"
+
+msgid "ttyd is not installed."
+msgstr "ttyd इंस्टॉल नहीं है।"
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "टर्मिनल बंद है (/etc/config/ttyd)।"
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "एक साथ बहुत सारे टर्मिनल खुल रहे हैं। एक मिनट बाद फिर कोशिश करें।"
+
+msgid "The terminal is not available."
+msgstr "टर्मिनल उपलब्ध नहीं है।"
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "यह डिवाइस का root शेल है: हर कमांड पूरे अधिकारों के साथ चलती है, और एक गलती डिवाइस को बूट होने से रोक सकती है।"
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "यह केवल LAN (USB और हॉटस्पॉट) से पहुँच योग्य है, मोबाइल डेटा से कभी नहीं, और केवल इसी लॉग-इन पेज से।"
+
+msgid "It closes after a minute without activity."
+msgstr "एक मिनट तक कोई गतिविधि न होने पर यह बंद हो जाता है।"
+
+msgid "It closes after %d minutes without activity."
+msgstr "%d मिनट तक कोई गतिविधि न होने पर यह बंद हो जाता है।"
+
+msgid "Reconnect"
+msgstr "फिर से कनेक्ट करें"
+
+msgid "Open in a new tab"
+msgstr "नए टैब में खोलें"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "यह पेज HTTPS से खोला गया है, और टर्मिनल LAN पर HTTP से चलता है: इसलिए यह अपने अलग टैब में खुलता है।"
 
 msgid "The data usage could not be read"
 msgstr "डेटा उपयोग पढ़ा नहीं जा सका"
@@ -1637,6 +1928,594 @@ msgstr "बंद करें"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "64 से हर पैकेट डिवाइस के अपने ट्रैफ़िक की तरह बाहर जाता है"
+
+msgid "running"
+msgstr "चल रहा है"
+
+msgid "(about %s)"
+msgstr "(लगभग %s)"
+
+msgid "Install %s?"
+msgstr "%s इंस्टॉल करें?"
+
+msgid "It is installed from this system's package feed."
+msgstr "यह इस सिस्टम के पैकेज फ़ीड से इंस्टॉल होता है।"
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "यह VPN मॉड्यूल की रिलीज़ से डाउनलोड होता है और SHA256SUMS से जाँचा जाता है।"
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "एक इंजन दर्जनों MB का होता है: मोबाइल डेटा पर डाउनलोड आपके प्लान से कटता है।"
+
+msgid "Install"
+msgstr "इंस्टॉल करें"
+
+msgid "Remove %s?"
+msgstr "%s हटाएँ?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "प्रोफ़ाइल इस पर चलते हैं: %s। दोबारा इंस्टॉल होने तक वे शुरू नहीं हो सकते (चालू प्रोफ़ाइल को इसकी ज़रूरत हो तो मॉड्यूल हटाने से मना कर देता है)।"
+
+msgid "No profile runs on it."
+msgstr "कोई प्रोफ़ाइल इस पर नहीं चलता।"
+
+msgid "Removed"
+msgstr "हटाया गया"
+
+msgid "Check for updates"
+msgstr "अपडेट जाँचें"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "हर इंजन एक अलग एक्स्ट्रा है: केवल वही इंस्टॉल करें जो आपके प्रोफ़ाइल को चाहिए। Xray, vless, vmess, trojan और ss लिंक चलाता है (hev-socks5-tunnel के साथ), sing-box वही लिंक और अपना JSON, mihomo Clash सब्सक्रिप्शन, और dae नए कर्नेल पर hysteria2, tuic व बाकी। WireGuard और OpenVPN सिस्टम के पैकेज हैं।"
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "डाउनलोड हर इंजन के लिए दर्जनों MB के होते हैं: मोबाइल डेटा पर ये आपके प्लान से कटते हैं। ऑफ़लाइन होने पर, VPN मॉड्यूल के रिलीज़ पेज से इंजन का tarball अपलोड करें।"
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "उपलब्ध संस्करण VPN मॉड्यूल की नवीनतम रिलीज़ से आते हैं।"
+
+msgid "Update"
+msgstr "अपडेट करें"
+
+msgid "system package"
+msgstr "सिस्टम पैकेज"
+
+msgid "in the vpn bundle"
+msgstr "vpn बंडल में"
+
+msgid "extra %s"
+msgstr "एक्स्ट्रा %s"
+
+msgid "not installed"
+msgstr "इंस्टॉल नहीं है"
+
+msgid "cannot run here"
+msgstr "यहाँ नहीं चल सकता"
+
+msgid "update available"
+msgstr "अपडेट उपलब्ध है"
+
+msgid "installed"
+msgstr "इंस्टॉल है"
+
+msgid "Kind"
+msgstr "प्रकार"
+
+msgid "Version"
+msgstr "संस्करण"
+
+msgid "Available"
+msgstr "उपलब्ध"
+
+msgid "not checked"
+msgstr "जाँचा नहीं गया"
+
+msgid "Size"
+msgstr "आकार"
+
+msgid "Needed by"
+msgstr "किसे चाहिए"
+
+msgid "no profile"
+msgstr "कोई प्रोफ़ाइल नहीं"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae को BTF वाला कर्नेल 5.17 या नया चाहिए: 5.4 वेंडर कर्नेल पर नहीं चलता (mu300-update kernel 6.18)। फिर भी इंस्टॉल किया जा सकता है।"
+
+msgid "All engines"
+msgstr "सभी इंजन"
+
+msgid "Last %s lines"
+msgstr "अंतिम %s पंक्तियाँ"
+
+msgid "VPN service log"
+msgstr "VPN सेवा लॉग"
+
+msgid "Every 5 s"
+msgstr "हर 5 सेकंड में"
+
+msgid "The log is empty."
+msgstr "लॉग खाली है।"
+
+msgid "The VPN is starting"
+msgstr "VPN शुरू हो रहा है"
+
+msgid "The VPN is stopped"
+msgstr "VPN बंद है"
+
+msgid "The VPN is restarting"
+msgstr "VPN रीस्टार्ट हो रहा है"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Kill switch चालू होने पर, VPN डाउन, शुरू होते या ख़राब होने की स्थिति में डिवाइस या LAN से कुछ भी टनल के बाहर नहीं जाता: हर कनेक्शन सीधे बाहर जाने के बजाय विफल हो जाता है। यह तब तक चालू रहता है जब तक आप यहाँ VPN बंद नहीं करते (बंद करें इसे हटा देता है)।"
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Kill switch के बिना, टनल डाउन होने पर (शुरू होते समय, क्रैश के बाद, इंजन न होने पर) ट्रैफ़िक असुरक्षित रूप से सीधे बाहर जाता है।"
+
+msgid "Turn the kill switch on?"
+msgstr "Kill switch चालू करें?"
+
+msgid "Turn the kill switch off?"
+msgstr "Kill switch बंद करें?"
+
+msgid "Turn on"
+msgstr "चालू करें"
+
+msgid "unknown"
+msgstr "अज्ञात"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "एग्ज़िट पता नहीं मिला (क्या टनल चालू है?)"
+
+msgid "Connecting…"
+msgstr "कनेक्ट हो रहा है…"
+
+msgid "On, but not running"
+msgstr "चालू, पर चल नहीं रहा"
+
+msgid "Stopped"
+msgstr "बंद किया गया"
+
+msgid "Install it"
+msgstr "इंस्टॉल करें"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "सक्रिय प्रोफ़ाइल का इंजन इंस्टॉल नहीं है: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch तब तक सब कुछ बंद रखता है जब तक वह नहीं आ जाता; सेवा संभव होने पर उसे खुद डाउनलोड कर लेती है।"
+
+msgid "The VPN cannot start until it is installed."
+msgstr "इंस्टॉल होने तक VPN शुरू नहीं हो सकता।"
+
+msgid "%s cannot run on this system"
+msgstr "%s इस सिस्टम पर नहीं चल सकता"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN चालू है, पर कोई प्रोफ़ाइल सक्रिय नहीं है: नीचे से एक चुनें।"
+
+msgid "Profile: %s"
+msgstr "प्रोफ़ाइल: %s"
+
+msgid "No active profile"
+msgstr "कोई सक्रिय प्रोफ़ाइल नहीं"
+
+msgid "engine %s"
+msgstr "इंजन %s"
+
+msgid "interface %s"
+msgstr "इंटरफ़ेस %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch सक्रिय"
+
+msgid "Kill switch on"
+msgstr "Kill switch चालू"
+
+msgid "Kill switch off"
+msgstr "Kill switch बंद"
+
+msgid "IPv6 in the tunnel"
+msgstr "टनल में IPv6"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 ब्लॉक"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 अछूता"
+
+msgid "Module %s"
+msgstr "मॉड्यूल %s"
+
+msgid "Check"
+msgstr "जाँचें"
+
+msgid "Uptime"
+msgstr "अपटाइम"
+
+msgid "Rate"
+msgstr "दर"
+
+msgid "Exit address"
+msgstr "एग्ज़िट पता"
+
+msgid "Start"
+msgstr "शुरू करें"
+
+msgid "Stop"
+msgstr "बंद करें"
+
+msgid "Restart"
+msgstr "रीस्टार्ट करें"
+
+msgid "Stop the VPN?"
+msgstr "VPN बंद करें?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "तब ट्रैफ़िक टनल के बिना सीधे बाहर जाता है; kill switch भी इसके साथ हट जाता है।"
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN चालू है: रीबूट के बाद यह अपने आप फिर शुरू होता है।"
+
+msgid "The VPN is off."
+msgstr "VPN बंद है।"
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "सेटिंग"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "सक्रिय: इंटरनेट तक केवल टनल पहुँच सकती है"
+
+msgid "Not active"
+msgstr "सक्रिय नहीं"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "VPN डाउन होने पर kill switch डिवाइस और LAN का सारा ट्रैफ़िक रोक देता है, इसलिए टनल के बिना कुछ भी बाहर नहीं जाता। अगर टनल नहीं बन पाती (बंद सर्वर, समाप्त अकाउंट), तो जब तक आप प्रोफ़ाइल ठीक नहीं करते या VPN बंद नहीं करते, डिवाइस ऑफ़लाइन रहता है। पैनल LAN से पहुँच में रहता है।"
+
+msgid "Choose a profile"
+msgstr "प्रोफ़ाइल चुनें"
+
+msgid "No profiles yet"
+msgstr "अभी कोई प्रोफ़ाइल नहीं"
+
+msgid "engine not installed"
+msgstr "इंजन इंस्टॉल नहीं है"
+
+msgid "Use"
+msgstr "उपयोग करें"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "बदल गया: VPN नए प्रोफ़ाइल पर रीस्टार्ट हो रहा है"
+
+msgid "Active profile"
+msgstr "सक्रिय प्रोफ़ाइल"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "चालू VPN आपके चुने प्रोफ़ाइल पर रीस्टार्ट होता है; इस बीच kill switch चालू रहता है।"
+
+msgid "Manage the profiles"
+msgstr "प्रोफ़ाइल प्रबंधित करें"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "स्वचालित: जहाँ इंजन ले जा सके वहाँ टनल से"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "इंजन से टनल में IPv6 माँगें"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "कभी टनल से नहीं (VPN चालू होने पर ब्लॉक)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "सहेजा गया: यह अगली शुरुआत से लागू होगा (रीस्टार्ट करें)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "टनल IPv6 ले जाती है"
+
+msgid "Yes"
+msgstr "हाँ"
+
+msgid "IPv6 guard"
+msgstr "IPv6 गार्ड"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "सक्रिय: टनल के बाहर IPv6 अस्वीकार है"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "VPN चालू होने पर, IPv6 उस टनल के बगल से कभी बाहर नहीं जाता जो उसे नहीं ले जाती: उसे तुरंत अस्वीकार कर दिया जाता है, ताकि प्रोग्राम और LAN क्लाइंट लीक करने या इंतज़ार करने के बजाय IPv4 पर लौट आएँ। स्वचालित: WireGuard अपने कॉन्फ़िग के IPv6 पते इस्तेमाल करता है, बाकी इंजन IPv4 पर रहते हैं।"
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: जाँचा नहीं जा सकता"
+
+msgid "blocked by the kill switch"
+msgstr "kill switch ने रोका"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "WireGuard या OpenVPN कॉन्फ़िग, Clash/mihomo YAML, Xray या sing-box JSON, dae कॉन्फ़िग"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "ठीक है के बाद फ़ाइल चुनें: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray या sing-box .json या dae कॉन्फ़िग (अधिकतम 1 MiB)।"
+
+msgid "From the source"
+msgstr "स्रोत से"
+
+msgid "Detect"
+msgstr "पहचानें"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL में टोकन हो सकता है: वह डिवाइस को अलग से भेजा जाता है, कभी कमांड लाइन या लॉग में नहीं जाता।"
+
+msgid "Type"
+msgstr "प्रकार"
+
+msgid "Share link"
+msgstr "शेयर लिंक"
+
+msgid "Paste"
+msgstr "चिपकाएँ"
+
+msgid "File"
+msgstr "फ़ाइल"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "यह इस पैनल द्वारा स्वीकार किया जाने वाला शेयर लिंक नहीं है"
+
+msgid "The config is empty"
+msgstr "कॉन्फ़िग खाली है"
+
+msgid "Not an https URL"
+msgstr "यह https URL नहीं है"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "अमान्य नाम: 1-64 अक्षर, कोई कंट्रोल कैरेक्टर नहीं"
+
+msgid "Add a profile"
+msgstr "प्रोफ़ाइल जोड़ें"
+
+msgid "Name"
+msgstr "नाम"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "पहचानें: मॉड्यूल लिंक या फ़ाइल से प्रकार पहचानता है। Xray या sing-box, दोनों हो सकने वाले JSON के लिए, या किसी अन्य इंजन पर चलने वाले लिंक के लिए, प्रकार चुनें।"
+
+msgid "The profile is added"
+msgstr "प्रोफ़ाइल जोड़ दिया गया"
+
+msgid "Rename the profile"
+msgstr "प्रोफ़ाइल का नाम बदलें"
+
+msgid "Delete the profile %s?"
+msgstr "प्रोफ़ाइल %s हटाएँ?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "यह सक्रिय प्रोफ़ाइल है: VPN चालू होने पर मॉड्यूल मना कर देता है; पहले VPN बंद करें या कोई दूसरा प्रोफ़ाइल चुनें।"
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "इसका कॉन्फ़िग और क्रेडेंशियल डिवाइस से हटा दिए जाते हैं।"
+
+msgid "Deleted"
+msgstr "हटाया गया"
+
+msgid "The profile passes the check"
+msgstr "प्रोफ़ाइल जाँच में सफल है"
+
+msgid "Show the config?"
+msgstr "कॉन्फ़िग दिखाएँ?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "कॉन्फ़िग में प्रोफ़ाइल के क्रेडेंशियल (की, पासवर्ड, UUID) होते हैं। यह केवल इसी स्क्रीन पर दिखता है; स्क्रीन देखने वाला कोई भी इसे पढ़ सकता है।"
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "सहेजने पर पहले इंजन से कॉन्फ़िग जाँचा जाता है (profile edit); जाँच में विफल कॉन्फ़िग सहेजा नहीं जाता और पुराना बना रहता है।"
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "यह प्रोफ़ाइल एक सब्सक्रिप्शन से आता है: उसका अगला रीफ़्रेश आपके बदलाव मिटा देगा।"
+
+msgid "Config of %s"
+msgstr "%s का कॉन्फ़िग"
+
+msgid "Close"
+msgstr "बंद करें"
+
+msgid "Rename"
+msgstr "नाम बदलें"
+
+msgid "Show / edit the config"
+msgstr "कॉन्फ़िग दिखाएँ / संपादित करें"
+
+msgid "Test the latency of all"
+msgstr "सबकी लेटेंसी जाँचें"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "अभी कोई प्रोफ़ाइल नहीं: शेयर लिंक, कॉन्फ़िग फ़ाइल या सब्सक्रिप्शन से एक जोड़ें।"
+
+msgid "Active"
+msgstr "सक्रिय"
+
+msgid "This profile is the active one now"
+msgstr "यह प्रोफ़ाइल अभी सक्रिय है"
+
+msgid "More"
+msgstr "और"
+
+msgid "active"
+msgstr "सक्रिय"
+
+msgid "subscription"
+msgstr "सब्सक्रिप्शन"
+
+msgid "migrated"
+msgstr "माइग्रेट किया गया"
+
+msgid "gone from its subscription"
+msgstr "सब्सक्रिप्शन से हट गया"
+
+msgid "Server"
+msgstr "सर्वर"
+
+msgid "Engine"
+msgstr "इंजन"
+
+msgid "Latency"
+msgstr "लेटेंसी"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "लेटेंसी सर्वर से एक TCP कनेक्शन है, VPN चालू होने पर टनल से होकर। WireGuard और OpenVPN सर्वर आमतौर पर UDP बोलते हैं और इस तरह जाँचे नहीं जा सकते।"
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "IPv4 या IPv6 पता दर्ज करें"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "चालू: टनल के बाहर कुछ भी नहीं जाता"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "बंद: टनल डाउन होने पर ट्रैफ़िक सीधे बाहर जाता है"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "हाँ: Tailscale के अपने कनेक्शन टनल से जाते हैं"
+
+msgid "No: Tailscale connects directly"
+msgstr "नहीं: Tailscale सीधे कनेक्ट होता है"
+
+msgid "Routing"
+msgstr "रूटिंग"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "VPN डाउन होने पर kill switch डिवाइस और LAN का सारा ट्रैफ़िक रोक देता है।"
+
+msgid "Bypass the tunnel"
+msgstr "टनल को बायपास करें"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "192.168.0.0/16 जैसी पता रेंज कॉमा से अलग करके दर्ज करें"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "वे पता रेंज जो कभी टनल में नहीं जातीं, LAN के अलावा (जो कभी नहीं जाता)। खाली: केवल LAN।"
+
+msgid "Tailscale through the VPN"
+msgstr "VPN के ज़रिए Tailscale"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "जब डिवाइस पर Tailscale चलता है, तो उसके WireGuard, DERP और कंट्रोल कनेक्शन जो भी टनल चल रही हो उससे होकर जाते हैं (dae उन्हें बाकी की तरह पकड़ता है)।"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "टनल के ज़रिए DNS"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "वह रिज़ॉल्वर जिसके पास डिवाइस और LAN की लुकअप टनल से होकर जाती हैं। कुछ भी कैरियर के रिज़ॉल्वर के पास नहीं जाता।"
+
+msgid "Bootstrap DNS"
+msgstr "बूटस्ट्रैप DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "टनल चालू होने से पहले VPN सर्वर का अपना पता खोजता है (सीधे, इंजन के अपने कनेक्शन से)।"
+
+msgid "Empty puts a setting back to its default."
+msgstr "खाली छोड़ने पर सेटिंग डिफ़ॉल्ट पर लौट आती है।"
+
+msgid "TUN stack"
+msgstr "TUN स्टैक"
+
+msgid "Default (gvisor)"
+msgstr "डिफ़ॉल्ट (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (5.4 कर्नेल पर नहीं)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "सेट है (नया टाइप करने तक अपरिवर्तित)"
+
+msgid "not set"
+msgstr "सेट नहीं है"
+
+msgid "Upstream HTTP proxy"
+msgstr "अपस्ट्रीम HTTP प्रॉक्सी"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS सर्टिफ़िकेट पिन (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "host:port दर्ज करें"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "SHA-256 हेक्स में दर्ज करें"
+
+msgid "Profile options"
+msgstr "प्रोफ़ाइल विकल्प"
+
+msgid "None of the profiles has options of its type."
+msgstr "किसी भी प्रोफ़ाइल में उसके प्रकार के विकल्प नहीं हैं।"
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomo का मोड (rule, global, direct), इंजनों के लॉग स्तर, dae के ग्रुप और रूटिंग हर प्रोफ़ाइल के अपने कॉन्फ़िग का हिस्सा हैं: VPN > प्रोफ़ाइल, कॉन्फ़िग दिखाएँ / संपादित करें।"
+
+msgid "Delete the subscription %s?"
+msgstr "सब्सक्रिप्शन %s हटाएँ?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "इसके प्रोफ़ाइल इसके साथ जा सकते हैं या अलग प्रोफ़ाइल के रूप में रह सकते हैं। VPN चालू होने पर सक्रिय प्रोफ़ाइल कभी नहीं हटाया जाता।"
+
+msgid "Keep the profiles"
+msgstr "प्रोफ़ाइल रखें"
+
+msgid "Delete with its profiles"
+msgstr "प्रोफ़ाइल सहित हटाएँ"
+
+msgid "Only by hand"
+msgstr "केवल हाथ से"
+
+msgid "Every %d h"
+msgstr "हर %d घंटे"
+
+msgid "Share links: one profile per link"
+msgstr "शेयर लिंक: हर लिंक पर एक प्रोफ़ाइल"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: एक mihomo प्रोफ़ाइल"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: हर नोड एक ग्रुप में, एक प्रोफ़ाइल"
+
+msgid "Add a subscription"
+msgstr "सब्सक्रिप्शन जोड़ें"
+
+msgid "Format"
+msgstr "फ़ॉर्मैट"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL में आमतौर पर आपका अकाउंट टोकन होता है: वह डिवाइस पर केवल root-पठनीय रूप में सहेजा जाता है और दोबारा नहीं दिखाया जाता। सब्सक्रिप्शन डिवाइस के अपने कनेक्शन से लाया जाता है: VPN चालू होने पर टनल से; kill switch चालू और टनल बंद होने पर इसे लाया नहीं जा सकता।"
+
+msgid "Refresh all"
+msgstr "सभी रीफ़्रेश करें"
+
+msgid "No subscriptions yet."
+msgstr "अभी कोई सब्सक्रिप्शन नहीं।"
+
+msgid "Host"
+msgstr "होस्ट"
+
+msgid "Updated"
+msgstr "अपडेट किया गया"
+
+msgid "Share links"
+msgstr "शेयर लिंक"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "रीफ़्रेश उन प्रोफ़ाइल को रखता है जिनका नाम नहीं बदला, नए जोड़ता है और जो हट गए उन्हें हटाता है (VPN चालू होने पर सक्रिय प्रोफ़ाइल रहता है, हट गया के रूप में चिह्नित)। सक्रिय प्रोफ़ाइल का रीफ़्रेश चालू VPN को रीस्टार्ट करता है।"
 
 msgid "Dashboard info failed"
 msgstr "डैशबोर्ड जानकारी प्राप्त नहीं हो सकी"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "पैकेज एडेप्टर ने मान्य जवाब नहीं दिया"
+
+msgid "Invalid packages operation"
+msgstr "अमान्य पैकेज क्रिया"
+
 msgid "Request too large"
 msgstr "अनुरोध बहुत बड़ा है"
 
@@ -1820,6 +2705,150 @@ msgstr "रनटाइम डायरेक्टरी सुरक्षि�
 
 msgid "No such method"
 msgstr "ऐसा कोई मेथड नहीं"
+
+msgid "The VPN module refused the request"
+msgstr "VPN मॉड्यूल ने अनुरोध अस्वीकार कर दिया"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN पैनल व्यस्त है, फिर से प्रयास करें"
+
+msgid "Another VPN task is still running"
+msgstr "कोई दूसरा VPN कार्य अभी भी चल रहा है"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "exit_ip पैरामीटर 0 या 1 होना चाहिए"
+
+msgid "The VPN status could not be read"
+msgstr "VPN स्टेटस पढ़ा नहीं जा सका"
+
+msgid "The profiles could not be read"
+msgstr "प्रोफ़ाइल पढ़े नहीं जा सके"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "check पैरामीटर 0 या 1 होना चाहिए"
+
+msgid "The engines could not be read"
+msgstr "इंजन पढ़े नहीं जा सके"
+
+msgid "The subscriptions could not be read"
+msgstr "सब्सक्रिप्शन पढ़े नहीं जा सके"
+
+msgid "The VPN settings could not be read"
+msgstr "VPN सेटिंग्स पढ़ी नहीं जा सकीं"
+
+msgid "Unknown VPN operation"
+msgstr "अज्ञात VPN ऑपरेशन"
+
+msgid "The VPN could not be switched"
+msgstr "VPN बदला नहीं जा सका"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch चालू या बंद होता है"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switch बदला नहीं जा सका"
+
+msgid "Invalid profile id"
+msgstr "अमान्य प्रोफ़ाइल आईडी"
+
+msgid "The profile could not be made the active one"
+msgstr "प्रोफ़ाइल को सक्रिय नहीं बनाया जा सका"
+
+msgid "Unknown profile source"
+msgstr "अज्ञात प्रोफ़ाइल स्रोत"
+
+msgid "Unknown profile type"
+msgstr "अज्ञात प्रोफ़ाइल प्रकार"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "कॉन्फ़िग खाली है, बहुत बड़ा है या कंट्रोल कैरेक्टर रखता है"
+
+msgid "Invalid profile request"
+msgstr "अमान्य प्रोफ़ाइल अनुरोध"
+
+msgid "A config from a URL takes the type it says"
+msgstr "URL से आया कॉन्फ़िग वही प्रकार लेता है जो वह बताता है"
+
+msgid "No uploaded file"
+msgstr "कोई फ़ाइल अपलोड नहीं हुई"
+
+msgid "The file is larger than 1 MiB"
+msgstr "फ़ाइल 1 MiB से बड़ी है"
+
+msgid "The profile could not be added"
+msgstr "प्रोफ़ाइल जोड़ा नहीं जा सका"
+
+msgid "The profile could not be renamed"
+msgstr "प्रोफ़ाइल का नाम बदला नहीं जा सका"
+
+msgid "The profile could not be removed"
+msgstr "प्रोफ़ाइल हटाया नहीं जा सका"
+
+msgid "The profile does not pass the check"
+msgstr "प्रोफ़ाइल जाँच में सफल नहीं है"
+
+msgid "Unknown profile option"
+msgstr "अज्ञात प्रोफ़ाइल विकल्प"
+
+msgid "Invalid value for this option"
+msgstr "इस विकल्प के लिए अमान्य मान"
+
+msgid "The option could not be set"
+msgstr "विकल्प सेट नहीं किया जा सका"
+
+msgid "The config could not be read"
+msgstr "कॉन्फ़िग पढ़ा नहीं जा सका"
+
+msgid "The config was not saved"
+msgstr "कॉन्फ़िग सहेजा नहीं गया"
+
+msgid "The latency test failed"
+msgstr "लेटेंसी जाँच विफल रही"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "रीफ़्रेश अंतराल 1 से 999 घंटे है"
+
+msgid "Unknown subscription type"
+msgstr "अज्ञात सब्सक्रिप्शन प्रकार"
+
+msgid "Invalid subscription id"
+msgstr "अमान्य सब्सक्रिप्शन आईडी"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "keep पैरामीटर 0 या 1 होना चाहिए"
+
+msgid "The subscription could not be removed"
+msgstr "सब्सक्रिप्शन हटाया नहीं जा सका"
+
+msgid "The file is too large"
+msgstr "फ़ाइल बहुत बड़ी है"
+
+msgid "Unknown engine"
+msgstr "अज्ञात इंजन"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "unverified पैरामीटर 0 या 1 होना चाहिए"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "यह इंजन एक सिस्टम पैकेज है: इसकी अपलोड करने के लिए कोई फ़ाइल नहीं है"
+
+msgid "The engine could not be removed"
+msgstr "इंजन हटाया नहीं जा सका"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra इस सिस्टम पर नहीं है"
+
+msgid "Unknown VPN setting"
+msgstr "अज्ञात VPN सेटिंग"
+
+msgid "The setting could not be saved"
+msgstr "सेटिंग सहेजी नहीं जा सकी"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "पंक्तियों की संख्या 1 से 1000 है"
+
+msgid "The log could not be read"
+msgstr "लॉग पढ़ा नहीं जा सका"
 
 msgid "Radio did not come up"
 msgstr "रेडियो चालू नहीं हुआ"
@@ -1935,6 +2964,9 @@ msgstr "अमान्य फ़िल्टर सूची (अधिकत�
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "वेबहुक का पता http:// या https:// URL होना चाहिए"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "वेबहुक बॉडी बहुत लंबी है या उसमें कोई नियंत्रण वर्ण है"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "अमान्य हेडर (प्रति पंक्ति एक \"Name: value\"; Host, Content-Type, Content-Length, Transfer-Encoding और Connection डिवाइस सेट करता है)"
 
@@ -1992,17 +3024,47 @@ msgstr "भाषा पैक हटाया नहीं जा सका"
 msgid "Lock cache unavailable"
 msgstr "लॉक कैश उपलब्ध नहीं"
 
+msgid "The saved locks could not be cleared"
+msgstr "सहेजे गए लॉक साफ़ नहीं किए जा सके"
+
 msgid "No serving cell to lock to"
 msgstr "लॉक करने के लिए कोई सर्विंग सेल नहीं"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "मोडेम ने मोड क्वेरी का उत्तर नहीं दिया; कुछ भी नहीं भेजा गया"
+
+msgid "The modem refused a write"
+msgstr "मोडेम ने एक लेखन अस्वीकार कर दिया"
+
+msgid "The read-back does not match the automatic values"
+msgstr "रीड-बैक स्वचालित मानों से मेल नहीं खाता"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "स्टैक पुनरारंभ के बाद रीड-बैक स्वचालित मानों से मेल नहीं खाता"
+
+msgid "The reset was interrupted"
+msgstr "रीसेट बाधित हो गया"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "इस सिस्टम पर पैकेज फिर से इंस्टॉल करना उपलब्ध नहीं है"
+
+msgid "No packages were written down by an update"
+msgstr "किसी अपडेट ने कोई पैकेज दर्ज नहीं किया"
+
+msgid "Reinstalling is running already"
+msgstr "फिर से इंस्टॉल करना पहले से चल रहा है"
+
+msgid "The note could not be dropped"
+msgstr "सूचना हटाई नहीं जा सकी"
+
+msgid "Unknown packages operation"
+msgstr "अज्ञात पैकेज क्रिया"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "इस सिस्टम पर डेटा उपयोग उपलब्ध नहीं है"
-
-msgid "The setting could not be saved"
-msgstr "सेटिंग सहेजी नहीं जा सकी"
 
 msgid "Unknown data usage operation"
 msgstr "अज्ञात डेटा उपयोग ऑपरेशन"

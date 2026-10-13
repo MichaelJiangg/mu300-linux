@@ -20,18 +20,25 @@ flowchart LR
 
 ## Install the module
 
-It needs mu300-linux **v2026.10.16 or newer**. The installer asks about it; otherwise, on the device:
+It needs mu300-linux **v2026.10.16 or newer**; module **v2.0.0** (a core plus engine extras, subscriptions, the panel's
+VPN section, the IPv6 guard) needs **v2026.10.20 or newer**. The installer asks about it; otherwise, on the device:
 
 ```sh
-sudo mu300-extra install vpn                                # online: the module's latest release, checked against its SHA256SUMS
-sudo mu300-extra install vpn --from mu300-linux-vpn.tar.gz  # offline: a copy brought onto the device (USB, scp)
-sudo mu300-extra install vpn --from /mnt/usb/               # offline, verified: a directory with the tarball and its SHA256SUMS
-sudo mu300-extra install vpn-mihomo                         # mihomo, for Clash/mihomo profiles
+sudo mu300-extra install vpn                                # online: the core and the engines its profiles need (first time: Xray)
+sudo mu300-vpn engine install sing-box                      # each engine is an extra: xray, sing-box, mihomo, dae
+sudo mu300-extra install vpn-mihomo                         # the same, by the extra's name (vpn-xray, vpn-singbox, vpn-dae)
+sudo mu300-extra install vpn --from /mnt/usb/               # offline, verified: a directory with the tarballs and their SHA256SUMS
+sudo mu300-extra remove vpn-mihomo                          # an engine; refused while the VPN runs on it
 sudo mu300-extra remove vpn                                 # turn the VPN off first
 ```
 
-On OpenWrt leave out `sudo`. The module lives on the Linux partition (`/mnt/mu300-disk/extra/vpn`), so Ubuntu and
-OpenWrt share one copy, and updates keep it.
+On OpenWrt leave out `sudo`. The module lives on the Linux partition (`/mnt/mu300-disk/extra/vpn`, the engines in
+`extra/vpn-xray` and so on), so Ubuntu and OpenWrt share one copy, and updates bring the core and the engines to their
+latest release as one set. A tarball is installed only when its hash is in the `SHA256SUMS` next to it (v1 modules
+keep both their engines when upgraded). On OpenWrt with the control panel all of this is also in the panel's **VPN**
+menu (see [Control Panel (LuCI)](Control-Panel-(LuCI)#the-panels-pages)); on Ubuntu with the panel extra, the MU300
+page in Cockpit turns the VPN on and off and picks the profile. Both panels, like `mu300-toolkit`, show their VPN
+section only once the module is installed: without it there is nothing of a VPN in them.
 
 ## Use it
 
@@ -57,8 +64,12 @@ not end up in your shell history. `mu300-toolkit` has a VPN menu.
 | VLESS, VMess, Trojan, Shadowsocks links; Xray JSON | Xray-core with hev-socks5-tunnel |
 | the same links behind the kill switch; sing-box JSON | sing-box |
 | Clash/mihomo YAML | mihomo (`mu300-extra install vpn-mihomo`) |
+| hysteria2, TUIC links; dae config | [dae](https://github.com/daeuniverse/dae), the eBPF proxy (`mu300-extra install vpn-dae`): needs kernel 6.18 or 7.2 of v2026.10.20 or newer (they carry BTF); never 5.4 |
 
 Tailscale's own traffic goes through the tunnel by default.
+
+**Subscriptions** (v2): `mu300-vpn subscription add NAME URL` takes a URL that yields profiles (share links, a mihomo
+or dae list), refreshed by hand or on a schedule; a refresh overwrites edits made to its profiles.
 
 ## Settings worth knowing
 
@@ -68,7 +79,7 @@ Tailscale's own traffic goes through the tunnel by default.
 |---|---|---|
 | `KILL_SWITCH` | 1 | nothing but the tunnel leaves the device, also while the tunnel is down |
 | `TAILSCALE` | 1 | Tailscale's traffic through the tunnel |
-| `IPV6` | 0 | IPv6 through the tunnel too, when the tunnel has an IPv6 address |
+| `IPV6` | auto | `auto`: IPv6 through the tunnel when the tunnel carries it, otherwise IPv6 is **blocked** beside the tunnel so nothing leaks past the kill switch (the IPv6 guard, v2); `1` always, `0` never |
 | `REMOTE_DNS` | 1.1.1.1 | DNS for the device and its clients, through the tunnel |
 | `LAN_CIDRS` | empty | more networks that stay local (the device's own LAN always does) |
 
@@ -77,7 +88,9 @@ Tailscale's own traffic goes through the tunnel by default.
 * A device whose VPN is on is never updated without the module. Offline, `mu300-update apply` stops before changing
   anything and says how to stage it (see [Updating](Updating#with-the-vpn-on)).
 * A system whose VPN is on with the kill switch and has lost the module keeps mobile data and the Wi-Fi client
-  **down** until the module is installed again (`mu300-extra install vpn`) or the VPN is turned off.
+  **down** until the module is installed again (`mu300-extra install vpn`) or the VPN is turned off. A missing engine
+  fails closed the same way, behind the kill switch, while the service fetches it again; `mu300-toolkit` says which one.
+* `mu300-extra remove vpn-<engine>` is refused while the VPN runs on that engine.
 
 ## Known limits
 

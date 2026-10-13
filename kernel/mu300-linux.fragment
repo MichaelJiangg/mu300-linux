@@ -158,6 +158,9 @@ CONFIG_NFT_FIB_NETDEV=y
 CONFIG_NFT_FWD_NETDEV=y
 CONFIG_NFT_BRIDGE_META=y
 CONFIG_NFT_BRIDGE_REJECT=y
+# the nft "queue" statement (nfnetlink_queue is already built in): the nftables mode of sing-box and other proxies,
+# which OpenWrt's kmod-nft-queue cannot supply on this kernel (issue #169); the mainline kernels have it as a module
+CONFIG_NFT_QUEUE=y
 
 # 8 per-CPU kthreads that only rotate big tasks for benchmark workloads; they are never woken on this
 # device and sit in uninterruptible sleep forever, adding 8 to the load average (upstream default is n)

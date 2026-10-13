@@ -17,6 +17,13 @@ sudo sms watch [COMMAND]            # wait for new messages, run COMMAND for eac
 ```
 
 No `sudo` on OpenWrt. All of it goes through `mu300-atd`, so it queues behind anything else talking to the modem.
+From v2026.10.22 a send is one transaction: the channel is held from the setup to the submission, and the SMSC the
+modem reports is written back to it unchanged first; some networks refused every send without that (issue #176, see
+[Troubleshooting](Troubleshooting)).
+`sms delete` accepts only a message index, `read` or `all` (from v2026.10.20); anything else is refused before the
+modem sees it, so a stray `1,4` can no longer wipe the mailbox.
+
+On Ubuntu with the web panel extra (Cockpit), the MU300 page reads, sends and deletes messages too.
 
 ## On OpenWrt with the control panel
 
@@ -35,6 +42,22 @@ form), a Telegram chat or another phone by SMS. It is off until you turn it on. 
 a delivery log, and failed deliveries are retried with a growing wait. Tokens, passwords and the webhook's address
 stay in `/etc/mu300/sms-forward.conf` (root only) and never appear in a log. E-mail forwarding needs `msmtp`, which
 the image does not include.
+
+From v2026.10.23 the webhook can send a body of your own instead of the standard fields (`sender`, `time`, `text`,
+`device`, `message`), for services that want their own format (Lark/Feishu, DingTalk, WeCom, Slack, Discord, Bark,
+ntfy). Choose the type (JSON, form or plain text; it sets the `Content-Type`) and write the body under "Custom
+body" with the placeholders `{sender}`, `{time}`, `{text}`, `{device}` and `{message}` (the message template filled
+in). Each value is escaped for the type - in JSON as the inside of a string, so write the quotes yourself:
+
+```json
+{"msg_type": "text", "content": {"text": "{message}"}}
+```
+
+In a form body the values are percent-encoded (`title={sender}&body={text}`); in plain text they are put in as they
+are, and an empty body is the message alone (enough for ntfy). The body may be 2000 bytes long. Unlike the address
+and the headers it is shown again in the panel, so keep keys and tokens in the address or in a header. "Send test"
+sends the same body. A delivery still counts as delivered on any HTTP 2xx: the service's own error inside a 200
+answer is not read.
 
 Since v2026.10.18 a message leaves the SIM only once its copy is on the disk, so a power cut loses none, and a long
 message whose other parts never arrive is shown after an hour, marked incomplete.

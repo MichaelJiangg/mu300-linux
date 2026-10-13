@@ -94,6 +94,9 @@ ln -sfn /run/systemd/resolve/stub-resolv.conf $R/etc/resolv.conf
 id -u ubuntu >/dev/null 2>&1 || true
 chroot $R /usr/bin/useradd -m -s /bin/bash -G wheel ubuntu 2>/dev/null || true
 echo "%wheel ALL=(ALL:ALL) ALL" > $R/etc/sudoers.d/wheel; chmod 440 $R/etc/sudoers.d/wheel
+# the Android vendor daemons own system account (android-run): uid 1000 is alarm here
+chroot $R /usr/bin/useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/bin/nologin \
+    --comment "MU300 Android vendor daemons" mu300vnd 2>/dev/null || true
 
 # services: same set the Ubuntu image enables
 for u in mu300-vendor.service:sysinit.target mu300-lan.service:multi-user.target mu300-ssh-hostkeys.service:sysinit.target \

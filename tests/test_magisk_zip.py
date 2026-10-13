@@ -41,6 +41,7 @@ class Customize(ShellTest):
             f.writestr('module.prop', 'id=x\n')
             f.writestr('action.sh', body)
             f.writestr('switch.sh', body)
+            f.writestr('bootchain.sh', body)
             f.writestr('system/bin/mu300-linux', body)
         return z
 
@@ -76,7 +77,7 @@ class Customize(ShellTest):
         for shell in self.each_shell():
             r, mod = self.run_customize(shell, f'cp "{evil}" "$ZIPFILE"; exit 0')
             self.assertNotIn('ABORT', r.stdout, r.stdout + r.stderr)
-            for f in ('switch.sh', 'action.sh', 'system/bin/mu300-linux'):
+            for f in ('switch.sh', 'action.sh', 'bootchain.sh', 'system/bin/mu300-linux'):
                 self.assertEqual((mod / f).read_text(), '#!/system/bin/sh\n', f)
             self.assertEqual(sorted(p.name for p in (self.tmp / 't').iterdir()), [])   # nothing left behind
 
@@ -88,7 +89,7 @@ class Customize(ShellTest):
 
 
 ALLOWED = {'META-INF/com/google/android/update-binary', 'META-INF/com/google/android/updater-script',
-           'module.prop', 'customize.sh', 'action.sh', 'switch.sh', 'system/bin/mu300-linux'} | set(MU300_FILES)
+           'module.prop', 'customize.sh', 'action.sh', 'switch.sh', 'bootchain.sh', 'system/bin/mu300-linux'} | set(MU300_FILES)
 ASSETS = ('mu300-kernel.tar.gz', 'mu300-kernel-6.18.tar.gz', 'mu300-kernel-7.2.tar.gz', 'mu300-openwrt-rootfs.tar.gz',
           'mu300-openwrt-luci-rootfs.tar.gz', 'mu300-ubuntu-rootfs.tar.gz', 'mu300-ubuntu-26.04-rootfs.tar.gz')
 

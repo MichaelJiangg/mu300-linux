@@ -34,8 +34,8 @@ tar -xzOf "$R/mu300-kernel.tar.gz" ./busybox > "$W/busybox"
 
 # what every zip holds besides its payload, by name (the audit below compares against this)
 COMMON='META-INF/com/google/android/update-binary META-INF/com/google/android/updater-script module.prop customize.sh
-action.sh switch.sh system/bin/mu300-linux mu300/install.sh mu300/android-boot-image.sh mu300/mu300-update
-mu300/android-install.sh mu300/android-mount-mu300root.sh mu300/storage.sh mu300/i18n.sh mu300/i18n/tr.tsv
+action.sh switch.sh bootchain.sh system/bin/mu300-linux mu300/install.sh mu300/android-boot-image.sh mu300/mu300-update
+mu300/android-install.sh mu300/android-bootchain.sh mu300/android-mount-mu300root.sh mu300/storage.sh mu300/i18n.sh mu300/i18n/tr.tsv
 mu300/i18n/zh.tsv mu300/subset-files.txt mu300/gpu-files.txt mu300/busybox mu300/manifest'
 stage() {  # stage DIR SYSTEM KERNEL ROOTFS_ASSET KERNEL_ASSET OS UBUNTU
     S=$1
@@ -43,10 +43,10 @@ stage() {  # stage DIR SYSTEM KERNEL ROOTFS_ASSET KERNEL_ASSET OS UBUNTU
     I=$TOP/android/magisk/installer; M=$TOP/android/magisk/mu300-linux-switch
     cp "$I/update-binary" "$I/updater-script" "$S/META-INF/com/google/android/"
     sed -e "s/@TAG@/$TAG/" -e "s/@CODE@/$code/" -e "s/@SYSTEM@/$2/" -e "s/@KERNEL@/$3/" "$I/module.prop.in" > "$S/module.prop"
-    cp "$I/customize.sh" "$M/action.sh" "$M/switch.sh" "$S/"
+    cp "$I/customize.sh" "$M/action.sh" "$M/switch.sh" "$M/bootchain.sh" "$S/"
     cp "$M/system/bin/mu300-linux" "$S/system/bin/"
     cp "$I/mu300-install.sh" "$S/mu300/install.sh"
-    cp "$TOP/tools/android-boot-image.sh" "$TOP/tools/android-install.sh" "$TOP/tools/android-mount-mu300root.sh" \
+    cp "$TOP/tools/android-boot-image.sh" "$TOP/tools/android-install.sh" "$TOP/tools/android-bootchain.sh" "$TOP/tools/android-mount-mu300root.sh" \
        "$TOP/tools/storage.sh" "$TOP/tools/i18n.sh" "$S/mu300/"
     # the checkout's (in CI the tag's, so the release's own): the installer needs bootimg_from_stock, which an older
     # release's mu300-update does not have when zips are built locally from one

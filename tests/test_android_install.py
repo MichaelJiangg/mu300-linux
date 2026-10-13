@@ -5,11 +5,19 @@ import os
 import re
 import shutil
 import tarfile
+import time
 
 from helpers import TOP, ShellTest
 from test_boot_init import fake_ext4
 
 SRC = (TOP / 'tools' / 'android-install.sh').read_text()
+
+
+def stage_block():
+    """the bounded-stage functions (stage_run, stall_check, ...), cut out between their markers"""
+    m = re.search(r'# --- stage begin\n(.*?)# --- stage end', SRC, re.S)
+    assert m, 'android-install.sh has no stage block'
+    return m.group(1)
 
 
 class SdCard(ShellTest):
@@ -30,8 +38,9 @@ class SdCard(ShellTest):
         fail = 'echo "Error: no volume manager" >&2; exit 3' if sm_fails else 'cat "$STUBLOG/volumes"'
         self.stub('sm', f'case "$1" in list-volumes) {fail} ;; '
                         'unmount) echo "sm unmount $2" >> "$STUBLOG/calls"; cp "$STUBLOG/volumes.after" "$STUBLOG/volumes" ;; esac')
+        # the stage block too: sd_prepare runs its mke2fs through stage_run (plainly: STAGE_DISK is empty here)
         code = ('say() { echo "[device] $*"; }\n' + f'MU300_MOUNTS="{self.tmp}/mounts"\nMU300_SYSFS="{self.tmp}/sys"\n'
-                + f'T="{self.tmp}"\n' + self.fn + f'\n{pre}\n{call}\necho "rc=$?"')
+                + f'T="{self.tmp}"\n' + stage_block() + self.fn + f'\n{pre}\n{call}\necho "rc=$?"')
         r = self.sh(shell, code)
         calls = (self.tmp / 'calls').read_text() if (self.tmp / 'calls').exists() else ''
         (self.tmp / 'calls').unlink(missing_ok=True)
@@ -367,10 +376,10 @@ class Extras(ShellTest):
     def test_order_in_the_install(self):
         self.assertIn('\nextra_from_push $M\nextra_vpn_precheck $M\n', SRC)
         # refused before anything is replaced: the systems come after
-        self.assertLess(SRC.index('\nextra_vpn_precheck $M\n'), SRC.index('rm -rf $M/$os && mv $M/$os.new $M/$os'))
+        self.assertLess(SRC.index('\nextra_vpn_precheck $M\n'), SRC.index('mv $M/$os.new $M/$os'))
         self.assertIn('\nextra_from_push $M\n', SRC)
         # the previous system is looked at before it is removed
-        self.assertLess(SRC.index('extra_keep_vpn $M $M/$os'), SRC.index('rm -rf $M/$os && mv $M/$os.new $M/$os'))
+        self.assertLess(SRC.index('extra_keep_vpn $M $M/$os'), SRC.index('stage_run "replace $os" 900 rm -rf $M/$os\n'))
 
 def make_tar(path, files):
     with tarfile.open(path, 'w:gz') as t:
@@ -396,6 +405,7 @@ class Systems(ShellTest):
                          'else exec "$S" -i "" "$@"; fi; fi; exec "$S" "$@"')
         self.wipe = self.block('legacy-wipe')
         self.install = self.block('install-os')
+        self.upk = self.block('user-packages')
 
     def block(self, name):
         m = re.search(rf'# --- {name} begin\n(.*?)# --- {name} end', SRC, re.S)
@@ -412,7 +422,7 @@ class Systems(ShellTest):
         e.update(env)
         # sd_unmark and extra_keep_vpn are other blocks of the script (SdCard and Extras test them)
         pre = ('set -e\nsay() { echo "[device] $*"; }\nsd_unmark() { :; }\nextra_keep_vpn() { :; }\nssid=; psk=\n'
-               + f'T="{self.T}"; M="{self.M}"\n')
+               + f'T="{self.T}"; M="{self.M}"\n' + stage_block() + self.upk)
         r = self.sh(shell, pre + self.install, **e)
         if fails:
             self.assertNotEqual(r.returncode, 0, r.stderr + r.stdout)
@@ -440,6 +450,30 @@ class Systems(ShellTest):
             self.tarball('openwrt-luci')
             self.run_install(shell, UPDATE='1', PWHASH='$6$salt$hash')
             self.assertEqual((self.M / 'openwrt-luci' / 'etc' / 'config' / 'network').read_text(), 'mine\n')
+
+    def test_adb_for_the_installing_computer(self):
+        key = 'QAAAA' + 'A' * 694 + '= me@my-pc'
+        etc = self.M / 'openwrt-luci' / 'etc' / 'mu300'
+        for shell in self.each_shell():
+            shutil.rmtree(self.M / 'openwrt-luci', ignore_errors=True)
+            self.tarball('openwrt-luci')
+            self.run_install(shell, PWHASH='$6$salt$hash')
+            self.assertFalse((etc / 'adb').exists())         # off unless asked for
+            self.assertFalse((etc / 'adb_keys').exists())
+            self.tarball('openwrt-luci')
+            r = self.run_install(shell, PWHASH='$6$salt$hash', ADB='1', ADB_KEY=key)
+            self.assertEqual('on\n', (etc / 'adb').read_text())
+            self.assertEqual(key + '\n', (etc / 'adb_keys').read_text())
+            self.assertEqual(0o600, (etc / 'adb_keys').stat().st_mode & 0o777)
+            self.assertIn('adb over USB on, for me@my-pc', r.stdout)
+            # an update: the key once, and ADB=0 takes nothing away
+            self.tarball('openwrt-luci')
+            self.run_install(shell, UPDATE='1', PWHASH='$6$salt$hash', ADB='1', ADB_KEY=key)
+            self.assertEqual(key + '\n', (etc / 'adb_keys').read_text())
+            self.tarball('openwrt-luci')
+            self.run_install(shell, UPDATE='1', PWHASH='$6$salt$hash', ADB='0', ADB_KEY='')
+            self.assertEqual('on\n', (etc / 'adb').read_text())
+            self.assertEqual(key + '\n', (etc / 'adb_keys').read_text())
 
     def test_update_adds_the_config_files_of_the_images_new_packages(self):
         # the old settings stay; a package the image brings keeps its own config file (the old etc/config copied
@@ -512,17 +546,29 @@ class Systems(ShellTest):
             self.assertIn('ubuntu:$6$new$hash:', shadow)
             self.assertNotIn('kaan', shadow)
 
-    def test_never_a_default_or_empty_password(self):
-        # fail closed: without a new hash a system is installed only when its account keeps a real hash of its own;
-        # otherwise the old system stays as it was and the install stops (the boot image is never armed)
-        cases = (  # name, os, the old system's shadow (None: no old system / no shadow file), image shadow
-            ('fresh, no hash given', 'ubuntu', None, None),
-            ('old system without a shadow', 'ubuntu', '', None),
-            ('OpenWrt root with an empty password', 'openwrt', 'root::19000:0:99999:7:::\n', None),
-            ('locked account', 'ubuntu', 'root:*:1::\nubuntu:!:19000::::::\n', None),
-            ('no entry for the account', 'ubuntu', 'root:$6$a$b:1::\n', None),
-            ('the image default carried over', 'ubuntu', 'root:*:1::\nubuntu:$6$image$ubuntu:19000::::::\n', None))
-        for name, os_, old, _ in cases:
+    def test_the_images_accounts_stand_without_a_hash(self):
+        # issue #167: the images' passwords are the well-known ones (ubuntu/ubuntu, OpenWrt's root without one), and
+        # a system is never refused for having them. Without a hash a new system keeps the image's shadow, an update
+        # the accounts carried over (whatever they hold), and the mark that has mu300-update carry some <os>.old's
+        # accounts over at boot never stays. PW_SET=1 puts PWHASH in even when it is empty: OpenWrt's root without a
+        # password, also over one an update would carry over (MU300_PASSWORD_RESET=yes).
+        # The device log says what the shadow holds (#178 follow-up): with the accounts carried over and PW_SET=1 (or
+        # a hash) the system's own account gets the images' password again, so "kept the accounts and passwords" would
+        # be untrue; only the other accounts keep theirs.
+        KEPT_ALL = 'kept the accounts and passwords of the previous {os}'
+        KEPT_OTHERS_NONE = "kept the other accounts of the previous {os}; {pwu}'s password is the images' own again: none, until one is set"
+        KEPT_OTHERS_HASH = "kept the other accounts of the previous {os}; {pwu}'s password is the one the installer chose (the images' own, or MU300_PASSWORD)"
+        cases = (  # name, os, the old system's shadow (None: no old system; '': no shadow file), PW_SET, what root/ubuntu keeps, the log line
+            ('fresh, no hash given', 'ubuntu', None, '0', 'ubuntu:$6$image$ubuntu:', None),
+            ('fresh, the Magisk zip', 'ubuntu', None, '1', 'ubuntu::', None),           # the installer sends a hash for Ubuntu; empty is empty
+            ('fresh OpenWrt, the Magisk zip', 'openwrt', None, '1', 'root::', None),
+            ('old system without a shadow', 'ubuntu', '', '0', 'ubuntu:$6$image$ubuntu:', None),
+            ('OpenWrt root with an empty password', 'openwrt', 'root::19000:0:99999:7:::\n', '0', 'root::', KEPT_ALL),
+            ('OpenWrt root reset to none', 'openwrt', 'root:$6$old$root:19000:0:99999:7:::\n', '1', 'root::', KEPT_OTHERS_NONE),
+            ('locked account', 'ubuntu', 'root:*:1::\nubuntu:!:19000::::::\n', '0', 'ubuntu:!:', KEPT_ALL),
+            ('no entry for the account', 'ubuntu', 'root:$6$a$b:1::\n', '0', 'ubuntu:$6$image$ubuntu:', KEPT_ALL),
+            ('the image default carried over', 'ubuntu', 'root:*:1::\nubuntu:$6$image$ubuntu:19000::::::\n', '0', 'ubuntu:$6$image$ubuntu:', KEPT_ALL))
+        for name, os_, old, pw_set, keeps, logged in cases:
             with self.subTest(name):
                 for shell in self.each_shell():
                     shutil.rmtree(self.M / os_, ignore_errors=True)
@@ -535,19 +581,29 @@ class Systems(ShellTest):
                         (self.M / os_ / 'etc' / 'precious').write_text('old\n')
                         if old:
                             (self.M / os_ / 'etc' / 'shadow').write_text(old)
-                    r = self.run_install(shell, fails=True, OSES=os_, BOOT_OS=os_, UPDATE='1' if old is not None else '0')
-                    self.assertIn('would keep no password of its own', r.stdout)
+                    r = self.run_install(shell, OSES=os_, BOOT_OS=os_, UPDATE='1' if old is not None else '0', PW_SET=pw_set)
                     self.assertFalse((self.M / f'{os_}.new').exists())
-                    if old is not None:
-                        self.assertEqual((self.M / os_ / 'etc' / 'precious').read_text(), 'old\n')
-                    else:
-                        self.assertFalse((self.M / os_).exists())
-        # the same with a new hash: installed, the hash in place
+                    self.assertIn(keeps, (self.M / os_ / 'etc' / 'shadow').read_text())
+                    self.assertFalse((self.M / os_ / 'etc' / '.mu300-accounts-from-image').exists())
+                    self.assertFalse((self.M / os_ / 'etc' / 'precious').exists())
+                    kept = [l for l in r.stdout.splitlines() if 'kept the' in l and 'accounts' in l]
+                    pwu = 'ubuntu' if os_ == 'ubuntu' else 'root'
+                    self.assertEqual(kept, [] if logged is None else ['[device] ' + logged.format(os=os_, pwu=pwu)], name)
+        # with a new hash: installed, the hash in place; on an update the log line says so
         for shell in self.each_shell():
             shutil.rmtree(self.M / 'openwrt', ignore_errors=True)
             self.tarball('openwrt', {'etc/shadow': 'root::19000:0:99999:7:::\n'})
             self.run_install(shell, OSES='openwrt', BOOT_OS='openwrt', PWHASH='$6$new$hash')
             self.assertIn('root:$6$new$hash:', (self.M / 'openwrt' / 'etc' / 'shadow').read_text())
+            (self.M / 'openwrt' / 'etc' / 'shadow').write_text('root:$6$old$root:19000:0:99999:7:::\nkaan:$6$k$k:19000::::::\n')
+            (self.M / 'openwrt' / 'etc' / 'passwd').write_text('root:x:0:0:root:/root:/bin/ash\nkaan:x:1000:1000::/home/kaan:/bin/ash\n')
+            self.tarball('openwrt', {'etc/shadow': 'root::19000:0:99999:7:::\n', 'etc/passwd': 'root:x:0:0:root:/root:/bin/ash\n'})
+            r = self.run_install(shell, OSES='openwrt', BOOT_OS='openwrt', UPDATE='1', PWHASH='$6$new$hash', PW_SET='1')
+            shadow = (self.M / 'openwrt' / 'etc' / 'shadow').read_text()
+            self.assertIn('root:$6$new$hash:', shadow)
+            self.assertIn('kaan:$6$k$k:', shadow)
+            self.assertIn('[device] ' + KEPT_OTHERS_HASH.format(os='openwrt', pwu='root'), r.stdout)
+            self.assertNotIn(KEPT_ALL.format(os='openwrt'), r.stdout)
 
     def test_accounts_merge_is_mu300_updates(self):
         # one merge, two copies: android-install.sh runs on Android and cannot source the system's mu300-update
@@ -570,3 +626,178 @@ class Systems(ShellTest):
             self.assertFalse((self.M / 'etc').exists())
             (self.M / 'lib' / 'systemd').mkdir(parents=True)
             (self.M / 'lib' / 'systemd' / 'systemd').write_text('x'); (self.M / 'lib' / 'systemd' / 'systemd').chmod(0o755)
+
+
+class Stages(ShellTest):
+    """The bounded stages of an SD-card installation (FINDINGS 50): a stage runs in a process group of its own and is
+    ended at its deadline, or after STAGE_STALL seconds without I/O progress on the card (its completion counters in
+    /sys/class/block/DISK/stat); a timeout stops the group, writes nothing more (no sync, no unmount) and leaves a
+    lock keyed by Android's boot id, which refuses every run until Android has rebooted; a clean run leaves none."""
+
+    def setUp(self):
+        super().setUp()
+        m = re.search(r'# --- sd begin\n(.*?)# --- sd end', SRC, re.S)
+        self.sd = m.group(1)
+        self.T = self.tmp / 'T'
+        self.M = self.T / 'mu300root'
+        self.M.mkdir(parents=True)
+        self.stat = self.tmp / 'sys' / 'class' / 'block' / 'mmcblk1' / 'stat'
+        self.stat.parent.mkdir(parents=True)
+        self.stat.write_text('100 0 800 50 200 0 1600 90 0 140 140 0 0 0 0 0 0\n')
+        self.boot_id = self.tmp / 'boot_id'
+        self.boot_id.write_text('11111111-2222-3333-4444-555555555555\n')
+        self.lock = self.T / 'mu300-install.stalled'
+        # macOS has no setsid: a Python one stands in (the real one is used where it exists)
+        if not shutil.which('setsid'):
+            self.stub('setsid', 'exec python3 -c \'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])\' "$@"')
+
+    def run_fn(self, shell, call, pre='', disk='mmcblk1', stall=2):
+        code = ('say() { echo "[device] $*"; }\n' + f'T="{self.T}"; M="{self.M}"\nMU300_SYSFS="{self.tmp}/sys"\n'
+                f'MU300_BOOT_ID="{self.boot_id}"\nMU300_STAGE_STALL={stall}\nMU300_STAGE_POLL=1\n'
+                + stage_block() + self.sd + f'\nSTAGE_DISK={disk}\n{pre}\n{call}\necho "rc=$?"')
+        return self.sh(shell, code)
+
+    def alive(self, pid):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        try:  # a zombie is dead: its parent went with the group, and in a container nothing may reap it
+            with open(f'/proc/{pid}/status') as f:
+                return not any(l.startswith('State:') and 'Z' in l.split()[1] for l in f)
+        except OSError:
+            return True
+
+    def test_stall_stops_the_group_and_locks(self):
+        # the card's counters never move: the stage ends after STAGE_STALL seconds, its whole group (a grandchild too)
+        # is gone, the lock holds the boot id and names the stage, and the run is told to reboot Android
+        child = self.tmp / 'child'
+        for shell in self.each_shell():
+            child.unlink(missing_ok=True); self.lock.unlink(missing_ok=True)
+            r = self.run_fn(shell, f'stage_run "unpack ubuntu" 600 sh -c \'sleep 60 & echo $! > "{child}"; wait\'')
+            self.assertIn('rc=1\n', r.stdout, r.stderr)
+            self.assertIn('the unpack ubuntu stage timed out (no I/O progress on mmcblk1 for 2 s)', r.stdout)
+            self.assertIn('reboot Android before running the installer again', r.stdout)
+            self.assertIn(f'the card stays mounted at {self.M}', r.stdout)
+            self.assertIn(str(self.lock), r.stdout)
+            lines = self.lock.read_text().splitlines()
+            self.assertEqual(lines[0], '11111111-2222-3333-4444-555555555555')
+            self.assertIn('stage unpack ubuntu', lines[1]); self.assertIn('no I/O progress', lines[1])
+            pid = int(child.read_text())
+            for _ in range(20):
+                if not self.alive(pid):
+                    break
+                time.sleep(0.1)
+            self.assertFalse(self.alive(pid), "the stage's grandchild survived the stop")
+            self.assertEqual(list(self.T.glob('mu300-stage.*')), [])
+
+    def test_deadline_ends_a_stage_that_makes_progress(self):
+        # counters moving, but the stage runs longer than its limit
+        bump = f'i=0; while :; do i=$((i + 1)); echo "$i 0 $i 0 $i 0 $i 0 0 0 0" > "{self.stat}"; sleep 1; done'
+        for shell in self.each_shell():
+            self.lock.unlink(missing_ok=True)
+            r = self.run_fn(shell, f"stage_run format 2 sh -c '{bump}'", stall=60)
+            self.assertIn('rc=1\n', r.stdout, r.stderr)
+            self.assertIn('the format stage timed out (it ran longer than 2 s)', r.stdout)
+            self.assertTrue(self.lock.exists())
+
+    def test_progress_keeps_a_stage_alive(self):
+        # a stage of 4 s with counters moving every second, STAGE_STALL 2 s: it finishes, no lock, its status kept
+        bump = f'for i in 1 2 3 4; do echo "$i 0 $i 0 $i 0 $i 0 0 0 0" > "{self.stat}"; sleep 1; done; echo done; exit 3'
+        for shell in self.each_shell():
+            r = self.run_fn(shell, f"stage_run \"unpack openwrt\" 600 sh -c '{bump}'")
+            self.assertIn('done\nrc=3\n', r.stdout, r.stderr)
+            self.assertNotIn('timed out', r.stdout)
+            self.assertFalse(self.lock.exists())
+            r = self.run_fn(shell, 'stage_run x 600 true; stage_run y 600 false')
+            self.assertIn('rc=1\n', r.stdout)
+            self.assertNotIn('timed out', r.stdout)
+
+    def test_without_counters_only_the_deadline_counts(self):
+        # no stat file (another sysfs layout): the stall rule is off, said so, and the deadline still applies
+        self.stat.unlink()
+        for shell in self.each_shell():
+            self.lock.unlink(missing_ok=True)
+            r = self.run_fn(shell, "stage_run flush 600 sh -c 'sleep 3; echo flushed'", stall=1)
+            self.assertIn('flushed\nrc=0\n', r.stdout, r.stderr)
+            self.assertIn('cannot read the I/O counters of mmcblk1: the flush stage is bounded by its limit of 600 s only', r.stdout)
+            r = self.run_fn(shell, "stage_run flush 1 sh -c 'sleep 4'", stall=1)
+            self.assertIn('rc=1\n', r.stdout)
+            self.assertIn('it ran longer than 1 s', r.stdout)
+
+    def test_on_the_emmc_a_stage_runs_as_it_is(self):
+        # STAGE_DISK empty (an internal installation): the command runs in this shell, no group, no deadline
+        for shell in self.each_shell():
+            r = self.run_fn(shell, "stage_run x 1 sh -c 'sleep 2; echo ran; exit 4'", disk='')
+            self.assertIn('ran\nrc=4\n', r.stdout, r.stderr)
+            self.assertNotIn('timed out', r.stdout)
+            self.assertFalse(self.lock.exists())
+
+    def test_a_rerun_in_the_same_android_boot_is_refused(self):
+        for shell in self.each_shell():
+            self.lock.write_text('11111111-2222-3333-4444-555555555555\n'
+                                 'stage unpack ubuntu, 2026-10-12 13:00: no I/O progress on mmcblk1 for 120 s\n')
+            r = self.run_fn(shell, 'stall_check')
+            self.assertIn('rc=1\n', r.stdout, r.stderr)
+            self.assertIn('an earlier run of the installer timed out in this Android boot (stage unpack ubuntu, 2026-10-12 13:00: '
+                          'no I/O progress on mmcblk1 for 120 s)', r.stdout)
+            self.assertIn('reboot Android, then run the installer again', r.stdout)
+            self.assertTrue(self.lock.exists())
+            # Android rebooted since: the lock is stale and goes
+            self.lock.write_text('99999999-0000-0000-0000-000000000000\nstage format\n')
+            r = self.run_fn(shell, 'stall_check')
+            self.assertIn('rc=0\n', r.stdout)
+            self.assertFalse(self.lock.exists())
+            r = self.run_fn(shell, 'stall_check')
+            self.assertIn('rc=0\n', r.stdout)
+
+    def test_a_clean_run_leaves_no_lock(self):
+        for shell in self.each_shell():
+            r = self.run_fn(shell, 'stage_run x 600 true; stall_clear; ls "$T"')
+            self.assertIn('rc=0\n', r.stdout, r.stderr)
+            self.assertFalse(self.lock.exists())
+            self.assertNotIn('mu300-stage', r.stdout)
+
+    def test_exit_flushes_nothing_after_a_timeout(self):
+        # the EXIT trap of SD mode: a sync and an unmount after a timeout would wait on the stuck request
+        self.stub('sync', 'echo sync >> "$STUBLOG/calls"')
+        (self.T / 'android-mount-mu300root.sh').write_text('echo "helper $*" >> "$STUBLOG/calls"\n')
+        for shell in self.each_shell():
+            (self.tmp / 'calls').unlink(missing_ok=True)
+            r = self.run_fn(shell, 'sd_exit', pre='STALLED=1')
+            self.assertIn('rc=0\n', r.stdout, r.stderr)
+            self.assertFalse((self.tmp / 'calls').exists())
+            r = self.run_fn(shell, 'sd_exit', pre='STALLED=')
+            self.assertIn('rc=0\n', r.stdout)
+            self.assertEqual((self.tmp / 'calls').read_text(), f'sync\nhelper -u {self.M}\n')
+
+    def test_a_timeout_ends_the_script_before_the_ok_line(self):
+        # under the script's set -e a timed-out stage is the end: the trap runs, the OK line never comes
+        self.stub('sync', 'echo sync >> "$STUBLOG/calls"')
+        (self.T / 'android-mount-mu300root.sh').write_text('echo "helper $*" >> "$STUBLOG/calls"\n')
+        for shell in self.each_shell():
+            (self.tmp / 'calls').unlink(missing_ok=True); self.lock.unlink(missing_ok=True)
+            r = self.run_fn(shell, "stage_run flush 600 sleep 30\nstall_clear\necho MU300-INSTALL-OK",
+                            pre='set -e; trap sd_exit EXIT')
+            self.assertNotEqual(r.returncode, 0)
+            self.assertNotIn('MU300-INSTALL-OK', r.stdout)
+            self.assertIn('timed out', r.stdout)
+            self.assertTrue(self.lock.exists())
+            self.assertFalse((self.tmp / 'calls').exists())
+
+    def test_wiring(self):
+        # the lock is checked before anything, the card's disk names the counters, every long card stage is bounded,
+        # the flush comes before the OK line and the lock goes with it, and the trap is sd_exit
+        self.assertLess(SRC.index('\nstall_check || exit 1\n'), SRC.index('if [ "${SD_MODE:-0}" = 1 ]; then'))
+        self.assertIn('STAGE_DISK=$(sd_disk "$SD_DEV"); STAGE_DISK=${STAGE_DISK##*/}', SRC)
+        self.assertIn('stage_run format 900 sh -c \'exec "$@" >/dev/null\' sh $mk -t ext4 -F -b 4096 -m 0 -i "$i" -L mu300sd "$1"', SRC)
+        self.assertIn('stage_run "unpack $os" 3600 tar -xzpf $tarball -C $M/$os.new', SRC)
+        self.assertIn('stage_run "unpack $os vendor" 900 tar -xzpf $T/mu300-vendor-$os.tar.gz -C $M/$os.new', SRC)
+        self.assertIn('stage_run "clean $os" 900 rm -rf $M/$os.new\n', SRC)
+        self.assertIn('    stage_run "replace $os" 900 rm -rf $M/$os\n    mv $M/$os.new $M/$os\n', SRC)
+        self.assertIn('[ "${SD_MODE:-0}" != 1 ] || stage_run flush 1800 sync\nstall_clear\n', SRC)
+        self.assertLess(SRC.index('stage_run flush 1800 sync'), SRC.index('echo MU300-INSTALL-OK'))
+        self.assertIn('trap sd_exit EXIT', SRC)
+        self.assertNotIn("trap 'sync; sh $T/android-mount-mu300root.sh -u $M", SRC[:SRC.index('# --- the region must')])

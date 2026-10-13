@@ -23,13 +23,18 @@ if [ -n "$miss" ]; then
 fi
 # Optional inputs decide whether the image can use the modem, Wi-Fi and the GPU at all. Missing ones used to
 # pass silently and produce an image that boots and does nothing useful, so say what went in.
-for o in /firmware /android-subset /android-gpu-subset /bt-init /keys /cltest; do
+for o in /firmware /android-subset /android-gpu-subset /bt-init /keys /adbd /cltest; do
     [ -e "$o" ] && echo "assemble.sh: + $o" || echo "assemble.sh: - $o (not mounted; the image will be built without it)"
 done
 
 rm -rf $R && mkdir -p $R
 tar -xf /w/base.tar -C $R
 cp -a /w/overlay/. $R/
+# the Android vendor daemons' own system account (android-run, ueventd-perms.sh): Android's system user is uid 1000,
+# which here is ubuntu's. mu300-update carries the image's system accounts into an updated system, so updated
+# systems have it too (android-vendor-start makes it on one that does not).
+grep -q '^mu300vnd:' $R/etc/passwd || useradd --root $R --system --user-group --no-create-home --home-dir /nonexistent \
+    --shell /usr/sbin/nologin --comment 'MU300 Android vendor daemons' mu300vnd
 # /lib is a symlink to usr/lib on Ubuntu; always write through usr/lib
 mkdir -p $R/usr/lib/modules/$KREL/extra
 cp /kmods/*.ko $R/usr/lib/modules/$KREL/extra/
@@ -43,6 +48,10 @@ rm -f $R/etc/ssh/ssh_host_* ; : > $R/etc/machine-id; rm -f $R/var/lib/dbus/machi
 echo mu300 > $R/etc/hostname
 # which release this filesystem came from, so mu300-update can tell whether a newer one exists
 mkdir -p $R/etc/mu300 && printf '%s\n' "${MU300_VERSION:-dev}" > $R/etc/mu300/image-version
+# the packages the image asks for (apt-mark showmanual): an update installs the others again, the ones added on the
+# device (mu300-update, upk_record; read with its own function)
+(MU300_LIB=1; . $R/opt/mu300/bin/mu300-update; upk_manual $R ubuntu) > $R/etc/mu300/image-packages
+[ -s $R/etc/mu300/image-packages ] || { echo "assemble.sh: no package list for etc/mu300/image-packages" >&2; exit 1; }
 ln -sfn ../run/systemd/resolve/stub-resolv.conf $R/etc/resolv.conf
 # vendor firmware for Wi-Fi (wcnmodem.bin, wifi_board_config*.ini) is copied from the device's /odm/firmware
 if [ -d /firmware ]; then mkdir -p $R/usr/lib/firmware && cp /firmware/* $R/usr/lib/firmware/; fi
@@ -57,11 +66,13 @@ if [ -e /cltest ]; then install -D -m755 /cltest $R/opt/mu300/android/system/bin
 if [ -e /bt-init ]; then cp /bt-init $R/opt/mu300/bin/mu300-bt-init; fi
 # tools/keys build (static arm64): the buttons (mu300-buttons)
 if [ -e /keys ]; then install -m755 /keys $R/opt/mu300/bin/mu300-keys; fi
+# tools/adbd build (static arm64, musl): adb over USB, off until mu300-usb adb on
+if [ -e /adbd ]; then install -m755 /adbd $R/opt/mu300/bin/adbd; fi
 # the VPN engines (Xray, hev-socks5-tunnel, sing-box) are not part of the image: they are the vpn extra
 # (tools/make-extra.sh, installed with mu300-extra install vpn)
 # accounts still the image's (ubuntu/ubuntu) until an installer or mu300-update puts the device's own in place
 : > $R/etc/.mu300-accounts-from-image
-for u in mu300-accounts.service:sysinit.target mu300-early-recorder.service:sysinit.target mu300-vendor.service:sysinit.target mu300-lan.service:multi-user.target mu300-ssh-hostkeys.service:sysinit.target mu300-telnetd.service:multi-user.target serial-getty@ttyGS0.service:getty.target ssh.socket:sockets.target mu300-wifi.service:multi-user.target mu300-wifi-client.service:multi-user.target mu300-mobile-data.service:multi-user.target mu300-mobile-data-watch.service:multi-user.target mu300-fixups.service:sysinit.target mu300-zram.service:swap.target mu300-boot-ok.service:multi-user.target mu300-cp_diskserver.service:multi-user.target mu300-refnotify.service:multi-user.target mu300-extra-modules.service:multi-user.target mu300-hotspot.service:multi-user.target mu300-bluetooth.service:multi-user.target mu300-thermal-guard.service:multi-user.target mu300-audio.service:multi-user.target mu300-firewall.service:sysinit.target mu300-kmsg.service:sysinit.target mu300-toolkit.service:multi-user.target mu300-cpu.service:multi-user.target mu300-atd.service:multi-user.target mu300-atd2.service:multi-user.target mu300-modem-log.service:multi-user.target mu300-buttons.service:multi-user.target mu300-power.service:multi-user.target mu300-traffic.service:multi-user.target mu300-update-notice.timer:timers.target mu300-wifi-scan-mode.service:multi-user.target systemd-networkd.service:multi-user.target; do
+for u in mu300-accounts.service:sysinit.target mu300-early-recorder.service:sysinit.target mu300-vendor.service:sysinit.target mu300-lan.service:multi-user.target mu300-ssh-hostkeys.service:sysinit.target mu300-telnetd.service:multi-user.target serial-getty@ttyGS0.service:getty.target ssh.socket:sockets.target mu300-wifi.service:multi-user.target mu300-wifi-client.service:multi-user.target mu300-mobile-data.service:multi-user.target mu300-mobile-data-watch.service:multi-user.target mu300-fixups.service:sysinit.target mu300-zram.service:swap.target mu300-boot-ok.service:multi-user.target mu300-cp_diskserver.service:multi-user.target mu300-refnotify.service:multi-user.target mu300-extra-modules.service:multi-user.target mu300-hotspot.service:multi-user.target mu300-bluetooth.service:multi-user.target mu300-thermal-guard.service:multi-user.target mu300-audio.service:multi-user.target mu300-firewall.service:sysinit.target mu300-kmsg.service:sysinit.target mu300-toolkit.service:multi-user.target mu300-cpu.service:multi-user.target mu300-atd.service:multi-user.target mu300-atd2.service:multi-user.target mu300-modem-log.service:multi-user.target mu300-buttons.service:multi-user.target mu300-power.service:multi-user.target mu300-traffic.service:multi-user.target mu300-user-packages.service:multi-user.target mu300-adbd.service:multi-user.target mu300-update-notice.timer:timers.target mu300-wifi-scan-mode.service:multi-user.target systemd-networkd.service:multi-user.target; do
   svc=${u%%:*}; tgt=${u##*:}
   mkdir -p $R/etc/systemd/system/$tgt.wants
   src=/etc/systemd/system/$svc; [ -e $R$src ] || src=/usr/lib/systemd/system/$svc

@@ -37,7 +37,10 @@ bc_files() {  # bc_files LIVE DIR: the four blocks of Task 1, byte for byte
     done
 }
 
-collect_firmware() {  # collect_firmware DIR: the Wi-Fi/Bluetooth/GNSS firmware of this device; prints what is missing
+# collect_firmware DIR: the Wi-Fi/Bluetooth/GNSS firmware of this device; prints what is missing. The collect_*
+# functions and vendor_overlay run under umask 022 whatever the caller has (see collect_subset).
+collect_firmware() { ( umask 022; _collect_firmware "$@" ); }
+_collect_firmware() {
     mkdir -p "$1"; _miss=
     for _f in $FIRMWARE; do
         _ok=
@@ -51,8 +54,11 @@ collect_firmware() {  # collect_firmware DIR: the Wi-Fi/Bluetooth/GNSS firmware 
 # collect_subset LIST DIR: the files of LIST (android-vendor/subset-files.txt) from this device's /, links followed
 # as extract-subset.sh follows them over adb, and the two things it adds. A file this firmware lacks is skipped; the
 # two the modem cannot start without are checked. LIST is read before the cd into Android's root, so a relative
-# path works too.
-collect_subset() {
+# path works too. Under umask 022 whatever the caller has: only the files are named, so tar makes vendor/etc and
+# the other directories itself, and under a root shell with 077 they come out 0700: modem_control (uid 1000 by
+# then) cannot reach its XML files in them ("can't get modem img!", and the CP is never loaded).
+collect_subset() { ( umask 022; _collect_subset "$@" ); }
+_collect_subset() {
     _list=$(grep -v '^#' "$1") || return 1
     rm -rf "$2"; mkdir -p "$2"
     (cd "${MU300_ANDROID_ROOT:-/}" && tar -chf - $_list 2>/dev/null) | tar -xf - -C "$2" 2>/dev/null
@@ -63,7 +69,8 @@ collect_subset() {
 }
 # collect_gpu LIST DIR: the Mali userspace and its library closure, all of it or nothing (a partial closure only
 # fails later, inside OpenCL). LIST is read before the cd, as in collect_subset.
-collect_gpu() {
+collect_gpu() { ( umask 022; _collect_gpu "$@" ); }
+_collect_gpu() {
     _list=$(grep -v '^#' "$1") || return 1
     rm -rf "$2"; mkdir -p "$2"
     for _p in $_list; do
@@ -79,7 +86,7 @@ collect_gpu() {
 vendor_overlay() {
     _o=$5.d
     rm -rf "$_o" "$5.gpu"
-    _vendor_overlay "$@" || { rm -rf "$_o" "$5" "$5.gpu"; return 1; }
+    ( umask 022; _vendor_overlay "$@" ) || { rm -rf "$_o" "$5" "$5.gpu"; return 1; }
     rm -rf "$_o" "$5.gpu"
 }
 _vendor_overlay() {
@@ -98,6 +105,11 @@ _vendor_overlay() {
             mkdir -p "$_o/opt/mu300/android/$(dirname "$_f")" && cp -a "$4/$_f" "$_o/opt/mu300/android/$_f" || return 1
         done < "$5.gpu"
     fi
+    # Root's, all of it, as tools/vendor-overlay.py stores it: tar keeps the owner each copy has, and on Android
+    # bionic belongs to system (uid 1000) and the programs to group shell (2000). On the installed system uid 1000
+    # is the first login account, which could then rewrite the libc root's cp_diskserver loads. -h: the linker64
+    # link itself, never what it points at on this device. (Not root: a test; the installer always is.)
+    [ "$(id -u)" != 0 ] || chown -hR 0:0 "$_o" || return 1
     tar -czf "$5" -C "$_o" "$_fw" opt/mu300/android
 }
 

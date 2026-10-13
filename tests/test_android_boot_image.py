@@ -9,7 +9,9 @@ import struct
 import subprocess
 import sys
 import tarfile
+import tempfile
 import unittest
+from pathlib import Path
 
 from helpers import BIN, TOP, ShellTest
 from test_boot_image import HAVE_LZ4, LIVE_A, cpio_files, fake_misc, fake_stock, unlz4_legacy
@@ -329,6 +331,164 @@ class DeviceSide(ShellTest):
             self.assertNotEqual(r.returncode, 0)
             self.assertFalse(list(self.tmp.glob('v.tar.gz*')))
             shutil.rmtree(bad); shutil.rmtree(self.tmp / 's'); shutil.rmtree(self.tmp / 'fw')
+
+    def test_the_import_does_not_take_the_callers_umask(self):
+        # only the files are named in the list, so tar makes vendor/etc and the others itself: under a root shell
+        # with umask 077 they were 0700, and modem_control (uid 1000) could not reach its XML files in them
+        root = self.tmp / 'root'
+        fake_android_root(root)
+        g = self.tmp / 'gpu'
+        (g / 'vendor/lib64/egl').mkdir(parents=True)
+        (g / 'vendor/lib64/egl/libGLES_mali.so').write_bytes(b'mali')
+        # the device's own modes, whatever umask the tests run under: what is asserted below is what the import
+        # adds to them
+        for top in (root, g):
+            for f in top.rglob('*'):
+                if not f.is_symlink():
+                    f.chmod(0o755 if f.is_dir() or f.name == 'modem_control' else 0o644)
+        if os.getuid() == 0:
+            # as on Android: bionic is system's, the programs are group shell's (only root can set that up)
+            os.chown(root / 'apex/com.android.runtime/lib64/bionic/libc.so', 1000, 1000)
+            os.chown(root / 'vendor/bin/modem_control', 0, 2000)
+        out = self.tmp / 'v.tar.gz'
+        for shell in self.each_shell():
+            r = self.lib(shell, f'umask 077; collect_subset "{TOP}/android-vendor/subset-files.txt" "{self.tmp}/s" && '
+                                f'collect_firmware "{self.tmp}/fw" && '
+                                f'vendor_overlay openwrt "{self.tmp}/fw" "{self.tmp}/s" "{g}" "{out}" && umask',
+                         MU300_ANDROID_ROOT=root, MU300_FW_DIRS=f'{root}/vendor/firmware')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn(r.stdout.split()[-1], ('0077', '077'), shell)      # the caller's own is not changed
+            for d in ('vendor', 'vendor/etc', 'vendor/bin', 'system/lib64', 'system/bin', 'linkerconfig',
+                      'apex/com.android.runtime/lib64'):
+                self.assertEqual(stat.S_IMODE((self.tmp / 's' / d).stat().st_mode), 0o755, (shell, d))
+            self.assertEqual(stat.S_IMODE((self.tmp / 's/linkerconfig/ld.config.txt').stat().st_mode), 0o644, shell)
+            with tarfile.open(out) as t:
+                modes = {m.name.lstrip('./').rstrip('/'): m.mode & 0o7777 for m in t.getmembers() if not m.issym()}
+                owners = {(m.uid, m.gid) for m in t.getmembers()}
+            if os.getuid() == 0:
+                self.assertEqual(owners, {(0, 0)}, shell)
+            dirs = {n: m for n, m in modes.items() if n in (
+                'opt/mu300/android', 'opt/mu300/android/vendor', 'opt/mu300/android/vendor/etc',
+                'opt/mu300/android/vendor/lib64/egl', 'opt/mu300/android/linkerconfig', 'lib/firmware')}
+            self.assertEqual(set(dirs.values()), {0o755}, (shell, dirs))
+            self.assertGreaterEqual(len(dirs), 6, (shell, dirs))
+            self.assertEqual(modes['opt/mu300/android/vendor/etc/modem_cp_info.xml'], 0o644, shell)
+            self.assertEqual(modes['opt/mu300/android/linkerconfig/ld.config.txt'], 0o644, shell)
+            self.assertEqual(modes['opt/mu300/android/vendor/lib64/egl/libGLES_mali.so'], 0o644, shell)
+            self.assertEqual(modes['lib/firmware/wcnmodem.bin'], 0o644, shell)
+            shutil.rmtree(self.tmp / 's'); shutil.rmtree(self.tmp / 'fw')
+
+    def test_the_overlay_is_packed_as_roots(self):
+        # tar stores the owner each copy has: on Android bionic is system's (uid 1000, the first login account of
+        # the installed system) and the programs are group shell's. Only root can give files away, so here the
+        # line is read; the installer always is root.
+        text = LIB.read_text()
+        body = text[text.index('\n_vendor_overlay() {'):]
+        self.assertLess(body.index('chown -hR 0:0 "$_o"'), body.index('tar -czf "$5"'))
+        self.assertIn('[ "$(id -u)" != 0 ] || chown -hR 0:0 "$_o" || return 1', body)
+
+
+class HostOverlay(unittest.TestCase):
+    """tools/vendor-overlay.py: the modes it stores come from where a file goes, not from the file system the
+    subset was extracted on (issue #127: a work directory on FAT/exFAT under macOS shows everything as 0700)."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix='mu300-test-'))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def subset(self):
+        s, g, fw = self.tmp / 'android-subset', self.tmp / 'android-gpu-subset', self.tmp / 'firmware'
+        for d in (s, g, fw):
+            shutil.rmtree(d, ignore_errors=True)
+        files = {'dev/__properties__/property_info': 0o444, 'dev/__properties__/u:object_r:radio_prop:s0': 0o444,
+                 'vendor/bin/modem_control': 0o755, 'vendor/bin/cp_diskserver': 0o755,
+                 'vendor/etc/modem_cp_info.xml': 0o644, 'vendor/lib64/lib_crypto.so': 0o644,
+                 'system/lib64/libc++.so': 0o644, 'apex/com.android.runtime/bin/linker64': 0o755,
+                 'apex/com.android.runtime/lib64/bionic/libc.so': 0o644, 'linkerconfig/ld.config.txt': 0o644}
+        for rel, mode in files.items():
+            (s / rel).parent.mkdir(parents=True, exist_ok=True)
+            (s / rel).write_text(rel)
+            (s / rel).chmod(mode)
+        (s / 'system/bin').mkdir()
+        os.symlink('/apex/com.android.runtime/bin/linker64', s / 'system/bin/linker64')
+        (s / 'dev/__properties__').chmod(0o711)
+        (g / 'vendor/lib64/egl').mkdir(parents=True)
+        (g / 'vendor/lib64/egl/libGLES_mali.so').write_text('mali')
+        fw.mkdir()
+        (fw / 'wcnmodem.bin').write_text('fw')
+        return s, g, fw
+
+    def pack(self, os_name, s, g, fw):
+        out = self.tmp / f'v-{os_name}.tar.gz'
+        r = subprocess.run([sys.executable, str(TOP / 'tools' / 'vendor-overlay.py'), '--os', os_name, '--firmware',
+                            str(fw), '--android-subset', str(s), '--gpu-subset', str(g), '--out', str(out)],
+                           capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        with tarfile.open(out) as t:
+            return {m.name: ('l' if m.issym() else 'd' if m.isdir() else 'f', m.mode & 0o7777, m.uid, m.gid,
+                             m.uname, m.gname) for m in t.getmembers()}
+
+    WANT = {'opt/mu300/android/dev-properties': ('d', 0o755), 'opt/mu300/android/dev-properties/property_info': ('f', 0o444),
+            'opt/mu300/android/dev-properties/u:object_r:radio_prop:s0': ('f', 0o444),
+            'opt/mu300/android/vendor': ('d', 0o755), 'opt/mu300/android/vendor/etc': ('d', 0o755),
+            'opt/mu300/android/vendor/bin/modem_control': ('f', 0o755),
+            'opt/mu300/android/vendor/bin/cp_diskserver': ('f', 0o755),
+            'opt/mu300/android/vendor/etc/modem_cp_info.xml': ('f', 0o644),
+            'opt/mu300/android/vendor/lib64/lib_crypto.so': ('f', 0o644),
+            'opt/mu300/android/vendor/lib64/egl': ('d', 0o755),
+            'opt/mu300/android/vendor/lib64/egl/libGLES_mali.so': ('f', 0o644),
+            'opt/mu300/android/system/lib64/libc++.so': ('f', 0o644),
+            'opt/mu300/android/system/bin/linker64': ('l', 0o777),
+            'opt/mu300/android/apex/com.android.runtime/bin/linker64': ('f', 0o755),
+            'opt/mu300/android/apex/com.android.runtime/lib64/bionic/libc.so': ('f', 0o644),
+            'opt/mu300/android/linkerconfig': ('d', 0o755),
+            'opt/mu300/android/linkerconfig/ld.config.txt': ('f', 0o644)}
+
+    def check(self, got, fwdir):
+        for name, want in dict(self.WANT, **{f'{fwdir}/wcnmodem.bin': ('f', 0o644)}).items():
+            self.assertIn(name, got)
+            self.assertEqual(got[name][:2], want, name)
+        for name, m in got.items():
+            self.assertEqual(m[2:], (0, 0, 'root', 'root'), name)
+            if m[0] != 'l':
+                # nothing only root can read or enter, nothing anyone else can write
+                self.assertEqual(m[1] & 0o444, 0o444, name)
+                self.assertEqual(m[1] & 0o7022, 0, name)
+                if m[0] == 'd':
+                    self.assertEqual(m[1], 0o755, name)
+
+    def test_modes_of_a_subset_extracted_on_a_host_that_keeps_them(self):
+        s, g, fw = self.subset()
+        self.check(self.pack('ubuntu', s, g, fw), 'usr/lib/firmware')
+        self.check(self.pack('openwrt-luci', s, g, fw), 'lib/firmware')
+
+    def test_modes_of_a_subset_on_a_file_system_without_modes(self):
+        # macOS on FAT/exFAT: every file and directory 0700 (measured: -rwx------ even for the empty
+        # ld.config.txt, drwx------ for vendor/etc; the tarball stored exactly that, as root:root)
+        s, g, fw = self.subset()
+        for top in (s, g, fw):
+            for p in sorted(top.rglob('*'), reverse=True):
+                if not p.is_symlink():
+                    p.chmod(0o700)
+        self.check(self.pack('openwrt-luci', s, g, fw), 'lib/firmware')
+        # and the other way a host can lie: everything readable, writable and executable by all (drvfs, ntfs-3g)
+        for top in (s, g, fw):
+            for p in sorted(top.rglob('*'), reverse=True):
+                if not p.is_symlink():
+                    p.chmod(0o777)
+        self.check(self.pack('ubuntu', s, g, fw), 'usr/lib/firmware')
+
+    def test_the_same_rule_as_the_device(self):
+        # android-vendor-start's modes block sets these at boot; a tarball this tool packs must already be so,
+        # or every first boot would report a repair
+        text = (BIN / 'android-vendor-start').read_text()
+        for rule in ("-type d ! -perm 755 ! -perm 711 -exec chmod 755", "-path '*/bin/*' ! -perm 755 -exec chmod 755",
+                     '-path "$MA/dev-properties/*" ! -perm 444 -exec chmod 444',
+                     "! -path '*/bin/*' ! -path \"$MA/dev-properties/*\" ! -perm 644 -exec chmod 644"):
+            self.assertIn(rule, text)
+
 
 if __name__ == '__main__':
     unittest.main()

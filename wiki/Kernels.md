@@ -35,6 +35,23 @@ flowchart TD
   NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers.
 * **U30 Air battery:** readings work on every kernel. Charging on the mainline kernels is driven by the `bq256xx`
   driver from v2026.10.12 on; the mainline kernels of v2026.10.11 and older leave charging off, so use 5.4 there.
+  From v2026.10.20 the mainline kernels also read the current a Type-C port offers (1.5 or 3 A), so charging on such
+  a port runs at up to 2 A instead of 500 mA; the charge limit (0-100 %) works on every kernel.
+* **dae** (the VPN module's eBPF engine) needs 6.18 or 7.2 of **v2026.10.20 or newer**: those kernels (6.18.56 and
+  7.2.10) carry BTF and the BPF JIT. 5.4 cannot run it. kprobes are left out on purpose: with them 7.2 failed 2 boots
+  in 36, so `dae trace` is not available.
+
+## The versions in v2026.10.23
+
+| kernel | version | notes |
+|---|---|---|
+| 5.4 | 5.4.254 | Unisoc's vendor kernel with the project's patches; rebuilt in v2026.10.23 with `NFT_QUEUE` (nftables' `queue` verdict, for userspace packet tools); since v2026.10.21 it no longer panics when a network namespace goes away (#103), and the Wi-Fi driver's routine lines are no longer errors (#140) |
+| 6.18 | 6.18.56 | longterm; BTF, BPF JIT, FunctionFS (for adb); v2026.10.23 adds the `mu300_thermal` module (the board's temperature as a thermal zone); since v2026.10.22 the F50's SD slot has real card detect (the EIC controller's six banks mapped), so an empty slot is no longer polled and no `mmc1` register dumps fill the log (#181); since v2026.10.21 the Wi-Fi driver can be unloaded (#146) and is quieter (#140) |
+| 7.2 | 7.2.10 | stable; the same additions, the same card-detect fix, the same modules |
+
+The point releases bring, among others, a DWC3 USB fix for an IRQ storm that could panic the board, netfilter
+flowtable and fq_codel fixes, Bluetooth and USB-serial use-after-free fixes. The BTF data costs about 4 MB of the
+boot image and 4 MiB of RAM.
 
 ## Known issue: a rare hang on 6.18
 

@@ -42,8 +42,38 @@ msgstr "電源"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300 控制中心：狀態儀表板、網路鎖定、AT 終端機與簡訊"
+msgid "Terminal"
+msgstr "終端機"
+
+msgid "Terminal settings"
+msgstr "終端機設定"
+
+msgid "Overview"
+msgstr "概覽"
+
+msgid "Profiles"
+msgstr "設定檔"
+
+msgid "Subscriptions"
+msgstr "訂閱"
+
+msgid "Engines"
+msgstr "引擎"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Logs"
+msgstr "記錄"
+
+msgid "Packages after an update"
+msgstr "更新後的套件"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 控制中心：狀態儀表板、網路鎖定、AT 終端機、簡訊和 VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "終端機：在瀏覽器中使用裝置的 root shell"
 
 msgid "China Mobile"
 msgstr "中國移動"
@@ -119,6 +149,93 @@ msgstr "未知號碼"
 
 msgid "Select"
 msgstr "選擇"
+
+msgid "never"
+msgstr "從未"
+
+msgid "just now"
+msgstr "剛剛"
+
+msgid "%s ago"
+msgstr "%s 前"
+
+msgid "Failed: %s"
+msgstr "失敗：%s"
+
+msgid "Management connection lost"
+msgstr "管理連線已中斷"
+
+msgid "Installing the VPN module"
+msgstr "正在安裝 VPN 模組"
+
+msgid "Installing the engine"
+msgstr "正在安裝引擎"
+
+msgid "Adding the subscription"
+msgstr "正在新增訂閱"
+
+msgid "Refreshing the subscriptions"
+msgstr "正在重新整理訂閱"
+
+msgid "Testing the latency of every profile"
+msgstr "正在測試所有設定檔的延遲"
+
+msgid "Downloading the config"
+msgstr "正在下載設定"
+
+msgid "Working…"
+msgstr "處理中…"
+
+msgid "done"
+msgstr "完成"
+
+msgid "failed"
+msgstr "失敗"
+
+msgid "Verify the uploaded file"
+msgstr "驗證上傳的檔案"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "上傳的檔案會與透過 HTTPS 下載的 VPN 模組最新發行版的 SHA256SUMS 進行驗證。若無法驗證（離線、較舊的版本），只有在您允許未驗證的檔案時才會安裝：屆時它將以 root 身分執行且不經任何檢查。"
+
+msgid "Install it even if it cannot be verified"
+msgstr "即使無法驗證也安裝"
+
+msgid "Install only a verified file"
+msgstr "僅安裝已驗證的檔案"
+
+msgid "Upload failed: %s"
+msgstr "上傳失敗：%s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN 模組版本過舊，此面板無法使用"
+
+msgid "The VPN module is not installed"
+msgstr "未安裝 VPN 模組"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "此頁面需要帶機器可讀 mu300-vpn 的 VPN 模組（v2 或更新版本）。更新會保留設定檔和設定。"
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN 是一個獨立模組：mu300-vpn（含斷網保護和設定檔），以及每個引擎一個附加套件（Xray、sing-box、mihomo、dae）。使用 mu300-extra install vpn 安裝。"
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "模組下載約數 MB，每個引擎最多數十 MB：使用行動數據時會計入您的方案流量。"
+
+msgid "Update the VPN module"
+msgstr "更新 VPN 模組"
+
+msgid "Install the VPN module"
+msgstr "安裝 VPN 模組"
+
+msgid "Upload the file…"
+msgstr "上傳檔案…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "離線：從 VPN 模組的發行頁面上傳 mu300-linux-vpn-core.tar.gz（或合集包 mu300-linux-vpn.tar.gz）。"
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "這是網路或頻點掃描：需要一到三分鐘，期間一直佔用數據機的 AT 通道，行動數據可能暫停。它在背景執行，完成後回覆會顯示在這裡。"
@@ -207,14 +324,8 @@ msgstr "掃描會讓 Wi-Fi 熱點短暫離開其頻道：已連線的裝置會�
 msgid "Scan anyway"
 msgstr "仍然掃描"
 
-msgid "Failed: %s"
-msgstr "失敗：%s"
-
 msgid "Saved"
 msgstr "已儲存"
-
-msgid "Management connection lost"
-msgstr "管理連線已中斷"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "溫控"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "核心的溫區，唯讀。帶有觸發點的溫區會在其被動觸發點限制與之綁定的冷卻裝置；冷卻狀態 0 表示未限頻。"
+
+msgid "Zone"
+msgstr "溫區"
+
+msgid "Temperature"
+msgstr "溫度"
+
+msgid "Trip points"
+msgstr "觸發點"
+
+msgid "Cooling devices"
+msgstr "冷卻裝置"
 
 msgid "USB role"
 msgstr "USB 角色"
@@ -489,8 +618,17 @@ msgstr "內容"
 msgid "Form (URL-encoded)"
 msgstr "表單（URL 編碼）"
 
+msgid "Plain text"
+msgstr "純文字"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "欄位：sender、time、text、device、message（填好的範本）"
+
+msgid "Custom body"
+msgstr "自訂請求本文"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "留空：使用標準欄位（純文字：訊息本身）。預留位置：{sender}、{time}、{text}、{device}、{message}。每個值都會依所選類型跳脫。此請求本文會在這裡再次顯示：請把密鑰放在位址或標頭裡。"
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "額外標頭（每行一個 \"Name: value\"）"
@@ -651,6 +789,9 @@ msgstr "累計傳送"
 msgid "Used today"
 msgstr "今日已用"
 
+msgid "SIM source"
+msgstr "SIM 來源"
+
 msgid "Session duration"
 msgstr "連線時間"
 
@@ -719,6 +860,9 @@ msgstr "數據機"
 
 msgid "Carrier"
 msgstr "電信業者"
+
+msgid "Own number"
+msgstr "本機號碼"
 
 msgid "Module"
 msgstr "模組"
@@ -858,8 +1002,17 @@ msgstr "鎖定失敗：%s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "正在將網路鎖定重設為自動（SFUN 重新啟動，約 30 秒）…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "重設失敗：%s。已儲存的鎖定設定被保留。"
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "未能及時確認鎖定已重設；仍然切換。"
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "已選擇內建 SIM：重新啟動後生效"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "已選擇內建 SIM，但此裝置不支援：正在使用外接 SIM"
 
 msgid "Uptime %s"
 msgstr "已運作 %s"
@@ -990,9 +1143,6 @@ msgstr "語言套件已安裝"
 msgid "The language pack could not be installed"
 msgstr "無法安裝語言套件"
 
-msgid "Upload failed: %s"
-msgstr "上傳失敗：%s"
-
 msgid "Language of the browser"
 msgstr "瀏覽器語言"
 
@@ -1013,9 +1163,6 @@ msgstr "語言套件（mu300-extra-lang.tar.gz，約 2 MB）可為 LuCI 新增�
 
 msgid "Download from the release"
 msgstr "從發行版下載"
-
-msgid "Upload the file…"
-msgstr "上傳檔案…"
 
 msgid "Release"
 msgstr "發行版"
@@ -1209,6 +1356,9 @@ msgstr "狀態已確認"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "回讀逾時；請選擇「重新整理鎖定狀態」"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "重設已核對：網路模式自動、EN-DC 開啟、全部頻段、無小區鎖定；已儲存的鎖定設定已清除"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "已生效（EN-DC 不需要重新啟動射頻協定堆疊）"
 
@@ -1235,6 +1385,114 @@ msgstr "自動（支援 %d 個）"
 
 msgid "%d locked: %s"
 msgstr "已鎖定 %d 個：%s"
+
+msgid "Repair DNS?"
+msgstr "修復 DNS？"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "這會移除一個已不再安裝的套件的 DNS 轉發。如果沒有其他 DNS 伺服器，裝置將使用行動連線的 DNS 伺服器：電信業者會看到你查詢的網域名稱，不經過任何代理或 VPN。"
+
+msgid "Repair DNS"
+msgstr "修復 DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "裝置上自行安裝的套件不屬於發行映像。更新會記錄它們，新系統在首次開機並連網後會重新安裝。套件恢復之前，其設定會被暫存。"
+
+msgid "No packages to install again."
+msgstr "沒有需要重新安裝的套件。"
+
+msgid "All back"
+msgstr "全部已恢復"
+
+msgid "Not installed yet"
+msgstr "尚未安裝"
+
+msgid "Could not be installed again"
+msgstr "無法重新安裝"
+
+msgid "Waiting for the internet"
+msgstr "正在等待網路"
+
+msgid "Given up: no internet at five boots"
+msgstr "已放棄：連續五次開機都沒有網路"
+
+msgid "Skipped"
+msgstr "已略過"
+
+msgid "Written down by the update from %s"
+msgstr "由來自 %s 的更新記錄"
+
+msgid "Installed again"
+msgstr "已重新安裝"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "請從原本的來源自行安裝（套件檔案：apk add --allow-untrusted FILE.apk）。"
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "暫存在 /etc/mu300/orphaned-config 中的設定"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS 仍指向一個未安裝的套件：裝置無法透過它解析 DNS。"
+
+msgid "Try again"
+msgstr "重試"
+
+msgid "Dismiss the note"
+msgstr "關閉提示"
+
+msgid "started"
+msgstr "已啟動"
+
+msgid "asleep now (asked)"
+msgstr "立即休眠（已要求）"
+
+msgid "woken: power daemon stopping"
+msgstr "已喚醒：電源常駐程式停止"
+
+msgid "woken by a key"
+msgstr "按鍵喚醒"
+
+msgid "woken by the Wi-Fi key"
+msgstr "Wi-Fi 鍵喚醒"
+
+msgid "woken (mu300-power wake)"
+msgstr "已喚醒（mu300-power wake）"
+
+msgid "woken by a computer on USB"
+msgstr "USB 上的電腦喚醒"
+
+msgid "woken: plugged in"
+msgstr "已喚醒：已接上電源"
+
+msgid "woken by a Wi-Fi client"
+msgstr "Wi-Fi 用戶端喚醒"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "充電開機（由充電器開機）"
+
+msgid "the hotspot is down"
+msgstr "熱點已關閉"
+
+msgid "the VPN is still stopped"
+msgstr "VPN 仍處於停止狀態"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "恢復失敗後 5G（EN-DC）仍關閉"
+
+msgid "self-check: %s"
+msgstr "自我檢查：%s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "休眠：%d 分鐘無用戶端（%s）"
+
+msgid "asleep: profile now %s"
+msgstr "休眠：設定檔現為 %s"
+
+msgid "woken by the %s key"
+msgstr "%s 鍵喚醒"
+
+msgid "the modem is suspended (%s)"
+msgstr "數據機已暫停（%s）"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "請輸入 0 到 %d 之間的整數"
@@ -1437,6 +1695,15 @@ msgstr "訊息（Enter 送出，Shift+Enter 換行）"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "傳送使用 AT+CMGS（PDU 模式）；通道忙碌時請重試。若要刪除單則訊息，請按其對話泡泡上的垃圾桶圖示。"
 
+msgid "Sending…"
+msgstr "傳送中…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "已傳送，清單稍後會更新。"
+
+msgid "Sending failed"
+msgstr "傳送失敗"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "正在背景從 SIM 同步（AT+CMGL）…"
 
@@ -1476,15 +1743,6 @@ msgstr "已刪除（僅本機）"
 msgid "Enter both a number and a message."
 msgstr "請同時輸入號碼與訊息。"
 
-msgid "Sending…"
-msgstr "傳送中…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "已傳送，清單稍後會更新。"
-
-msgid "Sending failed"
-msgstr "傳送失敗"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 則，%d 則未讀 · %d 個對話"
 
@@ -1502,6 +1760,39 @@ msgstr "不完整：收到 %d / %d 個分段"
 
 msgid "Delete"
 msgstr "刪除"
+
+msgid "ttyd is not installed."
+msgstr "未安裝 ttyd。"
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "終端機已關閉（/etc/config/ttyd）。"
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "同時開啟的終端機過多，請一分鐘後重試。"
+
+msgid "The terminal is not available."
+msgstr "終端機無法使用。"
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "這是裝置上的 root shell：每個指令都以完整權限執行，一個錯誤就可能讓裝置無法開機。"
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "只能從區域網路（USB 和熱點）並且只能從這個已登入的頁面存取，行動數據一側永遠無法存取。"
+
+msgid "It closes after a minute without activity."
+msgstr "無操作 1 分鐘後自動關閉。"
+
+msgid "It closes after %d minutes without activity."
+msgstr "無操作 %d 分鐘後自動關閉。"
+
+msgid "Reconnect"
+msgstr "重新連線"
+
+msgid "Open in a new tab"
+msgstr "在新分頁中開啟"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "此頁面透過 HTTPS 開啟，而終端機在區域網路上透過 HTTP 提供，因此會在單獨的分頁中開啟。"
 
 msgid "The data usage could not be read"
 msgstr "無法讀取流量統計"
@@ -1637,6 +1928,594 @@ msgstr "關閉"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "64 讓每個封包都像裝置本身的流量一樣送出"
+
+msgid "running"
+msgstr "執行中"
+
+msgid "(about %s)"
+msgstr "（約 %s）"
+
+msgid "Install %s?"
+msgstr "安裝 %s？"
+
+msgid "It is installed from this system's package feed."
+msgstr "將從本系統的軟體套件來源安裝。"
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "將從 VPN 模組的發行版本下載，並用其 SHA256SUMS 驗證。"
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "一個引擎有數十 MB：使用行動數據時下載會計入您的方案流量。"
+
+msgid "Install"
+msgstr "安裝"
+
+msgid "Remove %s?"
+msgstr "移除 %s？"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "使用它的設定檔：%s。在重新安裝之前它們無法啟動（正在執行的設定檔需要它時，模組會拒絕移除）。"
+
+msgid "No profile runs on it."
+msgstr "沒有設定檔使用它。"
+
+msgid "Removed"
+msgstr "已移除"
+
+msgid "Check for updates"
+msgstr "檢查更新"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "每個引擎都是獨立的附加套件：只安裝您的設定檔需要的即可。Xray 執行 vless、vmess、trojan 和 ss 連結（搭配 hev-socks5-tunnel），sing-box 執行相同的連結及其自有的 JSON，mihomo 執行 Clash 訂閱，dae 在較新的核心上執行 hysteria2、tuic 等。WireGuard 和 OpenVPN 是系統的套件。"
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "每個引擎下載數十 MB：使用行動數據時會計入方案流量。離線時，請從 VPN 模組的發行頁面上傳引擎的壓縮檔。"
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "可用版本來自 VPN 模組的最新發行版本。"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "system package"
+msgstr "系統套件"
+
+msgid "in the vpn bundle"
+msgstr "在 vpn 合集包中"
+
+msgid "extra %s"
+msgstr "附加套件 %s"
+
+msgid "not installed"
+msgstr "未安裝"
+
+msgid "cannot run here"
+msgstr "無法在此執行"
+
+msgid "update available"
+msgstr "有可用更新"
+
+msgid "installed"
+msgstr "已安裝"
+
+msgid "Kind"
+msgstr "類別"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Available"
+msgstr "可用"
+
+msgid "not checked"
+msgstr "未檢查"
+
+msgid "Size"
+msgstr "大小"
+
+msgid "Needed by"
+msgstr "使用者"
+
+msgid "no profile"
+msgstr "無設定檔"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae 需要帶 BTF 的 5.17 或更新核心：不支援 5.4 廠商核心（mu300-update kernel 6.18）。仍然可以安裝。"
+
+msgid "All engines"
+msgstr "所有引擎"
+
+msgid "Last %s lines"
+msgstr "最後 %s 行"
+
+msgid "VPN service log"
+msgstr "VPN 服務記錄"
+
+msgid "Every 5 s"
+msgstr "每 5 秒"
+
+msgid "The log is empty."
+msgstr "記錄為空。"
+
+msgid "The VPN is starting"
+msgstr "VPN 正在啟動"
+
+msgid "The VPN is stopped"
+msgstr "VPN 已停止"
+
+msgid "The VPN is restarting"
+msgstr "VPN 正在重新啟動"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "開啟斷網保護後，裝置和 LAN 的任何流量都不會繞過通道：VPN 中斷、啟動中或發生錯誤時，所有連線都會失敗，而不是直接連出。它會一直生效，直到您在此停止 VPN（停止會移除它）。"
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "沒有斷網保護時，只要通道中斷（啟動中、當機後、引擎缺失時），流量就會不受保護地直接連出。"
+
+msgid "Turn the kill switch on?"
+msgstr "開啟斷網保護？"
+
+msgid "Turn the kill switch off?"
+msgstr "關閉斷網保護？"
+
+msgid "Turn on"
+msgstr "開啟"
+
+msgid "unknown"
+msgstr "未知"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "無法取得出口位址（通道是否已連線？）"
+
+msgid "Connecting…"
+msgstr "連線中…"
+
+msgid "On, but not running"
+msgstr "已開啟，但未執行"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "Install it"
+msgstr "安裝"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "目前設定檔的引擎未安裝：%s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "在引擎安裝之前，斷網保護會阻斷所有流量；服務會在可能時自動下載它。"
+
+msgid "The VPN cannot start until it is installed."
+msgstr "安裝之前 VPN 無法啟動。"
+
+msgid "%s cannot run on this system"
+msgstr "%s 無法在此系統上執行"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN 已開啟，但沒有目前的設定檔：請在下方選擇一個。"
+
+msgid "Profile: %s"
+msgstr "設定檔：%s"
+
+msgid "No active profile"
+msgstr "沒有目前的設定檔"
+
+msgid "engine %s"
+msgstr "引擎 %s"
+
+msgid "interface %s"
+msgstr "介面 %s"
+
+msgid "Kill switch active"
+msgstr "斷網保護生效中"
+
+msgid "Kill switch on"
+msgstr "斷網保護已開啟"
+
+msgid "Kill switch off"
+msgstr "斷網保護已關閉"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 走通道"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 已阻斷"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 未處理"
+
+msgid "Module %s"
+msgstr "模組 %s"
+
+msgid "Check"
+msgstr "檢查"
+
+msgid "Uptime"
+msgstr "執行時間"
+
+msgid "Rate"
+msgstr "速率"
+
+msgid "Exit address"
+msgstr "出口位址"
+
+msgid "Start"
+msgstr "啟動"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Restart"
+msgstr "重新啟動"
+
+msgid "Stop the VPN?"
+msgstr "停止 VPN？"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "之後流量將不經通道直接連出；斷網保護也會隨之移除。"
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN 已開啟：重新啟動後會自動再次啟動。"
+
+msgid "The VPN is off."
+msgstr "VPN 已關閉。"
+
+msgid "Kill switch"
+msgstr "斷網保護"
+
+msgid "Setting"
+msgstr "設定"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "生效中：只有通道能存取網際網路"
+
+msgid "Not active"
+msgstr "未生效"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "VPN 中斷時，斷網保護會阻斷裝置和 LAN 的所有流量，因此沒有任何流量會繞過通道。如果通道無法建立（伺服器失效、帳號過期），裝置會保持離線，直到您修正設定檔或停止 VPN。面板本身仍可從 LAN 存取。"
+
+msgid "Choose a profile"
+msgstr "選擇設定檔"
+
+msgid "No profiles yet"
+msgstr "尚無設定檔"
+
+msgid "engine not installed"
+msgstr "引擎未安裝"
+
+msgid "Use"
+msgstr "使用"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "已切換：VPN 正在使用新設定檔重新啟動"
+
+msgid "Active profile"
+msgstr "目前設定檔"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "正在執行的 VPN 會使用您選擇的設定檔重新啟動；期間斷網保護保持生效。"
+
+msgid "Manage the profiles"
+msgstr "管理設定檔"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "自動：引擎支援時走通道"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "要求引擎在通道中提供 IPv6"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "從不走通道（VPN 執行時阻斷）"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "已儲存：下次啟動時生效（重新啟動）"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "通道承載 IPv6"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "IPv6 guard"
+msgstr "IPv6 防護"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "生效中：拒絕通道外的 IPv6"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "VPN 執行時，IPv6 絕不會在不承載它的通道之外連出：會被立即拒絕，使程式和 LAN 用戶端退回使用 IPv4，而不是外洩或等待。自動：WireGuard 使用其設定中的 IPv6 位址，其他引擎維持 IPv4。"
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP：無法測試"
+
+msgid "blocked by the kill switch"
+msgstr "被斷網保護阻斷"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "WireGuard 或 OpenVPN 設定、Clash/mihomo YAML、Xray 或 sing-box JSON、dae 設定"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "按下確定後選擇檔案：WireGuard .conf、OpenVPN .ovpn、Clash/mihomo .yaml、Xray 或 sing-box .json，或 dae 設定（最大 1 MiB）。"
+
+msgid "From the source"
+msgstr "取自來源"
+
+msgid "Detect"
+msgstr "自動偵測"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL 可能包含權杖：它會單獨傳送到裝置，絕不會出現在命令列或記錄中。"
+
+msgid "Type"
+msgstr "類型"
+
+msgid "Share link"
+msgstr "分享連結"
+
+msgid "Paste"
+msgstr "貼上"
+
+msgid "File"
+msgstr "檔案"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "不是此面板支援的分享連結"
+
+msgid "The config is empty"
+msgstr "設定為空"
+
+msgid "Not an https URL"
+msgstr "不是 https URL"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "名稱無效：1-64 個字元，不含控制字元"
+
+msgid "Add a profile"
+msgstr "新增設定檔"
+
+msgid "Name"
+msgstr "名稱"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "自動偵測：模組會根據連結或檔案判斷類型。對於既可能是 Xray 也可能是 sing-box 的 JSON，或需要在其他引擎上執行的連結，請手動選擇類型。"
+
+msgid "The profile is added"
+msgstr "設定檔已新增"
+
+msgid "Rename the profile"
+msgstr "重新命名設定檔"
+
+msgid "Delete the profile %s?"
+msgstr "刪除設定檔 %s？"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "這是目前的設定檔：VPN 開啟時模組會拒絕刪除；請先停止 VPN 或選擇其他設定檔。"
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "其設定和憑證將從裝置中刪除。"
+
+msgid "Deleted"
+msgstr "已刪除"
+
+msgid "The profile passes the check"
+msgstr "設定檔通過檢查"
+
+msgid "Show the config?"
+msgstr "顯示設定？"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "設定包含該設定檔的憑證（金鑰、密碼、UUID）。僅在此畫面上顯示；能看到畫面的人都能讀取。"
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "儲存時會先用引擎檢查設定（profile edit）；未通過檢查的設定不會儲存，舊設定維持不變。"
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "此設定檔來自訂閱：下次重新整理會覆蓋您的修改。"
+
+msgid "Config of %s"
+msgstr "%s 的設定"
+
+msgid "Close"
+msgstr "關閉"
+
+msgid "Rename"
+msgstr "重新命名"
+
+msgid "Show / edit the config"
+msgstr "顯示 / 編輯設定"
+
+msgid "Test the latency of all"
+msgstr "測試全部延遲"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "尚無設定檔：可透過分享連結、設定檔案或訂閱新增。"
+
+msgid "Active"
+msgstr "目前"
+
+msgid "This profile is the active one now"
+msgstr "此設定檔現為目前使用中"
+
+msgid "More"
+msgstr "更多"
+
+msgid "active"
+msgstr "目前"
+
+msgid "subscription"
+msgstr "訂閱"
+
+msgid "migrated"
+msgstr "已遷移"
+
+msgid "gone from its subscription"
+msgstr "已從訂閱中移除"
+
+msgid "Server"
+msgstr "伺服器"
+
+msgid "Engine"
+msgstr "引擎"
+
+msgid "Latency"
+msgstr "延遲"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "延遲為到伺服器的 TCP 連線耗時，VPN 執行時經由通道。WireGuard 和 OpenVPN 伺服器通常使用 UDP，無法用此方式測試。"
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "請輸入 IPv4 或 IPv6 位址"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "開啟：任何流量都不會繞過通道"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "關閉：通道中斷時流量直接連出"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "是：Tailscale 自身的連線經由通道"
+
+msgid "No: Tailscale connects directly"
+msgstr "否：Tailscale 直接連線"
+
+msgid "Routing"
+msgstr "路由"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "VPN 中斷時，斷網保護會阻斷裝置和 LAN 的所有流量。"
+
+msgid "Bypass the tunnel"
+msgstr "繞過通道"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "請輸入位址範圍，如 192.168.0.0/16，以逗號分隔"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "除 LAN 本身（它從不走通道）外，永不走通道的位址範圍。留空：僅 LAN。"
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale 經由 VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "當裝置上執行 Tailscale 時，其 WireGuard、DERP 和控制連線將經由目前執行的通道（dae 會像其他流量一樣接管它們）。"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "經通道的 DNS"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "裝置和 LAN 的查詢經通道送往的解析伺服器。不會有任何查詢送往電信業者的解析伺服器。"
+
+msgid "Bootstrap DNS"
+msgstr "引導 DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "在通道建立前解析 VPN 伺服器本身的位址（直接，經由引擎自身的連線）。"
+
+msgid "Empty puts a setting back to its default."
+msgstr "留空則恢復預設值。"
+
+msgid "TUN stack"
+msgstr "TUN 堆疊"
+
+msgid "Default (gvisor)"
+msgstr "預設（gvisor）"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system（不適用於 5.4 核心）"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "已設定（不輸入新值則維持不變）"
+
+msgid "not set"
+msgstr "未設定"
+
+msgid "Upstream HTTP proxy"
+msgstr "上游 HTTP 代理"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS 憑證固定（SHA-256）"
+
+msgid "Enter host:port"
+msgstr "請輸入 host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "請輸入十六進位的 SHA-256"
+
+msgid "Profile options"
+msgstr "設定檔選項"
+
+msgid "None of the profiles has options of its type."
+msgstr "沒有設定檔具有其類型的選項。"
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomo 的模式（rule、global、direct）、各引擎的記錄等級、dae 的群組和路由都屬於各設定檔自身的設定：VPN > 設定檔，顯示 / 編輯設定。"
+
+msgid "Delete the subscription %s?"
+msgstr "刪除訂閱 %s？"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "其設定檔可以一併刪除，也可以保留為獨立設定檔。VPN 開啟時目前的設定檔永遠不會被刪除。"
+
+msgid "Keep the profiles"
+msgstr "保留設定檔"
+
+msgid "Delete with its profiles"
+msgstr "連同設定檔一起刪除"
+
+msgid "Only by hand"
+msgstr "僅手動"
+
+msgid "Every %d h"
+msgstr "每 %d 小時"
+
+msgid "Share links: one profile per link"
+msgstr "分享連結：每個連結一個設定檔"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML：一個 mihomo 設定檔"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae：一個設定檔，所有節點在一個群組中"
+
+msgid "Add a subscription"
+msgstr "新增訂閱"
+
+msgid "Format"
+msgstr "格式"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL 通常包含您的帳號權杖：它在裝置上以僅 root 可讀的方式儲存，且不會再次顯示。訂閱透過裝置自身的連線取得：VPN 執行時經由通道；斷網保護生效且通道中斷時無法取得。"
+
+msgid "Refresh all"
+msgstr "全部重新整理"
+
+msgid "No subscriptions yet."
+msgstr "尚無訂閱。"
+
+msgid "Host"
+msgstr "主機"
+
+msgid "Updated"
+msgstr "更新時間"
+
+msgid "Share links"
+msgstr "分享連結"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "重新整理會保留名稱未變的設定檔，新增新的，並刪除已消失的（VPN 開啟時目前的設定檔會保留並標記為已移除）。重新整理目前的設定檔會重新啟動正在執行的 VPN。"
 
 msgid "Dashboard info failed"
 msgstr "取得儀表板資訊失敗"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "套件轉接器沒有傳回有效回覆"
+
+msgid "Invalid packages operation"
+msgstr "無效的套件操作"
+
 msgid "Request too large"
 msgstr "請求過大"
 
@@ -1820,6 +2705,150 @@ msgstr "執行階段目錄不安全；未執行任何操作"
 
 msgid "No such method"
 msgstr "沒有此方法"
+
+msgid "The VPN module refused the request"
+msgstr "VPN 模組拒絕了請求"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN 面板忙碌中，請重試"
+
+msgid "Another VPN task is still running"
+msgstr "另一個 VPN 工作仍在執行"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "exit_ip 參數必須為 0 或 1"
+
+msgid "The VPN status could not be read"
+msgstr "無法讀取 VPN 狀態"
+
+msgid "The profiles could not be read"
+msgstr "無法讀取設定檔"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "check 參數必須為 0 或 1"
+
+msgid "The engines could not be read"
+msgstr "無法讀取引擎"
+
+msgid "The subscriptions could not be read"
+msgstr "無法讀取訂閱"
+
+msgid "The VPN settings could not be read"
+msgstr "無法讀取 VPN 設定"
+
+msgid "Unknown VPN operation"
+msgstr "未知的 VPN 操作"
+
+msgid "The VPN could not be switched"
+msgstr "無法切換 VPN"
+
+msgid "The kill switch is on or off"
+msgstr "斷網保護只能是開或關"
+
+msgid "The kill switch could not be changed"
+msgstr "無法變更斷網保護"
+
+msgid "Invalid profile id"
+msgstr "設定檔 ID 無效"
+
+msgid "The profile could not be made the active one"
+msgstr "無法將設定檔設為目前使用中"
+
+msgid "Unknown profile source"
+msgstr "未知的設定檔來源"
+
+msgid "Unknown profile type"
+msgstr "未知的設定檔類型"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "設定為空、過大或包含控制字元"
+
+msgid "Invalid profile request"
+msgstr "無效的設定檔請求"
+
+msgid "A config from a URL takes the type it says"
+msgstr "來自 URL 的設定使用其自身宣告的類型"
+
+msgid "No uploaded file"
+msgstr "沒有已上傳的檔案"
+
+msgid "The file is larger than 1 MiB"
+msgstr "檔案大於 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "無法新增設定檔"
+
+msgid "The profile could not be renamed"
+msgstr "無法重新命名設定檔"
+
+msgid "The profile could not be removed"
+msgstr "無法刪除設定檔"
+
+msgid "The profile does not pass the check"
+msgstr "設定檔未通過檢查"
+
+msgid "Unknown profile option"
+msgstr "未知的設定檔選項"
+
+msgid "Invalid value for this option"
+msgstr "此選項的值無效"
+
+msgid "The option could not be set"
+msgstr "無法設定選項"
+
+msgid "The config could not be read"
+msgstr "無法讀取設定"
+
+msgid "The config was not saved"
+msgstr "設定未儲存"
+
+msgid "The latency test failed"
+msgstr "延遲測試失敗"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "重新整理間隔為 1 到 999 小時"
+
+msgid "Unknown subscription type"
+msgstr "未知的訂閱類型"
+
+msgid "Invalid subscription id"
+msgstr "訂閱 ID 無效"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "keep 參數必須為 0 或 1"
+
+msgid "The subscription could not be removed"
+msgstr "無法刪除訂閱"
+
+msgid "The file is too large"
+msgstr "檔案過大"
+
+msgid "Unknown engine"
+msgstr "未知的引擎"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "unverified 參數必須為 0 或 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "此引擎是系統套件：沒有可上傳的檔案"
+
+msgid "The engine could not be removed"
+msgstr "無法移除引擎"
+
+msgid "mu300-extra is not on this system"
+msgstr "此系統上沒有 mu300-extra"
+
+msgid "Unknown VPN setting"
+msgstr "未知的 VPN 設定"
+
+msgid "The setting could not be saved"
+msgstr "無法儲存設定"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "行數必須在 1 到 1000 之間"
+
+msgid "The log could not be read"
+msgstr "無法讀取記錄"
 
 msgid "Radio did not come up"
 msgstr "射頻未能啟動"
@@ -1935,6 +2964,9 @@ msgstr "無效的過濾清單（最多 50 行）"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "webhook 位址必須是 http:// 或 https:// 開頭的 URL"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Webhook 請求本文過長或包含控制字元"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "無效的標頭（每行一個 \"Name: value\"；Host、Content-Type、Content-Length、Transfer-Encoding 和 Connection 由裝置設定）"
 
@@ -1992,17 +3024,47 @@ msgstr "無法移除語言套件"
 msgid "Lock cache unavailable"
 msgstr "鎖定快取無法使用"
 
+msgid "The saved locks could not be cleared"
+msgstr "無法清除已儲存的鎖定"
+
 msgid "No serving cell to lock to"
 msgstr "沒有可鎖定的服務基地台"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "模組未回應模式查詢；未傳送任何設定"
+
+msgid "The modem refused a write"
+msgstr "模組拒絕了一次寫入"
+
+msgid "The read-back does not match the automatic values"
+msgstr "回讀結果與自動值不一致"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "協定堆疊重新啟動後的回讀結果與自動值不一致"
+
+msgid "The reset was interrupted"
+msgstr "重設被中斷"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "此系統不支援重新安裝套件"
+
+msgid "No packages were written down by an update"
+msgstr "沒有更新記錄的套件"
+
+msgid "Reinstalling is running already"
+msgstr "重新安裝已在執行"
+
+msgid "The note could not be dropped"
+msgstr "無法移除提示"
+
+msgid "Unknown packages operation"
+msgstr "未知的套件操作"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "此系統不支援流量統計"
-
-msgid "The setting could not be saved"
-msgstr "無法儲存設定"
 
 msgid "Unknown data usage operation"
 msgstr "未知的流量統計操作"

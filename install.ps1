@@ -8,6 +8,8 @@
       .\install.ps1            install Ubuntu, OpenWrt or both from the prebuilt release images
       .\install.ps1 -Answers f.txt   take one answer per question from that file (run without a console; the file
                                holds the password in plain text, delete it afterwards)
+      .\install.ps1 -NoBootchainSync   leave the Linux slot's boot chain as it is (for experts; the default copies
+                               uboot, sml, teecfg, trustos and vbmeta of Android's slot there, backed up first)
 
     Needs: adb. Python 3 and its lz4 module are installed for this user when missing (winget or python.org, then
     pip); Windows 10/11 provide tar and curl.
@@ -32,7 +34,8 @@ param(
     [string]$Work = '',      # empty: .\work next to this script
     [string]$Lang = '',      # en, tr or zh; empty: ask (English is the default)
     [string]$Answers = '',   # file with one answer per line: run without a console (see Ask; the password too)
-    [switch]$NoSelfUpdate    # do not bring this copy up to date with GitHub first
+    [switch]$NoSelfUpdate,   # do not bring this copy up to date with GitHub first
+    [switch]$NoBootchainSync # leave the Linux slot's boot chain as it is ($env:MU300_SYNC_BOOTCHAIN = '0' too)
 )
 
 $ErrorActionPreference = 'Stop'
@@ -384,6 +387,22 @@ function PushUnix($src, $dst) {
     Remove-Item $tmp
     $ok -eq 0
 }
+# BootchainLine: the plan's line from the device's BOOTCHAIN-PLAN <android> <linux> [names] (android-bootchain.sh
+# check), $null without one; BootchainRefused: the reason of its BOOTCHAIN-REFUSED line (install.sh's bootchain_line)
+function BootchainLine([string]$Out) {
+    $plan = @(($Out -replace "`r", '') -split "`n" | Where-Object { $_ -like 'BOOTCHAIN-PLAN *' })
+    if ($plan.Count -eq 0) { return $null }
+    $f = @($plan[0].Trim().Split(' ') | Where-Object { $_ })
+    if ($f.Count -lt 3) { return $null }
+    $diff = @($f | Select-Object -Skip 3)
+    if ($diff.Count -eq 0) { return (T 'boot chain:     identical on both slots') }
+    return (T "boot chain:     {1} differ between the slots; Android's slot {2} is copied to slot {3} (backed up first)" ($diff -join ', ') $f[1] $f[2])
+}
+function BootchainRefused([string]$Out) {
+    $r = @(($Out -replace "`r", '') -split "`n" | Where-Object { $_ -like 'BOOTCHAIN-REFUSED: *' })
+    if ($r.Count -eq 0) { return (T 'no answer from the device') }
+    return $r[0].Substring('BOOTCHAIN-REFUSED: '.Length)
+}
 
 # first of all, make this the newest installer (it runs the updated one and ends when it changed)
 if (SelfUpdate) {
@@ -454,10 +473,12 @@ Write-Host (T 'device: {1}' $model)
 # The U30 Air is the F50's board with a battery: the same kernel and images, a few modules of its own (init
 # loads them; the boot image says which device it is for)
 $DEVICE = 'f50'
+$MODEL_KNOWN = $true
 if ($model -match 'U30Air|U30_Air|U30 Air') {
     $DEVICE = 'u30air'
 } elseif ($model -notmatch 'MU300|F50|mu300') {
     if ((Ask (T 'This does not look like a ZTE F50/MU300 or U30 Air. Continue anyway? (yes/no)') 'no') -ne 'yes') { exit 1 }
+    $MODEL_KNOWN = $false
 }
 # Linux goes on the slot Android is not on: b next to an Android on a, a next to an Android on b (after an OTA the
 # device often runs from b, issue #86) - install.sh's slot_setup. Android's own boot partition is never written.
@@ -468,6 +489,29 @@ switch ((SuDo 'getprop ro.boot.slot_suffix').Trim()) {
 }
 if ((SuDo 'readlink -f /dev/block/by-name/boot_a') -eq (SuDo 'readlink -f /dev/block/by-name/boot_b')) { Die (T 'boot_a and boot_b are the same partition') }
 Write-Host (T 'Android runs from slot {1}; Linux goes to slot {2} (boot_{2})' $ANDROID_SLOT $LINUX_SLOT)
+# The Linux slot gets the boot chain of Android's slot - uboot, sml, teecfg, trustos and vbmeta, one firmware build on
+# both slots (issue #86): tools/android-bootchain.sh decides and checks, android-install.sh copies it before it
+# installs anything, with a backup (install.sh's bootchain_plan). -NoBootchainSync skips that, for experts.
+$SYNC_BOOTCHAIN = 1
+if ($NoBootchainSync -or $env:MU300_SYNC_BOOTCHAIN -eq '0') {
+    $SYNC_BOOTCHAIN = 0
+    $BC_LINE = T 'boot chain:     not synced (-NoBootchainSync)'
+} elseif (-not $MODEL_KNOWN) {
+    # android-bootchain.sh writes only on a model it knows: a device taken as an F50 anyway keeps its chain as it is
+    $SYNC_BOOTCHAIN = 0
+    $BC_LINE = T 'boot chain:     not synced (the model is not recognised)'
+} else {
+    $bcOut = ''
+    New-Item -ItemType Directory -Force -Path $Work | Out-Null
+    if (PushUnix "$Top\tools\android-bootchain.sh" "$T/android-bootchain.sh") { $bcOut = SuDo "sh $T/android-bootchain.sh check" }
+    $BC_LINE = BootchainLine $bcOut
+    if (-not $BC_LINE) {
+        $why = BootchainRefused $bcOut
+        if ($Check) { $BC_LINE = T 'boot chain:     cannot be synced: {1}' $why }
+        else { Die ((T 'the boot chain cannot be copied to the Linux slot: {1}' $why) + "`n" + (T 'Nothing was changed. Experts can skip this step with -NoBootchainSync.')) }
+    }
+}
+Write-Host $BC_LINE
 
 Say (T 'Locating free eMMC space after the last partition')
 $parts = (SuDo 'e=0; for p in /sys/block/mmcblk0/mmcblk0p*; do x=$(( $(cat $p/start) + $(cat $p/size) )); [ $x -gt $e ] && e=$x; done; echo $e $(cat /sys/block/mmcblk0/size)').Split(' ')
@@ -534,8 +578,24 @@ function InstallEnvText($v) {
         "FORMAT=$($v.FORMAT)", "OSES=`"$(@($v.OSES) -join ' ')`"", "WIPE_LEGACY=$($v.WIPE_LEGACY)", "UPDATE=$($v.UPDATE)",
         "BOOT_OS=$($v.BOOT_OS)", "DEFAULT_LINUX=$($v.DEFAULT_LINUX)", "BOOT_ATTEMPTS=$($v.BOOT_ATTEMPTS)",
         "IMPORT_HOTSPOT=$($v.IMPORT_HOTSPOT)", "KERNEL=$($v.KERNEL)", "SD_MODE=$($v.SD_MODE)", "SD_DEV=$($v.SD_DEV)",
-        "INTERNAL_EXISTS=$($v.INTERNAL_EXISTS)", "PWHASH='$($v.PWHASH)'")
+        "INTERNAL_EXISTS=$($v.INTERNAL_EXISTS)", "ADB=$(if ($v.ADB) { $v.ADB } else { 0 })", "ADB_KEY='$($v.ADB_KEY)'",
+        "SYNC_BOOTCHAIN=$(if ($v.SYNC_BOOTCHAIN) { $v.SYNC_BOOTCHAIN } else { 0 })",
+        "PWHASH='$($v.PWHASH)'")
     return (($lines -join "`n") + "`n")
+}
+# AdbPubKey: the first line of an adb public key file (adbkey.pub: "BASE64 user@host") as it goes into mu300-install.env
+# inside single quotes - an Android RSA-2048 key and a name of [A-Za-z0-9@._:-] only - or $null (tools/storage.sh's
+# adb_pubkey)
+function AdbPubKey($path) {
+    if (-not (Test-Path -LiteralPath $path)) { return $null }
+    $line = @(Get-Content -LiteralPath $path -TotalCount 1)[0]
+    if (-not $line) { return $null }
+    $parts = @($line.Trim() -split ' ', 2)
+    if ($parts[0] -cnotmatch '^QAAAA[A-Za-z0-9+/]{694}=$') { return $null }
+    $name = if ($parts.Count -gt 1) { $parts[1] -replace '[^A-Za-z0-9@._:-]', '' } else { '' }
+    if ($name.Length -gt 64) { $name = $name.Substring(0, 64) }
+    if (-not $name) { $name = 'installer' }
+    return "$($parts[0]) $name"
 }
 # VpnOnSystems: the systems among $oses of the Linux filesystem already on the device whose VPN is on (ENABLE=1 in
 # etc/mu300/vpn.conf), as "os:ks" when its kill switch is on too - decided on the device by the images'
@@ -759,7 +819,25 @@ $vx = Ask (T 'Install the VPN module (about 40 MB more to download, 120 MB on th
 if ($vx -ne 'yes' -and $vpnKs.Count -gt 0) {
     Die (T 'The VPN is on with its kill switch in {1}: an update without the VPN module would leave it to nothing. Answer yes to install the module, or turn the VPN off there first (ENABLE=0 in /etc/mu300/vpn.conf).' ($vpnKs -join ' '))
 }
+# adb over USB to Linux (mu300-usb adb on|off on the device): off unless wanted; this computer's adb key, which the
+# installer runs with anyway, is the one authorised. Whoever has an authorised key gets a root shell.
+$ADB = 0; $ADB_KEY = ''
+if ((Ask (T 'Allow adb (adb shell, push, pull) to Linux over USB from this computer? Its adb key (~/.android/adbkey.pub) gets a root shell (yes/no)') 'no') -eq 'yes') {
+    $adbHome = if ($env:ANDROID_USER_HOME) { $env:ANDROID_USER_HOME } else { Join-Path $HOME '.android' }
+    $ADB_KEY = AdbPubKey (Join-Path $adbHome 'adbkey.pub')
+    if (-not $ADB_KEY) { Die (T 'no adb key of this computer to authorise ({1})' (Join-Path $adbHome 'adbkey.pub')) }
+    $ADB = 1
+}
 $EXTRA_VPN = $null
+# the web panel for Ubuntu (Cockpit and the MU300 page): the panel extra, optional; offline from the release (Cockpit's
+# packages in it), so the first boot needs no network for it
+$px = 'no'
+$EXTRA_PANEL = $null
+if ($OSES -contains 'ubuntu') {
+    Write-Host ('  ' + (T 'The web panel for Ubuntu (Cockpit with an MU300 page: signal, SMS, VPN, Wi-Fi, updates, a terminal; on the LAN only) is optional. It can also be added later on the device:'))
+    Write-Host '    sudo mu300-extra install panel'
+    $px = Ask (T 'Install the web panel for Ubuntu (about 24 MB more to download, 50 MB on the device)? (yes/no)') 'no'
+}
 $KERNEL = $null
 Say (T 'Which kernel?')
 Write-Host ('  ' + (T "1) 5.4   Unisoc's vendor kernel (Android 12 base): the longest tested, everything this project supports"))
@@ -870,6 +948,13 @@ if ($vx -eq 'yes') {
     if ($sums.ContainsKey('mu300-extra-vpn.tar.gz')) { $files += 'mu300-extra-vpn.tar.gz'; $EXTRA_VPN = "$REL\mu300-extra-vpn.tar.gz" }
     else { $vpnFromModule = $true }
 }
+if ($px -eq 'yes') {
+    if ($sums.ContainsKey('mu300-extra-panel-offline.tar.gz')) {
+        $files += 'mu300-extra-panel-offline.tar.gz'; $EXTRA_PANEL = "$REL\mu300-extra-panel-offline.tar.gz"
+    } else {
+        Write-Host ('  ' + (T 'release {1} has no web panel for Ubuntu; it can be added on the device later: sudo mu300-extra install panel' $Release))
+    }
+}
 foreach ($f in $files) {
     if (-not $sums.ContainsKey($f)) {
         $why = if ($KERNEL -ne '5.4' -and $f -eq "mu300-kernel-$KERNEL.tar.gz") { ' ' + (T '(choose kernel 5.4, or a newer release)') } else { '' }
@@ -941,7 +1026,9 @@ Write-Host ('  ' + (T 'source:         {1}' (T 'prebuilt release {1} + vendor fi
 $sysText = ($OSES -join ' ') + $(if ($OSES -contains 'ubuntu') { " (Ubuntu $UBUNTU)" } else { '' })
 Write-Host ('  ' + (T 'systems:        {1} (boots: {2})' $sysText $BOOT_OS))
 Write-Host ('  ' + (T 'kernel:         {1}' "$KERNEL$(if ($KMAIN) { " (mainline, $((Get-Content "$KMAIN\kernel.release").Trim()))" })"))
-Write-Host ('  ' + (T 'extras:         {1}' $(if ($EXTRA_VPN) { 'vpn' } else { T 'none' })))
+$extras = @($(if ($EXTRA_VPN) { 'vpn' }), $(if ($EXTRA_PANEL) { 'panel' }) | Where-Object { $_ })
+Write-Host ('  ' + (T 'extras:         {1}' $(if ($extras.Count -gt 0) { $extras -join ' ' } else { T 'none' })))
+Write-Host ('  ' + (T 'adb to Linux:   {1}' $(if ($ADB -eq 1) { T 'on, for this computer' } else { T 'off' })))
 Write-Host ('  ' + (T 'default boot:   {1}' $(if ($DEFAULT_LINUX -eq 1) { T 'Linux (Android after {1} failed boots in a row)' $BOOT_ATTEMPTS } else { T 'Android, Linux on demand' })))
 $fsText = if ($FORMAT -eq 0) { T 'keep existing' } elseif ($SD_MODE -eq 1) { T 'CREATE new ext4 (erases the SD card)' } else { T 'CREATE new ext4 (erases the Linux region)' }
 Write-Host ('  ' + (T 'filesystem:     {1}' $fsText))
@@ -951,10 +1038,11 @@ if ($SD_MODE -eq 1) {
 } else {
     Write-Host ('  ' + (T 'writes:         Linux region at offset {1}, boot_{2}, 32 bytes of misc (boot_{3}, GPT and userdata are not touched)' $OFF $LINUX_SLOT $ANDROID_SLOT))
 }
+Write-Host ('  ' + $BC_LINE)
 if ((Ask (T 'Type INSTALL to continue') 'no') -ne 'INSTALL') { Die (T 'cancelled') }
 
 Say (T 'Copying to the device')
-foreach ($f in 'android-mount-mu300root.sh', 'android-install.sh') { PushUnix "$Top\tools\$f" "$T/$f" | Out-Null }
+foreach ($f in 'android-mount-mu300root.sh', 'android-install.sh', 'android-bootchain.sh') { PushUnix "$Top\tools\$f" "$T/$f" | Out-Null }
 foreach ($os in $OSES) {
     & adb push "$REL\$(RootfsFile $os)" "$T/mu300-$os.tar.gz" | Out-Null
     & adb push "$Work\mu300-vendor-$os.tar.gz" "$T/mu300-vendor-$os.tar.gz" | Out-Null
@@ -962,16 +1050,41 @@ foreach ($os in $OSES) {
 # android-install.sh puts every pushed mu300-extra-<name>.tar.gz onto the Linux partition (extra/<name>); the VPN
 # module goes as the vpn extra, and each system links it into itself at its first boot (mu300-extra link)
 if ($EXTRA_VPN) { & adb push $EXTRA_VPN "$T/mu300-extra-vpn.tar.gz" | Out-Null }
+# the web panel goes as the panel extra; Ubuntu's first boot installs Cockpit from it in the background (mu300-extra link)
+if ($EXTRA_PANEL) { & adb push $EXTRA_PANEL "$T/mu300-extra-panel.tar.gz" | Out-Null }
 $envFile = "$Work\mu300-install.env"
 WriteUnix $envFile (InstallEnvText @{ OFF = $OFF; SIZE = $SIZE; INT_SIZE = $INT_SIZE; FORMAT = $FORMAT; OSES = $OSES
     WIPE_LEGACY = $WIPE_LEGACY; UPDATE = $UPDATE; BOOT_OS = $BOOT_OS; DEFAULT_LINUX = $DEFAULT_LINUX
     BOOT_ATTEMPTS = $BOOT_ATTEMPTS; IMPORT_HOTSPOT = $IMPORT_HOTSPOT; KERNEL = $KERNEL; SD_MODE = $SD_MODE
-    SD_DEV = $SD_DEV; INTERNAL_EXISTS = $INTERNAL_EXISTS; PWHASH = $PWHASH })
+    SD_DEV = $SD_DEV; INTERNAL_EXISTS = $INTERNAL_EXISTS; ADB = $ADB; ADB_KEY = $ADB_KEY
+    SYNC_BOOTCHAIN = $SYNC_BOOTCHAIN; PWHASH = $PWHASH })
 & adb push $envFile "$T/mu300-install.env" | Out-Null
 Remove-Item $envFile
 $log = SuDo "sh $T/android-install.sh"
 Write-Host $log
-if ($log -notmatch 'MU300-INSTALL-OK') { Die (T 'installation on the device failed; boot_{1} and misc were not changed' $LINUX_SLOT) }
+# kept as install.sh keeps it: a timed-out SD-card stage (FINDINGS 50) names itself there, with the way out
+$devLog = "$Work\device-install.log"
+Set-Content -Path $devLog -Value $log
+if ($log -notmatch 'MU300-INSTALL-OK') {
+    Die ((T 'installation on the device failed; boot_{1} and misc were not changed' $LINUX_SLOT) + "`n" + (T 'the device log was kept at {1}' $devLog))
+}
+# the boot chain backup android-install.sh made, into the work directory (install.sh's bootchain_pull)
+if ($SYNC_BOOTCHAIN -eq 1 -and (SuDo "[ -d $T/mu300-bootchain-backup ] && echo y") -eq 'y') {
+    $bcDir = Join-Path $Work ('bootchain\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+    New-Item -ItemType Directory -Force -Path (Split-Path $bcDir) | Out-Null
+    Quiet { adb pull "$T/mu300-bootchain-backup" "$bcDir" } | Out-Null
+    SuDo "rm -rf $T/mu300-bootchain-backup" | Out-Null
+    $bcOk = Test-Path (Join-Path $bcDir 'SHA256SUMS')
+    if ($bcOk) {
+        foreach ($l in Get-Content (Join-Path $bcDir 'SHA256SUMS')) {
+            $p = @($l.Split(' ') | Where-Object { $_ })
+            if ($p.Count -ne 2 -or -not (Test-Path (Join-Path $bcDir $p[1])) -or
+                (Get-FileHash (Join-Path $bcDir $p[1]) -Algorithm SHA256).Hash.ToLower() -ne $p[0]) { $bcOk = $false }
+        }
+    }
+    if ($bcOk) { Write-Host ('  ' + (T 'boot chain backup: {1}' $bcDir)) }
+    else { Write-Host ('  ' + (T 'the boot chain backup could not be copied to this computer; it is on the Linux filesystem (.mu300/bootchain)')) }
+}
 
 # Android still runs from the slot it ran from when the image was built, and the image is the one for the other slot
 if ((SuDo 'getprop ro.boot.slot_suffix').Trim() -ne "_$ANDROID_SLOT") {
@@ -988,10 +1101,16 @@ $EXP = $bootJson.sha256
 & adb push $bcFile "$T/mu300-bc.bin" | Out-Null
 if ((SuDo "sha256sum $T/mu300-boot.img").Split(' ')[0] -ne $EXP) { Die (T 'pushed boot image hash mismatch') }
 SuDo "dd if=$T/mu300-boot.img of=/dev/block/by-name/boot_$LINUX_SLOT bs=4M && sync" | Out-Null
-if ((SuDo "sha256sum /dev/block/by-name/boot_$LINUX_SLOT").Split(' ')[0] -ne $EXP) {
+# read back from the medium (the page cache dropped first): exactly the image's length in whole 4096-byte blocks,
+# into a file, by one dd whose status counts (FINDINGS 50; install.sh's write_linux_boot does the same). A mismatch
+# stops here: misc is not written, Android keeps booting.
+$imgLen = (Get-Item "$Work\boot-linux-slot$LINUX_SLOT.img").Length
+$imgBlocks = [int][math]::Ceiling($imgLen / 4096)
+$readBack = SuDo "echo 3 > /proc/sys/vm/drop_caches; dd if=/dev/block/by-name/boot_$LINUX_SLOT of=$T/mu300-boot.rb bs=4096 count=$imgBlocks 2>/dev/null && head -c $imgLen $T/mu300-boot.rb | sha256sum"
+if ("$readBack".Split(' ')[0] -ne $EXP) {
     Die (T 'boot_{1} verify failed (slot {2} still active, Android keeps booting)' $LINUX_SLOT $ANDROID_SLOT)
 }
-SuDo "dd if=$T/mu300-bc.bin of=/dev/block/by-name/misc bs=1 seek=2048 conv=notrunc && sync && rm $T/mu300-boot.img $T/mu300-bc.bin" | Out-Null
+SuDo "dd if=$T/mu300-bc.bin of=/dev/block/by-name/misc bs=1 seek=2048 conv=notrunc && sync && rm $T/mu300-boot.img $T/mu300-bc.bin $T/mu300-boot.rb" | Out-Null
 
 # on-device switch for later: one command in Android instead of plugging into a computer (needs Magisk)
 Say (T 'Installing the on-device switch (Magisk module)')
@@ -1001,11 +1120,11 @@ $MTmp = "$T/mu300-magisk"
 if ((SuDo 'magisk -v')) {
     Quiet { adb shell "rm -rf $MTmp" } | Out-Null
     Quiet { adb shell "mkdir -p $MTmp/system/bin" } | Out-Null
-    foreach ($f in 'module.prop', 'switch.sh', 'action.sh') {
+    foreach ($f in 'module.prop', 'switch.sh', 'action.sh', 'bootchain.sh') {
         Quiet { PushUnix (Join-Path $ModSrc $f) "$MTmp/$f" } | Out-Null
     }
     Quiet { PushUnix (Join-Path $ModSrc 'system\bin\mu300-linux') "$MTmp/system/bin/mu300-linux" } | Out-Null
-    SuDo "rm -rf $Mod && mkdir -p $Mod/system/bin && cp -a $MTmp/module.prop $MTmp/switch.sh $MTmp/action.sh $Mod/ && cp -a $MTmp/system/bin/mu300-linux $Mod/system/bin/ && chown -R 0:0 $Mod && chmod 755 $Mod/switch.sh $Mod/action.sh $Mod/system/bin/mu300-linux && chmod 644 $Mod/module.prop && rm -rf $MTmp && sync" | Out-Null
+    SuDo "rm -rf $Mod && mkdir -p $Mod/system/bin && cp -a $MTmp/module.prop $MTmp/switch.sh $MTmp/action.sh $MTmp/bootchain.sh $Mod/ && cp -a $MTmp/system/bin/mu300-linux $Mod/system/bin/ && chown -R 0:0 $Mod && chmod 755 $Mod/switch.sh $Mod/action.sh $Mod/bootchain.sh $Mod/system/bin/mu300-linux && chmod 644 $Mod/module.prop && rm -rf $MTmp && sync" | Out-Null
     if ((SuDo "[ -x $Mod/switch.sh ] && echo yes") -eq 'yes') {
         Write-Host ('  ' + (T "installed: 'su -c mu300-linux' on the device starts Linux after the next Android boot"))
     } else {

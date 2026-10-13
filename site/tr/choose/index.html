@@ -116,7 +116,7 @@ kilitleri, bir AT terminali, USB kipleri ve güç ayarları, hepsi tarayıcıda.
 <div class="table-scroll"><table>
 <thead><tr><th scope="col"></th><th scope="col">Ubuntu</th><th scope="col">OpenWrt</th><th scope="col">OpenWrt + kontrol paneli</th></tr></thead><tbody>
 <tr><th scope="row">En uygun olduğu iş</th><td>küçük bir sunucu, kendi programlarınız, Linux öğrenmek</td><td>tarayıcıdan ayarladığınız bir 5G yönlendirici</td><td>modemi de izlediğiniz bir 5G yönlendirici: sinyal, bantlar, SMS</td></tr>
-<tr><th scope="row">Nasıl kullanılır</th><td>SSH, <code>mu300-toolkit</code></td><td>web arayüzü (LuCI), SSH</td><td>MU300 sayfalarıyla web arayüzü, SSH</td></tr>
+<tr><th scope="row">Nasıl kullanılır</th><td>SSH, <code>mu300-toolkit</code>; isteğe bağlı olarak MU300 sayfalı Cockpit (<code>panel</code> eklentisi, v2026.10.20'den beri)</td><td>web arayüzü (LuCI), SSH</td><td>MU300 sayfalarıyla web arayüzü, SSH</td></tr>
 <tr><th scope="row">Program kurmak</th><td><code>apt</code></td><td><code>apk</code></td><td><code>apk</code></td></tr>
 <tr><th scope="row">Giriş kullanıcısı</th><td><code>ubuntu</code></td><td><code>root</code></td><td><code>root</code></td></tr>
 <tr><th scope="row">RAM kullanımı (yaklaşık)</th><td>500 MiB</td><td>140 MiB</td><td>kurulum programı belirtmiyor</td></tr>
@@ -132,7 +132,10 @@ kilitleri, bir AT terminali, USB kipleri ve güç ayarları, hepsi tarayıcıda.
 <li><strong>Hücresel &gt; Veri kullanımı (Data usage):</strong> günlük ve fatura dönemi başına mobil veri kullanımı, aylık kotayla.</li>
 <li><strong>Hücresel &gt; AT terminali (AT terminal):</strong> modeme korumalı AT komutları.</li>
 <li><strong>Hücresel &gt; Cihaz yönetimi (Device management):</strong> USB rolü ve USB ağ kipi (NCM, ECM ya da RNDIS).</li>
-<li><strong>Sistem &gt; Diller (System &gt; Languages)</strong>, <strong>Sistem &gt; Güç (Power)</strong> ve <strong>Sistem &gt; CPU</strong>: arayüz dili, güç profilleri, şarj sınırı ve işlemci profili.</li>
+<li><strong>VPN</strong> (v2026.10.20'den beri, VPN modülüyle): Genel bakış, Profiller, Abonelikler, Motorlar, Ayarlar ve Günlükler.</li>
+<li><strong>Sistem &gt; Diller (System &gt; Languages)</strong>, <strong>Sistem &gt; Güç (Power)</strong> ve <strong>Sistem &gt; CPU</strong>: arayüz dili, güç profilleri, şarj sınırı (%0-100) ve işlemci profili.</li>
+<li><strong>Sistem &gt; Terminal</strong> (v2026.10.20'den beri): tarayıcıda bir root kabuğu, yalnızca LAN'da, oturum açmış oturumunuz için.</li>
+<li><strong>Sistem &gt; Güncelleme sonrası paketler (Packages after an update)</strong> (v2026.10.20'den beri): güncellemenin kurduğunuz paketlere ne yaptığı.</li>
 </ul>
 <p>Menü adları panelin Türkçe arayüzündeki gibidir; panel İngilizce açılır, parantez içindekiler oradaki adlardır.
 Tema eamonxg'nin
@@ -182,7 +185,10 @@ Ubuntu, ayarları ve verileri korunarak sonradan diğer sürüme geçebilir:</p>
 <li><strong>U30 Air'de USB host</strong> (OTG adaptörüyle flash bellek, klavye, Ethernet adaptörü) yalnızca ana hat
 çekirdeklerde çalışır.</li>
 <li><strong>U30 Air'de şarj:</strong> 5.4'te üreticinin şarj yazılımı şarj eder; 6.18 ve 7.2'de v2026.10.12'den beri
-<code>bq256xx</code> sürücüsü. v2026.10.11 ve öncesinin ana hat çekirdekleri şarjı kapalı bırakır; önce güncelleyin.</li>
+<code>bq256xx</code> sürücüsü. v2026.10.11 ve öncesinin ana hat çekirdekleri şarjı kapalı bırakır; önce güncelleyin. v2026.10.20'den
+beri ana hat çekirdekler Type-C portunun sunduğu akımı da okur (500 mA yerine 2 A'e kadar); şarj sınırı (%0-100) her çekirdekte çalışır.</li>
+<li><strong>dae</strong>, VPN modülünün eBPF motoru, v2026.10.20 ya da daha yeni bir 6.18/7.2 ister (BTF ve BPF JIT taşıyan 6.18.56 ve
+7.2.10); 5.4 onu çalıştıramaz.</li>
 <li><strong>WireGuard VPN profilleri</strong> ana hat bir çekirdek ister: <a href="https://github.com/dikeckaan/mu300-linux-vpn">VPN
 modülüne</a> göre 5.4 üretici çekirdeğinde WireGuard yoktur. Diğer VPN türleri üçünde de çalışır.</li>
 <li><strong>Modüller:</strong> ana hat çekirdekler yaklaşık 360 ek modülle gelir: WireGuard, SQM, tüneller, USB

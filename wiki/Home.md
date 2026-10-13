@@ -52,8 +52,90 @@ The installer recognises which device it is talking to. The **U30 Pro** is a dif
 ## What you get, and what you lose (spoiler: nothing)
 
 **You get:** Ubuntu 24.04 or 26.04 LTS, or OpenWrt 25.12 (plain or with a control panel for the modem); three
-kernels to choose from; 5G/LTE internet shared over Wi-Fi and USB; SSH; Bluetooth; SMS and USSD; an optional VPN
-module; a `raspi-config`-like menu called `mu300-toolkit`; automatic fallback to Android; updates on the device.
+kernels to choose from; 5G/LTE internet shared over Wi-Fi and USB; SSH, and `adb` over USB if you turn it on; Bluetooth;
+SMS and USSD; an optional VPN module; a web panel on Ubuntu too (Cockpit with an MU300 page, optional); a
+`raspi-config`-like menu called `mu300-toolkit`; automatic fallback to Android; updates on the device.
+
+## New in v2026.10.23
+
+The release of 2026-10-23 (a prerelease first, promoted once a board has run it). What it changes, and where to read
+on:
+
+* **The modem on mainline after a Magisk install** (issues #127, #170): Android files the installer imported could
+  end up readable by root only, and the modem's processor was then never loaded. The installers write them with the
+  right modes now, and every boot repairs an import that is already there. [Troubleshooting](Troubleshooting)
+* **A thermal zone on 6.18 and 7.2:** the board's temperature is a kernel thermal zone (`mu300_thermal`), and
+  `thermal-guard` hands over to it. [Kernels](Kernels)
+* **SMS arrive at once on OpenWrt:** the modem delivers a message as it comes in (`+CMT`) instead of waiting for the
+  next poll, and forwarding to a webhook can have a body of your own (issue #171). [SMS](SMS)
+* **The panel** shows the SIM's own number, shows a carrier name the modem sends as hex as text (issue #174), hides
+  a SIM slot the board does not have, and a band or cell lock reset is checked after it is made.
+* **The VPN page says why a config was refused** instead of "profile not added", and its check works. The engines'
+  own fixes are in VPN module v2.0.1 (`mu300-extra install vpn` again): sing-box, mihomo and dae find their server
+  on carriers that only let DNS through to their own resolvers, mihomo configs with GEOSITE/GEOIP rules start (the
+  geodata comes with the extra), dae stays up on 6.18 and 7.2, and switching to a profile that cannot run leaves the
+  working tunnel alone. [VPN](VPN)
+* **Installers:** a stalled write to the SD card or the internal storage is noticed and reported, and the boot image
+  is read back after it is written. [Installation](Installation)
+* **Kernels:** 5.4 rebuilt with `NFT_QUEUE`; 6.18.56 and 7.2.10 with the thermal module. [Kernels](Kernels)
+
+## New in v2026.10.22
+
+The release of 2026-10-22 (a prerelease first, promoted once a board has run it). Fixes again. What it changes, and
+where to read on:
+
+* **Sending an SMS no longer fails with `SMS FAILED: CODE:600`** on networks that refused every submission (China
+  Broadnet; issue #176): a send is now one AT transaction, with nothing else getting at the modem between the setup
+  and the submission, and the SMSC is written back to the modem unchanged before each one; on OpenWrt (`mu300-sms`
+  and the panel) and on Ubuntu (`sms`). [SMS](SMS), [Troubleshooting](Troubleshooting)
+* **The panel's SMS page keeps its send result:** a slow send used to be killed with the request after 30 s
+  (`sms_send - killed` in the operations log). The send now runs in the background and the page follows it, also
+  after a reload. [Troubleshooting](Troubleshooting)
+* **No more `mmc1` register dumps on the F50** on 6.18 and 7.2: the empty SD slot has real card detect now (the EIC
+  controller's six banks are mapped), so nothing polls it any more (issue #181). [Troubleshooting](Troubleshooting), [Kernels](Kernels)
+* **Magisk zips: known passwords.** A system the zip installs gets the images' own: Ubuntu's user `ubuntu` has the
+  password `ubuntu`, OpenWrt's `root` has none until you set one; `MU300_PASSWORD` still sets one of your own. No
+  random passwords any more, and the password note holds no secret (issue #167). [Installation](Installation#installing-from-android-with-a-magisk-zip-no-computer)
+* **No VPN section without the VPN module:** LuCI's VPN menu, the Cockpit page's VPN tab and the toolkit's VPN item
+  are there only once `mu300-extra install vpn` has run. [VPN](VPN)
+* **Kernels:** 5.4 unchanged; 6.18.56 and 7.2.10 rebuilt with the card-detect fix. [Kernels](Kernels)
+
+## New in v2026.10.21
+
+The release of 2026-10-21 (a prerelease first, promoted once a board has run it). Mostly fixes. What it changes, and
+where to read on:
+
+* **F50: the internal SIM can be selected** instead of the card in the slot: `mu300-sim select internal` (or the
+  **SIM source** field of the wan interface in LuCI), with that card's own APN. It takes effect at the next boot, the
+  external card stays the default, and nothing is written to the modem or the SIM. [docs/SIM-SELECTION.md](https://github.com/dikeckaan/mu300-linux/blob/main/docs/SIM-SELECTION.md)
+* **Kernel 5.4 no longer panics when a network namespace goes away** (Docker containers, sandboxes; issue #103). [Troubleshooting](Troubleshooting)
+* **The Wi-Fi driver can be unloaded** on 6.18 and 7.2: `rmmod sprd_wlan_combo` used to crash the device (issue #146). [Troubleshooting](Troubleshooting)
+* **Quieter logs:** the Wi-Fi driver's routine lines (`sc2355_dump_survey`, `bssid not found`, `data len is`...) are
+  no longer errors in `dmesg` and `logread`, on every kernel (issue #140). [Troubleshooting](Troubleshooting)
+* **`mu300-update` runs one at a time:** a second run started meanwhile is refused and names the first one's pid. [Updating](Updating)
+* **Kernels:** 5.4 rebuilt with the two fixes above; 6.18.56 and 7.2.10 with rebuilt modules. [Kernels](Kernels)
+
+## New in v2026.10.20
+
+The release of 2026-10-20 (a prerelease first, promoted once a board has run it). What it adds, and where to read on:
+
+* **Updates keep the packages you installed** (`apk add`, `apt install`): they come back at the first boot, with their
+  settings and their services' state; the panel shows it under System > Packages after an update. [Updating](Updating)
+* **The control panel gets a VPN section** (Overview, Profiles, Subscriptions, Engines, Settings, Logs), **System >
+  Terminal** (a root shell in the browser, LAN only), Wi-Fi clients with their speeds on the home page, the Power
+  page's reasons in your language, and it no longer freezes when an AT command gets stuck: on OpenWrt an AT command
+  now takes 0.13 s instead of a second. [Control Panel (LuCI)](Control-Panel-(LuCI))
+* **A web panel for Ubuntu:** Cockpit with an MU300 page, as the `panel` extra. [Control Panel (LuCI)](Control-Panel-(LuCI)#a-web-panel-on-ubuntu-cockpit)
+* **VPN module v2.0.0:** a core plus engine extras (`vpn-xray`, `vpn-singbox`, `vpn-mihomo`, `vpn-dae`), subscriptions,
+  and an IPv6 guard so nothing leaks beside a tunnel that carries no IPv6. [VPN](VPN)
+* **Kernels 6.18.56 and 7.2.10**, with BTF and the eBPF hooks dae needs. [Kernels](Kernels)
+* **U30 Air:** a charge limit of 0-100 % (`mu300-power charge-limit N`), and faster charging on Type-C ports that offer
+  1.5 or 3 A (mainline kernels). [Hardware Notes](Hardware-Notes)
+* **The hotspot never lands on a DFS channel** any more (it used to fail to start there). [Wi-Fi Hotspot and Client](Wi-Fi-Hotspot-and-Client)
+* **adb to Linux over USB** (`mu300-usb adb on`; off by default, your computer's key must be authorised). [Installation](Installation#adb-to-linux)
+* **The installers copy the boot chain** of Android's slot to the Linux slot after an Android update (issue #86). [Installation](Installation#the-boot-chain-of-the-linux-slot)
+* **Hardening:** the Android modem daemons run under their own account (`mu300vnd`) and nothing in `/dev` belongs to
+  the login user any more; `sms delete` sends only a message index to the modem. [Hardware Notes](Hardware-Notes), [SMS](SMS)
 
 **You lose:** nothing that was there. Android on these boxes has no screen, no speaker and no HDMI either; all Linux
 takes is your last excuse for not having a 5G Linux server in your pocket. Installing it costs you nothing; not

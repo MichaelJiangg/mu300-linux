@@ -16,6 +16,8 @@
 # MU300_LIB=1 defines the functions and runs nothing (tests/, which also set MU300_DIR to a directory laid out like
 # the zip's mu300/). The MU300_* paths below point at a fake device there.
 set -eu
+# what is built here ends up in the installed systems: with this umask, whatever the shell that flashes the zip has
+umask 022
 D=${MU300_DIR:-$(cd "$(dirname "$0")" && pwd)}
 # mu300-update first: it defines a say and a die of its own, which the ones below replace. MU300_LIB=1 while it is
 # read makes it define its functions only; the caller's value comes back afterwards.
@@ -53,7 +55,8 @@ die() { echo "! $*"; exit 1; }
 gib() { awk -v b="$1" 'BEGIN { printf "%.1f GiB", b / 1073741824 }'; }
 # Android's own shell and toolbox, never Magisk's standalone busybox: its mke2fs makes ext2 only and its losetup has
 # no -S. su -c sh gives install.sh exactly this environment. MU300_DEVICE_WORK tells android-install.sh where its files are.
-asw() { env -u ASH_STANDALONE PATH="$APATH" MU300_DEVICE_WORK="${W:-}" "$@"; }
+# MU300_LOCK_DIR: the lock of a timed-out SD-card stage (android-install.sh, FINDINGS 50) outlives this run's W.
+asw() { env -u ASH_STANDALONE PATH="$APATH" MU300_DEVICE_WORK="${W:-}" MU300_LOCK_DIR="$WORK_PARENT" "$@"; }
 su_do() { asw "$DEVSH" -c "$1"; }            # storage.sh's way to run a command on the device: here it is local
 
 android_lang() {  # the language of the Android locale: tr, zh or en
@@ -71,7 +74,7 @@ android_lang() {  # the language of the Android locale: tr, zh or en
 #   untrusted  /sdcard/mu300-install.conf or /sdcard/Download/mu300-install.conf (first found): any app with
 #              storage access can write these, so they choose only what destroys nothing and reveals nothing
 # Trusted values win.
-CONF_KEYS='MU300_STORAGE MU300_SD_ERASE MU300_REGION_OVERWRITE MU300_MODE MU300_BOOT_OS MU300_BOOT MU300_BOOT_ATTEMPTS MU300_HOTSPOT MU300_GPU MU300_PASSWORD MU300_PASSWORD_RESET MU300_PASSWORD_FILE MU300_DEVICE MU300_LANG MU300_DRY_RUN'
+CONF_KEYS='MU300_STORAGE MU300_SD_ERASE MU300_REGION_OVERWRITE MU300_MODE MU300_BOOT_OS MU300_BOOT MU300_BOOT_ATTEMPTS MU300_HOTSPOT MU300_GPU MU300_PASSWORD MU300_PASSWORD_RESET MU300_PASSWORD_FILE MU300_DEVICE MU300_LANG MU300_DRY_RUN MU300_SYNC_BOOTCHAIN'
 CONF_SET=
 conf_find() { for _f in "$SDCARD/mu300-install.conf" "$SDCARD/Download/mu300-install.conf"; do [ -f "$_f" ] && { echo "$_f"; return 0; }; done; return 0; }
 # erasing, formatting, overriding the model check and the password: only from a trusted file
@@ -152,6 +155,7 @@ conf_valid() {  # conf_valid KEY VALUE: VALUE is exactly one this installer know
         MU300_DEVICE) case $2 in f50|u30air) return 0 ;; esac ;;
         MU300_LANG) case $2 in en|tr|zh) return 0 ;; esac ;;
         MU300_DRY_RUN) [ "$2" = 1 ] && return 0 ;;
+        MU300_SYNC_BOOTCHAIN) case $2 in 0|1) return 0 ;; esac ;;
         # any characters: it only ever goes to mkpasswd on stdin, never into a path or a command line
         MU300_PASSWORD) [ ${#2} -ge 6 ] && return 0 ;;
     esac
@@ -167,6 +171,18 @@ conf_check() {  # every answer, from a file or the environment, has a value this
 }
 src_of() { eval "_s=\${SRC_$1:-}"; if [ -n "$_s" ]; then echo "$_s"; else t 'default'; fi; }   # where a value came from
 
+# ---- a run that timed out on the SD card in this Android boot (FINDINGS 50): android-install.sh left its lock, keyed
+# by the boot id, in WORK_PARENT (its own work directory was that run's and went with it). The request it waited on is
+# still stuck in the kernel, and another run would only add one: refused before anything is built or written. A lock
+# of an earlier boot is stale and goes.
+STALL_LOCK=$WORK_PARENT/mu300-install.stalled
+stall_check() {
+    [ -f "$STALL_LOCK" ] || return 0
+    _bi=$(cat "${MU300_BOOT_ID:-/proc/sys/kernel/random/boot_id}" 2>/dev/null | tr -d ' \n')
+    if [ "$(sed -n 1p "$STALL_LOCK" 2>/dev/null)" != "${_bi:-unknown}" ]; then rm -f "$STALL_LOCK"; return 0; fi
+    die "$(t 'An earlier run of this installer timed out in this Android boot ({1}); the SD card request it waited on is still stuck in the kernel. Reboot Android, then install the zip again. Nothing was changed; the lock is {2}.' "$(sed -n 2p "$STALL_LOCK")" "$STALL_LOCK")"
+}
+
 # ---- the device, its slots and the zip
 env_check() {
     [ -n "${MU300_SKIP_ROOT_CHECK:-}" ] || [ "$(id -u)" = 0 ] || die "$(t 'this installer needs root')"
@@ -181,6 +197,7 @@ detect_device() {
         *MU300*|*F50*|*mu300*) DEVICE=f50 ;;
         *) DEVICE= ;;
     esac
+    MODEL_KNOWN=0; [ -z "$DEVICE" ] || MODEL_KNOWN=1
     [ -z "${MU300_DEVICE:-}" ] || DEVICE=$MU300_DEVICE
     [ -n "$DEVICE" ] || die "$(t 'This does not look like a ZTE F50/MU300 or U30 Air. If it is one, put MU300_DEVICE=f50 or u30air into {1}.' "$TRUSTED_CONF")"
 }
@@ -425,14 +442,32 @@ plan_choices() {
     IMPORT_HOTSPOT=1; [ "${MU300_HOTSPOT:-yes}" = no ] && IMPORT_HOTSPOT=0
     GPU=${MU300_GPU:-yes}
     PW_FILE=$PW_FILE_ROOT; [ "${MU300_PASSWORD_FILE:-}" != sdcard ] || PW_FILE=$PW_FILE_SDCARD
-    # Update (keep) leaves the accounts and their passwords as they are, as mu300-update does: a password is made only
-    # for a system that has none of its own yet (a new filesystem, a wipe, a system added beside another), or when
-    # /data/adb/mu300-install.conf asks for one (MU300_PASSWORD, MU300_PASSWORD_RESET=yes: trusted only)
+    # Update (keep) leaves the accounts and their passwords as they are, as mu300-update does. A system that has none
+    # of its own yet (a new filesystem, a wipe, a system added beside another, one still with the images' accounts)
+    # gets the images' well-known ones (build_password), or the one /data/adb/mu300-install.conf gives (MU300_PASSWORD,
+    # MU300_PASSWORD_RESET=yes: trusted only)
     KEEP_PW=0
     if [ "$UPDATE" = 1 ] && [ "${HAVE_ACCOUNTS:-0}" = 1 ] && [ -z "${MU300_PASSWORD:-}" ] &&
         [ "${MU300_PASSWORD_RESET:-}" != yes ]; then KEEP_PW=1; fi
     # an if, not an && list: the last command's status is the function's, and set -e would stop main on it
     WIPE_LEGACY=0; if [ "$OS" = ubuntu ] && [ "$FORMAT" = 0 ]; then WIPE_LEGACY=1; fi
+}
+# The Linux slot gets the boot chain of Android's slot - uboot, sml, teecfg, trustos and vbmeta, one firmware build on
+# both slots (issue #86): android-bootchain.sh decides and checks here, android-install.sh copies it before it installs
+# anything, with a backup on the Linux filesystem (.mu300/bootchain). MU300_SYNC_BOOTCHAIN=0 skips that, for experts.
+plan_bootchain() {
+    SYNC_BOOTCHAIN=1; BC_LINE=; BC_REFUSED=
+    if [ "${MU300_SYNC_BOOTCHAIN:-1}" = 0 ]; then
+        SYNC_BOOTCHAIN=0; BC_LINE=$(t 'boot chain:     not synced (MU300_SYNC_BOOTCHAIN=0)'); return 0
+    fi
+    # android-bootchain.sh writes only on a model it knows: one taken from MU300_DEVICE keeps its chain as it is
+    if [ "${MODEL_KNOWN:-1}" = 0 ]; then
+        SYNC_BOOTCHAIN=0; BC_LINE=$(t 'boot chain:     not synced (the model is not recognised)'); return 0
+    fi
+    _bco=$(asw MU300_BY_NAME="$BY" "$ANDROID_SH" "$D/android-bootchain.sh" check 2>&1) || true
+    bootchain_line "$_bco" ||
+        die "$(t 'the boot chain cannot be copied to the Linux slot: {1}' "$BC_REFUSED")
+$(t 'Nothing was changed. Experts can skip this step with MU300_SYNC_BOOTCHAIN=0.')"
 }
 plan_print() {
     echo
@@ -453,11 +488,14 @@ plan_print() {
     if [ "$KEEP_PW" = 1 ]; then
         echo "  $(t 'password:       kept: the accounts and passwords of the installed system are not changed ({1} in {2} sets a new one)' "MU300_PASSWORD_RESET=yes" "$TRUSTED_CONF")"
     elif [ -n "${MU300_PASSWORD:-}" ]; then
-        echo "  $(t 'password:       from {1}, written to {2}' "$(src_of MU300_PASSWORD)" "$PW_FILE")"
+        echo "  $(t 'password:       the one from {1} (not shown)' "$(src_of MU300_PASSWORD)")"
+    elif [ "$OS" = ubuntu ]; then
+        echo "  $(t 'password:       ubuntu for user ubuntu, as in the images ({1} in {2} sets another)' "MU300_PASSWORD" "$TRUSTED_CONF")"
     else
-        echo "  $(t 'password:       generated, written to {1}' "$PW_FILE")"
+        echo "  $(t 'password:       none: root logs in without one until one is set with passwd or in LuCI, System > Administration ({1} in {2} sets one now)' "MU300_PASSWORD" "$TRUSTED_CONF")"
     fi
     echo "  $(t 'writes:         {1}, boot_{2}, 32 bytes of misc (boot_{3}, the partition table and userdata are not touched)' "$([ "$SD_MODE" = 1 ] && echo "$SD_DEV" || t 'the Linux region')" "$LINUX_SLOT" "$ANDROID_SLOT")"
+    echo "  $BC_LINE"
 }
 # Every setting, what it does and the value this run used (or would have: a refused run writes it too, with what
 # was known by then), so nobody has to type it from a README. Any app can write $SDCARD, so it is never opened by
@@ -496,11 +534,11 @@ write_example() {
         echo "#MU300_HOTSPOT=yes"
         echo "# Mali GPU (OpenCL) files: yes or no"
         echo "#MU300_GPU=yes"
-        echo "# (root) 6+ characters; empty: generated"
+        echo "# (root) 6+ characters; empty: the images' own (Ubuntu: ubuntu/ubuntu; OpenWrt: root without a password)"
         echo "#MU300_PASSWORD="
-        echo "# (root) yes: a new generated password also when updating (an update keeps the existing one)"
+        echo "# (root) yes: the images' own password also when updating (an update keeps the existing one)"
         echo "#MU300_PASSWORD_RESET=yes"
-        echo "# (root) write the password to $PW_FILE_SDCARD instead of $PW_FILE_ROOT"
+        echo "# (root) write the password note to $PW_FILE_SDCARD instead of $PW_FILE_ROOT"
         echo "#MU300_PASSWORD_FILE=sdcard"
         echo "# (root) f50 or u30air, only when the model is not recognised"
         echo "#MU300_DEVICE=${DEVICE:-f50}"
@@ -508,15 +546,18 @@ write_example() {
         echo "#MU300_LANG=${MU300_LANG:-en}"
         echo "# only show what would be done"
         echo "#MU300_DRY_RUN=1"
+        echo "# 0: leave the Linux slot's boot chain (uboot, sml, teecfg, trustos, vbmeta) as it is; experts only"
+        echo "#MU300_SYNC_BOOTCHAIN=1"
     } > "$_new" ) 2>/dev/null &&
         [ -f "$_new" ] && [ ! -L "$_new" ] && rm -f "$_ex" && mv -f "$_new" "$_ex" 2>/dev/null
     rm -f "$_new" 2>/dev/null
     return 0
 }
 
-# ---- the password: never empty, never the image's. 12 characters without look-alikes, unless a trusted conf gives
-# one.
-PW_ALPHABET=abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789
+# ---- the password: the images' well-known one, unless a trusted conf gives one. Ubuntu's user ubuntu has the
+# password ubuntu; OpenWrt's root has none, as stock OpenWrt ships it (dropbear and LuCI let root in without one until
+# the user sets one). Issue #167: a random password shown in nothing but a root-only file, which the next zip
+# overwrote, left added systems nobody could log in to.
 CRYPT_ITOA=./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 random_chars() {  # random_chars ALPHABET N: bytes past the last whole multiple of the alphabet are skipped (no bias)
     head -c 256 /dev/urandom | od -An -tu1 -v | awk -v a="$1" -v n="$2" '
@@ -577,28 +618,43 @@ build_boot() {
         die "$(t 'could not build the boot image')"
     say "$(t 'boot image for slot {1}: kernel {2}, {3} bytes' "$LINUX_SLOT" "$(cat "$KB/kernel.release" 2>/dev/null || echo 5.4)" "$(( $(fsize "$W/boot/new") + $(fsize "$W/boot/vbmeta") ))")"
 }
+# PWHASH goes into the system's own account (ubuntu, OpenWrt's root) when PW_SET=1; empty with PW_SET=1 it is OpenWrt's
+# root without a password. PW_SET=0: android-install.sh carries the accounts over (KEEP_PW)
 build_password() {
-    PW=; PWHASH=
-    [ "$KEEP_PW" = 0 ] || return 0                # android-install.sh carries the accounts over
-    PW=${MU300_PASSWORD:-}
-    [ -n "$PW" ] || PW=$(random_chars "$PW_ALPHABET" 12) || die "$(t 'could not generate a password')"
-    PWHASH=$(password_hash "$PW") || die "$(t 'could not hash the password')"
+    PWHASH=; PW_SET=0
+    [ "$KEEP_PW" = 0 ] || return 0
+    PW_SET=1
+    if [ -n "${MU300_PASSWORD:-}" ]; then PWHASH=$(password_hash "$MU300_PASSWORD") || die "$(t 'could not hash the password')"
+    elif [ "$OS" = ubuntu ]; then PWHASH=$(password_hash ubuntu) || die "$(t 'could not hash the password')"
+    fi
 }
 
 # ---- install: the systems, then the boot image, then misc
 # mu300-install.env as install.sh writes it (storage.sh): OFF and INT_SIZE are the internal region, SIZE the region
-# or, in SD mode, the card
+# or, in SD mode, the card; plus PW_SET (build_password), which install.sh does not write
 install_env() {
     OFF=$INT_OFF; SIZE=$INT_SIZE
     if [ "$SD_MODE" = 1 ]; then SIZE=$SD_BYTES; fi
-    ( umask 077; write_install_env > "$W/mu300-install.env" ) || die "$(t 'could not write {1}' "$W/mu300-install.env")"
+    ( umask 077; { write_install_env && echo "PW_SET=$PW_SET"; } > "$W/mu300-install.env" ) ||
+        die "$(t 'could not write {1}' "$W/mu300-install.env")"
 }
 install_systems() {
     say "$(t 'Installing {1} (this takes a few minutes)' "$OS")"
-    cp "$D/android-install.sh" "$D/android-mount-mu300root.sh" "$W/" || die "$(t 'could not copy the installer files')"
+    cp "$D/android-install.sh" "$D/android-mount-mu300root.sh" "$D/android-bootchain.sh" "$W/" || die "$(t 'could not copy the installer files')"
     install_env
     asw "$ANDROID_SH" "$W/android-install.sh" 2>&1 | tee "$W/device-install.log"
-    grep -q MU300-INSTALL-OK "$W/device-install.log" || die "$(t 'installation on the device failed; boot_{1} and misc were not changed' "$LINUX_SLOT")"
+    _keep=$WORK_PARENT/mu300-device-install.log
+    if ! grep -q MU300-INSTALL-OK "$W/device-install.log"; then
+        # W goes with this run: the device script's output is kept where root can read it (a timed-out SD-card stage
+        # names itself there, FINDINGS 50)
+        _msg=$(t 'installation on the device failed; boot_{1} and misc were not changed' "$LINUX_SLOT")
+        if ( umask 077; cp "$W/device-install.log" "$_keep" ) 2>/dev/null && chmod 600 "$_keep" 2>/dev/null; then
+            _msg="$_msg
+$(t 'the device log was kept at {1}' "$_keep")"
+        fi
+        die "$_msg"
+    fi
+    rm -f "$_keep"
     if [ -s "$KB/kernel.release" ]; then        # a mainline bundle: its modules into every system on the filesystem
         mount_target "$W/mnt" || die "$(t 'could not mount the Linux filesystem for the kernel modules')"
         DISK=$W/mnt MU300_NO_DEPMOD=1 kernel_modules_into_systems "$KB" ||
@@ -607,10 +663,31 @@ install_systems() {
         umount_target "$W/mnt" || die "$(t 'could not unmount the Linux filesystem from {1}' "$W/mnt")"
     fi
 }
+# boot_readback DEV: what write_boot put on DEV - the image with its vbmeta from offset 0, the AVB footer in the
+# partition's last 64 bytes - read back from the medium into files of their own, in whole 4096-byte blocks, by one dd
+# each whose status counts (a pipeline would turn a read error into a short hash and say no more), after the page
+# cache is dropped, and compared by sha256 with what was written. write_boot has its own check (mu300-update's,
+# through a pipeline); this is the installer's last word before misc is armed (FINDINGS 50). Prints why it failed.
+boot_readback() {
+    _bl=$(fsize "$W/boot/written"); _bn=$(( (_bl + 4095) / 4096 )); _ps=$(part_size "$1")
+    rm -f "$W/boot/readback" "$W/boot/readback.tail"
+    echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+    dd if="$1" of="$W/boot/readback" bs=4096 count="$_bn" 2>/dev/null || { echo "dd failed"; return 1; }
+    [ "$(fsize "$W/boot/readback")" = $((_bn * 4096)) ] || { echo "short read"; return 1; }
+    [ "$(head -c "$_bl" "$W/boot/readback" | sha256sum | cut -d' ' -f1)" = "$(sha256sum < "$W/boot/written" | cut -d' ' -f1)" ] ||
+        { echo "sha256 differs"; return 1; }
+    dd if="$1" of="$W/boot/readback.tail" bs=4096 skip=$((_ps / 4096 - 1)) count=1 2>/dev/null || { echo "dd failed (footer)"; return 1; }
+    [ "$(tail -c 64 "$W/boot/readback.tail" | sha256sum | cut -d' ' -f1)" = "$(sha256sum < "$W/boot/newfooter" | cut -d' ' -f1)" ] ||
+        { echo "sha256 differs (footer)"; return 1; }
+    rm -f "$W/boot/readback" "$W/boot/readback.tail"
+}
 install_boot() {
     say "$(t 'Writing and verifying boot_{1}' "$LINUX_SLOT")"
+    cat "$W/boot/new" "$W/boot/vbmeta" > "$W/boot/written" || die "$(t 'could not build the boot image')"
     write_boot "$BOOT_LINUX" "$(part_size "$BOOT_LINUX")" "$W/boot/new" "$W/boot/vbmeta" "$W/boot/newfooter" ||
         die "$(t 'boot_{1} did not verify after writing; misc was not changed, so Android keeps booting' "$LINUX_SLOT")"
+    _why=$(boot_readback "$BOOT_LINUX") ||
+        die "$(t 'boot_{1} read back from the eMMC is not the image that was written ({2}); Linux was not armed: misc was not changed, so Android keeps booting' "$LINUX_SLOT" "$_why")"
 }
 arm_linux() {  # the Linux slot's trial block, built from the misc block read at the start; misc must still hold that
     _blk=$W/ramdisk/etc/misc-bc-slot-$LINUX_SLOT-trial.bin
@@ -629,11 +706,18 @@ arm_linux() {  # the Linux slot's trial block, built from the misc block read at
     cp "$W/misc-bc-live.bin" "$_keep" 2>/dev/null || true
     die "$(t 'misc did not verify after writing, and the block it held before could not be written back: misc holds unknown bytes, and the device may not start Android. Do not reboot. Write the saved block back as root: {1}' "dd if=$_keep of=$MISC bs=1 seek=2048 conv=notrunc")"
 }
+# the note on the password, in the file: never the password itself
+pw_note() {
+    if [ -n "${MU300_PASSWORD:-}" ]; then echo "the one given as MU300_PASSWORD in $(src_of MU300_PASSWORD)"
+    elif [ "$OS" = ubuntu ]; then echo "ubuntu (as in the images; change it after the first login: passwd)"
+    else echo "none yet: set one with passwd, or in LuCI (System > Administration)"
+    fi
+}
 pw_text() {
-    printf 'MU300 Linux %s, %s\nuser: %s\npassword: %s\nDelete this file after the first login.\n' "$TAG" "$(date '+%Y-%m-%d %H:%M')" "$_users" "$PW"
+    printf 'MU300 Linux %s, %s\nuser: %s\npassword: %s\n' "$TAG" "$(date '+%Y-%m-%d %H:%M')" "$_users" "$(pw_note)"
     # The other system, installed beside this one by an earlier zip, keeps its password: so does the file (its block
-    # from the file this one replaces), or the first zip's password would be lost with its output. Not after a
-    # wipe (HAVE_SYSTEMS is empty then), and never a block of this run's user.
+    # from the file this one replaces), or the first zip's note would be lost with its output. Not after a wipe
+    # (HAVE_SYSTEMS is empty then), and never a block of this run's user.
     case $OS in ubuntu) _ou=root _os=openwrt ;; *) _ou=ubuntu _os=ubuntu ;; esac
     case " $HAVE_SYSTEMS " in *" $_os "*|*" $_os-luci "*) ;; *) return 0 ;; esac
     [ -f "$PW_FILE" ] && [ ! -L "$PW_FILE" ] || return 0
@@ -644,16 +728,19 @@ pw_text() {
         $0 == u { keep = 1 }
         END { if (keep) printf "\n%s", b }' "$PW_FILE"
 }
-# between quotes: a password of the conf file may hold blanks
+# never the password of the conf file: it is not shown anywhere
 pw_show() {
-    if [ "$KEEP_PW" = 1 ]; then echo "  $(t 'password for {1}: unchanged (the one this system had)' "$_users")"; return 0; fi
-    echo "  $(t 'password for {1}: "{2}"   (also in {3}; delete that file after the first login)' "$_users" "$PW" "$PW_FILE")"
+    if [ "$KEEP_PW" = 1 ]; then echo "  $(t 'password for {1}: unchanged (the one this system had)' "$_users")"
+    elif [ -n "${MU300_PASSWORD:-}" ]; then echo "  $(t 'password for {1}: the one from {2}' "$_users" "$(src_of MU300_PASSWORD)")"
+    elif [ "$OS" = ubuntu ]; then echo "  $(t 'password for ubuntu: "ubuntu"   (as in the images; change it after the first login: passwd)')"
+    else echo "  $(t 'password for root: none yet - set one with passwd, or in LuCI (System > Administration)')"
+    fi
 }
-# Shown and saved before anything is written: android-install.sh puts the hash into the systems, and a run that fails
-# or is killed after that must not leave a Linux whose password nobody has seen. No file, no installation.
+# Shown and noted before anything is written: android-install.sh puts the password into the systems, and a run that
+# fails or is killed after that must not leave a Linux whose password nobody was told. No file, no installation.
 save_password() {
     _users=root; [ "$OS" != ubuntu ] || _users=ubuntu
-    [ "$KEEP_PW" = 0 ] || return 0                # nothing new to show or save; the file stays as it is
+    [ "$KEEP_PW" = 0 ] || return 0                # nothing new to show or note; the file stays as it is
     replace_file "$PW_FILE" pw_text || die "$(t 'could not write {1}; nothing was installed' "$PW_FILE")"
     pw_show
 }
@@ -701,6 +788,7 @@ main() {
     conf_read
     conf_check
     env_check
+    stall_check
     detect_device
     slot_setup
     work_setup
@@ -709,6 +797,7 @@ main() {
     plan_storage
     inspect_target
     plan_choices
+    plan_bootchain
     plan_print
     if [ "${MU300_DRY_RUN:-}" = 1 ]; then say "$(t 'Dry run: nothing was written.')"; exit 3; fi
     build_vendor

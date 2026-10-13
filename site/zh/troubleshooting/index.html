@@ -148,6 +148,41 @@ adb shell su -c id</code></pre><p>设备应该显示为 <code>device</code>（�
 <p>在 v2026.10.13 之前的版本里，防火墙开机时的规则里没有 LAN 的部分，而在 5.4 上本该补上这些规则的重新加载总是失败。从 v2026.10.13 起已修复；请更新。在受影响的版本上，通过 USB 串口控制台（<code>ttyGS0</code>，root shell）登录，运行：</p><pre><code>nft delete flowtable inet fw4 ft; fw4 reload</code></pre><p>从 v2026.10.17 起，5.4 上单独执行 <code>fw4 reload</code> 或 <code>restart</code> 就能生效。</p>
 </section>
 
+<section id="dfs">
+<h3>热点在 52 到 144 之间的 5 GHz 信道上起不来</h3>
+<p>hostapd 报 <code>start_dfs_cac() failed</code> 然后停下（v2026.10.18 及之前的版本）。那些是 DFS 信道，而 Wi-Fi 驱动无法检测雷达。从 v2026.10.20 起已修复：这种信道会被换成 36（或 149），日志里有一行说明。在旧版本上请选 36-48 或 149-165，Ubuntu 上也可以用 <code>auto</code>。</p>
+</section>
+
+<section id="panel-stuck">
+<h3>一条 AT 命令卡住后，控制面板一片空白</h3>
+<p>在带控制面板的 OpenWrt 上，直到 v2026.10.18，一条卡住的 AT 命令能让所有页面空白好几分钟，连电池卡片也是，重启之后也一样。从 v2026.10.20 起已修复：页面会保留上一次的读数并说明它们有多旧，OpenWrt 上一条 AT 命令只要 0.13 秒而不是一秒。在旧版本上等它过去，或者重启 <code>rpcd</code> 和 <code>mu300-atd</code>。</p>
+</section>
+
+<section id="sms-600">
+<h3>发短信失败，提示 <code>SMS FAILED: CODE:600</code>，或面板的日志里是 <code>sms_send - killed</code></h3>
+<p>直到 v2026.10.21，在某些网络上（中国广电，issue #176）调制解调器的 IMS 栈拒绝每一次提交（URC 日志里是 <code>+SPIMSREASON: 1,512,"SMS FAILED: CODE:600 REASON:Busy Everywhere"</code>），而收短信正常；另外，在带控制面板的 OpenWrt 上，一次超过 30 秒的发送会连同面板的请求一起被杀掉，操作日志里只剩 <code>sms_send - killed</code>，短信有没有发出去无从得知。从 v2026.10.22 起已修复：一次发送是一个完整的 AT 事务（从准备到提交一直占着通道，别的客户端插不进来），而且每次发送前都把调制解调器报告的 SMSC 原样写回去；OpenWrt 上的 <code>mu300-sms</code> 和面板、Ubuntu 上的 <code>sms</code> 都是如此。面板把发送放到后台并跟踪它，刷新页面之后也一样。在旧版本上，自己把 SMSC 写回去（<code>mu300-at 'AT+CSCA?'</code>，然后 <code>mu300-at 'AT+CSCA="&lt;它显示的值&gt;",&lt;类型&gt;'</code>，Ubuntu 上加 <code>sudo</code>），并趁面板空闲时从 shell 发送（OpenWrt 上 <code>mu300-sms send 号码 内容</code>，Ubuntu 上 <code>sudo sms send 号码 内容</code>）。</p>
+</section>
+
+<section id="netns-panic">
+<h3>5.4 内核上，一个容器停止时设备就重启</h3>
+<p>直到 v2026.10.20，在 5.4 内核上，同时存在两个网络命名空间（network namespace）而其中一个退出时（Docker 容器、沙箱、<code>unshare -n</code>），内核在清理它时可能崩溃（栈里有 <code>xfrm_sysctl_fini</code>；issue #103）；设备随即重启，几次之后就回到 Android。从 v2026.10.21 起已修复；请更新。在旧版本上一次只跑一个容器，或者改用从来没有这个问题的 6.18 或 7.2。</p>
+</section>
+
+<section id="rmmod-panic">
+<h3>卸载 Wi-Fi 驱动时设备崩溃（6.18、7.2）</h3>
+<p>直到 v2026.10.20，在 6.18 或 7.2 上执行 <code>rmmod sprd_wlan_combo</code> 会在一秒内崩溃（<code>__run_timers</code>：驱动在已释放的内存里留下了一个还在跑的定时器；issue #146）。从 v2026.10.21 起已修复。在旧版本上不要卸载这个模块，改为重启设备。</p>
+</section>
+
+<section id="wlan-log-noise">
+<h3>日志里每隔几秒就是一条 <code>sprd-wlan</code> 错误</h3>
+<p><code>dmesg</code> 和 <code>logread</code> 里大约每六秒出现一次错误级别的 <code>sc2355_dump_survey, idx 0</code>、<code>bssid not found, multicast?</code> 或 <code>data len is 251, skb need 576</code> 之类的行（v2026.10.20 及之前的版本）。它们描述的是驱动的日常工作，不是故障（issue #140）。从 v2026.10.21 起它们成了调试行，只有你主动打开才会显示：<code>echo 'module sprd_wlan_combo +p' &gt; /sys/kernel/debug/dynamic_debug/control</code>。旁边真正的错误仍然会记录。</p>
+</section>
+
+<section id="mmc1-dumps">
+<h3>F50 的日志里全是 <code>mmc1</code> 寄存器转储（6.18、7.2）</h3>
+<p>在 SD 卡槽空着的 F50 上，6.18 和 7.2 直到 v2026.10.21，<code>dmesg -l err</code> 里每隔几秒到几分钟就出现一次 <code>mmc1: Got command interrupt 0x00000001 even though no command operation was in progress</code>，后面跟着 16 行的 <code>SDHCI REGISTER DUMP</code>（issue #181）。主线内核的 EIC 驱动只映射了控制器六个 bank 中的三个，卡槽的卡检测线因此找不到，卡槽改为轮询：每秒初始化一张并不存在的卡，而主机对那条无人应答的命令迟到的回应就连同转储一起写进日志。从 v2026.10.22 起已修复：六个 bank 都映射了，卡槽有了真正的卡检测（一个中断），空卡槽在插入卡之前不会被碰。这些转储是噪音，不是故障；在旧版本上往卡槽里插一张卡（有卡时就没有转储），或者改用从来没有这个问题的 5.4。U30 Air 没有卡槽。</p>
+</section>
+
 <section id="wpa3">
 <h3>Wi-Fi 客户端连不上某个网络</h3>
 <p>只有 WPA3 的网络连不上（Wi-Fi 驱动没有 SAE）；把路由器设成 WPA2/WPA3 混合模式。另外，无线要么当热点要么当客户端，在开机时决定：它正在当热点时，<code>wifi-client connect</code> 会请你重启。</p>

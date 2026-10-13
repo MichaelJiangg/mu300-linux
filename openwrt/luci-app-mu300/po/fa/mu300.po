@@ -42,8 +42,38 @@ msgstr "توان"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "مرکز کنترل MU300: داشبورد وضعیت، قفل‌های شبکه، ترمینال AT و SMS"
+msgid "Terminal"
+msgstr "ترمینال"
+
+msgid "Terminal settings"
+msgstr "تنظیمات ترمینال"
+
+msgid "Overview"
+msgstr "نمای کلی"
+
+msgid "Profiles"
+msgstr "پروفایل‌ها"
+
+msgid "Subscriptions"
+msgstr "اشتراک‌ها"
+
+msgid "Engines"
+msgstr "موتورها"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "Logs"
+msgstr "گزارش‌ها"
+
+msgid "Packages after an update"
+msgstr "بسته‌ها پس از به‌روزرسانی"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "مرکز کنترل MU300: داشبورد وضعیت، قفل‌های شبکه، ترمینال AT، پیامک و VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "ترمینال: یک پوسته root روی دستگاه در مرورگر"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "شمارهٔ نامشخص"
 
 msgid "Select"
 msgstr "انتخاب"
+
+msgid "never"
+msgstr "هرگز"
+
+msgid "just now"
+msgstr "همین الان"
+
+msgid "%s ago"
+msgstr "%s پیش"
+
+msgid "Failed: %s"
+msgstr "ناموفق: %s"
+
+msgid "Management connection lost"
+msgstr "اتصال مدیریت قطع شد"
+
+msgid "Installing the VPN module"
+msgstr "در حال نصب ماژول VPN"
+
+msgid "Installing the engine"
+msgstr "در حال نصب موتور"
+
+msgid "Adding the subscription"
+msgstr "در حال افزودن اشتراک"
+
+msgid "Refreshing the subscriptions"
+msgstr "در حال به‌روزرسانی اشتراک‌ها"
+
+msgid "Testing the latency of every profile"
+msgstr "در حال سنجش تأخیر همه پروفایل‌ها"
+
+msgid "Downloading the config"
+msgstr "در حال دریافت پیکربندی"
+
+msgid "Working…"
+msgstr "در حال کار…"
+
+msgid "done"
+msgstr "انجام شد"
+
+msgid "failed"
+msgstr "ناموفق"
+
+msgid "Verify the uploaded file"
+msgstr "تأیید فایل بارگذاری‌شده"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "فایل بارگذاری‌شده با SHA256SUMS آخرین نسخهٔ ماژول VPN که از طریق HTTPS دریافت می‌شود بررسی می‌شود. اگر این ممکن نباشد (آفلاین، نسخهٔ قدیمی‌تر)، فقط در صورتی نصب می‌شود که اجازهٔ فایل تأییدنشده را بدهید: در این صورت بدون هیچ بررسی با دسترسی root اجرا می‌شود."
+
+msgid "Install it even if it cannot be verified"
+msgstr "نصب کن حتی اگر تأیید نشود"
+
+msgid "Install only a verified file"
+msgstr "فقط فایل تأییدشده نصب شود"
+
+msgid "Upload failed: %s"
+msgstr "بارگذاری ناموفق بود: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "ماژول VPN برای این پنل بیش از حد قدیمی است"
+
+msgid "The VPN module is not installed"
+msgstr "ماژول VPN نصب نیست"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "این صفحه به ماژول VPN با mu300-vpn قابل‌خواندن برای ماشین (ماژول v2 یا جدیدتر) نیاز دارد. به‌روزرسانی، پروفایل‌ها و تنظیمات را حفظ می‌کند."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN یک ماژول مستقل است: mu300-vpn با kill switch و پروفایل‌هایش، و یک افزونه برای هر موتور (Xray، sing-box، mihomo، dae). با mu300-extra install vpn نصب می‌شود."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "دریافت ماژول چند MB و برای هر موتور تا ده‌ها MB است: روی داده تلفن همراه از بسته شما کسر می‌شود."
+
+msgid "Update the VPN module"
+msgstr "به‌روزرسانی ماژول VPN"
+
+msgid "Install the VPN module"
+msgstr "نصب ماژول VPN"
+
+msgid "Upload the file…"
+msgstr "بارگذاری فایل…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "آفلاین: فایل mu300-linux-vpn-core.tar.gz (یا بسته mu300-linux-vpn.tar.gz) را از صفحه انتشارهای ماژول VPN بارگذاری کنید."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "این یک جست‌وجوی شبکه یا فرکانس است: یک تا سه دقیقه طول می‌کشد، در تمام این مدت کانال AT مودم را اشغال می‌کند و ممکن است داده تلفن همراه در این فاصله متوقف شود. در پس‌زمینه اجرا می‌شود؛ پاسخ پس از پایان اینجا نمایش داده می‌شود."
@@ -207,14 +324,8 @@ msgstr "جست‌وجو نقطه دسترسی Wi-Fi را برای لحظه‌ا�
 msgid "Scan anyway"
 msgstr "به‌هر‌حال جست‌وجو شود"
 
-msgid "Failed: %s"
-msgstr "ناموفق: %s"
-
 msgid "Saved"
 msgstr "ذخیره شد"
-
-msgid "Management connection lost"
-msgstr "اتصال مدیریت قطع شد"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "حرارتی"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "ناحیه‌های حرارتی هسته، فقط خواندنی. ناحیه‌ای که نقاط آستانه دارد، دستگاه‌های خنک‌کننده متصل به خود را در آستانه غیرفعال محدود می‌کند؛ وضعیت خنک‌کنندگی 0 یعنی بدون محدودسازی."
+
+msgid "Zone"
+msgstr "ناحیه"
+
+msgid "Temperature"
+msgstr "دما"
+
+msgid "Trip points"
+msgstr "نقاط آستانه"
+
+msgid "Cooling devices"
+msgstr "دستگاه‌های خنک‌کننده"
 
 msgid "USB role"
 msgstr "نقش USB"
@@ -489,8 +618,17 @@ msgstr "بدنه"
 msgid "Form (URL-encoded)"
 msgstr "فرم (کدگذاری URL)"
 
+msgid "Plain text"
+msgstr "متن ساده"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "فیلدها: sender، time، text، device، message (الگوی پرشده)"
+
+msgid "Custom body"
+msgstr "بدنهٔ سفارشی"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "خالی: فیلدهای استاندارد (متن ساده: پیام). جای‌نگهدارها: {sender}، {time}، {text}، {device}، {message}. هر مقدار متناسب با نوع انتخاب‌شده escape می‌شود. این بدنه دوباره اینجا نمایش داده می‌شود: اطلاعات محرمانه را در نشانی یا یک سرآیند بگذارید."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "سرآیندهای اضافی (هر سطر یک \"Name: value\")"
@@ -651,6 +789,9 @@ msgstr "کل ارسالی"
 msgid "Used today"
 msgstr "مصرف امروز"
 
+msgid "SIM source"
+msgstr "منبع سیم‌کارت"
+
 msgid "Session duration"
 msgstr "مدت نشست"
 
@@ -719,6 +860,9 @@ msgstr "مودم"
 
 msgid "Carrier"
 msgstr "اپراتور"
+
+msgid "Own number"
+msgstr "شماره خود"
 
 msgid "Module"
 msgstr "ماژول"
@@ -858,8 +1002,17 @@ msgstr "قفل ناموفق بود: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "در حال بازگرداندن قفل‌های شبکه به خودکار (راه‌اندازی مجدد SFUN، حدود ۳۰ ثانیه)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "بازنشانی ناموفق بود: %s. تنظیمات قفل ذخیره‌شده نگه داشته شدند."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "بازنشانی قفل‌ها به‌موقع تأیید نشد؛ به هر حال تغییر انجام می‌شود."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "سیم‌کارت داخلی انتخاب شده است: پس از راه‌اندازی مجدد استفاده می‌شود"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "سیم‌کارت داخلی انتخاب شده اما در این دستگاه پشتیبانی نمی‌شود: سیم‌کارت خارجی در حال استفاده است"
 
 msgid "Uptime %s"
 msgstr "زمان کارکرد %s"
@@ -990,9 +1143,6 @@ msgstr "بستهٔ زبان نصب شد"
 msgid "The language pack could not be installed"
 msgstr "نصب بستهٔ زبان ممکن نشد"
 
-msgid "Upload failed: %s"
-msgstr "بارگذاری ناموفق بود: %s"
-
 msgid "Language of the browser"
 msgstr "زبان مرورگر"
 
@@ -1013,9 +1163,6 @@ msgstr "بستهٔ زبان (mu300-extra-lang.tar.gz، حدود 2 MB) حدود 4
 
 msgid "Download from the release"
 msgstr "دانلود از نسخهٔ انتشار"
-
-msgid "Upload the file…"
-msgstr "بارگذاری فایل…"
 
 msgid "Release"
 msgstr "نسخهٔ انتشار"
@@ -1209,6 +1356,9 @@ msgstr "وضعیت تأیید شد"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "مهلت خواندن دوباره تمام شد؛ «تازه‌سازی وضعیت قفل» را انتخاب کنید"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "بازنشانی تأیید شد: حالت شبکه خودکار، EN-DC روشن، همه باندها، بدون قفل سلول؛ تنظیمات قفل ذخیره‌شده پاک شدند"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "اعمال شد (EN-DC نیازی به راه‌اندازی مجدد پشتهٔ رادیو ندارد)"
 
@@ -1235,6 +1385,114 @@ msgstr "خودکار (%d پشتیبانی‌شده)"
 
 msgid "%d locked: %s"
 msgstr "%d قفل‌شده: %s"
+
+msgid "Repair DNS?"
+msgstr "DNS ترمیم شود؟"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "این کار ارسال DNS بسته‌ای را که دیگر نصب نیست حذف می‌کند. اگر سرور DNS دیگری نماند، دستگاه از سرورهای DNS اتصال همراه استفاده می‌کند: اپراتور نام‌هایی را که جستجو می‌کنید، بیرون از هر پراکسی یا VPN، می‌بیند."
+
+msgid "Repair DNS"
+msgstr "ترمیم DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "بسته‌هایی که روی دستگاه نصب شده‌اند بخشی از ایمیج نسخه نیستند. به‌روزرسانی آن‌ها را ثبت می‌کند و سیستم جدید در اولین راه‌اندازی، به محض آنلاین شدن، دوباره نصبشان می‌کند. تا بازگشت بسته، تنظیماتش کنار گذاشته می‌شود."
+
+msgid "No packages to install again."
+msgstr "بسته‌ای برای نصب دوباره نیست."
+
+msgid "All back"
+msgstr "همه برگشتند"
+
+msgid "Not installed yet"
+msgstr "هنوز نصب نشده"
+
+msgid "Could not be installed again"
+msgstr "نصب دوباره ممکن نشد"
+
+msgid "Waiting for the internet"
+msgstr "در انتظار اینترنت"
+
+msgid "Given up: no internet at five boots"
+msgstr "رها شد: در پنج راه‌اندازی اینترنت نبود"
+
+msgid "Skipped"
+msgstr "رد شد"
+
+msgid "Written down by the update from %s"
+msgstr "ثبت‌شده توسط به‌روزرسانی از %s"
+
+msgid "Installed again"
+msgstr "دوباره نصب شدند"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "خودتان آن‌ها را از جایی که گرفته‌اید نصب کنید (یک فایل بسته: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "تنظیمات کنار گذاشته در /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS هنوز به بسته‌ای می‌رود که نصب نیست: دستگاه از طریق آن DNS ندارد."
+
+msgid "Try again"
+msgstr "تلاش دوباره"
+
+msgid "Dismiss the note"
+msgstr "بستن یادداشت"
+
+msgid "started"
+msgstr "آغاز شد"
+
+msgid "asleep now (asked)"
+msgstr "خواب اکنون (درخواستی)"
+
+msgid "woken: power daemon stopping"
+msgstr "بیدار شد: سرویس انرژی در حال توقف"
+
+msgid "woken by a key"
+msgstr "با یک کلید بیدار شد"
+
+msgid "woken by the Wi-Fi key"
+msgstr "با کلید Wi-Fi بیدار شد"
+
+msgid "woken (mu300-power wake)"
+msgstr "بیدار شد (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "با رایانه از طریق USB بیدار شد"
+
+msgid "woken: plugged in"
+msgstr "بیدار شد: به برق وصل شد"
+
+msgid "woken by a Wi-Fi client"
+msgstr "با یک کلاینت Wi-Fi بیدار شد"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "راه‌اندازی شارژ (با شارژر روشن شد)"
+
+msgid "the hotspot is down"
+msgstr "هات‌اسپات خاموش است"
+
+msgid "the VPN is still stopped"
+msgstr "VPN هنوز متوقف است"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) پس از ازسرگیری ناموفق هنوز خاموش است"
+
+msgid "self-check: %s"
+msgstr "خودآزمایی: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "خواب: %d دقیقه بدون کلاینت (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "خواب: پروفایل اکنون %s"
+
+msgid "woken by the %s key"
+msgstr "با کلید %s بیدار شد"
+
+msgid "the modem is suspended (%s)"
+msgstr "مودم معلق است (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "یک عدد صحیح از 0 تا %d وارد کنید"
@@ -1437,6 +1695,15 @@ msgstr "پیام (Enter برای ارسال، Shift+Enter برای خط جدید
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "ارسال از AT+CMGS (حالت PDU) استفاده می‌کند؛ اگر کانال مشغول است دوباره تلاش کنید. برای حذف یک پیام، از نماد سطل زباله روی حباب آن استفاده کنید."
 
+msgid "Sending…"
+msgstr "در حال ارسال…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "ارسال شد؛ فهرست به‌زودی تازه می‌شود."
+
+msgid "Sending failed"
+msgstr "ارسال ناموفق بود"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "در حال همگام‌سازی از SIM در پس‌زمینه (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "حذف شد (فقط محلی)"
 msgid "Enter both a number and a message."
 msgstr "هم شماره و هم پیام را وارد کنید."
 
-msgid "Sending…"
-msgstr "در حال ارسال…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "ارسال شد؛ فهرست به‌زودی تازه می‌شود."
-
-msgid "Sending failed"
-msgstr "ارسال ناموفق بود"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d پیام، %d خوانده‌نشده · %d گفت‌وگو"
 
@@ -1502,6 +1760,39 @@ msgstr "ناقص: %d از %d بخش رسید"
 
 msgid "Delete"
 msgstr "حذف"
+
+msgid "ttyd is not installed."
+msgstr "ttyd نصب نیست."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "ترمینال خاموش است (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "ترمینال‌های زیادی هم‌زمان باز می‌شوند. یک دقیقه دیگر دوباره امتحان کنید."
+
+msgid "The terminal is not available."
+msgstr "ترمینال در دسترس نیست."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "این یک پوسته root روی دستگاه است: هر فرمان با دسترسی کامل اجرا می‌شود و یک اشتباه می‌تواند دستگاه را از راه‌اندازی بازدارد."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "فقط از LAN (USB و هات‌اسپات) در دسترس است، هرگز از داده همراه، و فقط از همین صفحه‌ای که با آن وارد شده‌اید."
+
+msgid "It closes after a minute without activity."
+msgstr "پس از یک دقیقه بدون فعالیت بسته می‌شود."
+
+msgid "It closes after %d minutes without activity."
+msgstr "پس از %d دقیقه بدون فعالیت بسته می‌شود."
+
+msgid "Reconnect"
+msgstr "اتصال دوباره"
+
+msgid "Open in a new tab"
+msgstr "باز کردن در زبانه جدید"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "این صفحه با HTTPS باز شده و ترمینال روی LAN با HTTP ارائه می‌شود: در زبانه جداگانه‌ای باز می‌شود."
 
 msgid "The data usage could not be read"
 msgstr "مصرف داده خوانده نشد"
@@ -1637,6 +1928,594 @@ msgstr "خاموش کردن"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "با 64 هر بسته مانند ترافیک خود دستگاه خارج می‌شود"
+
+msgid "running"
+msgstr "در حال اجرا"
+
+msgid "(about %s)"
+msgstr "(حدود %s)"
+
+msgid "Install %s?"
+msgstr "%s نصب شود؟"
+
+msgid "It is installed from this system's package feed."
+msgstr "از مخزن بسته‌های همین سیستم نصب می‌شود."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "از انتشار ماژول VPN دریافت و با SHA256SUMS آن بررسی می‌شود."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "هر موتور ده‌ها MB حجم دارد: روی داده تلفن همراه دریافت آن از بسته شما کسر می‌شود."
+
+msgid "Install"
+msgstr "نصب"
+
+msgid "Remove %s?"
+msgstr "%s حذف شود؟"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "پروفایل‌هایی که از آن استفاده می‌کنند: %s. تا نصب دوباره نمی‌توانند شروع شوند (تا وقتی پروفایل در حال اجرا به آن نیاز دارد، ماژول حذف را نمی‌پذیرد)."
+
+msgid "No profile runs on it."
+msgstr "هیچ پروفایلی از آن استفاده نمی‌کند."
+
+msgid "Removed"
+msgstr "حذف شد"
+
+msgid "Check for updates"
+msgstr "بررسی به‌روزرسانی‌ها"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "هر موتور یک افزونه مستقل است: فقط آنچه پروفایل‌هایتان لازم دارند نصب کنید. Xray پیوندهای vless، vmess، trojan و ss را اجرا می‌کند (با hev-socks5-tunnel)، sing-box همان پیوندها و JSON خودش را، mihomo اشتراک‌های Clash را، و dae پروتکل‌های hysteria2، tuic و بقیه را روی هسته‌های جدیدتر. WireGuard و OpenVPN بسته‌های سیستم هستند."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "دریافت‌ها برای هر موتور ده‌ها MB است: روی داده تلفن همراه از بسته شما کسر می‌شود. آفلاین، فایل tarball موتور را از صفحه انتشارهای ماژول VPN بارگذاری کنید."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "نسخه‌های موجود از آخرین انتشار ماژول VPN می‌آیند."
+
+msgid "Update"
+msgstr "به‌روزرسانی"
+
+msgid "system package"
+msgstr "بسته سیستم"
+
+msgid "in the vpn bundle"
+msgstr "در بسته vpn"
+
+msgid "extra %s"
+msgstr "افزونه %s"
+
+msgid "not installed"
+msgstr "نصب نشده"
+
+msgid "cannot run here"
+msgstr "اینجا قابل اجرا نیست"
+
+msgid "update available"
+msgstr "به‌روزرسانی موجود است"
+
+msgid "installed"
+msgstr "نصب شده"
+
+msgid "Kind"
+msgstr "نوع"
+
+msgid "Version"
+msgstr "نسخه"
+
+msgid "Available"
+msgstr "موجود"
+
+msgid "not checked"
+msgstr "بررسی نشده"
+
+msgid "Size"
+msgstr "اندازه"
+
+msgid "Needed by"
+msgstr "مورد استفاده"
+
+msgid "no profile"
+msgstr "بدون پروفایل"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae به هسته‌ای با BTF و نسخه 5.17 یا جدیدتر نیاز دارد: نه هسته 5.4 سازنده (mu300-update kernel 6.18). با این حال می‌توان آن را نصب کرد."
+
+msgid "All engines"
+msgstr "همه موتورها"
+
+msgid "Last %s lines"
+msgstr "%s خط آخر"
+
+msgid "VPN service log"
+msgstr "گزارش سرویس VPN"
+
+msgid "Every 5 s"
+msgstr "هر 5 ثانیه"
+
+msgid "The log is empty."
+msgstr "گزارش خالی است."
+
+msgid "The VPN is starting"
+msgstr "VPN در حال شروع است"
+
+msgid "The VPN is stopped"
+msgstr "VPN متوقف است"
+
+msgid "The VPN is restarting"
+msgstr "VPN در حال راه‌اندازی مجدد است"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "با روشن بودن kill switch، هیچ چیز خارج از تونل از دستگاه یا LAN بیرون نمی‌رود: تا وقتی VPN قطع است، در حال شروع است یا خراب است، هر اتصال به‌جای خروج مستقیم ناموفق می‌شود. تا زمانی که VPN را از اینجا متوقف نکنید فعال می‌ماند (توقف آن را برمی‌دارد)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "بدون kill switch، هرگاه تونل قطع باشد (هنگام شروع، پس از خرابی، وقتی موتور نیست) ترافیک مستقیم و بدون محافظت بیرون می‌رود."
+
+msgid "Turn the kill switch on?"
+msgstr "kill switch روشن شود؟"
+
+msgid "Turn the kill switch off?"
+msgstr "kill switch خاموش شود؟"
+
+msgid "Turn on"
+msgstr "روشن کردن"
+
+msgid "unknown"
+msgstr "نامشخص"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "نشانی خروجی پیدا نشد (آیا تونل برقرار است؟)"
+
+msgid "Connecting…"
+msgstr "در حال اتصال…"
+
+msgid "On, but not running"
+msgstr "روشن، اما در حال اجرا نیست"
+
+msgid "Stopped"
+msgstr "متوقف شد"
+
+msgid "Install it"
+msgstr "نصب آن"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "موتور پروفایل فعال نصب نیست: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "kill switch تا زمان وجود آن همه‌چیز را بسته نگه می‌دارد؛ سرویس هر وقت بتواند خودش آن را دریافت می‌کند."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN تا نصب نشدن آن نمی‌تواند شروع شود."
+
+msgid "%s cannot run on this system"
+msgstr "%s نمی‌تواند روی این سیستم اجرا شود"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN روشن است، اما هیچ پروفایلی فعال نیست: یکی را در زیر انتخاب کنید."
+
+msgid "Profile: %s"
+msgstr "پروفایل: %s"
+
+msgid "No active profile"
+msgstr "بدون پروفایل فعال"
+
+msgid "engine %s"
+msgstr "موتور %s"
+
+msgid "interface %s"
+msgstr "رابط %s"
+
+msgid "Kill switch active"
+msgstr "kill switch فعال"
+
+msgid "Kill switch on"
+msgstr "kill switch روشن"
+
+msgid "Kill switch off"
+msgstr "kill switch خاموش"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 در تونل"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 مسدود"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 دست‌نخورده"
+
+msgid "Module %s"
+msgstr "ماژول %s"
+
+msgid "Check"
+msgstr "بررسی"
+
+msgid "Uptime"
+msgstr "مدت روشن بودن"
+
+msgid "Rate"
+msgstr "نرخ"
+
+msgid "Exit address"
+msgstr "نشانی خروجی"
+
+msgid "Start"
+msgstr "شروع"
+
+msgid "Stop"
+msgstr "توقف"
+
+msgid "Restart"
+msgstr "راه‌اندازی مجدد"
+
+msgid "Stop the VPN?"
+msgstr "VPN متوقف شود؟"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "ترافیک از آن پس بدون تونل و مستقیم بیرون می‌رود؛ kill switch هم همراه آن برداشته می‌شود."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN روشن است: پس از راه‌اندازی مجدد خودش دوباره شروع می‌شود."
+
+msgid "The VPN is off."
+msgstr "VPN خاموش است."
+
+msgid "Kill switch"
+msgstr "kill switch"
+
+msgid "Setting"
+msgstr "تنظیم"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "فعال: فقط تونل می‌تواند به اینترنت برسد"
+
+msgid "Not active"
+msgstr "غیرفعال"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "kill switch تا وقتی VPN قطع است همه ترافیک دستگاه و LAN را مسدود می‌کند، پس هیچ چیز هرگز بدون تونل بیرون نمی‌رود. اگر تونل بالا نیاید (سرور از کار افتاده، حساب منقضی‌شده)، دستگاه تا وقتی پروفایل را درست نکنید یا VPN را متوقف نکنید آفلاین می‌ماند. خود پنل از LAN در دسترس می‌ماند."
+
+msgid "Choose a profile"
+msgstr "یک پروفایل انتخاب کنید"
+
+msgid "No profiles yet"
+msgstr "هنوز پروفایلی نیست"
+
+msgid "engine not installed"
+msgstr "موتور نصب نیست"
+
+msgid "Use"
+msgstr "استفاده"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "تغییر کرد: VPN با پروفایل جدید دوباره راه می‌افتد"
+
+msgid "Active profile"
+msgstr "پروفایل فعال"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "VPN در حال اجرا با پروفایلی که انتخاب می‌کنید دوباره راه می‌افتد؛ kill switch در این فاصله فعال می‌ماند."
+
+msgid "Manage the profiles"
+msgstr "مدیریت پروفایل‌ها"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "خودکار: از طریق تونل هرجا موتور بتواند آن را حمل کند"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "از موتور IPv6 در تونل بخواه"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "هرگز از طریق تونل نه (تا وقتی VPN روشن است مسدود می‌شود)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "ذخیره شد: از شروع بعدی اعمال می‌شود (راه‌اندازی مجدد)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "تونل IPv6 را حمل می‌کند"
+
+msgid "Yes"
+msgstr "بله"
+
+msgid "IPv6 guard"
+msgstr "محافظ IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "فعال: IPv6 بیرون از تونل رد می‌شود"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "تا وقتی VPN روشن است، IPv6 هرگز در کنار تونلی که آن را حمل نمی‌کند بیرون نمی‌رود: بلافاصله رد می‌شود، پس برنامه‌ها و کلاینت‌های LAN به‌جای نشت یا انتظار به IPv4 برمی‌گردند. خودکار: WireGuard از نشانی‌های IPv6 پیکربندی خود استفاده می‌کند، موتورهای دیگر روی IPv4 می‌مانند."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: قابل سنجش نیست"
+
+msgid "blocked by the kill switch"
+msgstr "توسط kill switch مسدود شد"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "یک پیکربندی WireGuard یا OpenVPN، یک YAML از Clash/mihomo، یک JSON از Xray یا sing-box، یک پیکربندی dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "پس از تأیید، فایل را انتخاب کنید: یک .conf از WireGuard، یک .ovpn از OpenVPN، یک .yaml از Clash/mihomo، یک .json از Xray یا sing-box یا یک پیکربندی dae (حداکثر 1 MiB)."
+
+msgid "From the source"
+msgstr "از منبع"
+
+msgid "Detect"
+msgstr "تشخیص"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL ممکن است توکن داشته باشد: جداگانه به دستگاه می‌رسد و هرگز در خط فرمان یا گزارش نمی‌آید."
+
+msgid "Type"
+msgstr "نوع"
+
+msgid "Share link"
+msgstr "پیوند اشتراک‌گذاری"
+
+msgid "Paste"
+msgstr "چسباندن"
+
+msgid "File"
+msgstr "فایل"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "پیوند اشتراک‌گذاری‌ای نیست که این پنل بپذیرد"
+
+msgid "The config is empty"
+msgstr "پیکربندی خالی است"
+
+msgid "Not an https URL"
+msgstr "یک URL از نوع https نیست"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "نام نامعتبر: 1 تا 64 نویسه، بدون نویسه کنترلی"
+
+msgid "Add a profile"
+msgstr "افزودن پروفایل"
+
+msgid "Name"
+msgstr "نام"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "تشخیص: ماژول نوع را از پیوند یا فایل می‌فهمد. برای JSON که می‌تواند Xray یا sing-box باشد، یا برای پیوندی که باید روی موتور دیگری اجرا شود، نوع را انتخاب کنید."
+
+msgid "The profile is added"
+msgstr "پروفایل افزوده شد"
+
+msgid "Rename the profile"
+msgstr "تغییر نام پروفایل"
+
+msgid "Delete the profile %s?"
+msgstr "پروفایل %s حذف شود؟"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "این پروفایل فعال است: با روشن بودن VPN ماژول نمی‌پذیرد؛ ابتدا VPN را متوقف کنید یا پروفایل دیگری انتخاب کنید."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "پیکربندی و اعتبارنامه‌های آن از دستگاه حذف می‌شود."
+
+msgid "Deleted"
+msgstr "حذف شد"
+
+msgid "The profile passes the check"
+msgstr "پروفایل از بررسی عبور می‌کند"
+
+msgid "Show the config?"
+msgstr "پیکربندی نمایش داده شود؟"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "پیکربندی شامل اعتبارنامه‌های پروفایل (کلیدها، گذرواژه‌ها، UUID) است. فقط روی همین صفحه نمایش داده می‌شود؛ هر کسی که صفحه را ببیند می‌تواند آن را بخواند."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "ذخیره ابتدا پیکربندی را با موتور بررسی می‌کند (profile edit)؛ پیکربندی‌ای که از بررسی عبور نکند ذخیره نمی‌شود و قبلی می‌ماند."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "این پروفایل از یک اشتراک آمده است: تازه‌سازی بعدی آن تغییرات شما را جایگزین می‌کند."
+
+msgid "Config of %s"
+msgstr "پیکربندی %s"
+
+msgid "Close"
+msgstr "بستن"
+
+msgid "Rename"
+msgstr "تغییر نام"
+
+msgid "Show / edit the config"
+msgstr "نمایش / ویرایش پیکربندی"
+
+msgid "Test the latency of all"
+msgstr "سنجش تأخیر همه"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "هنوز پروفایلی نیست: یکی را از پیوند اشتراک‌گذاری، فایل پیکربندی یا اشتراک اضافه کنید."
+
+msgid "Active"
+msgstr "فعال"
+
+msgid "This profile is the active one now"
+msgstr "این پروفایل اکنون فعال است"
+
+msgid "More"
+msgstr "بیشتر"
+
+msgid "active"
+msgstr "فعال"
+
+msgid "subscription"
+msgstr "اشتراک"
+
+msgid "migrated"
+msgstr "منتقل‌شده"
+
+msgid "gone from its subscription"
+msgstr "از اشتراکش حذف شده"
+
+msgid "Server"
+msgstr "سرور"
+
+msgid "Engine"
+msgstr "موتور"
+
+msgid "Latency"
+msgstr "تأخیر"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "تأخیر یک اتصال TCP به سرور است، در صورت روشن بودن VPN از طریق تونل. سرورهای WireGuard و OpenVPN معمولاً UDP به کار می‌برند و این‌گونه قابل سنجش نیستند."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "یک نشانی IPv4 یا IPv6 وارد کنید"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "روشن: هیچ چیز بیرون از تونل نمی‌رود"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "خاموش: تا وقتی تونل قطع است ترافیک مستقیم بیرون می‌رود"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "بله: اتصال‌های خود Tailscale از تونل می‌گذرند"
+
+msgid "No: Tailscale connects directly"
+msgstr "خیر: Tailscale مستقیم وصل می‌شود"
+
+msgid "Routing"
+msgstr "مسیریابی"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "kill switch تا وقتی VPN قطع است همه ترافیک دستگاه و LAN را مسدود می‌کند."
+
+msgid "Bypass the tunnel"
+msgstr "دور زدن تونل"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "بازه‌های نشانی مانند 192.168.0.0/16 را با ویرگول جدا کنید"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "بازه‌های نشانی که هرگز وارد تونل نمی‌شوند، علاوه بر خود LAN (که هرگز نمی‌شود). خالی: فقط LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale از طریق VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "وقتی Tailscale روی دستگاه اجرا می‌شود، اتصال‌های WireGuard، DERP و کنترل آن از هر تونلی که در حال اجراست می‌گذرد (dae آن‌ها را مثل بقیه می‌گیرد)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS از طریق تونل"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "تحلیلگری که پرس‌وجوهای دستگاه و LAN از طریق تونل به آن می‌روند. هیچ چیز به تحلیلگر اپراتور نمی‌رود."
+
+msgid "Bootstrap DNS"
+msgstr "DNS راه‌اندازی اولیه"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "نشانی خود سرور VPN را پیش از برقراری تونل پیدا می‌کند (مستقیم، با اتصال خود موتور)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "خالی گذاشتن، تنظیم را به پیش‌فرض برمی‌گرداند."
+
+msgid "TUN stack"
+msgstr "پشته TUN"
+
+msgid "Default (gvisor)"
+msgstr "پیش‌فرض (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (روی هسته 5.4 نیست)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "تنظیم شده (بدون تغییر مگر مقدار جدیدی بنویسید)"
+
+msgid "not set"
+msgstr "تنظیم نشده"
+
+msgid "Upstream HTTP proxy"
+msgstr "پراکسی HTTP بالادستی"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "پین گواهی TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "host:port را وارد کنید"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "SHA-256 را به صورت هگزادسیمال وارد کنید"
+
+msgid "Profile options"
+msgstr "گزینه‌های پروفایل"
+
+msgid "None of the profiles has options of its type."
+msgstr "هیچ‌یک از پروفایل‌ها گزینه‌ای مخصوص نوع خود ندارند."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "حالت mihomo (rule، global، direct)، سطح‌های گزارش موتورها، گروه‌ها و مسیریابی dae بخشی از پیکربندی خود هر پروفایل هستند: VPN > پروفایل‌ها، نمایش / ویرایش پیکربندی."
+
+msgid "Delete the subscription %s?"
+msgstr "اشتراک %s حذف شود؟"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "پروفایل‌های آن می‌توانند همراه آن حذف شوند یا به صورت پروفایل مستقل بمانند. تا وقتی VPN روشن است، پروفایل فعال هرگز حذف نمی‌شود."
+
+msgid "Keep the profiles"
+msgstr "نگه داشتن پروفایل‌ها"
+
+msgid "Delete with its profiles"
+msgstr "حذف همراه پروفایل‌ها"
+
+msgid "Only by hand"
+msgstr "فقط دستی"
+
+msgid "Every %d h"
+msgstr "هر %d ساعت"
+
+msgid "Share links: one profile per link"
+msgstr "پیوندهای اشتراک‌گذاری: یک پروفایل برای هر پیوند"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "YAML از Clash/mihomo: یک پروفایل mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: یک پروفایل با همه گره‌ها در یک گروه"
+
+msgid "Add a subscription"
+msgstr "افزودن اشتراک"
+
+msgid "Format"
+msgstr "قالب"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL معمولاً توکن حساب شما را دارد: روی دستگاه فقط با دسترسی خواندن برای root ذخیره می‌شود و دیگر نشان داده نمی‌شود. اشتراک با اتصال خود دستگاه دریافت می‌شود: وقتی VPN روشن است از طریق تونل؛ با kill switch فعال و تونل قطع، دریافت نمی‌شود."
+
+msgid "Refresh all"
+msgstr "تازه‌سازی همه"
+
+msgid "No subscriptions yet."
+msgstr "هنوز اشتراکی نیست."
+
+msgid "Host"
+msgstr "میزبان"
+
+msgid "Updated"
+msgstr "به‌روزرسانی شد"
+
+msgid "Share links"
+msgstr "پیوندهای اشتراک‌گذاری"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "تازه‌سازی پروفایل‌هایی را که نامشان تغییر نکرده نگه می‌دارد، جدیدها را اضافه و رفته‌ها را حذف می‌کند (پروفایل فعال تا وقتی VPN روشن است می‌ماند و به‌عنوان رفته علامت می‌خورد). تازه‌سازی پروفایل فعال، VPN در حال اجرا را دوباره راه‌اندازی می‌کند."
 
 msgid "Dashboard info failed"
 msgstr "دریافت اطلاعات داشبورد ناموفق بود"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "آداپتور بسته‌ها پاسخ معتبری نداد"
+
+msgid "Invalid packages operation"
+msgstr "عملیات بسته نامعتبر"
+
 msgid "Request too large"
 msgstr "درخواست بیش از حد بزرگ است"
 
@@ -1820,6 +2705,150 @@ msgstr "پوشهٔ زمان اجرا امن نیست؛ چیزی اجرا نشد"
 
 msgid "No such method"
 msgstr "چنین متدی وجود ندارد"
+
+msgid "The VPN module refused the request"
+msgstr "ماژول VPN درخواست را رد کرد"
+
+msgid "The VPN panel is busy, try again"
+msgstr "پنل VPN مشغول است، دوباره تلاش کنید"
+
+msgid "Another VPN task is still running"
+msgstr "وظیفه VPN دیگری هنوز در حال اجراست"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "پارامتر exit_ip باید 0 یا 1 باشد"
+
+msgid "The VPN status could not be read"
+msgstr "وضعیت VPN خوانده نشد"
+
+msgid "The profiles could not be read"
+msgstr "پروفایل‌ها خوانده نشدند"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "پارامتر check باید 0 یا 1 باشد"
+
+msgid "The engines could not be read"
+msgstr "موتورها خوانده نشدند"
+
+msgid "The subscriptions could not be read"
+msgstr "اشتراک‌ها خوانده نشدند"
+
+msgid "The VPN settings could not be read"
+msgstr "تنظیمات VPN خوانده نشد"
+
+msgid "Unknown VPN operation"
+msgstr "عملیات VPN ناشناخته"
+
+msgid "The VPN could not be switched"
+msgstr "VPN تغییر نکرد"
+
+msgid "The kill switch is on or off"
+msgstr "kill switch روشن یا خاموش است"
+
+msgid "The kill switch could not be changed"
+msgstr "kill switch تغییر نکرد"
+
+msgid "Invalid profile id"
+msgstr "شناسه پروفایل نامعتبر"
+
+msgid "The profile could not be made the active one"
+msgstr "پروفایل فعال نشد"
+
+msgid "Unknown profile source"
+msgstr "منبع پروفایل ناشناخته"
+
+msgid "Unknown profile type"
+msgstr "نوع پروفایل ناشناخته"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "پیکربندی خالی است، بیش از حد بزرگ است یا نویسه کنترلی دارد"
+
+msgid "Invalid profile request"
+msgstr "درخواست پروفایل نامعتبر"
+
+msgid "A config from a URL takes the type it says"
+msgstr "پیکربندی‌ای که از URL می‌آید همان نوعی را می‌گیرد که خودش اعلام می‌کند"
+
+msgid "No uploaded file"
+msgstr "فایلی بارگذاری نشده"
+
+msgid "The file is larger than 1 MiB"
+msgstr "فایل بزرگ‌تر از 1 MiB است"
+
+msgid "The profile could not be added"
+msgstr "پروفایل افزوده نشد"
+
+msgid "The profile could not be renamed"
+msgstr "نام پروفایل تغییر نکرد"
+
+msgid "The profile could not be removed"
+msgstr "پروفایل حذف نشد"
+
+msgid "The profile does not pass the check"
+msgstr "پروفایل از بررسی عبور نمی‌کند"
+
+msgid "Unknown profile option"
+msgstr "گزینه پروفایل ناشناخته"
+
+msgid "Invalid value for this option"
+msgstr "مقدار نامعتبر برای این گزینه"
+
+msgid "The option could not be set"
+msgstr "گزینه تنظیم نشد"
+
+msgid "The config could not be read"
+msgstr "پیکربندی خوانده نشد"
+
+msgid "The config was not saved"
+msgstr "پیکربندی ذخیره نشد"
+
+msgid "The latency test failed"
+msgstr "سنجش تأخیر ناموفق بود"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "فاصلهٔ به‌روزرسانی ۱ تا ۹۹۹ ساعت است"
+
+msgid "Unknown subscription type"
+msgstr "نوع اشتراک ناشناخته"
+
+msgid "Invalid subscription id"
+msgstr "شناسه اشتراک نامعتبر"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "پارامتر keep باید 0 یا 1 باشد"
+
+msgid "The subscription could not be removed"
+msgstr "اشتراک حذف نشد"
+
+msgid "The file is too large"
+msgstr "فایل خیلی بزرگ است"
+
+msgid "Unknown engine"
+msgstr "موتور ناشناخته"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "پارامتر unverified باید 0 یا 1 باشد"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "این موتور یک بسته سیستم است: فایلی برای بارگذاری ندارد"
+
+msgid "The engine could not be removed"
+msgstr "موتور حذف نشد"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra روی این سیستم نیست"
+
+msgid "Unknown VPN setting"
+msgstr "تنظیم VPN ناشناخته"
+
+msgid "The setting could not be saved"
+msgstr "تنظیم ذخیره نشد"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "تعداد خطوط از 1 تا 1000 است"
+
+msgid "The log could not be read"
+msgstr "گزارش خوانده نشد"
 
 msgid "Radio did not come up"
 msgstr "رادیو روشن نشد"
@@ -1935,6 +2964,9 @@ msgstr "فهرست فیلتر نامعتبر (حداکثر ۵۰ سطر)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "نشانی webhook باید یک URL با http:// یا https:// باشد"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "بدنهٔ webhook بیش از حد طولانی است یا نویسهٔ کنترلی دارد"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "سرآیند نامعتبر (هر سطر یک \"Name: value\"؛ Host، Content-Type، Content-Length، Transfer-Encoding و Connection را دستگاه تنظیم می‌کند)"
 
@@ -1992,17 +3024,47 @@ msgstr "حذف بستهٔ زبان ممکن نشد"
 msgid "Lock cache unavailable"
 msgstr "حافظهٔ نهان قفل در دسترس نیست"
 
+msgid "The saved locks could not be cleared"
+msgstr "قفل‌های ذخیره‌شده پاک نشدند"
+
 msgid "No serving cell to lock to"
 msgstr "سلول سرویس‌دهنده‌ای برای قفل کردن نیست"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "مودم به پرس‌وجوی حالت پاسخ نداد؛ چیزی ارسال نشد"
+
+msgid "The modem refused a write"
+msgstr "مودم یک نوشتن را رد کرد"
+
+msgid "The read-back does not match the automatic values"
+msgstr "بازخوانی با مقادیر خودکار مطابقت ندارد"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "بازخوانی پس از راه‌اندازی مجدد پشته با مقادیر خودکار مطابقت ندارد"
+
+msgid "The reset was interrupted"
+msgstr "بازنشانی قطع شد"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "نصب دوباره بسته‌ها روی این سیستم در دسترس نیست"
+
+msgid "No packages were written down by an update"
+msgstr "هیچ به‌روزرسانی‌ای بسته‌ای ثبت نکرده است"
+
+msgid "Reinstalling is running already"
+msgstr "نصب دوباره در حال اجراست"
+
+msgid "The note could not be dropped"
+msgstr "یادداشت حذف نشد"
+
+msgid "Unknown packages operation"
+msgstr "عملیات بسته ناشناخته"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "مصرف داده در این سیستم در دسترس نیست"
-
-msgid "The setting could not be saved"
-msgstr "تنظیم ذخیره نشد"
 
 msgid "Unknown data usage operation"
 msgstr "عملیات ناشناخته مصرف داده"

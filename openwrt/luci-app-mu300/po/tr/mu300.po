@@ -42,8 +42,38 @@ msgstr "Güç"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300 kontrol merkezi: durum paneli, ağ kilitleri, AT terminali ve SMS"
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Terminal settings"
+msgstr "Terminal ayarları"
+
+msgid "Overview"
+msgstr "Genel bakış"
+
+msgid "Profiles"
+msgstr "Profiller"
+
+msgid "Subscriptions"
+msgstr "Abonelikler"
+
+msgid "Engines"
+msgstr "Motorlar"
+
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgid "Logs"
+msgstr "Günlükler"
+
+msgid "Packages after an update"
+msgstr "Güncellemeden sonraki paketler"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 kontrol merkezi: durum paneli, ağ kilitleri, AT terminali, SMS ve VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminal: tarayıcıda cihazın root kabuğu"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Bilinmeyen numara"
 
 msgid "Select"
 msgstr "Seç"
+
+msgid "never"
+msgstr "hiç"
+
+msgid "just now"
+msgstr "az önce"
+
+msgid "%s ago"
+msgstr "%s önce"
+
+msgid "Failed: %s"
+msgstr "Başarısız: %s"
+
+msgid "Management connection lost"
+msgstr "Yönetim bağlantısı kesildi"
+
+msgid "Installing the VPN module"
+msgstr "VPN modülü kuruluyor"
+
+msgid "Installing the engine"
+msgstr "Motor kuruluyor"
+
+msgid "Adding the subscription"
+msgstr "Abonelik ekleniyor"
+
+msgid "Refreshing the subscriptions"
+msgstr "Abonelikler yenileniyor"
+
+msgid "Testing the latency of every profile"
+msgstr "Tüm profillerin gecikmesi ölçülüyor"
+
+msgid "Downloading the config"
+msgstr "Yapılandırma indiriliyor"
+
+msgid "Working…"
+msgstr "Çalışıyor…"
+
+msgid "done"
+msgstr "tamamlandı"
+
+msgid "failed"
+msgstr "başarısız"
+
+msgid "Verify the uploaded file"
+msgstr "Yüklenen dosyayı doğrula"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Yüklenen dosya, VPN modülünün en son sürümünün HTTPS ile indirilen SHA256SUMS dosyasıyla denetlenir. Bu mümkün değilse (çevrimdışı, eski bir sürüm) yalnızca doğrulanmamış bir dosyaya izin verirseniz kurulur: o zaman hiçbir denetim olmadan root olarak çalışır."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Doğrulanamasa bile kur"
+
+msgid "Install only a verified file"
+msgstr "Yalnızca doğrulanmış dosyayı kur"
+
+msgid "Upload failed: %s"
+msgstr "Yükleme başarısız: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN modülü bu panel için çok eski"
+
+msgid "The VPN module is not installed"
+msgstr "VPN modülü kurulu değil"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Bu sayfa, makinece okunabilir mu300-vpn içeren VPN modülünü (modül v2 veya daha yenisi) gerektirir. Güncelleme profilleri ve ayarları korur."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN ayrı bir modüldür: kill switch'i ve profilleriyle mu300-vpn, ve her motor için bir ek paket (Xray, sing-box, mihomo, dae). mu300-extra install vpn ile kurulur."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "İndirme, modül için birkaç MB, her motor için onlarca MB'a kadardır: mobil veride paketinizden düşer."
+
+msgid "Update the VPN module"
+msgstr "VPN modülünü güncelle"
+
+msgid "Install the VPN module"
+msgstr "VPN modülünü kur"
+
+msgid "Upload the file…"
+msgstr "Dosyayı yükle…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Çevrimdışı: VPN modülünün sürüm sayfasından mu300-linux-vpn-core.tar.gz (veya paket hâli mu300-linux-vpn.tar.gz) dosyasını yükleyin."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Bu bir ağ veya frekans taramasıdır: bir ila üç dakika sürer, modemin AT kanalını bu süre boyunca meşgul eder ve bu arada mobil veri duraklayabilir. Arka planda çalışır; yanıt bittiğinde burada görünür."
@@ -207,14 +324,8 @@ msgstr "Tarama, Wi-Fi erişim noktasını bir anlığına kanalından ayırır: 
 msgid "Scan anyway"
 msgstr "Yine de tara"
 
-msgid "Failed: %s"
-msgstr "Başarısız: %s"
-
 msgid "Saved"
 msgstr "Kaydedildi"
-
-msgid "Management connection lost"
-msgstr "Yönetim bağlantısı kesildi"
 
 msgid "CPU profile unavailable"
 msgstr "İşlemci profili kullanılamıyor"
@@ -272,6 +383,24 @@ msgstr "Donanım azamisi"
 
 msgid "Frequencies in MHz."
 msgstr "Frekanslar MHz cinsinden."
+
+msgid "Thermal"
+msgstr "Sıcaklık"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Çekirdeğin sıcaklık bölgeleri, salt okunur. Eşik noktaları olan bir bölge, pasif eşiğinde kendisine bağlı soğutma aygıtlarını kısar; soğutma durumu 0, kısma yok demektir."
+
+msgid "Zone"
+msgstr "Bölge"
+
+msgid "Temperature"
+msgstr "Sıcaklık"
+
+msgid "Trip points"
+msgstr "Eşik noktaları"
+
+msgid "Cooling devices"
+msgstr "Soğutma aygıtları"
 
 msgid "USB role"
 msgstr "USB rolü"
@@ -489,8 +618,17 @@ msgstr "Gövde"
 msgid "Form (URL-encoded)"
 msgstr "Form (URL kodlu)"
 
+msgid "Plain text"
+msgstr "Düz metin"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Alanlar: sender, time, text, device, message (doldurulmuş şablon)"
+
+msgid "Custom body"
+msgstr "Özel gövde"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Boş: standart alanlar (düz metin: ileti). Yer tutucular: {sender}, {time}, {text}, {device}, {message}. Her değer seçilen türe göre kaçışlanır. Bu gövde burada yeniden gösterilir: gizli bilgileri adreste veya bir başlıkta tutun."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ek başlıklar (satır başına bir \"Ad: değer\")"
@@ -651,6 +789,9 @@ msgstr "Toplam gönderilen"
 msgid "Used today"
 msgstr "Bugün kullanılan"
 
+msgid "SIM source"
+msgstr "SIM kaynağı"
+
 msgid "Session duration"
 msgstr "Oturum süresi"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Operatör"
+
+msgid "Own number"
+msgstr "Kendi numarası"
 
 msgid "Module"
 msgstr "Modül"
@@ -858,8 +1002,17 @@ msgstr "Kilitleme başarısız: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Ağ kilitleri otomatiğe sıfırlanıyor (SFUN yeniden başlatma, yaklaşık 30 saniye)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Sıfırlama başarısız: %s. Kaydedilen kilit ayarları korundu."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Kilit sıfırlaması zamanında doğrulanamadı; yine de geçiliyor."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Dahili SIM seçildi: yeniden başlatmadan sonra kullanılır"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Dahili SIM seçildi, ancak bu cihazda desteklenmiyor: harici SIM kullanılıyor"
 
 msgid "Uptime %s"
 msgstr "Çalışma süresi %s"
@@ -990,9 +1143,6 @@ msgstr "Dil paketi kuruldu"
 msgid "The language pack could not be installed"
 msgstr "Dil paketi kurulamadı"
 
-msgid "Upload failed: %s"
-msgstr "Yükleme başarısız: %s"
-
 msgid "Language of the browser"
 msgstr "Tarayıcının dili"
 
@@ -1013,9 +1163,6 @@ msgstr "Dil paketi (mu300-extra-lang.tar.gz, yaklaşık 2 MB) LuCI’ye yaklaş�
 
 msgid "Download from the release"
 msgstr "Sürümden indir"
-
-msgid "Upload the file…"
-msgstr "Dosyayı yükle…"
 
 msgid "Release"
 msgstr "Sürüm"
@@ -1209,6 +1356,9 @@ msgstr "Durum doğrulandı"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Geri okuma zaman aşımına uğradı; “Kilit durumunu yenile”yi seçin"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Sıfırlama doğrulandı: ağ modu otomatik, EN-DC açık, tüm bantlar, hücre kilidi yok; kaydedilen kilit ayarları temizlendi"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Uygulandı (EN-DC için radyo yığını yeniden başlatılmaz)"
 
@@ -1235,6 +1385,114 @@ msgstr "Otomatik (%d destekleniyor)"
 
 msgid "%d locked: %s"
 msgstr "%d kilitli: %s"
+
+msgid "Repair DNS?"
+msgstr "DNS onarılsın mı?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Bu, artık kurulu olmayan bir paketin DNS yönlendiricisini kaldırır. Başka DNS sunucusu kalmazsa cihaz mobil bağlantının DNS sunucularını kullanır: operatör, aradığınız adları herhangi bir proxy veya VPN dışında görür."
+
+msgid "Repair DNS"
+msgstr "DNS'i onar"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Cihaza kurulan paketler sürüm imajının parçası değildir. Güncelleme onları not eder ve yeni sistem, çevrimiçi olduğunda ilk açılışında onları yeniden kurar. Bir paket geri gelene kadar ayarları kenara alınır."
+
+msgid "No packages to install again."
+msgstr "Yeniden kurulacak paket yok."
+
+msgid "All back"
+msgstr "Hepsi geri geldi"
+
+msgid "Not installed yet"
+msgstr "Henüz kurulmadı"
+
+msgid "Could not be installed again"
+msgstr "Yeniden kurulamadı"
+
+msgid "Waiting for the internet"
+msgstr "İnternet bekleniyor"
+
+msgid "Given up: no internet at five boots"
+msgstr "Vazgeçildi: beş açılışta internet yoktu"
+
+msgid "Skipped"
+msgstr "Atlandı"
+
+msgid "Written down by the update from %s"
+msgstr "%s güncellemesi tarafından not edildi"
+
+msgid "Installed again"
+msgstr "Yeniden kuruldu"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Bunları edindiğiniz yerden kendiniz kurun (bir paket dosyası: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "/etc/mu300/orphaned-config içinde kenara alınan ayarlar"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS hâlâ kurulu olmayan bir pakete gidiyor: cihazın onun üzerinden DNS'i yok."
+
+msgid "Try again"
+msgstr "Yeniden dene"
+
+msgid "Dismiss the note"
+msgstr "Notu kapat"
+
+msgid "started"
+msgstr "başlatıldı"
+
+msgid "asleep now (asked)"
+msgstr "şimdi uyku (istendi)"
+
+msgid "woken: power daemon stopping"
+msgstr "uyandı: güç servisi duruyor"
+
+msgid "woken by a key"
+msgstr "bir tuşla uyandı"
+
+msgid "woken by the Wi-Fi key"
+msgstr "Wi-Fi tuşuyla uyandı"
+
+msgid "woken (mu300-power wake)"
+msgstr "uyandı (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "USB'deki bir bilgisayarla uyandı"
+
+msgid "woken: plugged in"
+msgstr "uyandı: şarja takıldı"
+
+msgid "woken by a Wi-Fi client"
+msgstr "bir Wi-Fi istemcisiyle uyandı"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "şarj açılışı (şarj cihazı açtı)"
+
+msgid "the hotspot is down"
+msgstr "hotspot kapalı"
+
+msgid "the VPN is still stopped"
+msgstr "VPN hâlâ durmuş"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "başarısız devamdan sonra 5G (EN-DC) hâlâ kapalı"
+
+msgid "self-check: %s"
+msgstr "öz denetim: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "uyku: %d dk istemci yok (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "uyku: profil artık %s"
+
+msgid "woken by the %s key"
+msgstr "%s tuşuyla uyandı"
+
+msgid "the modem is suspended (%s)"
+msgstr "modem askıda (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "0 ile %d arasında bir tam sayı girin"
@@ -1437,6 +1695,15 @@ msgstr "Mesaj (göndermek için Enter, yeni satır için Shift+Enter)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Gönderme AT+CMGS (PDU modu) kullanır; kanal meşgulse yeniden deneyin. Bir mesajı silmek için balonundaki çöp kutusu simgesini kullanın."
 
+msgid "Sending…"
+msgstr "Gönderiliyor…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Gönderildi; liste birazdan yenilenecek."
+
+msgid "Sending failed"
+msgstr "Gönderme başarısız"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "SIM’den arka planda eşitleniyor (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Silindi (yalnızca yerel)"
 msgid "Enter both a number and a message."
 msgstr "Numara ve mesaj girin."
 
-msgid "Sending…"
-msgstr "Gönderiliyor…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Gönderildi; liste birazdan yenilenecek."
-
-msgid "Sending failed"
-msgstr "Gönderme başarısız"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaj, %d okunmamış · %d görüşme"
 
@@ -1502,6 +1760,39 @@ msgstr "Eksik: %d / %d parça ulaştı"
 
 msgid "Delete"
 msgstr "Sil"
+
+msgid "ttyd is not installed."
+msgstr "ttyd kurulu değil."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Terminal kapalı (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Aynı anda çok fazla terminal açılıyor. Bir dakika sonra yeniden deneyin."
+
+msgid "The terminal is not available."
+msgstr "Terminal kullanılamıyor."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Bu, cihazın root kabuğudur: her komut tam yetkiyle çalışır ve bir hata cihazı açılamaz hale getirebilir."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Yalnızca LAN'dan (USB ve hotspot) ve yalnızca oturum açılmış bu sayfadan erişilebilir; mobil veriden asla erişilemez."
+
+msgid "It closes after a minute without activity."
+msgstr "1 dakika işlem yapılmazsa kapanır."
+
+msgid "It closes after %d minutes without activity."
+msgstr "%d dakika işlem yapılmazsa kapanır."
+
+msgid "Reconnect"
+msgstr "Yeniden bağlan"
+
+msgid "Open in a new tab"
+msgstr "Yeni sekmede aç"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Bu sayfa HTTPS ile açıldı, terminal ise LAN'da HTTP ile sunuluyor: bu yüzden kendi sekmesinde açılır."
 
 msgid "The data usage could not be read"
 msgstr "Veri kullanımı okunamadı"
@@ -1637,6 +1928,594 @@ msgstr "Kapat"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "64, her paketin cihazın kendi trafiği gibi çıkmasını sağlar"
+
+msgid "running"
+msgstr "çalışıyor"
+
+msgid "(about %s)"
+msgstr "(yaklaşık %s)"
+
+msgid "Install %s?"
+msgstr "%s kurulsun mu?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Bu sistemin paket deposundan kurulur."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "VPN modülünün sürümünden indirilir ve SHA256SUMS ile doğrulanır."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Bir motor onlarca MB'tır: mobil veride indirme paketinizden düşer."
+
+msgid "Install"
+msgstr "Kur"
+
+msgid "Remove %s?"
+msgstr "%s kaldırılsın mı?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Bu motoru kullanan profiller: %s. Motor yeniden kurulana kadar başlatılamazlar (çalışan profil ona ihtiyaç duyarken modül kaldırmayı reddeder)."
+
+msgid "No profile runs on it."
+msgstr "Bu motoru kullanan profil yok."
+
+msgid "Removed"
+msgstr "Kaldırıldı"
+
+msgid "Check for updates"
+msgstr "Güncellemeleri denetle"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Her motor ayrı bir ek pakettir: yalnızca profillerinizin ihtiyaç duyduklarını kurun. Xray vless, vmess, trojan ve ss bağlantılarını (hev-socks5-tunnel ile), sing-box aynı bağlantıları ve kendi JSON'unu, mihomo Clash aboneliklerini, dae ise yeni çekirdeklerde hysteria2, tuic ve diğerlerini çalıştırır. WireGuard ve OpenVPN sistemin paketleridir."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "İndirmeler motor başına onlarca MB'tır: mobil veride paketinizden düşer. Çevrimdışıysanız motorun tar arşivini VPN modülünün sürüm sayfasından yükleyin."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Mevcut sürümler VPN modülünün en son sürümünden gelir."
+
+msgid "Update"
+msgstr "Güncelle"
+
+msgid "system package"
+msgstr "sistem paketi"
+
+msgid "in the vpn bundle"
+msgstr "vpn paketinin içinde"
+
+msgid "extra %s"
+msgstr "ek paket %s"
+
+msgid "not installed"
+msgstr "kurulu değil"
+
+msgid "cannot run here"
+msgstr "burada çalışamaz"
+
+msgid "update available"
+msgstr "güncelleme var"
+
+msgid "installed"
+msgstr "kurulu"
+
+msgid "Kind"
+msgstr "Paket türü"
+
+msgid "Version"
+msgstr "Sürüm"
+
+msgid "Available"
+msgstr "Mevcut"
+
+msgid "not checked"
+msgstr "denetlenmedi"
+
+msgid "Size"
+msgstr "Boyut"
+
+msgid "Needed by"
+msgstr "Kullanan profiller"
+
+msgid "no profile"
+msgstr "profil yok"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae, BTF içeren 5.17 veya daha yeni bir çekirdek ister: 5.4 üretici çekirdeğinde çalışmaz (mu300-update kernel 6.18). Yine de kurulabilir."
+
+msgid "All engines"
+msgstr "Tüm motorlar"
+
+msgid "Last %s lines"
+msgstr "Son %s satır"
+
+msgid "VPN service log"
+msgstr "VPN hizmet günlüğü"
+
+msgid "Every 5 s"
+msgstr "5 sn'de bir"
+
+msgid "The log is empty."
+msgstr "Günlük boş."
+
+msgid "The VPN is starting"
+msgstr "VPN başlatılıyor"
+
+msgid "The VPN is stopped"
+msgstr "VPN durduruldu"
+
+msgid "The VPN is restarting"
+msgstr "VPN yeniden başlatılıyor"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Kill switch açıkken cihazdan veya LAN'dan tünel dışına hiçbir şey çıkmaz: VPN kapalıyken, başlarken ya da bozukken her bağlantı doğrudan çıkmak yerine başarısız olur. VPN'i buradan durdurana kadar etkin kalır (Durdur onu kaldırır)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Kill switch olmadan, tünel kapalı olduğu her an (başlarken, bir çökmeden sonra, motor eksikken) trafik korumasız ve doğrudan çıkar."
+
+msgid "Turn the kill switch on?"
+msgstr "Kill switch açılsın mı?"
+
+msgid "Turn the kill switch off?"
+msgstr "Kill switch kapatılsın mı?"
+
+msgid "Turn on"
+msgstr "Aç"
+
+msgid "unknown"
+msgstr "bilinmiyor"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Çıkış adresi bulunamadı (tünel açık mı?)"
+
+msgid "Connecting…"
+msgstr "Bağlanıyor…"
+
+msgid "On, but not running"
+msgstr "Açık, ama çalışmıyor"
+
+msgid "Stopped"
+msgstr "Durduruldu"
+
+msgid "Install it"
+msgstr "Kur"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Etkin profilin motoru kurulu değil: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch o kurulana kadar her şeyi kapalı tutar; hizmet, mümkün olduğunda onu kendisi indirir."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "Kurulana kadar VPN başlatılamaz."
+
+msgid "%s cannot run on this system"
+msgstr "%s bu sistemde çalışamaz"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN açık, ama etkin bir profil yok: aşağıdan birini seçin."
+
+msgid "Profile: %s"
+msgstr "Profil: %s"
+
+msgid "No active profile"
+msgstr "Etkin profil yok"
+
+msgid "engine %s"
+msgstr "motor %s"
+
+msgid "interface %s"
+msgstr "arayüz %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch etkin"
+
+msgid "Kill switch on"
+msgstr "Kill switch açık"
+
+msgid "Kill switch off"
+msgstr "Kill switch kapalı"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 tünelde"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 engelli"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 olduğu gibi"
+
+msgid "Module %s"
+msgstr "Modül %s"
+
+msgid "Check"
+msgstr "Denetle"
+
+msgid "Uptime"
+msgstr "Çalışma süresi"
+
+msgid "Rate"
+msgstr "Hız"
+
+msgid "Exit address"
+msgstr "Çıkış adresi"
+
+msgid "Start"
+msgstr "Başlat"
+
+msgid "Stop"
+msgstr "Durdur"
+
+msgid "Restart"
+msgstr "Yeniden başlat"
+
+msgid "Stop the VPN?"
+msgstr "VPN durdurulsun mu?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Trafik bundan sonra tünelsiz, doğrudan çıkar; kill switch de onunla birlikte kaldırılır."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN açık: yeniden başlatmadan sonra kendiliğinden tekrar başlar."
+
+msgid "The VPN is off."
+msgstr "VPN kapalı."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Ayar"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Etkin: internete yalnızca tünel ulaşabilir"
+
+msgid "Not active"
+msgstr "Etkin değil"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch, VPN kapalıyken cihazın ve LAN'ın tüm trafiğini engeller; böylece tünel olmadan hiçbir şey dışarı çıkmaz. Tünel kurulamazsa (çalışmayan sunucu, süresi dolmuş hesap) siz profili düzeltene veya VPN'i durdurana kadar cihaz çevrimdışı kalır. Panelin kendisine LAN'dan erişilebilir kalır."
+
+msgid "Choose a profile"
+msgstr "Bir profil seçin"
+
+msgid "No profiles yet"
+msgstr "Henüz profil yok"
+
+msgid "engine not installed"
+msgstr "motor kurulu değil"
+
+msgid "Use"
+msgstr "Kullan"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Değiştirildi: VPN yeni profille yeniden başlıyor"
+
+msgid "Active profile"
+msgstr "Etkin profil"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Çalışan VPN seçtiğiniz profille yeniden başlar; arada kill switch etkin kalır."
+
+msgid "Manage the profiles"
+msgstr "Profilleri yönet"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Otomatik: motor taşıyabiliyorsa tünelden"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Motordan tünelde IPv6 iste"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Asla tünelden değil (VPN açıkken engellenir)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Kaydedildi: bir sonraki başlatmada geçerli olur (Yeniden başlat)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Tünel IPv6 taşıyor"
+
+msgid "Yes"
+msgstr "Evet"
+
+msgid "IPv6 guard"
+msgstr "IPv6 koruması"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Etkin: tünel dışındaki IPv6 reddediliyor"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "VPN açıkken IPv6, onu taşımayan bir tünelin yanından asla dışarı çıkmaz: hemen reddedilir; böylece programlar ve LAN istemcileri sızdırmak ya da beklemek yerine IPv4'e geçer. Otomatik: WireGuard yapılandırmasındaki IPv6 adreslerini kullanır, diğer motorlar IPv4'te kalır."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: ölçülemez"
+
+msgid "blocked by the kill switch"
+msgstr "kill switch engelledi"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "Bir WireGuard veya OpenVPN yapılandırması, Clash/mihomo YAML, Xray veya sing-box JSON, dae yapılandırması"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Tamam'dan sonra dosyayı seçin: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray veya sing-box .json ya da dae yapılandırması (en fazla 1 MiB)."
+
+msgid "From the source"
+msgstr "Kaynaktan"
+
+msgid "Detect"
+msgstr "Otomatik algıla"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL bir belirteç içerebilir: cihaza ayrı olarak gider, asla bir komut satırına veya günlüğe yazılmaz."
+
+msgid "Type"
+msgstr "Tür"
+
+msgid "Share link"
+msgstr "Paylaşım bağlantısı"
+
+msgid "Paste"
+msgstr "Yapıştır"
+
+msgid "File"
+msgstr "Dosya"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Bu panelin kabul ettiği bir paylaşım bağlantısı değil"
+
+msgid "The config is empty"
+msgstr "Yapılandırma boş"
+
+msgid "Not an https URL"
+msgstr "https URL'si değil"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Geçersiz ad: 1-64 karakter, denetim karakteri olmadan"
+
+msgid "Add a profile"
+msgstr "Profil ekle"
+
+msgid "Name"
+msgstr "Ad"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Algıla: modül türü bağlantıdan veya dosyadan anlar. Xray da sing-box da olabilecek bir JSON için ya da başka bir motorda çalışması gereken bir bağlantı için türü seçin."
+
+msgid "The profile is added"
+msgstr "Profil eklendi"
+
+msgid "Rename the profile"
+msgstr "Profili yeniden adlandır"
+
+msgid "Delete the profile %s?"
+msgstr "%s profili silinsin mi?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Bu etkin profil: VPN açıkken modül reddeder; önce VPN'i durdurun ya da başka bir profil seçin."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Yapılandırması ve kimlik bilgileri cihazdan silinir."
+
+msgid "Deleted"
+msgstr "Silindi"
+
+msgid "The profile passes the check"
+msgstr "Profil denetimi geçti"
+
+msgid "Show the config?"
+msgstr "Yapılandırma gösterilsin mi?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Yapılandırma profilin kimlik bilgilerini (anahtarlar, parolalar, UUID'ler) içerir. Yalnızca bu ekranda gösterilir; ekranı gören herkes okuyabilir."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Kaydetme, yapılandırmayı önce motorla denetler (profile edit); denetimi geçmeyen yapılandırma kaydedilmez, eskisi kalır."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Bu profil bir abonelikten geliyor: bir sonraki yenileme değişikliklerinizin yerine geçer."
+
+msgid "Config of %s"
+msgstr "%s yapılandırması"
+
+msgid "Close"
+msgstr "Kapat"
+
+msgid "Rename"
+msgstr "Yeniden adlandır"
+
+msgid "Show / edit the config"
+msgstr "Yapılandırmayı göster / düzenle"
+
+msgid "Test the latency of all"
+msgstr "Tümünün gecikmesini ölç"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Henüz profil yok: bir paylaşım bağlantısından, yapılandırma dosyasından veya abonelikten ekleyin."
+
+msgid "Active"
+msgstr "Etkin"
+
+msgid "This profile is the active one now"
+msgstr "Bu profil artık etkin"
+
+msgid "More"
+msgstr "Diğer"
+
+msgid "active"
+msgstr "etkin"
+
+msgid "subscription"
+msgstr "abonelik"
+
+msgid "migrated"
+msgstr "taşındı"
+
+msgid "gone from its subscription"
+msgstr "aboneliğinden kalktı"
+
+msgid "Server"
+msgstr "Sunucu"
+
+msgid "Engine"
+msgstr "Motor"
+
+msgid "Latency"
+msgstr "Gecikme"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Gecikme, sunucuya kurulan bir TCP bağlantısıdır; VPN açıkken tünel üzerinden. WireGuard ve OpenVPN sunucuları genellikle UDP kullanır ve bu yolla ölçülemez."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Bir IPv4 veya IPv6 adresi girin"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Açık: tünel dışına hiçbir şey çıkmaz"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Kapalı: tünel kapalıyken trafik doğrudan çıkar"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Evet: Tailscale'in kendi bağlantıları tünelden geçer"
+
+msgid "No: Tailscale connects directly"
+msgstr "Hayır: Tailscale doğrudan bağlanır"
+
+msgid "Routing"
+msgstr "Yönlendirme"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch, VPN kapalıyken cihazın ve LAN'ın tüm trafiğini engeller."
+
+msgid "Bypass the tunnel"
+msgstr "Tünel dışında kalsın"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "192.168.0.0/16 gibi adres aralıklarını virgülle ayırarak girin"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "LAN'ın kendisi dışında (o zaten hiçbir zaman girmez) tünele asla girmeyen adres aralıkları. Boş: yalnızca LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale VPN üzerinden"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Tailscale cihazda çalışırken WireGuard, DERP ve denetim bağlantıları hangi tünel çalışıyorsa ondan geçer (dae onları diğerleri gibi yakalar)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "Tünel üzerinden DNS"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Cihazın ve LAN'ın sorgularının tünel üzerinden gittiği çözümleyici. Operatörün çözümleyicisine hiçbir şey gitmez."
+
+msgid "Bootstrap DNS"
+msgstr "Başlangıç DNS'i"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Tünel kurulmadan önce VPN sunucusunun adresini bulur (doğrudan, motorun kendi bağlantısıyla)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Boş bırakmak ayarı varsayılanına döndürür."
+
+msgid "TUN stack"
+msgstr "TUN yığını"
+
+msgid "Default (gvisor)"
+msgstr "Varsayılan (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (5.4 çekirdeğinde değil)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "ayarlı (yenisini yazmazsanız değişmez)"
+
+msgid "not set"
+msgstr "ayarlı değil"
+
+msgid "Upstream HTTP proxy"
+msgstr "Üst HTTP vekil sunucusu"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS sertifika sabitlemesi (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "host:port girin"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "SHA-256 değerini onaltılık girin"
+
+msgid "Profile options"
+msgstr "Profil seçenekleri"
+
+msgid "None of the profiles has options of its type."
+msgstr "Profillerin hiçbirinin türüne özgü seçeneği yok."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomo'nun modu (rule, global, direct), motorların günlük düzeyleri, dae'nin grupları ve yönlendirmesi her profilin kendi yapılandırmasının parçasıdır: VPN > Profiller, Yapılandırmayı göster / düzenle."
+
+msgid "Delete the subscription %s?"
+msgstr "%s aboneliği silinsin mi?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Profilleri onunla birlikte silinebilir ya da bağımsız profiller olarak kalabilir. VPN açıkken etkin profil asla silinmez."
+
+msgid "Keep the profiles"
+msgstr "Profilleri koru"
+
+msgid "Delete with its profiles"
+msgstr "Profilleriyle birlikte sil"
+
+msgid "Only by hand"
+msgstr "Yalnızca elle"
+
+msgid "Every %d h"
+msgstr "%d saatte bir"
+
+msgid "Share links: one profile per link"
+msgstr "Paylaşım bağlantıları: her bağlantıya bir profil"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: tek bir mihomo profili"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: tüm düğümler tek grupta, tek profil"
+
+msgid "Add a subscription"
+msgstr "Abonelik ekle"
+
+msgid "Format"
+msgstr "Biçim"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL genellikle hesap belirtecinizi içerir: cihazda yalnızca root'un okuyabileceği şekilde saklanır ve bir daha gösterilmez. Abonelik cihazın kendi bağlantısıyla alınır: VPN açıkken tünel üzerinden; kill switch etkinken ve tünel kapalıyken alınamaz."
+
+msgid "Refresh all"
+msgstr "Tümünü yenile"
+
+msgid "No subscriptions yet."
+msgstr "Henüz abonelik yok."
+
+msgid "Host"
+msgstr "Sunucu adı"
+
+msgid "Updated"
+msgstr "Güncelleme"
+
+msgid "Share links"
+msgstr "Paylaşım bağlantıları"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Yenileme, adı değişmeyen profilleri korur, yenileri ekler ve kalkanları siler (VPN açıkken etkin profil kalkmış olarak işaretlenip korunur). Etkin profilin yenilenmesi çalışan VPN'i yeniden başlatır."
 
 msgid "Dashboard info failed"
 msgstr "Gösterge paneli bilgisi alınamadı"
@@ -1812,6 +2691,12 @@ msgstr "İşlemci bağdaştırıcısı geçerli bir yanıt vermedi"
 msgid "Invalid CPU profile"
 msgstr "Geçersiz işlemci profili"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Paket bağdaştırıcısı geçerli bir yanıt vermedi"
+
+msgid "Invalid packages operation"
+msgstr "Geçersiz paket işlemi"
+
 msgid "Request too large"
 msgstr "İstek çok büyük"
 
@@ -1820,6 +2705,150 @@ msgstr "Çalışma dizini güvenli değil; hiçbir şey çalıştırılmadı"
 
 msgid "No such method"
 msgstr "Böyle bir yöntem yok"
+
+msgid "The VPN module refused the request"
+msgstr "VPN modülü isteği reddetti"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN paneli meşgul, yeniden deneyin"
+
+msgid "Another VPN task is still running"
+msgstr "Başka bir VPN görevi hâlâ çalışıyor"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "exit_ip parametresi 0 veya 1 olmalı"
+
+msgid "The VPN status could not be read"
+msgstr "VPN durumu okunamadı"
+
+msgid "The profiles could not be read"
+msgstr "Profiller okunamadı"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "check parametresi 0 veya 1 olmalı"
+
+msgid "The engines could not be read"
+msgstr "Motorlar okunamadı"
+
+msgid "The subscriptions could not be read"
+msgstr "Abonelikler okunamadı"
+
+msgid "The VPN settings could not be read"
+msgstr "VPN ayarları okunamadı"
+
+msgid "Unknown VPN operation"
+msgstr "Bilinmeyen VPN işlemi"
+
+msgid "The VPN could not be switched"
+msgstr "VPN değiştirilemedi"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch açık ya da kapalı olabilir"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switch değiştirilemedi"
+
+msgid "Invalid profile id"
+msgstr "Geçersiz profil kimliği"
+
+msgid "The profile could not be made the active one"
+msgstr "Profil etkin yapılamadı"
+
+msgid "Unknown profile source"
+msgstr "Bilinmeyen profil kaynağı"
+
+msgid "Unknown profile type"
+msgstr "Bilinmeyen profil türü"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Yapılandırma boş, çok büyük ya da denetim karakterleri içeriyor"
+
+msgid "Invalid profile request"
+msgstr "Geçersiz profil isteği"
+
+msgid "A config from a URL takes the type it says"
+msgstr "URL'den gelen yapılandırma kendi belirttiği türü alır"
+
+msgid "No uploaded file"
+msgstr "Yüklenmiş dosya yok"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Dosya 1 MiB'tan büyük"
+
+msgid "The profile could not be added"
+msgstr "Profil eklenemedi"
+
+msgid "The profile could not be renamed"
+msgstr "Profil yeniden adlandırılamadı"
+
+msgid "The profile could not be removed"
+msgstr "Profil silinemedi"
+
+msgid "The profile does not pass the check"
+msgstr "Profil denetimi geçemedi"
+
+msgid "Unknown profile option"
+msgstr "Bilinmeyen profil seçeneği"
+
+msgid "Invalid value for this option"
+msgstr "Bu seçenek için geçersiz değer"
+
+msgid "The option could not be set"
+msgstr "Seçenek ayarlanamadı"
+
+msgid "The config could not be read"
+msgstr "Yapılandırma okunamadı"
+
+msgid "The config was not saved"
+msgstr "Yapılandırma kaydedilmedi"
+
+msgid "The latency test failed"
+msgstr "Gecikme ölçümü başarısız"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Yenileme aralığı 1 ile 999 saat arasında olmalı"
+
+msgid "Unknown subscription type"
+msgstr "Bilinmeyen abonelik türü"
+
+msgid "Invalid subscription id"
+msgstr "Geçersiz abonelik kimliği"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "keep parametresi 0 veya 1 olmalı"
+
+msgid "The subscription could not be removed"
+msgstr "Abonelik silinemedi"
+
+msgid "The file is too large"
+msgstr "Dosya çok büyük"
+
+msgid "Unknown engine"
+msgstr "Bilinmeyen motor"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "unverified parametresi 0 veya 1 olmalı"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Bu motor bir sistem paketi: yüklenecek dosyası yok"
+
+msgid "The engine could not be removed"
+msgstr "Motor kaldırılamadı"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra bu sistemde yok"
+
+msgid "Unknown VPN setting"
+msgstr "Bilinmeyen VPN ayarı"
+
+msgid "The setting could not be saved"
+msgstr "Ayar kaydedilemedi"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Satır sayısı 1 ile 1000 arasında olmalı"
+
+msgid "The log could not be read"
+msgstr "Günlük okunamadı"
 
 msgid "Radio did not come up"
 msgstr "Radyo açılmadı"
@@ -1935,6 +2964,9 @@ msgstr "Geçersiz filtre listesi (en fazla 50 satır)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Webhook adresi http:// veya https:// ile başlayan bir URL olmalı"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Webhook gövdesi çok uzun veya bir denetim karakteri içeriyor"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Geçersiz başlık (satır başına bir \"Ad: değer\"; Host, Content-Type, Content-Length, Transfer-Encoding ve Connection cihaz tarafından ayarlanır)"
 
@@ -1992,17 +3024,47 @@ msgstr "Dil paketi kaldırılamadı"
 msgid "Lock cache unavailable"
 msgstr "Kilit önbelleği kullanılamıyor"
 
+msgid "The saved locks could not be cleared"
+msgstr "Kaydedilen kilitler temizlenemedi"
+
 msgid "No serving cell to lock to"
 msgstr "Kilitlenecek hizmet hücresi yok"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modem mod sorgusunu yanıtlamadı; hiçbir şey gönderilmedi"
+
+msgid "The modem refused a write"
+msgstr "Modem bir yazmayı reddetti"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Geri okuma otomatik değerlerle eşleşmiyor"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Yığın yeniden başlatıldıktan sonraki geri okuma otomatik değerlerle eşleşmiyor"
+
+msgid "The reset was interrupted"
+msgstr "Sıfırlama yarıda kesildi"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Paketleri yeniden kurma bu sistemde kullanılamıyor"
+
+msgid "No packages were written down by an update"
+msgstr "Bir güncelleme tarafından not edilmiş paket yok"
+
+msgid "Reinstalling is running already"
+msgstr "Yeniden kurma zaten çalışıyor"
+
+msgid "The note could not be dropped"
+msgstr "Not kaldırılamadı"
+
+msgid "Unknown packages operation"
+msgstr "Bilinmeyen paket işlemi"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Veri kullanımı bu sistemde kullanılamıyor"
-
-msgid "The setting could not be saved"
-msgstr "Ayar kaydedilemedi"
 
 msgid "Unknown data usage operation"
 msgstr "Bilinmeyen veri kullanımı işlemi"

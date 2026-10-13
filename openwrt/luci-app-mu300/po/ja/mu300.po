@@ -42,8 +42,38 @@ msgstr "電源"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300 コントロールセンター: ステータスダッシュボード、ネットワークロック、AT ターミナル、SMS"
+msgid "Terminal"
+msgstr "ターミナル"
+
+msgid "Terminal settings"
+msgstr "ターミナルの設定"
+
+msgid "Overview"
+msgstr "概要"
+
+msgid "Profiles"
+msgstr "プロファイル"
+
+msgid "Subscriptions"
+msgstr "サブスクリプション"
+
+msgid "Engines"
+msgstr "エンジン"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Logs"
+msgstr "ログ"
+
+msgid "Packages after an update"
+msgstr "アップデート後のパッケージ"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 コントロールセンター: ステータスダッシュボード、ネットワークロック、AT ターミナル、SMS、VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "ターミナル: ブラウザーで使うデバイスの root シェル"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "不明な番号"
 
 msgid "Select"
 msgstr "選択"
+
+msgid "never"
+msgstr "なし"
+
+msgid "just now"
+msgstr "たった今"
+
+msgid "%s ago"
+msgstr "%s前"
+
+msgid "Failed: %s"
+msgstr "失敗: %s"
+
+msgid "Management connection lost"
+msgstr "管理接続が切断されました"
+
+msgid "Installing the VPN module"
+msgstr "VPN モジュールをインストール中"
+
+msgid "Installing the engine"
+msgstr "エンジンをインストール中"
+
+msgid "Adding the subscription"
+msgstr "サブスクリプションを追加中"
+
+msgid "Refreshing the subscriptions"
+msgstr "サブスクリプションを更新中"
+
+msgid "Testing the latency of every profile"
+msgstr "全プロファイルのレイテンシーをテスト中"
+
+msgid "Downloading the config"
+msgstr "設定をダウンロード中"
+
+msgid "Working…"
+msgstr "処理中…"
+
+msgid "done"
+msgstr "完了"
+
+msgid "failed"
+msgstr "失敗"
+
+msgid "Verify the uploaded file"
+msgstr "アップロードしたファイルを検証"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "アップロードしたファイルは、HTTPS でダウンロードした VPN モジュール最新リリースの SHA256SUMS と照合されます。照合できない場合 (オフライン、古いリリース) は、未検証ファイルを許可したときだけインストールされ、その場合は一切のチェックなしで root として実行されます。"
+
+msgid "Install it even if it cannot be verified"
+msgstr "検証できなくてもインストール"
+
+msgid "Install only a verified file"
+msgstr "検証済みのファイルのみインストール"
+
+msgid "Upload failed: %s"
+msgstr "アップロードに失敗しました: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN モジュールがこのパネルには古すぎます"
+
+msgid "The VPN module is not installed"
+msgstr "VPN モジュールがインストールされていません"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "このページには、機械可読な mu300-vpn を備えた VPN モジュール (モジュール v2 以降) が必要です。更新してもプロファイルと設定は保持されます。"
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN は独立したモジュールです: キルスイッチとプロファイルを備えた mu300-vpn と、エンジンごとに 1 つのエクストラ (Xray、sing-box、mihomo、dae) があります。mu300-extra install vpn でインストールします。"
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "ダウンロードサイズはモジュールで数 MB、エンジンごとに最大数十 MB です。モバイルデータ通信ではプランの通信量を消費します。"
+
+msgid "Update the VPN module"
+msgstr "VPN モジュールを更新"
+
+msgid "Install the VPN module"
+msgstr "VPN モジュールをインストール"
+
+msgid "Upload the file…"
+msgstr "ファイルをアップロード…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "オフライン: VPN モジュールのリリースページから mu300-linux-vpn-core.tar.gz (またはバンドル mu300-linux-vpn.tar.gz) をアップロードしてください。"
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "これはネットワークまたは周波数のスキャンです。1～3 分かかり、その間ずっとモデムの AT チャネルを占有し、モバイルデータが一時停止することがあります。バックグラウンドで実行され、終わると応答がここに表示されます。"
@@ -207,14 +324,8 @@ msgstr "スキャン中は Wi-Fi アクセスポイントが一時的にチャ�
 msgid "Scan anyway"
 msgstr "それでもスキャン"
 
-msgid "Failed: %s"
-msgstr "失敗: %s"
-
 msgid "Saved"
 msgstr "保存しました"
-
-msgid "Management connection lost"
-msgstr "管理接続が切断されました"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "温度管理"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "カーネルのサーマルゾーン（読み取り専用）。トリップポイントを持つゾーンは、パッシブトリップでそのゾーンに結び付けられた冷却デバイスを制限します。冷却状態 0 は制限なしです。"
+
+msgid "Zone"
+msgstr "ゾーン"
+
+msgid "Temperature"
+msgstr "温度"
+
+msgid "Trip points"
+msgstr "トリップポイント"
+
+msgid "Cooling devices"
+msgstr "冷却デバイス"
 
 msgid "USB role"
 msgstr "USB ロール"
@@ -489,8 +618,17 @@ msgstr "本文"
 msgid "Form (URL-encoded)"
 msgstr "フォーム（URL エンコード）"
 
+msgid "Plain text"
+msgstr "プレーンテキスト"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "フィールド: sender, time, text, device, message（埋め込み済みテンプレート）"
+
+msgid "Custom body"
+msgstr "カスタム本文"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "空欄: 標準のフィールド（プレーンテキスト: メッセージ）。プレースホルダー: {sender}、{time}、{text}、{device}、{message}。各値は選択した形式に合わせてエスケープされます。この本文はここに再表示されます。秘密情報はアドレスかヘッダーに入れてください。"
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "追加ヘッダー（1 行に 1 つの \"Name: value\"）"
@@ -651,6 +789,9 @@ msgstr "送信合計"
 msgid "Used today"
 msgstr "今日の使用量"
 
+msgid "SIM source"
+msgstr "SIM の選択"
+
 msgid "Session duration"
 msgstr "セッション時間"
 
@@ -719,6 +860,9 @@ msgstr "モデム"
 
 msgid "Carrier"
 msgstr "キャリア"
+
+msgid "Own number"
+msgstr "自分の番号"
 
 msgid "Module"
 msgstr "モジュール"
@@ -858,8 +1002,17 @@ msgstr "ロックに失敗しました: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "ネットワークロックを自動にリセットしています（SFUN 再起動、約 30 秒）…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "リセットに失敗しました: %s。保存されたロック設定は保持されました。"
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "ロックのリセットを時間内に確認できませんでした。そのまま切り替えます。"
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "内蔵 SIM を選択済み: 再起動後に使用されます"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "内蔵 SIM を選択済みですが、このデバイスでは対応していません: 外部 SIM を使用中です"
 
 msgid "Uptime %s"
 msgstr "稼働時間 %s"
@@ -990,9 +1143,6 @@ msgstr "言語パックをインストールしました"
 msgid "The language pack could not be installed"
 msgstr "言語パックをインストールできませんでした"
 
-msgid "Upload failed: %s"
-msgstr "アップロードに失敗しました: %s"
-
 msgid "Language of the browser"
 msgstr "ブラウザの言語"
 
@@ -1013,9 +1163,6 @@ msgstr "言語パック (mu300-extra-lang.tar.gz、約 2 MB) は LuCI に約 40 
 
 msgid "Download from the release"
 msgstr "リリースからダウンロード"
-
-msgid "Upload the file…"
-msgstr "ファイルをアップロード…"
 
 msgid "Release"
 msgstr "リリース"
@@ -1209,6 +1356,9 @@ msgstr "ステータスを確認しました"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "読み戻しがタイムアウトしました。「ロック状態を更新」を選択してください"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "リセットを確認しました: ネットワークモード自動、EN-DC オン、全バンド、セルロックなし。保存されたロック設定は消去されました"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "適用しました (EN-DC は無線スタックの再起動を必要としません)"
 
@@ -1235,6 +1385,114 @@ msgstr "自動 (%d 個対応)"
 
 msgid "%d locked: %s"
 msgstr "%d 件ロック中: %s"
+
+msgid "Repair DNS?"
+msgstr "DNS を修復しますか？"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "インストールされなくなったパッケージの DNS 転送先を削除します。ほかに DNS サーバーが残っていない場合、デバイスはモバイル回線の DNS サーバーを使います。通信事業者は、プロキシや VPN を経由せずに調べた名前を見ることができます。"
+
+msgid "Repair DNS"
+msgstr "DNS を修復"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "デバイスに入れたパッケージはリリースイメージに含まれません。アップデートがそれらを記録し、新しいシステムは初回起動時にオンラインになると再インストールします。パッケージが戻るまで、その設定は退避されます。"
+
+msgid "No packages to install again."
+msgstr "再インストールするパッケージはありません。"
+
+msgid "All back"
+msgstr "すべて復元済み"
+
+msgid "Not installed yet"
+msgstr "まだインストールされていません"
+
+msgid "Could not be installed again"
+msgstr "再インストールできませんでした"
+
+msgid "Waiting for the internet"
+msgstr "インターネット待ち"
+
+msgid "Given up: no internet at five boots"
+msgstr "中止：5 回の起動でインターネットなし"
+
+msgid "Skipped"
+msgstr "スキップ"
+
+msgid "Written down by the update from %s"
+msgstr "%s からのアップデートで記録"
+
+msgid "Installed again"
+msgstr "再インストール済み"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "入手元から自分でインストールしてください（パッケージファイル：apk add --allow-untrusted FILE.apk）。"
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "/etc/mu300/orphaned-config に退避された設定"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS がまだインストールされていないパッケージに向いています：それを通じた DNS は使えません。"
+
+msgid "Try again"
+msgstr "再試行"
+
+msgid "Dismiss the note"
+msgstr "通知を閉じる"
+
+msgid "started"
+msgstr "起動しました"
+
+msgid "asleep now (asked)"
+msgstr "今すぐスリープ（要求）"
+
+msgid "woken: power daemon stopping"
+msgstr "復帰：電源デーモン停止"
+
+msgid "woken by a key"
+msgstr "キーで復帰"
+
+msgid "woken by the Wi-Fi key"
+msgstr "Wi-Fi キーで復帰"
+
+msgid "woken (mu300-power wake)"
+msgstr "復帰（mu300-power wake）"
+
+msgid "woken by a computer on USB"
+msgstr "USB 接続のコンピューターで復帰"
+
+msgid "woken: plugged in"
+msgstr "復帰：電源に接続"
+
+msgid "woken by a Wi-Fi client"
+msgstr "Wi-Fi クライアントで復帰"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "充電起動（充電器で電源オン）"
+
+msgid "the hotspot is down"
+msgstr "ホットスポットはオフです"
+
+msgid "the VPN is still stopped"
+msgstr "VPN はまだ停止中です"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "再開に失敗したため 5G（EN-DC）はまだオフです"
+
+msgid "self-check: %s"
+msgstr "セルフチェック：%s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "スリープ：%d 分間クライアントなし（%s）"
+
+msgid "asleep: profile now %s"
+msgstr "スリープ：プロファイルは %s になりました"
+
+msgid "woken by the %s key"
+msgstr "%s キーで復帰"
+
+msgid "the modem is suspended (%s)"
+msgstr "モデムは一時停止中です（%s）"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "0 から %d までの整数を入力してください"
@@ -1437,6 +1695,15 @@ msgstr "メッセージ (Enter で送信、Shift+Enter で改行)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "送信には AT+CMGS (PDU モード) を使用します。チャネルがビジーの場合は再試行してください。1 件だけ削除するには、吹き出しのゴミ箱アイコンを使用します。"
 
+msgid "Sending…"
+msgstr "送信中…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "送信しました。まもなく一覧が更新されます。"
+
+msgid "Sending failed"
+msgstr "送信に失敗しました"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "バックグラウンドで SIM から同期しています (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "削除しました (ローカルのみ)"
 msgid "Enter both a number and a message."
 msgstr "番号とメッセージの両方を入力してください。"
 
-msgid "Sending…"
-msgstr "送信中…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "送信しました。まもなく一覧が更新されます。"
-
-msgid "Sending failed"
-msgstr "送信に失敗しました"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 件、未読 %d 件 · 会話 %d 件"
 
@@ -1502,6 +1760,39 @@ msgstr "不完全: %d / %d 部分が届きました"
 
 msgid "Delete"
 msgstr "削除"
+
+msgid "ttyd is not installed."
+msgstr "ttyd がインストールされていません。"
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "ターミナルはオフです (/etc/config/ttyd)。"
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "同時に開かれているターミナルが多すぎます。1 分後にもう一度お試しください。"
+
+msgid "The terminal is not available."
+msgstr "ターミナルは利用できません。"
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "これはデバイスの root シェルです。すべてのコマンドが完全な権限で実行され、操作を誤るとデバイスが起動しなくなることがあります。"
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "LAN (USB とホットスポット) からのみ、ログイン済みのこのページからのみ利用でき、モバイルデータ側からは決して届きません。"
+
+msgid "It closes after a minute without activity."
+msgstr "1 分間操作がないと閉じます。"
+
+msgid "It closes after %d minutes without activity."
+msgstr "%d 分間操作がないと閉じます。"
+
+msgid "Reconnect"
+msgstr "再接続"
+
+msgid "Open in a new tab"
+msgstr "新しいタブで開く"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "このページは HTTPS で開かれていますが、ターミナルは LAN 上の HTTP で提供されるため、別のタブで開きます。"
 
 msgid "The data usage could not be read"
 msgstr "データ使用量を読み取れませんでした"
@@ -1637,6 +1928,594 @@ msgstr "オフにする"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "64 にすると、すべてのパケットがデバイス自身の通信と同じように送出されます"
+
+msgid "running"
+msgstr "実行中"
+
+msgid "(about %s)"
+msgstr "(約 %s)"
+
+msgid "Install %s?"
+msgstr "%s をインストールしますか?"
+
+msgid "It is installed from this system's package feed."
+msgstr "このシステムのパッケージフィードからインストールされます。"
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "VPN モジュールのリリースからダウンロードされ、SHA256SUMS で検証されます。"
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "エンジンは数十 MB です。モバイルデータ通信ではダウンロードがプランの通信量を消費します。"
+
+msgid "Install"
+msgstr "インストール"
+
+msgid "Remove %s?"
+msgstr "%s を削除しますか?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "これで動作中のプロファイル: %s。再インストールするまで開始できません (実行中のプロファイルが必要としている間は、モジュールが削除を拒否します)。"
+
+msgid "No profile runs on it."
+msgstr "これで動作しているプロファイルはありません。"
+
+msgid "Removed"
+msgstr "削除しました"
+
+msgid "Check for updates"
+msgstr "更新を確認"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "各エンジンは独立したエクストラです: プロファイルに必要なものだけをインストールしてください。Xray は vless、vmess、trojan、ss のリンクを (hev-socks5-tunnel と併せて) 実行し、sing-box は同じリンクと独自の JSON、mihomo は Clash サブスクリプション、dae は新しいカーネルで hysteria2、tuic などを実行します。WireGuard と OpenVPN はシステムのパッケージです。"
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "ダウンロードはエンジンごとに数十 MB です。モバイルデータ通信ではプランの通信量を消費します。オフラインの場合は、VPN モジュールのリリースページからエンジンの tarball をアップロードしてください。"
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "利用可能なバージョンは VPN モジュールの最新リリースに基づきます。"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "system package"
+msgstr "システムパッケージ"
+
+msgid "in the vpn bundle"
+msgstr "vpn バンドルに含まれる"
+
+msgid "extra %s"
+msgstr "エクストラ %s"
+
+msgid "not installed"
+msgstr "未インストール"
+
+msgid "cannot run here"
+msgstr "ここでは実行できません"
+
+msgid "update available"
+msgstr "更新あり"
+
+msgid "installed"
+msgstr "インストール済み"
+
+msgid "Kind"
+msgstr "種類"
+
+msgid "Version"
+msgstr "バージョン"
+
+msgid "Available"
+msgstr "利用可能"
+
+msgid "not checked"
+msgstr "未確認"
+
+msgid "Size"
+msgstr "サイズ"
+
+msgid "Needed by"
+msgstr "使用元"
+
+msgid "no profile"
+msgstr "プロファイルなし"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae には BTF を備えた 5.17 以降のカーネルが必要です: 5.4 ベンダーカーネルでは動作しません (mu300-update kernel 6.18)。それでもインストールは可能です。"
+
+msgid "All engines"
+msgstr "すべてのエンジン"
+
+msgid "Last %s lines"
+msgstr "最後の %s 行"
+
+msgid "VPN service log"
+msgstr "VPN サービスログ"
+
+msgid "Every 5 s"
+msgstr "5 秒ごと"
+
+msgid "The log is empty."
+msgstr "ログは空です。"
+
+msgid "The VPN is starting"
+msgstr "VPN を開始しています"
+
+msgid "The VPN is stopped"
+msgstr "VPN は停止しています"
+
+msgid "The VPN is restarting"
+msgstr "VPN を再起動しています"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "キルスイッチがオンの間は、VPN が停止中・開始中・故障中のとき、デバイスや LAN からトンネル外へは何も出ません。接続は直接外へ出る代わりにすべて失敗します。ここで VPN を停止するまで有効なままです (停止するとキルスイッチも解除されます)。"
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "キルスイッチがない場合、トンネルが停止しているとき (開始中、クラッシュ後、エンジンがないとき) は、トラフィックが保護されないまま直接外へ出ます。"
+
+msgid "Turn the kill switch on?"
+msgstr "キルスイッチをオンにしますか?"
+
+msgid "Turn the kill switch off?"
+msgstr "キルスイッチをオフにしますか?"
+
+msgid "Turn on"
+msgstr "オンにする"
+
+msgid "unknown"
+msgstr "不明"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "出口アドレスが見つかりませんでした (トンネルは起動していますか?)"
+
+msgid "Connecting…"
+msgstr "接続中…"
+
+msgid "On, but not running"
+msgstr "オンですが、動作していません"
+
+msgid "Stopped"
+msgstr "停止しました"
+
+msgid "Install it"
+msgstr "インストール"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "有効なプロファイルのエンジンがインストールされていません: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "キルスイッチは、それが入るまですべてを遮断します。サービスは可能なときに自動でダウンロードします。"
+
+msgid "The VPN cannot start until it is installed."
+msgstr "インストールするまで VPN は開始できません。"
+
+msgid "%s cannot run on this system"
+msgstr "%s はこのシステムでは実行できません"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN はオンですが、有効なプロファイルがありません: 下から選択してください。"
+
+msgid "Profile: %s"
+msgstr "プロファイル: %s"
+
+msgid "No active profile"
+msgstr "有効なプロファイルなし"
+
+msgid "engine %s"
+msgstr "エンジン %s"
+
+msgid "interface %s"
+msgstr "インターフェース %s"
+
+msgid "Kill switch active"
+msgstr "キルスイッチ作動中"
+
+msgid "Kill switch on"
+msgstr "キルスイッチ オン"
+
+msgid "Kill switch off"
+msgstr "キルスイッチ オフ"
+
+msgid "IPv6 in the tunnel"
+msgstr "トンネル内の IPv6"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 ブロック中"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 は未処理"
+
+msgid "Module %s"
+msgstr "モジュール %s"
+
+msgid "Check"
+msgstr "確認"
+
+msgid "Uptime"
+msgstr "稼働時間"
+
+msgid "Rate"
+msgstr "速度"
+
+msgid "Exit address"
+msgstr "出口アドレス"
+
+msgid "Start"
+msgstr "開始"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Restart"
+msgstr "再起動"
+
+msgid "Stop the VPN?"
+msgstr "VPN を停止しますか?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "その後、トラフィックはトンネルなしで直接外へ出ます。キルスイッチも一緒に解除されます。"
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN はオンです: 再起動後に自動で再び開始します。"
+
+msgid "The VPN is off."
+msgstr "VPN はオフです。"
+
+msgid "Kill switch"
+msgstr "キルスイッチ"
+
+msgid "Setting"
+msgstr "設定項目"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "有効: インターネットに届くのはトンネルだけ"
+
+msgid "Not active"
+msgstr "無効"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "キルスイッチは VPN が停止している間、デバイスと LAN のすべてのトラフィックを遮断するので、トンネルなしで外へ出るものはありません。トンネルが立ち上がらない場合 (サーバー停止、アカウント期限切れ) は、プロファイルを修正するか VPN を停止するまで、デバイスはオフラインのままです。パネル自体は LAN から引き続きアクセスできます。"
+
+msgid "Choose a profile"
+msgstr "プロファイルを選択"
+
+msgid "No profiles yet"
+msgstr "プロファイルはまだありません"
+
+msgid "engine not installed"
+msgstr "エンジン未インストール"
+
+msgid "Use"
+msgstr "使用"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "切り替えました: VPN は新しいプロファイルで再起動します"
+
+msgid "Active profile"
+msgstr "有効なプロファイル"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "実行中の VPN は選択したプロファイルで再起動します。その間もキルスイッチは有効なままです。"
+
+msgid "Manage the profiles"
+msgstr "プロファイルを管理"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "自動: エンジンが運べる場合はトンネル経由"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "エンジンにトンネル内の IPv6 を要求"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "トンネル経由にしない (VPN の稼働中はブロック)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "保存しました: 次回の開始から適用されます (再起動)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "トンネルが IPv6 を運ぶ"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid "IPv6 guard"
+msgstr "IPv6 ガード"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "有効: トンネル外の IPv6 は拒否されます"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "VPN の稼働中、IPv6 を運ばないトンネルの横から IPv6 が外へ出ることはありません。すぐに拒否されるので、プログラムや LAN クライアントは漏えいや待機ではなく IPv4 に切り替わります。自動: WireGuard は設定内の IPv6 アドレスを使い、他のエンジンは IPv4 のままです。"
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: テスト不可"
+
+msgid "blocked by the kill switch"
+msgstr "キルスイッチによりブロック"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "WireGuard または OpenVPN の設定、Clash/mihomo の YAML、Xray または sing-box の JSON、dae の設定"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "OK の後でファイルを選択してください: WireGuard の .conf、OpenVPN の .ovpn、Clash/mihomo の .yaml、Xray または sing-box の .json、または dae の設定 (最大 1 MiB)。"
+
+msgid "From the source"
+msgstr "ソースから"
+
+msgid "Detect"
+msgstr "検出"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL にはトークンが含まれる場合があります。デバイスには単独で送られ、コマンドラインやログには決して書かれません。"
+
+msgid "Type"
+msgstr "種類"
+
+msgid "Share link"
+msgstr "共有リンク"
+
+msgid "Paste"
+msgstr "貼り付け"
+
+msgid "File"
+msgstr "ファイル"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "このパネルが受け付ける共有リンクではありません"
+
+msgid "The config is empty"
+msgstr "設定が空です"
+
+msgid "Not an https URL"
+msgstr "https の URL ではありません"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "無効な名前: 1〜64 文字、制御文字は不可"
+
+msgid "Add a profile"
+msgstr "プロファイルを追加"
+
+msgid "Name"
+msgstr "名前"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "検出: モジュールがリンクまたはファイルから種類を判別します。Xray とも sing-box ともなり得る JSON や、別のエンジンで実行したいリンクの場合は、種類を選択してください。"
+
+msgid "The profile is added"
+msgstr "プロファイルを追加しました"
+
+msgid "Rename the profile"
+msgstr "プロファイル名を変更"
+
+msgid "Delete the profile %s?"
+msgstr "プロファイル %s を削除しますか?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "これは有効なプロファイルです: VPN がオンの間はモジュールが拒否します。先に VPN を停止するか、別のプロファイルを選択してください。"
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "その設定と認証情報はデバイスから削除されます。"
+
+msgid "Deleted"
+msgstr "削除しました"
+
+msgid "The profile passes the check"
+msgstr "プロファイルはチェックに合格しました"
+
+msgid "Show the config?"
+msgstr "設定を表示しますか?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "設定にはプロファイルの認証情報 (キー、パスワード、UUID) が含まれます。この画面にのみ表示されますが、画面を見られる人は誰でも読めます。"
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "保存時には、まずエンジンで設定をチェックします (profile edit)。チェックに通らない設定は保存されず、古いものが残ります。"
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "このプロファイルはサブスクリプション由来です: 次回の更新で変更は上書きされます。"
+
+msgid "Config of %s"
+msgstr "%s の設定"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Rename"
+msgstr "名前を変更"
+
+msgid "Show / edit the config"
+msgstr "設定を表示 / 編集"
+
+msgid "Test the latency of all"
+msgstr "すべてのレイテンシーをテスト"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "プロファイルはまだありません: 共有リンク、設定ファイル、サブスクリプションから追加してください。"
+
+msgid "Active"
+msgstr "有効"
+
+msgid "This profile is the active one now"
+msgstr "このプロファイルは現在有効です"
+
+msgid "More"
+msgstr "その他"
+
+msgid "active"
+msgstr "有効"
+
+msgid "subscription"
+msgstr "サブスクリプション"
+
+msgid "migrated"
+msgstr "移行済み"
+
+msgid "gone from its subscription"
+msgstr "サブスクリプションから消えました"
+
+msgid "Server"
+msgstr "サーバー"
+
+msgid "Engine"
+msgstr "エンジン"
+
+msgid "Latency"
+msgstr "レイテンシー"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "レイテンシーはサーバーへの TCP 接続で測定し、VPN がオンのときはトンネル経由です。WireGuard や OpenVPN のサーバーは通常 UDP を使うため、この方法ではテストできません。"
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "IPv4 または IPv6 アドレスを入力してください"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "オン: トンネル外へは何も出ません"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "オフ: トンネルが停止中はトラフィックが直接外へ出ます"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "はい: Tailscale 自身の接続もトンネルを通ります"
+
+msgid "No: Tailscale connects directly"
+msgstr "いいえ: Tailscale は直接接続します"
+
+msgid "Routing"
+msgstr "ルーティング"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "キルスイッチは VPN が停止している間、デバイスと LAN のすべてのトラフィックを遮断します。"
+
+msgid "Bypass the tunnel"
+msgstr "トンネルをバイパス"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "192.168.0.0/16 のようなアドレス範囲をカンマ区切りで入力してください"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "LAN 自体 (これは常に対象外) に加えて、トンネルに入れないアドレス範囲。空欄: LAN のみ。"
+
+msgid "Tailscale through the VPN"
+msgstr "VPN 経由の Tailscale"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "デバイスで Tailscale が動作しているとき、その WireGuard、DERP、コントロールの接続は、動作中のトンネルを通ります (dae は他の通信と同様にそれらを捕捉します)。"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "トンネル経由の DNS"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "デバイスと LAN の名前解決クエリがトンネル経由で送られるリゾルバー。通信事業者のリゾルバーには何も送られません。"
+
+msgid "Bootstrap DNS"
+msgstr "ブートストラップ DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "トンネルが立ち上がる前に VPN サーバー自身のアドレスを調べます (エンジン自身の接続で直接)。"
+
+msgid "Empty puts a setting back to its default."
+msgstr "空欄にすると設定は既定値に戻ります。"
+
+msgid "TUN stack"
+msgstr "TUN スタック"
+
+msgid "Default (gvisor)"
+msgstr "既定 (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (5.4 カーネルでは不可)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "設定済み (新しい値を入力しない限り変更されません)"
+
+msgid "not set"
+msgstr "未設定"
+
+msgid "Upstream HTTP proxy"
+msgstr "アップストリーム HTTP プロキシ"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS 証明書ピン (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "host:port を入力してください"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "SHA-256 を 16 進で入力してください"
+
+msgid "Profile options"
+msgstr "プロファイルオプション"
+
+msgid "None of the profiles has options of its type."
+msgstr "その種類のオプションを持つプロファイルはありません。"
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomo のモード (rule、global、direct)、エンジンのログレベル、dae のグループとルーティングは、各プロファイル自身の設定の一部です: VPN > プロファイル、設定を表示 / 編集。"
+
+msgid "Delete the subscription %s?"
+msgstr "サブスクリプション %s を削除しますか?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "そのプロファイルは一緒に削除することも、独立したプロファイルとして残すこともできます。VPN がオンの間、有効なプロファイルは削除されません。"
+
+msgid "Keep the profiles"
+msgstr "プロファイルを残す"
+
+msgid "Delete with its profiles"
+msgstr "プロファイルごと削除"
+
+msgid "Only by hand"
+msgstr "手動のみ"
+
+msgid "Every %d h"
+msgstr "%d 時間ごと"
+
+msgid "Share links: one profile per link"
+msgstr "共有リンク: リンクごとに 1 つのプロファイル"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: mihomo プロファイル 1 つ"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: すべてのノードを 1 グループにまとめた 1 つのプロファイル"
+
+msgid "Add a subscription"
+msgstr "サブスクリプションを追加"
+
+msgid "Format"
+msgstr "形式"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL には通常アカウントのトークンが含まれます。デバイス上では root のみ読める形で保存され、二度と表示されません。サブスクリプションはデバイス自身の接続で取得されます: VPN がオンのときはトンネル経由で、キルスイッチが有効でトンネルが停止中だと取得できません。"
+
+msgid "Refresh all"
+msgstr "すべて更新"
+
+msgid "No subscriptions yet."
+msgstr "サブスクリプションはまだありません。"
+
+msgid "Host"
+msgstr "ホスト"
+
+msgid "Updated"
+msgstr "更新日時"
+
+msgid "Share links"
+msgstr "共有リンク"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "更新では、名前が変わらないプロファイルは保持され、新しいものは追加され、なくなったものは削除されます (有効なプロファイルは VPN がオンの間は残り、消えたものとして表示されます)。有効なプロファイルの更新は、実行中の VPN を再起動します。"
 
 msgid "Dashboard info failed"
 msgstr "ダッシュボード情報の取得に失敗しました"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "パッケージアダプターから有効な応答がありません"
+
+msgid "Invalid packages operation"
+msgstr "無効なパッケージ操作"
+
 msgid "Request too large"
 msgstr "リクエストが大きすぎます"
 
@@ -1820,6 +2705,150 @@ msgstr "ランタイムディレクトリが安全ではありません。何も
 
 msgid "No such method"
 msgstr "該当するメソッドがありません"
+
+msgid "The VPN module refused the request"
+msgstr "VPN モジュールがリクエストを拒否しました"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN パネルは処理中です。再試行してください"
+
+msgid "Another VPN task is still running"
+msgstr "別の VPN タスクがまだ実行中です"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "exit_ip パラメーターは 0 または 1 にしてください"
+
+msgid "The VPN status could not be read"
+msgstr "VPN のステータスを読み取れませんでした"
+
+msgid "The profiles could not be read"
+msgstr "プロファイルを読み取れませんでした"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "check パラメーターは 0 または 1 にしてください"
+
+msgid "The engines could not be read"
+msgstr "エンジンを読み取れませんでした"
+
+msgid "The subscriptions could not be read"
+msgstr "サブスクリプションを読み取れませんでした"
+
+msgid "The VPN settings could not be read"
+msgstr "VPN の設定を読み取れませんでした"
+
+msgid "Unknown VPN operation"
+msgstr "不明な VPN 操作"
+
+msgid "The VPN could not be switched"
+msgstr "VPN を切り替えられませんでした"
+
+msgid "The kill switch is on or off"
+msgstr "キルスイッチはオンまたはオフです"
+
+msgid "The kill switch could not be changed"
+msgstr "キルスイッチを変更できませんでした"
+
+msgid "Invalid profile id"
+msgstr "無効なプロファイル ID"
+
+msgid "The profile could not be made the active one"
+msgstr "プロファイルを有効にできませんでした"
+
+msgid "Unknown profile source"
+msgstr "不明なプロファイルソース"
+
+msgid "Unknown profile type"
+msgstr "不明なプロファイルの種類"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "設定が空、大きすぎる、または制御文字を含んでいます"
+
+msgid "Invalid profile request"
+msgstr "無効なプロファイルリクエスト"
+
+msgid "A config from a URL takes the type it says"
+msgstr "URL からの設定は、そこに記載された種類になります"
+
+msgid "No uploaded file"
+msgstr "アップロードされたファイルがありません"
+
+msgid "The file is larger than 1 MiB"
+msgstr "ファイルが 1 MiB を超えています"
+
+msgid "The profile could not be added"
+msgstr "プロファイルを追加できませんでした"
+
+msgid "The profile could not be renamed"
+msgstr "プロファイル名を変更できませんでした"
+
+msgid "The profile could not be removed"
+msgstr "プロファイルを削除できませんでした"
+
+msgid "The profile does not pass the check"
+msgstr "プロファイルはチェックに合格しませんでした"
+
+msgid "Unknown profile option"
+msgstr "不明なプロファイルオプション"
+
+msgid "Invalid value for this option"
+msgstr "このオプションの値が無効です"
+
+msgid "The option could not be set"
+msgstr "オプションを設定できませんでした"
+
+msgid "The config could not be read"
+msgstr "設定を読み取れませんでした"
+
+msgid "The config was not saved"
+msgstr "設定は保存されませんでした"
+
+msgid "The latency test failed"
+msgstr "レイテンシーテストに失敗しました"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "更新間隔は 1〜999 時間です"
+
+msgid "Unknown subscription type"
+msgstr "不明なサブスクリプションの種類"
+
+msgid "Invalid subscription id"
+msgstr "無効なサブスクリプション ID"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "keep パラメーターは 0 または 1 にしてください"
+
+msgid "The subscription could not be removed"
+msgstr "サブスクリプションを削除できませんでした"
+
+msgid "The file is too large"
+msgstr "ファイルが大きすぎます"
+
+msgid "Unknown engine"
+msgstr "不明なエンジン"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "unverified パラメーターは 0 または 1 である必要があります"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "このエンジンはシステムパッケージです: アップロードするファイルはありません"
+
+msgid "The engine could not be removed"
+msgstr "エンジンを削除できませんでした"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra はこのシステムにありません"
+
+msgid "Unknown VPN setting"
+msgstr "不明な VPN 設定"
+
+msgid "The setting could not be saved"
+msgstr "設定を保存できませんでした"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "行数は 1〜1000 です"
+
+msgid "The log could not be read"
+msgstr "ログを読み取れませんでした"
 
 msgid "Radio did not come up"
 msgstr "無線を起動できませんでした"
@@ -1935,6 +2964,9 @@ msgstr "無効なフィルター一覧（最大 50 行）"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Webhook のアドレスは http:// または https:// の URL である必要があります"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Webhook の本文が長すぎるか、制御文字を含んでいます"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "無効なヘッダー（1 行に 1 つの \"Name: value\"。Host、Content-Type、Content-Length、Transfer-Encoding、Connection はデバイスが設定します）"
 
@@ -1992,17 +3024,47 @@ msgstr "言語パックを削除できませんでした"
 msgid "Lock cache unavailable"
 msgstr "ロックキャッシュを利用できません"
 
+msgid "The saved locks could not be cleared"
+msgstr "保存されたロックを消去できませんでした"
+
 msgid "No serving cell to lock to"
 msgstr "ロックできるサービングセルがありません"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "モデムがモード照会に応答しませんでした。何も送信されていません"
+
+msgid "The modem refused a write"
+msgstr "モデムが書き込みを拒否しました"
+
+msgid "The read-back does not match the automatic values"
+msgstr "読み戻し値が自動の値と一致しません"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "スタック再起動後の読み戻し値が自動の値と一致しません"
+
+msgid "The reset was interrupted"
+msgstr "リセットが中断されました"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "このシステムではパッケージの再インストールを利用できません"
+
+msgid "No packages were written down by an update"
+msgstr "アップデートで記録されたパッケージはありません"
+
+msgid "Reinstalling is running already"
+msgstr "再インストールはすでに実行中です"
+
+msgid "The note could not be dropped"
+msgstr "通知を削除できませんでした"
+
+msgid "Unknown packages operation"
+msgstr "不明なパッケージ操作"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "このシステムではデータ使用量を利用できません"
-
-msgid "The setting could not be saved"
-msgstr "設定を保存できませんでした"
 
 msgid "Unknown data usage operation"
 msgstr "不明なデータ使用量の操作"

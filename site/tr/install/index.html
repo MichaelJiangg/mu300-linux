@@ -376,9 +376,11 @@ kendisinden kurulabilir. Her sürümde her sistem ve çekirdek için bir zip var
 <li><strong>Kurun</strong>: Magisk uygulamasında (Modüller, Depodan yükle) ya da <code>adb shell</code>'den:
 <pre><code>su -c 'magisk --install-module /sdcard/Download/&lt;zip&gt;'</code></pre>
 Kurtarma (recovery) modundan değil.</li>
-<li><strong>Çıktıyı okuyun.</strong> Bulduğu cihazı, Linux'un nereye gittiğini, neyi yazdığını ve ürettiği şifreyi
-gösterir. Şifre <code>/data/adb/mu300-linux-password.txt</code> dosyasında da durur; ilk girişten sonra o dosyayı
-silin.</li>
+<li><strong>Çıktıyı okuyun.</strong> Bulduğu cihazı, Linux'un nereye gittiğini, neyi yazdığını ve hangi şifrenin
+geçerli olduğunu gösterir: imajların kendi şifresi - Ubuntu'da <code>ubuntu</code> kullanıcısının şifresi
+<code>ubuntu</code>, OpenWrt'de <code>root</code>'un siz belirleyene kadar şifresi yok (<code>passwd</code> ile ya da
+LuCI'de Sistem &gt; Yönetim); ayarlar dosyasındaki <code>MU300_PASSWORD</code> kendi şifrenizi belirler. Aynı not
+<code>/data/adb/mu300-linux-password.txt</code> dosyasında da durur.</li>
 <li><strong>Yeniden başlatın.</strong> Linux açılır; açılmazsa cihaz kendiliğinden Android'e döner.</li>
 </ol>
 <p>İki sistem için OpenWrt (ya da kontrol panelli OpenWrt) zip'ini ve Ubuntu zip'ini arka arkaya kurun. Zip'ler <code>userdata</code>'yı asla

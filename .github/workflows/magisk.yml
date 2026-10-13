@@ -53,3 +53,15 @@ jobs:
         run: cd tests && MU300_MAGISK_ZIPS="$GITHUB_WORKSPACE/out" python3 -m unittest test_magisk_zip -v
       - name: Attach to the release
         run: gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber out/*.zip out/SHA256SUMS-magisk
+      # the channel hears that the zips are there (tools/telegram-announce.sh; the release itself is announced by
+      # telegram.yml). The announce script of main, not of the tag: the message is not part of the release.
+      # (the secrets context is not available in a step's "if": the shell checks it - an "if" there makes the whole
+      # workflow file invalid, and GitHub then fails every run of it)
+      - name: Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          [ -n "$TELEGRAM_BOT_TOKEN" ] || { echo "no TELEGRAM_BOT_TOKEN secret: not announced"; exit 0; }
+          gh api "repos/$GITHUB_REPOSITORY/contents/tools/telegram-announce.sh" -H 'Accept: application/vnd.github.raw' > /tmp/announce.sh
+          sh /tmp/announce.sh zips "$TAG"

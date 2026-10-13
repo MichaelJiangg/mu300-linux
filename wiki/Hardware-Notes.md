@@ -52,6 +52,12 @@ The modem and a power-management co-processor are started by Android's own `mode
 own process name and expects Android's surroundings. Linux runs it, with `refnotify` and `cp_diskserver`, in a small
 Android sandbox (a chroot) with Android's libraries copied from **your** device.
 
+**Their own account (§41, v2026.10.20).** Android's `system` user is uid 1000, which on Ubuntu is the `ubuntu` login
+user: the daemons used to run as that user, and the modem's calibration partitions (`nr_fixnv*`, `persist`), which
+nothing can restore, were writable by it without `sudo`. Now `modem_control` and `refnotify` run as the system account
+`mu300vnd`, with only the capabilities they keep on Android, the device nodes they need belong to that account, the
+GPU nodes to `root:video`, and nothing in `/dev` is world-writable or owned by the login user.
+
 **The 290-second power cut.** Early on, Linux ran fine and then the power simply went off about 290 s after boot. A
 watchdog in the power co-processor was never told to stand down, because that message can only be sent after
 `modem_control` has started it. Running `modem_control` fixed it (§5).
@@ -83,7 +89,14 @@ the device lands in Android about 20 minutes later. The cause is still open.
 * **Battery (§33d, §36):** level, voltage, current, temperature and charging state in `mu300-toolkit`, the panel and
   `/sys/class/power_supply` on every kernel. Charging: on 5.4 by the vendor charger stack; on 6.18 and 7.2 by the
   `bq256xx` driver from v2026.10.12 on. `mu300-power` adds profiles (`plugged`, `battery`, `saver`, `auto`), idle radios
-  and an optional 80 % charge limit; charging pauses above 45 °C.
+  and a **charge limit** (from v2026.10.20: any value from 0 to 100 %, `sudo mu300-power charge-limit 80` or
+  `CHARGE_TO`; charging stops at the limit and resumes 5 points below it, 0 never charges, and the battery is never
+  held under 5 %; before: 100 or 80); charging pauses above 45 °C.
+* **Type-C current (§40, v2026.10.20, mainline kernels):** the charger used to take 500 mA from every port. Now the
+  PMIC's Type-C block is read and the larger of the BC1.2 and the Type-C (Rp) current is taken, 3 A capped to 2 A:
+  on a 1.5 or 3 A port the battery charges at about 1.6 A instead of 0.36 A.
+* **Host mode on outside power:** `sudo mu300-usb host` with something on VBUS (a powered hub) keeps the 5 V boost
+  off; on battery alone the boost supplies the 5 V as before.
 * **Charging boot:** a start caused by plugging in a charger stays a charging boot (LED blinking, hotspot and modem
   down) until the Wi-Fi key is pressed.
 * **LEDs (§33f):** battery (white: Linux is up), network (blue 4G, white 5G, red no service), Wi-Fi (white 2.4 GHz, blue

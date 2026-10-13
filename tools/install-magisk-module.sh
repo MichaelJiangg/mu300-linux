@@ -37,12 +37,12 @@ fi
 
 adb shell "rm -rf $TMP" >/dev/null 2>&1 || true
 adb shell "mkdir -p $TMP/system/bin" >/dev/null 2>&1
-for f in module.prop switch.sh action.sh; do
+for f in module.prop switch.sh action.sh bootchain.sh; do
     adb push "$SRC/$f" "$TMP/$f" >/dev/null 2>&1
 done
 adb push "$SRC/system/bin/mu300-linux" "$TMP/system/bin/mu300-linux" >/dev/null 2>&1
 
-su_do "rm -rf $MOD && mkdir -p $MOD/system/bin && cp -a $TMP/module.prop $TMP/switch.sh $TMP/action.sh $MOD/ && cp -a $TMP/system/bin/mu300-linux $MOD/system/bin/ && chown -R 0:0 $MOD && chmod 755 $MOD/switch.sh $MOD/action.sh $MOD/system/bin/mu300-linux && chmod 644 $MOD/module.prop && rm -rf $TMP && sync" >/dev/null
+su_do "rm -rf $MOD && mkdir -p $MOD/system/bin && cp -a $TMP/module.prop $TMP/switch.sh $TMP/action.sh $TMP/bootchain.sh $MOD/ && cp -a $TMP/system/bin/mu300-linux $MOD/system/bin/ && chown -R 0:0 $MOD && chmod 755 $MOD/switch.sh $MOD/action.sh $MOD/bootchain.sh $MOD/system/bin/mu300-linux && chmod 644 $MOD/module.prop && rm -rf $TMP && sync" >/dev/null
 
 ok=$(su_do "[ -x $MOD/switch.sh ] && echo yes")
 [ "$ok" = yes ] || { echo "the Magisk module did not land on the device" >&2; exit 1; }

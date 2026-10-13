@@ -52,6 +52,16 @@ does. See [Wi-Fi Hotspot and Client](Wi-Fi-Hotspot-and-Client).
 Yes, with the optional module (WireGuard, OpenVPN, VLESS/VMess/Trojan/Shadowsocks, Clash/mihomo, Xray/sing-box JSON),
 with a kill switch. See [VPN](VPN).
 
+### Is there a web page on Ubuntu too?
+Optionally, from v2026.10.20: `sudo mu300-extra install panel` adds Cockpit (Ubuntu's web console) with an MU300 page
+for the modem, SMS, VPN, power, Wi-Fi and updates, at `https://192.168.77.1:9090`, on the LAN only. See
+[Control Panel (LuCI)](Control-Panel-(LuCI)#a-web-panel-on-ubuntu-cockpit).
+
+### Can I use `adb shell` with Linux, like with Android?
+Yes, from v2026.10.20, and it is off by default: authorise your computer's key with `sudo mu300-usb adb key adbkey.pub`,
+then `sudo mu300-usb adb on`. Anyone whose key is authorised gets a root shell, and there is no way in without a key.
+See [Installation](Installation#adb-to-linux).
+
 ### Can I make calls or play sound?
 No. The board has no speaker or microphone; call audio is work in progress and carries no sound yet.
 
@@ -71,8 +81,8 @@ After a number of failed starts in a row (5 by default, 1-6 at your choice), the
 From Android, `su -c mu300-linux` starts Linux again.
 
 ### How do I update?
-`sudo mu300-update check`, then `sudo mu300-update apply`, then reboot. It never updates by itself. See
-[Updating](Updating).
+`sudo mu300-update check`, then `sudo mu300-update apply`, then reboot. It never updates by itself. From v2026.10.20
+the packages you installed yourself come back after the update. See [Updating](Updating).
 
 ### How do I remove it?
 Go back to Android and run `./uninstall.sh` (or `uninstall.ps1` / `uninstall.cmd`). See

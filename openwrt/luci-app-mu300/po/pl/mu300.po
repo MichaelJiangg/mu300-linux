@@ -42,8 +42,38 @@ msgstr "Zasilanie"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "Centrum sterowania MU300: panel stanu, blokady sieci, terminal AT i SMS"
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Terminal settings"
+msgstr "Ustawienia terminala"
+
+msgid "Overview"
+msgstr "Przegląd"
+
+msgid "Profiles"
+msgstr "Profile"
+
+msgid "Subscriptions"
+msgstr "Subskrypcje"
+
+msgid "Engines"
+msgstr "Silniki"
+
+msgid "Settings"
+msgstr "Ustawienia"
+
+msgid "Logs"
+msgstr "Dzienniki"
+
+msgid "Packages after an update"
+msgstr "Pakiety po aktualizacji"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "Centrum sterowania MU300: panel stanu, blokady sieci, terminal AT, SMS i VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminal: powłoka root urządzenia w przeglądarce"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Nieznany numer"
 
 msgid "Select"
 msgstr "Wybierz"
+
+msgid "never"
+msgstr "nigdy"
+
+msgid "just now"
+msgstr "przed chwilą"
+
+msgid "%s ago"
+msgstr "%s temu"
+
+msgid "Failed: %s"
+msgstr "Niepowodzenie: %s"
+
+msgid "Management connection lost"
+msgstr "Utracono połączenie zarządzające"
+
+msgid "Installing the VPN module"
+msgstr "Instalowanie modułu VPN"
+
+msgid "Installing the engine"
+msgstr "Instalowanie silnika"
+
+msgid "Adding the subscription"
+msgstr "Dodawanie subskrypcji"
+
+msgid "Refreshing the subscriptions"
+msgstr "Odświeżanie subskrypcji"
+
+msgid "Testing the latency of every profile"
+msgstr "Testowanie opóźnienia każdego profilu"
+
+msgid "Downloading the config"
+msgstr "Pobieranie konfiguracji"
+
+msgid "Working…"
+msgstr "Pracuję…"
+
+msgid "done"
+msgstr "gotowe"
+
+msgid "failed"
+msgstr "niepowodzenie"
+
+msgid "Verify the uploaded file"
+msgstr "Zweryfikuj przesłany plik"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Przesłany plik jest sprawdzany z SHA256SUMS najnowszego wydania modułu VPN, pobranym przez HTTPS. Jeśli to niemożliwe (offline, starsze wydanie), zostanie zainstalowany tylko wtedy, gdy zezwolisz na niezweryfikowany plik: uruchomi się wtedy jako root bez żadnej kontroli."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Zainstaluj, nawet jeśli nie można go zweryfikować"
+
+msgid "Install only a verified file"
+msgstr "Instaluj tylko zweryfikowany plik"
+
+msgid "Upload failed: %s"
+msgstr "Przesyłanie nie powiodło się: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "Moduł VPN jest zbyt stary dla tego panelu"
+
+msgid "The VPN module is not installed"
+msgstr "Moduł VPN nie jest zainstalowany"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Ta strona wymaga modułu VPN z maszynowo czytelnym mu300-vpn (moduł v2 lub nowszy). Aktualizacja zachowuje profile i ustawienia."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN to osobny moduł: mu300-vpn z kill switchem i profilami oraz po jednym dodatku na silnik (Xray, sing-box, mihomo, dae). Instaluje się go poleceniem mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Pobranie to kilka MB dla modułu i do kilkudziesięciu MB na silnik: przy danych mobilnych zużywa to Twój pakiet."
+
+msgid "Update the VPN module"
+msgstr "Zaktualizuj moduł VPN"
+
+msgid "Install the VPN module"
+msgstr "Zainstaluj moduł VPN"
+
+msgid "Upload the file…"
+msgstr "Prześlij plik…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Offline: wgraj mu300-linux-vpn-core.tar.gz (lub pakiet mu300-linux-vpn.tar.gz) ze strony wydania modułu VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "To skanowanie sieci lub częstotliwości: trwa od jednej do trzech minut, przez cały ten czas zajmuje kanał AT modemu, a dane komórkowe mogą w tym czasie się wstrzymać. Działa w tle; odpowiedź pojawi się tutaj po zakończeniu."
@@ -207,14 +324,8 @@ msgstr "Skanowanie na chwilę wyprowadza punkt dostępu Wi-Fi z jego kanału: po
 msgid "Scan anyway"
 msgstr "Skanuj mimo to"
 
-msgid "Failed: %s"
-msgstr "Niepowodzenie: %s"
-
 msgid "Saved"
 msgstr "Zapisano"
-
-msgid "Management connection lost"
-msgstr "Utracono połączenie zarządzające"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Termika"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Strefy termiczne jądra, tylko do odczytu. Strefa z punktami progowymi ogranicza przypisane do niej urządzenia chłodzące na swoim progu pasywnym; stan chłodzenia 0 oznacza brak ograniczenia."
+
+msgid "Zone"
+msgstr "Strefa"
+
+msgid "Temperature"
+msgstr "Temperatura"
+
+msgid "Trip points"
+msgstr "Punkty progowe"
+
+msgid "Cooling devices"
+msgstr "Urządzenia chłodzące"
 
 msgid "USB role"
 msgstr "Rola USB"
@@ -489,8 +618,17 @@ msgstr "Treść"
 msgid "Form (URL-encoded)"
 msgstr "Formularz (kodowanie URL)"
 
+msgid "Plain text"
+msgstr "Zwykły tekst"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Pola: sender, time, text, device, message (wypełniony szablon)"
+
+msgid "Custom body"
+msgstr "Własna treść"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Puste: pola standardowe (zwykły tekst: wiadomość). Symbole zastępcze: {sender}, {time}, {text}, {device}, {message}. Każda wartość jest poddawana escapowaniu zgodnie z wybranym typem. Ta treść jest tu ponownie wyświetlana: sekrety umieszczaj w adresie lub w nagłówku."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Dodatkowe nagłówki (jeden \"Nazwa: wartość\" w wierszu)"
@@ -651,6 +789,9 @@ msgstr "Wysłano łącznie"
 msgid "Used today"
 msgstr "Zużyto dziś"
 
+msgid "SIM source"
+msgstr "Źródło SIM"
+
 msgid "Session duration"
 msgstr "Czas sesji"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Operator"
+
+msgid "Own number"
+msgstr "Własny numer"
 
 msgid "Module"
 msgstr "Moduł"
@@ -858,8 +1002,17 @@ msgstr "Blokada nie powiodła się: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Resetowanie blokad sieci do automatycznych (restart SFUN, około 30 sekund)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Reset nie powiódł się: %s. Zapisane ustawienia blokad zostały zachowane."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Reset blokad nie został potwierdzony na czas; przełączanie mimo to."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Wybrano wewnętrzną kartę SIM: będzie używana po ponownym uruchomieniu"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Wybrano wewnętrzną kartę SIM, ale to urządzenie jej nie obsługuje: używana jest zewnętrzna karta SIM"
 
 msgid "Uptime %s"
 msgstr "Czas pracy %s"
@@ -990,9 +1143,6 @@ msgstr "Pakiet językowy został zainstalowany"
 msgid "The language pack could not be installed"
 msgstr "Nie udało się zainstalować pakietu językowego"
 
-msgid "Upload failed: %s"
-msgstr "Przesyłanie nie powiodło się: %s"
-
 msgid "Language of the browser"
 msgstr "Język przeglądarki"
 
@@ -1013,9 +1163,6 @@ msgstr "Pakiet językowy (mu300-extra-lang.tar.gz, około 2 MB) dodaje LuCI w ok
 
 msgid "Download from the release"
 msgstr "Pobierz z wydania"
-
-msgid "Upload the file…"
-msgstr "Prześlij plik…"
 
 msgid "Release"
 msgstr "Wydanie"
@@ -1209,6 +1356,9 @@ msgstr "Stan potwierdzony"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Przekroczono czas odczytu; wybierz „Odśwież stan blokad”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Reset zweryfikowany: tryb sieci automatyczny, EN-DC włączone, wszystkie pasma, brak blokady komórki; zapisane ustawienia blokad zostały usunięte"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Zastosowano (EN-DC nie wymaga restartu stosu radiowego)"
 
@@ -1235,6 +1385,114 @@ msgstr "Automatyczny (obsługiwanych: %d)"
 
 msgid "%d locked: %s"
 msgstr "Zablokowano %d: %s"
+
+msgid "Repair DNS?"
+msgstr "Naprawić DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "To usuwa przekierowanie DNS pakietu, który nie jest już zainstalowany. Jeśli nie zostanie żaden inny serwer DNS, urządzenie użyje serwerów DNS połączenia komórkowego: operator zobaczy nazwy, które wyszukujesz, z pominięciem proxy i VPN."
+
+msgid "Repair DNS"
+msgstr "Napraw DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Pakiety zainstalowane na urządzeniu nie są częścią obrazu wydania. Aktualizacja je zapisuje, a nowy system instaluje je ponownie przy pierwszym uruchomieniu, gdy tylko będzie online. Dopóki pakiet nie wróci, jego ustawienia są odłożone."
+
+msgid "No packages to install again."
+msgstr "Brak pakietów do ponownej instalacji."
+
+msgid "All back"
+msgstr "Wszystkie wróciły"
+
+msgid "Not installed yet"
+msgstr "Jeszcze niezainstalowany"
+
+msgid "Could not be installed again"
+msgstr "Nie udało się zainstalować ponownie"
+
+msgid "Waiting for the internet"
+msgstr "Oczekiwanie na internet"
+
+msgid "Given up: no internet at five boots"
+msgstr "Zaniechano: brak internetu przez pięć uruchomień"
+
+msgid "Skipped"
+msgstr "Pominięto"
+
+msgid "Written down by the update from %s"
+msgstr "Zapisane przez aktualizację z %s"
+
+msgid "Installed again"
+msgstr "Zainstalowane ponownie"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Zainstaluj je samodzielnie ze źródła, z którego je masz (plik pakietu: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Odłożone ustawienia w /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS nadal kieruje do niezainstalowanego pakietu: urządzenie nie ma przez niego DNS."
+
+msgid "Try again"
+msgstr "Spróbuj ponownie"
+
+msgid "Dismiss the note"
+msgstr "Zamknij powiadomienie"
+
+msgid "started"
+msgstr "uruchomiono"
+
+msgid "asleep now (asked)"
+msgstr "uśpienie teraz (na żądanie)"
+
+msgid "woken: power daemon stopping"
+msgstr "wybudzono: usługa zasilania kończy pracę"
+
+msgid "woken by a key"
+msgstr "wybudzono przyciskiem"
+
+msgid "woken by the Wi-Fi key"
+msgstr "wybudzono przyciskiem Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "wybudzono (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "wybudzono przez komputer na USB"
+
+msgid "woken: plugged in"
+msgstr "wybudzono: podłączono zasilanie"
+
+msgid "woken by a Wi-Fi client"
+msgstr "wybudzono przez klienta Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "start ładowania (włączony przez ładowarkę)"
+
+msgid "the hotspot is down"
+msgstr "hotspot jest wyłączony"
+
+msgid "the VPN is still stopped"
+msgstr "VPN jest nadal zatrzymany"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) jest nadal wyłączone po nieudanym wznowieniu"
+
+msgid "self-check: %s"
+msgstr "autotest: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "uśpiony: brak klientów od %d min (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "uśpiony: profil teraz %s"
+
+msgid "woken by the %s key"
+msgstr "wybudzono przyciskiem %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "modem jest wstrzymany (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Wpisz liczbę całkowitą od 0 do %d"
@@ -1437,6 +1695,15 @@ msgstr "Wiadomość (Enter wysyła, Shift+Enter nowa linia)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Wysyłanie używa AT+CMGS (tryb PDU); ponów, jeśli kanał jest zajęty. Aby usunąć jedną wiadomość, użyj ikony kosza na jej dymku."
 
+msgid "Sending…"
+msgstr "Wysyłanie…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Wysłano; lista wkrótce się odświeży."
+
+msgid "Sending failed"
+msgstr "Wysyłanie nie powiodło się"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Synchronizacja z SIM w tle (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Usunięto (tylko lokalnie)"
 msgid "Enter both a number and a message."
 msgstr "Wprowadź numer i wiadomość."
 
-msgid "Sending…"
-msgstr "Wysyłanie…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Wysłano; lista wkrótce się odświeży."
-
-msgid "Sending failed"
-msgstr "Wysyłanie nie powiodło się"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· wiadomości: %d, nieprzeczytane: %d · rozmowy: %d"
 
@@ -1502,6 +1760,39 @@ msgstr "Niekompletna: dotarło %d z %d części"
 
 msgid "Delete"
 msgstr "Usuń"
+
+msgid "ttyd is not installed."
+msgstr "ttyd nie jest zainstalowany."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Terminal jest wyłączony (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Zbyt wiele terminali otwiera się jednocześnie. Spróbuj ponownie za minutę."
+
+msgid "The terminal is not available."
+msgstr "Terminal jest niedostępny."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "To jest powłoka root urządzenia: każde polecenie działa z pełnymi uprawnieniami, a błąd może sprawić, że urządzenie się nie uruchomi."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Jest dostępny tylko z sieci LAN (USB i hotspot), nigdy z danych komórkowych, i tylko z tej zalogowanej strony."
+
+msgid "It closes after a minute without activity."
+msgstr "Zamyka się po minucie bezczynności."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Zamyka się po %d minutach bezczynności."
+
+msgid "Reconnect"
+msgstr "Połącz ponownie"
+
+msgid "Open in a new tab"
+msgstr "Otwórz w nowej karcie"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Ta strona została otwarta przez HTTPS, a terminal działa w sieci LAN przez HTTP: otwiera się w osobnej karcie."
 
 msgid "The data usage could not be read"
 msgstr "Nie udało się odczytać zużycia danych"
@@ -1637,6 +1928,594 @@ msgstr "Wyłącz"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Przy 64 każdy pakiet wychodzi jak własny ruch urządzenia"
+
+msgid "running"
+msgstr "działa"
+
+msgid "(about %s)"
+msgstr "(około %s)"
+
+msgid "Install %s?"
+msgstr "Zainstalować %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Zostanie zainstalowany z repozytorium pakietów tego systemu."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Zostanie pobrany z wydania modułu VPN i sprawdzony względem jego SHA256SUMS."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Silnik to kilkadziesiąt MB: przy danych mobilnych pobieranie zużywa Twój pakiet."
+
+msgid "Install"
+msgstr "Zainstaluj"
+
+msgid "Remove %s?"
+msgstr "Usunąć %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Profile, które na nim działają: %s. Nie uruchomią się, dopóki nie zostanie zainstalowany ponownie (moduł odmawia, gdy działający profil go potrzebuje)."
+
+msgid "No profile runs on it."
+msgstr "Żaden profil na nim nie działa."
+
+msgid "Removed"
+msgstr "Usunięto"
+
+msgid "Check for updates"
+msgstr "Sprawdź aktualizacje"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Każdy silnik to osobny dodatek: instaluj tylko te, których potrzebują Twoje profile. Xray obsługuje linki vless, vmess, trojan i ss (z hev-socks5-tunnel), sing-box te same linki i własny JSON, mihomo subskrypcje Clash, dae hysteria2, tuic i resztę na nowszych jądrach. WireGuard i OpenVPN są pakietami systemu."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Pobrania to kilkadziesiąt MB na silnik: przy danych mobilnych zużywają Twój pakiet. Offline wgraj archiwum tar silnika ze strony wydania modułu VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Dostępne wersje pochodzą z najnowszego wydania modułu VPN."
+
+msgid "Update"
+msgstr "Aktualizuj"
+
+msgid "system package"
+msgstr "pakiet systemowy"
+
+msgid "in the vpn bundle"
+msgstr "w pakiecie vpn"
+
+msgid "extra %s"
+msgstr "dodatek %s"
+
+msgid "not installed"
+msgstr "niezainstalowany"
+
+msgid "cannot run here"
+msgstr "nie może tu działać"
+
+msgid "update available"
+msgstr "dostępna aktualizacja"
+
+msgid "installed"
+msgstr "zainstalowany"
+
+msgid "Kind"
+msgstr "Rodzaj"
+
+msgid "Version"
+msgstr "Wersja"
+
+msgid "Available"
+msgstr "Dostępna"
+
+msgid "not checked"
+msgstr "nie sprawdzono"
+
+msgid "Size"
+msgstr "Rozmiar"
+
+msgid "Needed by"
+msgstr "Potrzebny dla"
+
+msgid "no profile"
+msgstr "brak profilu"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae wymaga jądra z BTF, w wersji 5.17 lub nowszej: nie działa na jądrze producenta 5.4 (mu300-update kernel 6.18). Można go mimo to zainstalować."
+
+msgid "All engines"
+msgstr "Wszystkie silniki"
+
+msgid "Last %s lines"
+msgstr "Ostatnie %s wierszy"
+
+msgid "VPN service log"
+msgstr "Dziennik usługi VPN"
+
+msgid "Every 5 s"
+msgstr "Co 5 s"
+
+msgid "The log is empty."
+msgstr "Dziennik jest pusty."
+
+msgid "The VPN is starting"
+msgstr "VPN się uruchamia"
+
+msgid "The VPN is stopped"
+msgstr "VPN jest zatrzymany"
+
+msgid "The VPN is restarting"
+msgstr "VPN jest restartowany"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Przy włączonym kill switchu nic nie opuszcza urządzenia ani sieci LAN poza tunelem: gdy VPN jest wyłączony, uruchamia się lub jest uszkodzony, każde połączenie kończy się niepowodzeniem zamiast wychodzić bezpośrednio. Pozostaje aktywny, dopóki nie zatrzymasz tu VPN (Zatrzymaj go usuwa)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Bez kill switcha ruch wychodzi bezpośrednio, bez ochrony, gdy tylko tunel nie działa (podczas uruchamiania, po awarii, gdy brakuje silnika)."
+
+msgid "Turn the kill switch on?"
+msgstr "Włączyć kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "Wyłączyć kill switch?"
+
+msgid "Turn on"
+msgstr "Włącz"
+
+msgid "unknown"
+msgstr "nieznany"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Nie znaleziono adresu wyjściowego (czy tunel działa?)"
+
+msgid "Connecting…"
+msgstr "Łączenie…"
+
+msgid "On, but not running"
+msgstr "Włączony, ale nie działa"
+
+msgid "Stopped"
+msgstr "Zatrzymany"
+
+msgid "Install it"
+msgstr "Zainstaluj"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Silnik aktywnego profilu nie jest zainstalowany: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch trzyma wszystko zamknięte, dopóki silnika nie będzie; usługa pobiera go sama, gdy może."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN nie może się uruchomić, dopóki nie zostanie zainstalowany."
+
+msgid "%s cannot run on this system"
+msgstr "%s nie może działać w tym systemie"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN jest włączony, ale żaden profil nie jest aktywny: wybierz jeden poniżej."
+
+msgid "Profile: %s"
+msgstr "Profil: %s"
+
+msgid "No active profile"
+msgstr "Brak aktywnego profilu"
+
+msgid "engine %s"
+msgstr "silnik %s"
+
+msgid "interface %s"
+msgstr "interfejs %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch aktywny"
+
+msgid "Kill switch on"
+msgstr "Kill switch włączony"
+
+msgid "Kill switch off"
+msgstr "Kill switch wyłączony"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 w tunelu"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 zablokowany"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 nietknięty"
+
+msgid "Module %s"
+msgstr "Moduł %s"
+
+msgid "Check"
+msgstr "Sprawdź"
+
+msgid "Uptime"
+msgstr "Czas działania"
+
+msgid "Rate"
+msgstr "Prędkość"
+
+msgid "Exit address"
+msgstr "Adres wyjściowy"
+
+msgid "Start"
+msgstr "Uruchom"
+
+msgid "Stop"
+msgstr "Zatrzymaj"
+
+msgid "Restart"
+msgstr "Uruchom ponownie"
+
+msgid "Stop the VPN?"
+msgstr "Zatrzymać VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Ruch będzie wtedy wychodził bezpośrednio, bez tunelu; kill switch zostaje wraz z nim zdjęty."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN jest włączony: po restarcie uruchomi się sam."
+
+msgid "The VPN is off."
+msgstr "VPN jest wyłączony."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Ustawienie"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Aktywny: do internetu ma dostęp tylko tunel"
+
+msgid "Not active"
+msgstr "Nieaktywny"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch blokuje cały ruch urządzenia i sieci LAN, gdy VPN nie działa, więc nic nigdy nie wychodzi bez tunelu. Jeśli tunel nie może się podnieść (martwy serwer, wygasłe konto), urządzenie pozostaje offline, dopóki nie naprawisz profilu lub nie zatrzymasz VPN. Sam panel pozostaje dostępny z sieci LAN."
+
+msgid "Choose a profile"
+msgstr "Wybierz profil"
+
+msgid "No profiles yet"
+msgstr "Brak profili"
+
+msgid "engine not installed"
+msgstr "silnik niezainstalowany"
+
+msgid "Use"
+msgstr "Użyj"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Przełączono: VPN uruchamia się ponownie z nowym profilem"
+
+msgid "Active profile"
+msgstr "Aktywny profil"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Działający VPN uruchamia się ponownie z wybranym profilem; kill switch pozostaje włączony w międzyczasie."
+
+msgid "Manage the profiles"
+msgstr "Zarządzaj profilami"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Automatycznie: przez tunel, jeśli silnik to obsłuży"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Poproś silnik o IPv6 w tunelu"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Nigdy przez tunel (blokowany, gdy VPN działa)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Zapisano: zadziała od następnego uruchomienia (Uruchom ponownie)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Tunel przenosi IPv6"
+
+msgid "Yes"
+msgstr "Tak"
+
+msgid "IPv6 guard"
+msgstr "Strażnik IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Aktywny: IPv6 poza tunelem jest odrzucany"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Gdy VPN działa, IPv6 nigdy nie wychodzi obok tunelu, który go nie przenosi: jest odrzucany od razu, więc programy i klienci LAN przechodzą na IPv4 zamiast przeciekać lub czekać. Automatycznie: WireGuard używa adresów IPv6 ze swojej konfiguracji, pozostałe silniki zostają przy IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: nie do przetestowania"
+
+msgid "blocked by the kill switch"
+msgstr "zablokowane przez kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "Konfiguracja WireGuard lub OpenVPN, YAML Clash/mihomo, JSON Xray lub sing-box, konfiguracja dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Po OK wybierz plik: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray lub sing-box .json albo konfigurację dae (maks. 1 MiB)."
+
+msgid "From the source"
+msgstr "Ze źródła"
+
+msgid "Detect"
+msgstr "Wykryj"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL może zawierać token: trafia na urządzenie osobno, nigdy do wiersza poleceń ani dziennika."
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Share link"
+msgstr "Link udostępniania"
+
+msgid "Paste"
+msgstr "Wklej"
+
+msgid "File"
+msgstr "Plik"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "To nie jest link udostępniania akceptowany przez ten panel"
+
+msgid "The config is empty"
+msgstr "Konfiguracja jest pusta"
+
+msgid "Not an https URL"
+msgstr "To nie jest adres URL https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Nieprawidłowa nazwa: 1-64 znaki, bez znaków sterujących"
+
+msgid "Add a profile"
+msgstr "Dodaj profil"
+
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Wykryj: moduł rozpoznaje rodzaj po linku lub pliku. Wybierz typ dla JSON, który może być Xray lub sing-box, albo dla linku, który ma działać na innym silniku."
+
+msgid "The profile is added"
+msgstr "Profil został dodany"
+
+msgid "Rename the profile"
+msgstr "Zmień nazwę profilu"
+
+msgid "Delete the profile %s?"
+msgstr "Usunąć profil %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "To aktywny profil: gdy VPN jest włączony, moduł odmawia; najpierw zatrzymaj VPN lub wybierz inny profil."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Jego konfiguracja i dane uwierzytelniające zostaną usunięte z urządzenia."
+
+msgid "Deleted"
+msgstr "Usunięto"
+
+msgid "The profile passes the check"
+msgstr "Profil przechodzi sprawdzenie"
+
+msgid "Show the config?"
+msgstr "Pokazać konfigurację?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Konfiguracja zawiera dane uwierzytelniające profilu (klucze, hasła, UUID-y). Jest pokazywana tylko na tym ekranie; każdy, kto widzi ekran, może ją przeczytać."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Zapis najpierw sprawdza konfigurację silnikiem (profile edit); konfiguracja, która nie przejdzie sprawdzenia, nie jest zapisywana, a stara zostaje."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Ten profil pochodzi z subskrypcji: jej następne odświeżenie zastąpi Twoje zmiany."
+
+msgid "Config of %s"
+msgstr "Konfiguracja %s"
+
+msgid "Close"
+msgstr "Zamknij"
+
+msgid "Rename"
+msgstr "Zmień nazwę"
+
+msgid "Show / edit the config"
+msgstr "Pokaż / edytuj konfigurację"
+
+msgid "Test the latency of all"
+msgstr "Przetestuj opóźnienie wszystkich"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Brak profili: dodaj profil z linku udostępniania, pliku konfiguracji lub subskrypcji."
+
+msgid "Active"
+msgstr "Aktywny"
+
+msgid "This profile is the active one now"
+msgstr "Ten profil jest teraz aktywny"
+
+msgid "More"
+msgstr "Więcej"
+
+msgid "active"
+msgstr "aktywny"
+
+msgid "subscription"
+msgstr "subskrypcja"
+
+msgid "migrated"
+msgstr "zmigrowany"
+
+msgid "gone from its subscription"
+msgstr "usunięty z subskrypcji"
+
+msgid "Server"
+msgstr "Serwer"
+
+msgid "Engine"
+msgstr "Silnik"
+
+msgid "Latency"
+msgstr "Opóźnienie"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Opóźnienie to połączenie TCP z serwerem, przez tunel, gdy VPN działa. Serwery WireGuard i OpenVPN zwykle używają UDP i nie da się ich tak przetestować."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Wpisz adres IPv4 lub IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Włączony: nic nie wychodzi poza tunelem"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Wyłączony: ruch wychodzi bezpośrednio, gdy tunel nie działa"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Tak: własne połączenia Tailscale idą przez tunel"
+
+msgid "No: Tailscale connects directly"
+msgstr "Nie: Tailscale łączy się bezpośrednio"
+
+msgid "Routing"
+msgstr "Routing"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch blokuje cały ruch urządzenia i sieci LAN, gdy VPN nie działa."
+
+msgid "Bypass the tunnel"
+msgstr "Omijaj tunel"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Wpisz zakresy adresów, np. 192.168.0.0/16, oddzielone przecinkami"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Zakresy adresów, które nigdy nie trafiają do tunelu, poza samą siecią LAN (która nigdy nie trafia). Puste: tylko LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale przez VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Gdy Tailscale działa na urządzeniu, jego połączenia WireGuard, DERP i sterujące idą przez działający tunel (dae przechwytuje je jak każde inne)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS przez tunel"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Resolver, do którego przez tunel trafiają zapytania urządzenia i sieci LAN. Nic nie trafia do resolvera operatora."
+
+msgid "Bootstrap DNS"
+msgstr "DNS startowy"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Znajduje adres samego serwera VPN, zanim tunel się podniesie (bezpośrednio, własnym połączeniem silnika)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Puste przywraca ustawieniu wartość domyślną."
+
+msgid "TUN stack"
+msgstr "Stos TUN"
+
+msgid "Default (gvisor)"
+msgstr "Domyślny (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (nie na jądrze 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "ustawiono (bez zmian, dopóki nie wpiszesz nowego)"
+
+msgid "not set"
+msgstr "nie ustawiono"
+
+msgid "Upstream HTTP proxy"
+msgstr "Nadrzędny serwer proxy HTTP"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "Przypięcie certyfikatu TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Wpisz host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Wpisz SHA-256 szesnastkowo"
+
+msgid "Profile options"
+msgstr "Opcje profilu"
+
+msgid "None of the profiles has options of its type."
+msgstr "Żaden z profili nie ma opcji swojego typu."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "Tryb mihomo (rule, global, direct), poziomy logów silników oraz grupy i routing dae są częścią własnej konfiguracji każdego profilu: VPN > Profile, Pokaż / edytuj konfigurację."
+
+msgid "Delete the subscription %s?"
+msgstr "Usunąć subskrypcję %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Jej profile mogą zostać usunięte razem z nią lub pozostać jako samodzielne profile. Aktywny profil nigdy nie jest usuwany, gdy VPN działa."
+
+msgid "Keep the profiles"
+msgstr "Zachowaj profile"
+
+msgid "Delete with its profiles"
+msgstr "Usuń razem z profilami"
+
+msgid "Only by hand"
+msgstr "Tylko ręcznie"
+
+msgid "Every %d h"
+msgstr "Co %d h"
+
+msgid "Share links: one profile per link"
+msgstr "Linki udostępniania: jeden profil na link"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "YAML Clash/mihomo: jeden profil mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: jeden profil ze wszystkimi węzłami w jednej grupie"
+
+msgid "Add a subscription"
+msgstr "Dodaj subskrypcję"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL zwykle zawiera token Twojego konta: jest przechowywany na urządzeniu z odczytem tylko dla roota i nigdy więcej nie jest pokazywany. Subskrypcja jest pobierana własnym połączeniem urządzenia: przez tunel, gdy VPN działa; przy aktywnym kill switchu i nieaktywnym tunelu nie da się jej pobrać."
+
+msgid "Refresh all"
+msgstr "Odśwież wszystkie"
+
+msgid "No subscriptions yet."
+msgstr "Brak subskrypcji."
+
+msgid "Host"
+msgstr "Host"
+
+msgid "Updated"
+msgstr "Zaktualizowano"
+
+msgid "Share links"
+msgstr "Linki udostępniania"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Odświeżenie zachowuje profile o niezmienionej nazwie, dodaje nowe i usuwa te, których już nie ma (aktywny pozostaje, gdy VPN działa, oznaczony jako usunięty). Odświeżenie aktywnego profilu uruchamia ponownie działający VPN."
 
 msgid "Dashboard info failed"
 msgstr "Błąd informacji panelu"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Adapter pakietów nie zwrócił prawidłowej odpowiedzi"
+
+msgid "Invalid packages operation"
+msgstr "Nieprawidłowa operacja na pakietach"
+
 msgid "Request too large"
 msgstr "Żądanie jest za duże"
 
@@ -1820,6 +2705,150 @@ msgstr "Katalog uruchomieniowy nie jest bezpieczny; niczego nie uruchomiono"
 
 msgid "No such method"
 msgstr "Brak takiej metody"
+
+msgid "The VPN module refused the request"
+msgstr "Moduł VPN odrzucił żądanie"
+
+msgid "The VPN panel is busy, try again"
+msgstr "Panel VPN jest zajęty, spróbuj ponownie"
+
+msgid "Another VPN task is still running"
+msgstr "Inne zadanie VPN nadal trwa"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Parametr exit_ip musi wynosić 0 lub 1"
+
+msgid "The VPN status could not be read"
+msgstr "Nie udało się odczytać stanu VPN"
+
+msgid "The profiles could not be read"
+msgstr "Nie udało się odczytać profili"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Parametr check musi wynosić 0 lub 1"
+
+msgid "The engines could not be read"
+msgstr "Nie udało się odczytać silników"
+
+msgid "The subscriptions could not be read"
+msgstr "Nie udało się odczytać subskrypcji"
+
+msgid "The VPN settings could not be read"
+msgstr "Nie udało się odczytać ustawień VPN"
+
+msgid "Unknown VPN operation"
+msgstr "Nieznana operacja VPN"
+
+msgid "The VPN could not be switched"
+msgstr "Nie udało się przełączyć VPN"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch jest włączony lub wyłączony"
+
+msgid "The kill switch could not be changed"
+msgstr "Nie udało się zmienić kill switcha"
+
+msgid "Invalid profile id"
+msgstr "Nieprawidłowy identyfikator profilu"
+
+msgid "The profile could not be made the active one"
+msgstr "Nie udało się uczynić profilu aktywnym"
+
+msgid "Unknown profile source"
+msgstr "Nieznane źródło profilu"
+
+msgid "Unknown profile type"
+msgstr "Nieznany typ profilu"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Konfiguracja jest pusta, zbyt duża lub zawiera znaki sterujące"
+
+msgid "Invalid profile request"
+msgstr "Nieprawidłowe żądanie profilu"
+
+msgid "A config from a URL takes the type it says"
+msgstr "Konfiguracja z URL przyjmuje typ, który sama podaje"
+
+msgid "No uploaded file"
+msgstr "Brak wgranego pliku"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Plik jest większy niż 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Nie udało się dodać profilu"
+
+msgid "The profile could not be renamed"
+msgstr "Nie udało się zmienić nazwy profilu"
+
+msgid "The profile could not be removed"
+msgstr "Nie udało się usunąć profilu"
+
+msgid "The profile does not pass the check"
+msgstr "Profil nie przechodzi sprawdzenia"
+
+msgid "Unknown profile option"
+msgstr "Nieznana opcja profilu"
+
+msgid "Invalid value for this option"
+msgstr "Nieprawidłowa wartość tej opcji"
+
+msgid "The option could not be set"
+msgstr "Nie udało się ustawić opcji"
+
+msgid "The config could not be read"
+msgstr "Nie udało się odczytać konfiguracji"
+
+msgid "The config was not saved"
+msgstr "Konfiguracja nie została zapisana"
+
+msgid "The latency test failed"
+msgstr "Test opóźnienia nie powiódł się"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Odstęp odświeżania to od 1 do 999 godzin"
+
+msgid "Unknown subscription type"
+msgstr "Nieznany typ subskrypcji"
+
+msgid "Invalid subscription id"
+msgstr "Nieprawidłowy identyfikator subskrypcji"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Parametr keep musi wynosić 0 lub 1"
+
+msgid "The subscription could not be removed"
+msgstr "Nie udało się usunąć subskrypcji"
+
+msgid "The file is too large"
+msgstr "Plik jest za duży"
+
+msgid "Unknown engine"
+msgstr "Nieznany silnik"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Parametr unverified musi mieć wartość 0 lub 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Ten silnik jest pakietem systemowym: nie ma pliku do wgrania"
+
+msgid "The engine could not be removed"
+msgstr "Nie udało się usunąć silnika"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra nie jest obecny w tym systemie"
+
+msgid "Unknown VPN setting"
+msgstr "Nieznane ustawienie VPN"
+
+msgid "The setting could not be saved"
+msgstr "Nie udało się zapisać ustawienia"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Liczba wierszy to od 1 do 1000"
+
+msgid "The log could not be read"
+msgstr "Nie udało się odczytać dziennika"
 
 msgid "Radio did not come up"
 msgstr "Radio nie uruchomiło się"
@@ -1935,6 +2964,9 @@ msgstr "Nieprawidłowa lista filtrów (najwyżej 50 wierszy)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Adres webhooka musi być adresem URL http:// lub https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Treść webhooka jest zbyt długa lub zawiera znak sterujący"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Nieprawidłowy nagłówek (jeden \"Nazwa: wartość\" w wierszu; Host, Content-Type, Content-Length, Transfer-Encoding i Connection ustawia urządzenie)"
 
@@ -1992,17 +3024,47 @@ msgstr "Nie udało się usunąć pakietu językowego"
 msgid "Lock cache unavailable"
 msgstr "Pamięć podręczna blokad niedostępna"
 
+msgid "The saved locks could not be cleared"
+msgstr "Nie można było usunąć zapisanych blokad"
+
 msgid "No serving cell to lock to"
 msgstr "Brak komórki obsługującej do zablokowania"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modem nie odpowiedział na zapytanie o tryb; nic nie wysłano"
+
+msgid "The modem refused a write"
+msgstr "Modem odrzucił zapis"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Odczyt zwrotny nie zgadza się z wartościami automatycznymi"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Odczyt zwrotny po restarcie stosu nie zgadza się z wartościami automatycznymi"
+
+msgid "The reset was interrupted"
+msgstr "Reset został przerwany"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Ponowna instalacja pakietów nie jest dostępna w tym systemie"
+
+msgid "No packages were written down by an update"
+msgstr "Żadna aktualizacja nie zapisała pakietów"
+
+msgid "Reinstalling is running already"
+msgstr "Ponowna instalacja już trwa"
+
+msgid "The note could not be dropped"
+msgstr "Nie udało się usunąć powiadomienia"
+
+msgid "Unknown packages operation"
+msgstr "Nieznana operacja na pakietach"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Zużycie danych nie jest dostępne w tym systemie"
-
-msgid "The setting could not be saved"
-msgstr "Nie udało się zapisać ustawienia"
 
 msgid "Unknown data usage operation"
 msgstr "Nieznana operacja zużycia danych"

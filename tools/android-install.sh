@@ -15,18 +15,106 @@
 #   BOOT_ATTEMPTS=1-6  with DEFAULT_LINUX=1: failed boots in a row before Android (.mu300/boot-attempts)
 #   PWHASH             SHA-512 crypt hash for the "ubuntu" (Ubuntu) and "root" (OpenWrt) accounts; empty with
 #                      UPDATE=1: the accounts and passwords of the previous installation stay as they are
+#   PW_SET=0|1         the Magisk installer: 1 puts PWHASH into that account even when it is empty (OpenWrt's root
+#                      without a password, as the image ships it); 0 or not set (install.sh): as above
 #   IMPORT_HOTSPOT=0|1 copy Android's hotspot SSID/passphrase into each system
 #   KERNEL=5.4|6.18|7.2  the kernel in the new boot image; mu300-update keeps installing that one (boot/kernel)
+#   ADB=0|1 ADB_KEY    adb over USB to each system on (etc/mu300/adb), for the adb public key ADB_KEY ("BASE64 name",
+#                      etc/mu300/adb_keys)
 # Extras pushed as $T/mu300-extra-<name>.tar.gz (the work directory, see below) go to extra/<name> on the Linux partition
 # (the VPN module, github.com/dikeckaan/mu300-linux-vpn, as mu300-extra-vpn.tar.gz; each system links it into itself
 # at its first boot: mu300-extra link runs the module's hooks/link).
+# Environment (not the env file): MU300_LOCK_DIR, where the lock of a timed-out SD-card stage lives (default $T;
+# the Magisk installer: /data/adb), MU300_STAGE_STALL / MU300_STAGE_POLL / MU300_BOOT_ID, the stage guard's knobs for
+# the tests (see the stage block).
 set -e
+# the systems' directories are made here: never with the modes of a caller whose umask is not this one
+umask 022
 # install.sh pushes everything to /data/local/tmp. The Magisk installer runs this as root from a directory only root
 # can write (MU300_DEVICE_WORK): files in /data/local/tmp can be replaced by the shell user after they were checked.
 T=${MU300_DEVICE_WORK:-/data/local/tmp}
 . $T/mu300-install.env
 M=$T/mu300root
 say() { echo "[device] $*"; }
+# --- stage begin
+# The long stages on an SD card run bounded (FINDINGS 50). A card, or the SD host, that stops answering leaves a
+# request in the kernel that never completes: the command sits in D state, kill -9 does nothing, and every retry adds
+# another one (38a's dd past the end of the eMMC did the same, one core at 100 % until a reboot). So in SD mode each
+# long stage - the format, the unpack of every system, the flush at the end - runs in a session of its own (setsid:
+# one process group to end) under a deadline, and is ended when the card's completion counters
+# (/sys/class/block/DISK/stat) have not moved for STAGE_STALL seconds. The installer then writes nothing more: no
+# sync and no unmount (both would wait on the same request), the card stays mounted, and a lock keyed by Android's
+# boot id refuses every run until Android has rebooted. On the eMMC the stages run as they are: Android itself keeps
+# the eMMC's counters moving, and the eMMC has not failed this way. (After kanoqwq's TF installer.)
+STAGE_DISK=                                # the card's disk (mmcblk1), set in SD mode; empty: a stage runs as it is
+STAGE_STALL=${MU300_STAGE_STALL:-120}      # seconds without I/O progress that end a stage
+STAGE_POLL=${MU300_STAGE_POLL:-2}
+STAGE_LOCK=${MU300_LOCK_DIR:-$T}/mu300-install.stalled
+STAGE_BOOT_ID=${MU300_BOOT_ID:-/proc/sys/kernel/random/boot_id}
+STALLED=                                   # set once a stage timed out: sd_exit then flushes and unmounts nothing
+boot_id() { _bi=$(cat "$STAGE_BOOT_ID" 2>/dev/null | tr -d ' \n'); echo "${_bi:-unknown}"; }
+stall_check() {  # a lock of this Android boot refuses the run; one of an earlier boot is stale and goes
+    [ -f "$STAGE_LOCK" ] || return 0
+    if [ "$(sed -n 1p "$STAGE_LOCK" 2>/dev/null)" != "$(boot_id)" ]; then rm -f "$STAGE_LOCK"; return 0; fi
+    say "an earlier run of the installer timed out in this Android boot ($(sed -n 2p "$STAGE_LOCK")): the SD card request it waited on is still stuck in the kernel"
+    say "reboot Android, then run the installer again (nothing was written now; the lock is $STAGE_LOCK)"
+    return 1
+}
+stall_clear() { rm -f "$STAGE_LOCK"; }
+stage_stat() {  # the card's completion counters: reads and writes completed, sectors read and written (the time
+    # fields keep moving while a request only waits); nothing when the file cannot be read. Always true.
+    set -- $(cat "${MU300_SYSFS:-/sys}/class/block/$STAGE_DISK/stat" 2>/dev/null)
+    [ $# -lt 7 ] || echo "$1 $3 $5 $7"
+}
+stage_stop() {  # stage_stop PGID: TERM, then KILL, for the whole session (a process in D state ignores both; it is
+    # never waited for). dash and busybox take -PGID, bash wants -- first; a shell that takes neither gets the pid.
+    kill -TERM -- "-$1" 2>/dev/null || kill -TERM "-$1" 2>/dev/null || kill -TERM "$1" 2>/dev/null || true
+    sleep 1
+    kill -KILL -- "-$1" 2>/dev/null || kill -KILL "-$1" 2>/dev/null || kill -KILL "$1" 2>/dev/null || true
+}
+# stage_run NAME LIMIT CMD...: in SD mode CMD in a session of its own, ended after LIMIT seconds, or after
+# STAGE_STALL seconds without I/O progress on STAGE_DISK: the timeout is reported, locks, and returns 1. Otherwise
+# CMD's status. On the eMMC (STAGE_DISK empty) CMD runs as it is.
+stage_run() {
+    _sn=$1 _sl=$2; shift 2
+    if [ -z "$STAGE_DISK" ]; then "$@"; return; fi
+    _sd=$T/mu300-stage.$$; rm -rf "$_sd"; mkdir -p "$_sd"
+    _sz=$(stage_stat)
+    [ -n "$_sz" ] || say "cannot read the I/O counters of $STAGE_DISK: the $_sn stage is bounded by its limit of $_sl s only"
+    # the worker: a session of its own where setsid exists (Android's toybox has it), its pid - the group to end - in
+    # one file, the command's status in another. It is never waited for before that status is there: a process stuck
+    # in the kernel never ends, and a wait on it would hang the installer the way the dd of 38a did.
+    if command -v setsid >/dev/null 2>&1; then _ss=setsid; else _ss=; fi
+    $_ss sh -c '_d=$1; shift; echo $$ > "$_d/pid"; "$@"; echo $? > "$_d/rc.tmp" && mv "$_d/rc.tmp" "$_d/rc"' sh "$_sd" "$@" &
+    _wp=$!
+    _t0=$(date +%s); _tl=$_t0; _why=
+    while [ ! -f "$_sd/rc" ]; do
+        sleep "$STAGE_POLL"
+        [ ! -f "$_sd/rc" ] || break
+        _now=$(date +%s); _cur=$(stage_stat)
+        if [ "$_cur" != "$_sz" ]; then _tl=$_now; _sz=$_cur; fi
+        if [ $((_now - _t0)) -ge "$_sl" ]; then _why="it ran longer than $_sl s"
+        elif [ -n "$_cur" ] && [ $((_now - _tl)) -ge "$STAGE_STALL" ]; then _why="no I/O progress on $STAGE_DISK for $STAGE_STALL s"
+        fi
+        [ -z "$_why" ] || break
+        # a worker that is gone without its status (ended from outside): a failed stage, not a hang
+        _lp=$(cat "$_sd/pid" 2>/dev/null); kill -0 "${_lp:-$_wp}" 2>/dev/null || { sleep 1; [ -f "$_sd/rc" ] || echo 1 > "$_sd/rc"; }
+    done
+    if [ -n "$_why" ]; then
+        stage_stop "$(cat "$_sd/pid" 2>/dev/null || echo "$_wp")"
+        STALLED=1
+        { boot_id; echo "stage $_sn, $(date '+%Y-%m-%d %H:%M'): $_why"; } > "$STAGE_LOCK" 2>/dev/null || true
+        say "the $_sn stage timed out ($_why) and was stopped; nothing more is written"
+        say "a request the SD card ($STAGE_DISK) did not answer is stuck in the kernel: reboot Android before running the installer again (until then every run is refused: $STAGE_LOCK)"
+        say "the card stays mounted at $M, with no sync and no unmount (both would wait on that request)"
+        rm -rf "$_sd"
+        return 1
+    fi
+    _rc=$(cat "$_sd/rc"); wait "$_wp" 2>/dev/null || true
+    rm -rf "$_sd"
+    return "$_rc"
+}
+# --- stage end
 # --- sd begin
 sd_ext4() {  # true when the device holds an ext4 filesystem, labelled or not
     [ "$(dd if="$1" bs=1 skip=1080 count=2 2>/dev/null | od -An -tx1 | tr -d ' \n')" = 53ef ]
@@ -88,7 +176,8 @@ sd_prepare() {  # sd_prepare DEV FORMAT: create mu300sd, or check that it is the
         s=$(cat "${MU300_SYSFS:-/sys}/class/block/${1##*/}/size" 2>/dev/null) || s=0
         i=$(awk -v s="${s:-0}" 'BEGIN { i = 16384; while (i < 1048576 && s * 512 / (i * 2) >= 65536) i *= 2; print i }')
         say "creating ext4 mu300sd on $1 (one inode per $((i / 1024)) KiB)"
-        $mk -t ext4 -F -b 4096 -m 0 -i "$i" -L mu300sd "$1" >/dev/null
+        # bounded (the stage block); mke2fs's own lines stay quiet inside the stage, the stage's are shown
+        stage_run format 900 sh -c 'exec "$@" >/dev/null' sh $mk -t ext4 -F -b 4096 -m 0 -i "$i" -L mu300sd "$1"
     elif [ "$label" != mu300sd ]; then
         say "no mu300sd filesystem on $1 (run with FORMAT=1)"; return 1
     fi
@@ -117,15 +206,23 @@ sd_mark_internal() {
 sd_unmark() {  # sd_unmark ROOT
     [ "${SD_MODE:-0}" = 1 ] || rm -f "$1/.mu300/root-on-sd"
 }
+# The EXIT trap of SD mode: flush and unmount - unless a stage timed out (STALLED): a sync and an unmount would
+# both wait on the request that is stuck, and the installer would hang where it was meant to stop.
+sd_exit() {
+    [ -n "$STALLED" ] || { sync; sh $T/android-mount-mu300root.sh -u $M >/dev/null 2>&1; }
+    true
+}
 # --- sd end
 
+stall_check || exit 1
 if [ "${SD_MODE:-0}" = 1 ]; then
     [ -b "${SD_DEV:?SD_DEV is not set}" ] || { say "no block device $SD_DEV (is the SD card inserted?)"; exit 1; }
     sd_check "$SD_DEV" || exit 1
+    STAGE_DISK=$(sd_disk "$SD_DEV"); STAGE_DISK=${STAGE_DISK##*/}
     sd_release "$SD_DEV" || exit 1
     sd_prepare "$SD_DEV" "$FORMAT" || exit 1
     MU300_SD_DEV=$SD_DEV sh $T/android-mount-mu300root.sh $M
-    trap 'sync; sh $T/android-mount-mu300root.sh -u $M >/dev/null 2>&1; true' EXIT
+    trap sd_exit EXIT
 else
 # --- the region must not overlap any partition (checked again here, on the device itself)
 end=0
@@ -163,6 +260,27 @@ fi
 MU300_OFF=$OFF MU300_SIZE=$SIZE sh $T/android-mount-mu300root.sh $M
 trap 'sync; sh $T/android-mount-mu300root.sh -u $M >/dev/null 2>&1; true' EXIT
 fi
+
+# --- bootchain begin
+# The Linux slot's uboot, sml, teecfg, trustos and vbmeta become the ones of Android's slot (android-bootchain.sh),
+# before anything else is installed: a failure stops here, and the installers then write no boot image. The images
+# the Linux slot held go onto the Linux filesystem first (.mu300/bootchain/<date>), and for install.sh/install.ps1
+# also to $T/mu300-bootchain-backup, which they pull into their work directory.
+if [ "${SYNC_BOOTCHAIN:-0}" = 1 ]; then
+    bcdir=$M/.mu300/bootchain/$(date +%Y%m%d-%H%M%S)
+    rm -rf $T/mu300-bootchain-backup
+    bcout=$(sh $T/android-bootchain.sh sync "$bcdir") && bcrc=0 || bcrc=$?
+    echo "$bcout" | grep -v '^BOOTCHAIN-' | sed 's/^/[device] /'
+    if [ $bcrc != 0 ]; then
+        say "$(echo "$bcout" | sed -n 's/^BOOTCHAIN-[A-Z]*: //p')"
+        say "the boot chain was not synced; no system was installed (MU300_SYNC_BOOTCHAIN=0 skips this step)"
+        exit 1
+    fi
+    if [ -z "${MU300_DEVICE_WORK:-}" ] && [ -d "$bcdir" ]; then
+        cp -R "$bcdir" $T/mu300-bootchain-backup && chmod -R a+rX $T/mu300-bootchain-backup || true
+    fi
+fi
+# --- bootchain end
 
 # --- legacy-wipe begin
 if [ "$WIPE_LEGACY" = 1 ] && { [ -x $M/lib/systemd/systemd ] || [ -L $M/lib ]; }; then
@@ -252,6 +370,245 @@ if [ "$IMPORT_HOTSPOT" = 1 ]; then
     [ -n "$ssid" ] && [ ${#psk} -ge 8 ] || { say "no usable Android hotspot config, a random password will be generated"; ssid=; psk=; }
 fi
 
+# --- user-packages begin
+# Packages installed on the device are not in the release's image, and an update puts the image in place while it
+# keeps /etc/config (OpenWrt) and /etc/mu300: their programs were gone and their settings stayed - OpenClash's left
+# the device without DNS (#116). So before the switch the update writes down what was added - the packages asked for
+# by hand (OpenWrt: /etc/apk/world; Ubuntu: dpkg's packages that apt did not pull in by itself) less the image's
+# own set (etc/mu300/image-packages, written when the image is built) - into etc/mu300/user-packages/ of the new
+# system, and sets the UCI files of those packages aside (etc/mu300/orphaned-config/): a package that is not there
+# leaves no settings behind. At its first boot the new system installs them again (mu300-user-packages, a service)
+# and puts their settings back. tools/android-install.sh (the installers' update) has a copy of this block; tests
+# hold the two to one text. It runs on Android too: sh, awk, sed, grep, sort - nothing else, and safe under set -e.
+UPK_DIR=etc/mu300/user-packages
+UPK_ORPH=etc/mu300/orphaned-config
+# what is never installed again: kernel modules (the feed's are for another kernel), and what the images take out on
+# purpose (sysupgrade would flash the eMMC; ujail crash-loops services on 5.4)
+upk_skip() {
+    case $1 in
+        kmod-*|kernel|procd-ujail|procd-seccomp|luci-app-attendedsysupgrade|attendedsysupgrade-common|owut) return 0 ;;
+        linux-image-*|linux-modules-*|linux-headers-*|linux-generic*|linux-firmware) return 0 ;;
+    esac
+    return 1
+}
+upk_kind() { case $1 in ubuntu) echo ubuntu ;; *) echo openwrt ;; esac; }
+# upk_dpkg ROOT [manual]: dpkg's installed packages in ROOT; with manual, less those apt installed as dependencies
+# (what apt-mark showmanual says, read from the files: ROOT need not be the running system)
+upk_dpkg() {
+    [ -f "$1/var/lib/dpkg/status" ] || return 0
+    { [ "${2:-}" != manual ] || cat "$1/var/lib/apt/extended_states" 2>/dev/null || :; echo '@dpkg'; cat "$1/var/lib/dpkg/status"; } |
+        awk '$0 == "@dpkg" { s = 1; next }
+             $1 == "Package:" { p = $2; next }
+             !s && $1 == "Auto-Installed:" && $2 == 1 { auto[p] = 1; next }
+             s && $1 == "Status:" && $3 == "ok" && $4 == "installed" { inst[p] = 1 }
+             END { for (p in inst) if (!(p in auto)) print p }' | sort
+}
+# upk_manual ROOT KIND: the packages asked for by name (OpenWrt: the world file, versions and pins taken off)
+upk_manual() {
+    if [ "$2" = ubuntu ]; then upk_dpkg "$1" manual; return 0; fi
+    [ -f "$1/etc/apk/world" ] || return 0
+    sed 's/[<>=~@ ].*//' "$1/etc/apk/world" | awk 'NF' | sort -u
+}
+# upk_installed ROOT KIND: every installed package
+upk_installed() {
+    if [ "$2" = ubuntu ]; then upk_dpkg "$1"; return 0; fi
+    [ -f "$1/lib/apk/db/installed" ] || return 0
+    sed -n 's/^P://p' "$1/lib/apk/db/installed" | sort -u
+}
+# upk_txt_names FILE: the names in etc/mu300/packages.txt ("apk list --installed": name-version-rN arch ...)
+upk_txt_names() {
+    [ -f "$1" ] || return 0
+    awk '{print $1}' "$1" | sed 's/-r[0-9][0-9]*$//; s/-[^-]*$//'
+}
+# upk_pending DIR: the packages of a record not installed again yet (nor given up on)
+upk_pending() {
+    [ -f "$1/wanted" ] || return 0
+    { for _uf in done failed; do [ ! -f "$1/$_uf" ] || sed 's/^/x /' "$1/$_uf"; done; sed 's/^/w /' "$1/wanted"; } |
+        awk '$1 == "x" { d[$2] = 1; next } NF > 1 && !($2 in d) { print $2 }'
+}
+# What belongs to the new image, not to the device, in the directories an update keeps: its version and package
+# lists in etc/mu300 (an update carried the old ones over: every update then reported the version it replaced), and
+# the names of its own files in etc/config (never set aside). image_own_save NEW before the settings are copied,
+# image_own_restore NEW after; upk_record removes what they keep in NEW/.mu300-image.
+image_own_save() {
+    rm -rf "$1/.mu300-image"; mkdir -p "$1/.mu300-image" || return 1
+    for _uf in image-version image-packages packages.txt; do
+        [ ! -f "$1/etc/mu300/$_uf" ] || cp "$1/etc/mu300/$_uf" "$1/.mu300-image/$_uf" || return 1
+    done
+    for _uf in "$1"/etc/config/*; do [ ! -e "$_uf" ] || echo "${_uf##*/}"; done > "$1/.mu300-image/config"
+}
+image_own_restore() {
+    [ -d "$1/.mu300-image" ] || return 0
+    mkdir -p "$1/etc/mu300" || return 1
+    for _uf in image-version image-packages packages.txt; do
+        if [ -f "$1/.mu300-image/$_uf" ]; then cp "$1/.mu300-image/$_uf" "$1/etc/mu300/$_uf" || return 1
+        # a list of the old image would describe the wrong one (the version stays: "unknown" says less)
+        elif [ "$_uf" != image-version ]; then rm -f "$1/etc/mu300/$_uf"; fi
+    done
+}
+# upk_os_codename ROOT: Ubuntu's release name (noble, ...)
+upk_os_codename() {
+    sed -n 's/^VERSION_CODENAME=//p' "$1/usr/lib/os-release" 2>/dev/null | tr -d '"' | head -n 1
+}
+# upk_apt_keep OLD NEW [checked]: Ubuntu keeps only parts of /etc, and apt's sources were not among them: a PPA's
+# packages could not come back. The source files added in etc/apt/sources.list.d are copied where the new image
+# has no file of that name (the image's own are never replaced), with the keys they need: one in etc/apt/keyrings
+# or usr/share/keyrings that a kept source names, and etc/apt/trusted.gpg.d's - each only where the new image has
+# no file of that name. checked: the first boot tries apt-get update and disables a kept source that makes it fail
+# (mu300-user-packages); without it (nothing to install again) a source of another Ubuntu release (24.04 -> 26.04)
+# is copied disabled (NAME.disabled, which apt skips) and said so. NEW/.mu300-image/apt-kept: the sources kept on.
+upk_apt_keep() {
+    _ua=$2/.mu300-image/apt-kept _ul=
+    : > "$_ua" || return 1
+    _uoc=$(upk_os_codename "$1") _unc=$(upk_os_codename "$2")
+    for _uf in "$1"/etc/apt/sources.list.d/*.list "$1"/etc/apt/sources.list.d/*.sources; do
+        [ -f "$_uf" ] || continue
+        _ur=etc/apt/sources.list.d/${_uf##*/}
+        { [ ! -e "$2/$_ur" ] && [ ! -L "$2/$_ur" ]; } || continue
+        mkdir -p "$2/etc/apt/sources.list.d" || return 1
+        if [ -z "${3:-}" ] && [ "$_uoc" != "$_unc" ]; then
+            cp -p "$_uf" "$2/$_ur.disabled" || return 1
+            echo "  apt: /$_ur is for Ubuntu $_uoc, this is $_unc: kept disabled (/$_ur.disabled)"
+        else
+            cp -p "$_uf" "$2/$_ur" || return 1
+            echo "$_ur" >> "$_ua"
+            echo "  apt: /$_ur kept"
+        fi
+        _ul="$_ul $_uf"
+    done
+    [ -n "$_ul" ] || return 0
+    # their pinning (etc/apt/preferences.d), where the new image has no file of that name; a pin whose source is
+    # turned off later does nothing on its own (mu300-user-packages status names it). NEW/.mu300-image/apt-prefs.
+    : > "$2/.mu300-image/apt-prefs" || return 1
+    for _uf in "$1"/etc/apt/preferences.d/*; do
+        [ -f "$_uf" ] || continue
+        _ur=etc/apt/preferences.d/${_uf##*/}
+        { [ ! -e "$2/$_ur" ] && [ ! -L "$2/$_ur" ]; } || continue
+        mkdir -p "$2/etc/apt/preferences.d" && cp -p "$_uf" "$2/$_ur" || return 1
+        echo "$_ur" >> "$2/.mu300-image/apt-prefs"
+        echo "  apt: /$_ur kept"
+    done
+    # shellcheck disable=SC2086
+    _us=$(cat $_ul 2>/dev/null)
+    for _uf in "$1"/etc/apt/keyrings/* "$1"/usr/share/keyrings/* "$1"/etc/apt/trusted.gpg.d/*; do
+        [ -f "$_uf" ] || continue
+        _ur=${_uf#"$1"/}
+        { [ ! -e "$2/$_ur" ] && [ ! -L "$2/$_ur" ]; } || continue
+        case $_ur in
+            etc/apt/trusted.gpg.d/*) ;;
+            *) printf '%s\n' "$_us" | grep -qF "/$_ur" || continue ;;
+        esac
+        mkdir -p "$2/${_ur%/*}" && cp -p "$_uf" "$2/$_ur" || return 1
+    done
+}
+# upk_units OLD: "PACKAGE UNIT enabled|disabled|masked" for the systemd units the packages named on stdin have in
+# OLD (dpkg's file lists), as OLD had them - mu300-user-packages puts that back after it installs them again
+upk_units() {
+    while read -r _up; do
+        for _ul in "$1/var/lib/dpkg/info/$_up.list" "$1/var/lib/dpkg/info/$_up":*.list; do
+            [ -f "$_ul" ] || continue
+            grep -E '^/(usr/)?lib/systemd/system/[A-Za-z0-9_.:-]+\.(service|socket|timer|path)$' "$_ul" |
+                while read -r _uu; do
+                    # an alias (a link to the unit, smartd.service) follows its unit
+                    [ ! -L "$1$_uu" ] || continue
+                    _uu=${_uu##*/}
+                    case $_uu in *@*) continue ;; esac
+                    _us=disabled
+                    for _uw in "$1"/etc/systemd/system/*.wants/"$_uu" "$1"/etc/systemd/system/*.requires/"$_uu"; do
+                        [ ! -L "$_uw" ] || _us=enabled
+                    done
+                    [ "$(readlink "$1/etc/systemd/system/$_uu" 2>/dev/null)" != /dev/null ] || _us=masked
+                    echo "$_up $_uu $_us"
+                done
+        done
+    done | sort -u
+}
+# upk_record OLD NEW OS: after the settings are in NEW, before the switch. Writes NEW/etc/mu300/user-packages/
+# (wanted: the names; files: "package path" of their files in etc/; rc.d: the services enabled in OLD; from; state)
+# and moves their etc/config files out of the way. MU300_KEEP_PACKAGES=0: they are not installed again (state
+# skipped; mu300-user-packages retry does it later), their settings are set aside all the same.
+upk_record() {
+    _uo=$1 _un=$2 _uk=$(upk_kind "$3")
+    _ut=$2/.mu300-image _ud=$2/$UPK_DIR
+    mkdir -p "$_ut" || return 1
+    # the old image's own set; a system from before that list: the new image's and the one packages.txt names
+    if [ -s "$_uo/etc/mu300/image-packages" ]; then cat "$_uo/etc/mu300/image-packages"
+    else
+        cat "$_ut/image-packages" 2>/dev/null || :
+        upk_manual "$_un" "$_uk"
+        upk_txt_names "$_uo/etc/mu300/packages.txt"
+    fi > "$_ut/not"
+    upk_installed "$_un" "$_uk" >> "$_ut/not"
+    # what an earlier update recorded and the device never got back (offline since, or skipped) stays wanted
+    { upk_manual "$_uo" "$_uk"; upk_pending "$_uo/$UPK_DIR"; } > "$_ut/had"
+    { sed 's/^/x /' "$_ut/not"; sed 's/^/w /' "$_ut/had"; } |
+        awk '$1 == "x" { n[$2] = 1; next } NF > 1 && !($2 in n) { print $2 }' | sort -u > "$_ut/added"
+    rm -rf "$_ud"
+    : > "$_ut/wanted"
+    while read -r _up; do upk_skip "$_up" || echo "$_up" >> "$_ut/wanted"; done < "$_ut/added"
+    # Ubuntu: the apt sources added on the device (a PPA's packages cannot come back without it), see upk_apt_keep
+    if [ "$_uk" = ubuntu ]; then
+        upk_apt_keep "$_uo" "$_un" "$([ -s "$_ut/wanted" ] && echo checked)" || return 1
+    fi
+    if [ ! -s "$_ut/wanted" ]; then
+        echo "  none: everything installed is part of the new image"
+        rm -rf "$_ut"
+        return 0
+    fi
+    mkdir -p "$_ud" || return 1
+    mv "$_ut/wanted" "$_ud/wanted"
+    [ ! -s "$_ut/apt-kept" ] || mv "$_ut/apt-kept" "$_ud/apt-sources"
+    [ ! -s "$_ut/apt-prefs" ] || mv "$_ut/apt-prefs" "$_ud/apt-prefs"
+    : > "$_ud/done"; : > "$_ud/failed"
+    cat "$_uo/etc/mu300/image-version" > "$_ud/from" 2>/dev/null || echo unknown > "$_ud/from"
+    # their files in etc/, from the package database of OLD (and of the record a pending one came from)
+    if [ "$_uk" = openwrt ]; then
+        { cat "$_uo/$UPK_DIR/files" 2>/dev/null || :
+          [ ! -f "$_uo/lib/apk/db/installed" ] || awk '
+            $0 ~ /^P:/ { p = substr($0, 3); next }
+            $0 ~ /^F:/ { d = substr($0, 3); next }
+            $0 ~ /^R:/ && (d == "etc" || d ~ /^etc\//) { print p " " d "/" substr($0, 3) }' "$_uo/lib/apk/db/installed"
+        } | { sed 's/^/w /' "$_ud/wanted"; sed 's/^/f /'; } |
+            awk '$1 == "w" { w[$2] = 1; next } ($2 in w) && NF > 2 { print substr($0, 3) }' | sort -u > "$_ud/files"
+        for _uf in "$_uo"/etc/rc.d/*; do { [ -L "$_uf" ] || [ -e "$_uf" ]; } && echo "${_uf##*/}"; done > "$_ud/rc.d" || :
+    else
+        : > "$_ud/files"; : > "$_ud/rc.d"
+        upk_units "$_uo" < "$_ud/wanted" > "$_ud/units"
+    fi
+    if [ "${MU300_KEEP_PACKAGES:-1}" = 0 ]; then echo skipped > "$_ud/state"; else echo pending > "$_ud/state"; fi
+    echo "  $(tr '\n' ' ' < "$_ud/wanted")"
+    if [ "$(cat "$_ud/state")" = skipped ]; then
+        echo "  The new system does not have them, and they are not installed again (MU300_KEEP_PACKAGES=0 or"
+        echo "  --no-reinstall; later: mu300-user-packages retry)."
+    else
+        echo "  The new system does not have them: its first boot installs them again once the device is online"
+        echo "  (the result: mu300-user-packages status)."
+    fi
+    # their UCI files: a package that is not there must leave nothing behind that acts on the network. Only a file
+    # its package owns, in etc/config, that the new image does not have itself (dhcp, firewall, luci: never).
+    _um=
+    while read -r _up _uf; do
+        case $_uf in etc/config/?*) ;; *) continue ;; esac
+        { [ -f "$_un/$_uf" ] && [ ! -L "$_un/$_uf" ]; } || continue
+        ! grep -qxF "${_uf#etc/config/}" "$_ut/config" 2>/dev/null || continue
+        mkdir -p "$_un/$UPK_ORPH/etc/config" && mv -f "$_un/$_uf" "$_un/$UPK_ORPH/$_uf" || return 1
+        [ -n "$_um" ] || echo "  Their settings are set aside until they are back, so that they cannot act without them:"
+        echo "    /$_uf -> /$UPK_ORPH/$_uf ($_up)"
+        _um=1
+    done < "$_ud/files"
+    rm -rf "$_ut"
+}
+# stale_config_clean NEW: what the images of v2026.10.18 left in etc/config and an update then copied onto every
+# device (the config files of the image are added to the kept ones): attendedsysupgrade, of a package the images
+# remove on purpose, and the .apk-new copies apk leaves beside a changed config. Gone from NEW's etc/config unless
+# the package is installed there (attendedsysupgrade stays with attendedsysupgrade-common or its LuCI app).
+stale_config_clean() {
+    for _uf in "$1"/etc/config/*.apk-new; do [ ! -e "$_uf" ] || rm -f "$_uf"; done
+    [ -e "$1/etc/config/attendedsysupgrade" ] || return 0
+    upk_installed "$1" openwrt | grep -qx 'attendedsysupgrade-common\|luci-app-attendedsysupgrade' && return 0
+    rm -f "$1/etc/config/attendedsysupgrade"
+}
+# --- user-packages end
 # --- install-os begin
 # Accounts are settings too, and etc/shadow is not in keep: an update carries them over the way mu300-update does,
 # with its own function (copied here: this runs on Android and cannot source the new system's mu300-update; tests
@@ -300,19 +657,21 @@ for os in $OSES; do
     tarball=$T/mu300-$os.tar.gz
     [ -f $tarball ] || { say "missing $tarball"; exit 1; }
     say "installing $os"
-    rm -rf $M/$os.new && mkdir $M/$os.new
-    tar -xzpf $tarball -C $M/$os.new
-    # the account the installer gives a password (ubuntu, OpenWrt's root) and its hash in the image
+    # the writes to the card run bounded (the stage block); on the eMMC as they are
+    stage_run "clean $os" 900 rm -rf $M/$os.new
+    mkdir $M/$os.new
+    stage_run "unpack $os" 3600 tar -xzpf $tarball -C $M/$os.new
+    # the account the installer gives a password (ubuntu, OpenWrt's root)
     case $os in ubuntu) pwu=ubuntu ;; *) pwu=root ;; esac
-    carried=0
-    imghash=$(sed -n "s/^$pwu:\([^:]*\):.*/\1/p" $M/$os.new/etc/shadow 2>/dev/null | head -n1) || imghash=
     # prebuilt images: firmware and Android userspace pulled from this device by install.sh (tools/vendor-overlay.py)
     if [ -f $T/mu300-vendor-$os.tar.gz ]; then
-        tar -xzpf $T/mu300-vendor-$os.tar.gz -C $M/$os.new
+        stage_run "unpack $os vendor" 900 tar -xzpf $T/mu300-vendor-$os.tar.gz -C $M/$os.new
         rm -f $T/mu300-vendor-$os.tar.gz
     fi
     # update: carry the settings and user data of the previous installation over to the new system
     if [ "${UPDATE:-0}" = 1 ] && [ -d $M/$os ]; then
+        # the new image's version and package lists, and the names of its own etc/config files (upk_record)
+        image_own_save "$M/$os.new"
         case $os in
             ubuntu) keep="etc/mu300 etc/ssh etc/hostname etc/localtime etc/timezone etc/fstab home root srv usr/local var/lib/bluetooth" ;;
             openwrt|openwrt-*) keep="etc/config etc/mu300 etc/dropbear etc/rc.local root" ;;
@@ -333,6 +692,8 @@ for os in $OSES; do
                     [ -e "$M/$os.new/$k/${f##*/}" ] || [ -L "$M/$os.new/$k/${f##*/}" ] || cp -a "$f" "$M/$os.new/$k/"
                 done
                 rm -rf "$M/$os.new/$k.image"
+                # the stray files of v2026.10.18 (the old system's, or that image's own) do not stay
+                stale_config_clean "$M/$os.new"
             fi
         done
         # services the user enabled or disabled themselves: copy the extra symlinks over, but only when the unit
@@ -364,30 +725,40 @@ for os in $OSES; do
                 done ;;
         esac
         say "kept from the previous $os:$kept"
+        image_own_restore "$M/$os.new"
+        # the packages installed on the device: written down, their settings set aside, put back at the first boot
+        # (mu300-user-packages), as mu300-update apply does
+        say "packages installed on the device in the previous $os:"
+        upk=$(upk_record "$M/$os" "$M/$os.new" "$os") ||
+            { rm -rf $M/$os.new; say "$upk"; say "$os: could not write down the packages installed on the device; $os was not replaced"; exit 1; }
+        printf '%s\n' "$upk" | while IFS= read -r l; do say "$l"; done
+        rm -rf "$M/$os.new/.mu300-image"
         if [ -f "$M/$os/etc/shadow" ]; then
             merge_accounts "$M/$os" "$M/$os.new" || { say "could not carry the accounts of $os over; nothing was replaced"; exit 1; }
-            carried=1
-            say "kept the accounts and passwords of the previous $os"
+            # the log line says what the shadow will hold: with a hash, or PW_SET=1 (the Magisk installer's
+            # MU300_PASSWORD_RESET=yes, or a system that still had the images' accounts), the system's own account
+            # gets PWHASH below, and only the other accounts keep their passwords
+            if [ -n "$PWHASH" ]; then
+                say "kept the other accounts of the previous $os; $pwu's password is the one the installer chose (the images' own, or MU300_PASSWORD)"
+            elif [ "${PW_SET:-0}" = 1 ]; then
+                say "kept the other accounts of the previous $os; $pwu's password is the images' own again: none, until one is set"
+            else
+                say "kept the accounts and passwords of the previous $os"
+            fi
         fi
         extra_keep_vpn $M $M/$os
         [ -n "$extra" ] && say "kept enabled services:$extra"
     fi
-    # The password, before the new system replaces the old one: the hash just chosen, or (an update without one) the
-    # one carried over. Fail closed: a system whose account would be left with no hash, an empty one, the image's
-    # default or the image's accounts is not installed, and the old one stays.
-    if [ -n "$PWHASH" ]; then
-        rm -f $M/$os.new$ACCOUNTS_MARK   # the password is the one just chosen, not one to carry over
+    # The password, before the new system replaces the old one: the hash just chosen (PWHASH; with PW_SET=1 also an
+    # empty one, OpenWrt's root without a password), else the accounts carried over, else the image's own (Ubuntu's
+    # ubuntu/ubuntu, OpenWrt's root without a password: the well-known ones, issue #167). The accounts are this
+    # system's now, whichever they are: never the mark that has mu300-update carry some <os>.old's over at boot.
+    if [ -n "$PWHASH" ] || [ "${PW_SET:-0}" = 1 ]; then
         sed -i "s|^$pwu:[^:]*:|$pwu:$PWHASH:|" $M/$os.new/etc/shadow
     fi
-    h=$(sed -n "s/^$pwu:\([^:]*\):.*/\1/p" $M/$os.new/etc/shadow 2>/dev/null | head -n1) || h=
-    case $h in '$'?*) ;; *) h= ;; esac
-    if [ -z "$h" ] || [ -e $M/$os.new$ACCOUNTS_MARK ] ||
-        { [ -z "$PWHASH" ] && { [ "$carried" != 1 ] || [ "$h" = "$imghash" ]; }; }; then
-        rm -rf $M/$os.new
-        say "$os: $pwu would keep no password of its own (empty, the image's default, or none to carry over); $os was not replaced. Install again with MU300_PASSWORD_RESET=yes in /data/adb/mu300-install.conf (or choose a password in install.sh)"
-        exit 1
-    fi
-    rm -rf $M/$os && mv $M/$os.new $M/$os
+    rm -f $M/$os.new$ACCOUNTS_MARK
+    stage_run "replace $os" 900 rm -rf $M/$os
+    mv $M/$os.new $M/$os
     R=$M/$os
     if [ "${SD_MODE:-0}" = 1 ]; then sd_fstab $R; fi
     mkdir -p $R/etc/mu300
@@ -398,6 +769,16 @@ for os in $OSES; do
         umask 022
     fi
     if [ "$DEFAULT_LINUX" = 1 ]; then echo linux > $R/etc/mu300/default-boot; else rm -f $R/etc/mu300/default-boot; fi
+    # adb over USB to Linux, for the installing computer's key (whoever holds it gets a root shell); ADB=0 changes
+    # nothing (an update keeps etc/mu300 and with it the setting and the keys)
+    if [ "${ADB:-0}" = 1 ] && [ -n "${ADB_KEY:-}" ]; then
+        echo on > $R/etc/mu300/adb
+        umask 077
+        grep -qF "${ADB_KEY%% *}" $R/etc/mu300/adb_keys 2>/dev/null || echo "$ADB_KEY" >> $R/etc/mu300/adb_keys
+        umask 022
+        chmod 600 $R/etc/mu300/adb_keys
+        say "$os: adb over USB on, for ${ADB_KEY#* }"
+    fi
     rm -f $tarball
 done
 mkdir -p $M/.mu300
@@ -413,5 +794,9 @@ rm -f $M/boot/installed.tag
 [ -n "$ssid" ] && say "hotspot: SSID $ssid imported (passphrase ${#psk} chars)"
 say "installed: $(ls -d $M/ubuntu $M/openwrt $M/openwrt-luci 2>/dev/null | sed "s|$M/||g" | tr '\n' ' ')boot-os=$BOOT_OS default-linux=$DEFAULT_LINUX"
 sd_mark_internal
+# the card's dirty pages go out now, bounded like the other card stages (the unmount in sd_exit then has little
+# left to wait for); a timeout here is a failure like any other: the OK line never comes, nothing is armed
+[ "${SD_MODE:-0}" != 1 ] || stage_run flush 1800 sync
+stall_clear
 rm -f $T/mu300-install.env
 echo MU300-INSTALL-OK   # install.sh checks for this line (set -e stops before it on any failure)

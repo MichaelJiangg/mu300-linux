@@ -1,7 +1,10 @@
 /* mu300-hfp: a minimal Bluetooth Hands-Free audio gateway (HFP AG) for one paired headset, so a cellular call's
  * audio can go to it. Raw BlueZ kernel sockets, no libbluetooth, no D-Bus: it builds static for Ubuntu and OpenWrt.
  *
- *   mu300-hfp [-c CHANNEL] [-C FIFO] [-a ANSWER_CMD] [-x HANGUP_CMD] BDADDR
+ *   mu300-hfp [-c CHANNEL] [-C FIFO] [-a ANSWER_CMD] [-x HANGUP_CMD] [-r|-l] BDADDR
+ *     -r  report what arrives over the SCO socket (bytes and the loudest sample, once a second): a microphone
+ *         test; -l also plays it back to the headset. With the PCM route (below) nothing arrives: measured on
+ *         F50-B with a Xiaomi Sound Pocket, 30 s of SCO up, 0 bytes.
  *
  * It connects to the headset (BlueZ must already have paired it - bluetoothctl pair/trust), finds the headset's
  * Hands-Free RFCOMM channel by SDP unless -c gives it, and runs the service level connection: the AT exchange a
@@ -37,10 +40,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 /* the few BlueZ kernel ABI definitions this needs, so no libbluetooth headers are required */
@@ -96,7 +101,11 @@ static void run_bg(const char *cmd)
 {
 	if (!cmd || !*cmd) return;
 	pid_t p = fork();
-	if (p == 0) { setsid(); execl("/bin/sh", "sh", "-c", cmd, (char *)NULL); _exit(127); }
+	if (p == 0) {
+		/* the command gets none of the links: a slow mu300-at must not hold the headset's sockets open */
+		for (int fd = 3; fd < 64; fd++) close(fd);
+		setsid(); execl("/bin/sh", "sh", "-c", cmd, (char *)NULL); _exit(127);
+	}
 }
 
 static void ciev(int idx, int val)
@@ -116,9 +125,18 @@ static int sdp_hf_channel(void)
 	if (s < 0) return -1;
 	struct sockaddr_l2 a; memset(&a, 0, sizeof a);
 	a.l2_family = AF_BLUETOOTH; a.l2_psm = 1; a.l2_bdaddr = peer;
-	if (connect(s, (struct sockaddr *)&a, sizeof a) < 0) { close(s); return -1; }
+	/* a headset may refuse the first SDP connection right after the ACL link comes up (AirPods Pro: ECONNREFUSED
+	 * once, then fine, as sdptool browse shows too): three tries */
+	int tries = 3;
+	while (connect(s, (struct sockaddr *)&a, sizeof a) < 0) {
+		close(s);
+		if (--tries == 0) return -1;
+		usleep(700000);
+		s = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+		if (s < 0) return -1;
+	}
 	static const uint8_t req[] = {
-		0x06, 0x00, 0x01, 0x00, 0x0f,          /* ServiceSearchAttributeRequest, tid 1, 15 bytes */
+		0x06, 0x00, 0x01, 0x00, 0x0d,          /* ServiceSearchAttributeRequest, tid 1, 13 bytes follow */
 		0x35, 0x03, 0x19, 0x11, 0x1e,          /* search pattern: UUID16 Handsfree */
 		0xff, 0xff,                            /* max attribute bytes */
 		0x35, 0x03, 0x09, 0x00, 0x04,          /* attribute: ProtocolDescriptorList */
@@ -153,6 +171,10 @@ static void sco_open(void)
 	}
 	say("sco up%s", "");
 }
+
+static int sco_report, sco_loop, rx_peak;
+static long rx_bytes;
+static time_t rx_t;
 
 static void sco_close(void)
 {
@@ -263,15 +285,68 @@ static void feed(char *acc, size_t *len, size_t cap, const char *in, ssize_t n, 
 
 static void on_term(int s) { (void)s; sco_close(); _exit(0); }
 
-/* BlueZ keeps a bonded device's link key in /var/lib/bluetooth/<adapter>/<ADDRESS>/info, section [LinkKey] */
+/* the adapter's own address, as BlueZ names its directory: HCIGETDEVINFO on hci0 (sysfs has no address file);
+ * MU300_BT_ADAPTER_FILE names a file with it instead, for tests */
+#define BTPROTO_HCI 1
+#define HCIGETDEVINFO _IOR('H', 211, int)
+struct hci_dev_info_min {
+	uint16_t dev_id; char name[8]; bdaddr_t bdaddr; uint32_t flags; uint8_t type; uint8_t features[8];
+	uint32_t pkt_type, link_policy, link_mode; uint16_t acl_mtu, acl_pkts, sco_mtu, sco_pkts; uint32_t stat[10];
+};
+static int adapter_address(char out[18])
+{
+	const char *tf = getenv("MU300_BT_ADAPTER_FILE");
+	if (tf) {
+		FILE *f = fopen(tf, "r");
+		if (!f || !fgets(out, 18, f)) { if (f) fclose(f); return 0; }
+		fclose(f);
+	} else {
+		struct hci_dev_info_min di; memset(&di, 0, sizeof di);
+		int h = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+		if (h < 0) return 0;
+		if (ioctl(h, HCIGETDEVINFO, &di) < 0) { close(h); return 0; }
+		close(h);
+		snprintf(out, 18, "%02X:%02X:%02X:%02X:%02X:%02X", di.bdaddr.b[5], di.bdaddr.b[4], di.bdaddr.b[3],
+		         di.bdaddr.b[2], di.bdaddr.b[1], di.bdaddr.b[0]);
+	}
+	out[17] = 0;
+	for (size_t i = 0; i < 17; i++) {
+		if (out[i] >= 'a' && out[i] <= 'f') out[i] -= 32;
+		if (i % 3 == 2 ? out[i] != ':' : !((out[i] >= '0' && out[i] <= '9') || (out[i] >= 'A' && out[i] <= 'F')))
+			return 0;
+	}
+	return 1;
+}
+
+/* BlueZ keeps a bonded device's link key in /var/lib/bluetooth/<adapter>/<ADDRESS>/info, section [LinkKey],
+ * Key=<32 hex>. Only the adapter in use counts (its address from /sys/class/bluetooth/hci0/address: this
+ * controller gets a new one at every boot, so the store holds stale directories whose keys the kernel would never
+ * use), and only a section that carries a key. Read directly, no shell: main() ignores SIGCHLD, under which
+ * system() can never collect its child's status - the first board test ended in "not bonded" with the key there.
+ * The kernel enforces the security level on the RFCOMM socket either way; this is the early, clear answer. */
 static int bonded(const char *addr, const char *store)
 {
-	char up[18], cmd[160];
+	char up[18], adapter[18], path[256], line[256];
 	size_t i;
+	FILE *f;
+	int in_key = 0, found = 0;
 	for (i = 0; i < 17 && addr[i]; i++) up[i] = (addr[i] >= 'a' && addr[i] <= 'f') ? addr[i] - 32 : addr[i];
 	up[i] = 0;
-	snprintf(cmd, sizeof cmd, "grep -qs '^\\[LinkKey\\]' %s/*/%s/info", store, up);
-	return system(cmd) == 0;
+	if (strlen(up) != 17) return 0;
+	if (!adapter_address(adapter)) return 0;
+	snprintf(path, sizeof path, "%s/%s/%s/info", store, adapter, up);
+	f = fopen(path, "r");
+	if (!f) return 0;
+	while (fgets(line, sizeof line, f)) {
+		if (line[0] == '[') { in_key = !strncmp(line, "[LinkKey]", 9); continue; }
+		if (in_key && !strncmp(line, "Key=", 4)) {
+			for (i = 4; i < 36 && line[i]; i++)
+				if (!((line[i] >= '0' && line[i] <= '9') || (line[i] >= 'A' && line[i] <= 'F') || (line[i] >= 'a' && line[i] <= 'f'))) break;
+			if (i == 36) { found = 1; break; }
+		}
+	}
+	fclose(f);
+	return found;
 }
 
 #ifndef MU300_HFP_TEST
@@ -280,12 +355,14 @@ int main(int argc, char **argv)
 {
 	int ch = 0, o;
 	const char *fifo = "/run/mu300-hfp.ctl";
-	while ((o = getopt(argc, argv, "c:C:a:x:")) != -1)
+	while ((o = getopt(argc, argv, "c:C:a:x:rl")) != -1)
 		switch (o) {
 		case 'c': ch = atoi(optarg); break;
 		case 'C': fifo = optarg; break;
 		case 'a': answer_cmd = optarg; break;
 		case 'x': hangup_cmd = optarg; break;
+		case 'r': sco_report = 1; break;
+		case 'l': sco_report = sco_loop = 1; break;
 		default: goto usage;
 		}
 	if (optind >= argc || str2ba(argv[optind], &peer) < 0) {
@@ -340,8 +417,17 @@ usage:
 		}
 		if (sco >= 0 && (p[2].revents & (POLLHUP | POLLERR))) { say("sco closed by the headset%s", ""); close(sco); sco = -1; }
 		else if (sco >= 0 && (p[2].revents & POLLIN)) {
-			/* with the PCM route nothing should arrive over HCI; drain whatever does */
-			if (read(sco, tmp, sizeof tmp) <= 0) { close(sco); sco = -1; }
+			/* with the PCM route nothing should arrive over HCI; drain whatever does. -r reports what did
+			 * (bytes and the loudest sample each second: a microphone test), -l also plays it back */
+			ssize_t n = read(sco, tmp, sizeof tmp);
+			if (n <= 0) { close(sco); sco = -1; }
+			else if (sco_report) {
+				const int16_t *sm = (const int16_t *)tmp;
+				for (ssize_t i = 0; i < n / 2; i++) { int v = sm[i] < 0 ? -sm[i] : sm[i]; if (v > rx_peak) rx_peak = v; }
+				rx_bytes += n;
+				if (sco_loop) { ssize_t w = write(sco, tmp, n); (void)w; }
+				if (time(NULL) != rx_t) { rx_t = time(NULL); char st[64]; snprintf(st, sizeof st, "%ld bytes, peak %d", rx_bytes, rx_peak); say("sco rx: %s", st); rx_bytes = 0; rx_peak = 0; }
+			}
 		}
 	}
 	sco_close();

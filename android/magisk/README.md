@@ -34,7 +34,16 @@ adb reboot                      # Magisk applies a new module on the next boot
 su -c mu300-linux               # switch to Linux now
 su -c 'mu300-linux status'      # what is on each slot; changes nothing
 su -c 'mu300-linux --dry-run'   # print the block it would write, write nothing
+su -c 'mu300-linux bootchain'   # does the boot chain differ between the slots? changes nothing
+su -c 'mu300-linux bootchain sync'   # copy Android's slot's chain to the Linux slot (backed up first)
 ```
+
+`bootchain sync` is the installers' step on its own (`bootchain.sh`, a copy of `tools/android-bootchain.sh`; FINDINGS
+40): where `uboot`, `sml`, `teecfg`, `trustos` or `vbmeta` differ between the slots - after an Android update, say -
+both slots' images go to `/data/adb/mu300-bootchain/<date>/` with a `SHA256SUMS`, then Android's are written to the
+Linux slot and read back; a mismatch writes the old ones back. It refuses when Android's slot is not marked as booted
+successfully, when the other slot is set to boot next without Linux on it (an update waiting for its restart), when
+any of the ten partitions is missing or the two slots of one differ in size, and on any other model.
 
 Going back needs nothing: Linux restores Android's block during its own boot, so the next reboot returns to
 Android. From inside Linux, `mu300-next-boot linux` arms another Linux boot and `mu300-os <name>` picks which
@@ -42,7 +51,7 @@ system starts.
 
 ## What it writes
 
-Exactly 32 bytes: the AOSP `bootloader_control` block at offset `0x800` of `misc`, with the slot Android is not on
+Switching writes exactly 32 bytes: the AOSP `bootloader_control` block at offset `0x800` of `misc`, with the slot Android is not on
 at the highest priority and `tries_remaining = 2` (LK treats 1 as an already failed boot), Android's slot still
 bootable and marked successful. `boot_a`, `boot_b`, the GPT, `userdata` and every other partition are untouched, so
 the worst case of a Linux that does not boot is that LK falls back to Android by itself.

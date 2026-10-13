@@ -28,6 +28,7 @@ MU300_FILES = {
     'mu300/mu300-update': 'rootfs/overlay/opt/mu300/bin/mu300-update',
     'mu300/android-install.sh': 'tools/android-install.sh',
     'mu300/android-mount-mu300root.sh': 'tools/android-mount-mu300root.sh',
+    'mu300/android-bootchain.sh': 'tools/android-bootchain.sh',
     'mu300/storage.sh': 'tools/storage.sh',
     'mu300/i18n.sh': 'tools/i18n.sh',
     'mu300/i18n/tr.tsv': 'i18n/tr.tsv',
@@ -233,7 +234,7 @@ class Conf(ShellTest):
             ex = (sd / 'mu300-install.conf.example').read_text()
             lines = ex.splitlines()
             keys = [l for l in lines if re.match(r'#MU300_[A-Z_]+=', l)]
-            self.assertEqual(len(keys), 15, ex)
+            self.assertEqual(len(keys), 16, ex)
             for line in keys:
                 i = lines.index(line)
                 self.assertTrue(lines[i - 1].startswith('# '), line)          # its explanation, on a line of its own
@@ -506,7 +507,8 @@ class Plan(InstallerCase):
         self.assertIn('/mmcblk1', r.stdout)
         self.assertIn('CREATE new ext4', r.stdout)
         self.assertIn('data/adb/mu300-install.conf', r.stdout)      # the plan says where the values came from
-        self.assertIn('data/adb/mu300-linux-password.txt', r.stdout)
+        self.assertIn('password:       the one from ', r.stdout)
+        self.assertIn('mu300-install.conf (not shown)', r.stdout)
         self.assertNotIn('hunter22', r.stdout)
         self.assertTrue(self.nothing_written())
 
@@ -774,11 +776,39 @@ class Install(InstallerCase):
         self.assertEqual(img[44:44 + 1536], b'loglevel=5'.ljust(1536, b'\0'))
         return cpio_all(unlz4_legacy(ramdisk_of(img)))
 
-    def password_of(self, out):
-        """the password as the output shows it, whole (between quotes: it may hold blanks)"""
-        m = re.search(r'password for \w+: "(.*)"   \(also in ', out)
-        self.assertTrue(m, out)
-        return m.group(1)
+    # the images' well-known passwords (issue #167: a random one shown in nothing but a root-only file, which the next
+    # zip overwrote, left systems nobody could log in to): what the report says, and the note in the password file
+    UBUNTU_HASH = "$" + b'ubuntu'.hex() + "'"              # the fake mkpasswd's hash of "ubuntu" after the salt, as install.env quotes it
+    SHOWN = {'ubuntu': 'password for ubuntu: "ubuntu"   (as in the images; change it after the first login: passwd)',
+             'openwrt': 'password for root: none yet - set one with passwd, or in LuCI (System > Administration)'}
+    NOTE = {'ubuntu': 'user: ubuntu\npassword: ubuntu (as in the images; change it after the first login: passwd)\n',
+            'openwrt': 'user: root\npassword: none yet: set one with passwd, or in LuCI (System > Administration)\n'}
+    PLAN = {'ubuntu': 'password:       ubuntu for user ubuntu, as in the images (MU300_PASSWORD in {conf} sets another)',
+            'openwrt': 'password:       none: root logs in without one until one is set with passwd or in LuCI, System > Administration '
+                       '(MU300_PASSWORD in {conf} sets one now)'}
+
+    def conf_path(self):
+        """the trusted conf as the installer names it (the fake device's path)"""
+        return str(self.fake.root / 'data/adb/mu300-install.conf')
+
+    def images_password(self, r, os_, pw_file='data/adb/mu300-linux-password.txt'):
+        """R gave OS_ (ubuntu, openwrt) the images' password: ubuntu/ubuntu, OpenWrt's root without one. The hash (or
+        none) goes to android-install.sh with PW_SET=1; the plan, the report and the file say so"""
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        kind = 'ubuntu' if os_ == 'ubuntu' else 'openwrt'
+        env = (self.fake.root / 'install.env').read_text()
+        self.assertIn('PW_SET=1\n', env)
+        if kind == 'ubuntu':
+            self.assertRegex(env, r"PWHASH='\$6\$[./0-9A-Za-z]{16}\$")
+            self.assertIn(self.UBUNTU_HASH, env)
+        else:
+            self.assertIn("PWHASH=''", env)
+        self.assertIn(self.PLAN[kind].format(conf=self.conf_path()), r.stdout)
+        self.assertIn(self.SHOWN[kind], r.stdout)
+        self.assertNotIn('the one from', r.stdout)
+        f = self.fake.root / pw_file
+        self.assertIn(self.NOTE[kind], f.read_text())
+        self.assertEqual(f.stat().st_mode & 0o777, 0o600)
 
     def test_full_install_internal(self):
         r = self.run_installer()
@@ -795,15 +825,9 @@ class Install(InstallerCase):
         env = (self.fake.root / 'install.env').read_text()
         for line in ('FORMAT=1', 'OSES="openwrt"', 'SD_MODE=0', 'DEFAULT_LINUX=1', 'BOOT_ATTEMPTS=5', 'KERNEL=6.18'):
             self.assertIn(line, env)
-        self.assertRegex(env, r"PWHASH='\$6\$[./0-9A-Za-z]{16}\$")
-        pw = self.password_of(r.stdout)
-        self.assertRegex(pw, r'^[a-km-zA-HJ-NP-Z2-9]{12}$')
-        # the hash is the password's (the fake mkpasswd's "hash" is its first 10 bytes in hex)
-        self.assertIn(pw.encode().hex()[:20] + "'", env)
-        # root's file by default, mode 600; nothing on the shared storage
-        f = self.fake.root / 'data/adb/mu300-linux-password.txt'
-        self.assertEqual(f.stat().st_mode & 0o777, 0o600)
-        self.assertRegex(f.read_text(), rf'(?m)^password: {pw}$')
+        # OpenWrt's root without a password, as the image ships it; the note in root's file by default, mode 600,
+        # nothing on the shared storage
+        self.images_password(r, 'openwrt')
         self.assertFalse((self.fake.root / 'sdcard/mu300-linux-password.txt').exists())
         self.assertEqual(self.work_dirs(), [])                                 # proprietary staging gone
 
@@ -862,17 +886,101 @@ class Install(InstallerCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn('boot_b and misc were not changed', r.stdout)
         (self.fake.root / 'data/adb/mu300-linux-password.txt').unlink()      # saved first (the next test)
+        (self.fake.root / 'data/adb/mu300-device-install.log').unlink()      # kept for a look (the test below)
         self.assertTrue(self.nothing_written(except_fs=True))
 
-    def test_password_is_saved_before_anything_is_written(self):
-        # android-install.sh puts the hash into the systems: a run that fails or is killed after that must not
-        # leave a Linux whose password was never shown or saved
+    def test_failed_device_install_keeps_its_log(self):
+        # the work directory goes with the run: the device script's output is kept where root can read it, and the
+        # message says where (a timed-out SD-card stage names itself there, FINDINGS 50)
         r = self.run_installer(extra_env={'FAKE_INSTALL_FAILS': '1'})
         self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
-        pw = self.password_of(r.stdout)
+        log = self.fake.root / 'data/adb/mu300-device-install.log'
+        self.assertIn('[device] failing as asked', log.read_text())
+        self.assertIn(f'the device log was kept at {log}', r.stdout)
+        self.assertEqual(log.stat().st_mode & 0o777, 0o600)
+        # a run that goes through leaves no log of a failure behind
+        self.device()
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertFalse(log.exists())
+
+    def test_android_install_gets_the_lock_directory(self):
+        # the lock of a timed-out SD-card stage must outlive the work directory of this run: it goes to /data/adb
+        self.assertEqual(self.run_installer().returncode, 0)
+        lines = [l for l in (self.fake.root / 'android-sh.log').read_text().splitlines() if 'android-install.sh' in l]
+        self.assertTrue(lines)
+        for l in lines:
+            self.assertIn(f'MU300_LOCK_DIR={self.fake.root}/data/adb', l)
+
+    def test_a_timed_out_run_in_this_boot_is_refused(self):
+        # android-install.sh left the lock of this Android boot (an SD-card stage timed out, its request still stuck
+        # in the kernel): refused before anything is built or written, with the stage and the way out
+        lock = self.fake.root / 'data/adb/mu300-install.stalled'
+        lock.write_text('11111111-2222-3333-4444-555555555555\nstage unpack openwrt, 2026-10-12 13:00: no I/O progress on mmcblk1 for 120 s\n')
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('An earlier run of this installer timed out in this Android boot (stage unpack openwrt, 2026-10-12 13:00: '
+                      'no I/O progress on mmcblk1 for 120 s)', r.stdout)
+        self.assertIn('Reboot Android, then install the zip again', r.stdout)
+        self.assertIn(str(lock), r.stdout)
+        self.assertNotIn('Installing', r.stdout)
+        self.assertNotIn('Plan', r.stdout)
+        self.assertFalse((self.fake.root / 'install.env').exists())
+        self.assertTrue(lock.exists())
+        self.assertTrue(self.nothing_written())
+        # Android has rebooted since (another boot id): the lock is stale, the installation goes through, the lock goes
+        lock.write_text('99999999-0000-0000-0000-000000000000\nstage format\n')
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertFalse(lock.exists())
+
+    def test_boot_readback_mismatch_is_not_armed(self):
+        # the image is read back from the partition into a file (whole 4096-byte blocks, one dd whose status counts)
+        # and compared by sha256: a difference refuses to arm Linux - misc stays, Android keeps booting
+        real = shutil.which('dd')
+        self.stub('dd', f'rb=; for a in "$@"; do case $a in of=*/boot/readback) rb=${{a#of=}} ;; esac; done\n'
+                        f'"{real}" "$@" || exit $?\n'
+                        f'[ -z "$rb" ] || printf X | "{real}" of="$rb" bs=1 seek=4100 conv=notrunc 2>/dev/null')
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('boot_b read back from the eMMC is not the image that was written (sha256 differs); '
+                      'Linux was not armed: misc was not changed, so Android keeps booting', r.stdout)
+        by = self.fake.root / 'dev/block/by-name'
+        self.assertEqual(sha(by / 'misc'), self.before['misc'])
+        self.assertEqual(sha(by / 'boot_a'), self.before['boot_a'])
+        self.assertNotEqual(sha(by / 'boot_b'), self.before['boot_b'])        # written, verified wrong, never armed
+        self.assertNotIn('Done. Reboot', r.stdout)
+        self.assertEqual(self.work_dirs(), [])
+        # a read that fails outright is the same refusal, with the reason
+        self.device()
+        self.stub('dd', f'for a in "$@"; do case $a in of=*/boot/readback) exit 1 ;; esac; done\nexec "{real}" "$@"')
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('is not the image that was written (dd failed)', r.stdout)
+        self.assertEqual(sha(by / 'misc'), self.before['misc'])
+
+    def test_boot_readback_is_a_file_of_whole_blocks(self):
+        # the shape of the read-back: exactly the image's length in 4096-byte blocks, into a file, no pipeline on the
+        # partition; mu300-update's write_boot (its own check) is called first
+        s = (TOP / 'android/magisk/installer/mu300-install.sh').read_text()
+        fn = re.search(r'^boot_readback\(\) \{.*?^\}\n', s, re.S | re.M).group(0)
+        self.assertIn('dd if="$1" of="$W/boot/readback" bs=4096 count="$_bn"', fn)
+        self.assertNotRegex(fn, r'dd if="\$1"[^\n]*[^|]\|[^|]')          # a |, never a ||
+        self.assertIn('echo 3 > /proc/sys/vm/drop_caches', fn)
+        ib = re.search(r'^install_boot\(\) \{.*?^\}\n', s, re.S | re.M).group(0)
+        self.assertLess(ib.index('write_boot '), ib.index('boot_readback '))
+        main = s[s.index('main() {'):]
+        self.assertLess(main.index('install_boot'), main.index('arm_linux'))
+
+    def test_password_is_saved_before_anything_is_written(self):
+        # android-install.sh puts the password into the systems: a run that fails or is killed after that must not
+        # leave a Linux whose password nobody was told
+        r = self.run_installer(extra_env={'FAKE_INSTALL_FAILS': '1'})
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn(self.SHOWN['openwrt'], r.stdout)
         self.assertLess(r.stdout.index('password for'), r.stdout.index('Installing'))
         f = self.fake.root / 'data/adb/mu300-linux-password.txt'
-        self.assertRegex(f.read_text(), rf'(?m)^password: {re.escape(pw)}$')
+        self.assertIn(self.NOTE['openwrt'], f.read_text())
         self.assertEqual(f.stat().st_mode & 0o777, 0o600)
         # a password file that cannot be written stops the run before anything is installed
         self.device()
@@ -976,9 +1084,17 @@ class Install(InstallerCase):
         conf = self.fake.root / 'data/adb/mu300-install.conf'
         r = self.run_installer(trusted='MU300_BOOT_ATTEMPTS=3\nMU300_PASSWORD=correct horse\n')
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        self.assertEqual(self.password_of(r.stdout), 'correct horse')          # shown whole, blank and all
-        self.assertIn('correct horse', (self.fake.root / 'data/adb/mu300-linux-password.txt').read_text())
-        self.assertIn('correct horse'.encode().hex()[:20], (self.fake.root / 'install.env').read_text())
+        # hashed, blank and all; never shown, never written down: the report and the file name where it came from
+        env = (self.fake.root / 'install.env').read_text()
+        self.assertIn('correct horse'.encode().hex()[:20], env)
+        self.assertIn('PW_SET=1\n', env)
+        self.assertNotIn('correct horse', r.stdout)
+        self.assertIn(f'password:       the one from {self.conf_path()} (not shown)', r.stdout)
+        self.assertIn(f'password for root: the one from {self.conf_path()}', r.stdout)
+        self.assertNotIn('none yet', r.stdout)
+        f = self.fake.root / 'data/adb/mu300-linux-password.txt'
+        self.assertNotIn('correct horse', f.read_text())
+        self.assertIn(f'user: root\npassword: the one given as MU300_PASSWORD in {self.conf_path()}\n', f.read_text())
         text = conf.read_text()
         self.assertNotIn('correct horse', text)
         self.assertIn('MU300_BOOT_ATTEMPTS=3\n', text)                         # the other settings stay
@@ -999,10 +1115,7 @@ class Install(InstallerCase):
         self.assertTrue((self.fake.root / 'data/adb/mu300-linux-password.txt').exists())
         self.device()
         r = self.run_installer(trusted='MU300_PASSWORD_FILE=sdcard\n')
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        f = self.fake.root / 'sdcard/mu300-linux-password.txt'
-        self.assertIn(self.password_of(r.stdout), f.read_text())
-        self.assertEqual(f.stat().st_mode & 0o777, 0o600)
+        self.images_password(r, 'openwrt', pw_file='sdcard/mu300-linux-password.txt')
         self.assertFalse((self.fake.root / 'data/adb/mu300-linux-password.txt').exists())
 
     def test_password_file_is_never_written_through_a_link(self):
@@ -1014,41 +1127,38 @@ class Install(InstallerCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertEqual(victim.read_text(), 'not yours')
         self.assertFalse(f.is_symlink())
-        self.assertIn(self.password_of(r.stdout), f.read_text())
+        self.assertIn(self.NOTE['openwrt'], f.read_text())
 
     def test_second_zip_keeps_the_first_systems_password(self):
         # Both systems are two zips. The second one installs beside the first and leaves that system's password as
-        # it was, so the file must keep it: the first zip's output may be gone, and the file is the only other place
-        # (seen on the F50: the Ubuntu zip's file replaced the OpenWrt root password)
+        # it was, so the file must keep its note: the first zip's output may be gone, and the file is the only other
+        # place (seen on the F50: the Ubuntu zip's file replaced the OpenWrt root password). Each gets the images'
+        # password of its own (issue #167: a random one nobody saw).
         f = self.fake.root / 'data/adb/mu300-linux-password.txt'
         r = self.run_installer()
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        pw_root = self.password_of(r.stdout)
+        self.images_password(r, 'openwrt')
         self.existing_filesystem(systems=('openwrt',))
         self.zip(system='ubuntu-24.04', kernel='5.4')
         r = self.run_installer()
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        pw_ubuntu = self.password_of(r.stdout)
+        self.images_password(r, 'ubuntu')
         text = f.read_text()
-        self.assertIn(f'user: ubuntu\npassword: {pw_ubuntu}\n', text)
-        self.assertIn(f'user: root\npassword: {pw_root}\n', text)
+        self.assertIn(self.NOTE['openwrt'], text)
         self.assertTrue(text.startswith('MU300 Linux '))                       # the newest first
         self.assertLess(text.index('user: ubuntu'), text.index('user: root'))
-        self.assertEqual(f.stat().st_mode & 0o777, 0o600)
-        # the first system again with a new password asked for: it replaces its old one, the other one stays
+        # the first system again with its password given: the note replaces its old one, the other one stays
         self.zip(system='openwrt')
-        r = self.run_installer(trusted='MU300_PASSWORD_RESET=yes\n')
+        r = self.run_installer(trusted='MU300_PASSWORD=correct horse\n')
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        pw_root2 = self.password_of(r.stdout)
         text = f.read_text()
         self.assertEqual(text.count('user: root\n'), 1, text)
         self.assertEqual(text.count('user: ubuntu\n'), 1, text)
-        self.assertIn(f'user: root\npassword: {pw_root2}\n', text)
-        self.assertIn(f'user: ubuntu\npassword: {pw_ubuntu}\n', text)
-        self.assertNotIn(f'password: {pw_root}\n', text)
-        # a wipe leaves one system: no password of the erased one
+        self.assertIn(f'user: root\npassword: the one given as MU300_PASSWORD in {self.conf_path()}\n', text)
+        self.assertIn(self.NOTE['ubuntu'], text)
+        self.assertNotIn(self.NOTE['openwrt'], text)
+        self.assertNotIn('correct horse', text)
+        # a wipe leaves one system: no note of the erased one
         r = self.run_installer(trusted='MU300_MODE=wipe\n')
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.images_password(r, 'openwrt')
         text = f.read_text()
         self.assertNotIn('user: ubuntu', text)
         self.assertEqual(text.count('user: root\n'), 1, text)
@@ -1056,8 +1166,11 @@ class Install(InstallerCase):
     def kept(self, r, users):
         """R kept the password: no hash for android-install.sh, no password shown, the plan and report say so"""
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        self.assertIn("PWHASH=''", (self.fake.root / 'install.env').read_text())
+        env = (self.fake.root / 'install.env').read_text()
+        self.assertIn("PWHASH=''", env)
+        self.assertIn('PW_SET=0\n', env)
         self.assertNotRegex(r.stdout, r'password for \w+: "')
+        self.assertNotIn('none yet', r.stdout)
         self.assertIn('password:       kept: the accounts and passwords of the installed system are not changed',
                       r.stdout)
         self.assertIn(f'password for {users}: unchanged', r.stdout)
@@ -1088,13 +1201,21 @@ class Install(InstallerCase):
                 self.kept(self.run_installer(), users)
                 self.assertFalse(f.exists())
 
-    def test_password_is_generated_for_a_fresh_install_or_a_wipe(self):
+    def test_the_images_password_for_a_fresh_install_a_wipe_or_a_system_added(self):
+        # issue #167 (seen on the F50: Ubuntu first, openwrt-luci and openwrt added with zips): a system that gets a
+        # new password got a random one, shown nowhere but in root's file, which the next zip overwrote. It gets
+        # the images' well-known one instead: ubuntu/ubuntu, OpenWrt's root without a password
         cases = (  # name, the target, trusted conf
             ('blank region', lambda: None, None),
             ('wipe', lambda: (self.existing_filesystem(systems=('openwrt',)), self.accounts('openwrt')),
              'MU300_MODE=wipe\n'),
-            # a system added beside another: the new one has only the image's accounts
+            # a system added beside another, whatever that one's accounts
             ('second system', lambda: (self.existing_filesystem(systems=('ubuntu',)), self.accounts('ubuntu')), None),
+            ('third system', lambda: (self.zip(system='openwrt-luci'), self.existing_filesystem(systems=('openwrt', 'ubuntu')),
+                                      self.accounts('ubuntu'), self.accounts('openwrt')), None),
+            ('Ubuntu beside OpenWrt', lambda: (self.zip(system='ubuntu-24.04'), self.existing_filesystem(systems=('openwrt',)),
+                                               self.accounts('openwrt')), None),
+            ('Ubuntu on a blank region', lambda: self.zip(system='ubuntu-24.04'), None),
             # the system there still has the image's accounts (an older mu300-update never carried them over)
             ('image accounts', lambda: (self.existing_filesystem(systems=('openwrt',)),
                                         self.accounts('openwrt', marked=True)), None),
@@ -1120,12 +1241,13 @@ class Install(InstallerCase):
                 self.reset()
                 target()
                 r = self.run_installer(trusted=trusted)
-                self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-                pw = self.password_of(r.stdout)
-                self.assertRegex(pw, r'^[a-km-zA-HJ-NP-Z2-9]{12}$')
-                self.assertIn('password:       generated, written to', r.stdout)
-                self.assertIn(pw.encode().hex()[:20] + "'", (self.fake.root / 'install.env').read_text())
-                self.assertIn(f'password: {pw}\n', (self.fake.root / 'data/adb/mu300-linux-password.txt').read_text())
+                self.images_password(r, self.zip_args['system'].partition('-')[0])
+        # the file does not hold a password any more: a plan that is only shown does not write it
+        self.reset()
+        r = self.run_installer(conf='MU300_DRY_RUN=1\n')
+        self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+        self.assertIn(self.PLAN['openwrt'].format(conf=self.conf_path()), r.stdout)
+        self.assertFalse((self.fake.root / 'data/adb/mu300-linux-password.txt').exists())
 
     def test_password_reset_only_when_a_trusted_conf_asks(self):
         conf = self.fake.root / 'data/adb/mu300-install.conf'
@@ -1136,24 +1258,27 @@ class Install(InstallerCase):
         self.kept(r, 'root')
         self.assertIn('MU300_PASSWORD_RESET is taken only from', r.stdout)
         self.assertFalse(f.exists())
-        # from /data/adb: generated, shown, saved, and the line used once
+        # from /data/adb: the images' password (OpenWrt's root without one), shown, noted, and the line used once
         r = self.run_installer(trusted='MU300_PASSWORD_RESET=yes\nMU300_BOOT_ATTEMPTS=3\n')
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        pw = self.password_of(r.stdout)
-        self.assertIn(pw.encode().hex()[:20] + "'", (self.fake.root / 'install.env').read_text())
-        self.assertIn(f'password: {pw}\n', f.read_text())
+        self.images_password(r, 'openwrt')
         text = conf.read_text()
         self.assertIn('# MU300_PASSWORD_RESET was used by the installer and removed', text)
         self.assertIn('MU300_BOOT_ATTEMPTS=3\n', text)
-        # the next flash keeps the new one
+        # the next flash: root without a password is not an account to keep, the images' password applies again
+        # (the same empty one; an update carries every other account over)
+        (self.fake.root / 'fs/openwrt/etc/shadow').write_text('root::19000::::::\n')
+        self.images_password(self.run_installer(trusted=text), 'openwrt')
+        # one the user set since is kept
+        self.accounts('openwrt')
         self.kept(self.run_installer(trusted=text), 'root')
-        self.assertIn(f'password: {pw}\n', f.read_text())
+        self.assertIn(self.NOTE['openwrt'], f.read_text())
         # a password of one's own in /data/adb is a reset too
         r = self.run_installer(trusted='MU300_PASSWORD=correct horse\n')
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        self.assertEqual(self.password_of(r.stdout), 'correct horse')
+        self.assertNotIn('correct horse', r.stdout)
         self.assertIn('correct horse'.encode().hex()[:20], (self.fake.root / 'install.env').read_text())
-        self.assertIn('password:       from ', r.stdout)
+        self.assertIn('password:       the one from ', r.stdout)
+        self.assertIn(f'password for root: the one from {self.conf_path()}', r.stdout)
 
     def test_payload_replaced_after_verification_is_not_installed(self):
         # the zip changes under the installer once the payload is checked (magiskboot runs only after that): what
@@ -1185,6 +1310,59 @@ class Install(InstallerCase):
         self.assertEqual(self.work_dirs(), [])
 
 
+class Bootchain(InstallerCase):
+    """the boot chain of Android's slot for the Linux slot (tools/android-bootchain.sh, tests/test_bootchain.py): the
+    plan says what happens, a refusal stops the installation before anything is written, and android-install.sh is
+    told whether to sync"""
+
+    def chain(self, name, slot, data):
+        (self.fake.root / 'dev/block/by-name' / f'{name}_{slot}').write_bytes(data)
+
+    def test_identical(self):
+        r = self.run_installer(conf='MU300_DRY_RUN=1\n')
+        self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+        self.assertIn('  boot chain:     identical on both slots', r.stdout)
+        self.assertTrue(self.nothing_written())
+
+    def test_differing_images_are_named(self):
+        # the same size, another build
+        self.chain('trustos', 'a', b'TRUSTOS' * 1024)
+        self.chain('vbmeta', 'a', b'VBMETA' * 1024)
+        r = self.run_installer(conf='MU300_DRY_RUN=1\n')
+        self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+        self.assertIn("  boot chain:     trustos, vbmeta differ between the slots; Android's slot a is copied to slot b "
+                      '(backed up first)', r.stdout)
+        self.assertTrue(self.nothing_written())
+
+    def test_refusal_stops_before_anything(self):
+        (self.fake.root / 'dev/block/by-name/teecfg_b').unlink()
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn('the boot chain cannot be copied to the Linux slot: teecfg_a or teecfg_b is missing', r.stdout)
+        self.assertIn('MU300_SYNC_BOOTCHAIN=0', r.stdout)
+        self.assertFalse((self.fake.root / 'install.env').exists())
+        self.assertTrue(self.nothing_written())
+
+    def test_install_tells_android_install_to_sync(self):
+        r = self.run_installer()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn('SYNC_BOOTCHAIN=1', (self.fake.root / 'install.env').read_text())
+
+    def test_skip_setting(self):
+        (self.fake.root / 'dev/block/by-name/teecfg_b').unlink()
+        r = self.run_installer(conf='MU300_SYNC_BOOTCHAIN=0\n')
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn('boot chain:     not synced (MU300_SYNC_BOOTCHAIN=0)', r.stdout)
+        self.assertIn('SYNC_BOOTCHAIN=0', (self.fake.root / 'install.env').read_text())
+
+    def test_unrecognised_model_is_not_synced(self):
+        self.device(model='Generic Phone')
+        r = self.run_installer(trusted='MU300_DEVICE=f50\n')
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn('boot chain:     not synced (the model is not recognised)', r.stdout)
+        self.assertIn('SYNC_BOOTCHAIN=0', (self.fake.root / 'install.env').read_text())
+
+
 class Password(ShellTest):
     def lib(self, shell, code):
         return self.sh(shell, f'MU300_LIB=1 MU300_DIR="{INSTALLER_DIR}" MU300_UBB="busybox" . "{INSTALLER}"; ' + code)
@@ -1204,11 +1382,12 @@ class Password(ShellTest):
             self.assertEqual(h, m.sha512_crypt('s3cret pw', salt))
 
     def test_random_chars(self):
+        # the salt of password_hash (the password itself is never random any more: issue #167)
         for shell in self.each_shell():
             seen = set()
             for _ in range(20):
-                r = self.lib(shell, 'random_chars "$PW_ALPHABET" 12')
-                self.assertRegex(r.stdout.strip(), r'^[a-km-np-zA-HJ-NP-Z2-9]{12}$')
+                r = self.lib(shell, 'random_chars "$CRYPT_ITOA" 16')
+                self.assertRegex(r.stdout.strip(), r'^[./0-9A-Za-z]{16}$')
                 seen.add(r.stdout)
             self.assertEqual(len(seen), 20)
 

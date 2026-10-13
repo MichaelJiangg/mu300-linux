@@ -42,8 +42,38 @@ msgstr "Energia"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300 vezérlőközpont: állapot-irányítópult, hálózati zárolások, AT-terminál és SMS"
+msgid "Terminal"
+msgstr "Terminál"
+
+msgid "Terminal settings"
+msgstr "Terminál beállításai"
+
+msgid "Overview"
+msgstr "Áttekintés"
+
+msgid "Profiles"
+msgstr "Profilok"
+
+msgid "Subscriptions"
+msgstr "Előfizetések"
+
+msgid "Engines"
+msgstr "Motorok"
+
+msgid "Settings"
+msgstr "Beállítások"
+
+msgid "Logs"
+msgstr "Naplók"
+
+msgid "Packages after an update"
+msgstr "Csomagok frissítés után"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 vezérlőközpont: állapotpanel, hálózati zárak, AT terminál, SMS és VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminál: root shell az eszközön, a böngészőben"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Ismeretlen szám"
 
 msgid "Select"
 msgstr "Kiválasztás"
+
+msgid "never"
+msgstr "soha"
+
+msgid "just now"
+msgstr "az imént"
+
+msgid "%s ago"
+msgstr "%s ezelőtt"
+
+msgid "Failed: %s"
+msgstr "Sikertelen: %s"
+
+msgid "Management connection lost"
+msgstr "A felügyeleti kapcsolat megszakadt"
+
+msgid "Installing the VPN module"
+msgstr "A VPN-modul telepítése"
+
+msgid "Installing the engine"
+msgstr "A motor telepítése"
+
+msgid "Adding the subscription"
+msgstr "Előfizetés hozzáadása"
+
+msgid "Refreshing the subscriptions"
+msgstr "Az előfizetések frissítése"
+
+msgid "Testing the latency of every profile"
+msgstr "Minden profil késleltetésének mérése"
+
+msgid "Downloading the config"
+msgstr "A konfiguráció letöltése"
+
+msgid "Working…"
+msgstr "Folyamatban…"
+
+msgid "done"
+msgstr "kész"
+
+msgid "failed"
+msgstr "sikertelen"
+
+msgid "Verify the uploaded file"
+msgstr "Feltöltött fájl ellenőrzése"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "A feltöltött fájlt a VPN-modul legújabb kiadásának HTTPS-en letöltött SHA256SUMS fájljával ellenőrizzük. Ha ez nem lehetséges (offline, régebbi kiadás), csak akkor települ, ha engedélyez egy nem ellenőrzött fájlt: ekkor ellenőrzés nélkül, rootként fut."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Telepítés akkor is, ha nem ellenőrizhető"
+
+msgid "Install only a verified file"
+msgstr "Csak ellenőrzött fájl telepítése"
+
+msgid "Upload failed: %s"
+msgstr "A feltöltés sikertelen: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "A VPN-modul túl régi ehhez a panelhez"
+
+msgid "The VPN module is not installed"
+msgstr "A VPN-modul nincs telepítve"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Ehhez az oldalhoz a gépileg olvasható mu300-vpn-t tartalmazó VPN-modul kell (v2 vagy újabb modul). A frissítés megtartja a profilokat és a beállításokat."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "A VPN önálló modul: a mu300-vpn a kill switch-csel és a profilokkal, plusz egy-egy extra motoronként (Xray, sing-box, mihomo, dae). A mu300-extra install vpn paranccsal telepíthető."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "A letöltés a modulnál néhány MB, motoronként akár több tíz MB: mobiladaton ez a csomagja terhére megy."
+
+msgid "Update the VPN module"
+msgstr "A VPN-modul frissítése"
+
+msgid "Install the VPN module"
+msgstr "A VPN-modul telepítése"
+
+msgid "Upload the file…"
+msgstr "Fájl feltöltése…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Offline: töltse fel a mu300-linux-vpn-core.tar.gz fájlt (vagy a mu300-linux-vpn.tar.gz csomagot) a VPN-modul kiadási oldaláról."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Ez egy hálózat- vagy frekvenciakeresés: egy-három percig tart, a modem AT-csatornáját egész idő alatt lefoglalja, és a mobiladat közben szünetelhet. A háttérben fut; a válasz itt jelenik meg, amikor elkészül."
@@ -207,14 +324,8 @@ msgstr "A keresés egy pillanatra leveszi a Wi-Fi hozzáférési pontot a csator
 msgid "Scan anyway"
 msgstr "Keresés mégis"
 
-msgid "Failed: %s"
-msgstr "Sikertelen: %s"
-
 msgid "Saved"
 msgstr "Mentve"
-
-msgid "Management connection lost"
-msgstr "A felügyeleti kapcsolat megszakadt"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Hőmérséklet"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "A kernel hőzónái, csak olvasható. A küszöbpontokkal rendelkező zóna a passzív küszöbénél korlátozza a hozzá kötött hűtőeszközöket; a 0 hűtési állapot azt jelenti, hogy nincs korlátozás."
+
+msgid "Zone"
+msgstr "Zóna"
+
+msgid "Temperature"
+msgstr "Hőmérséklet"
+
+msgid "Trip points"
+msgstr "Küszöbpontok"
+
+msgid "Cooling devices"
+msgstr "Hűtőeszközök"
 
 msgid "USB role"
 msgstr "USB-szerep"
@@ -489,8 +618,17 @@ msgstr "Törzs"
 msgid "Form (URL-encoded)"
 msgstr "Űrlap (URL-kódolt)"
 
+msgid "Plain text"
+msgstr "Egyszerű szöveg"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Mezők: sender, time, text, device, message (a kitöltött sablon)"
+
+msgid "Custom body"
+msgstr "Egyéni törzs"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Üres: a szabványos mezők (egyszerű szöveg: az üzenet). Helyőrzők: {sender}, {time}, {text}, {device}, {message}. Minden érték a választott típusnak megfelelően kap escape-elést. Ez a törzs itt újra megjelenik: a titkokat a címben vagy egy fejlécben tartsa."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "További fejlécek (soronként egy \"Név: érték\")"
@@ -651,6 +789,9 @@ msgstr "Összes küldött"
 msgid "Used today"
 msgstr "Ma felhasznált"
 
+msgid "SIM source"
+msgstr "SIM-forrás"
+
 msgid "Session duration"
 msgstr "Munkamenet időtartama"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Szolgáltató"
+
+msgid "Own number"
+msgstr "Saját szám"
 
 msgid "Module"
 msgstr "Modul"
@@ -858,8 +1002,17 @@ msgstr "A zárolás sikertelen: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "A hálózati zárak visszaállítása automatikusra (SFUN újraindítás, kb. 30 másodperc)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "A visszaállítás nem sikerült: %s. A mentett zárolási beállítások megmaradtak."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "A zárak visszaállítása nem erősítődött meg időben; a váltás így is megtörténik."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Belső SIM kiválasztva: újraindítás után lesz használatban"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Belső SIM kiválasztva, de ez az eszköz nem támogatja: a külső SIM van használatban"
 
 msgid "Uptime %s"
 msgstr "Üzemidő: %s"
@@ -990,9 +1143,6 @@ msgstr "A nyelvi csomag telepítve"
 msgid "The language pack could not be installed"
 msgstr "A nyelvi csomagot nem sikerült telepíteni"
 
-msgid "Upload failed: %s"
-msgstr "A feltöltés sikertelen: %s"
-
 msgid "Language of the browser"
 msgstr "A böngésző nyelve"
 
@@ -1013,9 +1163,6 @@ msgstr "A nyelvi csomag (mu300-extra-lang.tar.gz, kb. 2 MB) a LuCI-t további kb
 
 msgid "Download from the release"
 msgstr "Letöltés a kiadásból"
-
-msgid "Upload the file…"
-msgstr "Fájl feltöltése…"
 
 msgid "Release"
 msgstr "Kiadás"
@@ -1209,6 +1356,9 @@ msgstr "Állapot megerősítve"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "A visszaolvasás időtúllépés miatt megszakadt; válassza a „Zárolási állapot frissítése” lehetőséget"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Visszaállítás ellenőrizve: hálózati mód automatikus, EN-DC be, minden sáv, nincs cellazárolás; a mentett zárolási beállítások törölve"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Alkalmazva (az EN-DC-hez nem kell újraindítani a rádióvermet)"
 
@@ -1235,6 +1385,114 @@ msgstr "Automatikus (%d támogatott)"
 
 msgid "%d locked: %s"
 msgstr "%d zárolva: %s"
+
+msgid "Repair DNS?"
+msgstr "Javítja a DNS-t?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Ez eltávolítja egy már nem telepített csomag DNS-továbbítását. Ha nem marad más DNS-kiszolgáló, az eszköz a mobilkapcsolat DNS-kiszolgálóit használja: a szolgáltató látja a lekérdezett neveket, bármilyen proxyn vagy VPN-en kívül."
+
+msgid "Repair DNS"
+msgstr "DNS javítása"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Az eszközre telepített csomagok nem részei a kiadás képfájljának. A frissítés feljegyzi őket, és az új rendszer az első indításkor újratelepíti őket, amint van internet. Amíg egy csomag vissza nem tér, a beállításai félre vannak téve."
+
+msgid "No packages to install again."
+msgstr "Nincs újratelepítendő csomag."
+
+msgid "All back"
+msgstr "Mind visszakerült"
+
+msgid "Not installed yet"
+msgstr "Még nincs telepítve"
+
+msgid "Could not be installed again"
+msgstr "Nem sikerült újratelepíteni"
+
+msgid "Waiting for the internet"
+msgstr "Várakozás az internetre"
+
+msgid "Given up: no internet at five boots"
+msgstr "Feladva: öt indításnál nem volt internet"
+
+msgid "Skipped"
+msgstr "Kihagyva"
+
+msgid "Written down by the update from %s"
+msgstr "Feljegyezte a(z) %s verzióról történt frissítés"
+
+msgid "Installed again"
+msgstr "Újratelepítve"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Telepítse őket saját maga onnan, ahonnan szerezte (csomagfájl: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Félretett beállítások itt: /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "A DNS még mindig egy nem telepített csomaghoz megy: az eszköznek nincs DNS-e rajta keresztül."
+
+msgid "Try again"
+msgstr "Újra"
+
+msgid "Dismiss the note"
+msgstr "Értesítés elrejtése"
+
+msgid "started"
+msgstr "elindítva"
+
+msgid "asleep now (asked)"
+msgstr "alvás most (kérésre)"
+
+msgid "woken: power daemon stopping"
+msgstr "felébresztve: az energiaszolgáltatás leáll"
+
+msgid "woken by a key"
+msgstr "gomb ébresztette"
+
+msgid "woken by the Wi-Fi key"
+msgstr "a Wi-Fi gomb ébresztette"
+
+msgid "woken (mu300-power wake)"
+msgstr "felébresztve (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "USB-s számítógép ébresztette"
+
+msgid "woken: plugged in"
+msgstr "felébresztve: töltőre téve"
+
+msgid "woken by a Wi-Fi client"
+msgstr "Wi-Fi kliens ébresztette"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "töltési indítás (a töltő kapcsolta be)"
+
+msgid "the hotspot is down"
+msgstr "a hotspot ki van kapcsolva"
+
+msgid "the VPN is still stopped"
+msgstr "a VPN még mindig leállt"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "az 5G (EN-DC) sikertelen folytatás után is ki van kapcsolva"
+
+msgid "self-check: %s"
+msgstr "önellenőrzés: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "alszik: %d perce nincs kliens (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "alszik: a profil most %s"
+
+msgid "woken by the %s key"
+msgstr "a(z) %s gomb ébresztette"
+
+msgid "the modem is suspended (%s)"
+msgstr "a modem fel van függesztve (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Adjon meg egy egész számot 0 és %d között"
@@ -1437,6 +1695,15 @@ msgstr "Üzenet (Enter a küldéshez, Shift+Enter új sorhoz)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "A küldés AT+CMGS-t használ (PDU mód); ha a csatorna foglalt, próbálja újra. Egy üzenet törléséhez használja a buborékján lévő kuka ikont."
 
+msgid "Sending…"
+msgstr "Küldés…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Elküldve; a lista hamarosan frissül."
+
+msgid "Sending failed"
+msgstr "A küldés sikertelen"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Szinkronizálás a SIM-ről a háttérben (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Törölve (csak helyi)"
 msgid "Enter both a number and a message."
 msgstr "Adjon meg számot és üzenetet is."
 
-msgid "Sending…"
-msgstr "Küldés…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Elküldve; a lista hamarosan frissül."
-
-msgid "Sending failed"
-msgstr "A küldés sikertelen"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d üzenet, %d olvasatlan · %d beszélgetés"
 
@@ -1502,6 +1760,39 @@ msgstr "Hiányos: %d / %d rész érkezett meg"
 
 msgid "Delete"
 msgstr "Törlés"
+
+msgid "ttyd is not installed."
+msgstr "A ttyd nincs telepítve."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "A terminál ki van kapcsolva (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Túl sok terminál nyílik meg egyszerre. Próbálja újra egy perc múlva."
+
+msgid "The terminal is not available."
+msgstr "A terminál nem érhető el."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Ez az eszköz root shellje: minden parancs teljes jogokkal fut, és egy hiba miatt az eszköz nem fog elindulni."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Csak a LAN-ról érhető el (USB és a hotspot), mobiladatról soha, és csak erről a bejelentkezett oldalról."
+
+msgid "It closes after a minute without activity."
+msgstr "Egy perc tétlenség után bezárul."
+
+msgid "It closes after %d minutes without activity."
+msgstr "%d perc tétlenség után bezárul."
+
+msgid "Reconnect"
+msgstr "Újracsatlakozás"
+
+msgid "Open in a new tab"
+msgstr "Megnyitás új lapon"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Ez az oldal HTTPS-en nyílt meg, a terminál pedig HTTP-n fut a LAN-on: ezért saját lapon nyílik meg."
 
 msgid "The data usage could not be read"
 msgstr "Az adatforgalom nem olvasható"
@@ -1637,6 +1928,594 @@ msgstr "Kikapcsolás"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "64 esetén minden csomag úgy távozik, mint az eszköz saját forgalma"
+
+msgid "running"
+msgstr "fut"
+
+msgid "(about %s)"
+msgstr "(kb. %s)"
+
+msgid "Install %s?"
+msgstr "Telepíti a következőt: %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "A rendszer csomagforrásából települ."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "A VPN-modul kiadásából töltődik le, és a SHA256SUMS alapján ellenőrzi a rendszer."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Egy motor több tíz MB: mobiladaton a letöltés a csomagja terhére megy."
+
+msgid "Install"
+msgstr "Telepítés"
+
+msgid "Remove %s?"
+msgstr "Eltávolítja: %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Ezen futó profilok: %s. Amíg újra nem telepíti, nem indulhatnak el (a modul megtagadja az eltávolítást, ha a futó profilnak szüksége van rá)."
+
+msgid "No profile runs on it."
+msgstr "Egy profil sem fut rajta."
+
+msgid "Removed"
+msgstr "Eltávolítva"
+
+msgid "Check for updates"
+msgstr "Frissítések keresése"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Minden motor külön extra: csak azokat telepítse, amelyekre a profiljainak szüksége van. Az Xray vless, vmess, trojan és ss hivatkozásokat futtat (hev-socks5-tunnel-lel), a sing-box ugyanezeket és a saját JSON-ját, a mihomo Clash előfizetéseket, a dae pedig hysteria2-t, tuic-ot és a többit újabb kerneleken. A WireGuard és az OpenVPN a rendszer csomagjai."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "A letöltések motoronként több tíz MB-osak: mobiladaton ez a csomagja terhére megy. Offline esetben töltse fel a motor tarballját a VPN-modul kiadási oldaláról."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Az elérhető verziók a VPN-modul legfrissebb kiadásából származnak."
+
+msgid "Update"
+msgstr "Frissítés"
+
+msgid "system package"
+msgstr "rendszercsomag"
+
+msgid "in the vpn bundle"
+msgstr "a vpn csomagban"
+
+msgid "extra %s"
+msgstr "extra: %s"
+
+msgid "not installed"
+msgstr "nincs telepítve"
+
+msgid "cannot run here"
+msgstr "itt nem futhat"
+
+msgid "update available"
+msgstr "frissítés érhető el"
+
+msgid "installed"
+msgstr "telepítve"
+
+msgid "Kind"
+msgstr "Típus"
+
+msgid "Version"
+msgstr "Verzió"
+
+msgid "Available"
+msgstr "Elérhető"
+
+msgid "not checked"
+msgstr "nincs ellenőrizve"
+
+msgid "Size"
+msgstr "Méret"
+
+msgid "Needed by"
+msgstr "Ki használja"
+
+msgid "no profile"
+msgstr "nincs profil"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "A dae-hez BTF-es, 5.17-es vagy újabb kernel kell: az 5.4-es gyártói kernelen nem fut (mu300-update kernel 6.18). Ettől még telepíthető."
+
+msgid "All engines"
+msgstr "Minden motor"
+
+msgid "Last %s lines"
+msgstr "Utolsó %s sor"
+
+msgid "VPN service log"
+msgstr "A VPN szolgáltatás naplója"
+
+msgid "Every 5 s"
+msgstr "5 mp-enként"
+
+msgid "The log is empty."
+msgstr "A napló üres."
+
+msgid "The VPN is starting"
+msgstr "A VPN indul"
+
+msgid "The VPN is stopped"
+msgstr "A VPN le van állítva"
+
+msgid "The VPN is restarting"
+msgstr "A VPN újraindul"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Bekapcsolt kill switch mellett semmi sem hagyja el az eszközt vagy a LAN-t az alagúton kívül: amíg a VPN nem működik, indul vagy hibás, minden kapcsolat meghiúsul ahelyett, hogy közvetlenül kimenne. Addig marad bekapcsolva, amíg itt le nem állítja a VPN-t (a Leállítás eltávolítja)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Kill switch nélkül a forgalom védelem nélkül, közvetlenül megy ki, valahányszor az alagút nem működik (induláskor, összeomlás után, ha hiányzik a motor)."
+
+msgid "Turn the kill switch on?"
+msgstr "Bekapcsolja a kill switch-et?"
+
+msgid "Turn the kill switch off?"
+msgstr "Kikapcsolja a kill switch-et?"
+
+msgid "Turn on"
+msgstr "Bekapcsolás"
+
+msgid "unknown"
+msgstr "ismeretlen"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "A kilépési cím nem található (működik az alagút?)"
+
+msgid "Connecting…"
+msgstr "Csatlakozás…"
+
+msgid "On, but not running"
+msgstr "Be van kapcsolva, de nem fut"
+
+msgid "Stopped"
+msgstr "Leállítva"
+
+msgid "Install it"
+msgstr "Telepítés"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Az aktív profil motorja nincs telepítve: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "A kill switch mindent zárva tart, amíg az meg nem érkezik; a szolgáltatás magától letölti, ha tudja."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "A VPN nem indulhat el, amíg nincs telepítve."
+
+msgid "%s cannot run on this system"
+msgstr "A(z) %s nem futhat ezen a rendszeren"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "A VPN be van kapcsolva, de nincs aktív profil: válasszon egyet lent."
+
+msgid "Profile: %s"
+msgstr "Profil: %s"
+
+msgid "No active profile"
+msgstr "Nincs aktív profil"
+
+msgid "engine %s"
+msgstr "motor: %s"
+
+msgid "interface %s"
+msgstr "interfész: %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch aktív"
+
+msgid "Kill switch on"
+msgstr "Kill switch be"
+
+msgid "Kill switch off"
+msgstr "Kill switch ki"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 az alagútban"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 blokkolva"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 érintetlen"
+
+msgid "Module %s"
+msgstr "Modul: %s"
+
+msgid "Check"
+msgstr "Ellenőrzés"
+
+msgid "Uptime"
+msgstr "Üzemidő"
+
+msgid "Rate"
+msgstr "Sebesség"
+
+msgid "Exit address"
+msgstr "Kilépési cím"
+
+msgid "Start"
+msgstr "Indítás"
+
+msgid "Stop"
+msgstr "Leállítás"
+
+msgid "Restart"
+msgstr "Újraindítás"
+
+msgid "Stop the VPN?"
+msgstr "Leállítja a VPN-t?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "A forgalom ekkor az alagút nélkül, közvetlenül megy ki; a kill switch is leáll vele együtt."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "A VPN be van kapcsolva: újraindítás után magától újra elindul."
+
+msgid "The VPN is off."
+msgstr "A VPN ki van kapcsolva."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Beállítás"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Aktív: az internetet csak az alagút érheti el"
+
+msgid "Not active"
+msgstr "Nem aktív"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "A kill switch blokkolja az eszköz és a LAN teljes forgalmát, amíg a VPN nem működik, így semmi sem hagyja el az eszközt alagút nélkül. Ha az alagút nem épül fel (halott szerver, lejárt fiók), az eszköz offline marad, amíg nem javítja a profilt vagy nem állítja le a VPN-t. Maga a panel továbbra is elérhető a LAN-ról."
+
+msgid "Choose a profile"
+msgstr "Válasszon profilt"
+
+msgid "No profiles yet"
+msgstr "Még nincs profil"
+
+msgid "engine not installed"
+msgstr "a motor nincs telepítve"
+
+msgid "Use"
+msgstr "Használat"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Átváltva: a VPN az új profillal indul újra"
+
+msgid "Active profile"
+msgstr "Aktív profil"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "A futó VPN a kiválasztott profillal indul újra; a kill switch közben aktív marad."
+
+msgid "Manage the profiles"
+msgstr "Profilok kezelése"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Automatikus: az alagúton át, ahol a motor továbbítani tudja"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "IPv6 kérése a motortól az alagútban"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Soha az alagúton át (blokkolva, amíg a VPN fut)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Mentve: a következő indítástól érvényes (Újraindítás)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Az alagút IPv6-ot visz"
+
+msgid "Yes"
+msgstr "Igen"
+
+msgid "IPv6 guard"
+msgstr "IPv6-védelem"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Aktív: az alagúton kívüli IPv6 elutasítva"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Amíg a VPN fut, az IPv6 soha nem megy ki egy azt nem szállító alagút mellett: azonnal elutasításra kerül, így a programok és a LAN-kliensek kiszivárogtatás vagy várakozás helyett IPv4-re váltanak. Automatikus: a WireGuard a konfigurációja IPv6-címeit használja, a többi motor IPv4-en marad."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: nem mérhető"
+
+msgid "blocked by the kill switch"
+msgstr "a kill switch blokkolta"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "WireGuard vagy OpenVPN konfiguráció, Clash/mihomo YAML, Xray vagy sing-box JSON, dae konfiguráció"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Az OK után válassza ki a fájlt: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray vagy sing-box .json vagy dae konfiguráció (legfeljebb 1 MiB)."
+
+msgid "From the source"
+msgstr "Forrásból"
+
+msgid "Detect"
+msgstr "Felismerés"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "Az URL tokent tartalmazhat: külön jut el az eszközhöz, soha nem kerül parancssorba vagy naplóba."
+
+msgid "Type"
+msgstr "Típus"
+
+msgid "Share link"
+msgstr "Megosztási hivatkozás"
+
+msgid "Paste"
+msgstr "Beillesztés"
+
+msgid "File"
+msgstr "Fájl"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Ez a panel nem fogad el ilyen megosztási hivatkozást"
+
+msgid "The config is empty"
+msgstr "A konfiguráció üres"
+
+msgid "Not an https URL"
+msgstr "Nem https URL"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Érvénytelen név: 1-64 karakter, vezérlőkarakterek nélkül"
+
+msgid "Add a profile"
+msgstr "Profil hozzáadása"
+
+msgid "Name"
+msgstr "Név"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Felismerés: a modul a hivatkozásból vagy a fájlból állapítja meg a típust. Válassza ki a típust olyan JSON-hoz, amely Xray és sing-box is lehet, vagy olyan hivatkozáshoz, amelynek másik motoron kell futnia."
+
+msgid "The profile is added"
+msgstr "A profil hozzáadva"
+
+msgid "Rename the profile"
+msgstr "Profil átnevezése"
+
+msgid "Delete the profile %s?"
+msgstr "Törli a(z) %s profilt?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Ez az aktív profil: bekapcsolt VPN mellett a modul megtagadja; előbb állítsa le a VPN-t, vagy válasszon másik profilt."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "A konfigurációja és a hitelesítő adatai törlődnek az eszközről."
+
+msgid "Deleted"
+msgstr "Törölve"
+
+msgid "The profile passes the check"
+msgstr "A profil megfelel az ellenőrzésnek"
+
+msgid "Show the config?"
+msgstr "Megjeleníti a konfigurációt?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "A konfiguráció a profil hitelesítő adatait (kulcsok, jelszavak, UUID-k) tartalmazza. Csak ezen a képernyőn jelenik meg; bárki elolvashatja, aki látja a képernyőt."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Mentéskor a rendszer előbb ellenőrzi a konfigurációt a motorral (profile edit); az ellenőrzésen elbukó konfiguráció nem kerül mentésre, a régi marad."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Ez a profil egy előfizetésből származik: a következő frissítése felülírja a módosításait."
+
+msgid "Config of %s"
+msgstr "%s konfigurációja"
+
+msgid "Close"
+msgstr "Bezárás"
+
+msgid "Rename"
+msgstr "Átnevezés"
+
+msgid "Show / edit the config"
+msgstr "Konfiguráció megjelenítése / szerkesztése"
+
+msgid "Test the latency of all"
+msgstr "Mindegyik késleltetésének mérése"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Még nincs profil: adjon hozzá egyet megosztási hivatkozásból, konfigurációs fájlból vagy előfizetésből."
+
+msgid "Active"
+msgstr "Aktív"
+
+msgid "This profile is the active one now"
+msgstr "Ez a profil most az aktív"
+
+msgid "More"
+msgstr "Továbbiak"
+
+msgid "active"
+msgstr "aktív"
+
+msgid "subscription"
+msgstr "előfizetés"
+
+msgid "migrated"
+msgstr "átemelt"
+
+msgid "gone from its subscription"
+msgstr "kikerült az előfizetéséből"
+
+msgid "Server"
+msgstr "Szerver"
+
+msgid "Engine"
+msgstr "Motor"
+
+msgid "Latency"
+msgstr "Késleltetés"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "A késleltetés egy TCP-kapcsolat a szerverhez, bekapcsolt VPN mellett az alagúton át. A WireGuard- és OpenVPN-szerverek általában UDP-t használnak, és így nem tesztelhetők."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Adjon meg egy IPv4- vagy IPv6-címet"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Be: semmi sem megy ki az alagúton kívül"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Ki: az alagút leállása esetén a forgalom közvetlenül megy ki"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Igen: a Tailscale saját kapcsolatai az alagúton mennek át"
+
+msgid "No: Tailscale connects directly"
+msgstr "Nem: a Tailscale közvetlenül csatlakozik"
+
+msgid "Routing"
+msgstr "Útválasztás"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "A kill switch blokkolja az eszköz és a LAN teljes forgalmát, amíg a VPN nem működik."
+
+msgid "Bypass the tunnel"
+msgstr "Alagút megkerülése"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Adjon meg címtartományokat, például 192.168.0.0/16, vesszővel elválasztva"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Címtartományok, amelyek soha nem kerülnek az alagútba, magán a LAN-on kívül (az sosem kerül bele). Üres: csak a LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale a VPN-en át"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Amikor a Tailscale fut az eszközön, a WireGuard-, DERP- és vezérlőkapcsolatai az éppen működő alagúton mennek át (a dae ezeket is elkapja, mint a többit)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS az alagúton át"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "A feloldó, amelyhez az eszköz és a LAN lekérdezései az alagúton át jutnak. Semmi sem megy a szolgáltató feloldójához."
+
+msgid "Bootstrap DNS"
+msgstr "Bootstrap DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Megkeresi a VPN-szerver saját címét az alagút felépülése előtt (közvetlenül, a motor saját kapcsolatán)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Üresen hagyva a beállítás visszaáll az alapértelmezettre."
+
+msgid "TUN stack"
+msgstr "TUN-verem"
+
+msgid "Default (gvisor)"
+msgstr "Alapértelmezett (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (az 5.4-es kernelen nem)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "beállítva (változatlan, hacsak nem ír be újat)"
+
+msgid "not set"
+msgstr "nincs beállítva"
+
+msgid "Upstream HTTP proxy"
+msgstr "Upstream HTTP-proxy"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS-tanúsítvány rögzítése (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Adja meg: host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Adja meg a SHA-256 értéket hexadecimálisan"
+
+msgid "Profile options"
+msgstr "Profilbeállítások"
+
+msgid "None of the profiles has options of its type."
+msgstr "Egyik profilnak sincsenek a típusához tartozó beállításai."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "A mihomo módja (rule, global, direct), a motorok naplószintjei, a dae csoportjai és útválasztása az egyes profilok saját konfigurációjának részei: VPN > Profilok, Konfiguráció megjelenítése / szerkesztése."
+
+msgid "Delete the subscription %s?"
+msgstr "Törli a(z) %s előfizetést?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "A profiljai vele együtt törölhetők, vagy önálló profilként megmaradhatnak. Az aktív profil bekapcsolt VPN mellett soha nem törlődik."
+
+msgid "Keep the profiles"
+msgstr "Profilok megtartása"
+
+msgid "Delete with its profiles"
+msgstr "Törlés a profiljaival együtt"
+
+msgid "Only by hand"
+msgstr "Csak kézzel"
+
+msgid "Every %d h"
+msgstr "%d óránként"
+
+msgid "Share links: one profile per link"
+msgstr "Megosztási hivatkozások: hivatkozásonként egy profil"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: egy mihomo profil"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: egy profil, minden csomópont egy csoportban"
+
+msgid "Add a subscription"
+msgstr "Előfizetés hozzáadása"
+
+msgid "Format"
+msgstr "Formátum"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "Az URL általában a fiókja tokenjét tartalmazza: az eszközön csak root által olvashatóan tárolódik, és többé nem jelenik meg. Az előfizetés letöltése az eszköz saját kapcsolatán történik: bekapcsolt VPN mellett az alagúton át; aktív kill switch és leállt alagút mellett nem tölthető le."
+
+msgid "Refresh all"
+msgstr "Összes frissítése"
+
+msgid "No subscriptions yet."
+msgstr "Még nincs előfizetés."
+
+msgid "Host"
+msgstr "Gazdagép"
+
+msgid "Updated"
+msgstr "Frissítve"
+
+msgid "Share links"
+msgstr "Megosztási hivatkozások"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "A frissítés megtartja a változatlan nevű profilokat, hozzáadja az újakat, és eltávolítja a megszűnteket (az aktív profil bekapcsolt VPN mellett marad, megszűntként megjelölve). Az aktív profil frissítése újraindítja a futó VPN-t."
 
 msgid "Dashboard info failed"
 msgstr "Az irányítópult adatai nem érhetők el"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "A csomagadapter nem adott érvényes választ"
+
+msgid "Invalid packages operation"
+msgstr "Érvénytelen csomagművelet"
+
 msgid "Request too large"
 msgstr "A kérés túl nagy"
 
@@ -1820,6 +2705,150 @@ msgstr "A futtatási könyvtár nem biztonságos; semmi sem futott"
 
 msgid "No such method"
 msgstr "Nincs ilyen metódus"
+
+msgid "The VPN module refused the request"
+msgstr "A VPN-modul elutasította a kérést"
+
+msgid "The VPN panel is busy, try again"
+msgstr "A VPN-panel foglalt, próbálja újra"
+
+msgid "Another VPN task is still running"
+msgstr "Egy másik VPN-feladat még fut"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Az exit_ip paraméter értéke 0 vagy 1 lehet"
+
+msgid "The VPN status could not be read"
+msgstr "A VPN állapota nem olvasható"
+
+msgid "The profiles could not be read"
+msgstr "A profilok nem olvashatók"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "A check paraméter értéke 0 vagy 1 lehet"
+
+msgid "The engines could not be read"
+msgstr "A motorok nem olvashatók"
+
+msgid "The subscriptions could not be read"
+msgstr "Az előfizetések nem olvashatók"
+
+msgid "The VPN settings could not be read"
+msgstr "A VPN beállításai nem olvashatók"
+
+msgid "Unknown VPN operation"
+msgstr "Ismeretlen VPN-művelet"
+
+msgid "The VPN could not be switched"
+msgstr "A VPN-t nem sikerült átkapcsolni"
+
+msgid "The kill switch is on or off"
+msgstr "A kill switch be- vagy kikapcsolt lehet"
+
+msgid "The kill switch could not be changed"
+msgstr "A kill switch-et nem sikerült módosítani"
+
+msgid "Invalid profile id"
+msgstr "Érvénytelen profilazonosító"
+
+msgid "The profile could not be made the active one"
+msgstr "A profilt nem sikerült aktívvá tenni"
+
+msgid "Unknown profile source"
+msgstr "Ismeretlen profilforrás"
+
+msgid "Unknown profile type"
+msgstr "Ismeretlen profiltípus"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "A konfiguráció üres, túl nagy vagy vezérlőkaraktereket tartalmaz"
+
+msgid "Invalid profile request"
+msgstr "Érvénytelen profilkérés"
+
+msgid "A config from a URL takes the type it says"
+msgstr "Az URL-ről érkező konfiguráció azt a típust veszi fel, amelyet megad"
+
+msgid "No uploaded file"
+msgstr "Nincs feltöltött fájl"
+
+msgid "The file is larger than 1 MiB"
+msgstr "A fájl nagyobb 1 MiB-nál"
+
+msgid "The profile could not be added"
+msgstr "A profilt nem sikerült hozzáadni"
+
+msgid "The profile could not be renamed"
+msgstr "A profilt nem sikerült átnevezni"
+
+msgid "The profile could not be removed"
+msgstr "A profilt nem sikerült eltávolítani"
+
+msgid "The profile does not pass the check"
+msgstr "A profil nem felel meg az ellenőrzésnek"
+
+msgid "Unknown profile option"
+msgstr "Ismeretlen profilbeállítás"
+
+msgid "Invalid value for this option"
+msgstr "Érvénytelen érték ehhez a beállításhoz"
+
+msgid "The option could not be set"
+msgstr "A beállítást nem sikerült megadni"
+
+msgid "The config could not be read"
+msgstr "A konfiguráció nem olvasható"
+
+msgid "The config was not saved"
+msgstr "A konfiguráció nem lett mentve"
+
+msgid "The latency test failed"
+msgstr "A késleltetésmérés sikertelen"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "A frissítési időköz 1 és 999 óra között lehet"
+
+msgid "Unknown subscription type"
+msgstr "Ismeretlen előfizetéstípus"
+
+msgid "Invalid subscription id"
+msgstr "Érvénytelen előfizetés-azonosító"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "A keep paraméter értéke 0 vagy 1 lehet"
+
+msgid "The subscription could not be removed"
+msgstr "Az előfizetést nem sikerült eltávolítani"
+
+msgid "The file is too large"
+msgstr "A fájl túl nagy"
+
+msgid "Unknown engine"
+msgstr "Ismeretlen motor"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Az unverified paraméter értéke 0 vagy 1 lehet"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Ez a motor rendszercsomag: nincs feltölthető fájlja"
+
+msgid "The engine could not be removed"
+msgstr "A motort nem sikerült eltávolítani"
+
+msgid "mu300-extra is not on this system"
+msgstr "A mu300-extra nincs a rendszeren"
+
+msgid "Unknown VPN setting"
+msgstr "Ismeretlen VPN-beállítás"
+
+msgid "The setting could not be saved"
+msgstr "A beállítás nem menthető"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "A sorok száma 1 és 1000 közötti"
+
+msgid "The log could not be read"
+msgstr "A napló nem olvasható"
 
 msgid "Radio did not come up"
 msgstr "A rádió nem kapcsolt be"
@@ -1935,6 +2964,9 @@ msgstr "Érvénytelen szűrőlista (legfeljebb 50 sor)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "A webhook címének http:// vagy https:// URL-nek kell lennie"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "A webhook törzse túl hosszú, vagy vezérlőkaraktert tartalmaz"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Érvénytelen fejléc (soronként egy \"Név: érték\"; a Host, Content-Type, Content-Length, Transfer-Encoding és Connection fejlécet az eszköz állítja be)"
 
@@ -1992,17 +3024,47 @@ msgstr "A nyelvi csomagot nem sikerült eltávolítani"
 msgid "Lock cache unavailable"
 msgstr "A zárolási gyorsítótár nem érhető el"
 
+msgid "The saved locks could not be cleared"
+msgstr "A mentett zárolásokat nem sikerült törölni"
+
 msgid "No serving cell to lock to"
 msgstr "Nincs kiszolgáló cella a zároláshoz"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "A modem nem válaszolt a mód lekérdezésére; semmi nem lett elküldve"
+
+msgid "The modem refused a write"
+msgstr "A modem elutasított egy írást"
+
+msgid "The read-back does not match the automatic values"
+msgstr "A visszaolvasás nem egyezik az automatikus értékekkel"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "A verem újraindítása utáni visszaolvasás nem egyezik az automatikus értékekkel"
+
+msgid "The reset was interrupted"
+msgstr "A visszaállítás megszakadt"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "A csomagok újratelepítése nem érhető el ezen a rendszeren"
+
+msgid "No packages were written down by an update"
+msgstr "Egy frissítés sem jegyzett fel csomagot"
+
+msgid "Reinstalling is running already"
+msgstr "Az újratelepítés már fut"
+
+msgid "The note could not be dropped"
+msgstr "Az értesítést nem sikerült eltávolítani"
+
+msgid "Unknown packages operation"
+msgstr "Ismeretlen csomagművelet"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Az adatforgalom ezen a rendszeren nem érhető el"
-
-msgid "The setting could not be saved"
-msgstr "A beállítás nem menthető"
 
 msgid "Unknown data usage operation"
 msgstr "Ismeretlen adatforgalom-művelet"

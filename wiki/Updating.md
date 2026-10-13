@@ -18,7 +18,8 @@ sudo mu300-update clean           # delete the kept previous version
 ```
 
 On OpenWrt you are already root, so leave out `sudo`. `mu300-toolkit` offers the same under
-**System -> Software update**. Reboot after `apply` to start the new system and kernel.
+**System -> Software update**. Reboot after `apply` to start the new system and kernel. Only one run at a time: a
+second `mu300-update` started while one is going is refused with the first one's pid (from v2026.10.21 on).
 
 The device looks for a new release at boot and every 6 hours and tells you at login and in `mu300-toolkit`. **It
 never installs one by itself.**
@@ -28,7 +29,33 @@ never installs one by itself.**
 * your settings (`/etc/mu300`: hotspot, VPN, toolkit), users and home directories, `/usr/local`, SSH host keys,
   OpenWrt's UCI configuration and services you enabled yourself;
 * the vendor files copied from your device (Wi-Fi firmware, the Android modem userspace);
-* the installed extras: the lang extra is brought to the new release, the [VPN](VPN) module to its latest release.
+* the installed extras: the lang extra is brought to the new release, the [VPN](VPN) module to its latest release;
+* packages you installed yourself (`apk add`, `apt install`): see below.
+
+## Packages you installed yourself
+
+The release's image has only its own packages. `apply` lists the ones you added before it switches, and the new
+system installs them again at its first boot, once it is online (an hour of tries, then again at the next boots, five
+at most). Until they are back their OpenWrt settings (`/etc/config/<name>`) wait in `/etc/mu300/orphaned-config/`:
+settings without their program used to stay active - OpenClash's left the device without DNS. A package the feeds do
+not have (installed from a `.apk` file) cannot come back by itself; its settings stay aside. Services come back
+enabled or disabled as they were (OpenWrt's init scripts, Ubuntu's systemd units).
+
+On Ubuntu the apt sources you added (`/etc/apt/sources.list.d`, a PPA, with the keys they name, and your pinning in
+`/etc/apt/preferences.d`) are kept, so their
+packages can come back; the image's own sources are never replaced. A kept source that makes `apt-get update` fail
+(a PPA of 24.04 after a move to 26.04) is turned off as `NAME.disabled`, and `status` says so.
+
+In the control panel (OpenWrt with the panel) the same is under **System -> Packages after an update**: what came
+back, what did not and why, the settings set aside, and the buttons Try again, Repair DNS (it asks first: DNS then
+goes to the carrier) and Dismiss the note.
+
+```sh
+mu300-user-packages status    # what came back, what failed and why, how to put settings back
+mu300-user-packages retry     # try again now
+mu300-user-packages repair-dns  # a proxy that is gone left dnsmasq pointing at it: remove that (never done by itself)
+mu300-update apply --no-reinstall   # update without installing them again (MU300_KEEP_PACKAGES=0 does the same)
+```
 
 ## Why it is safe
 
@@ -52,9 +79,18 @@ flowchart LR
 
 ### With the VPN on
 
-A device that uses the VPN is never updated without it. Offline, the update stops **before** it changes anything and
-says how to stage the module: put `mu300-linux-vpn.tar.gz` and its `SHA256SUMS` in
-`/mnt/mu300-disk/.mu300-update/vpn/`, or run `MU300_VPN_MODULE=FILE mu300-update apply`.
+A device that uses the VPN is never updated without it. The update brings the module's core and every engine the
+device has or a profile needs to their latest release, as one set (engines first, the core last). Offline, it stops
+**before** it changes anything and says how to stage the module: put `mu300-linux-vpn-core.tar.gz` with the engine
+tarballs (`mu300-linux-vpn-xray.tar.gz`, `-singbox`, `-mihomo`, `-dae`), or the bundle `mu300-linux-vpn.tar.gz` (core,
+Xray and sing-box), and their `SHA256SUMS` in `/mnt/mu300-disk/.mu300-update/vpn/`, or run
+`MU300_VPN_MODULE=DIR mu300-update apply`. A tarball without a matching `SHA256SUMS` is refused.
+
+### On Ubuntu with the web panel
+
+A new Ubuntu image has no Cockpit in it. The first boot after an update puts the panel extra's packages back in the
+background (from the extra when it carries them, else from Ubuntu's archive once the device is online);
+`mu300-panel status` says where it is.
 
 ## Changing the Ubuntu release
 

@@ -42,8 +42,38 @@ msgstr "Alimentare"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "Centru de control MU300: panou de stare, blocări de rețea, terminal AT și SMS"
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Terminal settings"
+msgstr "Setările terminalului"
+
+msgid "Overview"
+msgstr "Prezentare generală"
+
+msgid "Profiles"
+msgstr "Profiluri"
+
+msgid "Subscriptions"
+msgstr "Abonamente"
+
+msgid "Engines"
+msgstr "Motoare"
+
+msgid "Settings"
+msgstr "Setări"
+
+msgid "Logs"
+msgstr "Jurnale"
+
+msgid "Packages after an update"
+msgstr "Pachete după o actualizare"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "Centru de control MU300: panou de stare, blocări de rețea, terminal AT, SMS și VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminal: un shell root al dispozitivului în browser"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Număr necunoscut"
 
 msgid "Select"
 msgstr "Selectare"
+
+msgid "never"
+msgstr "niciodată"
+
+msgid "just now"
+msgstr "chiar acum"
+
+msgid "%s ago"
+msgstr "acum %s"
+
+msgid "Failed: %s"
+msgstr "Eșuat: %s"
+
+msgid "Management connection lost"
+msgstr "Conexiunea de administrare s-a pierdut"
+
+msgid "Installing the VPN module"
+msgstr "Se instalează modulul VPN"
+
+msgid "Installing the engine"
+msgstr "Se instalează motorul"
+
+msgid "Adding the subscription"
+msgstr "Se adaugă abonamentul"
+
+msgid "Refreshing the subscriptions"
+msgstr "Se reîmprospătează abonamentele"
+
+msgid "Testing the latency of every profile"
+msgstr "Se testează latența fiecărui profil"
+
+msgid "Downloading the config"
+msgstr "Se descarcă configurația"
+
+msgid "Working…"
+msgstr "Se lucrează…"
+
+msgid "done"
+msgstr "gata"
+
+msgid "failed"
+msgstr "eșuat"
+
+msgid "Verify the uploaded file"
+msgstr "Verifică fișierul încărcat"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Fișierul încărcat este verificat cu SHA256SUMS din cea mai recentă versiune a modulului VPN, descărcat prin HTTPS. Dacă nu este posibil (offline, o versiune mai veche), este instalat doar dacă permiteți un fișier neverificat: rulează atunci ca root fără nicio verificare."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Instalează-l chiar dacă nu poate fi verificat"
+
+msgid "Install only a verified file"
+msgstr "Instalează doar un fișier verificat"
+
+msgid "Upload failed: %s"
+msgstr "Încărcarea a eșuat: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "Modulul VPN este prea vechi pentru acest panou"
+
+msgid "The VPN module is not installed"
+msgstr "Modulul VPN nu este instalat"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Această pagină necesită modulul VPN cu mu300-vpn citibil de mașină (modul v2 sau mai nou). Actualizarea păstrează profilurile și setările."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN-ul este un modul separat: mu300-vpn cu kill switch și profiluri, plus un extra pentru fiecare motor (Xray, sing-box, mihomo, dae). Se instalează cu mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Descărcarea are câțiva MB pentru modul și până la zeci de MB pentru fiecare motor: pe date mobile se consumă din pachetul dvs."
+
+msgid "Update the VPN module"
+msgstr "Actualizează modulul VPN"
+
+msgid "Install the VPN module"
+msgstr "Instalează modulul VPN"
+
+msgid "Upload the file…"
+msgstr "Încărcare fișier…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Offline: încărcați mu300-linux-vpn-core.tar.gz (sau pachetul mu300-linux-vpn.tar.gz) de pe pagina de versiuni a modulului VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Aceasta este o scanare a rețelelor sau a frecvențelor: durează între unu și trei minute, ține ocupat canalul AT al modemului tot acest timp, iar datele mobile se pot întrerupe între timp. Rulează în fundal; răspunsul apare aici când se termină."
@@ -207,14 +324,8 @@ msgstr "O scanare scoate pentru o clipă punctul de acces Wi-Fi de pe canalul s�
 msgid "Scan anyway"
 msgstr "Scanează oricum"
 
-msgid "Failed: %s"
-msgstr "Eșuat: %s"
-
 msgid "Saved"
 msgstr "Salvat"
-
-msgid "Management connection lost"
-msgstr "Conexiunea de administrare s-a pierdut"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Termic"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Zonele termice ale kernelului, doar citire. O zonă cu puncte de prag limitează dispozitivele de răcire legate de ea la pragul său pasiv; o stare de răcire 0 înseamnă fără limitare."
+
+msgid "Zone"
+msgstr "Zonă"
+
+msgid "Temperature"
+msgstr "Temperatură"
+
+msgid "Trip points"
+msgstr "Puncte de prag"
+
+msgid "Cooling devices"
+msgstr "Dispozitive de răcire"
 
 msgid "USB role"
 msgstr "Rol USB"
@@ -489,8 +618,17 @@ msgstr "Corp"
 msgid "Form (URL-encoded)"
 msgstr "Formular (codificat URL)"
 
+msgid "Plain text"
+msgstr "Text simplu"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Câmpuri: sender, time, text, device, message (șablonul completat)"
+
+msgid "Custom body"
+msgstr "Corp personalizat"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Gol: câmpurile standard (text simplu: mesajul). Substituenți: {sender}, {time}, {text}, {device}, {message}. Fiecare valoare este escapată potrivit tipului ales. Acest corp este afișat din nou aici: păstrați secretele în adresă sau într-un antet."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Antete suplimentare (un \"Nume: valoare\" pe linie)"
@@ -651,6 +789,9 @@ msgstr "Total trimis"
 msgid "Used today"
 msgstr "Folosit azi"
 
+msgid "SIM source"
+msgstr "Sursă SIM"
+
 msgid "Session duration"
 msgstr "Durata sesiunii"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Operator"
+
+msgid "Own number"
+msgstr "Număr propriu"
 
 msgid "Module"
 msgstr "Modul"
@@ -858,8 +1002,17 @@ msgstr "Blocarea a eșuat: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Se resetează blocările de rețea la automat (repornire SFUN, circa 30 de secunde)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Resetarea a eșuat: %s. Setările de blocare salvate au fost păstrate."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Resetarea blocărilor nu a fost confirmată la timp; se comută oricum."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "SIM intern selectat: folosit după o repornire"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "SIM intern selectat, dar neacceptat pe acest dispozitiv: se folosește SIM-ul extern"
 
 msgid "Uptime %s"
 msgstr "Timp de funcționare %s"
@@ -990,9 +1143,6 @@ msgstr "Pachetul de limbi este instalat"
 msgid "The language pack could not be installed"
 msgstr "Pachetul de limbi nu a putut fi instalat"
 
-msgid "Upload failed: %s"
-msgstr "Încărcarea a eșuat: %s"
-
 msgid "Language of the browser"
 msgstr "Limba browserului"
 
@@ -1013,9 +1163,6 @@ msgstr "Pachetul de limbi (mu300-extra-lang.tar.gz, aproximativ 2 MB) adaugă Lu
 
 msgid "Download from the release"
 msgstr "Descărcare din versiune"
-
-msgid "Upload the file…"
-msgstr "Încărcare fișier…"
 
 msgid "Release"
 msgstr "Versiune"
@@ -1209,6 +1356,9 @@ msgstr "Stare confirmată"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Citirea de verificare a expirat; selectați „Reîmprospătare stare blocări”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Resetare verificată: mod de rețea automatic, EN-DC pornit, toate benzile, fără blocare de celulă; setările de blocare salvate au fost șterse"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Aplicat (EN-DC nu necesită repornirea stivei radio)"
 
@@ -1235,6 +1385,114 @@ msgstr "Automat (%d suportate)"
 
 msgid "%d locked: %s"
 msgstr "%d blocate: %s"
+
+msgid "Repair DNS?"
+msgstr "Repari DNS-ul?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Aceasta elimină redirecționarea DNS a unui pachet care nu mai este instalat. Dacă nu rămâne alt server DNS, dispozitivul folosește serverele DNS ale conexiunii mobile: operatorul vede numele pe care le cauți, în afara oricărui proxy sau VPN."
+
+msgid "Repair DNS"
+msgstr "Repară DNS-ul"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Pachetele instalate pe dispozitiv nu fac parte din imaginea versiunii. O actualizare le notează, iar noul sistem le reinstalează la prima pornire, imediat ce este online. Până când un pachet revine, setările lui sunt puse deoparte."
+
+msgid "No packages to install again."
+msgstr "Niciun pachet de reinstalat."
+
+msgid "All back"
+msgstr "Toate au revenit"
+
+msgid "Not installed yet"
+msgstr "Încă neinstalat"
+
+msgid "Could not be installed again"
+msgstr "Nu a putut fi reinstalat"
+
+msgid "Waiting for the internet"
+msgstr "Se așteaptă internetul"
+
+msgid "Given up: no internet at five boots"
+msgstr "Abandonat: fără internet la cinci porniri"
+
+msgid "Skipped"
+msgstr "Omis"
+
+msgid "Written down by the update from %s"
+msgstr "Notat de actualizarea de la %s"
+
+msgid "Installed again"
+msgstr "Reinstalate"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Instalează-le singur de unde le-ai luat (un fișier de pachet: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Setări puse deoparte în /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS-ul încă merge către un pachet neinstalat: dispozitivul nu are DNS prin el."
+
+msgid "Try again"
+msgstr "Încearcă din nou"
+
+msgid "Dismiss the note"
+msgstr "Închide nota"
+
+msgid "started"
+msgstr "pornit"
+
+msgid "asleep now (asked)"
+msgstr "adormit acum (cerut)"
+
+msgid "woken: power daemon stopping"
+msgstr "trezit: serviciul de alimentare se oprește"
+
+msgid "woken by a key"
+msgstr "trezit de o tastă"
+
+msgid "woken by the Wi-Fi key"
+msgstr "trezit de tasta Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "trezit (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "trezit de un computer pe USB"
+
+msgid "woken: plugged in"
+msgstr "trezit: conectat la priză"
+
+msgid "woken by a Wi-Fi client"
+msgstr "trezit de un client Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "pornire la încărcare (pornit de încărcător)"
+
+msgid "the hotspot is down"
+msgstr "hotspotul este oprit"
+
+msgid "the VPN is still stopped"
+msgstr "VPN-ul este încă oprit"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) este încă oprit după o reluare eșuată"
+
+msgid "self-check: %s"
+msgstr "autoverificare: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "adormit: niciun client de %d min (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "adormit: profilul acum %s"
+
+msgid "woken by the %s key"
+msgstr "trezit de tasta %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "modemul este suspendat (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Introduceți un număr întreg de la 0 la %d"
@@ -1437,6 +1695,15 @@ msgstr "Mesaj (Enter pentru trimitere, Shift+Enter pentru rând nou)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Trimiterea folosește AT+CMGS (mod PDU); reîncercați dacă canalul este ocupat. Pentru a șterge un mesaj, folosiți pictograma coș de pe bula acestuia."
 
+msgid "Sending…"
+msgstr "Se trimite…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Trimis; lista se reîmprospătează în curând."
+
+msgid "Sending failed"
+msgstr "Trimiterea a eșuat"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Se sincronizează din SIM în fundal (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Șters (doar local)"
 msgid "Enter both a number and a message."
 msgstr "Introduceți atât un număr, cât și un mesaj."
 
-msgid "Sending…"
-msgstr "Se trimite…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Trimis; lista se reîmprospătează în curând."
-
-msgid "Sending failed"
-msgstr "Trimiterea a eșuat"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaje, %d necitite · %d conversații"
 
@@ -1502,6 +1760,39 @@ msgstr "Incomplet: au sosit %d din %d părți"
 
 msgid "Delete"
 msgstr "Ștergere"
+
+msgid "ttyd is not installed."
+msgstr "ttyd nu este instalat."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Terminalul este oprit (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Se deschid prea multe terminale deodată. Încercați din nou peste un minut."
+
+msgid "The terminal is not available."
+msgstr "Terminalul nu este disponibil."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Acesta este un shell root al dispozitivului: fiecare comandă rulează cu drepturi depline, iar o greșeală poate face dispozitivul să nu mai pornească."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Este accesibil doar din LAN (USB și hotspot), niciodată din datele mobile, și doar din această pagină autentificată."
+
+msgid "It closes after a minute without activity."
+msgstr "Se închide după un minut fără activitate."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Se închide după %d minute fără activitate."
+
+msgid "Reconnect"
+msgstr "Reconectare"
+
+msgid "Open in a new tab"
+msgstr "Deschide într-o filă nouă"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Această pagină a fost deschisă prin HTTPS, iar terminalul este servit prin HTTP în LAN: se deschide într-o filă separată."
 
 msgid "The data usage could not be read"
 msgstr "Consumul de date nu a putut fi citit"
@@ -1637,6 +1928,594 @@ msgstr "Dezactivează"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Cu 64 fiecare pachet pleacă la fel ca traficul propriu al dispozitivului"
+
+msgid "running"
+msgstr "rulează"
+
+msgid "(about %s)"
+msgstr "(aproximativ %s)"
+
+msgid "Install %s?"
+msgstr "Instalezi %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Se instalează din sursa de pachete a acestui sistem."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Se descarcă din versiunea modulului VPN și se verifică cu SHA256SUMS."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Un motor are zeci de MB: pe date mobile descărcarea se consumă din pachetul dvs."
+
+msgid "Install"
+msgstr "Instalează"
+
+msgid "Remove %s?"
+msgstr "Elimini %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Profiluri care rulează pe el: %s. Nu pot porni până nu este instalat din nou (modulul refuză cât timp profilul care rulează are nevoie de el)."
+
+msgid "No profile runs on it."
+msgstr "Niciun profil nu rulează pe el."
+
+msgid "Removed"
+msgstr "Eliminat"
+
+msgid "Check for updates"
+msgstr "Caută actualizări"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Fiecare motor este un extra separat: instalați doar pe cele de care au nevoie profilurile dvs. Xray rulează linkuri vless, vmess, trojan și ss (cu hev-socks5-tunnel), sing-box aceleași linkuri și propriul JSON, mihomo abonamente Clash, dae hysteria2, tuic și restul pe nuclee mai noi. WireGuard și OpenVPN sunt pachete ale sistemului."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Descărcările au zeci de MB pentru fiecare motor: pe date mobile se consumă din pachetul dvs. Offline, încărcați arhiva tar a motorului de pe pagina de versiuni a modulului VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Versiunile disponibile provin din cea mai recentă versiune a modulului VPN."
+
+msgid "Update"
+msgstr "Actualizează"
+
+msgid "system package"
+msgstr "pachet de sistem"
+
+msgid "in the vpn bundle"
+msgstr "în pachetul vpn"
+
+msgid "extra %s"
+msgstr "extra %s"
+
+msgid "not installed"
+msgstr "neinstalat"
+
+msgid "cannot run here"
+msgstr "nu poate rula aici"
+
+msgid "update available"
+msgstr "actualizare disponibilă"
+
+msgid "installed"
+msgstr "instalat"
+
+msgid "Kind"
+msgstr "Tip"
+
+msgid "Version"
+msgstr "Versiune"
+
+msgid "Available"
+msgstr "Disponibil"
+
+msgid "not checked"
+msgstr "necontrolat"
+
+msgid "Size"
+msgstr "Dimensiune"
+
+msgid "Needed by"
+msgstr "Necesar pentru"
+
+msgid "no profile"
+msgstr "niciun profil"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae necesită un nucleu cu BTF, 5.17 sau mai nou: nu nucleul 5.4 al producătorului (mu300-update kernel 6.18). Poate fi instalat oricum."
+
+msgid "All engines"
+msgstr "Toate motoarele"
+
+msgid "Last %s lines"
+msgstr "Ultimele %s linii"
+
+msgid "VPN service log"
+msgstr "Jurnalul serviciului VPN"
+
+msgid "Every 5 s"
+msgstr "La fiecare 5 s"
+
+msgid "The log is empty."
+msgstr "Jurnalul este gol."
+
+msgid "The VPN is starting"
+msgstr "VPN-ul pornește"
+
+msgid "The VPN is stopped"
+msgstr "VPN-ul este oprit"
+
+msgid "The VPN is restarting"
+msgstr "VPN-ul repornește"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Cu kill switch pornit, nimic nu iese din dispozitiv sau din LAN în afara tunelului: cât timp VPN-ul este oprit, pornește sau este defect, orice conexiune eșuează în loc să iasă direct. Rămâne activ până când opriți VPN-ul aici (Oprește îl elimină)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Fără kill switch, traficul iese direct, neprotejat, ori de câte ori tunelul este căzut (în timpul pornirii, după o cădere, când lipsește motorul)."
+
+msgid "Turn the kill switch on?"
+msgstr "Pornești kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "Oprești kill switch?"
+
+msgid "Turn on"
+msgstr "Pornește"
+
+msgid "unknown"
+msgstr "necunoscut"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Adresa de ieșire nu a putut fi găsită (este tunelul activ?)"
+
+msgid "Connecting…"
+msgstr "Se conectează…"
+
+msgid "On, but not running"
+msgstr "Pornit, dar nu rulează"
+
+msgid "Stopped"
+msgstr "Oprit"
+
+msgid "Install it"
+msgstr "Instalează"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Motorul profilului activ nu este instalat: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch ține totul blocat până când motorul este instalat; serviciul îl descarcă singur când poate."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN-ul nu poate porni până nu este instalat."
+
+msgid "%s cannot run on this system"
+msgstr "%s nu poate rula pe acest sistem"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN-ul este pornit, dar niciun profil nu este activ: alegeți unul mai jos."
+
+msgid "Profile: %s"
+msgstr "Profil: %s"
+
+msgid "No active profile"
+msgstr "Niciun profil activ"
+
+msgid "engine %s"
+msgstr "motor %s"
+
+msgid "interface %s"
+msgstr "interfață %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch activ"
+
+msgid "Kill switch on"
+msgstr "Kill switch pornit"
+
+msgid "Kill switch off"
+msgstr "Kill switch oprit"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 în tunel"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 blocat"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 neatins"
+
+msgid "Module %s"
+msgstr "Modul %s"
+
+msgid "Check"
+msgstr "Verifică"
+
+msgid "Uptime"
+msgstr "Timp de funcționare"
+
+msgid "Rate"
+msgstr "Viteză"
+
+msgid "Exit address"
+msgstr "Adresa de ieșire"
+
+msgid "Start"
+msgstr "Pornește"
+
+msgid "Stop"
+msgstr "Oprește"
+
+msgid "Restart"
+msgstr "Repornește"
+
+msgid "Stop the VPN?"
+msgstr "Oprești VPN-ul?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Traficul iese apoi direct, fără tunel; kill switch este eliminat odată cu el."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN-ul este pornit: repornește singur după o repornire a dispozitivului."
+
+msgid "The VPN is off."
+msgstr "VPN-ul este oprit."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Setare"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Activ: doar tunelul poate ajunge la internet"
+
+msgid "Not active"
+msgstr "Inactiv"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch blochează tot traficul dispozitivului și al LAN-ului cât timp VPN-ul este căzut, astfel încât nimic nu iese vreodată fără tunel. Dacă tunelul nu poate porni (un server mort, un cont expirat), dispozitivul rămâne offline până corectați profilul sau opriți VPN-ul. Panoul în sine rămâne accesibil din LAN."
+
+msgid "Choose a profile"
+msgstr "Alegeți un profil"
+
+msgid "No profiles yet"
+msgstr "Încă nu există profiluri"
+
+msgid "engine not installed"
+msgstr "motor neinstalat"
+
+msgid "Use"
+msgstr "Folosește"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Comutat: VPN-ul repornește cu noul profil"
+
+msgid "Active profile"
+msgstr "Profil activ"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Un VPN care rulează repornește cu profilul ales; kill switch rămâne activ între timp."
+
+msgid "Manage the profiles"
+msgstr "Gestionează profilurile"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Automat: prin tunel acolo unde motorul îl poate transporta"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Cere motorului IPv6 în tunel"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Niciodată prin tunel (blocat cât timp VPN-ul este pornit)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Salvat: se aplică de la următoarea pornire (Repornește)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Tunelul transportă IPv6"
+
+msgid "Yes"
+msgstr "Da"
+
+msgid "IPv6 guard"
+msgstr "Gardă IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Activ: IPv6 în afara tunelului este refuzat"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Cât timp VPN-ul este pornit, IPv6 nu iese niciodată pe lângă un tunel care nu îl transportă: este refuzat imediat, astfel că programele și clienții din LAN revin la IPv4 în loc să scape sau să aștepte. Automat: WireGuard folosește adresele IPv6 din configurația sa, celelalte motoare rămân pe IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: nu poate fi testat"
+
+msgid "blocked by the kill switch"
+msgstr "blocat de kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "O configurație WireGuard sau OpenVPN, un YAML Clash/mihomo, un JSON Xray sau sing-box, o configurație dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "După OK, alegeți fișierul: un .conf WireGuard, un .ovpn OpenVPN, un .yaml Clash/mihomo, un .json Xray sau sing-box ori o configurație dae (cel mult 1 MiB)."
+
+msgid "From the source"
+msgstr "Din sursă"
+
+msgid "Detect"
+msgstr "Detectează"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL-ul poate conține un token: ajunge separat la dispozitiv, niciodată într-o linie de comandă sau într-un jurnal."
+
+msgid "Type"
+msgstr "Tip"
+
+msgid "Share link"
+msgstr "Link de partajare"
+
+msgid "Paste"
+msgstr "Lipește"
+
+msgid "File"
+msgstr "Fișier"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Nu este un link de partajare acceptat de acest panou"
+
+msgid "The config is empty"
+msgstr "Configurația este goală"
+
+msgid "Not an https URL"
+msgstr "Nu este un URL https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Nume nevalid: 1-64 de caractere, fără caractere de control"
+
+msgid "Add a profile"
+msgstr "Adaugă un profil"
+
+msgid "Name"
+msgstr "Nume"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Detectează: modulul recunoaște tipul din link sau din fișier. Alegeți tipul pentru un JSON care poate fi fie Xray, fie sing-box, sau pentru un link care ar trebui să ruleze pe alt motor."
+
+msgid "The profile is added"
+msgstr "Profilul a fost adăugat"
+
+msgid "Rename the profile"
+msgstr "Redenumește profilul"
+
+msgid "Delete the profile %s?"
+msgstr "Ștergi profilul %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Este profilul activ: cu VPN-ul pornit, modulul refuză; opriți întâi VPN-ul sau alegeți alt profil."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Configurația și datele de autentificare ale acestuia sunt șterse de pe dispozitiv."
+
+msgid "Deleted"
+msgstr "Șters"
+
+msgid "The profile passes the check"
+msgstr "Profilul trece de verificare"
+
+msgid "Show the config?"
+msgstr "Afișezi configurația?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Configurația conține datele de autentificare ale profilului (chei, parole, UUID-uri). Este afișată doar pe acest ecran; oricine vede ecranul o poate citi."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Salvarea verifică mai întâi configurația cu motorul (profile edit); o configurație care nu trece verificarea nu este salvată, iar cea veche rămâne."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Acest profil provine dintr-un abonament: următoarea reîmprospătare a acestuia vă înlocuiește modificările."
+
+msgid "Config of %s"
+msgstr "Configurația %s"
+
+msgid "Close"
+msgstr "Închide"
+
+msgid "Rename"
+msgstr "Redenumește"
+
+msgid "Show / edit the config"
+msgstr "Afișează / editează configurația"
+
+msgid "Test the latency of all"
+msgstr "Testează latența tuturor"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Încă nu există profiluri: adăugați unul dintr-un link de partajare, un fișier de configurare sau un abonament."
+
+msgid "Active"
+msgstr "Activ"
+
+msgid "This profile is the active one now"
+msgstr "Acest profil este acum cel activ"
+
+msgid "More"
+msgstr "Mai multe"
+
+msgid "active"
+msgstr "activ"
+
+msgid "subscription"
+msgstr "abonament"
+
+msgid "migrated"
+msgstr "migrat"
+
+msgid "gone from its subscription"
+msgstr "dispărut din abonament"
+
+msgid "Server"
+msgstr "Server"
+
+msgid "Engine"
+msgstr "Motor"
+
+msgid "Latency"
+msgstr "Latență"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Latența este o conexiune TCP către server, prin tunel când VPN-ul este pornit. Serverele WireGuard și OpenVPN folosesc de obicei UDP și nu pot fi testate astfel."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Introduceți o adresă IPv4 sau IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Pornit: nimic nu iese în afara tunelului"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Oprit: traficul iese direct cât timp tunelul este căzut"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Da: conexiunile proprii ale Tailscale trec prin tunel"
+
+msgid "No: Tailscale connects directly"
+msgstr "Nu: Tailscale se conectează direct"
+
+msgid "Routing"
+msgstr "Rutare"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch blochează tot traficul dispozitivului și al LAN-ului cât timp VPN-ul este căzut."
+
+msgid "Bypass the tunnel"
+msgstr "Ocolește tunelul"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Introduceți intervale de adrese precum 192.168.0.0/16, separate prin virgule"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Intervale de adrese care nu intră niciodată în tunel, pe lângă LAN-ul însuși (care nu intră niciodată). Gol: doar LAN-ul."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale prin VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Când Tailscale rulează pe dispozitiv, conexiunile sale WireGuard, DERP și de control trec prin tunelul care rulează (dae le prinde ca pe oricare altele)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS prin tunel"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Resolverul către care merg, prin tunel, interogările dispozitivului și ale LAN-ului. Nimic nu merge către resolverul operatorului."
+
+msgid "Bootstrap DNS"
+msgstr "DNS de pornire"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Găsește adresa serverului VPN înainte ca tunelul să fie activ (direct, pe conexiunea proprie a motorului)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Gol readuce o setare la valoarea implicită."
+
+msgid "TUN stack"
+msgstr "Stivă TUN"
+
+msgid "Default (gvisor)"
+msgstr "Implicit (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (nu pe nucleul 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "setat (neschimbat dacă nu tastați unul nou)"
+
+msgid "not set"
+msgstr "nesetat"
+
+msgid "Upstream HTTP proxy"
+msgstr "Proxy HTTP upstream"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "Fixare certificat TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Introduceți host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Introduceți SHA-256 în hexazecimal"
+
+msgid "Profile options"
+msgstr "Opțiuni de profil"
+
+msgid "None of the profiles has options of its type."
+msgstr "Niciun profil nu are opțiuni de tipul său."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "Modul mihomo (rule, global, direct), nivelurile de jurnal ale motoarelor, grupurile și rutarea dae fac parte din configurația proprie a fiecărui profil: VPN > Profiluri, Afișează / editează configurația."
+
+msgid "Delete the subscription %s?"
+msgstr "Ștergi abonamentul %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Profilurile sale pot fi șterse odată cu el sau pot rămâne ca profiluri de sine stătătoare. Profilul activ nu este eliminat niciodată cât timp VPN-ul este pornit."
+
+msgid "Keep the profiles"
+msgstr "Păstrează profilurile"
+
+msgid "Delete with its profiles"
+msgstr "Șterge împreună cu profilurile"
+
+msgid "Only by hand"
+msgstr "Doar manual"
+
+msgid "Every %d h"
+msgstr "La fiecare %d h"
+
+msgid "Share links: one profile per link"
+msgstr "Linkuri de partajare: un profil pentru fiecare link"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "YAML Clash/mihomo: un profil mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: un profil cu toate nodurile într-un singur grup"
+
+msgid "Add a subscription"
+msgstr "Adaugă un abonament"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL-ul conține de obicei tokenul contului dvs.: este stocat pe dispozitiv, lizibil doar de root, și nu mai este afișat niciodată. Abonamentul este descărcat prin conexiunea proprie a dispozitivului: prin tunel când VPN-ul este pornit; cu kill switch activ și tunelul căzut nu poate fi descărcat."
+
+msgid "Refresh all"
+msgstr "Reîmprospătează tot"
+
+msgid "No subscriptions yet."
+msgstr "Încă nu există abonamente."
+
+msgid "Host"
+msgstr "Gazdă"
+
+msgid "Updated"
+msgstr "Actualizat"
+
+msgid "Share links"
+msgstr "Linkuri de partajare"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "O reîmprospătare păstrează profilurile al căror nume nu s-a schimbat, adaugă pe cele noi și elimină pe cele dispărute (cel activ rămâne cât timp VPN-ul este pornit, marcat ca dispărut). Reîmprospătarea profilului activ repornește VPN-ul care rulează."
 
 msgid "Dashboard info failed"
 msgstr "Informațiile panoului au eșuat"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Adaptorul de pachete nu a dat un răspuns valid"
+
+msgid "Invalid packages operation"
+msgstr "Operație pe pachete nevalidă"
+
 msgid "Request too large"
 msgstr "Cerere prea mare"
 
@@ -1820,6 +2705,150 @@ msgstr "Directorul de execuție nu este sigur; nu s-a rulat nimic"
 
 msgid "No such method"
 msgstr "Metodă inexistentă"
+
+msgid "The VPN module refused the request"
+msgstr "Modulul VPN a refuzat cererea"
+
+msgid "The VPN panel is busy, try again"
+msgstr "Panoul VPN este ocupat, încercați din nou"
+
+msgid "Another VPN task is still running"
+msgstr "O altă sarcină VPN rulează încă"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Parametrul exit_ip trebuie să fie 0 sau 1"
+
+msgid "The VPN status could not be read"
+msgstr "Starea VPN nu a putut fi citită"
+
+msgid "The profiles could not be read"
+msgstr "Profilurile nu au putut fi citite"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Parametrul check trebuie să fie 0 sau 1"
+
+msgid "The engines could not be read"
+msgstr "Motoarele nu au putut fi citite"
+
+msgid "The subscriptions could not be read"
+msgstr "Abonamentele nu au putut fi citite"
+
+msgid "The VPN settings could not be read"
+msgstr "Setările VPN nu au putut fi citite"
+
+msgid "Unknown VPN operation"
+msgstr "Operație VPN necunoscută"
+
+msgid "The VPN could not be switched"
+msgstr "VPN-ul nu a putut fi comutat"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch este pornit sau oprit"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switch nu a putut fi schimbat"
+
+msgid "Invalid profile id"
+msgstr "ID de profil nevalid"
+
+msgid "The profile could not be made the active one"
+msgstr "Profilul nu a putut fi făcut activ"
+
+msgid "Unknown profile source"
+msgstr "Sursă de profil necunoscută"
+
+msgid "Unknown profile type"
+msgstr "Tip de profil necunoscut"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Configurația este goală, prea mare sau conține caractere de control"
+
+msgid "Invalid profile request"
+msgstr "Cerere de profil nevalidă"
+
+msgid "A config from a URL takes the type it says"
+msgstr "O configurație dintr-un URL preia tipul pe care îl indică ea însăși"
+
+msgid "No uploaded file"
+msgstr "Niciun fișier încărcat"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Fișierul este mai mare de 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Profilul nu a putut fi adăugat"
+
+msgid "The profile could not be renamed"
+msgstr "Profilul nu a putut fi redenumit"
+
+msgid "The profile could not be removed"
+msgstr "Profilul nu a putut fi eliminat"
+
+msgid "The profile does not pass the check"
+msgstr "Profilul nu trece de verificare"
+
+msgid "Unknown profile option"
+msgstr "Opțiune de profil necunoscută"
+
+msgid "Invalid value for this option"
+msgstr "Valoare nevalidă pentru această opțiune"
+
+msgid "The option could not be set"
+msgstr "Opțiunea nu a putut fi setată"
+
+msgid "The config could not be read"
+msgstr "Configurația nu a putut fi citită"
+
+msgid "The config was not saved"
+msgstr "Configurația nu a fost salvată"
+
+msgid "The latency test failed"
+msgstr "Testul de latență a eșuat"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Intervalul de reîmprospătare este între 1 și 999 de ore"
+
+msgid "Unknown subscription type"
+msgstr "Tip de abonament necunoscut"
+
+msgid "Invalid subscription id"
+msgstr "ID de abonament nevalid"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Parametrul keep trebuie să fie 0 sau 1"
+
+msgid "The subscription could not be removed"
+msgstr "Abonamentul nu a putut fi eliminat"
+
+msgid "The file is too large"
+msgstr "Fișierul este prea mare"
+
+msgid "Unknown engine"
+msgstr "Motor necunoscut"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Parametrul unverified trebuie să fie 0 sau 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Acest motor este un pachet de sistem: nu are niciun fișier de încărcat"
+
+msgid "The engine could not be removed"
+msgstr "Motorul nu a putut fi eliminat"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra nu este pe acest sistem"
+
+msgid "Unknown VPN setting"
+msgstr "Setare VPN necunoscută"
+
+msgid "The setting could not be saved"
+msgstr "Setarea nu a putut fi salvată"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Numărul de linii este între 1 și 1000"
+
+msgid "The log could not be read"
+msgstr "Jurnalul nu a putut fi citit"
 
 msgid "Radio did not come up"
 msgstr "Radioul nu a pornit"
@@ -1935,6 +2964,9 @@ msgstr "Listă de filtre nevalidă (cel mult 50 de linii)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Adresa webhookului trebuie să fie un URL http:// sau https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Corpul webhook-ului este prea lung sau conține un caracter de control"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Antet nevalid (un \"Nume: valoare\" pe linie; Host, Content-Type, Content-Length, Transfer-Encoding și Connection sunt setate de dispozitiv)"
 
@@ -1992,17 +3024,47 @@ msgstr "Pachetul de limbi nu a putut fi eliminat"
 msgid "Lock cache unavailable"
 msgstr "Cache-ul blocărilor nu este disponibil"
 
+msgid "The saved locks could not be cleared"
+msgstr "Blocările salvate nu au putut fi șterse"
+
 msgid "No serving cell to lock to"
 msgstr "Nicio celulă de servire pe care să se blocheze"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modemul nu a răspuns la interogarea modului; nu s-a trimis nimic"
+
+msgid "The modem refused a write"
+msgstr "Modemul a refuzat o scriere"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Recitirea nu corespunde valorilor automate"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Recitirea după repornirea stivei nu corespunde valorilor automate"
+
+msgid "The reset was interrupted"
+msgstr "Resetarea a fost întreruptă"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Reinstalarea pachetelor nu este disponibilă pe acest sistem"
+
+msgid "No packages were written down by an update"
+msgstr "Nicio actualizare nu a notat pachete"
+
+msgid "Reinstalling is running already"
+msgstr "Reinstalarea rulează deja"
+
+msgid "The note could not be dropped"
+msgstr "Nota nu a putut fi eliminată"
+
+msgid "Unknown packages operation"
+msgstr "Operație pe pachete necunoscută"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Consumul de date nu este disponibil pe acest sistem"
-
-msgid "The setting could not be saved"
-msgstr "Setarea nu a putut fi salvată"
 
 msgid "Unknown data usage operation"
 msgstr "Operație de consum de date necunoscută"

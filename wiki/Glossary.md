@@ -58,7 +58,7 @@ Every word in plain language first, then what it means for this device. Grouped 
 
 **Magisk:** A popular tool that gives Android root and can install "modules". *Here:* the installer adds a module whose Action button (or `su -c mu300-linux`) starts Linux; releases also ship Magisk zips that install Linux from the device.
 
-**adb:** Android Debug Bridge, a computer program that talks to an Android device over USB. *Here:* the installer uses it.
+**adb:** Android Debug Bridge, a computer program that talks to an Android device over USB. *Here:* the installer uses it; from v2026.10.20 Linux can offer it too (`sudo mu300-usb adb on`, off by default, only for computers whose key you authorised).
 
 **USB debugging:** The Android setting that lets `adb` connect. *Here:* must be on.
 
@@ -130,6 +130,14 @@ Every word in plain language first, then what it means for this device. Grouped 
 
 **OpenVPN:** An older, widely used VPN program. *Here:* install the system's OpenVPN package to use `.ovpn` profiles.
 
-**Xray / sing-box / mihomo:** Proxy engines for protocols such as VLESS, VMess, Trojan and Shadowsocks, and for Clash-style configs. *Here:* the VPN module picks the engine that speaks your profile.
+**Xray / sing-box / mihomo / dae:** Proxy engines for protocols such as VLESS, VMess, Trojan and Shadowsocks, for Clash-style configs, and (dae) an eBPF proxy that runs inside the kernel. *Here:* the VPN module picks the engine that speaks your profile; from v2.0.0 each engine is an extra (`vpn-xray`, `vpn-singbox`, `vpn-mihomo`, `vpn-dae`), and dae needs kernel 6.18 or 7.2 of v2026.10.20 or newer.
+
+**BTF / eBPF:** eBPF lets programs run safely inside the kernel; BTF is the type information such programs need to find their way around. *Here:* the mainline kernels carry BTF from v2026.10.20 so that dae can run.
+
+**DFS channel:** A 5 GHz Wi-Fi channel (52-144) that radar also uses; an access point there must first listen for radar. *Here:* the Wi-Fi driver cannot, so the hotspot never uses one (a DFS channel you pick is replaced by 36 or 149).
+
+**Cockpit:** Ubuntu's web console (terminal, logs, services, networking). *Here:* the optional `panel` extra on Ubuntu, with an MU300 page for the modem, SMS, VPN and power.
+
+**Subscription (VPN):** A URL your VPN provider gives you that yields a list of profiles. *Here:* `mu300-vpn subscription add`, refreshed by hand or on a schedule; also in the panel's VPN menu.
 
 **Tailscale:** A mesh VPN for reaching your own devices. *Here:* its traffic goes through the active tunnel by default.

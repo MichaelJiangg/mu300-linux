@@ -27,6 +27,7 @@ fi
 set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm "$MODPATH/switch.sh" 0 0 0755
 set_perm "$MODPATH/action.sh" 0 0 0755
+set_perm "$MODPATH/bootchain.sh" 0 0 0755
 set_perm "$MODPATH/system/bin/mu300-linux" 0 0 0755
 
 ui_print "- Installed. Use the module's Action button in the Magisk app,"

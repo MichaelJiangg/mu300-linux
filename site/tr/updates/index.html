@@ -110,7 +110,7 @@ sudo reboot</code></pre>
 <li>Yeni sistem eskisinin <strong>yanına</strong> açılır ve ancak en sonda yer değiştirir; yarıda kesilen bir indirme
 yarı güncellenmiş bir sistem bırakamaz.</li>
 <li>Ayarlarınız, kullanıcılar, <code>/usr/local</code>, cihazınızdan alınan Wi-Fi ve modem dosyaları ve kurulu
-eklentiler taşınır. VPN modülü son sürümüne getirilir.</li>
+eklentiler taşınır. VPN modülü, çekirdeği ve motorları tek set olarak, son sürümüne getirilir.</li>
 <li>Çekirdek ve açılış imajı da güncellenir. Yeni bir çekirdek ilk açılışlarını her zamanki deneme haklarıyla yapar;
 açılmazsa cihaz kendiliğinden Android'e döner.</li>
 </ol>
@@ -129,6 +129,13 @@ mu300-update apply</code></pre>
 </div>
 <p>Bilgisayarla da olur: kurulum programını yeniden çalıştırın ve <code>update</code> cevabını verin. Sistemleri yeniden
 kurar, yeni bir açılış imajı yazar, ayarlarınızı ve verilerinizi korur.</p>
+<p><strong>Kendi kurduğunuz paketler</strong> (<code>apk add</code>, <code>apt install</code>) sürümün imajında yoktur. Güncelleme
+onları listeler, OpenWrt ayarlarını programları olmadan iş görmesinler diye kenara koyar, ve yeni sistem çevrimiçi olur olmaz ilk
+açılışında onları yeniden kurar. <code>mu300-user-packages status</code> nelerin geri geldiğini gösterir (kontrol panelinde: Sistem
+&rarr; Güncelleme sonrası paketler); <code>mu300-update apply --no-reinstall</code> bunu atlar. Ubuntu'da eklediğiniz apt kaynakları
+(bir PPA) da korunur. v2026.10.20'den beri.</p>
+<p>Web paneli eklentili Ubuntu'da yeni imajda Cockpit yoktur: güncellemeden sonraki ilk açılış onu arka planda geri koyar (eklentinin
+kendi kopyası varsa ondan, yoksa çevrimiçi olunca Ubuntu'nun arşivinden); <code>mu300-panel status</code> nerede olduğunu söyler.</p>
 </section>
 
 <section id="rollback">

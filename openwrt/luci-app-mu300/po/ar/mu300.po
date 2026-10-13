@@ -42,8 +42,38 @@ msgstr "الطاقة"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "مركز تحكم MU300: لوحة الحالة، أقفال الشبكة، طرفية AT وSMS"
+msgid "Terminal"
+msgstr "الطرفية"
+
+msgid "Terminal settings"
+msgstr "إعدادات الطرفية"
+
+msgid "Overview"
+msgstr "نظرة عامة"
+
+msgid "Profiles"
+msgstr "الملفات الشخصية"
+
+msgid "Subscriptions"
+msgstr "الاشتراكات"
+
+msgid "Engines"
+msgstr "المحركات"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+msgid "Logs"
+msgstr "السجلات"
+
+msgid "Packages after an update"
+msgstr "الحزم بعد التحديث"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "مركز تحكم MU300: لوحة الحالة، أقفال الشبكة، طرفية AT، الرسائل النصية وVPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "الطرفية: صدفة root على الجهاز داخل المتصفح"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "رقم غير معروف"
 
 msgid "Select"
 msgstr "اختيار"
+
+msgid "never"
+msgstr "أبدًا"
+
+msgid "just now"
+msgstr "الآن"
+
+msgid "%s ago"
+msgstr "منذ %s"
+
+msgid "Failed: %s"
+msgstr "فشل: %s"
+
+msgid "Management connection lost"
+msgstr "فُقد اتصال الإدارة"
+
+msgid "Installing the VPN module"
+msgstr "جارٍ تثبيت وحدة VPN"
+
+msgid "Installing the engine"
+msgstr "جارٍ تثبيت المحرك"
+
+msgid "Adding the subscription"
+msgstr "جارٍ إضافة الاشتراك"
+
+msgid "Refreshing the subscriptions"
+msgstr "جارٍ تحديث الاشتراكات"
+
+msgid "Testing the latency of every profile"
+msgstr "جارٍ قياس زمن الاستجابة لكل الملفات الشخصية"
+
+msgid "Downloading the config"
+msgstr "جارٍ تنزيل الإعدادات"
+
+msgid "Working…"
+msgstr "جارٍ العمل…"
+
+msgid "done"
+msgstr "تم"
+
+msgid "failed"
+msgstr "فشل"
+
+msgid "Verify the uploaded file"
+msgstr "التحقق من الملف المرفوع"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "يُطابَق الملف المرفوع مع ملف SHA256SUMS لأحدث إصدار من وحدة VPN، المُنزَّل عبر HTTPS. إذا تعذّر ذلك (دون اتصال، إصدار أقدم)، فلا يُثبَّت إلا إذا سمحت بملف غير متحقق منه: وعندها يعمل بصلاحيات root دون أي فحص."
+
+msgid "Install it even if it cannot be verified"
+msgstr "ثبّته حتى لو تعذّر التحقق منه"
+
+msgid "Install only a verified file"
+msgstr "ثبّت ملفًا متحققًا منه فقط"
+
+msgid "Upload failed: %s"
+msgstr "فشل الرفع: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "وحدة VPN قديمة جدًا لهذه اللوحة"
+
+msgid "The VPN module is not installed"
+msgstr "وحدة VPN غير مثبتة"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "تحتاج هذه الصفحة إلى وحدة VPN التي تتضمن mu300-vpn القابل للقراءة آليًا (الوحدة v2 أو أحدث). التحديث يحافظ على الملفات الشخصية والإعدادات."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN وحدة قائمة بذاتها: mu300-vpn مع مفتاح الإيقاف (kill switch) والملفات الشخصية، وإضافة واحدة لكل محرك (Xray وsing-box وmihomo وdae). يتم تثبيتها بالأمر mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "حجم التنزيل بضعة MB للوحدة وحتى عشرات MB لكل محرك: على بيانات الجوال يُحتسب من باقتك."
+
+msgid "Update the VPN module"
+msgstr "تحديث وحدة VPN"
+
+msgid "Install the VPN module"
+msgstr "تثبيت وحدة VPN"
+
+msgid "Upload the file…"
+msgstr "رفع الملف…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "بدون اتصال: ارفع mu300-linux-vpn-core.tar.gz (أو الحزمة mu300-linux-vpn.tar.gz) من صفحة الإصدارات الخاصة بوحدة VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "هذا مسح للشبكات أو الترددات: يستغرق من دقيقة إلى ثلاث دقائق، ويشغل قناة AT في المودم طوال ذلك الوقت، وقد تتوقف بيانات الجوال مؤقتًا في أثنائه. يعمل في الخلفية؛ ويظهر الرد هنا عند انتهائه."
@@ -207,14 +324,8 @@ msgstr "يُخرج المسح نقطة الوصول Wi-Fi من قناتها لل
 msgid "Scan anyway"
 msgstr "المسح على أي حال"
 
-msgid "Failed: %s"
-msgstr "فشل: %s"
-
 msgid "Saved"
 msgstr "تم الحفظ"
-
-msgid "Management connection lost"
-msgstr "فُقد اتصال الإدارة"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "الحرارة"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "مناطق الحرارة في النواة، للقراءة فقط. المنطقة التي لها نقاط عتبة تخنق أجهزة التبريد المرتبطة بها عند عتبتها السلبية؛ حالة تبريد 0 تعني عدم وجود خنق."
+
+msgid "Zone"
+msgstr "المنطقة"
+
+msgid "Temperature"
+msgstr "درجة الحرارة"
+
+msgid "Trip points"
+msgstr "نقاط العتبة"
+
+msgid "Cooling devices"
+msgstr "أجهزة التبريد"
 
 msgid "USB role"
 msgstr "دور USB"
@@ -489,8 +618,17 @@ msgstr "المحتوى"
 msgid "Form (URL-encoded)"
 msgstr "نموذج (ترميز URL)"
 
+msgid "Plain text"
+msgstr "نص عادي"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "الحقول: sender، time، text، device، message (القالب بعد ملئه)"
+
+msgid "Custom body"
+msgstr "نص طلب مخصص"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "فارغ: الحقول القياسية (نص عادي: الرسالة). العناصر النائبة: {sender}، {time}، {text}، {device}، {message}. تُهرَّب كل قيمة بحسب النوع المختار. يُعرض هذا النص هنا مجددًا: ضع الأسرار في العنوان أو في ترويسة."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "ترويسات إضافية (واحدة \"Name: value\" في كل سطر)"
@@ -651,6 +789,9 @@ msgstr "إجمالي المرسَل"
 msgid "Used today"
 msgstr "المستخدم اليوم"
 
+msgid "SIM source"
+msgstr "مصدر SIM"
+
 msgid "Session duration"
 msgstr "مدة الجلسة"
 
@@ -719,6 +860,9 @@ msgstr "المودم"
 
 msgid "Carrier"
 msgstr "المشغّل"
+
+msgid "Own number"
+msgstr "الرقم الخاص"
 
 msgid "Module"
 msgstr "الوحدة"
@@ -858,8 +1002,17 @@ msgstr "فشل القفل: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "جارٍ إعادة أقفال الشبكة إلى الوضع التلقائي (إعادة تشغيل SFUN، نحو 30 ثانية)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "فشلت إعادة الضبط: %s. تم الاحتفاظ بإعدادات القفل المحفوظة."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "لم يُؤكَّد إعادة ضبط الأقفال في الوقت المحدد؛ سيتم التبديل على أي حال."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "تم اختيار SIM الداخلية: تُستخدم بعد إعادة التشغيل"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "تم اختيار SIM الداخلية لكنها غير مدعومة على هذا الجهاز: تُستخدم SIM الخارجية"
 
 msgid "Uptime %s"
 msgstr "مدة التشغيل %s"
@@ -990,9 +1143,6 @@ msgstr "تم تثبيت حزمة اللغات"
 msgid "The language pack could not be installed"
 msgstr "تعذّر تثبيت حزمة اللغات"
 
-msgid "Upload failed: %s"
-msgstr "فشل الرفع: %s"
-
 msgid "Language of the browser"
 msgstr "لغة المتصفح"
 
@@ -1013,9 +1163,6 @@ msgstr "تضيف حزمة اللغات (mu300-extra-lang.tar.gz، حوالي 2 M
 
 msgid "Download from the release"
 msgstr "التنزيل من الإصدار"
-
-msgid "Upload the file…"
-msgstr "رفع الملف…"
 
 msgid "Release"
 msgstr "الإصدار"
@@ -1209,6 +1356,9 @@ msgstr "تم تأكيد الحالة"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "انتهت مهلة القراءة؛ اختر «تحديث حالة القفل»"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "تم التحقق من إعادة الضبط: وضع الشبكة تلقائي، EN-DC مفعّل، كل النطاقات، لا قفل خلية؛ تم مسح إعدادات القفل المحفوظة"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "تم التطبيق (لا يتطلب EN-DC إعادة تشغيل حزمة الراديو)"
 
@@ -1235,6 +1385,114 @@ msgstr "تلقائي (%d مدعوم)"
 
 msgid "%d locked: %s"
 msgstr "%d مقفل: %s"
+
+msgid "Repair DNS?"
+msgstr "إصلاح DNS؟"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "يزيل هذا إعادة توجيه DNS لحزمة لم تعد مثبتة. إذا لم يبقَ خادم DNS آخر، يستخدم الجهاز خوادم DNS الخاصة بالاتصال المحمول: يرى المشغّل الأسماء التي تبحث عنها خارج أي وكيل أو VPN."
+
+msgid "Repair DNS"
+msgstr "إصلاح DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "الحزم المثبتة على الجهاز ليست جزءًا من صورة الإصدار. يسجّلها التحديث، ويعيد النظام الجديد تثبيتها عند أول إقلاع بمجرد اتصاله بالإنترنت. إلى أن تعود الحزمة تُحفظ إعداداتها جانبًا."
+
+msgid "No packages to install again."
+msgstr "لا توجد حزم لإعادة تثبيتها."
+
+msgid "All back"
+msgstr "عادت كلها"
+
+msgid "Not installed yet"
+msgstr "لم تُثبَّت بعد"
+
+msgid "Could not be installed again"
+msgstr "تعذّرت إعادة التثبيت"
+
+msgid "Waiting for the internet"
+msgstr "بانتظار الإنترنت"
+
+msgid "Given up: no internet at five boots"
+msgstr "تم التخلي: لا إنترنت خلال خمس عمليات إقلاع"
+
+msgid "Skipped"
+msgstr "تم التخطي"
+
+msgid "Written down by the update from %s"
+msgstr "سجّلها التحديث من %s"
+
+msgid "Installed again"
+msgstr "أُعيد تثبيتها"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "ثبّتها بنفسك من المصدر الذي حصلت عليها منه (ملف حزمة: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "إعدادات محفوظة جانبًا في /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "لا يزال DNS يتجه إلى حزمة غير مثبتة: لا يوجد DNS للجهاز عبرها."
+
+msgid "Try again"
+msgstr "إعادة المحاولة"
+
+msgid "Dismiss the note"
+msgstr "إخفاء الملاحظة"
+
+msgid "started"
+msgstr "بدأ"
+
+msgid "asleep now (asked)"
+msgstr "سكون الآن (بطلب)"
+
+msgid "woken: power daemon stopping"
+msgstr "استيقظ: خدمة الطاقة تتوقف"
+
+msgid "woken by a key"
+msgstr "استيقظ بزر"
+
+msgid "woken by the Wi-Fi key"
+msgstr "استيقظ بزر Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "استيقظ (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "استيقظ بحاسوب عبر USB"
+
+msgid "woken: plugged in"
+msgstr "استيقظ: تم توصيل الشاحن"
+
+msgid "woken by a Wi-Fi client"
+msgstr "استيقظ بعميل Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "إقلاع الشحن (شغّله الشاحن)"
+
+msgid "the hotspot is down"
+msgstr "نقطة الاتصال متوقفة"
+
+msgid "the VPN is still stopped"
+msgstr "الـ VPN ما زال متوقفًا"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "ما زال 5G (EN-DC) متوقفًا بعد استئناف فاشل"
+
+msgid "self-check: %s"
+msgstr "فحص ذاتي: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "سكون: لا عملاء منذ %d دقيقة (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "سكون: الملف الشخصي الآن %s"
+
+msgid "woken by the %s key"
+msgstr "استيقظ بزر %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "المودم معلّق (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "أدخل عددًا صحيحًا من 0 إلى %d"
@@ -1437,6 +1695,15 @@ msgstr "الرسالة (Enter للإرسال، Shift+Enter لسطر جديد)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "يستخدم الإرسال AT+CMGS (وضع PDU)؛ أعد المحاولة إذا كانت القناة مشغولة. لحذف رسالة واحدة، استخدم أيقونة سلة المهملات على فقاعتها."
 
+msgid "Sending…"
+msgstr "جارٍ الإرسال…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "تم الإرسال؛ ستُحدَّث القائمة قريباً."
+
+msgid "Sending failed"
+msgstr "فشل الإرسال"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "جارٍ المزامنة من SIM في الخلفية (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "تم الحذف (محلياً فقط)"
 msgid "Enter both a number and a message."
 msgstr "أدخل رقماً ورسالة معاً."
 
-msgid "Sending…"
-msgstr "جارٍ الإرسال…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "تم الإرسال؛ ستُحدَّث القائمة قريباً."
-
-msgid "Sending failed"
-msgstr "فشل الإرسال"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d رسالة، %d غير مقروءة · %d محادثة"
 
@@ -1502,6 +1760,39 @@ msgstr "غير مكتملة: وصل %d من %d أجزاء"
 
 msgid "Delete"
 msgstr "حذف"
+
+msgid "ttyd is not installed."
+msgstr "ttyd غير مثبت."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "الطرفية متوقفة (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "تُفتح طرفيات كثيرة في الوقت نفسه. حاول مرة أخرى بعد دقيقة."
+
+msgid "The terminal is not available."
+msgstr "الطرفية غير متاحة."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "هذه صدفة root على الجهاز: يعمل كل أمر بصلاحيات كاملة، وقد يجعل خطأ واحد الجهاز غير قابل للإقلاع."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "يمكن الوصول إليها من الشبكة المحلية فقط (USB ونقطة الاتصال)، ولا يمكن أبدًا من بيانات الجوال، ومن هذه الصفحة المسجّل الدخول إليها فقط."
+
+msgid "It closes after a minute without activity."
+msgstr "تُغلق بعد دقيقة من عدم النشاط."
+
+msgid "It closes after %d minutes without activity."
+msgstr "تُغلق بعد %d دقيقة من عدم النشاط."
+
+msgid "Reconnect"
+msgstr "إعادة الاتصال"
+
+msgid "Open in a new tab"
+msgstr "فتح في علامة تبويب جديدة"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "فُتحت هذه الصفحة عبر HTTPS، والطرفية تُقدَّم عبر HTTP على الشبكة المحلية: لذا تُفتح في علامة تبويب خاصة بها."
 
 msgid "The data usage could not be read"
 msgstr "تعذرت قراءة استهلاك البيانات"
@@ -1637,6 +1928,594 @@ msgstr "إيقاف"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "مع 64 تخرج كل حزمة كأنها من حركة مرور الجهاز نفسه"
+
+msgid "running"
+msgstr "قيد التشغيل"
+
+msgid "(about %s)"
+msgstr "(حوالي %s)"
+
+msgid "Install %s?"
+msgstr "تثبيت %s؟"
+
+msgid "It is installed from this system's package feed."
+msgstr "يُثبَّت من مستودع حزم هذا النظام."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "يُنزَّل من إصدار وحدة VPN ويُتحقق منه مقابل SHA256SUMS الخاص به."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "المحرك بحجم عشرات MB: على بيانات الجوال يُحتسب التنزيل من باقتك."
+
+msgid "Install"
+msgstr "تثبيت"
+
+msgid "Remove %s?"
+msgstr "إزالة %s؟"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "الملفات الشخصية التي تعمل عليه: %s. لا يمكنها البدء حتى يُثبَّت مرة أخرى (ترفض الوحدة الإزالة ما دام الملف الشخصي العامل بحاجة إليه)."
+
+msgid "No profile runs on it."
+msgstr "لا يعمل أي ملف شخصي عليه."
+
+msgid "Removed"
+msgstr "تمت الإزالة"
+
+msgid "Check for updates"
+msgstr "التحقق من التحديثات"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "كل محرك إضافة قائمة بذاتها: ثبّت فقط ما تحتاجه ملفاتك الشخصية. يشغّل Xray روابط vless وvmess وtrojan وss (مع hev-socks5-tunnel)، ويشغّل sing-box الروابط نفسها وJSON الخاص به، ويشغّل mihomo اشتراكات Clash، ويشغّل dae بروتوكولات hysteria2 وtuic وغيرها على الأنوية الأحدث. WireGuard وOpenVPN حزمتان من النظام."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "التنزيلات بحجم عشرات MB لكل محرك: على بيانات الجوال تُحتسب من باقتك. بدون اتصال، ارفع أرشيف tarball الخاص بالمحرك من صفحة الإصدارات الخاصة بوحدة VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "الإصدارات المتاحة تأتي من أحدث إصدار لوحدة VPN."
+
+msgid "Update"
+msgstr "تحديث"
+
+msgid "system package"
+msgstr "حزمة نظام"
+
+msgid "in the vpn bundle"
+msgstr "ضمن حزمة vpn"
+
+msgid "extra %s"
+msgstr "إضافة %s"
+
+msgid "not installed"
+msgstr "غير مثبت"
+
+msgid "cannot run here"
+msgstr "لا يمكنه العمل هنا"
+
+msgid "update available"
+msgstr "يتوفر تحديث"
+
+msgid "installed"
+msgstr "مثبت"
+
+msgid "Kind"
+msgstr "النوع"
+
+msgid "Version"
+msgstr "الإصدار"
+
+msgid "Available"
+msgstr "المتاح"
+
+msgid "not checked"
+msgstr "لم يُتحقق"
+
+msgid "Size"
+msgstr "الحجم"
+
+msgid "Needed by"
+msgstr "مطلوب لـ"
+
+msgid "no profile"
+msgstr "لا يوجد ملف شخصي"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "يحتاج dae إلى نواة تدعم BTF بإصدار 5.17 أو أحدث: ليست نواة الشركة المصنّعة 5.4 (mu300-update kernel 6.18). يمكن تثبيته على أي حال."
+
+msgid "All engines"
+msgstr "كل المحركات"
+
+msgid "Last %s lines"
+msgstr "آخر %s سطرًا"
+
+msgid "VPN service log"
+msgstr "سجل خدمة VPN"
+
+msgid "Every 5 s"
+msgstr "كل 5 ثوانٍ"
+
+msgid "The log is empty."
+msgstr "السجل فارغ."
+
+msgid "The VPN is starting"
+msgstr "VPN قيد البدء"
+
+msgid "The VPN is stopped"
+msgstr "VPN متوقف"
+
+msgid "The VPN is restarting"
+msgstr "VPN قيد إعادة التشغيل"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "عند تفعيل مفتاح الإيقاف (kill switch) لا يخرج شيء من الجهاز أو من LAN خارج النفق: وما دام VPN متوقفًا أو يبدأ أو معطلًا يفشل كل اتصال بدلًا من الخروج مباشرة. يبقى فعالًا حتى توقف VPN من هنا (إيقاف يزيله)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "بدون مفتاح الإيقاف (kill switch) تخرج الحركة مباشرة وغير محمية كلما كان النفق متوقفًا (أثناء البدء، بعد انهيار، عند غياب المحرك)."
+
+msgid "Turn the kill switch on?"
+msgstr "تشغيل مفتاح الإيقاف (kill switch)؟"
+
+msgid "Turn the kill switch off?"
+msgstr "إيقاف مفتاح الإيقاف (kill switch)؟"
+
+msgid "Turn on"
+msgstr "تشغيل"
+
+msgid "unknown"
+msgstr "غير معروف"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "تعذّر العثور على عنوان الخروج (هل النفق يعمل؟)"
+
+msgid "Connecting…"
+msgstr "جارٍ الاتصال…"
+
+msgid "On, but not running"
+msgstr "مفعّل، لكنه لا يعمل"
+
+msgid "Stopped"
+msgstr "متوقف"
+
+msgid "Install it"
+msgstr "ثبّته"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "محرك الملف الشخصي النشط غير مثبت: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "يبقي مفتاح الإيقاف (kill switch) كل شيء مغلقًا حتى يتوفر؛ وتنزّله الخدمة بنفسها عندما تستطيع."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "لا يمكن بدء VPN حتى يتم تثبيته."
+
+msgid "%s cannot run on this system"
+msgstr "لا يمكن تشغيل %s على هذا النظام"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN يعمل، لكن لا يوجد ملف شخصي نشط: اختر واحدًا أدناه."
+
+msgid "Profile: %s"
+msgstr "الملف الشخصي: %s"
+
+msgid "No active profile"
+msgstr "لا يوجد ملف شخصي نشط"
+
+msgid "engine %s"
+msgstr "المحرك %s"
+
+msgid "interface %s"
+msgstr "الواجهة %s"
+
+msgid "Kill switch active"
+msgstr "مفتاح الإيقاف (kill switch) فعّال"
+
+msgid "Kill switch on"
+msgstr "مفتاح الإيقاف (kill switch) مفعّل"
+
+msgid "Kill switch off"
+msgstr "مفتاح الإيقاف (kill switch) معطّل"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 داخل النفق"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 محظور"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 دون تدخل"
+
+msgid "Module %s"
+msgstr "الوحدة %s"
+
+msgid "Check"
+msgstr "تحقق"
+
+msgid "Uptime"
+msgstr "مدة التشغيل"
+
+msgid "Rate"
+msgstr "المعدل"
+
+msgid "Exit address"
+msgstr "عنوان الخروج"
+
+msgid "Start"
+msgstr "بدء"
+
+msgid "Stop"
+msgstr "إيقاف"
+
+msgid "Restart"
+msgstr "إعادة التشغيل"
+
+msgid "Stop the VPN?"
+msgstr "إيقاف VPN؟"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "ستخرج الحركة بعد ذلك مباشرة دون نفق؛ ويُرفع مفتاح الإيقاف (kill switch) معه."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN مفعّل: يبدأ من جديد تلقائيًا بعد إعادة التشغيل."
+
+msgid "The VPN is off."
+msgstr "VPN متوقف."
+
+msgid "Kill switch"
+msgstr "مفتاح الإيقاف (kill switch)"
+
+msgid "Setting"
+msgstr "الإعداد"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "فعّال: النفق وحده يصل إلى الإنترنت"
+
+msgid "Not active"
+msgstr "غير فعّال"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "يحظر مفتاح الإيقاف (kill switch) كل حركة الجهاز وLAN ما دام VPN متوقفًا، فلا يخرج شيء أبدًا دون النفق. إذا تعذّر إقامة النفق (خادم معطل، حساب منتهي)، يبقى الجهاز دون اتصال حتى تصلح الملف الشخصي أو توقف VPN. تبقى اللوحة نفسها متاحة من LAN."
+
+msgid "Choose a profile"
+msgstr "اختر ملفًا شخصيًا"
+
+msgid "No profiles yet"
+msgstr "لا توجد ملفات شخصية بعد"
+
+msgid "engine not installed"
+msgstr "المحرك غير مثبت"
+
+msgid "Use"
+msgstr "استخدام"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "تم التبديل: يعاد تشغيل VPN بالملف الشخصي الجديد"
+
+msgid "Active profile"
+msgstr "الملف الشخصي النشط"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "يعاد تشغيل VPN العامل بالملف الشخصي الذي تختاره؛ ويبقى مفتاح الإيقاف (kill switch) قائمًا خلال ذلك."
+
+msgid "Manage the profiles"
+msgstr "إدارة الملفات الشخصية"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "تلقائي: عبر النفق حيث يستطيع المحرك حمله"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "اطلب من المحرك IPv6 داخل النفق"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "ليس عبر النفق أبدًا (محظور ما دام VPN يعمل)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "تم الحفظ: يسري من التشغيل التالي (إعادة التشغيل)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "النفق يحمل IPv6"
+
+msgid "Yes"
+msgstr "نعم"
+
+msgid "IPv6 guard"
+msgstr "حارس IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "فعّال: يُرفض IPv6 خارج النفق"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "ما دام VPN يعمل، لا يخرج IPv6 أبدًا بجانب نفق لا يحمله: يُرفض فورًا، فتعود البرامج وعملاء LAN إلى IPv4 بدلًا من التسرب أو الانتظار. تلقائي: يستخدم WireGuard عناوين IPv6 من إعداداته، وتبقى المحركات الأخرى على IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: لا يمكن اختباره"
+
+msgid "blocked by the kill switch"
+msgstr "محظور بواسطة مفتاح الإيقاف (kill switch)"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "إعداد WireGuard أو OpenVPN، أو YAML لـ Clash/mihomo، أو JSON لـ Xray أو sing-box، أو إعداد dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "بعد OK اختر الملف: WireGuard .conf أو OpenVPN .ovpn أو Clash/mihomo .yaml أو Xray أو sing-box .json أو إعداد dae (بحد أقصى 1 MiB)."
+
+msgid "From the source"
+msgstr "من المصدر"
+
+msgid "Detect"
+msgstr "اكتشاف"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "قد يحتوي URL على رمز: يُرسل إلى الجهاز منفردًا، ولا يدخل أبدًا في سطر أوامر أو سجل."
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Share link"
+msgstr "رابط مشاركة"
+
+msgid "Paste"
+msgstr "لصق"
+
+msgid "File"
+msgstr "ملف"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "ليس رابط مشاركة تقبله هذه اللوحة"
+
+msgid "The config is empty"
+msgstr "الإعداد فارغ"
+
+msgid "Not an https URL"
+msgstr "ليس عنوان URL من نوع https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "اسم غير صالح: من 1 إلى 64 حرفًا، دون أحرف تحكم"
+
+msgid "Add a profile"
+msgstr "إضافة ملف شخصي"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "اكتشاف: تحدد الوحدة النوع من الرابط أو الملف. اختر النوع لملف JSON قد يكون Xray أو sing-box، أو لرابط ينبغي تشغيله على محرك آخر."
+
+msgid "The profile is added"
+msgstr "أُضيف الملف الشخصي"
+
+msgid "Rename the profile"
+msgstr "إعادة تسمية الملف الشخصي"
+
+msgid "Delete the profile %s?"
+msgstr "حذف الملف الشخصي %s؟"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "هذا هو الملف الشخصي النشط: وبينما VPN يعمل ترفض الوحدة؛ أوقف VPN أو اختر ملفًا شخصيًا آخر أولًا."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "يُحذف إعداده وبيانات اعتماده من الجهاز."
+
+msgid "Deleted"
+msgstr "تم الحذف"
+
+msgid "The profile passes the check"
+msgstr "الملف الشخصي يجتاز الفحص"
+
+msgid "Show the config?"
+msgstr "عرض الإعداد؟"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "يحتوي الإعداد على بيانات اعتماد الملف الشخصي (مفاتيح، كلمات مرور، UUID). يُعرض على هذه الشاشة فقط؛ ويستطيع أي شخص يرى الشاشة قراءته."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "يفحص الحفظ الإعداد مع المحرك أولًا (profile edit)؛ والإعداد الذي لا يجتاز الفحص لا يُحفظ ويبقى القديم."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "هذا الملف الشخصي قادم من اشتراك: التحديث التالي له يستبدل تعديلاتك."
+
+msgid "Config of %s"
+msgstr "إعداد %s"
+
+msgid "Close"
+msgstr "إغلاق"
+
+msgid "Rename"
+msgstr "إعادة تسمية"
+
+msgid "Show / edit the config"
+msgstr "عرض / تحرير الإعداد"
+
+msgid "Test the latency of all"
+msgstr "قياس زمن الاستجابة للجميع"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "لا توجد ملفات شخصية بعد: أضف واحدًا من رابط مشاركة أو ملف إعداد أو اشتراك."
+
+msgid "Active"
+msgstr "نشط"
+
+msgid "This profile is the active one now"
+msgstr "هذا الملف الشخصي هو النشط الآن"
+
+msgid "More"
+msgstr "المزيد"
+
+msgid "active"
+msgstr "نشط"
+
+msgid "subscription"
+msgstr "اشتراك"
+
+msgid "migrated"
+msgstr "منقول"
+
+msgid "gone from its subscription"
+msgstr "اختفى من اشتراكه"
+
+msgid "Server"
+msgstr "الخادم"
+
+msgid "Engine"
+msgstr "المحرك"
+
+msgid "Latency"
+msgstr "زمن الاستجابة"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "زمن الاستجابة هو اتصال TCP بالخادم، عبر النفق عندما يعمل VPN. تستخدم خوادم WireGuard وOpenVPN عادةً UDP ولا يمكن اختبارها بهذه الطريقة."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "أدخل عنوان IPv4 أو IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "مفعّل: لا يخرج شيء خارج النفق"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "متوقف: تخرج الحركة مباشرة ما دام النفق متوقفًا"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "نعم: اتصالات Tailscale الخاصة تمر عبر النفق"
+
+msgid "No: Tailscale connects directly"
+msgstr "لا: يتصل Tailscale مباشرة"
+
+msgid "Routing"
+msgstr "التوجيه"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "يحظر مفتاح الإيقاف (kill switch) كل حركة الجهاز وLAN ما دام VPN متوقفًا."
+
+msgid "Bypass the tunnel"
+msgstr "تجاوز النفق"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "أدخل نطاقات عناوين مثل 192.168.0.0/16، مفصولة بفواصل"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "نطاقات عناوين لا تدخل النفق أبدًا، إضافة إلى LAN نفسها (التي لا تدخله أبدًا). فارغ: LAN فقط."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale عبر VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "عندما يعمل Tailscale على الجهاز، تمر اتصالات WireGuard وDERP والتحكم الخاصة به عبر أي نفق يعمل (يلتقطها dae كغيرها)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS عبر النفق"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "المحلِّل الذي تذهب إليه استعلامات الجهاز وLAN عبر النفق. لا يذهب شيء إلى محلِّل المشغّل."
+
+msgid "Bootstrap DNS"
+msgstr "DNS التمهيدي"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "يعثر على عنوان خادم VPN نفسه قبل قيام النفق (مباشرة، عبر اتصال المحرك الخاص)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "ترك الحقل فارغًا يعيد الإعداد إلى قيمته الافتراضية."
+
+msgid "TUN stack"
+msgstr "مكدس TUN"
+
+msgid "Default (gvisor)"
+msgstr "افتراضي (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (ليس على نواة 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "معيَّن (دون تغيير ما لم تكتب قيمة جديدة)"
+
+msgid "not set"
+msgstr "غير معيَّن"
+
+msgid "Upstream HTTP proxy"
+msgstr "وكيل HTTP أعلى"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "تثبيت شهادة TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "أدخل host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "أدخل SHA-256 بالنظام السداسي عشري"
+
+msgid "Profile options"
+msgstr "خيارات الملف الشخصي"
+
+msgid "None of the profiles has options of its type."
+msgstr "لا يملك أي من الملفات الشخصية خيارات خاصة بنوعه."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "وضع mihomo (rule وglobal وdirect) ومستويات سجل المحركات ومجموعات dae وتوجيهه كلها جزء من إعداد كل ملف شخصي: VPN > الملفات الشخصية، عرض / تحرير الإعداد."
+
+msgid "Delete the subscription %s?"
+msgstr "حذف الاشتراك %s؟"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "يمكن أن تُحذف ملفاته الشخصية معه أو تبقى ملفات شخصية مستقلة. لا يُزال الملف الشخصي النشط أبدًا ما دام VPN يعمل."
+
+msgid "Keep the profiles"
+msgstr "الإبقاء على الملفات الشخصية"
+
+msgid "Delete with its profiles"
+msgstr "الحذف مع ملفاته الشخصية"
+
+msgid "Only by hand"
+msgstr "يدويًا فقط"
+
+msgid "Every %d h"
+msgstr "كل %d ساعة"
+
+msgid "Share links: one profile per link"
+msgstr "روابط المشاركة: ملف شخصي واحد لكل رابط"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: ملف شخصي واحد لـ mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: ملف شخصي واحد بكل العقد في مجموعة واحدة"
+
+msgid "Add a subscription"
+msgstr "إضافة اشتراك"
+
+msgid "Format"
+msgstr "الصيغة"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "يحتوي URL عادةً على رمز حسابك: يُخزَّن على الجهاز بحيث لا يقرؤه إلا root، ولا يُعرض مرة أخرى. يُجلب الاشتراك عبر اتصال الجهاز الخاص: عبر النفق عندما يعمل VPN؛ ومع قيام مفتاح الإيقاف (kill switch) وتوقف النفق لا يمكن جلبه."
+
+msgid "Refresh all"
+msgstr "تحديث الكل"
+
+msgid "No subscriptions yet."
+msgstr "لا توجد اشتراكات بعد."
+
+msgid "Host"
+msgstr "المضيف"
+
+msgid "Updated"
+msgstr "آخر تحديث"
+
+msgid "Share links"
+msgstr "روابط المشاركة"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "يُبقي التحديث الملفات الشخصية التي لم يتغير اسمها، ويضيف الجديدة، ويزيل التي اختفت (يبقى النشط ما دام VPN يعمل، ويُعلَّم بأنه اختفى). تحديث الملف الشخصي النشط يعيد تشغيل VPN العامل."
 
 msgid "Dashboard info failed"
 msgstr "فشل جلب معلومات اللوحة"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "لم يُرجع محوّل الحزم ردًا صالحًا"
+
+msgid "Invalid packages operation"
+msgstr "عملية حزم غير صالحة"
+
 msgid "Request too large"
 msgstr "الطلب كبير جداً"
 
@@ -1820,6 +2705,150 @@ msgstr "مجلد التشغيل غير آمن؛ لم يُنفَّذ أي شيء"
 
 msgid "No such method"
 msgstr "لا توجد طريقة بهذا الاسم"
+
+msgid "The VPN module refused the request"
+msgstr "رفضت وحدة VPN الطلب"
+
+msgid "The VPN panel is busy, try again"
+msgstr "لوحة VPN مشغولة، حاول مرة أخرى"
+
+msgid "Another VPN task is still running"
+msgstr "مهمة VPN أخرى ما زالت قيد التشغيل"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "يجب أن يكون المعامل exit_ip هو 0 أو 1"
+
+msgid "The VPN status could not be read"
+msgstr "تعذّرت قراءة حالة VPN"
+
+msgid "The profiles could not be read"
+msgstr "تعذّرت قراءة الملفات الشخصية"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "يجب أن يكون المعامل check هو 0 أو 1"
+
+msgid "The engines could not be read"
+msgstr "تعذّرت قراءة المحركات"
+
+msgid "The subscriptions could not be read"
+msgstr "تعذّرت قراءة الاشتراكات"
+
+msgid "The VPN settings could not be read"
+msgstr "تعذّرت قراءة إعدادات VPN"
+
+msgid "Unknown VPN operation"
+msgstr "عملية VPN غير معروفة"
+
+msgid "The VPN could not be switched"
+msgstr "تعذّر تبديل VPN"
+
+msgid "The kill switch is on or off"
+msgstr "مفتاح الإيقاف (kill switch) إما مفعّل أو معطّل"
+
+msgid "The kill switch could not be changed"
+msgstr "تعذّر تغيير مفتاح الإيقاف (kill switch)"
+
+msgid "Invalid profile id"
+msgstr "معرّف ملف شخصي غير صالح"
+
+msgid "The profile could not be made the active one"
+msgstr "تعذّر جعل الملف الشخصي نشطًا"
+
+msgid "Unknown profile source"
+msgstr "مصدر ملف شخصي غير معروف"
+
+msgid "Unknown profile type"
+msgstr "نوع ملف شخصي غير معروف"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "الإعداد فارغ أو كبير جدًا أو يحتوي على أحرف تحكم"
+
+msgid "Invalid profile request"
+msgstr "طلب ملف شخصي غير صالح"
+
+msgid "A config from a URL takes the type it says"
+msgstr "الإعداد القادم من URL يأخذ النوع الذي يحدده بنفسه"
+
+msgid "No uploaded file"
+msgstr "لا يوجد ملف مرفوع"
+
+msgid "The file is larger than 1 MiB"
+msgstr "الملف أكبر من 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "تعذّرت إضافة الملف الشخصي"
+
+msgid "The profile could not be renamed"
+msgstr "تعذّرت إعادة تسمية الملف الشخصي"
+
+msgid "The profile could not be removed"
+msgstr "تعذّرت إزالة الملف الشخصي"
+
+msgid "The profile does not pass the check"
+msgstr "الملف الشخصي لا يجتاز الفحص"
+
+msgid "Unknown profile option"
+msgstr "خيار ملف شخصي غير معروف"
+
+msgid "Invalid value for this option"
+msgstr "قيمة غير صالحة لهذا الخيار"
+
+msgid "The option could not be set"
+msgstr "تعذّر تعيين الخيار"
+
+msgid "The config could not be read"
+msgstr "تعذّرت قراءة الإعداد"
+
+msgid "The config was not saved"
+msgstr "لم يُحفظ الإعداد"
+
+msgid "The latency test failed"
+msgstr "فشل اختبار زمن الاستجابة"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "يجب أن تكون فترة التحديث من 1 إلى 999 ساعة"
+
+msgid "Unknown subscription type"
+msgstr "نوع اشتراك غير معروف"
+
+msgid "Invalid subscription id"
+msgstr "معرّف اشتراك غير صالح"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "يجب أن يكون المعامل keep هو 0 أو 1"
+
+msgid "The subscription could not be removed"
+msgstr "تعذّرت إزالة الاشتراك"
+
+msgid "The file is too large"
+msgstr "الملف كبير جدًا"
+
+msgid "Unknown engine"
+msgstr "محرك غير معروف"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "يجب أن تكون قيمة المعامل unverified هي 0 أو 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "هذا المحرك حزمة نظام: لا يوجد ملف لرفعه"
+
+msgid "The engine could not be removed"
+msgstr "تعذّرت إزالة المحرك"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra غير موجود على هذا النظام"
+
+msgid "Unknown VPN setting"
+msgstr "إعداد VPN غير معروف"
+
+msgid "The setting could not be saved"
+msgstr "تعذر حفظ الإعداد"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "عدد الأسطر من 1 إلى 1000"
+
+msgid "The log could not be read"
+msgstr "تعذّرت قراءة السجل"
 
 msgid "Radio did not come up"
 msgstr "لم يعمل الراديو"
@@ -1935,6 +2964,9 @@ msgstr "قائمة تصفية غير صالحة (50 سطرًا على الأكث
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "يجب أن يكون عنوان webhook عنوان URL يبدأ بـ http:// أو https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "نص طلب الـ webhook طويل جدًا أو يحتوي على محرف تحكم"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "ترويسة غير صالحة (واحدة \"Name: value\" في كل سطر؛ يضبط الجهاز Host وContent-Type وContent-Length وTransfer-Encoding وConnection)"
 
@@ -1992,17 +3024,47 @@ msgstr "تعذّرت إزالة حزمة اللغات"
 msgid "Lock cache unavailable"
 msgstr "ذاكرة التخزين المؤقت للأقفال غير متاحة"
 
+msgid "The saved locks could not be cleared"
+msgstr "تعذر مسح الأقفال المحفوظة"
+
 msgid "No serving cell to lock to"
 msgstr "لا توجد خلية خادمة للقفل عليها"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "لم يرد المودم على استعلام الوضع؛ لم يُرسل شيء"
+
+msgid "The modem refused a write"
+msgstr "رفض المودم عملية كتابة"
+
+msgid "The read-back does not match the automatic values"
+msgstr "القراءة المرتجعة لا تطابق القيم التلقائية"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "القراءة المرتجعة بعد إعادة تشغيل المكدس لا تطابق القيم التلقائية"
+
+msgid "The reset was interrupted"
+msgstr "تمت مقاطعة إعادة الضبط"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "إعادة تثبيت الحزم غير متاحة على هذا النظام"
+
+msgid "No packages were written down by an update"
+msgstr "لم يسجّل أي تحديث حزمًا"
+
+msgid "Reinstalling is running already"
+msgstr "إعادة التثبيت قيد التشغيل بالفعل"
+
+msgid "The note could not be dropped"
+msgstr "تعذّرت إزالة الملاحظة"
+
+msgid "Unknown packages operation"
+msgstr "عملية حزم غير معروفة"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "استهلاك البيانات غير متاح على هذا النظام"
-
-msgid "The setting could not be saved"
-msgstr "تعذر حفظ الإعداد"
 
 msgid "Unknown data usage operation"
 msgstr "عملية استهلاك بيانات غير معروفة"

@@ -338,8 +338,10 @@ sudo mu300-update check        <span class="c"># 有没有更新的版本？</sp
 <li><strong>安装</strong>：在 Magisk 应用中（模块，从本地安装），或者在 <code>adb shell</code> 中：
 <pre><code>su -c 'magisk --install-module /sdcard/Download/&lt;zip&gt;'</code></pre>
 不要在 recovery 中安装。</li>
-<li><strong>阅读输出。</strong>它会显示找到的设备、Linux 装在哪里、写入了什么，以及它生成的密码。密码也保存在
-<code>/data/adb/mu300-linux-password.txt</code> 里；第一次登录后请删除这个文件。</li>
+<li><strong>阅读输出。</strong>它会显示找到的设备、Linux 装在哪里、写入了什么，以及哪个密码有效：镜像自带的密码 -
+Ubuntu 的用户 <code>ubuntu</code> 密码是 <code>ubuntu</code>，OpenWrt 的 <code>root</code> 在你设置之前没有密码（用
+<code>passwd</code>，或在 LuCI 的系统 &gt; 管理权中设置）；设置文件里的 <code>MU300_PASSWORD</code> 可指定你自己的密码。同样的说明也记在
+<code>/data/adb/mu300-linux-password.txt</code> 里。</li>
 <li><strong>重启。</strong>Linux 会启动；如果没有，设备会自动回到 Android。</li>
 </ol>
 <p>要装两个系统，就先后安装 OpenWrt（或带控制面板的 OpenWrt）和 Ubuntu 的 zip。zip 永远不会缩小 <code>userdata</code>，这件事只能用电脑上的安装程序完成。存储位置、默认启动或你自己的密码等设置写在 <code>mu300-install.conf</code> 文件里，说明见

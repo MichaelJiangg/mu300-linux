@@ -68,7 +68,7 @@ them. If that is not acceptable to you, do not install it.
 | Heat alarm | the network LED flashes red, white, blue in turn: the SoC at 85 °C, until it cools down (`thermal-guard`) | the battery LED flashes red, white, blue in turn: the SoC at 85 °C or the battery at 50 °C, until they cool down (`thermal-guard`) |
 | USB network | `192.168.77.1` | `192.168.78.1` (so both can be plugged into one computer) |
 | Tested | everything below | 5.4, 6.18 and 7.2: USB, Wi-Fi hotspot, Bluetooth, mobile data, VPN, LEDs |
-| Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit`, the `openwrt-luci` dashboard and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`). Charging: on 5.4 by the vendor charger stack; on 6.18 and 7.2 by the `bq256xx` driver, which is on `main` (PR #55) and comes with the next release. The mainline kernels of v2026.10.11 and older leave charging off, so the battery drains while plugged in: use 5.4 with those |
+| Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit`, the `openwrt-luci` dashboard and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`). Charging: on 5.4 by the vendor charger stack; on 6.18 and 7.2 by the `bq256xx` driver (from v2026.10.12; the mainline kernels of v2026.10.11 and older leave charging off). From v2026.10.20: a **charge limit** of 0-100 % (`sudo mu300-power charge-limit 80`, `CHARGE_TO` in the power settings, System > Power on the panel; charging stops at the limit and resumes 5 points below it, and the battery is never held under 5 %), and on the mainline kernels the **Type-C current** the port advertises is read, so a 1.5 A or 3 A port charges at up to 2 A instead of 500 mA |
 | USB host (OTG) | - (its USB port is its power supply) | `sudo mu300-usb host` with an OTG adapter: flash drives (FAT, exFAT), keyboards and mice, USB modems and Ethernet adapters, with 5 V from the battery; `sudo mu300-usb device` back to the computer (the default at every boot). Mainline kernels; HDMI through USB-C adapters does not work |
 | SD card | the Linux filesystem can live on a card instead of the internal storage (see [Install](#install)) | no card slot |
 | Buttons | power: held 3 s shuts down | power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down; the Wi-Fi key switches the hotspot 2.4 / 5 GHz, held 3 s turns it off or on |
@@ -83,7 +83,8 @@ LEDs and the default address follow. The U30 **Pro** is a different chip (UMS963
 
 * **A real Linux system**, not an app or a container: Ubuntu 24.04 or 26.04 LTS with systemd and `apt`, OpenWrt
   with its LuCI web interface, or OpenWrt with the MU300 control panel (below).
-* **Three kernels to choose from:** Unisoc's vendor 5.4, mainline 6.18 LTS and mainline 7.2, with KVM
+* **Three kernels to choose from:** Unisoc's vendor 5.4, mainline 6.18 LTS and mainline 7.2 (6.18.56 and 7.2.10 in
+  v2026.10.20, with BTF and the eBPF hooks that [dae](https://github.com/daeuniverse/dae) needs), with KVM
   (`/dev/kvm`) on all three.
 * **Internet over 5G/LTE**, shared with everything connected to the device.
 * **A Wi-Fi hotspot** (5 GHz or 2.4 GHz) and **USB networking**: plug it into a computer and it shows up as a network adapter.
@@ -223,11 +224,21 @@ Before it writes anything it shows what it is about to do and waits for `INSTALL
 
 ![The summary before installing, and the end of the install](docs/images/installer/installer-3-summary.png)
 
+**The boot chain of the Linux slot.** Linux boots with the bootloader chain of its own slot, but runs Android's modem.
+After an Android update (OTA) the two slots hold different firmware builds, and the Linux slot's chain is still the
+factory one (issue #86). So the installer copies `uboot`, `sml`, `teecfg`, `trustos` and `vbmeta` of Android's slot to
+the Linux slot whenever they differ - and only those five, never the NV or calibration partitions or anything of
+Android's slot. The images the Linux slot held are backed up first, to the Linux filesystem (`.mu300/bootchain/`) and
+to `work/bootchain/` on the computer; each written image is read back, and a mismatch puts the old ones back and stops
+before Linux is armed. The summary says what it will do ("boot chain: identical on both slots" on a device that never
+took an update). Experts can skip it: `MU300_SYNC_BOOTCHAIN=0 ./install.sh`, `.\install.ps1 -NoBootchainSync`.
+Details: [FINDINGS 40](docs/FINDINGS.md). Thanks to kano for the advice.
+
 If Linux is already installed it asks whether to **update** or **wipe**:
 
 * **update** — reinstalls the systems but keeps your settings and data: `/etc/mu300` (hotspot, VPN, toolkit), user
   accounts and home directories, `/usr/local`, SSH host keys, OpenWrt's UCI config, and the services you enabled
-  yourself.
+  yourself. Packages you installed yourself are installed again at the first boot (see [Updating](#updating)).
 * **wipe** — erases the Linux filesystem and installs from scratch.
 
 If the device is running Linux rather than Android when you start, the installer notices and offers to reboot it
@@ -253,8 +264,10 @@ whenever OpenWrt is chosen (`MU300_OPENWRT=plain|luci` answers without asking), 
 `/openwrt-luci` on the Linux disk. Its release asset is `mu300-openwrt-luci-rootfs.tar.gz`; switch to it with
 `sudo mu300-os openwrt-luci`. The panel's pages:
 
-* **Status dashboard:** live radio readings (signal, bands, cells, temperatures), mobile data state; on the U30 Air
-  also the battery: its level, whether it charges, and the power in watts.
+* **Status dashboard:** live radio readings (signal, bands, cells, temperatures), mobile data state, the Wi-Fi clients
+  with their speeds, connected time, name and address, the carrier's DNS servers and the connection count; on the U30 Air
+  also the battery: its level, whether it charges, and the power in watts. When the modem is busy the page keeps its
+  last readings and says how old they are instead of going blank.
 * **Cellular > Network locks:** network mode, band, cell and EN-DC locks that persist across reboots and are replayed at boot, before
   the radio comes on where the modem allows it.
 * **Cellular > SMS:** read, send and delete messages. A pool daemon syncs the SIM every 30 s with `AT+CMGL`, which marks
@@ -262,27 +275,76 @@ whenever OpenWrt is chosen (`MU300_OPENWRT=plain|luci` answers without asking), 
   `sms delete read` on this system. A message leaves the SIM only once the pool's copy is on the disk (an fsync of
   that file and its directory, never a global sync). A long message whose other parts never come is shown after an
   hour with what did arrive, marked incomplete.
-* **Cellular > SMS forwarding:** off until turned on. Received messages go on to a webhook (JSON or form, extra
-  headers), a Telegram chat, an e-mail address (only when the image has `msmtp`) and/or another phone by SMS, through a
+* **Cellular > SMS forwarding:** off until turned on. Received messages go on to a webhook (JSON, form or plain text,
+  extra headers; the standard fields or a body of your own with `{sender}`, `{time}`, `{text}`, `{device}`,
+  `{message}`, each value escaped for the type), a Telegram chat, an e-mail address (only when the image has `msmtp`) and/or another phone by SMS, through a
   template (`{sender}`, `{time}`, `{text}`, `{device}`), with sender allow/deny lists and keywords. Failed deliveries
   are retried (30 s, doubling, an hour at most, ten times); a delivery log and a "Send test" button. Tokens, passwords
   and the webhook address and headers stay in `/etc/mu300/sms-forward.conf` (root only) and are never shown again.
-* **Cellular > AT terminal:** guarded AT commands over the same channel daemons the system uses.
+* **Cellular > AT terminal:** guarded AT commands over the same channel daemons the system uses. A command that scans,
+  changes the radio, the APN, the SIM or a setting that persists into Android is explained and sent only after a
+  click; a network scan runs in the background and the page follows it. The Device page keeps a log of the panel's
+  recent modem operations (names and timings, never values or messages).
+* **VPN** (its own top-level menu, with the [VPN module](#vpn) v2): **Overview** (state, active profile, engine, tunnel
+  addresses, uptime, live rates, the exit IP behind a button, Start/Stop/Restart, the kill switch and the IPv6 setting
+  behind a confirmation), **Profiles** (add from a share link, pasted text, a file or a URL; test the latency; rename,
+  show and edit the config, delete), **Subscriptions** (a URL that yields profiles, refreshed by hand or on a schedule),
+  **Engines** (Xray, sing-box, mihomo, dae: install, update or remove, online or from an uploaded tarball checked
+  against the module's release), **Settings** (kill switch, IPv6, LAN ranges that bypass the tunnel, Tailscale, DNS)
+  and **Logs**. Without the module every page offers to install it.
 * **Cellular > Device management:** USB role (device or host), the USB network mode (NCM, ECM or RNDIS, applied at the next boot) and
   adapters in host mode that can join the LAN bridge.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom AT adapter).
 * **System > Languages:** the language of the interface, and the lang extra: download it, or upload the file.
-* **System > Power:** the active power profile and why, the battery and the power source, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`).
+* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`).
+* **System > Packages after an update:** the packages you had installed yourself and what the update did with them
+  (see [Updating](#updating)): what came back, what is pending or failed and why, the settings set aside, and the
+  buttons Try again, Repair DNS (after a confirmation) and Dismiss.
+* **System > Terminal:** a root shell in the browser ([ttyd](https://github.com/tsl0922/ttyd)). It listens on the LAN
+  address only (port 7681; the cellular side never reaches it), and opens a shell only for a one-time token the page
+  gets for a logged-in panel session: there is no second password to guess. It closes after 15 minutes without
+  activity (`uci set ttyd.mu300.idle=<seconds>`, 0 never). A panel opened over https opens it in a tab of its own
+  (ttyd serves HTTP: its websocket over TLS fails in Chrome). **Terminal settings** is ttyd's own page; turning the
+  instance off (`enable`) removes the terminal.
 
 IPv6 on this system is relayed from the carrier (router advertisements and NAT66) instead of the prefix extension
 plain OpenWrt uses. Aurora is the default theme, Bootstrap stays installed. Its boot timings, measured on an F50
 and a U30 Air, are in [FINDINGS 35](docs/FINDINGS.md).
+
+From v2026.10.20 one stuck AT command no longer takes the whole panel down: every modem read has a deadline, the
+pages send their calls one at a time and back off after failures, and the lock reading is served from a cache while
+the modem is busy. On OpenWrt an AT command now takes about 0.13 s instead of a full second (the shell's `read` could
+not wait for fractions of a second), so the dashboard's readings arrive 7 times faster ([FINDINGS 40](docs/FINDINGS.md)).
 
 
 The panel is the work of kanoqwq ([`kanoqwq/mu300-linux`](https://github.com/kanoqwq/mu300-linux), branch
 `clean-tf-7.2`); this repository ports it, with translations rewritten as standard LuCI catalogs and the shared
 fixes applied to all three systems. The theme is [Aurora](https://github.com/eamonxg/luci-theme-aurora) by
 eamonxg. The app's own notes are in [`openwrt/luci-app-mu300/README.md`](openwrt/luci-app-mu300/README.md).
+
+### A web panel on Ubuntu (optional)
+
+Ubuntu can have a web panel too: [Cockpit](https://cockpit-project.org/), Ubuntu's own web console (a terminal,
+logs, services, networking, storage, accounts), with an **MU300** page in it: the mobile network (operator,
+technology, registration, RSRP/RSRQ), mobile data on/off, data usage and live rates, the battery and temperatures,
+SMS (read, send, delete), the VPN (on/off, profiles; with the VPN module), the CPU profile and the power state, the
+hotspot's name and password, joining a Wi-Fi network, and updates (`mu300-update check` / `apply`). Network locks stay
+a feature of the OpenWrt panel. It is the panel extra, not part of the image:
+
+```sh
+sudo mu300-extra install panel                      # Cockpit from Ubuntu's archive (about 12 MB, online)
+sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz   # offline: the release's file, Cockpit inside
+sudo mu300-extra remove panel
+```
+
+or answer yes to the installer's question (it takes the offline file, so the first boot needs no network). Then open
+`https://192.168.77.1:9090` (the U30 Air: `.78.1`; your LAN address if you changed it), accept Cockpit's own
+certificate, and log in as `ubuntu` with your password; "Turn on administrative access" (your password again) for
+the pages that need root. Cockpit listens on the LAN bridge only (USB and the hotspot: `BindToDevice=br-lan`), and the
+firewall drops everything new from the cellular uplink (and a Wi-Fi uplink) in front of it anyway; root cannot log in,
+the login page offers no other host, and a session ends after 15 minutes idle. An update replaces Ubuntu without
+Cockpit's packages: its first boot puts them back in the background (from the extra when it carries them, else from
+the archive once online). `mu300-panel status` says where it is.
 
 ## Everyday use
 
@@ -295,8 +357,10 @@ eamonxg. The app's own notes are in [`openwrt/luci-app-mu300/README.md`](openwrt
 | Test stability under load | `sudo mu300-toolkit stress all 10` |
 | Check the mobile connection | `sudo mobile-data status` |
 | Set the APN | Ubuntu: `/etc/mu300/mobile-data.conf` (`MU300_APN`, `MU300_PDP_TYPE`). OpenWrt: LuCI → Network → Interfaces → wan, or `uci set network.wan.apn='…'; uci commit network; ifup wan`. Leave it empty to keep the context the SIM defines, which is what most carriers expect |
+| Use the F50's internal SIM instead of the card in the slot | `sudo mu300-sim select internal` (`external` goes back; it takes effect at the next boot, the external card is the default, and nothing is written to the modem or the SIM). OpenWrt: LuCI → Network → Interfaces → wan → SIM source, with that card's own APN; Ubuntu: its APN in `/etc/mu300/mobile-data.conf`. F50 only, and the device must have an internal SIM fitted (docs/SIM-SELECTION.md) |
 | Change the Wi-Fi name or password | Ubuntu: edit `/etc/mu300/hotspot.conf`, then `sudo systemctl restart mu300-hotspot`. OpenWrt: LuCI → Network → Wireless (that file is only read once, at the first boot) |
-| Read and send SMS | `sudo sms list`, `sudo sms send NUMBER TEXT...`, `sudo sms delete INDEX` (OpenWrt with the panel: Cellular → SMS) |
+| Change the hotspot's channel | Ubuntu: `CHANNEL=` in `/etc/mu300/hotspot.conf` (`auto`, or on 5 GHz 36-48 / 149-165). OpenWrt: LuCI → Network → Wireless. Never a DFS channel (52-144): the Wi-Fi driver cannot detect radar, so hostapd could not start there; a DFS channel is replaced by 36 (149 where 36-48 are not allowed) and the log says why (FINDINGS 42) |
+| Read and send SMS | `sudo sms list`, `sudo sms send NUMBER TEXT...`, `sudo sms delete INDEX` (an index, `read` or `all`; anything else is refused before it reaches the modem) (OpenWrt with the panel: Cellular → SMS; Ubuntu with the panel extra: the MU300 page) |
 | Send a USSD code (balance, own number) | `sudo mu300-ussd '*101#'` |
 | Change the kernel | `sudo mu300-update kernel 6.18` (or `5.4`, `7.2`), then reboot |
 | Connect the device to someone else's Wi-Fi | `sudo mu300-toolkit` → Network → Wi-Fi → "Join a network", or `sudo wifi-client scan` then `sudo wifi-client connect "NAME"` (it asks for the password); see [Wi-Fi client](#wi-fi-client) |
@@ -312,6 +376,32 @@ eamonxg. The app's own notes are in [`openwrt/luci-app-mu300/README.md`](openwrt
 | Save battery: profiles, radios that go idle when nobody is connected, a charge limit | `mu300-power status`, `sudo mu300-power profile battery` (`plugged`, `saver`, `auto`), `sudo mu300-power set battery.WIFI_IDLE 10`, `mu300-power log 5 /tmp/power.csv`; on `openwrt-luci` the page System -> Power. A boot that started from a charger stays a charging boot (LED blinking, hotspot and modem down) until the Wi-Fi key is pressed; see FINDINGS 36 |
 | Language of the web interface (OpenWrt) | System -> System -> Language and Style; more languages: see Languages below |
 | Find out which LED is which | `sudo mu300-led test` |
+| `adb shell`, `adb push`/`pull`, `adb forward` to Linux from a computer, as with Android | `sudo mu300-usb adb key adbkey.pub` (the computer's `~/.android/adbkey.pub`), then `sudo mu300-usb adb on`; see [adb to Linux](#adb-to-linux) |
+
+### adb to Linux
+
+Linux can offer adb over the USB cable, next to the USB network and the serial console, as Android does: `adb shell`
+(a root login shell), `adb push`/`pull`, `adb forward`/`reverse`. It is **off by default**. adb has no password:
+**anyone whose adb key is authorised gets a root shell**, so authorise only your own computers.
+
+```sh
+# on the computer: the key adb made for itself (adb keygen makes one where there is none)
+scp ~/.android/adbkey.pub ubuntu@192.168.77.1:      # root@ on OpenWrt; 192.168.78.1 on a U30 Air
+# on the device
+sudo mu300-usb adb key ~/adbkey.pub    # authorise it (/etc/mu300/adb_keys)
+sudo mu300-usb adb on                  # the USB connection drops for a moment and comes back with adb
+sudo mu300-usb adb keys                # the authorised keys; delete a line of /etc/mu300/adb_keys to take one back
+sudo mu300-usb adb off
+```
+
+The installers ask whether to turn it on for the computer they run on (`install.sh`, `install.ps1`). The device shows
+up in `adb devices` as `MU300LINUX-...`; a device in Android has another serial number. A computer whose key is not
+authorised sees it as `unauthorized` and gets nothing: there is no prompt to accept a key on the device, no TCP port
+(adb over Wi-Fi is left out) and no setting that turns the check off. Like Android's, the adb interface asks Windows
+for its WinUSB driver (MS OS descriptors; not tried on Windows yet - without it, Google's USB driver serves). The
+setting stays across reboots and updates; it needs a kernel with FunctionFS (5.4, and the mainline kernels from
+v2026.10.20 on). The daemon is AOSP's adbd (platform-tools 34.0.5), built static for both systems by
+`tools/adbd/build.sh`; see FINDINGS 43.
 
 
 ### Installing from Android with a Magisk zip
@@ -347,9 +437,10 @@ calls that kernel does not have, the same rule as for `install.sh`. Check a down
 **2. Install it.** Put the zip on the device and open it in the Magisk app (Modules, Install from storage), or run
 `su -c 'magisk --install-module /sdcard/Download/<zip>'`. Not from recovery.
 
-**3. Read the output.** It shows the device it found, where Linux goes, what it will write, and the password it
-generated. The password is also in `/data/adb/mu300-linux-password.txt` (mode 600; read it with
-`su -c cat /data/adb/mu300-linux-password.txt`, and delete the file after the first login). A zip installed over a
+**3. Read the output.** It shows the device it found, where Linux goes, what it will write, and which password works:
+the images' own, as on a computer install without one of your choice - Ubuntu's user `ubuntu` has the password
+`ubuntu`, OpenWrt's `root` has none until you set one (`passwd`, or LuCI's System > Administration). The same note is
+in `/data/adb/mu300-linux-password.txt` (`su -c cat /data/adb/mu300-linux-password.txt`). A zip installed over a
 system that is already there (an update) keeps its accounts and passwords and says "unchanged".
 
 **4. Reboot.** Linux starts. If it does not, the device returns to Android by itself.
@@ -368,9 +459,12 @@ boots). Beyond that:
 
 * the boot partition of the slot Android is **not** on (`boot_b` when Android runs from slot a, `boot_a` when it runs
   from slot b), checked after writing;
+* the bootloader chain of the Linux slot (`uboot`, `sml`, `teecfg`, `trustos`, `vbmeta`), only where it differs from
+  Android's slot, backed up first to `.mu300/bootchain/` on the Linux filesystem and checked after writing
+  (`MU300_SYNC_BOOTCHAIN=0` keeps it as it is; see [Install](#install));
 * 32 bytes of `misc`, written last, only when everything before succeeded.
 
-Android's own boot partition, `vbmeta`, the partition table and `userdata` are never written. If the install stops
+Android's own boot partition, Android's slot of every partition, the partition table and `userdata` are never written. If the install stops
 before the last step, `misc` is as it was and Android boots. If `misc` itself does not read back right after the last
 step, the installer writes back the block it held before and says whether that worked.
 
@@ -438,12 +532,13 @@ update - would wipe or erase again. For another erase, put the line back.
 | `MU300_BOOT_ATTEMPTS` | `1` to `6` | either | `5` |
 | `MU300_HOTSPOT` | `yes`, `no` | either | `yes`: Android's hotspot name and password are copied |
 | `MU300_GPU` | `yes`, `no` | either | `yes` (skipped with a message when this device lacks a file of the GPU set) |
-| `MU300_PASSWORD` | 6 or more characters | `/data/adb` only | Generated for a new system: 12 characters from `/dev/urandom` without look-alikes. An update keeps the existing password |
-| `MU300_PASSWORD_RESET` | `yes` | `/data/adb` only | Not set: an update keeps the existing password. `yes`: a new one is generated |
-| `MU300_PASSWORD_FILE` | `sdcard` | `/data/adb` only | Not set: the password file is `/data/adb/mu300-linux-password.txt` |
+| `MU300_PASSWORD` | 6 or more characters | `/data/adb` only | The images' own for a new system: Ubuntu's `ubuntu`/`ubuntu`, OpenWrt's `root` without a password. An update keeps the existing password |
+| `MU300_PASSWORD_RESET` | `yes` | `/data/adb` only | Not set: an update keeps the existing password. `yes`: the images' own again |
+| `MU300_PASSWORD_FILE` | `sdcard` | `/data/adb` only | Not set: the password note is `/data/adb/mu300-linux-password.txt` |
 | `MU300_DEVICE` | `f50`, `u30air` | `/data/adb` only | Detected; needed only for a model name the installer does not know |
 | `MU300_LANG` | `en`, `tr`, `zh` | either | The language of the Android locale |
 | `MU300_DRY_RUN` | `1` | either | Not set |
+| `MU300_SYNC_BOOTCHAIN` | `0`, `1` | either | `1`: the Linux slot gets the boot chain of Android's slot where it differs (backed up first). `0`: left as it is, for experts |
 
 Examples. Install to the card, formatting it (everything on it is erased), with a password of your own, from
 `adb shell` as root:
@@ -455,16 +550,19 @@ su -c 'chmod 600 /data/adb/mu300-install.conf'
 
 Only look at what an install would do, with the file on `/sdcard`: `MU300_DRY_RUN=1` on a line of its own.
 
-**The password.** It is never empty and never the image's (`ubuntu`/`ubuntu`, OpenWrt's empty root). An update
-keeps the accounts and passwords the system has, as `mu300-update` does: a password is made only for a system that has
-none of its own yet (a first install, a wipe, the second system next to the first), or when
-`/data/adb/mu300-install.conf` asks for one with `MU300_PASSWORD` or `MU300_PASSWORD_RESET=yes` (put these there, not
-into a zip's own `mu300/mu300-install.conf`, which is never edited and would reset the password at every update). A new one is written to
-`/data/adb/mu300-linux-password.txt`, which only root reads, and shown in the Magisk output (between quotes) before
-anything is installed, so an install that stops later never leaves a password nobody has seen. Only a trusted
-`MU300_PASSWORD_FILE=sdcard` writes it to `/sdcard/mu300-linux-password.txt` instead, where every app with storage
-access can read it. A `MU300_PASSWORD` or `MU300_PASSWORD_RESET` from `/data/adb/mu300-install.conf` is replaced by a
-comment in that file after a successful install.
+**The password.** A system the zip installs gets the images' own, well-known one: Ubuntu's user `ubuntu` has the
+password `ubuntu`, OpenWrt's `root` has none (as stock OpenWrt ships: dropbear and LuCI let root in without one until
+you set one with `passwd` or in LuCI, System > Administration). Nothing random: a random password shown in nothing
+but a root-only file, which the next zip overwrote, left systems added beside a first one with a password nobody knew
+(FINDINGS 47). An update keeps the accounts and passwords the system has, as `mu300-update` does: the images' own
+apply only to a system that has none of its own yet (a first install, a wipe, the second system next to the first), or
+when `/data/adb/mu300-install.conf` asks with `MU300_PASSWORD_RESET=yes`. `MU300_PASSWORD` there sets one of your own
+instead, for every system it installs (put these there, not into a zip's own `mu300/mu300-install.conf`, which is
+never edited and would reset the password at every update); it is hashed and never shown or written down. Which
+password works is said in the Magisk output before anything is installed and noted in
+`/data/adb/mu300-linux-password.txt` (a trusted `MU300_PASSWORD_FILE=sdcard` puts the note in
+`/sdcard/mu300-linux-password.txt` instead). A `MU300_PASSWORD` or `MU300_PASSWORD_RESET` from
+`/data/adb/mu300-install.conf` is replaced by a comment in that file after a successful install.
 
 ### Starting Linux from Android without a computer
 
@@ -472,34 +570,45 @@ comment in that file after a successful install.
 the zips above are this module plus the installer). Once it is installed, the Magisk app gets an **Action**
 button that reboots the device into Linux, and `su -c mu300-linux` does the same from a terminal
 (`su -c 'mu300-linux status'` just shows which system is on which slot). It writes only the same 32 bytes of
-`misc` that the installer does. See [android/magisk/README.md](android/magisk/README.md).
+`misc` that the installer does. `su -c 'mu300-linux bootchain'` shows whether the boot chain differs between the
+slots, and `su -c 'mu300-linux bootchain sync'` copies Android's to the Linux slot as the installer does (after an
+Android update, say), with the backup in `/data/adb/mu300-bootchain/`. See [android/magisk/README.md](android/magisk/README.md).
 
 ### VPN
 
 The device can send its own traffic **and** everything from connected clients through a VPN server: `mu300-vpn`
 keeps profiles - a WireGuard `.conf`, an OpenVPN `.ovpn`, a Clash/mihomo YAML, a VLESS, VMess, Trojan or Shadowsocks
-share link, or a raw Xray or sing-box JSON - and runs the active one with a kill switch, Tailscale through the
-tunnel, on Ubuntu and OpenWrt alike. It is a module of its own, developed and released in
+share link, a hysteria2 or TUIC link for dae, or a raw Xray or sing-box JSON - and runs the active one with a kill
+switch, Tailscale through the tunnel, on Ubuntu and OpenWrt alike. It is a module of its own, developed and released in
 **[dikeckaan/mu300-linux-vpn](https://github.com/dikeckaan/mu300-linux-vpn)** (commands, profiles, settings, the
 security model): the images carry none of it, and mu300-linux keeps the kernel support (TUN, WireGuard, nftables)
 and the places that work with it (mobile data, the Wi-Fi client, power saving, the toolkit, the panel).
 
+Module **v2.0.0** (with mu300-linux v2026.10.20) splits it into a core and engine extras, adds subscriptions (a URL
+that yields profiles, refreshed on a schedule), a `--json` interface the control panel's VPN section is built on, and
+an **IPv6 guard**: `IPV6` is `auto`, `1` or `0`; when the tunnel carries no IPv6, IPv6 is blocked beside it instead
+of leaking past the kill switch. [dae](https://github.com/daeuniverse/dae), the eBPF engine, needs kernel 6.18 or
+7.2 of v2026.10.20 or newer (they carry BTF); 5.4 cannot run it.
+
 ```sh
-sudo mu300-extra install vpn                                # online: the module's latest release, checked against its SHA256SUMS
-sudo mu300-extra install vpn --from mu300-linux-vpn.tar.gz  # offline: a copy brought onto the device (USB, scp)
-sudo mu300-extra install vpn --from /mnt/usb/               # offline, verified: a directory with the tarball and its SHA256SUMS
-sudo mu300-extra install vpn-mihomo                         # mihomo, for Clash/mihomo profiles
+sudo mu300-extra install vpn                                # online: the core and the engines its profiles need (first time: xray)
+sudo mu300-vpn engine install sing-box                      # each engine is an extra: xray, sing-box, mihomo, dae (= mu300-extra install vpn-singbox ...)
+sudo mu300-extra install vpn --from /mnt/usb/               # offline, verified: a directory with the tarballs and their SHA256SUMS
+sudo mu300-extra remove vpn-mihomo                          # an engine; refused while the VPN runs on it
 sudo mu300-extra remove vpn                                 # turn the VPN off first
 ```
 
-The installer asks for it too. The module lives on the Linux partition (`/mnt/mu300-disk/extra/vpn`), so Ubuntu and
-OpenWrt share one copy; installing it links it into every installed system, and each system links it again at boot.
-`mu300-update apply` brings it to its latest release, and a device that uses the VPN is never updated without it:
-offline, the update stops before it changes anything and says how to stage the module
-(`mu300-linux-vpn.tar.gz` and its `SHA256SUMS` in `/mnt/mu300-disk/.mu300-update/vpn/`, or
-`MU300_VPN_MODULE=FILE mu300-update apply`). An older vpn extra (the engines alone) is replaced by the module. A
+The installer asks for it too. The module lives on the Linux partition (`/mnt/mu300-disk/extra/vpn`, the engines in
+`extra/vpn-xray`, `vpn-singbox`, `vpn-mihomo`, `vpn-dae`), so Ubuntu and OpenWrt share one copy; installing it links
+it into every installed system, and each system links it again at boot. `mu300-update apply` brings the core and every
+engine the device has or a profile needs to their latest release, as one set (engines first, the core last), and a
+device that uses the VPN is never updated without them: offline, the update stops before it changes anything and says
+how to stage the module (`mu300-linux-vpn-core.tar.gz` with the engine tarballs, or `mu300-linux-vpn.tar.gz` - the
+core with xray and sing-box - and `SHA256SUMS`, in `/mnt/mu300-disk/.mu300-update/vpn/`, or `MU300_VPN_MODULE=DIR
+mu300-update apply`). Module v1 (the engines inside the vpn extra) keeps both its engines when it is upgraded. A
 system whose VPN is on with its kill switch and has lost the module fails closed: mobile data and the Wi-Fi client stay
-down until it is installed again (`mu300-extra install vpn`) or the VPN is turned off.
+down until it is installed again (`mu300-extra install vpn`) or the VPN is turned off. A missing engine fails closed
+too, behind the kill switch, while the service fetches it again; mu300-toolkit says which one.
 
 ### Languages
 
@@ -603,6 +712,17 @@ to the new release, the [VPN](#vpn) module to its latest one), and the previous 
 a rollback until you run `mu300-update clean`. The new filesystem is unpacked beside the old one and only swapped in
 at the end, so an interrupted download cannot leave a half-updated system.
 
+**Packages you installed yourself** (`apk add` on OpenWrt, `apt install` on Ubuntu) are not part of the release's
+image. `apply` lists them before the switch, sets their OpenWrt settings (`/etc/config/<name>`) aside in
+`/etc/mu300/orphaned-config/` until they are back, and the new system installs them again at its first boot once it
+is online, with their settings and their services' enabled/disabled state put back. Ubuntu keeps the apt sources you
+added (a PPA, with its key); one that makes `apt-get update` fail on the new release is turned off and said so. The
+panel shows it all under System -> Packages after an update. A package the feeds do not have (installed from a file) stays out, with its
+settings aside: `mu300-user-packages status` says what came back and how to restore the rest. If such a proxy
+(OpenClash) had pointed dnsmasq at itself, the device reports it and never falls back to the connection's resolvers by
+itself: `mu300-user-packages repair-dns` does that on request. `mu300-update apply --no-reinstall` (or
+`MU300_KEEP_PACKAGES=0`) skips the reinstall. The installers' **update** does the same.
+
 The kernel and the boot image are updated too. The boot image keeps your device's own part (its Android files and
 the stock header) as it is and gets the release's kernel and the generic part of its ramdisk, so no computer and
 nothing from Android are needed. The previous image is kept for `rollback-boot`, and a kernel that does not start
@@ -662,7 +782,7 @@ Like the installer, it offers to reboot the device from Linux into Android first
 |---|---|
 | Ubuntu 24.04 LTS, OpenWrt 25.12, OpenWrt with the control panel | ✅ |
 | Ubuntu 26.04 LTS | ✅ kernel 6.18 or 7.2 (its programs need system calls 5.4 does not have) |
-| Kernels | ✅ vendor 5.4, mainline 6.18 LTS and 7.2, with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
+| Kernels | ✅ vendor 5.4, mainline 6.18 LTS and 7.2 (6.18.56 and 7.2.10 in v2026.10.20, with BTF and the BPF JIT, so dae runs), with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
 | KVM | ✅ `/dev/kvm` on all three kernels |
 | Mobile data (5G NSA / LTE) | ✅ shared with Wi-Fi and USB clients; reconnects by itself after modem resets |
 | SMS, USSD | ✅ `sms`, `mu300-ussd`; on `openwrt-luci` also in the panel |
@@ -676,7 +796,8 @@ Like the installer, it offers to reboot the device from Linux into Android first
 | Storage | ✅ about 32 GB in the unused area of the internal eMMC on the 64 GB device; on the 32 GB one you choose the split with Android, or use an SD card (F50) |
 | RAM | ✅ about 1.4 GB usable (MemTotal 1473 MiB; the modem firmware keeps most of the rest) |
 | Temperature control, status LEDs, SIM tray | ✅ |
-| U30 Air: battery, buttons, NFC, USB host | ✅ battery readings on every kernel, charging on 5.4 (on mainline from the next release, see [Supported devices](#supported-devices)); USB host on mainline only |
+| U30 Air: battery, buttons, NFC, USB host | ✅ battery readings on every kernel; charging on every kernel (mainline from v2026.10.12), a charge limit and the Type-C charging current from v2026.10.20 (see [Supported devices](#supported-devices)); USB host on mainline only, also while on outside power |
+| Web panels | ✅ OpenWrt: LuCI, and the MU300 control panel on `openwrt-luci` (with a terminal in the browser); Ubuntu: Cockpit with an MU300 page as the panel extra; adb to Linux over USB on both (off by default) |
 | Back to Android, automatic rollback | ✅ |
 | Screen output (HDMI over USB-C) | ✗ the USB-C power chip never answers, so no display |
 | Sound | ✗ the board has no speaker and no microphone. Call audio through the modem's audio DSP is work in progress and not in the releases (`kernel/build-audio.sh`, `mu300-audio-dsp`, `mu300-voice`): with those, the sound card comes up (`sprdphone-sc2730`, 19 PCM devices) and the DSP answers, but no audio moves in any scene, and a call without audio ends after about 20 seconds, as it does under Android on this board ([FINDINGS 24, 24b](docs/FINDINGS.md)). The call sequence and kernel fixes of kano's [e5-linux](https://github.com/kanoqwq/e5-linux) are ported, with a Bluetooth headset as the output (`mu300-voice audio start bt`, `tools/hfp`); the DSP image is yours to supply (`mu300-audio-dsp install`), and with it this is not yet measured ([FINDINGS 24c](docs/FINDINGS.md)). The kernels have USB audio drivers, not tried here |
@@ -688,7 +809,10 @@ used) and is left alone. The installer puts a Linux kernel into the other slot a
 small startup program loads the device's drivers, finds the Linux filesystem on the SD card or in the unused part of
 the internal storage and starts Ubuntu or OpenWrt from it. If Linux fails to start several times in a row (5 unless
 you chose otherwise), the device falls back to Android by itself. Three small Android programs (`modem_control`,
-`refnotify`, `cp_diskserver`) keep running inside Linux in a sandbox, because the modem needs them.
+`refnotify`, `cp_diskserver`) keep running inside Linux in a sandbox, because the modem needs them. From v2026.10.20
+the first two run under a system account of their own, `mu300vnd`, with only the capabilities they keep on Android,
+and the modem's device nodes (its calibration partitions among them) belong to that account rather than to the login
+user, and nothing in `/dev` is world-writable ([FINDINGS 41](docs/FINDINGS.md)).
 
 The 5.4 kernel is built from ZTE's published (GPL) source; 6.18 and 7.2 are mainline Linux with this project's
 patches and the vendor drivers ported to them ([`upstream/`](upstream/)). The reasoning behind each step is in
@@ -718,6 +842,16 @@ v2026.10.11). The firewall's boot ruleset had no rules for the LAN, and on 5.4 t
 always failed ([FINDINGS 38c](docs/FINDINGS.md)). Fixed from the next release; until then the USB serial console
 (`ttyGS0`, a root shell) is the way in, and `nft delete flowtable inet fw4 ft; fw4 reload` brings the LAN up. On
 5.4 a firewall change saved in LuCI still needs those two commands (or a reboot) to take effect.
+
+**The hotspot does not start on a 5 GHz channel between 52 and 144** (hostapd: `start_dfs_cac() failed`,
+`AP-DISABLED`; releases up to v2026.10.18). Those are DFS channels, and the Wi-Fi driver cannot detect radar
+([FINDINGS 42](docs/FINDINGS.md)). Fixed from v2026.10.20 on: such a channel is replaced by 36 (or 149). Until then
+choose 36-48 or 149-165 (165 at 20 MHz), or `auto` on Ubuntu.
+
+**The control panel stops answering after an AT command got stuck** (`openwrt-luci`, releases up to v2026.10.18):
+every page went blank, even the battery tile, and came back by itself after minutes. The panel's lock wait counted
+whole seconds instead of tenths, and some pages read the modem inside the request ([FINDINGS 40](docs/FINDINGS.md)).
+Fixed from v2026.10.20 on; until then wait, or restart `rpcd` and `mu300-atd`.
 
 **The installer prints nothing for minutes and the device gets hot.** A read past the end of the eMMC never
 returned on devices whose partition table ends at the end of the disk (the 32 GB variant and an F50 with no gap

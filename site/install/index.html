@@ -370,9 +370,11 @@ finds the place by itself (the internal storage or an SD card).</p>
 <li><strong>Install it</strong> in the Magisk app (Modules, Install from storage), or from <code>adb shell</code>:
 <pre><code>su -c 'magisk --install-module /sdcard/Download/&lt;zip&gt;'</code></pre>
 Not from recovery.</li>
-<li><strong>Read the output.</strong> It shows the device it found, where Linux goes, what it writes, and the password
-it generated. The password is also in <code>/data/adb/mu300-linux-password.txt</code>; delete that file after your
-first login.</li>
+<li><strong>Read the output.</strong> It shows the device it found, where Linux goes, what it writes, and which password
+works: the images' own - Ubuntu's user <code>ubuntu</code> has the password <code>ubuntu</code>, OpenWrt's
+<code>root</code> has none until you set one (<code>passwd</code>, or LuCI's System &gt; Administration);
+<code>MU300_PASSWORD</code> in the settings file sets one of your own. The same note is in
+<code>/data/adb/mu300-linux-password.txt</code>.</li>
 <li><strong>Restart.</strong> Linux starts; if it does not, the device returns to Android by itself.</li>
 </ol>
 <p>For two systems, install the OpenWrt (or control panel) zip and the Ubuntu zip one after the other. The zips never shrink

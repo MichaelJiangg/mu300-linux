@@ -42,8 +42,38 @@ msgstr "Nguồn"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "Trung tâm điều khiển MU300: bảng trạng thái, khóa mạng, terminal AT và SMS"
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Terminal settings"
+msgstr "Cài đặt terminal"
+
+msgid "Overview"
+msgstr "Tổng quan"
+
+msgid "Profiles"
+msgstr "Hồ sơ"
+
+msgid "Subscriptions"
+msgstr "Đăng ký"
+
+msgid "Engines"
+msgstr "Công cụ"
+
+msgid "Settings"
+msgstr "Cài đặt"
+
+msgid "Logs"
+msgstr "Nhật ký"
+
+msgid "Packages after an update"
+msgstr "Gói sau khi cập nhật"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "Trung tâm điều khiển MU300: bảng trạng thái, khóa mạng, terminal AT, SMS và VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminal: shell root của thiết bị trong trình duyệt"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Số không xác định"
 
 msgid "Select"
 msgstr "Chọn"
+
+msgid "never"
+msgstr "chưa bao giờ"
+
+msgid "just now"
+msgstr "vừa xong"
+
+msgid "%s ago"
+msgstr "%s trước"
+
+msgid "Failed: %s"
+msgstr "Thất bại: %s"
+
+msgid "Management connection lost"
+msgstr "Mất kết nối quản lý"
+
+msgid "Installing the VPN module"
+msgstr "Đang cài đặt mô-đun VPN"
+
+msgid "Installing the engine"
+msgstr "Đang cài đặt công cụ"
+
+msgid "Adding the subscription"
+msgstr "Đang thêm gói đăng ký"
+
+msgid "Refreshing the subscriptions"
+msgstr "Đang làm mới các gói đăng ký"
+
+msgid "Testing the latency of every profile"
+msgstr "Đang đo độ trễ của từng hồ sơ"
+
+msgid "Downloading the config"
+msgstr "Đang tải xuống cấu hình"
+
+msgid "Working…"
+msgstr "Đang xử lý…"
+
+msgid "done"
+msgstr "xong"
+
+msgid "failed"
+msgstr "thất bại"
+
+msgid "Verify the uploaded file"
+msgstr "Xác minh tệp đã tải lên"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Tệp đã tải lên được đối chiếu với SHA256SUMS của bản phát hành mới nhất của mô-đun VPN, tải qua HTTPS. Nếu không thể (ngoại tuyến, bản cũ hơn), tệp chỉ được cài khi bạn cho phép tệp chưa xác minh: khi đó nó chạy với quyền root mà không có kiểm tra nào."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Vẫn cài dù không xác minh được"
+
+msgid "Install only a verified file"
+msgstr "Chỉ cài tệp đã xác minh"
+
+msgid "Upload failed: %s"
+msgstr "Tải lên thất bại: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "Mô-đun VPN quá cũ so với bảng điều khiển này"
+
+msgid "The VPN module is not installed"
+msgstr "Chưa cài đặt mô-đun VPN"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Trang này cần mô-đun VPN có mu300-vpn đọc được bằng máy (mô-đun v2 trở lên). Cập nhật sẽ giữ nguyên các hồ sơ và cài đặt."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN là một mô-đun riêng: mu300-vpn với kill switch và các hồ sơ, cùng một gói bổ sung cho mỗi công cụ (Xray, sing-box, mihomo, dae). Cài đặt bằng mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Dung lượng tải xuống là vài MB cho mô-đun và tới hàng chục MB cho mỗi công cụ: với dữ liệu di động, mức này sẽ tính vào gói cước của bạn."
+
+msgid "Update the VPN module"
+msgstr "Cập nhật mô-đun VPN"
+
+msgid "Install the VPN module"
+msgstr "Cài đặt mô-đun VPN"
+
+msgid "Upload the file…"
+msgstr "Tải tệp lên…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Ngoại tuyến: tải lên mu300-linux-vpn-core.tar.gz (hoặc gói tổng hợp mu300-linux-vpn.tar.gz) từ trang phát hành của mô-đun VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Đây là quét mạng hoặc quét tần số: mất từ một đến ba phút, chiếm kênh AT của modem suốt thời gian đó, và dữ liệu di động có thể tạm dừng trong lúc này. Lệnh chạy ở chế độ nền; phản hồi sẽ hiện ở đây khi xong."
@@ -207,14 +324,8 @@ msgstr "Việc quét khiến điểm phát Wi-Fi rời kênh của nó trong ch�
 msgid "Scan anyway"
 msgstr "Vẫn quét"
 
-msgid "Failed: %s"
-msgstr "Thất bại: %s"
-
 msgid "Saved"
 msgstr "Đã lưu"
-
-msgid "Management connection lost"
-msgstr "Mất kết nối quản lý"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Nhiệt"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Các vùng nhiệt của nhân, chỉ đọc. Vùng có điểm ngưỡng sẽ hạn chế các thiết bị làm mát gắn với nó tại ngưỡng thụ động; trạng thái làm mát 0 nghĩa là không hạn chế."
+
+msgid "Zone"
+msgstr "Vùng"
+
+msgid "Temperature"
+msgstr "Nhiệt độ"
+
+msgid "Trip points"
+msgstr "Điểm ngưỡng"
+
+msgid "Cooling devices"
+msgstr "Thiết bị làm mát"
 
 msgid "USB role"
 msgstr "Vai trò USB"
@@ -489,8 +618,17 @@ msgstr "Nội dung"
 msgid "Form (URL-encoded)"
 msgstr "Biểu mẫu (mã hóa URL)"
 
+msgid "Plain text"
+msgstr "Văn bản thuần"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Các trường: sender, time, text, device, message (mẫu đã điền)"
+
+msgid "Custom body"
+msgstr "Nội dung tùy chỉnh"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Để trống: các trường chuẩn (văn bản thuần: tin nhắn). Chỗ giữ chỗ: {sender}, {time}, {text}, {device}, {message}. Mỗi giá trị được escape theo kiểu đã chọn. Nội dung này được hiển thị lại ở đây: hãy để thông tin bí mật trong địa chỉ hoặc trong một header."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Tiêu đề bổ sung (mỗi dòng một \"Tên: giá trị\")"
@@ -651,6 +789,9 @@ msgstr "Tổng đã gửi"
 msgid "Used today"
 msgstr "Đã dùng hôm nay"
 
+msgid "SIM source"
+msgstr "Nguồn SIM"
+
 msgid "Session duration"
 msgstr "Thời lượng phiên"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Nhà mạng"
+
+msgid "Own number"
+msgstr "Số của mình"
 
 msgid "Module"
 msgstr "Mô-đun"
@@ -858,8 +1002,17 @@ msgstr "Khóa thất bại: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Đang đặt lại khóa mạng về tự động (khởi động lại SFUN, khoảng 30 giây)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Đặt lại thất bại: %s. Các thiết lập khóa đã lưu được giữ lại."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Không xác nhận kịp việc đặt lại khóa; vẫn chuyển."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Đã chọn SIM trong máy: được dùng sau khi khởi động lại"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Đã chọn SIM trong máy, nhưng thiết bị này không hỗ trợ: SIM ngoài đang được dùng"
 
 msgid "Uptime %s"
 msgstr "Thời gian hoạt động %s"
@@ -990,9 +1143,6 @@ msgstr "Gói ngôn ngữ đã được cài đặt"
 msgid "The language pack could not be installed"
 msgstr "Không thể cài đặt gói ngôn ngữ"
 
-msgid "Upload failed: %s"
-msgstr "Tải lên thất bại: %s"
-
 msgid "Language of the browser"
 msgstr "Ngôn ngữ của trình duyệt"
 
@@ -1013,9 +1163,6 @@ msgstr "Gói ngôn ngữ (mu300-extra-lang.tar.gz, khoảng 2 MB) bổ sung LuCI
 
 msgid "Download from the release"
 msgstr "Tải xuống từ bản phát hành"
-
-msgid "Upload the file…"
-msgstr "Tải tệp lên…"
 
 msgid "Release"
 msgstr "Bản phát hành"
@@ -1209,6 +1356,9 @@ msgstr "Đã xác nhận trạng thái"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Hết thời gian đọc lại; hãy chọn “Làm mới trạng thái khóa”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Đặt lại đã được xác minh: chế độ mạng tự động, EN-DC bật, tất cả các băng tần, không khóa ô; các thiết lập khóa đã lưu đã được xóa"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Đã áp dụng (EN-DC không cần khởi động lại ngăn xếp radio)"
 
@@ -1235,6 +1385,114 @@ msgstr "Tự động (hỗ trợ %d)"
 
 msgid "%d locked: %s"
 msgstr "%d đã khóa: %s"
+
+msgid "Repair DNS?"
+msgstr "Sửa DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Thao tác này xóa chuyển tiếp DNS của một gói không còn được cài đặt. Nếu không còn máy chủ DNS nào khác, thiết bị sẽ dùng máy chủ DNS của kết nối di động: nhà mạng thấy các tên bạn tra cứu, bên ngoài mọi proxy hoặc VPN."
+
+msgid "Repair DNS"
+msgstr "Sửa DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Các gói được cài trên thiết bị không thuộc ảnh phát hành. Bản cập nhật ghi lại chúng, và hệ thống mới cài lại chúng ở lần khởi động đầu tiên, ngay khi có mạng. Cho đến khi gói trở lại, cài đặt của nó được để riêng."
+
+msgid "No packages to install again."
+msgstr "Không có gói nào cần cài lại."
+
+msgid "All back"
+msgstr "Tất cả đã trở lại"
+
+msgid "Not installed yet"
+msgstr "Chưa được cài"
+
+msgid "Could not be installed again"
+msgstr "Không thể cài lại"
+
+msgid "Waiting for the internet"
+msgstr "Đang chờ internet"
+
+msgid "Given up: no internet at five boots"
+msgstr "Đã bỏ cuộc: không có internet trong năm lần khởi động"
+
+msgid "Skipped"
+msgstr "Đã bỏ qua"
+
+msgid "Written down by the update from %s"
+msgstr "Được ghi lại bởi bản cập nhật từ %s"
+
+msgid "Installed again"
+msgstr "Đã cài lại"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Hãy tự cài chúng từ nơi bạn đã lấy (tệp gói: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Cài đặt được để riêng trong /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS vẫn trỏ tới một gói chưa được cài: thiết bị không có DNS qua nó."
+
+msgid "Try again"
+msgstr "Thử lại"
+
+msgid "Dismiss the note"
+msgstr "Đóng ghi chú"
+
+msgid "started"
+msgstr "đã khởi động"
+
+msgid "asleep now (asked)"
+msgstr "ngủ ngay (theo yêu cầu)"
+
+msgid "woken: power daemon stopping"
+msgstr "đã đánh thức: dịch vụ nguồn đang dừng"
+
+msgid "woken by a key"
+msgstr "được đánh thức bằng một phím"
+
+msgid "woken by the Wi-Fi key"
+msgstr "được đánh thức bằng phím Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "đã đánh thức (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "được đánh thức bởi máy tính qua USB"
+
+msgid "woken: plugged in"
+msgstr "đã đánh thức: đã cắm sạc"
+
+msgid "woken by a Wi-Fi client"
+msgstr "được đánh thức bởi máy khách Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "khởi động sạc (bộ sạc bật máy)"
+
+msgid "the hotspot is down"
+msgstr "điểm phát sóng đang tắt"
+
+msgid "the VPN is still stopped"
+msgstr "VPN vẫn đang dừng"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) vẫn tắt sau khi tiếp tục thất bại"
+
+msgid "self-check: %s"
+msgstr "tự kiểm tra: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "đang ngủ: không có máy khách %d phút (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "đang ngủ: cấu hình giờ là %s"
+
+msgid "woken by the %s key"
+msgstr "được đánh thức bằng phím %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "modem đang tạm ngưng (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Nhập số nguyên từ 0 đến %d"
@@ -1437,6 +1695,15 @@ msgstr "Tin nhắn (Enter để gửi, Shift+Enter để xuống dòng)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Gửi dùng AT+CMGS (chế độ PDU); thử lại nếu kênh bận. Để xóa một tin nhắn, dùng biểu tượng thùng rác trên bong bóng của tin đó."
 
+msgid "Sending…"
+msgstr "Đang gửi…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Đã gửi; danh sách sẽ sớm làm mới."
+
+msgid "Sending failed"
+msgstr "Gửi thất bại"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Đang đồng bộ từ SIM trong nền (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Đã xóa (chỉ cục bộ)"
 msgid "Enter both a number and a message."
 msgstr "Hãy nhập cả số và tin nhắn."
 
-msgid "Sending…"
-msgstr "Đang gửi…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Đã gửi; danh sách sẽ sớm làm mới."
-
-msgid "Sending failed"
-msgstr "Gửi thất bại"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d tin nhắn, %d chưa đọc · %d hội thoại"
 
@@ -1502,6 +1760,39 @@ msgstr "Không đầy đủ: đã nhận %d / %d phần"
 
 msgid "Delete"
 msgstr "Xóa"
+
+msgid "ttyd is not installed."
+msgstr "ttyd chưa được cài đặt."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Terminal đang tắt (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Có quá nhiều terminal đang mở cùng lúc. Hãy thử lại sau một phút."
+
+msgid "The terminal is not available."
+msgstr "Terminal không khả dụng."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Đây là shell root của thiết bị: mọi lệnh chạy với toàn quyền, và một sai sót có thể khiến thiết bị không khởi động được."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Chỉ truy cập được từ LAN (USB và điểm phát sóng), không bao giờ từ dữ liệu di động, và chỉ từ trang đã đăng nhập này."
+
+msgid "It closes after a minute without activity."
+msgstr "Tự đóng sau một phút không hoạt động."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Tự đóng sau %d phút không hoạt động."
+
+msgid "Reconnect"
+msgstr "Kết nối lại"
+
+msgid "Open in a new tab"
+msgstr "Mở trong thẻ mới"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Trang này được mở qua HTTPS, còn terminal được phục vụ qua HTTP trong LAN: nó mở trong một thẻ riêng."
 
 msgid "The data usage could not be read"
 msgstr "Không đọc được lưu lượng dữ liệu"
@@ -1637,6 +1928,594 @@ msgstr "Tắt"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Với 64, mọi gói tin đi ra giống như lưu lượng của chính thiết bị"
+
+msgid "running"
+msgstr "đang chạy"
+
+msgid "(about %s)"
+msgstr "(khoảng %s)"
+
+msgid "Install %s?"
+msgstr "Cài đặt %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Được cài đặt từ kho gói của hệ thống này."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Được tải xuống từ bản phát hành của mô-đun VPN và kiểm tra theo SHA256SUMS của nó."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Một công cụ nặng hàng chục MB: với dữ liệu di động, lượng tải xuống sẽ tính vào gói cước của bạn."
+
+msgid "Install"
+msgstr "Cài đặt"
+
+msgid "Remove %s?"
+msgstr "Gỡ %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Các hồ sơ đang chạy trên nó: %s. Chúng không thể khởi động cho đến khi được cài đặt lại (mô-đun từ chối khi hồ sơ đang chạy cần nó)."
+
+msgid "No profile runs on it."
+msgstr "Không có hồ sơ nào chạy trên nó."
+
+msgid "Removed"
+msgstr "Đã gỡ"
+
+msgid "Check for updates"
+msgstr "Kiểm tra bản cập nhật"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Mỗi công cụ là một gói bổ sung riêng: chỉ cài những công cụ mà hồ sơ của bạn cần. Xray chạy các liên kết vless, vmess, trojan và ss (với hev-socks5-tunnel), sing-box chạy cùng các liên kết đó và JSON riêng của nó, mihomo chạy gói đăng ký Clash, dae chạy hysteria2, tuic và phần còn lại trên các kernel mới hơn. WireGuard và OpenVPN là các gói của hệ thống."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Mỗi công cụ tải xuống hàng chục MB: với dữ liệu di động, mức này sẽ tính vào gói cước của bạn. Khi ngoại tuyến, hãy tải lên tệp tarball của công cụ từ trang phát hành của mô-đun VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Các phiên bản khả dụng lấy từ bản phát hành mới nhất của mô-đun VPN."
+
+msgid "Update"
+msgstr "Cập nhật"
+
+msgid "system package"
+msgstr "gói hệ thống"
+
+msgid "in the vpn bundle"
+msgstr "trong gói vpn"
+
+msgid "extra %s"
+msgstr "gói bổ sung %s"
+
+msgid "not installed"
+msgstr "chưa cài đặt"
+
+msgid "cannot run here"
+msgstr "không thể chạy ở đây"
+
+msgid "update available"
+msgstr "có bản cập nhật"
+
+msgid "installed"
+msgstr "đã cài đặt"
+
+msgid "Kind"
+msgstr "Loại"
+
+msgid "Version"
+msgstr "Phiên bản"
+
+msgid "Available"
+msgstr "Khả dụng"
+
+msgid "not checked"
+msgstr "chưa kiểm tra"
+
+msgid "Size"
+msgstr "Kích thước"
+
+msgid "Needed by"
+msgstr "Được dùng bởi"
+
+msgid "no profile"
+msgstr "không có hồ sơ"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae cần kernel có BTF, 5.17 trở lên: không phải kernel 5.4 của nhà sản xuất (mu300-update kernel 6.18). Vẫn có thể cài đặt."
+
+msgid "All engines"
+msgstr "Tất cả công cụ"
+
+msgid "Last %s lines"
+msgstr "%s dòng cuối"
+
+msgid "VPN service log"
+msgstr "Nhật ký dịch vụ VPN"
+
+msgid "Every 5 s"
+msgstr "Mỗi 5 giây"
+
+msgid "The log is empty."
+msgstr "Nhật ký trống."
+
+msgid "The VPN is starting"
+msgstr "VPN đang khởi động"
+
+msgid "The VPN is stopped"
+msgstr "VPN đã dừng"
+
+msgid "The VPN is restarting"
+msgstr "VPN đang khởi động lại"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Khi kill switch bật, không có gì rời thiết bị hoặc LAN ngoài đường hầm: khi VPN tắt, đang khởi động hoặc bị lỗi, mọi kết nối đều thất bại thay vì đi ra trực tiếp. Nó giữ nguyên cho đến khi bạn dừng VPN tại đây (Dừng sẽ gỡ nó)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Không có kill switch, lưu lượng sẽ đi ra trực tiếp, không được bảo vệ, bất cứ khi nào đường hầm ngừng hoạt động (khi đang khởi động, sau khi gặp sự cố, khi thiếu công cụ)."
+
+msgid "Turn the kill switch on?"
+msgstr "Bật kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "Tắt kill switch?"
+
+msgid "Turn on"
+msgstr "Bật"
+
+msgid "unknown"
+msgstr "không rõ"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Không tìm thấy địa chỉ thoát (đường hầm đã hoạt động chưa?)"
+
+msgid "Connecting…"
+msgstr "Đang kết nối…"
+
+msgid "On, but not running"
+msgstr "Đang bật nhưng không chạy"
+
+msgid "Stopped"
+msgstr "Đã dừng"
+
+msgid "Install it"
+msgstr "Cài đặt"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Công cụ của hồ sơ đang dùng chưa được cài đặt: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch giữ mọi thứ bị chặn cho đến khi có nó; dịch vụ tự tải xuống khi có thể."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN không thể khởi động cho đến khi nó được cài đặt."
+
+msgid "%s cannot run on this system"
+msgstr "%s không thể chạy trên hệ thống này"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN đang bật nhưng không có hồ sơ nào đang dùng: hãy chọn một hồ sơ bên dưới."
+
+msgid "Profile: %s"
+msgstr "Hồ sơ: %s"
+
+msgid "No active profile"
+msgstr "Không có hồ sơ đang dùng"
+
+msgid "engine %s"
+msgstr "công cụ %s"
+
+msgid "interface %s"
+msgstr "giao diện %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch đang hoạt động"
+
+msgid "Kill switch on"
+msgstr "Kill switch bật"
+
+msgid "Kill switch off"
+msgstr "Kill switch tắt"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 trong đường hầm"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 bị chặn"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 không can thiệp"
+
+msgid "Module %s"
+msgstr "Mô-đun %s"
+
+msgid "Check"
+msgstr "Kiểm tra"
+
+msgid "Uptime"
+msgstr "Thời gian chạy"
+
+msgid "Rate"
+msgstr "Tốc độ"
+
+msgid "Exit address"
+msgstr "Địa chỉ thoát"
+
+msgid "Start"
+msgstr "Khởi động"
+
+msgid "Stop"
+msgstr "Dừng"
+
+msgid "Restart"
+msgstr "Khởi động lại"
+
+msgid "Stop the VPN?"
+msgstr "Dừng VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Khi đó lưu lượng đi ra trực tiếp, không qua đường hầm; kill switch cũng bị gỡ theo."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN đang bật: nó tự khởi động lại sau khi khởi động lại thiết bị."
+
+msgid "The VPN is off."
+msgstr "VPN đang tắt."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Cài đặt"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Đang hoạt động: chỉ đường hầm mới ra được internet"
+
+msgid "Not active"
+msgstr "Không hoạt động"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch chặn toàn bộ lưu lượng của thiết bị và của LAN khi VPN tắt, nên không có gì rời đi mà không qua đường hầm. Nếu đường hầm không thể dựng lên (máy chủ hỏng, tài khoản hết hạn), thiết bị sẽ ngoại tuyến cho đến khi bạn sửa hồ sơ hoặc dừng VPN. Bản thân bảng điều khiển vẫn truy cập được từ LAN."
+
+msgid "Choose a profile"
+msgstr "Chọn một hồ sơ"
+
+msgid "No profiles yet"
+msgstr "Chưa có hồ sơ nào"
+
+msgid "engine not installed"
+msgstr "chưa cài đặt công cụ"
+
+msgid "Use"
+msgstr "Dùng"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Đã chuyển: VPN khởi động lại với hồ sơ mới"
+
+msgid "Active profile"
+msgstr "Hồ sơ đang dùng"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "VPN đang chạy sẽ khởi động lại với hồ sơ bạn chọn; kill switch vẫn giữ nguyên trong thời gian đó."
+
+msgid "Manage the profiles"
+msgstr "Quản lý các hồ sơ"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Tự động: qua đường hầm nếu công cụ truyền được"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Yêu cầu công cụ cấp IPv6 trong đường hầm"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Không bao giờ qua đường hầm (bị chặn khi VPN đang bật)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Đã lưu: áp dụng từ lần khởi động tiếp theo (Khởi động lại)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Đường hầm truyền IPv6"
+
+msgid "Yes"
+msgstr "Có"
+
+msgid "IPv6 guard"
+msgstr "Bảo vệ IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Đang hoạt động: IPv6 ngoài đường hầm bị từ chối"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Khi VPN đang bật, IPv6 không bao giờ đi ra bên cạnh một đường hầm không truyền nó: nó bị từ chối ngay, nên chương trình và máy khách LAN chuyển sang IPv4 thay vì rò rỉ hoặc chờ đợi. Tự động: WireGuard dùng các địa chỉ IPv6 trong cấu hình của nó, các công cụ khác giữ IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: không thể kiểm tra"
+
+msgid "blocked by the kill switch"
+msgstr "bị kill switch chặn"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "Cấu hình WireGuard hoặc OpenVPN, YAML Clash/mihomo, JSON Xray hoặc sing-box, cấu hình dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Sau khi bấm OK, hãy chọn tệp: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray hoặc sing-box .json hoặc cấu hình dae (tối đa 1 MiB)."
+
+msgid "From the source"
+msgstr "Từ nguồn"
+
+msgid "Detect"
+msgstr "Tự phát hiện"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL có thể chứa token: nó được gửi riêng tới thiết bị, không bao giờ nằm trong dòng lệnh hay nhật ký."
+
+msgid "Type"
+msgstr "Loại"
+
+msgid "Share link"
+msgstr "Liên kết chia sẻ"
+
+msgid "Paste"
+msgstr "Dán"
+
+msgid "File"
+msgstr "Tệp"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Không phải liên kết chia sẻ mà bảng điều khiển này chấp nhận"
+
+msgid "The config is empty"
+msgstr "Cấu hình trống"
+
+msgid "Not an https URL"
+msgstr "Không phải URL https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Tên không hợp lệ: 1-64 ký tự, không có ký tự điều khiển"
+
+msgid "Add a profile"
+msgstr "Thêm hồ sơ"
+
+msgid "Name"
+msgstr "Tên"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Tự phát hiện: mô-đun xác định loại từ liên kết hoặc tệp. Hãy chọn loại cho JSON có thể là Xray hoặc sing-box, hoặc cho liên kết cần chạy trên công cụ khác."
+
+msgid "The profile is added"
+msgstr "Đã thêm hồ sơ"
+
+msgid "Rename the profile"
+msgstr "Đổi tên hồ sơ"
+
+msgid "Delete the profile %s?"
+msgstr "Xóa hồ sơ %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Đây là hồ sơ đang dùng: khi VPN bật, mô-đun từ chối; hãy dừng VPN hoặc chọn hồ sơ khác trước."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Cấu hình và thông tin xác thực của nó sẽ bị xóa khỏi thiết bị."
+
+msgid "Deleted"
+msgstr "Đã xóa"
+
+msgid "The profile passes the check"
+msgstr "Hồ sơ đạt kiểm tra"
+
+msgid "Show the config?"
+msgstr "Hiện cấu hình?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Cấu hình chứa thông tin xác thực của hồ sơ (khóa, mật khẩu, UUID). Nó chỉ hiển thị trên màn hình này; ai nhìn thấy màn hình đều đọc được."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Khi lưu, cấu hình được kiểm tra bằng công cụ trước (profile edit); cấu hình không đạt sẽ không được lưu và bản cũ vẫn giữ nguyên."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Hồ sơ này đến từ một gói đăng ký: lần làm mới tiếp theo sẽ thay thế các thay đổi của bạn."
+
+msgid "Config of %s"
+msgstr "Cấu hình của %s"
+
+msgid "Close"
+msgstr "Đóng"
+
+msgid "Rename"
+msgstr "Đổi tên"
+
+msgid "Show / edit the config"
+msgstr "Hiện / sửa cấu hình"
+
+msgid "Test the latency of all"
+msgstr "Đo độ trễ tất cả"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Chưa có hồ sơ nào: hãy thêm từ liên kết chia sẻ, tệp cấu hình hoặc gói đăng ký."
+
+msgid "Active"
+msgstr "Đang dùng"
+
+msgid "This profile is the active one now"
+msgstr "Hồ sơ này hiện đang được dùng"
+
+msgid "More"
+msgstr "Thêm"
+
+msgid "active"
+msgstr "đang dùng"
+
+msgid "subscription"
+msgstr "đăng ký"
+
+msgid "migrated"
+msgstr "đã chuyển đổi"
+
+msgid "gone from its subscription"
+msgstr "không còn trong gói đăng ký"
+
+msgid "Server"
+msgstr "Máy chủ"
+
+msgid "Engine"
+msgstr "Công cụ"
+
+msgid "Latency"
+msgstr "Độ trễ"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Độ trễ là một kết nối TCP tới máy chủ, qua đường hầm khi VPN đang bật. Máy chủ WireGuard và OpenVPN thường dùng UDP nên không thể kiểm tra theo cách này."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Nhập địa chỉ IPv4 hoặc IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Bật: không có gì đi ra ngoài đường hầm"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Tắt: lưu lượng đi ra trực tiếp khi đường hầm ngừng hoạt động"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Có: các kết nối của chính Tailscale đi qua đường hầm"
+
+msgid "No: Tailscale connects directly"
+msgstr "Không: Tailscale kết nối trực tiếp"
+
+msgid "Routing"
+msgstr "Định tuyến"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch chặn toàn bộ lưu lượng của thiết bị và của LAN khi VPN tắt."
+
+msgid "Bypass the tunnel"
+msgstr "Bỏ qua đường hầm"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Nhập các dải địa chỉ như 192.168.0.0/16, phân tách bằng dấu phẩy"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Các dải địa chỉ không bao giờ đi vào đường hầm, ngoài chính LAN (vốn không bao giờ đi vào). Để trống: chỉ LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale qua VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Khi Tailscale chạy trên thiết bị, các kết nối WireGuard, DERP và điều khiển của nó đi qua đường hầm đang chạy (dae bắt chúng như mọi lưu lượng khác)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS qua đường hầm"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Bộ phân giải mà các truy vấn của thiết bị và của LAN gửi tới, qua đường hầm. Không có gì đi tới bộ phân giải của nhà mạng."
+
+msgid "Bootstrap DNS"
+msgstr "DNS khởi tạo"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Tìm địa chỉ của chính máy chủ VPN trước khi đường hầm hoạt động (trực tiếp, trên kết nối riêng của công cụ)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Để trống sẽ đặt cài đặt về giá trị mặc định."
+
+msgid "TUN stack"
+msgstr "Ngăn xếp TUN"
+
+msgid "Default (gvisor)"
+msgstr "Mặc định (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (không dùng trên kernel 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "đã đặt (không đổi trừ khi bạn nhập giá trị mới)"
+
+msgid "not set"
+msgstr "chưa đặt"
+
+msgid "Upstream HTTP proxy"
+msgstr "Proxy HTTP thượng nguồn"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "Ghim chứng chỉ TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Nhập host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Nhập SHA-256 ở dạng hex"
+
+msgid "Profile options"
+msgstr "Tùy chọn hồ sơ"
+
+msgid "None of the profiles has options of its type."
+msgstr "Không có hồ sơ nào có tùy chọn theo loại của nó."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "Chế độ của mihomo (rule, global, direct), mức nhật ký của các công cụ, nhóm và định tuyến của dae là một phần cấu hình riêng của từng hồ sơ: VPN > Hồ sơ, Hiện / sửa cấu hình."
+
+msgid "Delete the subscription %s?"
+msgstr "Xóa gói đăng ký %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Các hồ sơ của nó có thể bị xóa theo hoặc giữ lại thành hồ sơ riêng. Hồ sơ đang dùng không bao giờ bị gỡ khi VPN đang bật."
+
+msgid "Keep the profiles"
+msgstr "Giữ các hồ sơ"
+
+msgid "Delete with its profiles"
+msgstr "Xóa cùng các hồ sơ"
+
+msgid "Only by hand"
+msgstr "Chỉ thủ công"
+
+msgid "Every %d h"
+msgstr "Mỗi %d giờ"
+
+msgid "Share links: one profile per link"
+msgstr "Liên kết chia sẻ: mỗi liên kết một hồ sơ"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: một hồ sơ mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: một hồ sơ với mọi nút trong một nhóm"
+
+msgid "Add a subscription"
+msgstr "Thêm gói đăng ký"
+
+msgid "Format"
+msgstr "Định dạng"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL thường chứa token tài khoản của bạn: nó được lưu trên thiết bị chỉ root đọc được và không bao giờ hiển thị lại. Gói đăng ký được tải qua kết nối riêng của thiết bị: qua đường hầm khi VPN đang bật; khi kill switch bật và đường hầm tắt thì không tải được."
+
+msgid "Refresh all"
+msgstr "Làm mới tất cả"
+
+msgid "No subscriptions yet."
+msgstr "Chưa có gói đăng ký nào."
+
+msgid "Host"
+msgstr "Máy chủ"
+
+msgid "Updated"
+msgstr "Cập nhật"
+
+msgid "Share links"
+msgstr "Liên kết chia sẻ"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Làm mới giữ các hồ sơ có tên không đổi, thêm hồ sơ mới và gỡ hồ sơ đã mất (hồ sơ đang dùng vẫn được giữ khi VPN bật, đánh dấu là đã mất). Làm mới hồ sơ đang dùng sẽ khởi động lại VPN đang chạy."
 
 msgid "Dashboard info failed"
 msgstr "Không lấy được thông tin bảng trạng thái"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Bộ điều hợp gói không trả về phản hồi hợp lệ"
+
+msgid "Invalid packages operation"
+msgstr "Thao tác gói không hợp lệ"
+
 msgid "Request too large"
 msgstr "Yêu cầu quá lớn"
 
@@ -1820,6 +2705,150 @@ msgstr "Thư mục runtime không an toàn; không có gì được chạy"
 
 msgid "No such method"
 msgstr "Không có phương thức này"
+
+msgid "The VPN module refused the request"
+msgstr "Mô-đun VPN đã từ chối yêu cầu"
+
+msgid "The VPN panel is busy, try again"
+msgstr "Bảng VPN đang bận, hãy thử lại"
+
+msgid "Another VPN task is still running"
+msgstr "Một tác vụ VPN khác vẫn đang chạy"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Tham số exit_ip phải là 0 hoặc 1"
+
+msgid "The VPN status could not be read"
+msgstr "Không thể đọc trạng thái VPN"
+
+msgid "The profiles could not be read"
+msgstr "Không thể đọc các hồ sơ"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Tham số check phải là 0 hoặc 1"
+
+msgid "The engines could not be read"
+msgstr "Không thể đọc các công cụ"
+
+msgid "The subscriptions could not be read"
+msgstr "Không thể đọc các gói đăng ký"
+
+msgid "The VPN settings could not be read"
+msgstr "Không thể đọc cài đặt VPN"
+
+msgid "Unknown VPN operation"
+msgstr "Thao tác VPN không xác định"
+
+msgid "The VPN could not be switched"
+msgstr "Không thể chuyển đổi VPN"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch chỉ có thể bật hoặc tắt"
+
+msgid "The kill switch could not be changed"
+msgstr "Không thể thay đổi kill switch"
+
+msgid "Invalid profile id"
+msgstr "ID hồ sơ không hợp lệ"
+
+msgid "The profile could not be made the active one"
+msgstr "Không thể đặt hồ sơ làm hồ sơ đang dùng"
+
+msgid "Unknown profile source"
+msgstr "Nguồn hồ sơ không xác định"
+
+msgid "Unknown profile type"
+msgstr "Loại hồ sơ không xác định"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Cấu hình trống, quá lớn hoặc chứa ký tự điều khiển"
+
+msgid "Invalid profile request"
+msgstr "Yêu cầu hồ sơ không hợp lệ"
+
+msgid "A config from a URL takes the type it says"
+msgstr "Cấu hình từ URL lấy loại mà nó tự khai báo"
+
+msgid "No uploaded file"
+msgstr "Không có tệp đã tải lên"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Tệp lớn hơn 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Không thể thêm hồ sơ"
+
+msgid "The profile could not be renamed"
+msgstr "Không thể đổi tên hồ sơ"
+
+msgid "The profile could not be removed"
+msgstr "Không thể xóa hồ sơ"
+
+msgid "The profile does not pass the check"
+msgstr "Hồ sơ không đạt kiểm tra"
+
+msgid "Unknown profile option"
+msgstr "Tùy chọn hồ sơ không xác định"
+
+msgid "Invalid value for this option"
+msgstr "Giá trị không hợp lệ cho tùy chọn này"
+
+msgid "The option could not be set"
+msgstr "Không thể đặt tùy chọn"
+
+msgid "The config could not be read"
+msgstr "Không thể đọc cấu hình"
+
+msgid "The config was not saved"
+msgstr "Cấu hình chưa được lưu"
+
+msgid "The latency test failed"
+msgstr "Kiểm tra độ trễ thất bại"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Khoảng làm mới là từ 1 đến 999 giờ"
+
+msgid "Unknown subscription type"
+msgstr "Loại gói đăng ký không xác định"
+
+msgid "Invalid subscription id"
+msgstr "ID gói đăng ký không hợp lệ"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Tham số keep phải là 0 hoặc 1"
+
+msgid "The subscription could not be removed"
+msgstr "Không thể xóa gói đăng ký"
+
+msgid "The file is too large"
+msgstr "Tệp quá lớn"
+
+msgid "Unknown engine"
+msgstr "Công cụ không xác định"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Tham số unverified phải là 0 hoặc 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Công cụ này là gói hệ thống: không có tệp để tải lên"
+
+msgid "The engine could not be removed"
+msgstr "Không thể gỡ công cụ"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra không có trên hệ thống này"
+
+msgid "Unknown VPN setting"
+msgstr "Cài đặt VPN không xác định"
+
+msgid "The setting could not be saved"
+msgstr "Không lưu được thiết lập"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Số dòng từ 1 đến 1000"
+
+msgid "The log could not be read"
+msgstr "Không thể đọc nhật ký"
 
 msgid "Radio did not come up"
 msgstr "Radio không bật lên được"
@@ -1935,6 +2964,9 @@ msgstr "Danh sách bộ lọc không hợp lệ (tối đa 50 dòng)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Địa chỉ webhook phải là URL http:// hoặc https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Nội dung webhook quá dài hoặc chứa ký tự điều khiển"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Tiêu đề không hợp lệ (mỗi dòng một \"Tên: giá trị\"; Host, Content-Type, Content-Length, Transfer-Encoding và Connection do thiết bị đặt)"
 
@@ -1992,17 +3024,47 @@ msgstr "Không thể gỡ gói ngôn ngữ"
 msgid "Lock cache unavailable"
 msgstr "Bộ đệm khóa không khả dụng"
 
+msgid "The saved locks could not be cleared"
+msgstr "Không thể xóa các khóa đã lưu"
+
 msgid "No serving cell to lock to"
 msgstr "Không có cell phục vụ để khóa"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modem không trả lời truy vấn chế độ; không có gì được gửi"
+
+msgid "The modem refused a write"
+msgstr "Modem đã từ chối một lệnh ghi"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Giá trị đọc lại không khớp với các giá trị tự động"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Giá trị đọc lại sau khi khởi động lại ngăn xếp không khớp với các giá trị tự động"
+
+msgid "The reset was interrupted"
+msgstr "Việc đặt lại đã bị gián đoạn"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Cài lại gói không khả dụng trên hệ thống này"
+
+msgid "No packages were written down by an update"
+msgstr "Không có bản cập nhật nào ghi lại gói"
+
+msgid "Reinstalling is running already"
+msgstr "Việc cài lại đang chạy"
+
+msgid "The note could not be dropped"
+msgstr "Không thể xóa ghi chú"
+
+msgid "Unknown packages operation"
+msgstr "Thao tác gói không xác định"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Lưu lượng dữ liệu không khả dụng trên hệ thống này"
-
-msgid "The setting could not be saved"
-msgstr "Không lưu được thiết lập"
 
 msgid "Unknown data usage operation"
 msgstr "Thao tác lưu lượng dữ liệu không xác định"

@@ -62,8 +62,11 @@ into `/src/out-linux`. Copy `Image`, `modules.builtin*` and all `*.ko` (flattene
 Wi-Fi driver: extract `kernel_modules/kernel5.4/wcn/wlan/wlan_combo` from the realme C51/C53 AndroidT kernel source into
 the volume as `/src/ext-wlan_combo`, then run `kernel/build-wlan.sh` (applies the `patches/wlan_combo-*.patch` files).
 
-Kernel patches: apply `kernel/patches/bluetooth-marlin3-link-policy.patch`, `of-reserved-mem-skip.patch` and `regdb-wens-certificate.patch` to the kernel tree
-before building, and `echo -gb50db5b6224c > .scmversion` so the release string does not get a `-dirty` suffix.
+Kernel patches: apply the `kernel/patches/*.patch` files that `KPATCHES` in `kernel/build-all.sh` lists, in that order
+(`patch -p1`), to the kernel tree before building, and `echo -gb50db5b6224c > .scmversion` so the release string does
+not get a `-dirty` suffix. `xfrm-sysctl-fragment-per-netns.patch` is the one that is not optional on a system that
+creates network namespaces (Docker, sandboxes, `unshare -n`): without it the vendor kernel panics in their teardown
+(FINDINGS §44).
 
 GPU: copy `kernel_modules/kernel5.4/gpu/natt/mali` from the realme tree (master branch) to `/src/ext-mali` and run
 `kernel/build-mali.sh`; pull the userspace with `android-vendor/extract-gpu-subset.sh` and build `tools/gpu/cltest` with
@@ -76,6 +79,9 @@ and the vendor-init tool: `docker run --rm -v "$PWD/tools/bt-init":/w mu300-kbui
 ```sh
 android-vendor/extract-subset.sh android-subset
 python3 android-vendor/gen-ueventd-perms.py android-subset/vendor/etc/ueventd.rc <vendor init *.rc> > android-vendor/ueventd-perms.sh
+# the F50's inputs are kept in android-vendor/ueventd/: regenerate after changing the generator with
+# python3 android-vendor/gen-ueventd-perms.py android-vendor/ueventd/ueventd.rc android-vendor/ueventd/init-perms.rc > android-vendor/ueventd-perms.sh
+# (and copy it to rootfs/overlay/opt/mu300/bin/ueventd-perms.sh; tests/test_vendor_ids.py checks both)
 ```
 
 ### 3. Boot image
@@ -97,9 +103,12 @@ python3 boot/build-boot-image.py --stock-boot dumps/boot_a.img --misc-head dumps
 cid=$(docker create mu300-ubuntu:24.04); docker export $cid > rootfs/base.tar; docker rm $cid
 # the VPN is not part of the image: it is the module of github.com/dikeckaan/mu300-linux-vpn (built there with
 # tools/make-module.sh); on the device: sudo mu300-extra install vpn [--from mu300-linux-vpn.tar.gz]
+# adbd (adb over USB to Linux, mu300-usb adb on): static aarch64, a couple of minutes; optional
+sh tools/adbd/build.sh tools/adbd/adbd
 docker run --rm -v "$PWD/rootfs":/w -v "$PWD/out/modules":/kmods:ro -v "$PWD/out":/kout:ro \
   -v "$PWD/firmware":/firmware:ro -v "$PWD/android-subset":/android-subset:ro -v "$PWD/tools/logdw/logdw":/logdw:ro \
-  -v "$PWD/tools/bt-init/mu300-bt-init":/bt-init:ro mu300-ubuntu:24.04 bash /w/assemble.sh
+  -v "$PWD/tools/bt-init/mu300-bt-init":/bt-init:ro -v "$PWD/tools/adbd/adbd":/adbd:ro \
+  mu300-ubuntu:24.04 bash /w/assemble.sh
 ```
 Push `mu300-ubuntu-24.04-rootfs.tar.gz` to the device and extract it with `tools/android-mount-mu300root.sh`.
 `firmware/` holds `wcnmodem.bin`, `gnssmodem.bin` and `wifi_board_config*.ini` from the device's `/odm/firmware`, plus

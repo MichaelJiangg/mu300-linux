@@ -150,6 +150,41 @@ adb shell su -c id</code></pre><p>Cihaz <code>device</code> olarak listelenmeli 
 <p>v2026.10.13'ten önceki sürümlerde güvenlik duvarının açılış kurallarında LAN için hiçbir şey yoktu, ve 5.4'te onları eklemesi gereken yeniden yükleme hep başarısız oluyordu. v2026.10.13'ten beri düzeltildi; güncelleyin. Etkilenen bir sürümde USB seri konsoldan (<code>ttyGS0</code>, bir root kabuğu) girin ve şunu çalıştırın:</p><pre><code>nft delete flowtable inet fw4 ft; fw4 reload</code></pre><p>v2026.10.17'den beri 5.4'te <code>fw4 reload</code> ya da <code>restart</code> tek başına çalışır.</p>
 </section>
 
+<section id="dfs">
+<h3>Hotspot 52-144 arası bir 5 GHz kanalında başlamıyor</h3>
+<p>hostapd <code>start_dfs_cac() failed</code> diyerek durur (v2026.10.18'e kadarki sürümler). Bunlar DFS kanallarıdır ve Wi-Fi sürücüsü radar algılayamaz. v2026.10.20'den beri düzeltildi: böyle bir kanalın yerine 36 (ya da 149) kullanılır, günlüğe bir satır yazılır. Eski bir sürümde 36-48 ya da 149-165 seçin, Ubuntu'da <code>auto</code> da olur.</p>
+</section>
+
+<section id="panel-stuck">
+<h3>Bir AT komutu takılınca kontrol paneli bomboş kaldı</h3>
+<p>Kontrol panelli OpenWrt'de, v2026.10.18'e kadar, takılan tek bir AT komutu bütün sayfaları dakikalarca boş bırakabiliyordu, pil kutusunu bile, yeniden başlattıktan sonra da. v2026.10.20'den beri düzeltildi: sayfalar son değerlerini gösterip kaç saniyelik olduklarını söyler, OpenWrt'de bir AT komutu bir saniye yerine 0.13 s sürer. Eski bir sürümde bekleyin ya da <code>rpcd</code> ile <code>mu300-atd</code>'yi yeniden başlatın.</p>
+</section>
+
+<section id="sms-600">
+<h3>SMS gönderimi <code>SMS FAILED: CODE:600</code> ile başarısız oluyor ya da panelin günlüğü <code>sms_send - killed</code> diyor</h3>
+<p>v2026.10.21'e kadar bazı şebekelerde (China Broadnet, sorun #176) modemin IMS yığını her gönderimi reddediyordu (URC günlüğünde <code>+SPIMSREASON: 1,512,"SMS FAILED: CODE:600 REASON:Busy Everywhere"</code>), gelen mesajlar ise ulaşıyordu; ayrıca kontrol panelli OpenWrt'de 30 saniyeden uzun süren bir gönderim panelin isteğiyle birlikte öldürülüyor, geriye işlem günlüğünde <code>sms_send - killed</code> kalıyor ve mesajın gidip gitmediği belli olmuyordu. v2026.10.22'den beri düzeltildi: bir gönderim tek bir AT işlemidir (kanal hazırlıktan gönderime kadar tutulur, araya başka bir istemci giremez) ve her gönderimden önce modemin bildirdiği SMSC ona olduğu gibi geri yazılır; OpenWrt'de <code>mu300-sms</code> ile panelde, Ubuntu'da <code>sms</code>'de. Panel gönderimi arka planda başlatıp izler, sayfa yenilense de. Eski bir sürümde SMSC'yi kendiniz geri yazın (<code>mu300-at 'AT+CSCA?'</code>, sonra <code>mu300-at 'AT+CSCA="&lt;gösterdiği değer&gt;",&lt;tür&gt;'</code>; Ubuntu'da <code>sudo</code> ile) ve panel boştayken kabuktan gönderin (OpenWrt'de <code>mu300-sms send NUMARA METİN</code>, Ubuntu'da <code>sudo sms send NUMARA METİN</code>).</p>
+</section>
+
+<section id="netns-panic">
+<h3>5.4 çekirdeğinde bir konteyner durunca cihaz yeniden başlıyor</h3>
+<p>v2026.10.20'ye kadar, 5.4 çekirdeğinde, aynı anda iki ağ ad alanı (network namespace) varken biri kapanınca (Docker konteynerleri, bir sandbox, <code>unshare -n</code>) çekirdek onu temizlerken çökebiliyordu (izde <code>xfrm_sysctl_fini</code>; sorun #103); cihaz yeniden başlar, bu birkaç kez tekrarlanınca da Android'e döner. v2026.10.21'den beri düzeltildi; güncelleyin. Eski bir sürümde aynı anda tek konteyner çalıştırın ya da bu hatanın hiç olmadığı 6.18 ya da 7.2'yi kullanın.</p>
+</section>
+
+<section id="rmmod-panic">
+<h3>Wi-Fi sürücüsü kaldırılınca cihaz çöküyor (6.18, 7.2)</h3>
+<p>v2026.10.20'ye kadar 6.18 ya da 7.2'de <code>rmmod sprd_wlan_combo</code> bir saniye içinde çökmeye yol açıyordu (<code>__run_timers</code>: sürücü, boşaltılmış bellekte çalışmaya devam eden bir zamanlayıcı bırakıyordu; sorun #146). v2026.10.21'den beri düzeltildi. Eski bir sürümde modülü kaldırmayın; onun yerine cihazı yeniden başlatın.</p>
+</section>
+
+<section id="wlan-log-noise">
+<h3>Günlük birkaç saniyede bir <code>sprd-wlan</code> hatalarıyla doluyor</h3>
+<p><code>dmesg</code> ve <code>logread</code>'de yaklaşık altı saniyede bir, hata düzeyinde <code>sc2355_dump_survey, idx 0</code>, <code>bssid not found, multicast?</code> ya da <code>data len is 251, skb need 576</code> gibi satırlar (v2026.10.20'ye kadarki sürümler). Bunlar sürücünün olağan işini anlatır, bir arızayı değil (sorun #140). v2026.10.21'den beri bunlar hata ayıklama satırıdır ve ancak siz isterseniz görünür: <code>echo 'module sprd_wlan_combo +p' &gt; /sys/kernel/debug/dynamic_debug/control</code>. Yanlarındaki gerçek hatalar yine günlüğe yazılır.</p>
+</section>
+
+<section id="mmc1-dumps">
+<h3>F50'de günlük <code>mmc1</code> yazmaç dökümleriyle doluyor (6.18, 7.2)</h3>
+<p>SD yuvası boş bir F50'de, 6.18 ve 7.2'de v2026.10.21'e kadar, <code>dmesg -l err</code>'de birkaç saniyeden birkaç dakikaya varan aralıklarla <code>mmc1: Got command interrupt 0x00000001 even though no command operation was in progress</code> ve ardından 16 satırlık bir <code>SDHCI REGISTER DUMP</code> (sorun #181). Anaçizgi çekirdeğin EIC sürücüsü denetleyicinin altı bankasından yalnızca üçünü eşliyordu; yuvanın kart algılama hattı bulunamıyor, yuva bunun yerine sürekli yoklanıyordu: her saniye orada olmayan bir kart başlatılıyor, kimsenin yanıtlamadığı komuta denetleyicinin geç verdiği yanıt da dökümle birlikte günlüğe yazılıyordu. v2026.10.22'den beri düzeltildi: altı banka da eşlenir, yuvanın gerçek kart algılaması (bir kesme) vardır ve boş yuvaya kart takılana kadar dokunulmaz. Dökümler gürültüdür, arıza değil; eski bir sürümde yuvaya bir kart takın (kart varken döküm olmaz) ya da bunun hiç görülmediği 5.4'ü kullanın. U30 Air'de yuva yoktur.</p>
+</section>
+
 <section id="wpa3">
 <h3>Wi-Fi istemcisi bir ağa katılamıyor</h3>
 <p>Yalnızca WPA3 olan ağlar çalışmaz (Wi-Fi sürücüsünde SAE yok); yönlendiriciyi karma WPA2/WPA3 kipine alın. Ayrıca radyo ya hotspot ya istemcidir ve buna açılışta karar verilir: hotspot iken <code>wifi-client connect</code> yeniden başlatma ister.</p>

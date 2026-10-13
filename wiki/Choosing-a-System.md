@@ -16,10 +16,10 @@ the control-panel OpenWrt is the same router with an extra dashboard for the SIM
 | RAM in use (installer's figure) | ~500 MiB | ~140 MiB | not stated by the installer |
 | Installed size (measured) | ~580 MiB | ~320 MiB | - |
 | Install software with | `apt` | `apk` | `apk` |
-| Web interface | none (use SSH and `mu300-toolkit`) | LuCI | LuCI + the MU300 panel |
+| Web interface | optional: Cockpit with an MU300 page (`mu300-extra install panel`, from v2026.10.20); otherwise SSH and `mu300-toolkit` | LuCI | LuCI + the MU300 panel (with a VPN section and a terminal in the browser) |
 | Log in as | `ubuntu` (with `sudo`) | `root` | `root` |
 | Good for | servers, containers, scripts, development, learning Linux | a lean router | a router you manage from the browser: signal, band locks, SMS, AT terminal, power |
-| Magisk zip | yes | yes | no (only `./install.sh`) |
+| Magisk zip | yes | yes | yes (since v2026.10.18) |
 
 All three get mobile data, the Wi-Fi hotspot and client, USB networking, SSH, SMS (`sms`), the toolkit and the
 optional [VPN](VPN) module.

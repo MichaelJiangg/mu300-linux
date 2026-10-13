@@ -96,6 +96,7 @@ yazmayın.</p>
 <li><a href="#toolkit">Araç menüsü</a></li>
 <li><a href="#battery">Pil, güç ve LED'ler</a></li>
 <li><a href="#u30air">U30 Air'e özel</a></li>
+<li><a href="#panels">Web panelleri, tarayıcıda terminal, adb</a></li>
 <li><a href="#more">Bluetooth, GPU, KVM, diller</a></li>
 <li><a href="#limits">Neler çalışmaz</a></li>
 </ol>
@@ -114,6 +115,7 @@ cihaz SIM kartın söylediğini kullanır.</p>
 <tr><th scope="row">OpenWrt</th><td>LuCI: Network &gt; Interfaces &gt; wan, ya da <code>uci</code> ile (aşağıda)</td></tr>
 </tbody></table></div>
 <pre><code>uci set network.wan.apn='your.apn'; uci commit network; ifup wan</code></pre>
+<p>Dahili SIM'i olan bir F50, yuvadaki kart yerine onu kullanabilir: <code>mu300-sim select internal</code> (ya da LuCI'de wan arabirimindeki <strong>SIM source</strong> alanı, o kartın kendi APN'siyle), sonra yeniden başlatın; <code>external</code> geri döndürür, varsayılan harici kart olarak kalır.</p>
 <h3 id="data-usage">Ne kadar veri kullandınız</h3>
 <p>Cihaz mobil veriyi günlük ve fatura dönemi başına, iki yönde de, operatörün saydığı gibi sayar. Dönemin başladığı
 günü ve uyarılı bir aylık kotayı ayarlayabilirsiniz; kotada mobil veriyi kapatmak isteğe bağlıdır ve veri, yeni dönem
@@ -146,6 +148,10 @@ seçmediyseniz adı ve şifresi Android'dekiyle aynıdır; telefonlarınız eski
 </tbody></table></div>
 <pre><code>sudo nano /etc/mu300/hotspot.conf        <span class="c"># SSID=, PSK=, BAND=5 ya da 2.4, CHANNEL=auto, COUNTRY=</span>
 sudo systemctl restart mu300-hotspot</code></pre>
+<p>5 GHz'de hotspot 36-48 ya da 149-165 kanallarını kullanır, hiçbir zaman bir DFS kanalını (52-144) değil: Wi-Fi
+sürücüsü radar algılayamaz; dosyada ya da LuCI'de seçilen bir DFS kanalının yerine 36. kanal (36-48'e izin verilmeyen
+ülkelerde 149) kullanılır ve günlükte nedeni yazar (v2026.10.20'den beri; önceki sürümlerde hotspot böyle bir kanalda hiç
+başlamıyordu).</p>
 <p>Wi-Fi çipinin yazılımı çökerse sürücü çipi sıfırlar ve Wi-Fi kendiliğinden geri gelir; hotspot olarak da, başka bir
 ağın istemcisi olarak da: testlerde 15 ile 20 saniye içinde, 6.18 ve 7.2'de. Çip 70 saniye içinde sıfırlanamazsa
 cihaz donup kalmak yerine düzgünce yeniden başlar.</p>
@@ -188,9 +194,9 @@ kablo bir seri konsol da taşır (<code>ttyGS0</code>): ağ çalışmadığında
 <p>SIM'deki mesajları okuyun, gönderin, silin; bakiyenizi ya da kendi numaranızı gösteren USSD kodlarını gönderin.</p>
 <pre><code>sudo sms list
 sudo sms send NUMBER TEXT...
-sudo sms delete INDEX
+sudo sms delete INDEX                    <span class="c"># yalnızca bir dizin, read ya da all; başka bir şey modeme ulaşmadan reddedilir</span>
 sudo mu300-ussd '*101#'                  <span class="c"># bir USSD kodu, örneğin bakiye sorgusu</span></code></pre>
-<p>Kontrol panelli OpenWrt'de SMS'ler Hücresel &gt; SMS altındadır. Bu sistem SIM'i 30 saniyede bir eşitler ve bu,
+<p>Web paneli eklentili Ubuntu'da Cockpit'teki MU300 sayfası da mesajları okur, gönderir ve siler. Kontrol panelli OpenWrt'de SMS'ler Hücresel &gt; SMS altındadır. Bu sistem SIM'i 30 saniyede bir eşitler ve bu,
 SIM'deki okunmamış mesajları okunmuş yapar; panel kendi okunmamış durumunu tutar. Orada <code>sms delete read</code>
 çalıştırmayın. Bir mesaj SIM'den ancak kopyası diske güvenle yazıldıktan sonra silinir, yani elektrik kesintisinde hiç
 mesaj kaybolmaz; diğer parçaları hiç gelmeyen uzun bir mesaj bir saat sonra "eksik" işaretiyle gösterilir.</p>
@@ -214,9 +220,11 @@ kurulum programının sorusuyla) kurulur ve güncellemelerde korunur. Pek çok t
 <ul>
 <li>bir WireGuard <code>.conf</code> (ana hat çekirdek ister), bir OpenVPN <code>.ovpn</code>,</li>
 <li>bir VLESS, VMess, Trojan ya da Shadowsocks paylaşım bağlantısı,</li>
-<li>bir Clash/mihomo YAML'ı (<code>vpn-mihomo</code> ekleyin) ya da ham bir Xray veya sing-box JSON'u.</li>
+<li>bir Clash/mihomo YAML'ı (<code>vpn-mihomo</code> ekleyin) ya da ham bir Xray veya sing-box JSON'u,</li>
+<li><a href="https://github.com/daeuniverse/dae">dae</a> için bir hysteria2 ya da TUIC bağlantısı ya da bir dae yapılandırması (<code>vpn-dae</code> ekleyin; v2026.10.20 ya da daha yeni bir 6.18/7.2 çekirdeği ister).</li>
 </ul>
-<pre><code>sudo mu300-extra install vpn                         <span class="c"># modülün son sürümü, SHA256SUMS ile denetlenir</span>
+<pre><code>sudo mu300-extra install vpn                         <span class="c"># modülün son sürümü, SHA256SUMS ile denetlenir; çekirdek ve Xray</span>
+sudo mu300-vpn engine install sing-box               <span class="c"># her motor bir eklentidir: xray, sing-box, mihomo, dae</span>
 sudo mu300-vpn profile import ~/office.conf Office   <span class="c"># bir WireGuard .conf, .ovpn, YAML ya da JSON dosyası</span>
 sudo mu300-vpn profile import 'vless://...'          <span class="c"># ya da bir paylaşım bağlantısı</span>
 sudo mu300-vpn on
@@ -225,6 +233,11 @@ mu300-vpn status</code></pre>
 modül yeniden kurulana ya da VPN kapatılana kadar mobil veri ve Wi-Fi istemcisi kapalı kalır. Profiller, ayarlar ve
 güvenlik modeli <a href="https://github.com/dikeckaan/mu300-linux-vpn#readme" hreflang="en">modülün README'sinde</a>
 (İngilizce). Bazı operatörler UDP'yi düşürür ve OpenVPN'i engeller.</p>
+<p>Modülün <strong>v2.0.0</strong> sürümü (v2026.10.20 ile) onu bir çekirdek ve motor eklentilerine ayırır (güncellemeler hepsini tek set olarak
+getirir), <strong>abonelikler</strong> ekler (sağlayıcınızın verdiği, profiller üreten bir URL; zamanlamayla yenilenir) ve bir <strong>IPv6
+koruması</strong> getirir: tünel IPv6 taşımıyorsa IPv6, kill switch'i atlayıp sızmak yerine tünelin yanında engellenir. Kontrol panelli
+OpenWrt'de bunların hepsi panelin <strong>VPN</strong> menüsündedir: Genel bakış, Profiller, Abonelikler, Motorlar, Ayarlar ve Günlükler. Paneller
+ve araç kutusu VPN bölümünü ancak modül kurulduktan sonra gösterir.</p>
 </section>
 
 <section id="toolkit">
@@ -254,9 +267,12 @@ sudo mu300-extra remove vpn</code></pre>
 </tbody></table></div>
 <pre><code>sudo mu300-led test            <span class="c"># hangi LED hangisi, öğrenin</span></code></pre>
 <p>U30 Air'de <code>mu300-power</code> pilden tasarruf eder: profiller (<code>plugged</code>, <code>battery</code>,
-<code>saver</code> ya da <code>auto</code>), kimse bağlı değilken boşa alınan radyolar ve %80 şarj sınırı. Kontrol
-panelli OpenWrt'de bu Sistem &gt; Güç (System &gt; Power) sayfasıdır.</p>
+<code>saver</code> ya da <code>auto</code>), kimse bağlı değilken boşa alınan radyolar ve %0-100 arası bir şarj sınırı
+(v2026.10.20'den beri; önce %80): şarj sınırda durur, 5 puan altında yeniden başlar, pil hiçbir zaman %5'in altında tutulmaz. Ana hat
+çekirdeklerde şarj devresi artık Type-C portunun sunduğu akımı da okur; 1.5 ya da 3 A'lik bir port 500 mA yerine 2 A'e kadar şarj eder.
+Kontrol panelli OpenWrt'de bu Sistem &gt; Güç (System &gt; Power) sayfasıdır.</p>
 <pre><code>mu300-power status
+sudo mu300-power charge-limit 80         <span class="c"># 0-100; 100 = sınır yok</span>
 sudo mu300-power profile battery         <span class="c"># plugged, battery, saver ya da auto</span>
 sudo mu300-power set battery.WIFI_IDLE 10</code></pre>
 <h3 id="cpu">İşlemci profilleri</h3>
@@ -274,7 +290,7 @@ söner, hotspot ve modem kapalı).</p>
 <h2>U30 Air'e özel</h2>
 <div class="table-scroll"><table>
 <thead><tr><th scope="col"></th><th scope="col">Ne yapar</th></tr></thead><tbody>
-<tr><th scope="row">Pil</th><td>doluluk, voltaj, akım, sıcaklık ve şarj durumu <code>mu300-toolkit</code>'te, kontrol panelinde ve <code>/sys/class/power_supply</code>'da, her çekirdekte. Şarj: 5.4'te üreticinin şarj yazılımıyla, 6.18 ve 7.2'de v2026.10.12'den beri <code>bq256xx</code> sürücüsüyle</td></tr>
+<tr><th scope="row">Pil</th><td>doluluk, voltaj, akım, sıcaklık ve şarj durumu <code>mu300-toolkit</code>'te, kontrol panelinde ve <code>/sys/class/power_supply</code>'da, her çekirdekte. Şarj: 5.4'te üreticinin şarj yazılımıyla, 6.18 ve 7.2'de v2026.10.12'den beri <code>bq256xx</code> sürücüsüyle; v2026.10.20'den beri %0-100 şarj sınırı ve Type-C şarj akımı</td></tr>
 <tr><th scope="row">Tuşlar</th><td>güç: kısa basış LED'leri uyandırır (60 s sonra kararırlar), 3 s basılı tutmak kapatır. Wi-Fi tuşu: hotspot'u 2.4 ile 5 GHz arasında değiştirir, 3 s basılı tutmak açar ya da kapatır</td></tr>
 <tr><th scope="row">NFC</th><td>cihaza tutulan bir telefon, ZTE'nin yazılımındaki gibi hotspot'a katılır</td></tr>
 <tr><th scope="row">USB host</th><td>ana hat çekirdeklerde OTG adaptörüyle: flash bellekler (FAT, exFAT), klavye ve fareler, USB modemler ve Ethernet adaptörleri</td></tr>
@@ -284,6 +300,30 @@ sudo mu300-nfc wifi            <span class="c"># hotspot'un adını ve şifresin
 <pre><code>sudo mu300-usb host            <span class="c"># U30 Air, ana hat çekirdekler: OTG adaptörü, pilden 5 V</span>
 sudo mu300-usb device          <span class="c"># bilgisayara dönüş (her açılışta varsayılan)</span></code></pre>
 <p>F50'de USB portu güç girişidir, bu yüzden USB host kipi yoktur; güç düğmesini 3 s basılı tutmak onu kapatır.</p>
+</section>
+
+<section id="panels">
+<h2>Web panelleri, tarayıcıda terminal, adb</h2>
+<p><strong>Kontrol panelli OpenWrt</strong> (<code>openwrt-luci</code>) MU300 sayfalarını taşır: durum paneli (sinyal,
+bantlar, hücreler, sıcaklıklar, hızlarıyla Wi-Fi istemcileri, pil), ağ kilitleri, SMS ve SMS yönlendirme, veri kullanımı,
+AT terminali, TTL ve USB kipleri; v2026.10.20'den beri bir de <strong>VPN</strong> menüsü (Genel bakış, Profiller,
+Abonelikler, Motorlar, Ayarlar, Günlükler), <strong>Sistem &gt; Terminal</strong> (tarayıcıda bir root kabuğu, yalnızca
+LAN'da, yalnızca oturum açmış panel oturumunuz için açılır, 15 dakika boşta kalınca kapanır) ve <strong>Sistem &gt;
+Güncelleme sonrası paketler</strong> (Packages after an update). Panel artık bir AT komutu takılınca donmuyor; OpenWrt'de
+bir AT komutu bir saniye yerine 0.13 s sürüyor. Bkz. <a href="../choose/#panel">kontrol paneli neler ekler</a>.</p>
+<p><strong>Ubuntu</strong>'nun da bir web paneli olabilir, v2026.10.20'den beri: <a href="https://cockpit-project.org/">Cockpit</a>,
+Ubuntu'nun kendi web konsolu (terminal, günlükler, servisler, ağ, depolama, hesaplar), içinde bir <strong>MU300</strong>
+sayfasıyla: mobil ağ, mobil veri ve kullanımı, SMS, VPN, güç ve CPU, hotspot ve Wi-Fi istemcisi, güncellemeler. İmajın
+parçası değil, <code>panel</code> eklentisidir; yalnızca LAN'da, <code>https://192.168.77.1:9090</code> adresinde (U30 Air:
+<code>.78.1</code>); <code>ubuntu</code> olarak giriş yapın. Kurulum programı Ubuntu seçilince sorar.</p>
+<pre><code>sudo mu300-extra install panel                                           <span class="c"># Cockpit Ubuntu'nun arşivinden (yaklaşık 12 MB)</span>
+sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz   <span class="c"># çevrimdışı, sürümün dosyasıyla</span></code></pre>
+<p><strong>Linux'a adb.</strong> v2026.10.20'den beri Linux, Android gibi USB kablosu üzerinden <code>adb shell</code>,
+<code>push</code>, <code>pull</code> ve <code>forward</code> sunabilir. <strong>Varsayılan olarak kapalıdır</strong> ve
+yalnızca anahtarını yetkilendirdiğiniz bilgisayar girebilir; yetkili anahtarı olan herkes root kabuğu alır, bu yüzden
+yalnızca kendi bilgisayarlarınızı yetkilendirin. Kurulum programı, çalıştığı bilgisayar için açmak isteyip istemediğinizi sorar.</p>
+<pre><code>sudo mu300-usb adb key adbkey.pub       <span class="c"># bilgisayarın ~/.android/adbkey.pub dosyası, cihaza kopyalanmış</span>
+sudo mu300-usb adb on                   <span class="c"># kapatmak: sudo mu300-usb adb off</span></code></pre>
 </section>
 
 <section id="more">

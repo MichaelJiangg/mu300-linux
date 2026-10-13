@@ -96,6 +96,7 @@
 <li><a href="#toolkit">The toolkit menu</a></li>
 <li><a href="#battery">Battery, power and LEDs</a></li>
 <li><a href="#u30air">U30 Air extras</a></li>
+<li><a href="#panels">Web panels, a terminal in the browser, adb</a></li>
 <li><a href="#more">Bluetooth, GPU, KVM, languages</a></li>
 <li><a href="#limits">What does not work</a></li>
 </ol>
@@ -114,6 +115,7 @@ and the device uses what the SIM card says.</p>
 <tr><th scope="row">OpenWrt</th><td>LuCI: Network &gt; Interfaces &gt; wan, or with <code>uci</code> (below)</td></tr>
 </tbody></table></div>
 <pre><code>uci set network.wan.apn='your.apn'; uci commit network; ifup wan</code></pre>
+<p>An F50 with an internal SIM can use that card instead of the one in the slot: <code>mu300-sim select internal</code> (or <strong>SIM source</strong> on the wan interface in LuCI, with that card's own APN), then restart; <code>external</code> goes back, and the external card stays the default.</p>
 <h3 id="data-usage">How much data you used</h3>
 <p>The device counts its mobile data per day and per billing cycle, in both directions, the way the operator counts
 it. You can set the day the cycle starts and a monthly cap with a warning; turning mobile data off at the cap is
@@ -146,6 +148,9 @@ otherwise at install, it has the same name and password as under Android, so you
 </tbody></table></div>
 <pre><code>sudo nano /etc/mu300/hotspot.conf        <span class="c"># SSID=, PSK=, BAND=5 or 2.4, CHANNEL=auto, COUNTRY=</span>
 sudo systemctl restart mu300-hotspot</code></pre>
+<p>On 5 GHz the hotspot uses channels 36-48 or 149-165, never a DFS channel (52-144): the Wi-Fi driver cannot detect
+radar, so a DFS channel chosen in the file or in LuCI is replaced by channel 36 (149 where 36-48 are not allowed) and
+the log says why (from v2026.10.20; releases before it failed to start the hotspot on such a channel).</p>
 <p>If the Wi-Fi chip's firmware crashes, the driver resets the chip and the Wi-Fi comes back by itself, as a hotspot
 or as a client of another network: in the tests within 15 to 20 seconds, on 6.18 and 7.2. If the chip cannot be reset
 within 70 seconds, the device restarts cleanly instead of hanging.</p>
@@ -195,7 +200,9 @@ sudo mu300-ussd '*101#'                  <span class="c"># a USSD code, for exam
 <p>On OpenWrt with the control panel, SMS are under Cellular &gt; SMS. That system syncs the SIM every 30 seconds,
 which marks unread messages on the SIM as read; the panel keeps its own unread state. Do not run
 <code>sms delete read</code> there. A message leaves the SIM only after its copy is safely on the disk, so a power cut
-loses none, and a long message whose other parts never arrive is shown after an hour, marked incomplete.</p>
+loses none, and a long message whose other parts never arrive is shown after an hour, marked incomplete. On Ubuntu with
+the web panel extra, the MU300 page in Cockpit reads, sends and deletes messages too. <code>sms delete</code> accepts
+only an index, <code>read</code> or <code>all</code>; anything else is refused before it reaches the modem.</p>
 <h3 id="sms-forwarding">SMS forwarding</h3>
 <p>On OpenWrt with the control panel, Cellular &gt; SMS forwarding sends incoming messages on: to a webhook (JSON or a
 form), a Telegram chat, or another phone by SMS. It is off until you turn it on. Each target has a template
@@ -216,9 +223,11 @@ the device (or by the installer's question) and kept across updates. It keeps pr
 <ul>
 <li>a WireGuard <code>.conf</code> (needs a mainline kernel), an OpenVPN <code>.ovpn</code>,</li>
 <li>a VLESS, VMess, Trojan or Shadowsocks share link,</li>
-<li>a Clash/mihomo YAML (add <code>vpn-mihomo</code>), or a raw Xray or sing-box JSON.</li>
+<li>a Clash/mihomo YAML (add <code>vpn-mihomo</code>), or a raw Xray or sing-box JSON,</li>
+<li>a hysteria2 or TUIC link, or a dae config, for <a href="https://github.com/daeuniverse/dae">dae</a> (add <code>vpn-dae</code>; kernel 6.18 or 7.2 of v2026.10.20 or newer).</li>
 </ul>
-<pre><code>sudo mu300-extra install vpn                         <span class="c"># the module's latest release, checked against its SHA256SUMS</span>
+<pre><code>sudo mu300-extra install vpn                         <span class="c"># the module's latest release, checked against its SHA256SUMS; the core and Xray</span>
+sudo mu300-vpn engine install sing-box               <span class="c"># each engine is an extra: xray, sing-box, mihomo, dae</span>
 sudo mu300-vpn profile import ~/office.conf Office   <span class="c"># a WireGuard .conf, an .ovpn, a YAML or JSON file</span>
 sudo mu300-vpn profile import 'vless://...'          <span class="c"># or a share link</span>
 sudo mu300-vpn on
@@ -228,6 +237,11 @@ the module is missing: mobile data and the Wi-Fi client stay down until it is in
 off. Profiles, settings and the security model are in the
 <a href="https://github.com/dikeckaan/mu300-linux-vpn#readme">module's README</a>. Some carriers drop UDP and block
 OpenVPN.</p>
+<p>Module <strong>v2.0.0</strong> (with v2026.10.20) splits it into a core and engine extras that updates bring along as one set, adds
+<strong>subscriptions</strong> (a URL from your provider that yields profiles, refreshed on a schedule) and an <strong>IPv6 guard</strong>: when
+the tunnel carries no IPv6, IPv6 is blocked beside it instead of leaking past the kill switch. On OpenWrt with the control panel all of
+it is in the panel's <strong>VPN</strong> menu: Overview, Profiles, Subscriptions, Engines, Settings and Logs. The panels
+and the toolkit show their VPN section only once the module is installed.</p>
 </section>
 
 <section id="toolkit">
@@ -257,9 +271,12 @@ sudo mu300-extra remove vpn</code></pre>
 </tbody></table></div>
 <pre><code>sudo mu300-led test            <span class="c"># find out which LED is which</span></code></pre>
 <p>On the U30 Air, <code>mu300-power</code> saves the battery: profiles (<code>plugged</code>, <code>battery</code>,
-<code>saver</code>, or <code>auto</code>), radios that go idle when nobody is connected, and a charge limit of 80 %.
-On OpenWrt with the control panel this is the System &gt; Power page.</p>
+<code>saver</code>, or <code>auto</code>), radios that go idle when nobody is connected, and a charge limit of 0 to 100 %
+(from v2026.10.20; 80 % before): charging stops at the limit and resumes 5 points below it, and the battery is never held under 5 %. On
+the mainline kernels the charger now also reads the current a Type-C port offers, so a 1.5 or 3 A port charges at up to 2 A instead of
+500 mA. On OpenWrt with the control panel this is the System &gt; Power page.</p>
 <pre><code>mu300-power status
+sudo mu300-power charge-limit 80         <span class="c"># 0-100; 100 = no limit</span>
 sudo mu300-power profile battery         <span class="c"># plugged, battery, saver or auto</span>
 sudo mu300-power set battery.WIFI_IDLE 10</code></pre>
 <h3 id="cpu">CPU profiles</h3>
@@ -277,7 +294,7 @@ until you press the Wi-Fi key.</p>
 <h2>U30 Air extras</h2>
 <div class="table-scroll"><table>
 <thead><tr><th scope="col"></th><th scope="col">What it does</th></tr></thead><tbody>
-<tr><th scope="row">Battery</th><td>level, voltage, current, temperature and charging state in <code>mu300-toolkit</code>, the control panel and <code>/sys/class/power_supply</code>, on every kernel. Charging: on 5.4 by the vendor charger stack, on 6.18 and 7.2 by the <code>bq256xx</code> driver from v2026.10.12 on</td></tr>
+<tr><th scope="row">Battery</th><td>level, voltage, current, temperature and charging state in <code>mu300-toolkit</code>, the control panel and <code>/sys/class/power_supply</code>, on every kernel. Charging: on 5.4 by the vendor charger stack, on 6.18 and 7.2 by the <code>bq256xx</code> driver from v2026.10.12 on; a charge limit of 0-100 % and the Type-C charging current from v2026.10.20</td></tr>
 <tr><th scope="row">Buttons</th><td>power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down. Wi-Fi key: switches the hotspot between 2.4 and 5 GHz, held 3 s turns it off or on</td></tr>
 <tr><th scope="row">NFC</th><td>a phone held to the device joins the hotspot, as under ZTE's firmware</td></tr>
 <tr><th scope="row">USB host</th><td>with an OTG adapter on the mainline kernels: flash drives (FAT, exFAT), keyboards and mice, USB modems and Ethernet adapters</td></tr>
@@ -288,6 +305,31 @@ sudo mu300-nfc wifi            <span class="c"># writes the hotspot's name and p
 sudo mu300-usb device          <span class="c"># back to the computer (the default at every start)</span></code></pre>
 <p>On the F50 the USB port is its power supply, so it has no USB host mode; holding its power button 3 s shuts it
 down.</p>
+</section>
+
+<section id="panels">
+<h2>Web panels, a terminal in the browser, adb</h2>
+<p><strong>OpenWrt with the control panel</strong> (<code>openwrt-luci</code>) has the MU300 pages: a status dashboard
+(signal, bands, cells, temperatures, the Wi-Fi clients with their speeds, the battery), network locks, SMS and SMS
+forwarding, data usage, an AT terminal, TTL and USB modes, and from v2026.10.20 a <strong>VPN</strong> menu (Overview,
+Profiles, Subscriptions, Engines, Settings, Logs), <strong>System &gt; Terminal</strong> (a root shell in the browser,
+on the LAN only, opened only for your logged-in panel session, closed after 15 idle minutes) and <strong>System &gt;
+Packages after an update</strong>. The panel also no longer freezes when an AT command gets stuck, and on OpenWrt an AT
+command now takes 0.13 s instead of a second. See <a href="../choose/#panel">what the panel adds</a>.</p>
+<p><strong>Ubuntu</strong> can have a web panel too, from v2026.10.20: <a href="https://cockpit-project.org/">Cockpit</a>,
+Ubuntu's own web console (terminal, logs, services, networking, storage, accounts), with an <strong>MU300</strong> page
+for the mobile network, mobile data and usage, SMS, the VPN, power and CPU, the hotspot and the Wi-Fi client, and
+updates. It is the <code>panel</code> extra, not part of the image, on the LAN only, at
+<code>https://192.168.77.1:9090</code> (U30 Air: <code>.78.1</code>); log in as <code>ubuntu</code>. The installer asks
+about it when Ubuntu is chosen.</p>
+<pre><code>sudo mu300-extra install panel                                           <span class="c"># Cockpit from Ubuntu's archive (about 12 MB)</span>
+sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz   <span class="c"># offline, with the release's file</span></code></pre>
+<p><strong>adb to Linux.</strong> From v2026.10.20 Linux can offer <code>adb shell</code>, <code>push</code>,
+<code>pull</code> and <code>forward</code> over the USB cable, as Android does. It is <strong>off by default</strong>,
+and only a computer whose key you authorised gets in; anyone with an authorised key gets a root shell, so authorise only
+your own computers. The installer asks whether to turn it on for the computer it runs on.</p>
+<pre><code>sudo mu300-usb adb key adbkey.pub       <span class="c"># the computer's ~/.android/adbkey.pub, copied to the device</span>
+sudo mu300-usb adb on                   <span class="c"># and off: sudo mu300-usb adb off</span></code></pre>
 </section>
 
 <section id="more">

@@ -8,6 +8,8 @@
 # Android, so take a full backup with tools/backup-device.sh first.
 #   ./install.sh                 install Ubuntu, OpenWrt or both from the prebuilt release images
 #   ./install.sh --build         build kernel outputs/root filesystems locally instead (see README "Build and run")
+# The Linux slot gets the boot chain of Android's slot (uboot, sml, teecfg, trustos, vbmeta; backed up first):
+# MU300_SYNC_BOOTCHAIN=0 skips that.
 # It first brings this copy of the project up to date with GitHub (MU300_NO_SELF_UPDATE=1 skips that), and asks for
 # the language (MU300_LANG=en|tr|zh skips that).
 #
@@ -33,7 +35,7 @@ for a in "$@"; do
         --check) CHECK_ONLY=1 ;;
         --build) MODE=build ;;
         --prebuilt) MODE=prebuilt ;;
-        -h|--help) sed -n '2,13s/^# \{0,1\}//p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,15s/^# \{0,1\}//p' "$0"; exit 0 ;;
         *) echo "unknown option $a (see --help)" >&2; exit 2 ;;
     esac
 done
@@ -152,7 +154,7 @@ case "$model" in
     *U30Air*|*U30_Air*|*"U30 Air"*) DEVICE=u30air ;;
     *MU300*|*F50*|*mu300*) DEVICE=f50 ;;
     *) ask go "$(t 'This does not look like a ZTE F50/MU300 or U30 Air. Continue anyway? (yes/no)')" no; [ "$go" = yes ] || exit 1
-       DEVICE=f50 ;;
+       DEVICE=f50; MODEL_KNOWN=0 ;;
 esac
 # --- slot begin
 # Linux goes on the slot Android is not on: b next to an Android on a, a next to an Android on b (after an OTA the
@@ -196,12 +198,51 @@ write_linux_boot() {
     adb push "$_wb.misc-slot-$LINUX_SLOT-trial.bin" $T/mu300-bc.bin >/dev/null
     [ "$(su_do "sha256sum $T/mu300-boot.img" | cut -d' ' -f1)" = "$EXP" ] || die "$(t 'pushed boot image hash mismatch')"
     su_do "dd if=$T/mu300-boot.img of=/dev/block/by-name/boot_$LINUX_SLOT bs=4M && sync"
-    [ "$(su_do "sha256sum /dev/block/by-name/boot_$LINUX_SLOT" | cut -d' ' -f1)" = "$EXP" ] ||
+    # read back from the medium (the page cache dropped first): exactly the image's length in whole 4096-byte blocks,
+    # into a file, by one dd whose status counts - a read error leaves no hash to compare instead of a wrong one that
+    # looks like anything (FINDINGS 50). A mismatch stops here: misc is not written, Android keeps booting.
+    _len=$(wc -c < "$1" | tr -d ' ')
+    [ "$(su_do "echo 3 > /proc/sys/vm/drop_caches; dd if=/dev/block/by-name/boot_$LINUX_SLOT of=$T/mu300-boot.rb bs=4096 count=$(( (_len + 4095) / 4096 )) 2>/dev/null && head -c $_len $T/mu300-boot.rb | sha256sum" | cut -d' ' -f1)" = "$EXP" ] ||
         die "$(t 'boot_{1} verify failed (slot {2} still active, Android keeps booting)' "$LINUX_SLOT" "$ANDROID_SLOT")"
-    su_do "dd if=$T/mu300-bc.bin of=/dev/block/by-name/misc bs=1 seek=2048 conv=notrunc && sync && rm $T/mu300-boot.img $T/mu300-bc.bin"
+    su_do "dd if=$T/mu300-bc.bin of=/dev/block/by-name/misc bs=1 seek=2048 conv=notrunc && sync && rm $T/mu300-boot.img $T/mu300-bc.bin $T/mu300-boot.rb"
 }
 # --- slot end
 slot_setup
+# --- bootchain begin
+# The Linux slot gets the boot chain of Android's slot - uboot, sml, teecfg, trustos and vbmeta, one firmware build on
+# both slots (issue #86; tools/android-bootchain.sh decides and checks, android-install.sh copies it before it installs
+# anything, with a backup). MU300_SYNC_BOOTCHAIN=0 skips that, for experts.
+bootchain_plan() {
+    SYNC_BOOTCHAIN=1; BC_LINE=; BC_REFUSED=
+    if [ "${MU300_SYNC_BOOTCHAIN:-1}" = 0 ]; then
+        SYNC_BOOTCHAIN=0; BC_LINE=$(t 'boot chain:     not synced (MU300_SYNC_BOOTCHAIN=0)'); return 0
+    fi
+    # android-bootchain.sh writes only on a model it knows: a device taken as an F50 anyway keeps its chain as it is
+    if [ "${MODEL_KNOWN:-1}" = 0 ]; then
+        SYNC_BOOTCHAIN=0; BC_LINE=$(t 'boot chain:     not synced (the model is not recognised)'); return 0
+    fi
+    adb push "$TOP/tools/android-bootchain.sh" $T/android-bootchain.sh >/dev/null 2>&1 || BC_REFUSED=$(t 'no answer from the device')
+    bootchain_line "$(su_do "sh $T/android-bootchain.sh check")" && return 0
+    if [ $CHECK_ONLY = 1 ]; then BC_LINE="$(t 'boot chain:     cannot be synced: {1}' "$BC_REFUSED")"; return 0; fi
+    die "$(t 'the boot chain cannot be copied to the Linux slot: {1}' "$BC_REFUSED")
+$(t 'Nothing was changed. Experts can skip this step with MU300_SYNC_BOOTCHAIN=0.')"
+}
+bootchain_pull() {  # the backup android-install.sh made, into the work directory
+    [ "$SYNC_BOOTCHAIN" = 1 ] || return 0
+    [ "$(su_do "[ -d $T/mu300-bootchain-backup ] && echo y")" = y ] || return 0
+    _d=$WORK/bootchain/$(date +%Y%m%d-%H%M%S)
+    mkdir -p "$WORK/bootchain"
+    adb pull $T/mu300-bootchain-backup "$_d" >/dev/null 2>&1 || true
+    su_do "rm -rf $T/mu300-bootchain-backup" >/dev/null
+    if [ -s "$_d/SHA256SUMS" ] && (cd "$_d" && { shasum -a 256 -c SHA256SUMS >/dev/null 2>&1 || sha256sum -c SHA256SUMS >/dev/null 2>&1; }); then
+        echo "  $(t 'boot chain backup: {1}' "$_d")"
+    else
+        echo "  $(t 'the boot chain backup could not be copied to this computer; it is on the Linux filesystem (.mu300/bootchain)')"
+    fi
+}
+# --- bootchain end
+bootchain_plan
+echo "$BC_LINE"
 
 
 # ---------------------------------------------------------------- making room on a small eMMC (EXPERIMENTAL)
@@ -480,7 +521,25 @@ fi
 ask vx "$(t 'Install the VPN module (about 40 MB more to download, 120 MB on the device)? (yes/no)')" $vx_default
 # its kill switch on too: without the module nothing would enforce it (android-install.sh refuses the same, later)
 [ "$vx" = yes ] || [ -z "$vpn_ks" ] || die "$(t 'The VPN is on with its kill switch in {1}: an update without the VPN module would leave it to nothing. Answer yes to install the module, or turn the VPN off there first (ENABLE=0 in /etc/mu300/vpn.conf).' "${vpn_ks% }")"
+# adb over USB to Linux (mu300-usb adb on|off on the device): off unless wanted; this computer's adb key, which the
+# installer runs with anyway, is the one authorised. Whoever has an authorised key gets a root shell.
+ADB=0 ADB_KEY=
+ask ab "$(t "Allow adb (adb shell, push, pull) to Linux over USB from this computer? Its adb key (~/.android/adbkey.pub) gets a root shell (yes/no)")" no
+if [ "$ab" = yes ]; then
+    ADB_KEY=$(adb_pubkey "${ANDROID_USER_HOME:-$HOME/.android}/adbkey.pub") ||
+        die "$(t 'no adb key of this computer to authorise ({1})' "$HOME/.android/adbkey.pub")"
+    ADB=1
+fi
 EXTRA_VPN=
+# the web panel for Ubuntu (Cockpit and the MU300 page): the panel extra, optional; offline from the release (Cockpit's
+# packages in it), so the first boot needs no network for it
+px=no
+EXTRA_PANEL=
+case " $OSES " in *" ubuntu "*)
+    echo "  $(t 'The web panel for Ubuntu (Cockpit with an MU300 page: signal, SMS, VPN, Wi-Fi, updates, a terminal; on the LAN only) is optional. It can also be added later on the device:')"
+    echo "    sudo mu300-extra install panel"
+    ask px "$(t 'Install the web panel for Ubuntu (about 24 MB more to download, 50 MB on the device)? (yes/no)')" no ;;
+esac
 KERNEL=5.4
 if [ $MODE = prebuilt ]; then
     say "$(t 'Which kernel?')"
@@ -590,6 +649,13 @@ if [ "$vx" = yes ]; then
         VPN_FROM_MODULE=1
     fi
 fi
+if [ "$px" = yes ]; then
+    if awk '$2 == "mu300-extra-panel-offline.tar.gz" || $2 == "*mu300-extra-panel-offline.tar.gz" {f = 1} END {exit !f}' "$REL/SHA256SUMS"; then
+        files="$files mu300-extra-panel-offline.tar.gz"; EXTRA_PANEL=$REL/mu300-extra-panel-offline.tar.gz
+    else
+        echo "  $(t 'release {1} has no web panel for Ubuntu; it can be added on the device later: sudo mu300-extra install panel' "$RELEASE")"
+    fi
+fi
 for f in $files; do
     want=$(awk -v f="$f" '$2 == f || $2 == "*" f {print $1}' "$REL/SHA256SUMS")
     [ -n "$want" ] || die "$(t '{1} is not part of release {2}' "$f" "$RELEASE")$([ "$f" = "mu300-kernel-$KERNEL.tar.gz" ] && [ "$KERNEL" != 5.4 ] && echo " $(t '(choose kernel 5.4, or a newer release)')")"
@@ -633,12 +699,20 @@ rm -rf "$WORK/out/modules" && cp -R "$KOUT/modules" "$WORK/out/modules"
 cp "$KOUT/modules.builtin" "$KOUT/modules.builtin.modinfo" "$WORK/out/" 2>/dev/null || true
 docker build -q -t mu300-ubuntu:24.04 "$TOP/rootfs" >/dev/null
 docker run --rm mu300-ubuntu:24.04 cat /bin/busybox > "$WORK/busybox"; chmod +x "$WORK/busybox"
+# adbd, only when adb is wanted (it is in the release images; a build here takes a few minutes)
+[ "$ADB" = 0 ] || sh "$TOP/tools/adbd/build.sh" "$WORK/tools/adbd/adbd" >/dev/null
 docker run --rm -v "$TOP/tools":/src:ro -v "$WORK/tools":/o mu300-kbuild sh -c '
   gcc -O2 -static -o /o/logdw/logdw /src/logdw/logdw.c &&
   gcc -O2 -static -o /o/bt-init/mu300-bt-init /src/bt-init/mu300-bt-init.c &&
   mkdir -p /o/keys && gcc -O2 -static -o /o/keys/mu300-keys /src/keys/mu300-keys.c'
 # the VPN: the module of its own repository, as for prebuilt images (not part of the systems)
 [ "$vx" != yes ] || fetch_vpn_module
+# the web panel: built here without Cockpit's packages (its first boot installs them from Ubuntu's archive once online)
+if [ "$px" = yes ]; then
+    say "$(t 'Building the web panel extra')"
+    sh "$TOP/tools/make-extra.sh" panel "$WORK/mu300-extra-panel.tar.gz" dev >/dev/null
+    EXTRA_PANEL=$WORK/mu300-extra-panel.tar.gz
+fi
 if [ -d "$WORK/android-gpu-subset" ]; then
     L=$(mktemp -d "$WORK/cllibs.XXXX")
     cp "$WORK/android-gpu-subset/vendor/lib64/libOpenCL.so" "$WORK/android-subset/apex/com.android.runtime/lib64/bionic/libc.so" \
@@ -656,7 +730,8 @@ case " $OSES " in *" ubuntu "*) reuse ubuntu || {
     tar -C "$TOP/rootfs" --exclude ./base.tar --exclude './*.tar.gz' -cf - . | tar -xf - -C "$B"
     cid=$(docker create mu300-ubuntu:24.04 /bin/true); docker export "$cid" > "$B/base.tar"; docker rm "$cid" >/dev/null
     gpuargs=""
-    [ -d "$WORK/android-gpu-subset" ] && gpuargs="-v $WORK/android-gpu-subset:/android-gpu-subset:ro -v $WORK/tools/gpu/cltest:/cltest:ro"
+    [ -f "$WORK/tools/adbd/adbd" ] && gpuargs="-v $WORK/tools/adbd/adbd:/adbd:ro"
+    [ -d "$WORK/android-gpu-subset" ] && gpuargs="$gpuargs -v $WORK/android-gpu-subset:/android-gpu-subset:ro -v $WORK/tools/gpu/cltest:/cltest:ro"
     # shellcheck disable=SC2086
     docker run --rm -v "$B":/w -v "$WORK/out/modules":/kmods:ro -v "$WORK/out":/kout:ro -v "$WORK/firmware":/firmware:ro \
       -v "$WORK/android-subset":/android-subset:ro -v "$WORK/tools/logdw/logdw":/logdw:ro \
@@ -688,7 +763,8 @@ say "$(t 'Ready to install')"
 echo "  $(t 'source:         {1}' "$([ $MODE = prebuilt ] && t 'prebuilt release {1} + vendor files from this device' "$RELEASE" || t 'local build')")"
 echo "  $(t 'systems:        {1} (boots: {2})' "$OSES$(case " $OSES " in (*" ubuntu "*) echo " (Ubuntu $UBUNTU)" ;; esac)" "$BOOT_OS")"
 echo "  $(t 'kernel:         {1}' "$KERNEL$([ -n "$KMAIN" ] && echo " (mainline, $(cat "$KMAIN/kernel.release"))")")"
-echo "  $(t 'extras:         {1}' "$([ -n "$EXTRA_VPN" ] && echo vpn || t 'none')")"
+echo "  $(t 'extras:         {1}' "$(x=; [ -z "$EXTRA_VPN" ] || x=vpn; [ -z "$EXTRA_PANEL" ] || x="${x:+$x }panel"; [ -n "$x" ] && echo "$x" || t 'none')")"
+echo "  $(t 'adb to Linux:   {1}' "$([ "$ADB" = 1 ] && t 'on, for this computer' || t 'off')")"
 echo "  $(t 'default boot:   {1}' "$([ $DEFAULT_LINUX = 1 ] && t 'Linux (Android after {1} failed boots in a row)' "$BOOT_ATTEMPTS" || t 'Android, Linux on demand')")"
 echo "  $(t 'filesystem:     {1}' "$([ $FORMAT = 0 ] && t 'keep existing' || { [ $SD_MODE = 1 ] && t 'CREATE new ext4 (erases the SD card)' || t 'CREATE new ext4 (erases the Linux region)'; })")"
 [ $UPDATE = 1 ] && echo "  $(t 'update:         settings and user data of the chosen systems are kept, everything else is replaced')"
@@ -698,11 +774,12 @@ if [ $SD_MODE = 1 ]; then
 else
     echo "  $(t 'writes:         Linux region at offset {1}, boot_{2}, 32 bytes of misc (boot_{3}, GPT and userdata are not touched)' "$OFF" "$LINUX_SLOT" "$ANDROID_SLOT")"
 fi
+echo "  $BC_LINE"
 ask confirm "$(t 'Type INSTALL to continue')" no
 [ "$confirm" = INSTALL ] || die "$(t 'cancelled')"
 
 say "$(t 'Copying to the device')"
-adb push "$TOP/tools/android-mount-mu300root.sh" "$TOP/tools/android-install.sh" $T/ >/dev/null
+adb push "$TOP/tools/android-mount-mu300root.sh" "$TOP/tools/android-install.sh" "$TOP/tools/android-bootchain.sh" $T/ >/dev/null
 for os in $OSES; do
     if [ $MODE = prebuilt ]; then
         adb push "$REL/$(rootfs_file $os)" $T/mu300-$os.tar.gz >/dev/null
@@ -714,11 +791,17 @@ done
 # android-install.sh puts every pushed mu300-extra-<name>.tar.gz onto the Linux partition (extra/<name>); the VPN
 # module goes as the vpn extra, and each system links it into itself at its first boot (mu300-extra link)
 [ -z "$EXTRA_VPN" ] || adb push "$EXTRA_VPN" $T/mu300-extra-vpn.tar.gz >/dev/null
+# the web panel goes as the panel extra; Ubuntu's first boot installs Cockpit from it in the background (mu300-extra link)
+[ -z "$EXTRA_PANEL" ] || adb push "$EXTRA_PANEL" $T/mu300-extra-panel.tar.gz >/dev/null
 env=$(mktemp)
 write_install_env > "$env"
 adb push "$env" $T/mu300-install.env >/dev/null; rm -f "$env"
 su_do "sh $T/android-install.sh" | tee "$WORK/device-install.log"
-grep -q MU300-INSTALL-OK "$WORK/device-install.log" || die "$(t 'installation on the device failed; boot_{1} and misc were not changed' "$LINUX_SLOT")"
+# a timed-out SD-card stage (FINDINGS 50) names itself in that log, with the way out (reboot Android first)
+grep -q MU300-INSTALL-OK "$WORK/device-install.log" ||
+    die "$(t 'installation on the device failed; boot_{1} and misc were not changed' "$LINUX_SLOT")
+$(t 'the device log was kept at {1}' "$WORK/device-install.log")"
+bootchain_pull
 
 write_linux_boot "$WORK/boot-linux-slot$LINUX_SLOT.img"
 

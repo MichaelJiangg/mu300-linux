@@ -110,7 +110,7 @@ sudo reboot</code></pre>
 <li>The new system is unpacked <strong>beside</strong> the old one and swapped in only at the end, so an interrupted
 download cannot leave a half-updated system.</li>
 <li>Your settings, users, <code>/usr/local</code>, the Wi-Fi and modem files from your device, and the installed
-extras are carried over. The VPN module is brought to its latest release.</li>
+extras are carried over. The VPN module is brought to its latest release, its core and its engines as one set.</li>
 <li>The kernel and boot image are updated too. A new kernel gets its first starts on the usual attempts, so one that
 does not start sends the device back to Android on its own.</li>
 </ol>
@@ -129,6 +129,15 @@ mu300-update apply</code></pre>
 </div>
 <p>A computer works too: run the installer again and answer <code>update</code>. It reinstalls the systems, writes a
 fresh boot image and keeps your settings and data.</p>
+<p><strong>Packages you installed yourself</strong> (<code>apk add</code>, <code>apt install</code>) are not in the
+release's image. The update lists them, keeps their OpenWrt settings aside so they cannot act without their program,
+and the new system installs them again at its first boot once it is online. <code>mu300-user-packages status</code>
+shows what came back (in the control panel: System &rarr; Packages after an update);
+<code>mu300-update apply --no-reinstall</code> skips it. On Ubuntu the apt sources you added (a PPA) are kept too. All of
+this from v2026.10.20 on.</p>
+<p>On Ubuntu with the web panel extra, a new image has no Cockpit in it: the first boot after the update puts it back in the
+background (from the extra's own copy when it has one, else from Ubuntu's archive once online); <code>mu300-panel status</code> says
+where it is.</p>
 </section>
 
 <section id="rollback">

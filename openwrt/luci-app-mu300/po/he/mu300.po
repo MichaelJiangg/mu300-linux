@@ -42,8 +42,38 @@ msgstr "צריכת חשמל"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "מרכז הבקרה של MU300: לוח מצב, נעילות רשת, מסוף AT ו-SMS"
+msgid "Terminal"
+msgstr "מסוף"
+
+msgid "Terminal settings"
+msgstr "הגדרות המסוף"
+
+msgid "Overview"
+msgstr "סקירה כללית"
+
+msgid "Profiles"
+msgstr "פרופילים"
+
+msgid "Subscriptions"
+msgstr "מנויים"
+
+msgid "Engines"
+msgstr "מנועים"
+
+msgid "Settings"
+msgstr "הגדרות"
+
+msgid "Logs"
+msgstr "יומנים"
+
+msgid "Packages after an update"
+msgstr "חבילות אחרי עדכון"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "מרכז הבקרה של MU300: לוח מצב, נעילות רשת, מסוף AT, SMS ו-VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "מסוף: מעטפת root של המכשיר בדפדפן"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "מספר לא ידוע"
 
 msgid "Select"
 msgstr "בחירה"
+
+msgid "never"
+msgstr "אף פעם"
+
+msgid "just now"
+msgstr "הרגע"
+
+msgid "%s ago"
+msgstr "לפני %s"
+
+msgid "Failed: %s"
+msgstr "נכשל: %s"
+
+msgid "Management connection lost"
+msgstr "חיבור הניהול אבד"
+
+msgid "Installing the VPN module"
+msgstr "מתקין את מודול ה-VPN"
+
+msgid "Installing the engine"
+msgstr "מתקין את המנוע"
+
+msgid "Adding the subscription"
+msgstr "מוסיף את המנוי"
+
+msgid "Refreshing the subscriptions"
+msgstr "מרענן את המנויים"
+
+msgid "Testing the latency of every profile"
+msgstr "בודק את זמן ההשהיה של כל פרופיל"
+
+msgid "Downloading the config"
+msgstr "מוריד את התצורה"
+
+msgid "Working…"
+msgstr "עובד…"
+
+msgid "done"
+msgstr "בוצע"
+
+msgid "failed"
+msgstr "נכשל"
+
+msgid "Verify the uploaded file"
+msgstr "אימות הקובץ שהועלה"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "הקובץ שהועלה נבדק מול SHA256SUMS של הגרסה האחרונה של מודול ה-VPN, שהורד דרך HTTPS. אם זה לא אפשרי (לא מקוון, גרסה ישנה יותר), הוא מותקן רק אם תאפשרו קובץ שלא אומת: אז הוא רץ כ-root ללא שום בדיקה."
+
+msgid "Install it even if it cannot be verified"
+msgstr "להתקין גם אם לא ניתן לאמת"
+
+msgid "Install only a verified file"
+msgstr "להתקין רק קובץ מאומת"
+
+msgid "Upload failed: %s"
+msgstr "ההעלאה נכשלה: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "מודול ה-VPN ישן מדי עבור לוח זה"
+
+msgid "The VPN module is not installed"
+msgstr "מודול ה-VPN אינו מותקן"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "דף זה דורש את מודול ה-VPN עם mu300-vpn הניתן לקריאה אוטומטית (מודול v2 ומעלה). העדכון שומר על הפרופילים וההגדרות."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "ה-VPN הוא מודול נפרד: mu300-vpn עם ה-kill switch והפרופילים שלו, ותוסף אחד לכל מנוע (Xray, sing-box, mihomo, dae). הוא מותקן באמצעות mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "ההורדה היא כמה MB למודול ועד עשרות MB לכל מנוע: בנתונים סלולריים היא נספרת במכסה שלך."
+
+msgid "Update the VPN module"
+msgstr "עדכון מודול ה-VPN"
+
+msgid "Install the VPN module"
+msgstr "התקנת מודול ה-VPN"
+
+msgid "Upload the file…"
+msgstr "העלאת הקובץ…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "לא מקוון: העלו את mu300-linux-vpn-core.tar.gz (או את החבילה mu300-linux-vpn.tar.gz) מדף הגרסאות של מודול ה-VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "זוהי סריקת רשתות או תדרים: היא נמשכת דקה עד שלוש דקות, מחזיקה את ערוץ ה-AT של המודם כל אותו זמן, ונתונים סלולריים עשויים להיעצר בינתיים. היא רצה ברקע; התשובה תופיע כאן כשתסתיים."
@@ -207,14 +324,8 @@ msgstr "סריקה מוציאה את נקודת הגישה של ה-Wi-Fi מהע�
 msgid "Scan anyway"
 msgstr "לסרוק בכל זאת"
 
-msgid "Failed: %s"
-msgstr "נכשל: %s"
-
 msgid "Saved"
 msgstr "נשמר"
-
-msgid "Management connection lost"
-msgstr "חיבור הניהול אבד"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "תרמי"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "אזורי החום של הליבה, לקריאה בלבד. אזור עם נקודות סף מצמצם את התקני הקירור הקשורים אליו בנקודת הסף הפסיבית שלו; מצב קירור 0 פירושו ללא צמצום."
+
+msgid "Zone"
+msgstr "אזור"
+
+msgid "Temperature"
+msgstr "טמפרטורה"
+
+msgid "Trip points"
+msgstr "נקודות סף"
+
+msgid "Cooling devices"
+msgstr "התקני קירור"
 
 msgid "USB role"
 msgstr "תפקיד USB"
@@ -489,8 +618,17 @@ msgstr "גוף"
 msgid "Form (URL-encoded)"
 msgstr "טופס (קידוד URL)"
 
+msgid "Plain text"
+msgstr "טקסט פשוט"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "שדות: sender, time, text, device, message (התבנית המלאה)"
+
+msgid "Custom body"
+msgstr "גוף מותאם אישית"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "ריק: השדות הרגילים (טקסט פשוט: ההודעה). מצייני מקום: {sender}, {time}, {text}, {device}, {message}. כל ערך עובר escape לפי הסוג שנבחר. גוף זה מוצג כאן שוב: שמרו סודות בכתובת או בכותרת."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "כותרות נוספות (\"Name: value\" אחת בכל שורה)"
@@ -651,6 +789,9 @@ msgstr "סה״כ נשלח"
 msgid "Used today"
 msgstr "נוצל היום"
 
+msgid "SIM source"
+msgstr "מקור ה-SIM"
+
 msgid "Session duration"
 msgstr "משך ההפעלה"
 
@@ -719,6 +860,9 @@ msgstr "מודם"
 
 msgid "Carrier"
 msgstr "ספק"
+
+msgid "Own number"
+msgstr "המספר שלי"
 
 msgid "Module"
 msgstr "מודול"
@@ -858,8 +1002,17 @@ msgstr "הנעילה נכשלה: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "מאפס את נעילות הרשת לאוטומטי (הפעלה מחדש של SFUN, כ-30 שניות)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "האיפוס נכשל: %s. הגדרות הנעילה השמורות נשמרו."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "איפוס הנעילות לא אושר בזמן; עובר בכל זאת."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "נבחר SIM פנימי: ייכנס לשימוש לאחר הפעלה מחדש"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "נבחר SIM פנימי, אך הוא אינו נתמך במכשיר זה: ה-SIM החיצוני בשימוש"
 
 msgid "Uptime %s"
 msgstr "זמן פעולה %s"
@@ -990,9 +1143,6 @@ msgstr "חבילת השפות הותקנה"
 msgid "The language pack could not be installed"
 msgstr "לא ניתן היה להתקין את חבילת השפות"
 
-msgid "Upload failed: %s"
-msgstr "ההעלאה נכשלה: %s"
-
 msgid "Language of the browser"
 msgstr "שפת הדפדפן"
 
@@ -1013,9 +1163,6 @@ msgstr "חבילת השפות (mu300-extra-lang.tar.gz, כ-2 MB) מוסיפה א
 
 msgid "Download from the release"
 msgstr "הורדה מהגרסה"
-
-msgid "Upload the file…"
-msgstr "העלאת הקובץ…"
 
 msgid "Release"
 msgstr "גרסה"
@@ -1209,6 +1356,9 @@ msgstr "המצב אושר"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "תם הזמן לקריאה חוזרת; יש לבחור “רענון מצב הנעילה”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "האיפוס אומת: מצב רשת אוטומטי, EN-DC פועל, כל הפסים, ללא נעילת תא; הגדרות הנעילה השמורות נוקו"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "הוחל (EN-DC אינו דורש הפעלה מחדש של מחסנית הרדיו)"
 
@@ -1235,6 +1385,114 @@ msgstr "אוטומטי (%d נתמכים)"
 
 msgid "%d locked: %s"
 msgstr "%d נעולים: %s"
+
+msgid "Repair DNS?"
+msgstr "לתקן את ה-DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "פעולה זו מסירה את העברת ה-DNS של חבילה שכבר אינה מותקנת. אם לא נשאר שרת DNS אחר, המכשיר ישתמש בשרתי ה-DNS של החיבור הסלולרי: הספק רואה את השמות שאתם מחפשים, מחוץ לכל פרוקסי או VPN."
+
+msgid "Repair DNS"
+msgstr "תיקון DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "חבילות שהותקנו במכשיר אינן חלק מתמונת הגרסה. העדכון רושם אותן, והמערכת החדשה מתקינה אותן מחדש באתחול הראשון, ברגע שהיא מחוברת. עד שחבילה חוזרת, ההגדרות שלה נשמרות בצד."
+
+msgid "No packages to install again."
+msgstr "אין חבילות להתקנה מחדש."
+
+msgid "All back"
+msgstr "כולן חזרו"
+
+msgid "Not installed yet"
+msgstr "עדיין לא הותקנה"
+
+msgid "Could not be installed again"
+msgstr "לא ניתן היה להתקין מחדש"
+
+msgid "Waiting for the internet"
+msgstr "ממתין לאינטרנט"
+
+msgid "Given up: no internet at five boots"
+msgstr "ויתור: אין אינטרנט בחמישה אתחולים"
+
+msgid "Skipped"
+msgstr "דולג"
+
+msgid "Written down by the update from %s"
+msgstr "נרשם על ידי העדכון מ-%s"
+
+msgid "Installed again"
+msgstr "הותקנו מחדש"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "התקינו אותן בעצמכם מהמקום שממנו השגתם אותן (קובץ חבילה: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "הגדרות שנשמרו בצד ב-/etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "ה-DNS עדיין מופנה לחבילה שאינה מותקנת: אין למכשיר DNS דרכה."
+
+msgid "Try again"
+msgstr "נסו שוב"
+
+msgid "Dismiss the note"
+msgstr "סגירת ההודעה"
+
+msgid "started"
+msgstr "הופעל"
+
+msgid "asleep now (asked)"
+msgstr "שינה עכשיו (לבקשה)"
+
+msgid "woken: power daemon stopping"
+msgstr "התעורר: שירות החשמל נעצר"
+
+msgid "woken by a key"
+msgstr "התעורר מלחצן"
+
+msgid "woken by the Wi-Fi key"
+msgstr "התעורר מלחצן ה-Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "התעורר (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "התעורר ממחשב ב-USB"
+
+msgid "woken: plugged in"
+msgstr "התעורר: חובר לחשמל"
+
+msgid "woken by a Wi-Fi client"
+msgstr "התעורר מלקוח Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "אתחול טעינה (הודלק על ידי המטען)"
+
+msgid "the hotspot is down"
+msgstr "הנקודה החמה כבויה"
+
+msgid "the VPN is still stopped"
+msgstr "ה-VPN עדיין עצור"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "ה-5G (EN-DC) עדיין כבוי אחרי חידוש שנכשל"
+
+msgid "self-check: %s"
+msgstr "בדיקה עצמית: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "שינה: אין לקוח %d דק' (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "שינה: הפרופיל כעת %s"
+
+msgid "woken by the %s key"
+msgstr "התעורר מלחצן %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "המודם מושהה (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "הזינו מספר שלם בין 0 ל-%d"
@@ -1437,6 +1695,15 @@ msgstr "הודעה (Enter לשליחה, Shift+Enter לשורה חדשה)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "השליחה משתמשת ב-AT+CMGS (מצב PDU); יש לנסות שוב אם הערוץ תפוס. למחיקת הודעה בודדת, יש להשתמש בסמל הפח שעל הבועה שלה."
 
+msgid "Sending…"
+msgstr "שולח…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "נשלח; הרשימה תתרענן בקרוב."
+
+msgid "Sending failed"
+msgstr "השליחה נכשלה"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "מסנכרן מה-SIM ברקע (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "נמחק (מקומי בלבד)"
 msgid "Enter both a number and a message."
 msgstr "יש להזין גם מספר וגם הודעה."
 
-msgid "Sending…"
-msgstr "שולח…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "נשלח; הרשימה תתרענן בקרוב."
-
-msgid "Sending failed"
-msgstr "השליחה נכשלה"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d הודעות, %d שלא נקראו · %d שיחות"
 
@@ -1502,6 +1760,39 @@ msgstr "לא שלמה: הגיעו %d מתוך %d חלקים"
 
 msgid "Delete"
 msgstr "מחיקה"
+
+msgid "ttyd is not installed."
+msgstr "ttyd אינו מותקן."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "המסוף כבוי (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "יותר מדי מסופים נפתחים בבת אחת. נסו שוב בעוד דקה."
+
+msgid "The terminal is not available."
+msgstr "המסוף אינו זמין."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "זוהי מעטפת root של המכשיר: כל פקודה רצה עם הרשאות מלאות, וטעות אחת עלולה למנוע מהמכשיר לאתחל."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "הוא נגיש רק מה-LAN (USB ונקודת הגישה), לעולם לא מנתוני הסלולר, ורק מהדף המחובר הזה."
+
+msgid "It closes after a minute without activity."
+msgstr "הוא נסגר לאחר דקה ללא פעילות."
+
+msgid "It closes after %d minutes without activity."
+msgstr "הוא נסגר לאחר %d דקות ללא פעילות."
+
+msgid "Reconnect"
+msgstr "התחבר מחדש"
+
+msgid "Open in a new tab"
+msgstr "פתח בכרטיסייה חדשה"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "הדף הזה נפתח ב-HTTPS, והמסוף מוגש ב-HTTP ברשת המקומית: הוא נפתח בכרטיסייה משלו."
 
 msgid "The data usage could not be read"
 msgstr "לא ניתן לקרוא את השימוש בנתונים"
@@ -1637,6 +1928,594 @@ msgstr "כבה"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "עם 64 כל חבילה יוצאת כמו התעבורה של המכשיר עצמו"
+
+msgid "running"
+msgstr "פועל"
+
+msgid "(about %s)"
+msgstr "(כ-%s)"
+
+msgid "Install %s?"
+msgstr "להתקין את %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "הוא מותקן ממאגר החבילות של מערכת זו."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "הוא מורד מגרסת מודול ה-VPN ונבדק מול ה-SHA256SUMS שלה."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "מנוע הוא עשרות MB: בנתונים סלולריים ההורדה נספרת במכסה שלך."
+
+msgid "Install"
+msgstr "התקנה"
+
+msgid "Remove %s?"
+msgstr "להסיר את %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "פרופילים שפועלים עליו: %s. הם לא יוכלו להתחיל עד שיותקן מחדש (המודול מסרב כל עוד הפרופיל הפועל זקוק לו)."
+
+msgid "No profile runs on it."
+msgstr "אף פרופיל אינו פועל עליו."
+
+msgid "Removed"
+msgstr "הוסר"
+
+msgid "Check for updates"
+msgstr "בדיקת עדכונים"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "כל מנוע הוא תוסף נפרד: התקינו רק את אלה שהפרופילים שלכם צריכים. Xray מריץ קישורי vless, vmess, trojan ו-ss (עם hev-socks5-tunnel), sing-box את אותם קישורים ואת ה-JSON שלו, mihomo מנויי Clash, dae את hysteria2, tuic והשאר בליבות חדשות יותר. WireGuard ו-OpenVPN הם חבילות של המערכת."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "ההורדות הן עשרות MB לכל מנוע: בנתונים סלולריים הן נספרות במכסה שלך. במצב לא מקוון, העלו את קובץ ה-tarball של המנוע מדף הגרסאות של מודול ה-VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "הגרסאות הזמינות מגיעות מהגרסה האחרונה של מודול ה-VPN."
+
+msgid "Update"
+msgstr "עדכון"
+
+msgid "system package"
+msgstr "חבילת מערכת"
+
+msgid "in the vpn bundle"
+msgstr "בחבילת ה-vpn"
+
+msgid "extra %s"
+msgstr "תוסף %s"
+
+msgid "not installed"
+msgstr "לא מותקן"
+
+msgid "cannot run here"
+msgstr "אינו יכול לפעול כאן"
+
+msgid "update available"
+msgstr "עדכון זמין"
+
+msgid "installed"
+msgstr "מותקן"
+
+msgid "Kind"
+msgstr "סוג"
+
+msgid "Version"
+msgstr "גרסה"
+
+msgid "Available"
+msgstr "זמין"
+
+msgid "not checked"
+msgstr "לא נבדק"
+
+msgid "Size"
+msgstr "גודל"
+
+msgid "Needed by"
+msgstr "בשימוש של"
+
+msgid "no profile"
+msgstr "אין פרופיל"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae דורש ליבה עם BTF, 5.17 ומעלה: לא ליבת 5.4 של היצרן (mu300-update kernel 6.18). אפשר להתקין אותו בכל זאת."
+
+msgid "All engines"
+msgstr "כל המנועים"
+
+msgid "Last %s lines"
+msgstr "%s השורות האחרונות"
+
+msgid "VPN service log"
+msgstr "יומן שירות ה-VPN"
+
+msgid "Every 5 s"
+msgstr "כל 5 שניות"
+
+msgid "The log is empty."
+msgstr "היומן ריק."
+
+msgid "The VPN is starting"
+msgstr "ה-VPN מתחיל"
+
+msgid "The VPN is stopped"
+msgstr "ה-VPN נעצר"
+
+msgid "The VPN is restarting"
+msgstr "ה-VPN מופעל מחדש"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "כאשר ה-kill switch פעיל, שום דבר לא יוצא מההתקן או מה-LAN מחוץ למנהרה: כל עוד ה-VPN מושבת, מתחיל או שבור, כל חיבור נכשל במקום לצאת ישירות. הוא נשאר פעיל עד שתעצרו את ה-VPN כאן (עצירה מסירה אותו)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "בלי ה-kill switch, התעבורה יוצאת ישירות, ללא הגנה, בכל פעם שהמנהרה מושבתת (בזמן ההתחלה, אחרי קריסה, כשהמנוע חסר)."
+
+msgid "Turn the kill switch on?"
+msgstr "להפעיל את ה-kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "לכבות את ה-kill switch?"
+
+msgid "Turn on"
+msgstr "הפעלה"
+
+msgid "unknown"
+msgstr "לא ידוע"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "כתובת היציאה לא נמצאה (האם המנהרה פעילה?)"
+
+msgid "Connecting…"
+msgstr "מתחבר…"
+
+msgid "On, but not running"
+msgstr "מופעל, אך לא פועל"
+
+msgid "Stopped"
+msgstr "נעצר"
+
+msgid "Install it"
+msgstr "התקנה"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "המנוע של הפרופיל הפעיל אינו מותקן: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "ה-kill switch שומר על הכול סגור עד שיהיה זמין; השירות מוריד אותו בעצמו כשהוא יכול."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "ה-VPN לא יכול להתחיל עד שיותקן."
+
+msgid "%s cannot run on this system"
+msgstr "%s אינו יכול לפעול במערכת זו"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "ה-VPN מופעל, אך אין פרופיל פעיל: בחרו אחד למטה."
+
+msgid "Profile: %s"
+msgstr "פרופיל: %s"
+
+msgid "No active profile"
+msgstr "אין פרופיל פעיל"
+
+msgid "engine %s"
+msgstr "מנוע %s"
+
+msgid "interface %s"
+msgstr "ממשק %s"
+
+msgid "Kill switch active"
+msgstr "kill switch פעיל"
+
+msgid "Kill switch on"
+msgstr "kill switch מופעל"
+
+msgid "Kill switch off"
+msgstr "kill switch כבוי"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 במנהרה"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 חסום"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 ללא שינוי"
+
+msgid "Module %s"
+msgstr "מודול %s"
+
+msgid "Check"
+msgstr "בדיקה"
+
+msgid "Uptime"
+msgstr "זמן פעילות"
+
+msgid "Rate"
+msgstr "קצב"
+
+msgid "Exit address"
+msgstr "כתובת יציאה"
+
+msgid "Start"
+msgstr "התחלה"
+
+msgid "Stop"
+msgstr "עצירה"
+
+msgid "Restart"
+msgstr "הפעלה מחדש"
+
+msgid "Stop the VPN?"
+msgstr "לעצור את ה-VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "התעבורה תצא אז ישירות, בלי המנהרה; ה-kill switch יוסר יחד איתו."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "ה-VPN מופעל: הוא מתחיל שוב מעצמו אחרי הפעלה מחדש."
+
+msgid "The VPN is off."
+msgstr "ה-VPN כבוי."
+
+msgid "Kill switch"
+msgstr "kill switch"
+
+msgid "Setting"
+msgstr "הגדרה"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "פעיל: רק המנהרה יכולה להגיע לאינטרנט"
+
+msgid "Not active"
+msgstr "לא פעיל"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "ה-kill switch חוסם את כל התעבורה של ההתקן ושל ה-LAN כל עוד ה-VPN מושבת, כך ששום דבר לא יוצא בלי המנהרה. אם המנהרה לא יכולה לעלות (שרת מת, חשבון שפג תוקפו), ההתקן נשאר לא מקוון עד שתתקנו את הפרופיל או תעצרו את ה-VPN. הלוח עצמו נשאר נגיש מה-LAN."
+
+msgid "Choose a profile"
+msgstr "בחירת פרופיל"
+
+msgid "No profiles yet"
+msgstr "עדיין אין פרופילים"
+
+msgid "engine not installed"
+msgstr "המנוע אינו מותקן"
+
+msgid "Use"
+msgstr "שימוש"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "הוחלף: ה-VPN מופעל מחדש עם הפרופיל החדש"
+
+msgid "Active profile"
+msgstr "פרופיל פעיל"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "VPN פועל מופעל מחדש עם הפרופיל שתבחרו; ה-kill switch נשאר פעיל בינתיים."
+
+msgid "Manage the profiles"
+msgstr "ניהול הפרופילים"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "אוטומטי: דרך המנהרה כשהמנוע יכול לשאת זאת"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "בקשת IPv6 במנהרה מהמנוע"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "אף פעם לא דרך המנהרה (חסום כל עוד ה-VPN מופעל)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "נשמר: חל מההתחלה הבאה (הפעלה מחדש)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "המנהרה נושאת IPv6"
+
+msgid "Yes"
+msgstr "כן"
+
+msgid "IPv6 guard"
+msgstr "שומר IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "פעיל: IPv6 מחוץ למנהרה נדחה"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "כל עוד ה-VPN מופעל, IPv6 לא יוצא לעולם לצד מנהרה שאינה נושאת אותו: הוא נדחה מיד, כך שתוכניות ולקוחות ה-LAN חוזרים ל-IPv4 במקום לדלוף או להמתין. אוטומטי: WireGuard משתמש בכתובות ה-IPv6 שבתצורה שלו, שאר המנועים נשארים ב-IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: לא ניתן לבדיקה"
+
+msgid "blocked by the kill switch"
+msgstr "נחסם על ידי ה-kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "תצורת WireGuard או OpenVPN, קובץ YAML של Clash/mihomo, קובץ JSON של Xray או sing-box, תצורת dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "לאחר אישור, בחרו את הקובץ: קובץ .conf של WireGuard, קובץ .ovpn של OpenVPN, קובץ .yaml של Clash/mihomo, קובץ .json של Xray או sing-box או תצורת dae (עד 1 MiB)."
+
+msgid "From the source"
+msgstr "מהמקור"
+
+msgid "Detect"
+msgstr "זיהוי"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "ה-URL עשוי להכיל אסימון: הוא נשלח להתקן בנפרד, ואף פעם לא לשורת פקודה או ליומן."
+
+msgid "Type"
+msgstr "סוג"
+
+msgid "Share link"
+msgstr "קישור שיתוף"
+
+msgid "Paste"
+msgstr "הדבקה"
+
+msgid "File"
+msgstr "קובץ"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "לא קישור שיתוף שלוח זה מקבל"
+
+msgid "The config is empty"
+msgstr "התצורה ריקה"
+
+msgid "Not an https URL"
+msgstr "זו אינה כתובת URL מסוג https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "שם לא תקין: 1-64 תווים, ללא תווי בקרה"
+
+msgid "Add a profile"
+msgstr "הוספת פרופיל"
+
+msgid "Name"
+msgstr "שם"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "זיהוי: המודול מזהה את הסוג לפי הקישור או הקובץ. בחרו את הסוג עבור JSON שיכול להיות של Xray או של sing-box, או עבור קישור שצריך לפעול על מנוע אחר."
+
+msgid "The profile is added"
+msgstr "הפרופיל נוסף"
+
+msgid "Rename the profile"
+msgstr "שינוי שם הפרופיל"
+
+msgid "Delete the profile %s?"
+msgstr "למחוק את הפרופיל %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "זהו הפרופיל הפעיל: כשה-VPN מופעל, המודול מסרב; עצרו תחילה את ה-VPN או בחרו פרופיל אחר."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "התצורה ופרטי הגישה שלו נמחקים מההתקן."
+
+msgid "Deleted"
+msgstr "נמחק"
+
+msgid "The profile passes the check"
+msgstr "הפרופיל עובר את הבדיקה"
+
+msgid "Show the config?"
+msgstr "להציג את התצורה?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "התצורה מכילה את פרטי הגישה של הפרופיל (מפתחות, סיסמאות, UUID). היא מוצגת במסך זה בלבד; כל מי שרואה את המסך יכול לקרוא אותה."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "השמירה בודקת תחילה את התצורה מול המנוע (profile edit); תצורה שאינה עוברת את הבדיקה לא נשמרת והישנה נשארת."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "פרופיל זה מגיע ממנוי: הרענון הבא שלו יחליף את השינויים שלכם."
+
+msgid "Config of %s"
+msgstr "תצורת %s"
+
+msgid "Close"
+msgstr "סגירה"
+
+msgid "Rename"
+msgstr "שינוי שם"
+
+msgid "Show / edit the config"
+msgstr "הצגה / עריכה של התצורה"
+
+msgid "Test the latency of all"
+msgstr "בדיקת זמן ההשהיה של כולם"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "עדיין אין פרופילים: הוסיפו אחד מקישור שיתוף, מקובץ תצורה או ממנוי."
+
+msgid "Active"
+msgstr "פעיל"
+
+msgid "This profile is the active one now"
+msgstr "פרופיל זה הוא כעת הפעיל"
+
+msgid "More"
+msgstr "עוד"
+
+msgid "active"
+msgstr "פעיל"
+
+msgid "subscription"
+msgstr "מנוי"
+
+msgid "migrated"
+msgstr "הועבר"
+
+msgid "gone from its subscription"
+msgstr "נעלם מהמנוי שלו"
+
+msgid "Server"
+msgstr "שרת"
+
+msgid "Engine"
+msgstr "מנוע"
+
+msgid "Latency"
+msgstr "השהיה"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "ההשהיה היא חיבור TCP אל השרת, דרך המנהרה כשה-VPN מופעל. שרתי WireGuard ו-OpenVPN משתמשים בדרך כלל ב-UDP ואי אפשר לבדוק אותם כך."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "הזינו כתובת IPv4 או IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "מופעל: שום דבר לא יוצא מחוץ למנהרה"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "כבוי: התעבורה יוצאת ישירות כשהמנהרה מושבתת"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "כן: החיבורים של Tailscale עצמו עוברים דרך המנהרה"
+
+msgid "No: Tailscale connects directly"
+msgstr "לא: Tailscale מתחבר ישירות"
+
+msgid "Routing"
+msgstr "ניתוב"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "ה-kill switch חוסם את כל התעבורה של ההתקן ושל ה-LAN כל עוד ה-VPN מושבת."
+
+msgid "Bypass the tunnel"
+msgstr "עקיפת המנהרה"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "הזינו טווחי כתובות כמו 192.168.0.0/16, מופרדים בפסיקים"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "טווחי כתובות שלעולם לא נכנסים למנהרה, מלבד ה-LAN עצמו (שלעולם לא נכנס). ריק: ה-LAN בלבד."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale דרך ה-VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "כש-Tailscale פועל בהתקן, חיבורי ה-WireGuard, ה-DERP והבקרה שלו עוברים דרך המנהרה הפועלת (dae תופס אותם כמו כל חיבור אחר)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS דרך המנהרה"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "המפענח שאליו הולכות, דרך המנהרה, השאילתות של ההתקן ושל ה-LAN. שום דבר לא הולך למפענח של הספק."
+
+msgid "Bootstrap DNS"
+msgstr "DNS אתחול"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "מוצא את הכתובת של שרת ה-VPN עצמו לפני שהמנהרה עולה (ישירות, בחיבור של המנוע עצמו)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "ריק מחזיר הגדרה לברירת המחדל שלה."
+
+msgid "TUN stack"
+msgstr "מחסנית TUN"
+
+msgid "Default (gvisor)"
+msgstr "ברירת מחדל (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (לא בליבת 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "מוגדר (ללא שינוי אלא אם תקלידו חדש)"
+
+msgid "not set"
+msgstr "לא מוגדר"
+
+msgid "Upstream HTTP proxy"
+msgstr "פרוקסי HTTP במעלה הזרם"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "נעיצת אישור TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "הזינו host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "הזינו את ה-SHA-256 בהקסדצימלי"
+
+msgid "Profile options"
+msgstr "אפשרויות פרופיל"
+
+msgid "None of the profiles has options of its type."
+msgstr "לאף אחד מהפרופילים אין אפשרויות מסוגו."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "המצב של mihomo (rule, global, direct), רמות היומן של המנועים, הקבוצות והניתוב של dae הם חלק מהתצורה של כל פרופיל: VPN > פרופילים, הצגה / עריכה של התצורה."
+
+msgid "Delete the subscription %s?"
+msgstr "למחוק את המנוי %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "הפרופילים שלו יכולים להימחק יחד איתו או להישאר כפרופילים עצמאיים. הפרופיל הפעיל לעולם אינו מוסר כשה-VPN מופעל."
+
+msgid "Keep the profiles"
+msgstr "שמירת הפרופילים"
+
+msgid "Delete with its profiles"
+msgstr "מחיקה יחד עם הפרופילים"
+
+msgid "Only by hand"
+msgstr "ידנית בלבד"
+
+msgid "Every %d h"
+msgstr "כל %d שעות"
+
+msgid "Share links: one profile per link"
+msgstr "קישורי שיתוף: פרופיל אחד לכל קישור"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "קובץ YAML של Clash/mihomo: פרופיל mihomo אחד"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: פרופיל אחד עם כל הצמתים בקבוצה אחת"
+
+msgid "Add a subscription"
+msgstr "הוספת מנוי"
+
+msgid "Format"
+msgstr "פורמט"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "ה-URL מכיל בדרך כלל את אסימון החשבון שלכם: הוא נשמר בהתקן וניתן לקריאה על ידי root בלבד, ולא מוצג שוב. המנוי נמשך בחיבור של ההתקן עצמו: דרך המנהרה כשה-VPN מופעל; כשה-kill switch פעיל והמנהרה מושבתת אי אפשר למשוך אותו."
+
+msgid "Refresh all"
+msgstr "רענון הכול"
+
+msgid "No subscriptions yet."
+msgstr "עדיין אין מנויים."
+
+msgid "Host"
+msgstr "מארח"
+
+msgid "Updated"
+msgstr "עודכן"
+
+msgid "Share links"
+msgstr "קישורי שיתוף"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "רענון שומר על פרופילים ששמם לא השתנה, מוסיף את החדשים ומסיר את אלה שנעלמו (הפעיל נשאר כשה-VPN מופעל, מסומן כנעלם). רענון הפרופיל הפעיל מפעיל מחדש את ה-VPN הפועל."
 
 msgid "Dashboard info failed"
 msgstr "קבלת נתוני לוח המצב נכשלה"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "מתאם החבילות לא החזיר תשובה תקינה"
+
+msgid "Invalid packages operation"
+msgstr "פעולת חבילות לא תקינה"
+
 msgid "Request too large"
 msgstr "הבקשה גדולה מדי"
 
@@ -1820,6 +2705,150 @@ msgstr "תיקיית זמן הריצה אינה בטוחה; דבר לא הורץ
 
 msgid "No such method"
 msgstr "אין שיטה כזו"
+
+msgid "The VPN module refused the request"
+msgstr "מודול ה-VPN דחה את הבקשה"
+
+msgid "The VPN panel is busy, try again"
+msgstr "לוח ה-VPN עסוק, נסו שוב"
+
+msgid "Another VPN task is still running"
+msgstr "משימת VPN אחרת עדיין רצה"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "הפרמטר exit_ip חייב להיות 0 או 1"
+
+msgid "The VPN status could not be read"
+msgstr "לא ניתן היה לקרוא את מצב ה-VPN"
+
+msgid "The profiles could not be read"
+msgstr "לא ניתן היה לקרוא את הפרופילים"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "הפרמטר check חייב להיות 0 או 1"
+
+msgid "The engines could not be read"
+msgstr "לא ניתן היה לקרוא את המנועים"
+
+msgid "The subscriptions could not be read"
+msgstr "לא ניתן היה לקרוא את המנויים"
+
+msgid "The VPN settings could not be read"
+msgstr "לא ניתן היה לקרוא את הגדרות ה-VPN"
+
+msgid "Unknown VPN operation"
+msgstr "פעולת VPN לא מוכרת"
+
+msgid "The VPN could not be switched"
+msgstr "לא ניתן היה להחליף את ה-VPN"
+
+msgid "The kill switch is on or off"
+msgstr "ה-kill switch מופעל או כבוי"
+
+msgid "The kill switch could not be changed"
+msgstr "לא ניתן היה לשנות את ה-kill switch"
+
+msgid "Invalid profile id"
+msgstr "מזהה פרופיל לא תקין"
+
+msgid "The profile could not be made the active one"
+msgstr "לא ניתן היה להפוך את הפרופיל לפעיל"
+
+msgid "Unknown profile source"
+msgstr "מקור פרופיל לא מוכר"
+
+msgid "Unknown profile type"
+msgstr "סוג פרופיל לא מוכר"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "התצורה ריקה, גדולה מדי או מכילה תווי בקרה"
+
+msgid "Invalid profile request"
+msgstr "בקשת פרופיל לא תקינה"
+
+msgid "A config from a URL takes the type it says"
+msgstr "תצורה מ-URL מקבלת את הסוג שהיא מצהירה עליו"
+
+msgid "No uploaded file"
+msgstr "אין קובץ שהועלה"
+
+msgid "The file is larger than 1 MiB"
+msgstr "הקובץ גדול מ-1 MiB"
+
+msgid "The profile could not be added"
+msgstr "לא ניתן היה להוסיף את הפרופיל"
+
+msgid "The profile could not be renamed"
+msgstr "לא ניתן היה לשנות את שם הפרופיל"
+
+msgid "The profile could not be removed"
+msgstr "לא ניתן היה להסיר את הפרופיל"
+
+msgid "The profile does not pass the check"
+msgstr "הפרופיל אינו עובר את הבדיקה"
+
+msgid "Unknown profile option"
+msgstr "אפשרות פרופיל לא מוכרת"
+
+msgid "Invalid value for this option"
+msgstr "ערך לא תקין עבור אפשרות זו"
+
+msgid "The option could not be set"
+msgstr "לא ניתן היה להגדיר את האפשרות"
+
+msgid "The config could not be read"
+msgstr "לא ניתן היה לקרוא את התצורה"
+
+msgid "The config was not saved"
+msgstr "התצורה לא נשמרה"
+
+msgid "The latency test failed"
+msgstr "בדיקת ההשהיה נכשלה"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "מרווח הרענון הוא 1 עד 999 שעות"
+
+msgid "Unknown subscription type"
+msgstr "סוג מנוי לא מוכר"
+
+msgid "Invalid subscription id"
+msgstr "מזהה מנוי לא תקין"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "הפרמטר keep חייב להיות 0 או 1"
+
+msgid "The subscription could not be removed"
+msgstr "לא ניתן היה להסיר את המנוי"
+
+msgid "The file is too large"
+msgstr "הקובץ גדול מדי"
+
+msgid "Unknown engine"
+msgstr "מנוע לא מוכר"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "הפרמטר unverified חייב להיות 0 או 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "מנוע זה הוא חבילת מערכת: אין לו קובץ להעלאה"
+
+msgid "The engine could not be removed"
+msgstr "לא ניתן היה להסיר את המנוע"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra אינו קיים במערכת זו"
+
+msgid "Unknown VPN setting"
+msgstr "הגדרת VPN לא מוכרת"
+
+msgid "The setting could not be saved"
+msgstr "לא ניתן לשמור את ההגדרה"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "מספר השורות הוא 1 עד 1000"
+
+msgid "The log could not be read"
+msgstr "לא ניתן היה לקרוא את היומן"
 
 msgid "Radio did not come up"
 msgstr "הרדיו לא עלה"
@@ -1935,6 +2964,9 @@ msgstr "רשימת סינון לא תקינה (50 שורות לכל היותר)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "כתובת ה-webhook חייבת להיות כתובת URL של http:// או https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "גוף ה-webhook ארוך מדי או מכיל תו בקרה"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "כותרת לא תקינה (\"Name: value\" אחת בכל שורה; את Host, Content-Type, Content-Length, Transfer-Encoding ו-Connection המכשיר קובע)"
 
@@ -1992,17 +3024,47 @@ msgstr "לא ניתן היה להסיר את חבילת השפות"
 msgid "Lock cache unavailable"
 msgstr "מטמון הנעילות אינו זמין"
 
+msgid "The saved locks could not be cleared"
+msgstr "לא ניתן היה לנקות את הנעילות השמורות"
+
 msgid "No serving cell to lock to"
 msgstr "אין תא משרת לנעילה"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "המודם לא ענה לשאילתת המצב; לא נשלח דבר"
+
+msgid "The modem refused a write"
+msgstr "המודם דחה כתיבה"
+
+msgid "The read-back does not match the automatic values"
+msgstr "הקריאה החוזרת אינה תואמת לערכים האוטומטיים"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "הקריאה החוזרת לאחר הפעלת המחסנית מחדש אינה תואמת לערכים האוטומטיים"
+
+msgid "The reset was interrupted"
+msgstr "האיפוס הופסק"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "התקנה מחדש של חבילות אינה זמינה במערכת זו"
+
+msgid "No packages were written down by an update"
+msgstr "אף עדכון לא רשם חבילות"
+
+msgid "Reinstalling is running already"
+msgstr "ההתקנה מחדש כבר פועלת"
+
+msgid "The note could not be dropped"
+msgstr "לא ניתן היה להסיר את ההודעה"
+
+msgid "Unknown packages operation"
+msgstr "פעולת חבילות לא ידועה"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "שימוש בנתונים אינו זמין במערכת זו"
-
-msgid "The setting could not be saved"
-msgstr "לא ניתן לשמור את ההגדרה"
 
 msgid "Unknown data usage operation"
 msgstr "פעולת שימוש בנתונים לא ידועה"

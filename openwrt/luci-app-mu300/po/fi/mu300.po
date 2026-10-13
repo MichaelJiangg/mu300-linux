@@ -42,8 +42,38 @@ msgstr "Virta"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300-ohjauskeskus: tilan yleiskatsaus, verkkolukitukset, AT-pääte ja SMS"
+msgid "Terminal"
+msgstr "Pääte"
+
+msgid "Terminal settings"
+msgstr "Päätteen asetukset"
+
+msgid "Overview"
+msgstr "Yleiskatsaus"
+
+msgid "Profiles"
+msgstr "Profiilit"
+
+msgid "Subscriptions"
+msgstr "Tilaukset"
+
+msgid "Engines"
+msgstr "Moottorit"
+
+msgid "Settings"
+msgstr "Asetukset"
+
+msgid "Logs"
+msgstr "Lokit"
+
+msgid "Packages after an update"
+msgstr "Paketit päivityksen jälkeen"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300-hallintakeskus: tilapaneeli, verkkolukot, AT-pääte, tekstiviestit ja VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Pääte: laitteen root-komentotulkki selaimessa"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Tuntematon numero"
 
 msgid "Select"
 msgstr "Valitse"
+
+msgid "never"
+msgstr "ei koskaan"
+
+msgid "just now"
+msgstr "juuri nyt"
+
+msgid "%s ago"
+msgstr "%s sitten"
+
+msgid "Failed: %s"
+msgstr "Epäonnistui: %s"
+
+msgid "Management connection lost"
+msgstr "Hallintayhteys katkesi"
+
+msgid "Installing the VPN module"
+msgstr "Asennetaan VPN-moduulia"
+
+msgid "Installing the engine"
+msgstr "Asennetaan moottoria"
+
+msgid "Adding the subscription"
+msgstr "Lisätään tilausta"
+
+msgid "Refreshing the subscriptions"
+msgstr "Päivitetään tilauksia"
+
+msgid "Testing the latency of every profile"
+msgstr "Testataan jokaisen profiilin viive"
+
+msgid "Downloading the config"
+msgstr "Ladataan asetuksia"
+
+msgid "Working…"
+msgstr "Työstetään…"
+
+msgid "done"
+msgstr "valmis"
+
+msgid "failed"
+msgstr "epäonnistui"
+
+msgid "Verify the uploaded file"
+msgstr "Tarkista ladattu tiedosto"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Ladattu tiedosto tarkistetaan VPN-moduulin uusimman julkaisun SHA256SUMS-tiedostoa vasten, joka ladataan HTTPS:n kautta. Jos se ei ole mahdollista (offline, vanhempi julkaisu), se asennetaan vain, jos sallit tarkistamattoman tiedoston: se suoritetaan silloin root-oikeuksin ilman tarkistusta."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Asenna, vaikka sitä ei voi tarkistaa"
+
+msgid "Install only a verified file"
+msgstr "Asenna vain tarkistettu tiedosto"
+
+msgid "Upload failed: %s"
+msgstr "Lähetys epäonnistui: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN-moduuli on liian vanha tälle paneelille"
+
+msgid "The VPN module is not installed"
+msgstr "VPN-moduulia ei ole asennettu"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Tämä sivu tarvitsee VPN-moduulin, jossa on koneluettava mu300-vpn (moduuli v2 tai uudempi). Päivitys säilyttää profiilit ja asetukset."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN on oma moduulinsa: mu300-vpn kill switchineen ja profiileineen sekä yksi lisäosa moottoria kohti (Xray, sing-box, mihomo, dae). Se asennetaan komennolla mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Moduulin lataus on muutama MB ja moottorin enintään kymmeniä MB: mobiilidatalla se kuluttaa liittymäsi dataa."
+
+msgid "Update the VPN module"
+msgstr "Päivitä VPN-moduuli"
+
+msgid "Install the VPN module"
+msgstr "Asenna VPN-moduuli"
+
+msgid "Upload the file…"
+msgstr "Lähetä tiedosto…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Offline-tilassa: lataa mu300-linux-vpn-core.tar.gz (tai paketti mu300-linux-vpn.tar.gz) VPN-moduulin julkaisusivulta."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Tämä on verkko- tai taajuushaku: se kestää yhdestä kolmeen minuuttia, varaa modeemin AT-kanavan koko ajaksi, ja mobiilidata voi katketa sillä välin. Se toimii taustalla; vastaus näkyy tässä, kun se on valmis."
@@ -207,14 +324,8 @@ msgstr "Haku vie Wi-Fi-tukiaseman hetkeksi pois kanavaltaan: yhdistetyt laitteet
 msgid "Scan anyway"
 msgstr "Hae silti"
 
-msgid "Failed: %s"
-msgstr "Epäonnistui: %s"
-
 msgid "Saved"
 msgstr "Tallennettu"
-
-msgid "Management connection lost"
-msgstr "Hallintayhteys katkesi"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Lämpötila"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Ytimen lämpöalueet, vain luku. Alue, jolla on raja-arvopisteitä, rajoittaa siihen sidottuja jäähdytyslaitteita passiivisessa raja-arvossaan; jäähdytystila 0 tarkoittaa, ettei rajoitusta ole."
+
+msgid "Zone"
+msgstr "Alue"
+
+msgid "Temperature"
+msgstr "Lämpötila"
+
+msgid "Trip points"
+msgstr "Raja-arvopisteet"
+
+msgid "Cooling devices"
+msgstr "Jäähdytyslaitteet"
 
 msgid "USB role"
 msgstr "USB-rooli"
@@ -489,8 +618,17 @@ msgstr "Sisältö"
 msgid "Form (URL-encoded)"
 msgstr "Lomake (URL-koodattu)"
 
+msgid "Plain text"
+msgstr "Pelkkä teksti"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Kentät: sender, time, text, device, message (täytetty pohja)"
+
+msgid "Custom body"
+msgstr "Mukautettu runko"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Tyhjä: vakiokentät (pelkkä teksti: viesti). Paikkamerkit: {sender}, {time}, {text}, {device}, {message}. Jokainen arvo suojataan valitun tyypin mukaan. Tämä runko näytetään tässä uudelleen: pidä salaisuudet osoitteessa tai otsakkeessa."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Lisäotsakkeet (yksi \"Nimi: arvo\" riviä kohden)"
@@ -651,6 +789,9 @@ msgstr "Lähetetty yhteensä"
 msgid "Used today"
 msgstr "Käytetty tänään"
 
+msgid "SIM source"
+msgstr "SIM-lähde"
+
 msgid "Session duration"
 msgstr "Istunnon kesto"
 
@@ -719,6 +860,9 @@ msgstr "Modeemi"
 
 msgid "Carrier"
 msgstr "Operaattori"
+
+msgid "Own number"
+msgstr "Oma numero"
 
 msgid "Module"
 msgstr "Moduuli"
@@ -858,8 +1002,17 @@ msgstr "Lukitus epäonnistui: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Verkkolukituksia palautetaan automaattisiksi (SFUN-uudelleenkäynnistys, noin 30 sekuntia)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Palautus epäonnistui: %s. Tallennetut lukitusasetukset säilytettiin."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Lukitusten nollausta ei vahvistettu ajoissa; vaihdetaan silti."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Sisäinen SIM valittu: käytössä uudelleenkäynnistyksen jälkeen"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Sisäinen SIM valittu, mutta tämä laite ei tue sitä: ulkoinen SIM on käytössä"
 
 msgid "Uptime %s"
 msgstr "Käynnissä %s"
@@ -990,9 +1143,6 @@ msgstr "Kielipaketti on asennettu"
 msgid "The language pack could not be installed"
 msgstr "Kielipakettia ei voitu asentaa"
 
-msgid "Upload failed: %s"
-msgstr "Lähetys epäonnistui: %s"
-
 msgid "Language of the browser"
 msgstr "Selaimen kieli"
 
@@ -1013,9 +1163,6 @@ msgstr "Kielipaketti (mu300-extra-lang.tar.gz, noin 2 MB) lisää LuCIin noin 40
 
 msgid "Download from the release"
 msgstr "Lataa julkaisusta"
-
-msgid "Upload the file…"
-msgstr "Lähetä tiedosto…"
 
 msgid "Release"
 msgstr "Julkaisu"
@@ -1209,6 +1356,9 @@ msgstr "Tila vahvistettu"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Takaisinluku aikakatkaistiin; valitse ”Päivitä lukitusten tila”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Palautus vahvistettu: verkkotila automaattinen, EN-DC päällä, kaikki taajuusalueet, ei solulukitusta; tallennetut lukitusasetukset on poistettu"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Otettu käyttöön (EN-DC ei vaadi radiopinon uudelleenkäynnistystä)"
 
@@ -1235,6 +1385,114 @@ msgstr "Automaattinen (%d tuettu)"
 
 msgid "%d locked: %s"
 msgstr "%d lukittu: %s"
+
+msgid "Repair DNS?"
+msgstr "Korjataanko DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Tämä poistaa sellaisen paketin DNS-uudelleenohjauksen, joka ei ole enää asennettuna. Jos muuta DNS-palvelinta ei jää, laite käyttää mobiiliyhteyden DNS-palvelimia: operaattori näkee hakemasi nimet minkään välityspalvelimen tai VPN:n ohi."
+
+msgid "Repair DNS"
+msgstr "Korjaa DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Laitteeseen asennetut paketit eivät kuulu julkaisun levykuvaan. Päivitys kirjaa ne, ja uusi järjestelmä asentaa ne uudelleen ensimmäisellä käynnistyksellä heti, kun se on verkossa. Kunnes paketti on palannut, sen asetukset on siirretty sivuun."
+
+msgid "No packages to install again."
+msgstr "Ei uudelleen asennettavia paketteja."
+
+msgid "All back"
+msgstr "Kaikki palautettu"
+
+msgid "Not installed yet"
+msgstr "Ei vielä asennettu"
+
+msgid "Could not be installed again"
+msgstr "Uudelleenasennus ei onnistunut"
+
+msgid "Waiting for the internet"
+msgstr "Odotetaan internetiä"
+
+msgid "Given up: no internet at five boots"
+msgstr "Luovuttu: ei internetiä viidellä käynnistyksellä"
+
+msgid "Skipped"
+msgstr "Ohitettu"
+
+msgid "Written down by the update from %s"
+msgstr "Kirjattu päivityksessä versiosta %s"
+
+msgid "Installed again"
+msgstr "Asennettu uudelleen"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Asenna ne itse sieltä, mistä sait ne (pakettitiedosto: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Sivuun siirretyt asetukset kansiossa /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS ohjautuu yhä pakettiin, jota ei ole asennettu: laitteella ei ole sen kautta DNS:ää."
+
+msgid "Try again"
+msgstr "Yritä uudelleen"
+
+msgid "Dismiss the note"
+msgstr "Sulje ilmoitus"
+
+msgid "started"
+msgstr "käynnistetty"
+
+msgid "asleep now (asked)"
+msgstr "lepotila nyt (pyydetty)"
+
+msgid "woken: power daemon stopping"
+msgstr "herätetty: virtapalvelu pysähtyy"
+
+msgid "woken by a key"
+msgstr "herätetty painikkeella"
+
+msgid "woken by the Wi-Fi key"
+msgstr "herätetty Wi-Fi-painikkeella"
+
+msgid "woken (mu300-power wake)"
+msgstr "herätetty (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "herätetty USB-tietokoneella"
+
+msgid "woken: plugged in"
+msgstr "herätetty: laturi kytketty"
+
+msgid "woken by a Wi-Fi client"
+msgstr "herätetty Wi-Fi-asiakkaalla"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "latauskäynnistys (laturi käynnisti)"
+
+msgid "the hotspot is down"
+msgstr "hotspot on pois päältä"
+
+msgid "the VPN is still stopped"
+msgstr "VPN on yhä pysäytetty"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) on yhä pois epäonnistuneen jatkamisen jälkeen"
+
+msgid "self-check: %s"
+msgstr "itsetarkistus: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "lepotila: ei asiakkaita %d min (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "lepotila: profiili nyt %s"
+
+msgid "woken by the %s key"
+msgstr "herätetty %s-painikkeella"
+
+msgid "the modem is suspended (%s)"
+msgstr "modeemi on keskeytetty (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Anna kokonaisluku väliltä 0–%d"
@@ -1437,6 +1695,15 @@ msgstr "Viesti (Enter lähettää, Shift+Enter uusi rivi)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Lähetys käyttää AT+CMGS-komentoa (PDU-tila); yritä uudelleen, jos kanava on varattu. Poista yksittäinen viesti sen kuplan roskakorikuvakkeella."
 
+msgid "Sending…"
+msgstr "Lähetetään…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Lähetetty; luettelo päivittyy pian."
+
+msgid "Sending failed"
+msgstr "Lähetys epäonnistui"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Synkronoidaan SIM-kortilta taustalla (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Poistettu (vain paikallinen)"
 msgid "Enter both a number and a message."
 msgstr "Anna sekä numero että viesti."
 
-msgid "Sending…"
-msgstr "Lähetetään…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Lähetetty; luettelo päivittyy pian."
-
-msgid "Sending failed"
-msgstr "Lähetys epäonnistui"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d viestiä, %d lukematonta · %d keskustelua"
 
@@ -1502,6 +1760,39 @@ msgstr "Puutteellinen: %d / %d osaa saapui"
 
 msgid "Delete"
 msgstr "Poista"
+
+msgid "ttyd is not installed."
+msgstr "ttyd ei ole asennettu."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Pääte on pois päältä (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Liian monta päätettä avataan yhtä aikaa. Yritä uudelleen minuutin kuluttua."
+
+msgid "The terminal is not available."
+msgstr "Pääte ei ole käytettävissä."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Tämä on laitteen root-komentotulkki: jokainen komento suoritetaan täysin oikeuksin, ja virhe voi estää laitetta käynnistymästä."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Se on käytettävissä vain lähiverkosta (USB ja hotspot), ei koskaan mobiilidatan kautta, ja vain tältä kirjautuneelta sivulta."
+
+msgid "It closes after a minute without activity."
+msgstr "Se suljetaan minuutin toimettomuuden jälkeen."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Se suljetaan %d minuutin toimettomuuden jälkeen."
+
+msgid "Reconnect"
+msgstr "Yhdistä uudelleen"
+
+msgid "Open in a new tab"
+msgstr "Avaa uudessa välilehdessä"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Tämä sivu avattiin HTTPS:n kautta, ja pääte toimii lähiverkossa HTTP:n kautta: se avautuu omaan välilehteensä."
 
 msgid "The data usage could not be read"
 msgstr "Datan käyttöä ei voitu lukea"
@@ -1637,6 +1928,594 @@ msgstr "Poista käytöstä"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Arvolla 64 jokainen paketti lähtee kuin laitteen oma liikenne"
+
+msgid "running"
+msgstr "käynnissä"
+
+msgid "(about %s)"
+msgstr "(noin %s)"
+
+msgid "Install %s?"
+msgstr "Asennetaanko %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Se asennetaan tämän järjestelmän pakettivarastosta."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Se ladataan VPN-moduulin julkaisusta ja tarkistetaan sen SHA256SUMS-tiedostolla."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Moottori on kymmeniä MB: mobiilidatalla lataus kuluttaa liittymäsi dataa."
+
+msgid "Install"
+msgstr "Asenna"
+
+msgid "Remove %s?"
+msgstr "Poistetaanko %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Profiilit, jotka käyttävät sitä: %s. Ne eivät voi käynnistyä ennen kuin se asennetaan uudelleen (moduuli kieltäytyy, kun käynnissä oleva profiili tarvitsee sitä)."
+
+msgid "No profile runs on it."
+msgstr "Mikään profiili ei käytä sitä."
+
+msgid "Removed"
+msgstr "Poistettu"
+
+msgid "Check for updates"
+msgstr "Tarkista päivitykset"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Jokainen moottori on oma lisäosansa: asenna vain ne, joita profiilisi tarvitsevat. Xray ajaa vless-, vmess-, trojan- ja ss-linkkejä (hev-socks5-tunnelin kanssa), sing-box samoja linkkejä ja omaa JSON-muotoaan, mihomo Clash-tilauksia, dae hysteria2:ta, tuicia ja muita uudemmilla ytimillä. WireGuard ja OpenVPN ovat järjestelmän paketteja."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Lataukset ovat kymmeniä MB moottoria kohti: mobiilidatalla ne kuluttavat liittymäsi dataa. Offline-tilassa lataa moottorin tarball VPN-moduulin julkaisusivulta."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Saatavilla olevat versiot tulevat VPN-moduulin uusimmasta julkaisusta."
+
+msgid "Update"
+msgstr "Päivitä"
+
+msgid "system package"
+msgstr "järjestelmäpaketti"
+
+msgid "in the vpn bundle"
+msgstr "vpn-paketissa"
+
+msgid "extra %s"
+msgstr "lisäosa %s"
+
+msgid "not installed"
+msgstr "ei asennettu"
+
+msgid "cannot run here"
+msgstr "ei toimi täällä"
+
+msgid "update available"
+msgstr "päivitys saatavilla"
+
+msgid "installed"
+msgstr "asennettu"
+
+msgid "Kind"
+msgstr "Laji"
+
+msgid "Version"
+msgstr "Versio"
+
+msgid "Available"
+msgstr "Saatavilla"
+
+msgid "not checked"
+msgstr "ei tarkistettu"
+
+msgid "Size"
+msgstr "Koko"
+
+msgid "Needed by"
+msgstr "Käyttäjät"
+
+msgid "no profile"
+msgstr "ei profiilia"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae tarvitsee ytimen, jossa on BTF, 5.17 tai uudempi: ei valmistajan 5.4-ydintä (mu300-update kernel 6.18). Sen voi silti asentaa."
+
+msgid "All engines"
+msgstr "Kaikki moottorit"
+
+msgid "Last %s lines"
+msgstr "Viimeiset %s riviä"
+
+msgid "VPN service log"
+msgstr "VPN-palvelun loki"
+
+msgid "Every 5 s"
+msgstr "5 s välein"
+
+msgid "The log is empty."
+msgstr "Loki on tyhjä."
+
+msgid "The VPN is starting"
+msgstr "VPN käynnistyy"
+
+msgid "The VPN is stopped"
+msgstr "VPN on pysäytetty"
+
+msgid "The VPN is restarting"
+msgstr "VPN käynnistyy uudelleen"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Kun kill switch on päällä, mikään ei poistu laitteesta tai LAN-verkosta tunnelin ulkopuolelle: kun VPN on alhaalla, käynnistymässä tai rikki, jokainen yhteys epäonnistuu sen sijaan että se kulkisi suoraan. Se pysyy päällä, kunnes pysäytät VPN:n täällä (Pysäytä poistaa sen)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Ilman kill switchiä liikenne kulkee suoraan, suojaamattomana, aina kun tunneli on alhaalla (käynnistyksen aikana, kaatumisen jälkeen, kun moottori puuttuu)."
+
+msgid "Turn the kill switch on?"
+msgstr "Kytketäänkö kill switch päälle?"
+
+msgid "Turn the kill switch off?"
+msgstr "Kytketäänkö kill switch pois päältä?"
+
+msgid "Turn on"
+msgstr "Kytke päälle"
+
+msgid "unknown"
+msgstr "tuntematon"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Poistumisosoitetta ei löytynyt (onko tunneli ylhäällä?)"
+
+msgid "Connecting…"
+msgstr "Yhdistetään…"
+
+msgid "On, but not running"
+msgstr "Päällä, mutta ei käynnissä"
+
+msgid "Stopped"
+msgstr "Pysäytetty"
+
+msgid "Install it"
+msgstr "Asenna se"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Aktiivisen profiilin moottoria ei ole asennettu: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch pitää kaiken suljettuna, kunnes se on paikalla; palvelu lataa sen itse, kun voi."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN ei voi käynnistyä ennen kuin se on asennettu."
+
+msgid "%s cannot run on this system"
+msgstr "%s ei voi toimia tässä järjestelmässä"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN on päällä, mutta yksikään profiili ei ole aktiivinen: valitse yksi alta."
+
+msgid "Profile: %s"
+msgstr "Profiili: %s"
+
+msgid "No active profile"
+msgstr "Ei aktiivista profiilia"
+
+msgid "engine %s"
+msgstr "moottori %s"
+
+msgid "interface %s"
+msgstr "liitäntä %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch aktiivinen"
+
+msgid "Kill switch on"
+msgstr "Kill switch päällä"
+
+msgid "Kill switch off"
+msgstr "Kill switch pois päältä"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 tunnelissa"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 estetty"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 koskematon"
+
+msgid "Module %s"
+msgstr "Moduuli %s"
+
+msgid "Check"
+msgstr "Tarkista"
+
+msgid "Uptime"
+msgstr "Käynnissäoloaika"
+
+msgid "Rate"
+msgstr "Nopeus"
+
+msgid "Exit address"
+msgstr "Poistumisosoite"
+
+msgid "Start"
+msgstr "Käynnistä"
+
+msgid "Stop"
+msgstr "Pysäytä"
+
+msgid "Restart"
+msgstr "Käynnistä uudelleen"
+
+msgid "Stop the VPN?"
+msgstr "Pysäytetäänkö VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Liikenne kulkee silloin suoraan ilman tunnelia; kill switch poistetaan sen mukana."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN on päällä: se käynnistyy uudelleen itsestään käynnistyksen jälkeen."
+
+msgid "The VPN is off."
+msgstr "VPN on pois päältä."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Asetus"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Aktiivinen: vain tunneli pääsee internetiin"
+
+msgid "Not active"
+msgstr "Ei aktiivinen"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch estää laitteen ja LAN-verkon kaiken liikenteen, kun VPN on alhaalla, joten mikään ei koskaan poistu ilman tunnelia. Jos tunnelia ei saada ylös (kuollut palvelin, vanhentunut tili), laite pysyy offline-tilassa, kunnes korjaat profiilin tai pysäytät VPN:n. Itse paneeli pysyy tavoitettavana LAN-verkosta."
+
+msgid "Choose a profile"
+msgstr "Valitse profiili"
+
+msgid "No profiles yet"
+msgstr "Ei vielä profiileja"
+
+msgid "engine not installed"
+msgstr "moottoria ei ole asennettu"
+
+msgid "Use"
+msgstr "Käytä"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Vaihdettu: VPN käynnistyy uudelleen uudella profiililla"
+
+msgid "Active profile"
+msgstr "Aktiivinen profiili"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Käynnissä oleva VPN käynnistyy uudelleen valitsemallasi profiililla; kill switch pysyy päällä välillä."
+
+msgid "Manage the profiles"
+msgstr "Hallitse profiileja"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Automaattinen: tunnelin kautta, kun moottori voi kuljettaa sitä"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Pyydä moottorilta IPv6:ta tunnelissa"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Ei koskaan tunnelin kautta (estetty, kun VPN on päällä)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Tallennettu: otetaan käyttöön seuraavasta käynnistyksestä (Käynnistä uudelleen)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Tunneli kuljettaa IPv6:ta"
+
+msgid "Yes"
+msgstr "Kyllä"
+
+msgid "IPv6 guard"
+msgstr "IPv6-suoja"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Aktiivinen: tunnelin ulkopuolinen IPv6 hylätään"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Kun VPN on päällä, IPv6 ei koskaan poistu sellaisen tunnelin ohi, joka ei kuljeta sitä: se hylätään heti, joten ohjelmat ja LAN-asiakkaat siirtyvät IPv4:ään vuotamisen tai odottamisen sijaan. Automaattinen: WireGuard käyttää asetustensa IPv6-osoitteita, muut moottorit pysyvät IPv4:ssä."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: ei testattavissa"
+
+msgid "blocked by the kill switch"
+msgstr "kill switchin estämä"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "WireGuard- tai OpenVPN-asetukset, Clash/mihomo-YAML, Xray- tai sing-box-JSON, dae-asetukset"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "OK:n jälkeen valitse tiedosto: WireGuardin .conf, OpenVPN:n .ovpn, Clash/mihomon .yaml, Xrayn tai sing-boxin .json tai dae-asetukset (enintään 1 MiB)."
+
+msgid "From the source"
+msgstr "Lähteestä"
+
+msgid "Detect"
+msgstr "Tunnista"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL voi sisältää tunnuksen: se menee laitteelle erikseen, ei koskaan komentoriville tai lokiin."
+
+msgid "Type"
+msgstr "Tyyppi"
+
+msgid "Share link"
+msgstr "Jakolinkki"
+
+msgid "Paste"
+msgstr "Liitä"
+
+msgid "File"
+msgstr "Tiedosto"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Ei tämän paneelin hyväksymä jakolinkki"
+
+msgid "The config is empty"
+msgstr "Asetukset ovat tyhjät"
+
+msgid "Not an https URL"
+msgstr "Ei https-URL"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Virheellinen nimi: 1-64 merkkiä, ei ohjausmerkkejä"
+
+msgid "Add a profile"
+msgstr "Lisää profiili"
+
+msgid "Name"
+msgstr "Nimi"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Tunnista: moduuli päättelee lajin linkistä tai tiedostosta. Valitse tyyppi JSONille, joka voi olla Xray tai sing-box, tai linkille, jonka pitäisi toimia toisella moottorilla."
+
+msgid "The profile is added"
+msgstr "Profiili on lisätty"
+
+msgid "Rename the profile"
+msgstr "Nimeä profiili uudelleen"
+
+msgid "Delete the profile %s?"
+msgstr "Poistetaanko profiili %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Se on aktiivinen profiili: kun VPN on päällä, moduuli kieltäytyy; pysäytä ensin VPN tai valitse toinen profiili."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Sen asetukset ja tunnistetiedot poistetaan laitteelta."
+
+msgid "Deleted"
+msgstr "Poistettu"
+
+msgid "The profile passes the check"
+msgstr "Profiili läpäisee tarkistuksen"
+
+msgid "Show the config?"
+msgstr "Näytetäänkö asetukset?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Asetukset sisältävät profiilin tunnistetiedot (avaimet, salasanat, UUID:t). Ne näytetään vain tällä ruudulla; kuka tahansa, joka näkee ruudun, voi lukea ne."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Tallennus tarkistaa ensin asetukset moottorilla (profile edit); asetuksia, jotka eivät läpäise tarkistusta, ei tallenneta ja vanhat säilyvät."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Tämä profiili tulee tilauksesta: sen seuraava päivitys korvaa muutoksesi."
+
+msgid "Config of %s"
+msgstr "Profiilin %s asetukset"
+
+msgid "Close"
+msgstr "Sulje"
+
+msgid "Rename"
+msgstr "Nimeä uudelleen"
+
+msgid "Show / edit the config"
+msgstr "Näytä / muokkaa asetuksia"
+
+msgid "Test the latency of all"
+msgstr "Testaa kaikkien viive"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Ei vielä profiileja: lisää yksi jakolinkistä, asetustiedostosta tai tilauksesta."
+
+msgid "Active"
+msgstr "Aktiivinen"
+
+msgid "This profile is the active one now"
+msgstr "Tämä profiili on nyt aktiivinen"
+
+msgid "More"
+msgstr "Lisää"
+
+msgid "active"
+msgstr "aktiivinen"
+
+msgid "subscription"
+msgstr "tilaus"
+
+msgid "migrated"
+msgstr "siirretty"
+
+msgid "gone from its subscription"
+msgstr "poistunut tilauksestaan"
+
+msgid "Server"
+msgstr "Palvelin"
+
+msgid "Engine"
+msgstr "Moottori"
+
+msgid "Latency"
+msgstr "Viive"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Viive on TCP-yhteys palvelimeen, tunnelin kautta kun VPN on päällä. WireGuard- ja OpenVPN-palvelimet puhuvat yleensä UDP:tä, eikä niitä voi testata näin."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Anna IPv4- tai IPv6-osoite"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Päällä: mikään ei poistu tunnelin ulkopuolelle"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Pois: liikenne kulkee suoraan, kun tunneli on alhaalla"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Kyllä: Tailscalen omat yhteydet kulkevat tunnelin kautta"
+
+msgid "No: Tailscale connects directly"
+msgstr "Ei: Tailscale yhdistää suoraan"
+
+msgid "Routing"
+msgstr "Reititys"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch estää laitteen ja LAN-verkon kaiken liikenteen, kun VPN on alhaalla."
+
+msgid "Bypass the tunnel"
+msgstr "Ohita tunneli"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Anna osoitealueita, kuten 192.168.0.0/16, pilkuilla erotettuna"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Osoitealueet, jotka eivät koskaan mene tunneliin, LAN-verkon itsensä lisäksi (se ei koskaan mene). Tyhjä: vain LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale VPN:n kautta"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Kun Tailscale toimii laitteella, sen WireGuard-, DERP- ja ohjausyhteydet kulkevat sen tunnelin kautta, joka on käynnissä (dae kaappaa ne kuten muutkin)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS tunnelin kautta"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Selvitin, jolle laitteen ja LAN-verkon kyselyt menevät tunnelin kautta. Mikään ei mene operaattorin selvittimelle."
+
+msgid "Bootstrap DNS"
+msgstr "Käynnistys-DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Etsii VPN-palvelimen oman osoitteen ennen kuin tunneli on ylhäällä (suoraan, moottorin omalla yhteydellä)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Tyhjä palauttaa asetuksen oletukseensa."
+
+msgid "TUN stack"
+msgstr "TUN-pino"
+
+msgid "Default (gvisor)"
+msgstr "Oletus (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (ei 5.4-ytimellä)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "asetettu (ei muutu, ellet kirjoita uutta)"
+
+msgid "not set"
+msgstr "ei asetettu"
+
+msgid "Upstream HTTP proxy"
+msgstr "Ylävirran HTTP-välityspalvelin"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS-varmenteen kiinnitys (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Anna host:portti"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Anna SHA-256 heksana"
+
+msgid "Profile options"
+msgstr "Profiilin asetukset"
+
+msgid "None of the profiles has options of its type."
+msgstr "Millään profiililla ei ole tyyppinsä mukaisia asetuksia."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomon tila (rule, global, direct), moottorien lokitasot sekä daen ryhmät ja reititys kuuluvat kunkin profiilin omiin asetuksiin: VPN > Profiilit, Näytä / muokkaa asetuksia."
+
+msgid "Delete the subscription %s?"
+msgstr "Poistetaanko tilaus %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Sen profiilit voivat poistua sen mukana tai jäädä itsenäisinä profiileina. Aktiivista profiilia ei koskaan poisteta, kun VPN on päällä."
+
+msgid "Keep the profiles"
+msgstr "Säilytä profiilit"
+
+msgid "Delete with its profiles"
+msgstr "Poista profiileineen"
+
+msgid "Only by hand"
+msgstr "Vain käsin"
+
+msgid "Every %d h"
+msgstr "%d tunnin välein"
+
+msgid "Share links: one profile per link"
+msgstr "Jakolinkit: yksi profiili linkkiä kohti"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo-YAML: yksi mihomo-profiili"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: yksi profiili, jossa kaikki solmut yhdessä ryhmässä"
+
+msgid "Add a subscription"
+msgstr "Lisää tilaus"
+
+msgid "Format"
+msgstr "Muoto"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL sisältää yleensä tilisi tunnuksen: se tallennetaan laitteelle vain rootin luettavaksi, eikä sitä näytetä uudelleen. Tilaus haetaan laitteen omalla yhteydellä: tunnelin kautta, kun VPN on päällä; kun kill switch on päällä ja tunneli alhaalla, sitä ei voi hakea."
+
+msgid "Refresh all"
+msgstr "Päivitä kaikki"
+
+msgid "No subscriptions yet."
+msgstr "Ei vielä tilauksia."
+
+msgid "Host"
+msgstr "Isäntä"
+
+msgid "Updated"
+msgstr "Päivitetty"
+
+msgid "Share links"
+msgstr "Jakolinkit"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Päivitys säilyttää profiilit, joiden nimi ei ole muuttunut, lisää uudet ja poistaa kadonneet (aktiivinen säilyy, kun VPN on päällä, merkittynä kadonneeksi). Aktiivisen profiilin päivitys käynnistää käynnissä olevan VPN:n uudelleen."
 
 msgid "Dashboard info failed"
 msgstr "Yleiskatsauksen tietojen haku epäonnistui"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Pakettisovitin ei antanut kelvollista vastausta"
+
+msgid "Invalid packages operation"
+msgstr "Virheellinen pakettitoiminto"
+
 msgid "Request too large"
 msgstr "Pyyntö on liian suuri"
 
@@ -1820,6 +2705,150 @@ msgstr "Ajonaikainen hakemisto ei ole turvallinen; mitään ei suoritettu"
 
 msgid "No such method"
 msgstr "Menetelmää ei ole"
+
+msgid "The VPN module refused the request"
+msgstr "VPN-moduuli hylkäsi pyynnön"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN-paneeli on varattu, yritä uudelleen"
+
+msgid "Another VPN task is still running"
+msgstr "Toinen VPN-tehtävä on vielä käynnissä"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "exit_ip-parametrin on oltava 0 tai 1"
+
+msgid "The VPN status could not be read"
+msgstr "VPN:n tilaa ei voitu lukea"
+
+msgid "The profiles could not be read"
+msgstr "Profiileja ei voitu lukea"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "check-parametrin on oltava 0 tai 1"
+
+msgid "The engines could not be read"
+msgstr "Moottoreita ei voitu lukea"
+
+msgid "The subscriptions could not be read"
+msgstr "Tilauksia ei voitu lukea"
+
+msgid "The VPN settings could not be read"
+msgstr "VPN-asetuksia ei voitu lukea"
+
+msgid "Unknown VPN operation"
+msgstr "Tuntematon VPN-toiminto"
+
+msgid "The VPN could not be switched"
+msgstr "VPN:ää ei voitu vaihtaa"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch on päällä tai pois"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switchiä ei voitu muuttaa"
+
+msgid "Invalid profile id"
+msgstr "Virheellinen profiilin tunniste"
+
+msgid "The profile could not be made the active one"
+msgstr "Profiilia ei voitu tehdä aktiiviseksi"
+
+msgid "Unknown profile source"
+msgstr "Tuntematon profiilin lähde"
+
+msgid "Unknown profile type"
+msgstr "Tuntematon profiilin tyyppi"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Asetukset ovat tyhjät, liian suuret tai sisältävät ohjausmerkkejä"
+
+msgid "Invalid profile request"
+msgstr "Virheellinen profiilipyyntö"
+
+msgid "A config from a URL takes the type it says"
+msgstr "URL:stä tuleva asetus saa sen tyypin, jonka se ilmoittaa"
+
+msgid "No uploaded file"
+msgstr "Ei ladattua tiedostoa"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Tiedosto on suurempi kuin 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Profiilia ei voitu lisätä"
+
+msgid "The profile could not be renamed"
+msgstr "Profiilia ei voitu nimetä uudelleen"
+
+msgid "The profile could not be removed"
+msgstr "Profiilia ei voitu poistaa"
+
+msgid "The profile does not pass the check"
+msgstr "Profiili ei läpäise tarkistusta"
+
+msgid "Unknown profile option"
+msgstr "Tuntematon profiilin asetus"
+
+msgid "Invalid value for this option"
+msgstr "Virheellinen arvo tälle asetukselle"
+
+msgid "The option could not be set"
+msgstr "Asetusta ei voitu asettaa"
+
+msgid "The config could not be read"
+msgstr "Asetuksia ei voitu lukea"
+
+msgid "The config was not saved"
+msgstr "Asetuksia ei tallennettu"
+
+msgid "The latency test failed"
+msgstr "Viivetesti epäonnistui"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Päivitysväli on 1–999 tuntia"
+
+msgid "Unknown subscription type"
+msgstr "Tuntematon tilauksen tyyppi"
+
+msgid "Invalid subscription id"
+msgstr "Virheellinen tilauksen tunniste"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "keep-parametrin on oltava 0 tai 1"
+
+msgid "The subscription could not be removed"
+msgstr "Tilausta ei voitu poistaa"
+
+msgid "The file is too large"
+msgstr "Tiedosto on liian suuri"
+
+msgid "Unknown engine"
+msgstr "Tuntematon moottori"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Parametrin unverified on oltava 0 tai 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Tämä moottori on järjestelmäpaketti: sillä ei ole ladattavaa tiedostoa"
+
+msgid "The engine could not be removed"
+msgstr "Moottoria ei voitu poistaa"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra ei ole tässä järjestelmässä"
+
+msgid "Unknown VPN setting"
+msgstr "Tuntematon VPN-asetus"
+
+msgid "The setting could not be saved"
+msgstr "Asetusta ei voitu tallentaa"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Rivien määrä on 1-1000"
+
+msgid "The log could not be read"
+msgstr "Lokia ei voitu lukea"
 
 msgid "Radio did not come up"
 msgstr "Radio ei käynnistynyt"
@@ -1935,6 +2964,9 @@ msgstr "Virheellinen suodatinluettelo (enintään 50 riviä)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Webhookin osoitteen on oltava http://- tai https://-URL"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Webhookin runko on liian pitkä tai sisältää ohjausmerkin"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Virheellinen otsake (yksi \"Nimi: arvo\" riviä kohden; laite asettaa Host-, Content-Type-, Content-Length-, Transfer-Encoding- ja Connection-otsakkeet)"
 
@@ -1992,17 +3024,47 @@ msgstr "Kielipakettia ei voitu poistaa"
 msgid "Lock cache unavailable"
 msgstr "Lukitusvälimuisti ei käytettävissä"
 
+msgid "The saved locks could not be cleared"
+msgstr "Tallennettuja lukituksia ei voitu poistaa"
+
 msgid "No serving cell to lock to"
 msgstr "Ei palvelevaa solua lukittavaksi"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modeemi ei vastannut tilakyselyyn; mitään ei lähetetty"
+
+msgid "The modem refused a write"
+msgstr "Modeemi hylkäsi kirjoituksen"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Takaisinluku ei vastaa automaattisia arvoja"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Takaisinluku pinon uudelleenkäynnistyksen jälkeen ei vastaa automaattisia arvoja"
+
+msgid "The reset was interrupted"
+msgstr "Palautus keskeytyi"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Pakettien uudelleenasennus ei ole käytettävissä tässä järjestelmässä"
+
+msgid "No packages were written down by an update"
+msgstr "Mikään päivitys ei kirjannut paketteja"
+
+msgid "Reinstalling is running already"
+msgstr "Uudelleenasennus on jo käynnissä"
+
+msgid "The note could not be dropped"
+msgstr "Ilmoitusta ei voitu poistaa"
+
+msgid "Unknown packages operation"
+msgstr "Tuntematon pakettitoiminto"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Datan käyttö ei ole käytettävissä tässä järjestelmässä"
-
-msgid "The setting could not be saved"
-msgstr "Asetusta ei voitu tallentaa"
 
 msgid "Unknown data usage operation"
 msgstr "Tuntematon datan käytön toiminto"

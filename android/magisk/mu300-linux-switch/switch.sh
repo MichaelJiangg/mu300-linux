@@ -4,13 +4,16 @@
 #   mu300-linux            arm the one-shot trial and reboot
 #   mu300-linux status     show what is on each slot, change nothing
 #   mu300-linux --dry-run  do everything except writing and rebooting
+#   mu300-linux bootchain  whether the boot chain (uboot, sml, teecfg, trustos, vbmeta) differs between the slots
+#   mu300-linux bootchain sync   copy Android's slot's chain to the Linux slot, backed up first (bootchain.sh)
 #
-# The only thing written is the 32-byte AOSP bootloader_control block at offset 0x800 of the misc partition:
+# The switch writes only the 32-byte AOSP bootloader_control block at offset 0x800 of the misc partition:
 # the Linux slot gets the highest priority with tries_remaining = 2, Android's stays bootable and marked successful.
 # LK then boots Linux once. Linux writes Android's block back as one of its first steps, so the reboot after that
 # returns to Android, and a Linux that does not boot falls back to Android by itself.
 #
-# Android's boot partition, the GPT, userdata and every other partition are never touched.
+# Android's boot partition, the GPT, userdata and every other partition are never touched. (bootchain sync writes
+# the Linux slot's uboot, sml, teecfg, trustos and vbmeta, and nothing else: see bootchain.sh.)
 BC_OFFSET=2048          # 0x800
 MAGIC=42434142          # "BCAB", little endian in the struct
 ANDROID_ARMED=158       # 0x9e: priority 14, tries 1, successful 1
@@ -21,8 +24,14 @@ case ${1:-} in
     status) ACTION=status ;;
     --dry-run|-n) DRY=1; ACTION=switch ;;
     ''|switch) ACTION=switch ;;
-    -h|--help|help) sed -n '2,12s/^# \{0,1\}//p' "$0"; exit 0 ;;
-    *) echo "usage: mu300-linux [status|--dry-run]" >&2; exit 2 ;;
+    bootchain)
+        case ${2:-check} in
+            check|status) exec sh "${0%/*}/bootchain.sh" check ;;
+            sync) exec sh "${0%/*}/bootchain.sh" sync ${3:+"$3"} ;;
+            *) echo "usage: mu300-linux bootchain [sync]" >&2; exit 2 ;;
+        esac ;;
+    -h|--help|help) sed -n '2,16s/^# \{0,1\}//p' "$0"; exit 0 ;;
+    *) echo "usage: mu300-linux [status|--dry-run|bootchain [sync]]" >&2; exit 2 ;;
 esac
 
 die() { echo "mu300-linux: $*" >&2; exit 1; }

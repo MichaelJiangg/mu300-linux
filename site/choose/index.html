@@ -116,7 +116,7 @@ an AT terminal, USB modes and power settings, in the browser.</p>
 <div class="table-scroll"><table>
 <thead><tr><th scope="col"></th><th scope="col">Ubuntu</th><th scope="col">OpenWrt</th><th scope="col">OpenWrt + control panel</th></tr></thead><tbody>
 <tr><th scope="row">Best for</th><td>a small server, your own programs, learning Linux</td><td>a 5G router you set up in the browser</td><td>a 5G router where you also watch the modem: signal, bands, SMS</td></tr>
-<tr><th scope="row">How you use it</th><td>SSH, <code>mu300-toolkit</code></td><td>web interface (LuCI), SSH</td><td>web interface with the MU300 pages, SSH</td></tr>
+<tr><th scope="row">How you use it</th><td>SSH, <code>mu300-toolkit</code>; optionally Cockpit with an MU300 page (the <code>panel</code> extra, from v2026.10.20)</td><td>web interface (LuCI), SSH</td><td>web interface with the MU300 pages, SSH</td></tr>
 <tr><th scope="row">Installing programs</th><td><code>apt</code></td><td><code>apk</code></td><td><code>apk</code></td></tr>
 <tr><th scope="row">Log in as</th><td><code>ubuntu</code></td><td><code>root</code></td><td><code>root</code></td></tr>
 <tr><th scope="row">RAM in use (about)</th><td>500 MiB</td><td>140 MiB</td><td>not listed by the installer</td></tr>
@@ -132,7 +132,10 @@ an AT terminal, USB modes and power settings, in the browser.</p>
 <li><strong>Cellular &gt; Data usage:</strong> mobile data per day and per billing cycle, with a monthly cap.</li>
 <li><strong>Cellular &gt; AT terminal:</strong> guarded AT commands to the modem.</li>
 <li><strong>Cellular &gt; Device management:</strong> the USB role and the USB network mode (NCM, ECM or RNDIS).</li>
-<li><strong>System &gt; Languages</strong>, <strong>System &gt; Power</strong> and <strong>System &gt; CPU</strong>: the interface language, power profiles, the charge limit and the CPU profile.</li>
+<li><strong>VPN</strong> (from v2026.10.20, with the VPN module): Overview, Profiles, Subscriptions, Engines, Settings and Logs.</li>
+<li><strong>System &gt; Languages</strong>, <strong>System &gt; Power</strong> and <strong>System &gt; CPU</strong>: the interface language, power profiles, the charge limit (0-100 %) and the CPU profile.</li>
+<li><strong>System &gt; Terminal</strong> (from v2026.10.20): a root shell in the browser, on the LAN only, for your logged-in session.</li>
+<li><strong>System &gt; Packages after an update</strong> (from v2026.10.20): what the update did with the packages you had installed.</li>
 </ul>
 <p>The theme is <a href="https://github.com/eamonxg/luci-theme-aurora">Aurora</a> by eamonxg. The full list is in the
 <a href="https://github.com/dikeckaan/mu300-linux#openwrt-with-the-mu300-control-panel">README</a>.</p>
@@ -180,7 +183,11 @@ puts it:</p>
 <li><strong>U30 Air USB host</strong> (flash drives, keyboards, Ethernet adapters through an OTG adapter) works on the
 mainline kernels only.</li>
 <li><strong>U30 Air charging:</strong> on 5.4 the vendor charger stack charges; on 6.18 and 7.2 the <code>bq256xx</code>
-driver does, from v2026.10.12 on. Mainline kernels of v2026.10.11 and older leave charging off, so update first.</li>
+driver does, from v2026.10.12 on. Mainline kernels of v2026.10.11 and older leave charging off, so update first. From
+v2026.10.20 the mainline kernels also read the current a Type-C port offers (up to 2 A instead of 500 mA); the charge limit (0-100 %)
+works on every kernel.</li>
+<li><strong>dae</strong>, the VPN module's eBPF engine, needs 6.18 or 7.2 of v2026.10.20 or newer (6.18.56 and 7.2.10, which carry
+BTF and the BPF JIT); 5.4 cannot run it.</li>
 <li><strong>WireGuard VPN profiles</strong> need a mainline kernel: the 5.4 vendor kernel has no WireGuard, according to
 the <a href="https://github.com/dikeckaan/mu300-linux-vpn">VPN module</a>. The other VPN types work on all three.</li>
 <li><strong>Modules:</strong> the mainline kernels carry about 360 extra modules: WireGuard, SQM, tunnels, USB adapters

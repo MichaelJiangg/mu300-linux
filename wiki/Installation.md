@@ -46,6 +46,21 @@ do not need to download the images yourself: the installer fetches the newest re
   from slot b, as it often does after an OTA update) and **32 bytes of `misc`**.
 * On the 64 GB device, **Android, its data and the partition table are never modified.**
 * The exception is the 32 GB variant, see below.
+* From v2026.10.20 the installer also copies the **boot chain** of Android's slot to the Linux slot where the two
+  differ, see [below](#the-boot-chain-of-the-linux-slot).
+
+### The boot chain of the Linux slot
+
+Linux boots with the bootloader chain of its own slot but runs Android's modem. After an Android update (OTA) the two
+slots hold different firmware builds, and the Linux slot's chain is still the factory one, which has kept the modem
+from starting on updated devices (issue #86). So the installer copies `uboot`, `sml`, `teecfg`, `trustos` and
+`vbmeta` of Android's slot to the Linux slot whenever they differ - only those five, never the NV or calibration
+partitions or anything of Android's slot. The images the Linux slot held are backed up first (`.mu300/bootchain/` on
+the Linux filesystem and `work/bootchain/` on the computer), every written image is read back, and a mismatch puts
+the old ones back and stops before Linux is armed. The summary says what it will do ("boot chain: identical on both
+slots" on a device that never took an update). Experts skip it with `MU300_SYNC_BOOTCHAIN=0` (`install.ps1
+-NoBootchainSync`). From Android, `su -c 'mu300-linux bootchain'` shows the state and `... bootchain sync` copies.
+Thanks to kano for the advice.
 
 ```mermaid
 flowchart LR
@@ -132,6 +147,8 @@ First it brings your copy of the project up to date from GitHub and restarts its
 | *Copy Android's hotspot name and password to Linux?* | your Wi-Fi keeps its name and password | yes |
 | *Include the Mali GPU (OpenCL) userspace (~90 MiB)?* | GPU compute support | yes |
 | *Install the VPN module?* | the optional [VPN](VPN) (about 40 MB to download) | no, add it later if needed |
+| *Install the web panel for Ubuntu?* (Ubuntu only) | Cockpit with the MU300 page, from the release's offline file (about 24 MB more; see [Control Panel (LuCI)](Control-Panel-(LuCI)#a-web-panel-on-ubuntu-cockpit)) | no, add it later with `mu300-extra install panel` |
+| *Turn on adb to Linux for this computer?* | `adb shell` to Linux over the cable, for the key of the computer you install from (see [adb to Linux](#adb-to-linux)) | no (it is off by default) |
 | *Which kernel?* 1) 5.4 2) 6.18 3) 7.2 | the core of Linux; see [Kernels](Kernels) | 1 (5.4), or 2 (6.18) for Ubuntu 26.04 |
 | *update or wipe* (only when Linux is already there) | `update` keeps settings and data, `wipe` starts fresh | update |
 | *Password for the "ubuntu" user (Ubuntu) and "root" (OpenWrt)* | your login password, at least 6 characters | choose a good one |
@@ -179,6 +196,25 @@ macOS. Then try `sudo mu300-toolkit`.
 **macOS tip:** macOS does not set up a network interface it has never seen while the screen is locked. Unlock the Mac
 the first time you plug the device in.
 
+### adb to Linux
+
+From v2026.10.20 Linux can offer `adb` over the same cable, next to the USB network and the serial console, as
+Android does: `adb shell` (a root shell), `adb push`/`pull`, `adb forward`. It is **off by default**, and adb has no
+password: **anyone whose adb key is authorised gets a root shell**, so authorise only your own computers.
+
+```sh
+scp ~/.android/adbkey.pub ubuntu@192.168.77.1:      # the computer's key (root@ on OpenWrt; .78.1 on a U30 Air)
+sudo mu300-usb adb key ~/adbkey.pub                 # authorise it (/etc/mu300/adb_keys)
+sudo mu300-usb adb on                               # the USB connection drops for a moment and comes back with adb
+sudo mu300-usb adb keys                             # the authorised keys
+sudo mu300-usb adb off
+```
+
+The installers ask whether to turn it on for the computer they run on. The device shows up in `adb devices` as
+`MU300LINUX-...`; a computer whose key is not authorised sees `unauthorized` and gets nothing (no prompt on the device,
+no TCP port, no setting that turns the check off). The setting survives reboots and updates. It needs a kernel with
+FunctionFS: 5.4, or the mainline kernels of v2026.10.20 or newer.
+
 ## Installing from Android with a Magisk zip (no computer)
 
 If the device runs a rooted Android with **Magisk 26 or newer**, Linux can be installed from the device itself. Each
@@ -188,9 +224,10 @@ U30 Air and finds the place by itself. There is no Ubuntu 26.04 zip with kernel 
 
 1. Put the zip on the device and open it in the Magisk app (Modules, Install from storage), or run
    `su -c 'magisk --install-module /sdcard/Download/<zip>'`. Not from recovery.
-2. Read the output: it shows the device, where Linux goes, what it writes and the **password it generated**, which
-   is also in `/data/adb/mu300-linux-password.txt` (read it with `su -c cat /data/adb/mu300-linux-password.txt`,
-   delete it after the first login).
+2. Read the output: it shows the device, where Linux goes, what it writes and **which password works** - the images'
+   own: Ubuntu's user `ubuntu` has the password `ubuntu`, OpenWrt's `root` has none until you set one (`passwd`, or
+   LuCI's System > Administration); `MU300_PASSWORD` in the settings file sets one of your own. The same note is in
+   `/data/adb/mu300-linux-password.txt` (`su -c cat /data/adb/mu300-linux-password.txt`).
 3. Reboot. If Linux does not start, the device returns to Android by itself.
 
 Magisk cannot ask questions, so choices go in a settings file, `mu300-install.conf`. Shrinking `userdata` is not

@@ -42,8 +42,38 @@ msgstr "Захранване"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "Контролен център MU300: табло за състоянието, мрежови заключвания, AT терминал и SMS"
+msgid "Terminal"
+msgstr "Терминал"
+
+msgid "Terminal settings"
+msgstr "Настройки на терминала"
+
+msgid "Overview"
+msgstr "Общ преглед"
+
+msgid "Profiles"
+msgstr "Профили"
+
+msgid "Subscriptions"
+msgstr "Абонаменти"
+
+msgid "Engines"
+msgstr "Двигатели"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Logs"
+msgstr "Дневници"
+
+msgid "Packages after an update"
+msgstr "Пакети след обновяване"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "Контролен център на MU300: табло със състоянието, мрежови заключвания, AT терминал, SMS и VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Терминал: root обвивка на устройството в браузъра"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Неизвестен номер"
 
 msgid "Select"
 msgstr "Избор"
+
+msgid "never"
+msgstr "никога"
+
+msgid "just now"
+msgstr "току-що"
+
+msgid "%s ago"
+msgstr "преди %s"
+
+msgid "Failed: %s"
+msgstr "Неуспешно: %s"
+
+msgid "Management connection lost"
+msgstr "Връзката за управление е загубена"
+
+msgid "Installing the VPN module"
+msgstr "VPN модулът се инсталира"
+
+msgid "Installing the engine"
+msgstr "Двигателят се инсталира"
+
+msgid "Adding the subscription"
+msgstr "Абонаментът се добавя"
+
+msgid "Refreshing the subscriptions"
+msgstr "Абонаментите се обновяват"
+
+msgid "Testing the latency of every profile"
+msgstr "Измерва се латентността на всички профили"
+
+msgid "Downloading the config"
+msgstr "Конфигурацията се изтегля"
+
+msgid "Working…"
+msgstr "Работи се…"
+
+msgid "done"
+msgstr "готово"
+
+msgid "failed"
+msgstr "неуспешно"
+
+msgid "Verify the uploaded file"
+msgstr "Проверка на качения файл"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Каченият файл се сверява със SHA256SUMS на последното издание на VPN модула, изтеглен през HTTPS. Ако това не е възможно (без мрежа, по-старо издание), той се инсталира само ако разрешите непроверен файл: тогава работи като root без никаква проверка."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Инсталиране, дори ако не може да се провери"
+
+msgid "Install only a verified file"
+msgstr "Инсталиране само на проверен файл"
+
+msgid "Upload failed: %s"
+msgstr "Качването е неуспешно: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN модулът е твърде стар за този панел"
+
+msgid "The VPN module is not installed"
+msgstr "VPN модулът не е инсталиран"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Тази страница изисква VPN модула с машинночетимия mu300-vpn (модул v2 или по-нов). Обновяването запазва профилите и настройките."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN е отделен модул: mu300-vpn с kill switch и профили, и по едно допълнение за всеки двигател (Xray, sing-box, mihomo, dae). Инсталира се с mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Изтеглянето е няколко MB за модула и до десетки MB за всеки двигател: при мобилни данни се взема от вашия пакет."
+
+msgid "Update the VPN module"
+msgstr "Обнови VPN модула"
+
+msgid "Install the VPN module"
+msgstr "Инсталирай VPN модула"
+
+msgid "Upload the file…"
+msgstr "Качване на файла…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Офлайн: качете mu300-linux-vpn-core.tar.gz (или пакета mu300-linux-vpn.tar.gz) от страницата с версии на VPN модула."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Това е сканиране на мрежи или честоти: отнема от една до три минути, през цялото време заема AT канала на модема, а мобилните данни може да спрат междувременно. Изпълнява се във фонов режим; отговорът ще се появи тук, когато приключи."
@@ -207,14 +324,8 @@ msgstr "Сканирането за миг изкарва Wi-Fi точката �
 msgid "Scan anyway"
 msgstr "Сканирай въпреки това"
 
-msgid "Failed: %s"
-msgstr "Неуспешно: %s"
-
 msgid "Saved"
 msgstr "Запазено"
-
-msgid "Management connection lost"
-msgstr "Връзката за управление е загубена"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Температура"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Термичните зони на ядрото, само за четене. Зона с прагови точки ограничава свързаните с нея охлаждащи устройства при пасивния си праг; състояние на охлаждане 0 означава без ограничаване."
+
+msgid "Zone"
+msgstr "Зона"
+
+msgid "Temperature"
+msgstr "Температура"
+
+msgid "Trip points"
+msgstr "Прагови точки"
+
+msgid "Cooling devices"
+msgstr "Охлаждащи устройства"
 
 msgid "USB role"
 msgstr "USB роля"
@@ -489,8 +618,17 @@ msgstr "Тяло"
 msgid "Form (URL-encoded)"
 msgstr "Формуляр (URL кодиран)"
 
+msgid "Plain text"
+msgstr "Обикновен текст"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Полета: sender, time, text, device, message (попълненият шаблон)"
+
+msgid "Custom body"
+msgstr "Собствено тяло"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Празно: стандартните полета (обикновен текст: съобщението). Заместители: {sender}, {time}, {text}, {device}, {message}. Всяка стойност се екранира според избрания тип. Това тяло се показва тук отново: дръжте тайните в адреса или в заглавка."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Допълнителни заглавки (по една \"Име: стойност\" на ред)"
@@ -651,6 +789,9 @@ msgstr "Общо изпратени"
 msgid "Used today"
 msgstr "Използвано днес"
 
+msgid "SIM source"
+msgstr "Източник на SIM"
+
 msgid "Session duration"
 msgstr "Продължителност на сесията"
 
@@ -719,6 +860,9 @@ msgstr "Модем"
 
 msgid "Carrier"
 msgstr "Оператор"
+
+msgid "Own number"
+msgstr "Собствен номер"
 
 msgid "Module"
 msgstr "Модул"
@@ -858,8 +1002,17 @@ msgstr "Заключването е неуспешно: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Мрежовите заключвания се връщат на автоматично (рестарт на SFUN, около 30 секунди)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Нулирането не успя: %s. Запазените настройки за заключване са запазени."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Нулирането на заключванията не се потвърди навреме; превключва се въпреки това."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Избрана е вътрешната SIM: ще се използва след рестартиране"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Избрана е вътрешната SIM, но тя не се поддържа на това устройство: използва се външната SIM"
 
 msgid "Uptime %s"
 msgstr "Време на работа %s"
@@ -990,9 +1143,6 @@ msgstr "Езиковият пакет е инсталиран"
 msgid "The language pack could not be installed"
 msgstr "Езиковият пакет не можа да бъде инсталиран"
 
-msgid "Upload failed: %s"
-msgstr "Качването е неуспешно: %s"
-
 msgid "Language of the browser"
 msgstr "Език на браузъра"
 
@@ -1013,9 +1163,6 @@ msgstr "Езиковият пакет (mu300-extra-lang.tar.gz, около 2 MB)
 
 msgid "Download from the release"
 msgstr "Изтегляне от изданието"
-
-msgid "Upload the file…"
-msgstr "Качване на файла…"
 
 msgid "Release"
 msgstr "Издание"
@@ -1209,6 +1356,9 @@ msgstr "Състоянието е потвърдено"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Времето за прочитане изтече; изберете „Опресняване на състоянието на заключването“"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Нулирането е потвърдено: мрежов режим автоматичен, EN-DC включен, всички ленти, без заключване на клетка; запазените настройки за заключване са изчистени"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Приложено (EN-DC не изисква рестартиране на радио стека)"
 
@@ -1235,6 +1385,114 @@ msgstr "Автоматично (%d поддържани)"
 
 msgid "%d locked: %s"
 msgstr "%d заключени: %s"
+
+msgid "Repair DNS?"
+msgstr "Да се поправи ли DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Това премахва DNS пренасочването на пакет, който вече не е инсталиран. Ако не остане друг DNS сървър, устройството използва DNS сървърите на мобилната връзка: операторът вижда имената, които търсите, извън всеки прокси или VPN."
+
+msgid "Repair DNS"
+msgstr "Поправка на DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Пакетите, инсталирани на устройството, не са част от образа на изданието. Обновяването ги записва и новата система ги инсталира отново при първото си стартиране, щом има интернет. Докато пакетът не се върне, настройките му са оставени настрана."
+
+msgid "No packages to install again."
+msgstr "Няма пакети за повторно инсталиране."
+
+msgid "All back"
+msgstr "Всички са върнати"
+
+msgid "Not installed yet"
+msgstr "Още не е инсталиран"
+
+msgid "Could not be installed again"
+msgstr "Не можа да се инсталира отново"
+
+msgid "Waiting for the internet"
+msgstr "Изчакване на интернет"
+
+msgid "Given up: no internet at five boots"
+msgstr "Прекратено: без интернет при пет стартирания"
+
+msgid "Skipped"
+msgstr "Пропуснато"
+
+msgid "Written down by the update from %s"
+msgstr "Записано от обновяването от %s"
+
+msgid "Installed again"
+msgstr "Инсталирани отново"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Инсталирайте ги сами оттам, откъдето сте ги взели (файл на пакет: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Оставени настрана настройки в /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS все още сочи към неинсталиран пакет: устройството няма DNS през него."
+
+msgid "Try again"
+msgstr "Опитай отново"
+
+msgid "Dismiss the note"
+msgstr "Скрий бележката"
+
+msgid "started"
+msgstr "стартирано"
+
+msgid "asleep now (asked)"
+msgstr "заспиване сега (поискано)"
+
+msgid "woken: power daemon stopping"
+msgstr "събуждане: услугата за захранване спира"
+
+msgid "woken by a key"
+msgstr "събуждане с бутон"
+
+msgid "woken by the Wi-Fi key"
+msgstr "събуждане с бутона Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "събуждане (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "събуждане от компютър по USB"
+
+msgid "woken: plugged in"
+msgstr "събуждане: включено захранване"
+
+msgid "woken by a Wi-Fi client"
+msgstr "събуждане от Wi-Fi клиент"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "зарядно стартиране (включено от зарядното)"
+
+msgid "the hotspot is down"
+msgstr "хотспотът е изключен"
+
+msgid "the VPN is still stopped"
+msgstr "VPN все още е спрян"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) все още е изключен след неуспешно възобновяване"
+
+msgid "self-check: %s"
+msgstr "самопроверка: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "спи: няма клиенти от %d мин (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "спи: профилът сега е %s"
+
+msgid "woken by the %s key"
+msgstr "събуждане с бутона %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "модемът е спрян временно (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Въведете цяло число от 0 до %d"
@@ -1437,6 +1695,15 @@ msgstr "Съобщение (Enter за изпращане, Shift+Enter за но
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Изпращането използва AT+CMGS (PDU режим); опитайте отново, ако каналът е зает. За изтриване на едно съобщение използвайте иконата с кошче в неговия балон."
 
+msgid "Sending…"
+msgstr "Изпращане…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Изпратено; списъкът ще се опресни скоро."
+
+msgid "Sending failed"
+msgstr "Изпращането е неуспешно"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Синхронизиране от SIM във фонов режим (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Изтрито (само локално)"
 msgid "Enter both a number and a message."
 msgstr "Въведете номер и съобщение."
 
-msgid "Sending…"
-msgstr "Изпращане…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Изпратено; списъкът ще се опресни скоро."
-
-msgid "Sending failed"
-msgstr "Изпращането е неуспешно"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d съобщения, %d непрочетени · %d разговора"
 
@@ -1502,6 +1760,39 @@ msgstr "Непълно: пристигнаха %d от %d части"
 
 msgid "Delete"
 msgstr "Изтриване"
+
+msgid "ttyd is not installed."
+msgstr "ttyd не е инсталиран."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Терминалът е изключен (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Отварят се твърде много терминали едновременно. Опитайте отново след минута."
+
+msgid "The terminal is not available."
+msgstr "Терминалът не е достъпен."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Това е root обвивка на устройството: всяка команда се изпълнява с пълни права и една грешка може да направи устройството нестартиращо."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Достъпен е само от LAN (USB и точката за достъп), никога от мобилните данни, и само от тази страница с вход."
+
+msgid "It closes after a minute without activity."
+msgstr "Затваря се след минута без активност."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Затваря се след %d минути без активност."
+
+msgid "Reconnect"
+msgstr "Свържи отново"
+
+msgid "Open in a new tab"
+msgstr "Отвори в нов раздел"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Тази страница е отворена през HTTPS, а терминалът се предоставя през HTTP в LAN: затова се отваря в отделен раздел."
 
 msgid "The data usage could not be read"
 msgstr "Използването на данни не можа да бъде прочетено"
@@ -1637,6 +1928,594 @@ msgstr "Изключи"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "С 64 всеки пакет излиза като собствения трафик на устройството"
+
+msgid "running"
+msgstr "работи"
+
+msgid "(about %s)"
+msgstr "(около %s)"
+
+msgid "Install %s?"
+msgstr "Да се инсталира ли %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Инсталира се от хранилището с пакети на тази система."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Изтегля се от версията на VPN модула и се проверява по неговия SHA256SUMS."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Един двигател е десетки MB: при мобилни данни изтеглянето се взема от вашия пакет."
+
+msgid "Install"
+msgstr "Инсталирай"
+
+msgid "Remove %s?"
+msgstr "Да се премахне ли %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Профили, които работят с него: %s. Не могат да стартират, докато не бъде инсталиран отново (модулът отказва, докато работещият профил се нуждае от него)."
+
+msgid "No profile runs on it."
+msgstr "Няма профил, който да работи с него."
+
+msgid "Removed"
+msgstr "Премахнат"
+
+msgid "Check for updates"
+msgstr "Провери за обновления"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Всеки двигател е отделно допълнение: инсталирайте само тези, от които се нуждаят профилите ви. Xray изпълнява връзки vless, vmess, trojan и ss (с hev-socks5-tunnel), sing-box същите връзки и собствен JSON, mihomo абонаменти за Clash, dae hysteria2, tuic и останалите при по-нови ядра. WireGuard и OpenVPN са пакети на системата."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Изтеглянията са десетки MB за двигател: при мобилни данни се вземат от вашия пакет. Офлайн качете tar архива на двигателя от страницата с версии на VPN модула."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Наличните версии идват от последната версия на VPN модула."
+
+msgid "Update"
+msgstr "Обнови"
+
+msgid "system package"
+msgstr "системен пакет"
+
+msgid "in the vpn bundle"
+msgstr "във vpn пакета"
+
+msgid "extra %s"
+msgstr "допълнение %s"
+
+msgid "not installed"
+msgstr "не е инсталиран"
+
+msgid "cannot run here"
+msgstr "не може да работи тук"
+
+msgid "update available"
+msgstr "има обновление"
+
+msgid "installed"
+msgstr "инсталиран"
+
+msgid "Kind"
+msgstr "Вид"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "Available"
+msgstr "Налична"
+
+msgid "not checked"
+msgstr "непроверено"
+
+msgid "Size"
+msgstr "Размер"
+
+msgid "Needed by"
+msgstr "Нужен на"
+
+msgid "no profile"
+msgstr "няма профил"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae изисква ядро с BTF, 5.17 или по-ново: не и производителското ядро 5.4 (mu300-update kernel 6.18). Може да се инсталира и така."
+
+msgid "All engines"
+msgstr "Всички двигатели"
+
+msgid "Last %s lines"
+msgstr "Последни %s реда"
+
+msgid "VPN service log"
+msgstr "Дневник на VPN услугата"
+
+msgid "Every 5 s"
+msgstr "На всеки 5 с"
+
+msgid "The log is empty."
+msgstr "Дневникът е празен."
+
+msgid "The VPN is starting"
+msgstr "VPN стартира"
+
+msgid "The VPN is stopped"
+msgstr "VPN е спрян"
+
+msgid "The VPN is restarting"
+msgstr "VPN се рестартира"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "При включен kill switch нищо не напуска устройството или LAN извън тунела: докато VPN е спрян, стартира или е повреден, всяка връзка се проваля, вместо да излезе директно. Остава активен, докато не спрете VPN оттук (Спри го премахва)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Без kill switch трафикът излиза директно и незащитен, когато тунелът не работи (докато стартира, след срив, когато двигателят липсва)."
+
+msgid "Turn the kill switch on?"
+msgstr "Да се включи ли kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "Да се изключи ли kill switch?"
+
+msgid "Turn on"
+msgstr "Включи"
+
+msgid "unknown"
+msgstr "неизвестно"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Изходящият адрес не беше намерен (работи ли тунелът?)"
+
+msgid "Connecting…"
+msgstr "Свързване…"
+
+msgid "On, but not running"
+msgstr "Включен, но не работи"
+
+msgid "Stopped"
+msgstr "Спрян"
+
+msgid "Install it"
+msgstr "Инсталирай го"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Двигателят на активния профил не е инсталиран: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch държи всичко затворено, докато го няма; услугата го изтегля сама, когато може."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN не може да стартира, докато не бъде инсталиран."
+
+msgid "%s cannot run on this system"
+msgstr "%s не може да работи на тази система"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN е включен, но няма активен профил: изберете един по-долу."
+
+msgid "Profile: %s"
+msgstr "Профил: %s"
+
+msgid "No active profile"
+msgstr "Няма активен профил"
+
+msgid "engine %s"
+msgstr "двигател %s"
+
+msgid "interface %s"
+msgstr "интерфейс %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch е активен"
+
+msgid "Kill switch on"
+msgstr "Kill switch е включен"
+
+msgid "Kill switch off"
+msgstr "Kill switch е изключен"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 в тунела"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 е блокиран"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 не е докоснат"
+
+msgid "Module %s"
+msgstr "Модул %s"
+
+msgid "Check"
+msgstr "Провери"
+
+msgid "Uptime"
+msgstr "Време на работа"
+
+msgid "Rate"
+msgstr "Скорост"
+
+msgid "Exit address"
+msgstr "Изходящ адрес"
+
+msgid "Start"
+msgstr "Старт"
+
+msgid "Stop"
+msgstr "Спри"
+
+msgid "Restart"
+msgstr "Рестартирай"
+
+msgid "Stop the VPN?"
+msgstr "Да се спре ли VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Тогава трафикът излиза директно, без тунел; kill switch се сваля заедно с него."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN е включен: след рестарт стартира отново сам."
+
+msgid "The VPN is off."
+msgstr "VPN е изключен."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Настройка"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Активен: само тунелът достига до интернет"
+
+msgid "Not active"
+msgstr "Неактивен"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch блокира целия трафик на устройството и на LAN, докато VPN е спрян, така че нищо никога не излиза без тунела. Ако тунелът не може да се вдигне (мъртъв сървър, изтекъл акаунт), устройството остава офлайн, докато не поправите профила или не спрете VPN. Самият панел остава достъпен от LAN."
+
+msgid "Choose a profile"
+msgstr "Изберете профил"
+
+msgid "No profiles yet"
+msgstr "Още няма профили"
+
+msgid "engine not installed"
+msgstr "двигателят не е инсталиран"
+
+msgid "Use"
+msgstr "Използвай"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Сменен: VPN се рестартира с новия профил"
+
+msgid "Active profile"
+msgstr "Активен профил"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Работещ VPN се рестартира с избрания от вас профил; kill switch остава активен междувременно."
+
+msgid "Manage the profiles"
+msgstr "Управление на профилите"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Автоматично: през тунела, където двигателят може да го носи"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Поискай от двигателя IPv6 в тунела"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Никога през тунела (блокиран, докато VPN работи)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Запазено: важи от следващото стартиране (Рестартирай)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Тунелът носи IPv6"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "IPv6 guard"
+msgstr "IPv6 защита"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Активна: IPv6 извън тунела се отхвърля"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Докато VPN работи, IPv6 никога не излиза до тунел, който не го носи: отхвърля се веднага, така че програмите и клиентите в LAN преминават към IPv4, вместо да изтичат или да чакат. Автоматично: WireGuard използва IPv6 адресите от своята конфигурация, останалите двигатели остават на IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: не може да се тества"
+
+msgid "blocked by the kill switch"
+msgstr "блокирано от kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "Конфигурация за WireGuard или OpenVPN, Clash/mihomo YAML, Xray или sing-box JSON, конфигурация за dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "След OK изберете файла: WireGuard .conf, OpenVPN .ovpn, Clash/mihomo .yaml, Xray или sing-box .json или конфигурация за dae (най-много 1 MiB)."
+
+msgid "From the source"
+msgstr "От източника"
+
+msgid "Detect"
+msgstr "Разпознай"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL адресът може да съдържа токен: отива към устройството сам, никога в команден ред или дневник."
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Share link"
+msgstr "Връзка за споделяне"
+
+msgid "Paste"
+msgstr "Постави"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Не е връзка за споделяне, която този панел приема"
+
+msgid "The config is empty"
+msgstr "Конфигурацията е празна"
+
+msgid "Not an https URL"
+msgstr "Това не е https URL"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Невалидно име: 1-64 знака, без управляващи знаци"
+
+msgid "Add a profile"
+msgstr "Добавяне на профил"
+
+msgid "Name"
+msgstr "Име"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Разпознай: модулът определя вида от връзката или файла. Изберете типа за JSON, който може да е Xray или sing-box, или за връзка, която трябва да работи с друг двигател."
+
+msgid "The profile is added"
+msgstr "Профилът е добавен"
+
+msgid "Rename the profile"
+msgstr "Преименуване на профила"
+
+msgid "Delete the profile %s?"
+msgstr "Да се изтрие ли профилът %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Това е активният профил: при включен VPN модулът отказва; първо спрете VPN или изберете друг профил."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Неговата конфигурация и идентификационни данни се изтриват от устройството."
+
+msgid "Deleted"
+msgstr "Изтрит"
+
+msgid "The profile passes the check"
+msgstr "Профилът преминава проверката"
+
+msgid "Show the config?"
+msgstr "Да се покаже ли конфигурацията?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Конфигурацията съдържа идентификационните данни на профила (ключове, пароли, UUID). Показва се само на този екран; всеки, който вижда екрана, може да я прочете."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Запазването първо проверява конфигурацията с двигателя (profile edit); конфигурация, която не издържа проверката, не се запазва и старата остава."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Този профил идва от абонамент: следващото му обновяване заменя промените ви."
+
+msgid "Config of %s"
+msgstr "Конфигурация на %s"
+
+msgid "Close"
+msgstr "Затвори"
+
+msgid "Rename"
+msgstr "Преименувай"
+
+msgid "Show / edit the config"
+msgstr "Покажи / редактирай конфигурацията"
+
+msgid "Test the latency of all"
+msgstr "Измери латентността на всички"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Още няма профили: добавете от връзка за споделяне, конфигурационен файл или абонамент."
+
+msgid "Active"
+msgstr "Активен"
+
+msgid "This profile is the active one now"
+msgstr "Този профил е сега активният"
+
+msgid "More"
+msgstr "Още"
+
+msgid "active"
+msgstr "активен"
+
+msgid "subscription"
+msgstr "абонамент"
+
+msgid "migrated"
+msgstr "мигриран"
+
+msgid "gone from its subscription"
+msgstr "изчезнал от абонамента си"
+
+msgid "Server"
+msgstr "Сървър"
+
+msgid "Engine"
+msgstr "Двигател"
+
+msgid "Latency"
+msgstr "Латентност"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Латентността е TCP връзка към сървъра, през тунела, когато VPN работи. Сървърите на WireGuard и OpenVPN обикновено използват UDP и не могат да се тестват така."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Въведете IPv4 или IPv6 адрес"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Включено: нищо не излиза извън тунела"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Изключено: трафикът излиза директно, докато тунелът не работи"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Да: собствените връзки на Tailscale минават през тунела"
+
+msgid "No: Tailscale connects directly"
+msgstr "Не: Tailscale се свързва директно"
+
+msgid "Routing"
+msgstr "Маршрутизиране"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch блокира целия трафик на устройството и на LAN, докато VPN е спрян."
+
+msgid "Bypass the tunnel"
+msgstr "Заобикаляне на тунела"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Въведете диапазони от адреси като 192.168.0.0/16, разделени със запетаи"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Диапазони от адреси, които никога не влизат в тунела, освен самата LAN (която никога не влиза). Празно: само LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale през VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Когато Tailscale работи на устройството, неговите WireGuard, DERP и управляващи връзки минават през тунела, който работи (dae ги прихваща като всички останали)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS през тунела"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Резолверът, към който отиват заявките на устройството и на LAN, през тунела. Нищо не отива към резолвъра на оператора."
+
+msgid "Bootstrap DNS"
+msgstr "Начален DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Намира собствения адрес на VPN сървъра, преди тунелът да е вдигнат (директно, по собствената връзка на двигателя)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Празно връща настройката към стойността по подразбиране."
+
+msgid "TUN stack"
+msgstr "TUN стек"
+
+msgid "Default (gvisor)"
+msgstr "По подразбиране (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (не на ядро 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "зададено (непроменено, освен ако не въведете ново)"
+
+msgid "not set"
+msgstr "не е зададено"
+
+msgid "Upstream HTTP proxy"
+msgstr "Горен HTTP прокси"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "Закрепване на TLS сертификат (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Въведете host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Въведете SHA-256 в шестнадесетичен вид"
+
+msgid "Profile options"
+msgstr "Опции на профила"
+
+msgid "None of the profiles has options of its type."
+msgstr "Нито един от профилите няма опции за своя тип."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "Режимът на mihomo (rule, global, direct), нивата на дневника на двигателите, групите и маршрутизирането на dae са част от собствената конфигурация на всеки профил: VPN > Профили, Покажи / редактирай конфигурацията."
+
+msgid "Delete the subscription %s?"
+msgstr "Да се изтрие ли абонаментът %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Профилите му могат да си отидат с него или да останат като самостоятелни профили. Активният профил никога не се премахва, докато VPN е включен."
+
+msgid "Keep the profiles"
+msgstr "Запази профилите"
+
+msgid "Delete with its profiles"
+msgstr "Изтрий заедно с профилите"
+
+msgid "Only by hand"
+msgstr "Само ръчно"
+
+msgid "Every %d h"
+msgstr "На всеки %d ч"
+
+msgid "Share links: one profile per link"
+msgstr "Връзки за споделяне: един профил на връзка"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo YAML: един mihomo профил"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: един профил с всички възли в една група"
+
+msgid "Add a subscription"
+msgstr "Добавяне на абонамент"
+
+msgid "Format"
+msgstr "Формат"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL адресът обикновено съдържа токена на акаунта ви: съхранява се на устройството, четим само от root, и никога не се показва отново. Абонаментът се изтегля по собствената връзка на устройството: през тунела, когато VPN работи; при активен kill switch и спрян тунел не може да бъде изтеглен."
+
+msgid "Refresh all"
+msgstr "Обнови всички"
+
+msgid "No subscriptions yet."
+msgstr "Още няма абонаменти."
+
+msgid "Host"
+msgstr "Хост"
+
+msgid "Updated"
+msgstr "Обновен"
+
+msgid "Share links"
+msgstr "Връзки за споделяне"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Обновяването запазва профилите с непроменено име, добавя новите и премахва изчезналите (активният остава, докато VPN е включен, маркиран като изчезнал). Обновяването на активния профил рестартира работещия VPN."
 
 msgid "Dashboard info failed"
 msgstr "Информацията за таблото е недостъпна"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Адаптерът за пакети не върна валиден отговор"
+
+msgid "Invalid packages operation"
+msgstr "Невалидна операция с пакети"
+
 msgid "Request too large"
 msgstr "Заявката е твърде голяма"
 
@@ -1820,6 +2705,150 @@ msgstr "Директорията за изпълнение не е безопа�
 
 msgid "No such method"
 msgstr "Няма такъв метод"
+
+msgid "The VPN module refused the request"
+msgstr "VPN модулът отхвърли заявката"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN панелът е зает, опитайте отново"
+
+msgid "Another VPN task is still running"
+msgstr "Друга VPN задача още работи"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Параметърът exit_ip трябва да е 0 или 1"
+
+msgid "The VPN status could not be read"
+msgstr "Състоянието на VPN не можа да се прочете"
+
+msgid "The profiles could not be read"
+msgstr "Профилите не можаха да се прочетат"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Параметърът check трябва да е 0 или 1"
+
+msgid "The engines could not be read"
+msgstr "Двигателите не можаха да се прочетат"
+
+msgid "The subscriptions could not be read"
+msgstr "Абонаментите не можаха да се прочетат"
+
+msgid "The VPN settings could not be read"
+msgstr "Настройките на VPN не можаха да се прочетат"
+
+msgid "Unknown VPN operation"
+msgstr "Непозната VPN операция"
+
+msgid "The VPN could not be switched"
+msgstr "VPN не можа да се превключи"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch е включен или изключен"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switch не можа да се промени"
+
+msgid "Invalid profile id"
+msgstr "Невалиден идентификатор на профил"
+
+msgid "The profile could not be made the active one"
+msgstr "Профилът не можа да стане активен"
+
+msgid "Unknown profile source"
+msgstr "Непознат източник на профил"
+
+msgid "Unknown profile type"
+msgstr "Непознат тип профил"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Конфигурацията е празна, твърде голяма или съдържа управляващи знаци"
+
+msgid "Invalid profile request"
+msgstr "Невалидна заявка за профил"
+
+msgid "A config from a URL takes the type it says"
+msgstr "Конфигурация от URL приема типа, който сама посочва"
+
+msgid "No uploaded file"
+msgstr "Няма качен файл"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Файлът е по-голям от 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Профилът не можа да се добави"
+
+msgid "The profile could not be renamed"
+msgstr "Профилът не можа да се преименува"
+
+msgid "The profile could not be removed"
+msgstr "Профилът не можа да се премахне"
+
+msgid "The profile does not pass the check"
+msgstr "Профилът не преминава проверката"
+
+msgid "Unknown profile option"
+msgstr "Непозната опция на профил"
+
+msgid "Invalid value for this option"
+msgstr "Невалидна стойност за тази опция"
+
+msgid "The option could not be set"
+msgstr "Опцията не можа да се зададе"
+
+msgid "The config could not be read"
+msgstr "Конфигурацията не можа да се прочете"
+
+msgid "The config was not saved"
+msgstr "Конфигурацията не беше запазена"
+
+msgid "The latency test failed"
+msgstr "Тестът на латентността не успя"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Интервалът за опресняване е от 1 до 999 часа"
+
+msgid "Unknown subscription type"
+msgstr "Непознат тип абонамент"
+
+msgid "Invalid subscription id"
+msgstr "Невалиден идентификатор на абонамент"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Параметърът keep трябва да е 0 или 1"
+
+msgid "The subscription could not be removed"
+msgstr "Абонаментът не можа да се премахне"
+
+msgid "The file is too large"
+msgstr "Файлът е твърде голям"
+
+msgid "Unknown engine"
+msgstr "Непознат двигател"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Параметърът unverified трябва да е 0 или 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Този двигател е системен пакет: няма файл за качване"
+
+msgid "The engine could not be removed"
+msgstr "Двигателят не можа да се премахне"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra не е наличен на тази система"
+
+msgid "Unknown VPN setting"
+msgstr "Непозната VPN настройка"
+
+msgid "The setting could not be saved"
+msgstr "Настройката не можа да бъде запазена"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Броят на редовете е от 1 до 1000"
+
+msgid "The log could not be read"
+msgstr "Дневникът не можа да се прочете"
 
 msgid "Radio did not come up"
 msgstr "Радиото не се включи"
@@ -1935,6 +2964,9 @@ msgstr "Невалиден списък с филтри (най-много 50 р
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Адресът на уебкуката трябва да е URL с http:// или https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Тялото на webhook е твърде дълго или съдържа управляващ знак"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Невалидна заглавка (по една \"Име: стойност\" на ред; Host, Content-Type, Content-Length, Transfer-Encoding и Connection се задават от устройството)"
 
@@ -1992,17 +3024,47 @@ msgstr "Езиковият пакет не можа да бъде премахн
 msgid "Lock cache unavailable"
 msgstr "Кешът на заключванията е недостъпен"
 
+msgid "The saved locks could not be cleared"
+msgstr "Запазените заключвания не можаха да бъдат изчистени"
+
 msgid "No serving cell to lock to"
 msgstr "Няма обслужваща клетка за заключване"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Модемът не отговори на заявката за режим; нищо не беше изпратено"
+
+msgid "The modem refused a write"
+msgstr "Модемът отказа запис"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Обратното четене не съвпада с автоматичните стойности"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Обратното четене след рестарта на стека не съвпада с автоматичните стойности"
+
+msgid "The reset was interrupted"
+msgstr "Нулирането беше прекъснато"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Повторното инсталиране на пакети не е налично в тази система"
+
+msgid "No packages were written down by an update"
+msgstr "Никое обновяване не е записало пакети"
+
+msgid "Reinstalling is running already"
+msgstr "Повторното инсталиране вече работи"
+
+msgid "The note could not be dropped"
+msgstr "Бележката не можа да бъде премахната"
+
+msgid "Unknown packages operation"
+msgstr "Непозната операция с пакети"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Използването на данни не е налично в тази система"
-
-msgid "The setting could not be saved"
-msgstr "Настройката не можа да бъде запазена"
 
 msgid "Unknown data usage operation"
 msgstr "Неизвестна операция за използване на данни"

@@ -1,0 +1,303 @@
+# The MU300 page of Cockpit (rootfs/panel), tr. tools/cockpit-i18n.py update / check / build.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Unknown error"
+msgstr "Bilinmeyen hata"
+
+msgid "The command is not on this system."
+msgstr "Bu komut bu sistemde yok."
+
+msgid "This needs administrative access: turn it on at the top of Cockpit."
+msgstr "Bunun için yönetici erişimi gerekir: Cockpit'in üst kısmından açın."
+
+msgid "Done"
+msgstr "Tamam"
+
+msgid "Mobile network"
+msgstr "Mobil ağ"
+
+msgid "Mobile data"
+msgstr "Mobil veri"
+
+msgid "Data usage"
+msgstr "Veri kullanımı"
+
+msgid "Live rates"
+msgstr "Anlık hızlar"
+
+msgid "Device"
+msgstr "Cihaz"
+
+msgid "Registered (home network)"
+msgstr "Kayıtlı (ev ağı)"
+
+msgid "Registered (roaming)"
+msgstr "Kayıtlı (dolaşım)"
+
+msgid "Searching"
+msgstr "Aranıyor"
+
+msgid "Registration denied"
+msgstr "Kayıt reddedildi"
+
+msgid "Not registered"
+msgstr "Kayıtlı değil"
+
+msgid "Emergency calls only"
+msgstr "Yalnızca acil aramalar"
+
+msgid "Operator"
+msgstr "Operatör"
+
+msgid "Technology"
+msgstr "Teknoloji"
+
+msgid "Registration"
+msgstr "Kayıt"
+
+msgid "RSRP"
+msgstr "RSRP"
+
+msgid "RSRQ"
+msgstr "RSRQ"
+
+msgid "No readings from the modem (mu300-at)."
+msgstr "Modemden okuma yok (mu300-at)."
+
+msgid "State"
+msgstr "Durum"
+
+msgid "On"
+msgstr "Açık"
+
+msgid "Off"
+msgstr "Kapalı"
+
+msgid "Address"
+msgstr "Adres"
+
+msgid "Turn mobile data off"
+msgstr "Mobil veriyi kapat"
+
+msgid "Turn mobile data on"
+msgstr "Mobil veriyi aç"
+
+msgid "Turn mobile data off? Clients of the device lose the internet until it is on again."
+msgstr "Mobil veri kapatılsın mı? Cihaza bağlı istemciler, yeniden açılana kadar internetsiz kalır."
+
+msgid "Release"
+msgstr "Sürüm"
+
+msgid "Battery"
+msgstr "Pil"
+
+msgid "Hottest sensor"
+msgstr "En sıcak sensör"
+
+msgid "CPU profile"
+msgstr "CPU profili"
+
+msgid "Hotspot"
+msgstr "Hotspot"
+
+msgid "Network, band and cell locks are part of the OpenWrt control panel (openwrt-luci); on Ubuntu, AT commands go through mu300-at in the Terminal."
+msgstr "Ağ, bant ve hücre kilitleri OpenWrt kontrol panelinin (openwrt-luci) parçasıdır; Ubuntu'da AT komutları Terminal'de mu300-at ile gönderilir."
+
+msgid "Today"
+msgstr "Bugün"
+
+msgid "This billing cycle"
+msgstr "Bu fatura dönemi"
+
+msgid "Cycle"
+msgstr "Dönem"
+
+msgid "Monthly cap"
+msgstr "Aylık kota"
+
+msgid "LAN"
+msgstr "LAN"
+
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+msgid "Power saving"
+msgstr "Güç tasarrufu"
+
+msgid "Balanced"
+msgstr "Dengeli"
+
+msgid "Performance"
+msgstr "Performans"
+
+msgid "Messages"
+msgstr "Mesajlar"
+
+msgid "Send a message"
+msgstr "Mesaj gönder"
+
+msgid "Send"
+msgstr "Gönder"
+
+msgid "Enter a phone number (digits, an optional + first)."
+msgstr "Bir telefon numarası girin (rakamlar, başta isteğe bağlı +)."
+
+msgid "The message is empty."
+msgstr "Mesaj boş."
+
+msgid "Number"
+msgstr "Numara"
+
+msgid "Text"
+msgstr "Metin"
+
+msgid "Refresh"
+msgstr "Yenile"
+
+msgid "Reading the SIM..."
+msgstr "SIM okunuyor..."
+
+msgid "No messages."
+msgstr "Mesaj yok."
+
+msgid "Delete"
+msgstr "Sil"
+
+msgid "Delete this message from the SIM?"
+msgstr "Bu mesaj SIM'den silinsin mi?"
+
+msgid "$0 parts"
+msgstr "$0 parça"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Profiles"
+msgstr "Profiller"
+
+msgid "Switch"
+msgstr "Anahtar"
+
+msgid "Running"
+msgstr "Çalışıyor"
+
+msgid "Yes"
+msgstr "Evet"
+
+msgid "No"
+msgstr "Hayır"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Tunnel"
+msgstr "Tünel"
+
+msgid "up"
+msgstr "açık"
+
+msgid "down"
+msgstr "kapalı"
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "active"
+msgstr "etkin"
+
+msgid "inactive"
+msgstr "etkin değil"
+
+msgid "The profile needs the engine extra $0: sudo mu300-extra install $0"
+msgstr "Profil $0 motor ekini gerektiriyor: sudo mu300-extra install $0"
+
+msgid "Turn the VPN off"
+msgstr "VPN'i kapat"
+
+msgid "Turn the VPN on"
+msgstr "VPN'i aç"
+
+msgid "No profiles: add one with mu300-vpn profile import (Terminal) or mu300-toolkit."
+msgstr "Profil yok: mu300-vpn profile import (Terminal) veya mu300-toolkit ile ekleyin."
+
+msgid "Use"
+msgstr "Kullan"
+
+msgid "The VPN module is not installed: sudo mu300-extra install vpn"
+msgstr "VPN modülü kurulu değil: sudo mu300-extra install vpn"
+
+msgid "Power"
+msgstr "Güç"
+
+msgid "A profile sets the CPU governor and the per-cluster frequency limits, inside the hardware frequency table; the kernel keeps throttling at its thermal limit in every profile."
+msgstr "Profil, CPU yöneticisini ve küme başına frekans sınırlarını donanımın frekans tablosu içinde ayarlar; çekirdek her profilde sıcaklık sınırında yavaşlatmaya devam eder."
+
+msgid "Thermal throttling is active right now."
+msgstr "Şu anda sıcaklık nedeniyle yavaşlatma etkin."
+
+msgid "Join a Wi-Fi network"
+msgstr "Bir Wi-Fi ağına katıl"
+
+msgid "Save and restart the hotspot"
+msgstr "Kaydet ve hotspot'u yeniden başlat"
+
+msgid "The name must be 1 to 32 bytes."
+msgstr "Ad 1 ile 32 bayt arasında olmalı."
+
+msgid "The password must be 8 to 63 printable ASCII characters."
+msgstr "Parola 8 ile 63 arası yazdırılabilir ASCII karakter olmalı."
+
+msgid "Restart the hotspot? Devices on it are disconnected and must join again, with the new password."
+msgstr "Hotspot yeniden başlatılsın mı? Bağlı cihazların bağlantısı kesilir ve yeni parolayla yeniden katılmaları gerekir."
+
+msgid "Name (SSID)"
+msgstr "Ad (SSID)"
+
+msgid "New password"
+msgstr "Yeni parola"
+
+msgid "The radio does one thing at a time: joining a network turns the hotspot off while it is joined. If you reach this page over the hotspot, you lose it."
+msgstr "Radyo aynı anda tek iş yapar: bir ağa katılmak, bağlı kaldığı sürece hotspot'u kapatır. Bu sayfaya hotspot üzerinden ulaşıyorsanız bağlantıyı kaybedersiniz."
+
+msgid "Join"
+msgstr "Katıl"
+
+msgid "Leave and turn the hotspot back on"
+msgstr "Ayrıl ve hotspot'u yeniden aç"
+
+msgid "Network name"
+msgstr "Ağ adı"
+
+msgid "Password (empty for an open network)"
+msgstr "Parola (açık ağ için boş)"
+
+msgid "Updates"
+msgstr "Güncellemeler"
+
+msgid "Check for updates"
+msgstr "Güncellemeleri denetle"
+
+msgid "Checking..."
+msgstr "Denetleniyor..."
+
+msgid "Install the update"
+msgstr "Güncellemeyi kur"
+
+msgid "Install the newest release now? The systems are replaced (your settings are kept) and the new one runs after the next reboot. Keep the device powered until it is done."
+msgstr "En yeni sürüm şimdi kurulsun mu? Sistemler değiştirilir (ayarlarınız korunur) ve yenisi bir sonraki yeniden başlatmadan sonra çalışır. Bitene kadar cihazın gücünü kesmeyin."
+
+msgid "The update is installed: reboot to run it."
+msgstr "Güncelleme kuruldu: çalıştırmak için yeniden başlatın."
+
+msgid "Overview"
+msgstr "Genel bakış"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Power and CPU"
+msgstr "Güç ve CPU"

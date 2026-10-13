@@ -20,7 +20,7 @@ Log in as `root` with the password you chose at install.
 | | OpenWrt (`openwrt`) | OpenWrt with the panel (`openwrt-luci`) |
 |---|---|---|
 | LuCI (network, wireless, firewall, packages) | yes | yes |
-| MU300 pages (dashboard, Cellular, Power, CPU, Languages) | - | yes |
+| MU300 pages (dashboard, Cellular, VPN, Power, CPU, Languages, Packages, Terminal) | - | yes |
 | Theme | LuCI's default | Aurora (Bootstrap stays installed) |
 | IPv6 from the carrier | prefix extension | relayed (router advertisements and NAT66) |
 | Magisk zip | yes | yes (since v2026.10.18) |
@@ -31,8 +31,10 @@ Pick it at install ("Which OpenWrt?" -> 2, or `MU300_OPENWRT=luci`), or switch a
 ## The panel's pages
 
 * **Status dashboard:** live radio readings (signal, bands, cells, temperatures), the operator's name, the mobile
-  data state and the current download and upload speed, every second; on the U30
-  Air also the battery: level, whether it charges, and the power in watts. The home page also has **Switch to
+  data state and the current download and upload speed, every second; the Wi-Fi clients with their speeds, connected
+  time, name and address; the carrier's DNS servers and the number of connections; on the U30
+  Air also the battery: level, whether it charges, and the power in watts. While the modem is busy the page keeps its
+  last readings and says how old they are. The home page also has **Switch to
   Android** and **Lock Linux** (see [Going Back to Android](Going-Back-to-Android)).
 * **Cellular > Network locks:** network mode, band, cell and EN-DC locks that persist across reboots and are replayed
   at boot. **Reset all to automatic** clears them. Locks live in the modem, so they also apply in Android.
@@ -41,16 +43,57 @@ Pick it at install ("Which OpenWrt?" -> 2, or `MU300_OPENWRT=luci`), or switch a
   [SMS](SMS#sms-forwarding)).
 * **Cellular > Data usage:** mobile data per day and per billing cycle, with a reset day and a monthly cap
   (`mu300-traffic`, see [Mobile Data and APN](Mobile-Data-and-APN#data-usage)).
-* **Cellular > AT terminal:** guarded AT commands over the same channel the system uses.
+* **Cellular > AT terminal:** guarded AT commands over the same channel the system uses. A command that scans, changes
+  the radio, the APN or the SIM, or writes a setting that persists into Android, is explained first and sent only
+  after a click; a network scan runs in the background and the page follows it.
+* **VPN** (a menu of its own, with the [VPN](VPN) module v2): **Overview** (state, active profile, engine, tunnel,
+  uptime, live rates, the exit IP behind a button, Start/Stop/Restart, the kill switch and IPv6 behind a
+  confirmation), **Profiles** (add from a share link, pasted text, a file or a URL; test the latency; rename, show and
+  edit the config, delete), **Subscriptions** (a URL that yields profiles, refreshed by hand or every 6 to 168 hours),
+  **Engines** (Xray, sing-box, mihomo, dae: install, update, remove; online or from an uploaded tarball checked against
+  the module's release), **Settings** (kill switch, IPv6, LAN ranges that bypass the tunnel, Tailscale, DNS, the
+  per-profile options) and **Logs**. Without the module every page offers to install it.
 * **Cellular > TTL:** a fixed TTL for mobile data (`mu300-ttl`).
 * **Cellular > Device management:** USB role (device or host), the USB network mode (NCM, ECM or RNDIS, applied at the
   next boot), and host-mode adapters that can join the LAN bridge.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom adapter).
 * **System > Languages:** interface language, and the lang extra.
-* **System > Power:** the active power profile and why, battery and power source, the idle settings of the three
-  profiles, the saver threshold and the charge limit (100 or 80 %).
+* **System > Power:** the active power profile and why (in your language), battery, power source and the charger's
+  input current, the idle settings of the three profiles, the saver threshold and the charge limit (0-100 %, U30 Air).
 * **System > CPU:** the CPU profile: saving, balanced (the default) or performance (`mu300-cpu`). It never touches
-  the voltage, and the thermal protection stays in charge in every profile.
+  the voltage, and the thermal protection stays in charge in every profile. Below it, read only, the kernel's thermal
+  zones: temperatures, trip points and the cooling devices bound to them with their current state (on the mainline
+  kernels the stock `soc-thmzone`, 70/85 °C passive and 110 °C critical, throttles the three clusters at 85 °C).
+* **System > Packages after an update:** the packages you had installed yourself and what the update did with them
+  (see [Updating](Updating#packages-you-installed-yourself)).
+* **System > Terminal:** a root shell in the browser ([ttyd](https://github.com/tsl0922/ttyd)). It listens on the LAN
+  address only (port 7681; the cellular side never reaches it) and opens a shell only for a one-time token the page
+  gets for your logged-in panel session, so there is no second password to guess. It closes after 15 minutes without
+  activity (`uci set ttyd.mu300.idle=<seconds>`; 0 never). A panel opened over https opens it in a tab of its own.
+  **Terminal settings** is ttyd's own page; `enable 0` there removes the terminal.
+
+Since v2026.10.20 one stuck AT command no longer takes the panel down: every modem read has a deadline, the pages
+send their calls one at a time and back off after failures, and the Device page keeps a log of the panel's recent
+modem operations (names and timings only). On OpenWrt an AT command takes about 0.13 s instead of a full second.
+
+## A web panel on Ubuntu (Cockpit)
+
+Ubuntu has no LuCI, but it can have [Cockpit](https://cockpit-project.org/), Ubuntu's own web console (terminal, logs,
+services, networking, storage, accounts), with an **MU300** page: the mobile network (operator, technology,
+registration, signal), mobile data on/off, data usage and live rates, battery and temperatures, SMS, the VPN (on/off,
+profiles), the CPU profile and power state, the hotspot's name and password, joining a Wi-Fi network, and updates.
+Network locks stay a feature of the OpenWrt panel.
+
+```sh
+sudo mu300-extra install panel                                           # Cockpit from Ubuntu's archive (about 12 MB)
+sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz   # offline: the release's file, Cockpit inside
+sudo mu300-extra remove panel
+```
+
+The installer asks about it too (default no). Then open `https://192.168.77.1:9090` (U30 Air: `.78.1`), accept
+Cockpit's own certificate and log in as `ubuntu`; "Turn on administrative access" for the pages that need root.
+Cockpit listens on the LAN only (USB and the hotspot), the firewall closes it to the cellular side anyway, root cannot
+log in, and a session ends after 15 minutes idle. In English, Turkish and Chinese.
 
 ## Languages
 

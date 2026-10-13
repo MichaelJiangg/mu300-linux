@@ -11,6 +11,8 @@
 #   sd_kernel_ok     a card installation refuses a kernel bundle that cannot read the card
 #   sd_erase         uninstall.sh: overwrite the start of the card's mu300sd filesystem (nothing else, ever)
 #   write_install_env  install.sh: the text of mu300-install.env (install.ps1's InstallEnvText writes the same)
+#   adb_pubkey FILE  install.sh: the adb public key in FILE (adbkey.pub) as one safe line, "BASE64 name"
+#   bootchain_line   install.sh and the Magisk installer: the plan's line from android-bootchain.sh check
 
 SD_MIN=$((700 * 1024 * 1024))
 
@@ -117,13 +119,60 @@ sd_erase() {
     [ "$(sd_existing)" = no ] || die "the SD card still shows a mu300sd filesystem"
 }
 
+# The first line of an adb public key file (~/.android/adbkey.pub: "BASE64 user@host", no newline at the end), as it
+# goes into mu300-install.env inside single quotes: an Android RSA-2048 key (700 base64 characters, "QAAAA" first) and
+# a name of [A-Za-z0-9@._:-] only. Status 1 when FILE holds no such key.
+adb_pubkey() {
+    _k= _c=
+    IFS=' ' read -r _k _c < "$1" 2>/dev/null || [ -n "$_k" ] || return 1
+    [ ${#_k} -eq 700 ] && [ "${_k%=}" != "$_k" ] || return 1
+    case ${_k%=} in QAAAA*[!A-Za-z0-9+/]*) return 1 ;; QAAAA*) ;; *) return 1 ;; esac
+    _c=$(printf '%s' "$_c" | tr -cd 'A-Za-z0-9@._:-' | cut -c1-64)
+    echo "$_k ${_c:-installer}"
+}
+
 # mu300-install.env, what android-install.sh is told. OFF/SIZE (and their sectors) are always the internal region:
 # in SD mode SIZE is the card's by now and INT_SIZE keeps the region's, which the root-on-sd marker needs; the card's
 # own size is read on the device.
+bootchain_line() {  # bootchain_line OUTPUT: BC_LINE for the plan from the device's BOOTCHAIN-PLAN line, else 1 and
+    # BC_REFUSED, the reason
+    _p=$(printf '%s\n' "$1" | sed -n 's/^BOOTCHAIN-PLAN //p' | head -n1)
+    if [ -z "$_p" ]; then
+        BC_REFUSED=$(printf '%s\n' "$1" | sed -n 's/^BOOTCHAIN-REFUSED: //p' | head -n1)
+        [ -n "$BC_REFUSED" ] || BC_REFUSED=$(t 'no answer from the device')
+        return 1
+    fi
+    set -- $_p
+    _a=$1; _l=$2; shift 2
+    if [ $# = 0 ]; then BC_LINE=$(t 'boot chain:     identical on both slots')
+    else BC_LINE=$(t "boot chain:     {1} differ between the slots; Android's slot {2} is copied to slot {3} (backed up first)" "$(echo "$*" | sed 's/ /, /g')" "$_a" "$_l")
+    fi
+}
+
 write_install_env() {
     _rs=$SIZE; [ "$SD_MODE" = 1 ] && _rs=$INT_SIZE
-    printf 'OFF=%s\nSIZE=%s\nOFF_S=%s\nSIZE_S=%s\nFORMAT=%s\nOSES="%s"\nWIPE_LEGACY=%s\nUPDATE=%s\nBOOT_OS=%s\nDEFAULT_LINUX=%s\nBOOT_ATTEMPTS=%s\nIMPORT_HOTSPOT=%s\nKERNEL=%s\nSD_MODE=%s\nSD_DEV=%s\nINTERNAL_EXISTS=%s\nPWHASH='"'"'%s'"'"'\n' \
-      "$OFF" "$_rs" "$((OFF / 512))" "$((_rs / 512))" "$FORMAT" "$OSES" "$WIPE_LEGACY" "$UPDATE" "$BOOT_OS" "$DEFAULT_LINUX" "$BOOT_ATTEMPTS" "$IMPORT_HOTSPOT" "$KERNEL" "$SD_MODE" "$SD_DEV" "$INTERNAL_EXISTS" "$PWHASH"
+    printf 'OFF=%s
+SIZE=%s
+OFF_S=%s
+SIZE_S=%s
+FORMAT=%s
+OSES="%s"
+WIPE_LEGACY=%s
+UPDATE=%s
+BOOT_OS=%s
+DEFAULT_LINUX=%s
+BOOT_ATTEMPTS=%s
+IMPORT_HOTSPOT=%s
+KERNEL=%s
+SD_MODE=%s
+SD_DEV=%s
+INTERNAL_EXISTS=%s
+ADB=%s
+ADB_KEY='"'"'%s'"'"'
+SYNC_BOOTCHAIN=%s
+PWHASH='"'"'%s'"'"'
+' \
+      "$OFF" "$_rs" "$((OFF / 512))" "$((_rs / 512))" "$FORMAT" "$OSES" "$WIPE_LEGACY" "$UPDATE" "$BOOT_OS" "$DEFAULT_LINUX" "$BOOT_ATTEMPTS" "$IMPORT_HOTSPOT" "$KERNEL" "$SD_MODE" "$SD_DEV" "$INTERNAL_EXISTS" "${ADB:-0}" "${ADB_KEY:-}" "${SYNC_BOOTCHAIN:-0}" "$PWHASH"
 }
 
 # The free eMMC region: from the first 2 MiB boundary after the last partition to the last one before the backup

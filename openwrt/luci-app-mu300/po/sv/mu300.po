@@ -42,8 +42,38 @@ msgstr "Ström"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "MU300-kontrollcenter: statuspanel, nätverkslås, AT-terminal och SMS"
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Terminal settings"
+msgstr "Terminalinställningar"
+
+msgid "Overview"
+msgstr "Översikt"
+
+msgid "Profiles"
+msgstr "Profiler"
+
+msgid "Subscriptions"
+msgstr "Prenumerationer"
+
+msgid "Engines"
+msgstr "Motorer"
+
+msgid "Settings"
+msgstr "Inställningar"
+
+msgid "Logs"
+msgstr "Loggar"
+
+msgid "Packages after an update"
+msgstr "Paket efter en uppdatering"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "MU300 kontrollcenter: statuspanel, nätverkslås, AT-terminal, SMS och VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Terminal: ett root-skal på enheten i webbläsaren"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Okänt nummer"
 
 msgid "Select"
 msgstr "Välj"
+
+msgid "never"
+msgstr "aldrig"
+
+msgid "just now"
+msgstr "nyss"
+
+msgid "%s ago"
+msgstr "%s sedan"
+
+msgid "Failed: %s"
+msgstr "Misslyckades: %s"
+
+msgid "Management connection lost"
+msgstr "Hanteringsanslutningen förlorades"
+
+msgid "Installing the VPN module"
+msgstr "VPN-modulen installeras"
+
+msgid "Installing the engine"
+msgstr "Motorn installeras"
+
+msgid "Adding the subscription"
+msgstr "Prenumerationen läggs till"
+
+msgid "Refreshing the subscriptions"
+msgstr "Prenumerationerna uppdateras"
+
+msgid "Testing the latency of every profile"
+msgstr "Latensen för varje profil testas"
+
+msgid "Downloading the config"
+msgstr "Konfigurationen laddas ner"
+
+msgid "Working…"
+msgstr "Arbetar…"
+
+msgid "done"
+msgstr "klart"
+
+msgid "failed"
+msgstr "misslyckades"
+
+msgid "Verify the uploaded file"
+msgstr "Verifiera den uppladdade filen"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Den uppladdade filen kontrolleras mot SHA256SUMS från VPN-modulens senaste version, hämtad över HTTPS. Om det inte går (offline, en äldre version) installeras den bara om du tillåter en overifierad fil: den körs då som root utan någon kontroll."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Installera den även om den inte kan verifieras"
+
+msgid "Install only a verified file"
+msgstr "Installera bara en verifierad fil"
+
+msgid "Upload failed: %s"
+msgstr "Uppladdningen misslyckades: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "VPN-modulen är för gammal för den här panelen"
+
+msgid "The VPN module is not installed"
+msgstr "VPN-modulen är inte installerad"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Den här sidan kräver VPN-modulen med maskinläsbar mu300-vpn (modul v2 eller nyare). En uppdatering behåller profilerna och inställningarna."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "VPN är en egen modul: mu300-vpn med sin kill switch och sina profiler, plus ett tillägg per motor (Xray, sing-box, mihomo, dae). Den installeras med mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Nedladdningen är några MB för modulen och upp till tiotals MB per motor: på mobildata räknas den mot din surfmängd."
+
+msgid "Update the VPN module"
+msgstr "Uppdatera VPN-modulen"
+
+msgid "Install the VPN module"
+msgstr "Installera VPN-modulen"
+
+msgid "Upload the file…"
+msgstr "Ladda upp filen…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Offline: ladda upp mu300-linux-vpn-core.tar.gz (eller paketet mu300-linux-vpn.tar.gz) från VPN-modulens releasesida."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Det här är en nät- eller frekvenssökning: den tar en till tre minuter, håller modemets AT-kanal upptagen hela tiden och mobildata kan pausa under tiden. Den körs i bakgrunden; svaret visas här när den är klar."
@@ -207,14 +324,8 @@ msgstr "En sökning tar för en stund Wi-Fi-hotspoten från sin kanal: anslutna 
 msgid "Scan anyway"
 msgstr "Sök ändå"
 
-msgid "Failed: %s"
-msgstr "Misslyckades: %s"
-
 msgid "Saved"
 msgstr "Sparat"
-
-msgid "Management connection lost"
-msgstr "Hanteringsanslutningen förlorades"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Termiskt"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Kärnans termiska zoner, skrivskyddade. En zon med tröskelpunkter stryper de kylenheter som är bundna till den vid sin passiva tröskel; kyltillstånd 0 betyder ingen strypning."
+
+msgid "Zone"
+msgstr "Zon"
+
+msgid "Temperature"
+msgstr "Temperatur"
+
+msgid "Trip points"
+msgstr "Tröskelpunkter"
+
+msgid "Cooling devices"
+msgstr "Kylenheter"
 
 msgid "USB role"
 msgstr "USB-roll"
@@ -489,8 +618,17 @@ msgstr "Innehåll"
 msgid "Form (URL-encoded)"
 msgstr "Formulär (URL-kodat)"
 
+msgid "Plain text"
+msgstr "Oformaterad text"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Fält: sender, time, text, device, message (den ifyllda mallen)"
+
+msgid "Custom body"
+msgstr "Egen kropp"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Tomt: standardfälten (oformaterad text: meddelandet). Platshållare: {sender}, {time}, {text}, {device}, {message}. Varje värde escapas enligt den valda typen. Den här kroppen visas här igen: lägg hemligheter i adressen eller i en header."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Extra rubriker (en \"Namn: värde\" per rad)"
@@ -651,6 +789,9 @@ msgstr "Totalt skickat"
 msgid "Used today"
 msgstr "Använt i dag"
 
+msgid "SIM source"
+msgstr "SIM-källa"
+
 msgid "Session duration"
 msgstr "Sessionslängd"
 
@@ -719,6 +860,9 @@ msgstr "Modem"
 
 msgid "Carrier"
 msgstr "Operatör"
+
+msgid "Own number"
+msgstr "Eget nummer"
 
 msgid "Module"
 msgstr "Modul"
@@ -858,8 +1002,17 @@ msgstr "Låsning misslyckades: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Nätverkslåsen återställs till automatiskt (SFUN-omstart, cirka 30 sekunder)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Återställningen misslyckades: %s. De sparade låsinställningarna behölls."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Återställningen av låsen bekräftades inte i tid; byter ändå."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Intern SIM vald: används efter en omstart"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Intern SIM vald, men stöds inte på den här enheten: den externa SIM:en används"
 
 msgid "Uptime %s"
 msgstr "Drifttid %s"
@@ -990,9 +1143,6 @@ msgstr "Språkpaketet är installerat"
 msgid "The language pack could not be installed"
 msgstr "Språkpaketet kunde inte installeras"
 
-msgid "Upload failed: %s"
-msgstr "Uppladdningen misslyckades: %s"
-
 msgid "Language of the browser"
 msgstr "Webbläsarens språk"
 
@@ -1013,9 +1163,6 @@ msgstr "Språkpaketet (mu300-extra-lang.tar.gz, cirka 2 MB) lägger till LuCI p�
 
 msgid "Download from the release"
 msgstr "Ladda ner från releasen"
-
-msgid "Upload the file…"
-msgstr "Ladda upp filen…"
 
 msgid "Release"
 msgstr "Release"
@@ -1209,6 +1356,9 @@ msgstr "Status bekräftad"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Tidsgräns för återläsning överskreds; välj ”Uppdatera låsstatus”"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Återställning verifierad: nätverksläge automatiskt, EN-DC på, alla band, inget cellås; de sparade låsinställningarna är rensade"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Verkställt (EN-DC kräver ingen omstart av radiostacken)"
 
@@ -1235,6 +1385,114 @@ msgstr "Automatiskt (%d stöds)"
 
 msgid "%d locked: %s"
 msgstr "%d låsta: %s"
+
+msgid "Repair DNS?"
+msgstr "Reparera DNS?"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Detta tar bort DNS-vidarebefordran för ett paket som inte längre är installerat. Finns ingen annan DNS-server kvar använder enheten mobilanslutningens DNS-servrar: operatören ser namnen du slår upp, utanför alla proxyer och VPN."
+
+msgid "Repair DNS"
+msgstr "Reparera DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Paket som installerats på enheten ingår inte i versionens avbild. En uppdatering antecknar dem, och det nya systemet installerar dem igen vid första starten, så snart det är online. Tills ett paket är tillbaka läggs dess inställningar åt sidan."
+
+msgid "No packages to install again."
+msgstr "Inga paket att installera igen."
+
+msgid "All back"
+msgstr "Alla tillbaka"
+
+msgid "Not installed yet"
+msgstr "Inte installerat än"
+
+msgid "Could not be installed again"
+msgstr "Kunde inte installeras igen"
+
+msgid "Waiting for the internet"
+msgstr "Väntar på internet"
+
+msgid "Given up: no internet at five boots"
+msgstr "Gav upp: inget internet vid fem starter"
+
+msgid "Skipped"
+msgstr "Hoppades över"
+
+msgid "Written down by the update from %s"
+msgstr "Antecknat av uppdateringen från %s"
+
+msgid "Installed again"
+msgstr "Installerade igen"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Installera dem själv från där du fick dem (en paketfil: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Inställningar lagda åt sidan i /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "DNS går fortfarande till ett paket som inte är installerat: enheten har ingen DNS via det."
+
+msgid "Try again"
+msgstr "Försök igen"
+
+msgid "Dismiss the note"
+msgstr "Stäng meddelandet"
+
+msgid "started"
+msgstr "startad"
+
+msgid "asleep now (asked)"
+msgstr "viloläge nu (begärt)"
+
+msgid "woken: power daemon stopping"
+msgstr "väckt: energitjänsten stoppas"
+
+msgid "woken by a key"
+msgstr "väckt av en knapp"
+
+msgid "woken by the Wi-Fi key"
+msgstr "väckt av Wi-Fi-knappen"
+
+msgid "woken (mu300-power wake)"
+msgstr "väckt (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "väckt av en dator via USB"
+
+msgid "woken: plugged in"
+msgstr "väckt: laddare ansluten"
+
+msgid "woken by a Wi-Fi client"
+msgstr "väckt av en Wi-Fi-klient"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "laddstart (påslagen av laddaren)"
+
+msgid "the hotspot is down"
+msgstr "hotspoten är avstängd"
+
+msgid "the VPN is still stopped"
+msgstr "VPN är fortfarande stoppat"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "5G (EN-DC) är fortfarande av efter en misslyckad återupptagning"
+
+msgid "self-check: %s"
+msgstr "självtest: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "viloläge: ingen klient på %d min (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "viloläge: profil nu %s"
+
+msgid "woken by the %s key"
+msgstr "väckt av %s-knappen"
+
+msgid "the modem is suspended (%s)"
+msgstr "modemet är pausat (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Ange ett heltal från 0 till %d"
@@ -1437,6 +1695,15 @@ msgstr "Meddelande (Enter för att skicka, Skift+Enter för ny rad)"
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Sändning använder AT+CMGS (PDU-läge); försök igen om kanalen är upptagen. Använd papperskorgsikonen på bubblan för att radera ett enskilt meddelande."
 
+msgid "Sending…"
+msgstr "Skickar…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Skickat; listan uppdateras strax."
+
+msgid "Sending failed"
+msgstr "Sändningen misslyckades"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Synkroniserar från SIM i bakgrunden (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Raderat (endast lokalt)"
 msgid "Enter both a number and a message."
 msgstr "Ange både ett nummer och ett meddelande."
 
-msgid "Sending…"
-msgstr "Skickar…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Skickat; listan uppdateras strax."
-
-msgid "Sending failed"
-msgstr "Sändningen misslyckades"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d meddelanden, %d olästa · %d konversationer"
 
@@ -1502,6 +1760,39 @@ msgstr "Ofullständigt: %d av %d delar kom fram"
 
 msgid "Delete"
 msgstr "Radera"
+
+msgid "ttyd is not installed."
+msgstr "ttyd är inte installerat."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Terminalen är avstängd (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "För många terminaler öppnas samtidigt. Försök igen om en minut."
+
+msgid "The terminal is not available."
+msgstr "Terminalen är inte tillgänglig."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Det här är ett root-skal på enheten: varje kommando körs med fullständiga rättigheter, och ett misstag kan göra att enheten inte startar."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Den nås bara från LAN (USB och hotspot), aldrig via mobildata, och bara från den här inloggade sidan."
+
+msgid "It closes after a minute without activity."
+msgstr "Den stängs efter en minut utan aktivitet."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Den stängs efter %d minuter utan aktivitet."
+
+msgid "Reconnect"
+msgstr "Anslut igen"
+
+msgid "Open in a new tab"
+msgstr "Öppna i en ny flik"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Den här sidan öppnades via HTTPS, och terminalen levereras via HTTP på LAN: den öppnas i en egen flik."
 
 msgid "The data usage could not be read"
 msgstr "Dataförbrukningen kunde inte läsas"
@@ -1637,6 +1928,594 @@ msgstr "Stäng av"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Med 64 lämnar varje paket enheten som dess egen trafik"
+
+msgid "running"
+msgstr "körs"
+
+msgid "(about %s)"
+msgstr "(cirka %s)"
+
+msgid "Install %s?"
+msgstr "Installera %s?"
+
+msgid "It is installed from this system's package feed."
+msgstr "Den installeras från systemets paketkälla."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Den laddas ner från VPN-modulens release och kontrolleras mot dess SHA256SUMS."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "En motor är tiotals MB: på mobildata räknas nedladdningen mot din surfmängd."
+
+msgid "Install"
+msgstr "Installera"
+
+msgid "Remove %s?"
+msgstr "Ta bort %s?"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Profiler som använder den: %s. De kan inte starta förrän den installeras igen (modulen vägrar medan den körande profilen behöver den)."
+
+msgid "No profile runs on it."
+msgstr "Ingen profil använder den."
+
+msgid "Removed"
+msgstr "Borttagen"
+
+msgid "Check for updates"
+msgstr "Sök efter uppdateringar"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Varje motor är ett eget tillägg: installera bara de som dina profiler behöver. Xray kör länkar av typen vless, vmess, trojan och ss (med hev-socks5-tunnel), sing-box samma länkar och sin egen JSON, mihomo Clash-prenumerationer, dae hysteria2, tuic och resten på nyare kärnor. WireGuard och OpenVPN är paket i systemet."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Nedladdningar är tiotals MB per motor: på mobildata räknas de mot din surfmängd. Offline: ladda upp motorns tarball från VPN-modulens releasesida."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "De tillgängliga versionerna kommer från den senaste releasen av VPN-modulen."
+
+msgid "Update"
+msgstr "Uppdatera"
+
+msgid "system package"
+msgstr "systempaket"
+
+msgid "in the vpn bundle"
+msgstr "i vpn-paketet"
+
+msgid "extra %s"
+msgstr "tillägg %s"
+
+msgid "not installed"
+msgstr "inte installerad"
+
+msgid "cannot run here"
+msgstr "kan inte köras här"
+
+msgid "update available"
+msgstr "uppdatering finns"
+
+msgid "installed"
+msgstr "installerad"
+
+msgid "Kind"
+msgstr "Typ"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Available"
+msgstr "Tillgänglig"
+
+msgid "not checked"
+msgstr "inte kontrollerad"
+
+msgid "Size"
+msgstr "Storlek"
+
+msgid "Needed by"
+msgstr "Används av"
+
+msgid "no profile"
+msgstr "ingen profil"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "dae kräver en kärna med BTF, 5.17 eller nyare: inte tillverkarens 5.4-kärna (mu300-update kernel 6.18). Den kan installeras ändå."
+
+msgid "All engines"
+msgstr "Alla motorer"
+
+msgid "Last %s lines"
+msgstr "Senaste %s raderna"
+
+msgid "VPN service log"
+msgstr "VPN-tjänstens logg"
+
+msgid "Every 5 s"
+msgstr "Var 5:e s"
+
+msgid "The log is empty."
+msgstr "Loggen är tom."
+
+msgid "The VPN is starting"
+msgstr "VPN startar"
+
+msgid "The VPN is stopped"
+msgstr "VPN är stoppat"
+
+msgid "The VPN is restarting"
+msgstr "VPN startar om"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Med kill switch på lämnar ingenting enheten eller LAN utanför tunneln: medan VPN är nere, startar eller är trasigt misslyckas varje anslutning i stället för att gå ut direkt. Den ligger kvar tills du stoppar VPN här (Stoppa tar bort den)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Utan kill switch går trafiken ut direkt, oskyddad, så fort tunneln är nere (under start, efter en krasch, när motorn saknas)."
+
+msgid "Turn the kill switch on?"
+msgstr "Slå på kill switch?"
+
+msgid "Turn the kill switch off?"
+msgstr "Slå av kill switch?"
+
+msgid "Turn on"
+msgstr "Slå på"
+
+msgid "unknown"
+msgstr "okänd"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Utgångsadressen hittades inte (är tunneln uppe?)"
+
+msgid "Connecting…"
+msgstr "Ansluter…"
+
+msgid "On, but not running"
+msgstr "På, men körs inte"
+
+msgid "Stopped"
+msgstr "Stoppad"
+
+msgid "Install it"
+msgstr "Installera den"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Motorn för den aktiva profilen är inte installerad: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Kill switch håller allt stängt tills den finns; tjänsten laddar ner den själv när den kan."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "VPN kan inte starta förrän den är installerad."
+
+msgid "%s cannot run on this system"
+msgstr "%s kan inte köras på det här systemet"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "VPN är på, men ingen profil är aktiv: välj en nedan."
+
+msgid "Profile: %s"
+msgstr "Profil: %s"
+
+msgid "No active profile"
+msgstr "Ingen aktiv profil"
+
+msgid "engine %s"
+msgstr "motor %s"
+
+msgid "interface %s"
+msgstr "gränssnitt %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch aktiv"
+
+msgid "Kill switch on"
+msgstr "Kill switch på"
+
+msgid "Kill switch off"
+msgstr "Kill switch av"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 i tunneln"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 blockerat"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 orört"
+
+msgid "Module %s"
+msgstr "Modul %s"
+
+msgid "Check"
+msgstr "Kontrollera"
+
+msgid "Uptime"
+msgstr "Drifttid"
+
+msgid "Rate"
+msgstr "Hastighet"
+
+msgid "Exit address"
+msgstr "Utgångsadress"
+
+msgid "Start"
+msgstr "Starta"
+
+msgid "Stop"
+msgstr "Stoppa"
+
+msgid "Restart"
+msgstr "Starta om"
+
+msgid "Stop the VPN?"
+msgstr "Stoppa VPN?"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Trafiken går då ut direkt, utan tunneln; kill switch tas bort med den."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "VPN är på: det startar igen av sig självt efter en omstart."
+
+msgid "The VPN is off."
+msgstr "VPN är av."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Inställning"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Aktiv: bara tunneln når internet"
+
+msgid "Not active"
+msgstr "Inte aktiv"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Kill switch blockerar all trafik från enheten och från LAN medan VPN är nere, så att ingenting någonsin lämnar utan tunneln. Om tunneln inte kan komma upp (en död server, ett utgånget konto) förblir enheten offline tills du åtgärdar profilen eller stoppar VPN. Själva panelen förblir nåbar från LAN."
+
+msgid "Choose a profile"
+msgstr "Välj en profil"
+
+msgid "No profiles yet"
+msgstr "Inga profiler ännu"
+
+msgid "engine not installed"
+msgstr "motorn är inte installerad"
+
+msgid "Use"
+msgstr "Använd"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Bytt: VPN startar om med den nya profilen"
+
+msgid "Active profile"
+msgstr "Aktiv profil"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Ett körande VPN startar om med den profil du väljer; kill switch ligger kvar däremellan."
+
+msgid "Manage the profiles"
+msgstr "Hantera profilerna"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Automatiskt: genom tunneln där motorn kan bära den"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Be motorn om IPv6 i tunneln"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Aldrig genom tunneln (blockeras medan VPN är uppe)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Sparat: gäller från nästa start (Starta om)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Tunneln bär IPv6"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "IPv6 guard"
+msgstr "IPv6-skydd"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Aktivt: IPv6 utanför tunneln nekas"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Medan VPN är uppe lämnar IPv6 aldrig bredvid en tunnel som inte bär det: det nekas direkt, så program och LAN-klienter går över till IPv4 i stället för att läcka eller vänta. Automatiskt: WireGuard använder IPv6-adresserna i sin konfiguration, de andra motorerna stannar på IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: kan inte testas"
+
+msgid "blocked by the kill switch"
+msgstr "blockerad av kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "En WireGuard- eller OpenVPN-konfiguration, en Clash/mihomo-YAML, en Xray- eller sing-box-JSON, en dae-konfiguration"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Efter OK väljer du filen: en WireGuard .conf, en OpenVPN .ovpn, en Clash/mihomo .yaml, en Xray- eller sing-box-.json eller en dae-konfiguration (högst 1 MiB)."
+
+msgid "From the source"
+msgstr "Från källan"
+
+msgid "Detect"
+msgstr "Identifiera"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "URL:en kan innehålla en token: den går till enheten för sig, aldrig in i en kommandorad eller en logg."
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Share link"
+msgstr "Delningslänk"
+
+msgid "Paste"
+msgstr "Klistra in"
+
+msgid "File"
+msgstr "Fil"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Inte en delningslänk som den här panelen tar emot"
+
+msgid "The config is empty"
+msgstr "Konfigurationen är tom"
+
+msgid "Not an https URL"
+msgstr "Inte en https-URL"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Ogiltigt namn: 1-64 tecken, inga styrtecken"
+
+msgid "Add a profile"
+msgstr "Lägg till en profil"
+
+msgid "Name"
+msgstr "Namn"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Identifiera: modulen avgör typen från länken eller filen. Välj typ för en JSON som kan vara både Xray och sing-box, eller för en länk som ska köras på en annan motor."
+
+msgid "The profile is added"
+msgstr "Profilen har lagts till"
+
+msgid "Rename the profile"
+msgstr "Byt namn på profilen"
+
+msgid "Delete the profile %s?"
+msgstr "Radera profilen %s?"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Det är den aktiva profilen: med VPN på vägrar modulen; stoppa VPN eller välj en annan profil först."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Dess konfiguration och inloggningsuppgifter raderas från enheten."
+
+msgid "Deleted"
+msgstr "Raderad"
+
+msgid "The profile passes the check"
+msgstr "Profilen klarar kontrollen"
+
+msgid "Show the config?"
+msgstr "Visa konfigurationen?"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Konfigurationen innehåller profilens inloggningsuppgifter (nycklar, lösenord, UUID:er). Den visas bara på den här skärmen; alla som kan se skärmen kan läsa den."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Vid sparning kontrolleras konfigurationen först med motorn (profile edit); en konfiguration som inte klarar kontrollen sparas inte och den gamla ligger kvar."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Den här profilen kommer från en prenumeration: nästa uppdatering ersätter dina ändringar."
+
+msgid "Config of %s"
+msgstr "Konfiguration för %s"
+
+msgid "Close"
+msgstr "Stäng"
+
+msgid "Rename"
+msgstr "Byt namn"
+
+msgid "Show / edit the config"
+msgstr "Visa / redigera konfigurationen"
+
+msgid "Test the latency of all"
+msgstr "Testa latensen för alla"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Inga profiler ännu: lägg till en från en delningslänk, en konfigurationsfil eller en prenumeration."
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "This profile is the active one now"
+msgstr "Den här profilen är den aktiva nu"
+
+msgid "More"
+msgstr "Mer"
+
+msgid "active"
+msgstr "aktiv"
+
+msgid "subscription"
+msgstr "prenumeration"
+
+msgid "migrated"
+msgstr "migrerad"
+
+msgid "gone from its subscription"
+msgstr "borta från sin prenumeration"
+
+msgid "Server"
+msgstr "Server"
+
+msgid "Engine"
+msgstr "Motor"
+
+msgid "Latency"
+msgstr "Latens"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Latensen är en TCP-anslutning till servern, genom tunneln när VPN är uppe. WireGuard- och OpenVPN-servrar använder oftast UDP och kan inte testas på det här sättet."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Ange en IPv4- eller IPv6-adress"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "På: ingenting lämnar utanför tunneln"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Av: trafiken går ut direkt medan tunneln är nere"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Ja: Tailscales egna anslutningar går genom tunneln"
+
+msgid "No: Tailscale connects directly"
+msgstr "Nej: Tailscale ansluter direkt"
+
+msgid "Routing"
+msgstr "Routing"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Kill switch blockerar all trafik från enheten och från LAN medan VPN är nere."
+
+msgid "Bypass the tunnel"
+msgstr "Gå förbi tunneln"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Ange adressintervall som 192.168.0.0/16, separerade med kommatecken"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Adressintervall som aldrig går in i tunneln, förutom själva LAN (som aldrig gör det). Tomt: bara LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale genom VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "När Tailscale körs på enheten går dess WireGuard-, DERP- och kontrollanslutningar genom den tunnel som körs (dae fångar upp dem som allt annat)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS genom tunneln"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Resolvern som enhetens och LAN:s uppslagningar går till, genom tunneln. Ingenting går till operatörens resolver."
+
+msgid "Bootstrap DNS"
+msgstr "Bootstrap-DNS"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Hittar VPN-serverns egen adress innan tunneln är uppe (direkt, på motorns egen anslutning)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Tomt återställer en inställning till standardvärdet."
+
+msgid "TUN stack"
+msgstr "TUN-stack"
+
+msgid "Default (gvisor)"
+msgstr "Standard (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (inte på 5.4-kärnan)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "angiven (oförändrad om du inte skriver en ny)"
+
+msgid "not set"
+msgstr "inte angiven"
+
+msgid "Upstream HTTP proxy"
+msgstr "Uppströms HTTP-proxy"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "TLS-certifikatfastnålning (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Ange host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Ange SHA-256 i hex"
+
+msgid "Profile options"
+msgstr "Profilalternativ"
+
+msgid "None of the profiles has options of its type."
+msgstr "Ingen av profilerna har alternativ för sin typ."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "mihomos läge (rule, global, direct), motorernas loggnivåer, daes grupper och routing ingår i varje profils egen konfiguration: VPN > Profiler, Visa / redigera konfigurationen."
+
+msgid "Delete the subscription %s?"
+msgstr "Radera prenumerationen %s?"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Dess profiler kan följa med eller stanna kvar som egna profiler. Den aktiva profilen tas aldrig bort medan VPN är på."
+
+msgid "Keep the profiles"
+msgstr "Behåll profilerna"
+
+msgid "Delete with its profiles"
+msgstr "Radera med profilerna"
+
+msgid "Only by hand"
+msgstr "Bara manuellt"
+
+msgid "Every %d h"
+msgstr "Var %d:e timme"
+
+msgid "Share links: one profile per link"
+msgstr "Delningslänkar: en profil per länk"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "Clash/mihomo-YAML: en mihomo-profil"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: en profil med alla noder i en grupp"
+
+msgid "Add a subscription"
+msgstr "Lägg till en prenumeration"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "URL:en innehåller oftast din kontotoken: den lagras på enheten läsbar endast för root och visas aldrig igen. Prenumerationen hämtas över enhetens egen anslutning: genom tunneln när VPN är uppe; med kill switch uppe och tunneln nere kan den inte hämtas."
+
+msgid "Refresh all"
+msgstr "Uppdatera alla"
+
+msgid "No subscriptions yet."
+msgstr "Inga prenumerationer ännu."
+
+msgid "Host"
+msgstr "Värd"
+
+msgid "Updated"
+msgstr "Uppdaterad"
+
+msgid "Share links"
+msgstr "Delningslänkar"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "En uppdatering behåller profilerna vars namn är oförändrat, lägger till de nya och tar bort de som försvunnit (den aktiva stannar kvar medan VPN är på, markerad som försvunnen). Uppdatering av den aktiva profilen startar om det körande VPN."
 
 msgid "Dashboard info failed"
 msgstr "Panelinformation misslyckades"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Paketadaptern gav inget giltigt svar"
+
+msgid "Invalid packages operation"
+msgstr "Ogiltig paketåtgärd"
+
 msgid "Request too large"
 msgstr "Begäran för stor"
 
@@ -1820,6 +2705,150 @@ msgstr "Körtidskatalogen är inte säker; inget kördes"
 
 msgid "No such method"
 msgstr "Ingen sådan metod"
+
+msgid "The VPN module refused the request"
+msgstr "VPN-modulen avvisade begäran"
+
+msgid "The VPN panel is busy, try again"
+msgstr "VPN-panelen är upptagen, försök igen"
+
+msgid "Another VPN task is still running"
+msgstr "En annan VPN-uppgift körs fortfarande"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Parametern exit_ip måste vara 0 eller 1"
+
+msgid "The VPN status could not be read"
+msgstr "VPN-statusen kunde inte läsas"
+
+msgid "The profiles could not be read"
+msgstr "Profilerna kunde inte läsas"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Parametern check måste vara 0 eller 1"
+
+msgid "The engines could not be read"
+msgstr "Motorerna kunde inte läsas"
+
+msgid "The subscriptions could not be read"
+msgstr "Prenumerationerna kunde inte läsas"
+
+msgid "The VPN settings could not be read"
+msgstr "VPN-inställningarna kunde inte läsas"
+
+msgid "Unknown VPN operation"
+msgstr "Okänd VPN-åtgärd"
+
+msgid "The VPN could not be switched"
+msgstr "VPN kunde inte växlas"
+
+msgid "The kill switch is on or off"
+msgstr "Kill switch är på eller av"
+
+msgid "The kill switch could not be changed"
+msgstr "Kill switch kunde inte ändras"
+
+msgid "Invalid profile id"
+msgstr "Ogiltigt profil-id"
+
+msgid "The profile could not be made the active one"
+msgstr "Profilen kunde inte göras aktiv"
+
+msgid "Unknown profile source"
+msgstr "Okänd profilkälla"
+
+msgid "Unknown profile type"
+msgstr "Okänd profiltyp"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Konfigurationen är tom, för stor eller innehåller styrtecken"
+
+msgid "Invalid profile request"
+msgstr "Ogiltig profilbegäran"
+
+msgid "A config from a URL takes the type it says"
+msgstr "En konfiguration från en URL får den typ den själv anger"
+
+msgid "No uploaded file"
+msgstr "Ingen uppladdad fil"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Filen är större än 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Profilen kunde inte läggas till"
+
+msgid "The profile could not be renamed"
+msgstr "Profilen kunde inte döpas om"
+
+msgid "The profile could not be removed"
+msgstr "Profilen kunde inte tas bort"
+
+msgid "The profile does not pass the check"
+msgstr "Profilen klarar inte kontrollen"
+
+msgid "Unknown profile option"
+msgstr "Okänt profilalternativ"
+
+msgid "Invalid value for this option"
+msgstr "Ogiltigt värde för det här alternativet"
+
+msgid "The option could not be set"
+msgstr "Alternativet kunde inte ställas in"
+
+msgid "The config could not be read"
+msgstr "Konfigurationen kunde inte läsas"
+
+msgid "The config was not saved"
+msgstr "Konfigurationen sparades inte"
+
+msgid "The latency test failed"
+msgstr "Latenstestet misslyckades"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Uppdateringsintervallet är 1 till 999 timmar"
+
+msgid "Unknown subscription type"
+msgstr "Okänd prenumerationstyp"
+
+msgid "Invalid subscription id"
+msgstr "Ogiltigt prenumerations-id"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Parametern keep måste vara 0 eller 1"
+
+msgid "The subscription could not be removed"
+msgstr "Prenumerationen kunde inte tas bort"
+
+msgid "The file is too large"
+msgstr "Filen är för stor"
+
+msgid "Unknown engine"
+msgstr "Okänd motor"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Parametern unverified måste vara 0 eller 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Den här motorn är ett systempaket: den har ingen fil att ladda upp"
+
+msgid "The engine could not be removed"
+msgstr "Motorn kunde inte tas bort"
+
+msgid "mu300-extra is not on this system"
+msgstr "mu300-extra finns inte på det här systemet"
+
+msgid "Unknown VPN setting"
+msgstr "Okänd VPN-inställning"
+
+msgid "The setting could not be saved"
+msgstr "Inställningen kunde inte sparas"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Antalet rader är 1 till 1000"
+
+msgid "The log could not be read"
+msgstr "Loggen kunde inte läsas"
 
 msgid "Radio did not come up"
 msgstr "Radion startade inte"
@@ -1935,6 +2964,9 @@ msgstr "Ogiltig filterlista (högst 50 rader)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Webhookens adress måste vara en http://- eller https://-URL"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Webhookens kropp är för lång eller innehåller ett styrtecken"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Ogiltig rubrik (en \"Namn: värde\" per rad; Host, Content-Type, Content-Length, Transfer-Encoding och Connection sätts av enheten)"
 
@@ -1992,17 +3024,47 @@ msgstr "Språkpaketet kunde inte tas bort"
 msgid "Lock cache unavailable"
 msgstr "Låscache inte tillgänglig"
 
+msgid "The saved locks could not be cleared"
+msgstr "De sparade låsen kunde inte rensas"
+
 msgid "No serving cell to lock to"
 msgstr "Ingen betjänande cell att låsa till"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Modemet svarade inte på lägesförfrågan; ingenting skickades"
+
+msgid "The modem refused a write"
+msgstr "Modemet avvisade en skrivning"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Återläsningen stämmer inte med de automatiska värdena"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Återläsningen efter omstarten av stacken stämmer inte med de automatiska värdena"
+
+msgid "The reset was interrupted"
+msgstr "Återställningen avbröts"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Att installera om paket är inte tillgängligt på det här systemet"
+
+msgid "No packages were written down by an update"
+msgstr "Ingen uppdatering har antecknat paket"
+
+msgid "Reinstalling is running already"
+msgstr "Ominstallationen körs redan"
+
+msgid "The note could not be dropped"
+msgstr "Meddelandet kunde inte tas bort"
+
+msgid "Unknown packages operation"
+msgstr "Okänd paketåtgärd"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Dataförbrukning är inte tillgänglig på detta system"
-
-msgid "The setting could not be saved"
-msgstr "Inställningen kunde inte sparas"
 
 msgid "Unknown data usage operation"
 msgstr "Okänd åtgärd för dataförbrukning"

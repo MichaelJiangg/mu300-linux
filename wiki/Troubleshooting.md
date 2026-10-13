@@ -120,6 +120,74 @@ Android still works.
 The mainline kernels (6.18, 7.2) of v2026.10.11 and older leave charging off. Update (charging on mainline comes from
 v2026.10.12 on), or use kernel 5.4.
 
+## The hotspot does not start on a 5 GHz channel between 52 and 144
+
+hostapd stops with `start_dfs_cac() failed` / `AP-DISABLED` (releases up to v2026.10.18). Those are DFS channels, and
+the Wi-Fi driver cannot detect radar. **Fixed from v2026.10.20 on:** such a channel is replaced by 36 (or 149) with
+a line in the log. On an older release choose 36-48 or 149-165, or `auto` on Ubuntu.
+[FINDINGS 42](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## The control panel went blank after an AT command got stuck
+
+On `openwrt-luci` up to v2026.10.18 one stuck AT command could blank every page, even the battery tile, for minutes,
+also after a reboot. The panel's lock wait counted whole seconds instead of tenths (OpenWrt's `sleep` takes no
+fractions), and some pages read the modem inside the request. **Fixed from v2026.10.20 on**; there the pages keep
+their last readings and say how old they are. On an older release wait it out, or restart `rpcd` and `mu300-atd`.
+[FINDINGS 40](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## Sending an SMS fails with `SMS FAILED: CODE:600`, or the panel's operations log says `sms_send - killed`
+
+Up to v2026.10.21, on some networks (China Broadnet, issue #176) the modem's IMS stack refused every submission
+(`+SPIMSREASON: 1,512,"SMS FAILED: CODE:600 REASON:Busy Everywhere"` in the URC log) while incoming messages
+arrived; and on `openwrt-luci` a send that took longer than 30 s was killed together with the panel's request, leaving
+`sms_send - killed` in the operations log and no word on whether the message went out. **Fixed from v2026.10.22 on**:
+a send is one AT transaction (the channel is held from the setup to the submission, so no other client gets in
+between) and the SMSC the modem reports is written back to it unchanged before each one, in `mu300-sms` and the panel
+on OpenWrt and in `sms` on Ubuntu; the panel starts the send in the background and follows it, also after a reload.
+On an older release write the SMSC back yourself (`mu300-at 'AT+CSCA?'`, then `mu300-at 'AT+CSCA="<the value it
+showed>",<the type>'`, with `sudo` on Ubuntu) and send from the shell while the panel is idle (`mu300-sms send NUMBER
+TEXT` on OpenWrt, `sudo sms send NUMBER TEXT` on Ubuntu).
+[FINDINGS 46](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## The device restarts on kernel 5.4 when a container stops
+
+Up to v2026.10.20, on 5.4, when two network namespaces were alive at once and one went away (Docker containers, a
+sandbox, `unshare -n`), the kernel could panic while cleaning it up (`xfrm_sysctl_fini` in the trace; issue #103); the
+device restarts, and after a few of those it falls back to Android. **Fixed from v2026.10.21 on**; update. On an older
+release keep to one container at a time, or use 6.18 or 7.2, which never had the bug.
+[FINDINGS 44](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## The device crashes when the Wi-Fi driver is unloaded (6.18, 7.2)
+
+Up to v2026.10.20, `rmmod sprd_wlan_combo` on 6.18 or 7.2 panicked within a second (`__run_timers`: the driver left a
+timer running in freed memory; issue #146). **Fixed from v2026.10.21 on.** On an older release do not unload the
+module; restart the device instead. [FINDINGS 45](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## The log is full of `sprd-wlan` errors every few seconds
+
+Lines such as `sc2355_dump_survey, idx 0`, `bssid not found, multicast?` or `data len is 251, skb need 576` at error
+level, every six seconds or so in `dmesg` and `logread` (releases up to v2026.10.20). They describe the driver's
+routine work, not faults (issue #140). **From v2026.10.21 on** they are debug lines, shown only when you ask for them:
+`echo 'module sprd_wlan_combo +p' > /sys/kernel/debug/dynamic_debug/control`. The real errors next to them are still
+logged.
+
+## The log is full of `mmc1` register dumps on the F50 (6.18, 7.2)
+
+`mmc1: Got command interrupt 0x00000001 even though no command operation was in progress`, followed by a 16-line
+`SDHCI REGISTER DUMP`, every few seconds to minutes in `dmesg -l err` on an F50 with nothing in the SD slot, on 6.18
+and 7.2 up to v2026.10.21 (issue #181). Mainline's EIC driver mapped only three of the controller's six banks, so the
+slot's card-detect line could not be found and the slot was polled instead: every second a card that is not there was
+initialised, and the host's late answer to a command nothing replied to was logged with the dump. **Fixed from
+v2026.10.22 on**: the six banks are mapped, the slot has real card detect (an interrupt), and an empty slot is left
+alone until a card goes in. The dumps are noise, not a fault; on an older release put a card in the slot (with a card
+there are none) or use 5.4, which never had them. The U30 Air has no slot.
+[FINDINGS 31j](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md)
+
+## The U30 Air charges slowly on a strong USB-C port
+
+The mainline kernels of v2026.10.19 and older took 500 mA from every port. From v2026.10.20 on they read the current
+the port offers (1.5 or 3 A) and charge at up to 2 A. On 5.4 the vendor stack decides.
+
 ## The U30 Air stays dark after starting from a charger
 
 A boot that started because a charger was plugged in stays a **charging boot** (LED blinking, hotspot and modem down)

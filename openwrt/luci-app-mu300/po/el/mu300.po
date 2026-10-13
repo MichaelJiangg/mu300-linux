@@ -42,8 +42,38 @@ msgstr "Ισχύς"
 msgid "CPU"
 msgstr "CPU"
 
-msgid "MU300 control center: status dashboard, network locks, AT terminal and SMS"
-msgstr "Κέντρο ελέγχου MU300: πίνακας κατάστασης, κλειδώματα δικτύου, τερματικό AT και SMS"
+msgid "Terminal"
+msgstr "Τερματικό"
+
+msgid "Terminal settings"
+msgstr "Ρυθμίσεις τερματικού"
+
+msgid "Overview"
+msgstr "Επισκόπηση"
+
+msgid "Profiles"
+msgstr "Προφίλ"
+
+msgid "Subscriptions"
+msgstr "Συνδρομές"
+
+msgid "Engines"
+msgstr "Μηχανές"
+
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+msgid "Logs"
+msgstr "Αρχεία καταγραφής"
+
+msgid "Packages after an update"
+msgstr "Πακέτα μετά από ενημέρωση"
+
+msgid "MU300 control center: status dashboard, network locks, AT terminal, SMS and VPN"
+msgstr "Κέντρο ελέγχου MU300: πίνακας κατάστασης, κλειδώματα δικτύου, τερματικό AT, SMS και VPN"
+
+msgid "Terminal: a root shell on the device in the browser"
+msgstr "Τερματικό: ένα κέλυφος root της συσκευής στο πρόγραμμα περιήγησης"
 
 msgid "China Mobile"
 msgstr "China Mobile"
@@ -119,6 +149,93 @@ msgstr "Άγνωστος αριθμός"
 
 msgid "Select"
 msgstr "Επιλογή"
+
+msgid "never"
+msgstr "ποτέ"
+
+msgid "just now"
+msgstr "μόλις τώρα"
+
+msgid "%s ago"
+msgstr "πριν από %s"
+
+msgid "Failed: %s"
+msgstr "Απέτυχε: %s"
+
+msgid "Management connection lost"
+msgstr "Η σύνδεση διαχείρισης χάθηκε"
+
+msgid "Installing the VPN module"
+msgstr "Εγκατάσταση της μονάδας VPN"
+
+msgid "Installing the engine"
+msgstr "Εγκατάσταση της μηχανής"
+
+msgid "Adding the subscription"
+msgstr "Προσθήκη της συνδρομής"
+
+msgid "Refreshing the subscriptions"
+msgstr "Ανανέωση των συνδρομών"
+
+msgid "Testing the latency of every profile"
+msgstr "Δοκιμή της καθυστέρησης κάθε προφίλ"
+
+msgid "Downloading the config"
+msgstr "Λήψη της διαμόρφωσης"
+
+msgid "Working…"
+msgstr "Σε εξέλιξη…"
+
+msgid "done"
+msgstr "ολοκληρώθηκε"
+
+msgid "failed"
+msgstr "απέτυχε"
+
+msgid "Verify the uploaded file"
+msgstr "Επαλήθευση του αρχείου που ανέβηκε"
+
+msgid "The uploaded file is checked against the SHA256SUMS of the VPN module's latest release, downloaded over HTTPS. When that is not possible (offline, an older release), it is installed only if you allow an unverified file: it then runs as root with no check."
+msgstr "Το αρχείο που ανέβηκε ελέγχεται με το SHA256SUMS της τελευταίας έκδοσης της μονάδας VPN, που λαμβάνεται μέσω HTTPS. Αν αυτό δεν είναι δυνατό (εκτός σύνδεσης, παλαιότερη έκδοση), εγκαθίσταται μόνο αν επιτρέψετε μη επαληθευμένο αρχείο: τότε εκτελείται ως root χωρίς κανέναν έλεγχο."
+
+msgid "Install it even if it cannot be verified"
+msgstr "Εγκατάσταση ακόμη κι αν δεν μπορεί να επαληθευτεί"
+
+msgid "Install only a verified file"
+msgstr "Εγκατάσταση μόνο επαληθευμένου αρχείου"
+
+msgid "Upload failed: %s"
+msgstr "Η μεταφόρτωση απέτυχε: %s"
+
+msgid "The VPN module is too old for this panel"
+msgstr "Η μονάδα VPN είναι πολύ παλιά για αυτόν τον πίνακα"
+
+msgid "The VPN module is not installed"
+msgstr "Η μονάδα VPN δεν είναι εγκατεστημένη"
+
+msgid "This page needs the VPN module with the machine-readable mu300-vpn (module v2 or newer). Updating it keeps the profiles and the settings."
+msgstr "Αυτή η σελίδα απαιτεί τη μονάδα VPN με το mu300-vpn που διαβάζεται από μηχανή (μονάδα v2 ή νεότερη). Η ενημέρωση διατηρεί τα προφίλ και τις ρυθμίσεις."
+
+msgid "The VPN is a module of its own: mu300-vpn with its kill switch and profiles, and one extra per engine (Xray, sing-box, mihomo, dae). It is installed with mu300-extra install vpn."
+msgstr "Το VPN είναι ξεχωριστή μονάδα: το mu300-vpn με το kill switch και τα προφίλ του, και ένα πρόσθετο ανά μηχανή (Xray, sing-box, mihomo, dae). Εγκαθίσταται με το mu300-extra install vpn."
+
+msgid "The download is a few MB for the module and up to tens of MB per engine: on mobile data it counts towards your plan."
+msgstr "Η λήψη είναι λίγα MB για τη μονάδα και έως δεκάδες MB ανά μηχανή: στα δεδομένα κινητής χρεώνεται στο πακέτο σας."
+
+msgid "Update the VPN module"
+msgstr "Ενημέρωση της μονάδας VPN"
+
+msgid "Install the VPN module"
+msgstr "Εγκατάσταση της μονάδας VPN"
+
+msgid "Upload the file…"
+msgstr "Μεταφόρτωση του αρχείου…"
+
+msgid "Offline: upload mu300-linux-vpn-core.tar.gz (or the bundle mu300-linux-vpn.tar.gz) from the release page of the VPN module."
+msgstr "Εκτός σύνδεσης: ανεβάστε το mu300-linux-vpn-core.tar.gz (ή το πακέτο mu300-linux-vpn.tar.gz) από τη σελίδα εκδόσεων της μονάδας VPN."
+
+msgid "VPN"
+msgstr "VPN"
 
 msgid "This is a network or frequency scan: it takes one to three minutes, holds the modem's AT channel all that time, and mobile data may pause meanwhile. It runs in the background; the reply appears here when it is done."
 msgstr "Πρόκειται για σάρωση δικτύων ή συχνοτήτων: διαρκεί ένα έως τρία λεπτά, κρατά το κανάλι AT του μόντεμ όλο αυτό το διάστημα και τα δεδομένα κινητής μπορεί να διακοπούν στο μεταξύ. Εκτελείται στο παρασκήνιο· η απάντηση εμφανίζεται εδώ όταν ολοκληρωθεί."
@@ -207,14 +324,8 @@ msgstr "Μια σάρωση βγάζει για λίγο το σημείο πρ�
 msgid "Scan anyway"
 msgstr "Σάρωση παρ' όλα αυτά"
 
-msgid "Failed: %s"
-msgstr "Απέτυχε: %s"
-
 msgid "Saved"
 msgstr "Αποθηκεύτηκε"
-
-msgid "Management connection lost"
-msgstr "Η σύνδεση διαχείρισης χάθηκε"
 
 msgid "CPU profile unavailable"
 msgstr "CPU profile unavailable"
@@ -272,6 +383,24 @@ msgstr "Hardware max"
 
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
+
+msgid "Thermal"
+msgstr "Θερμικά"
+
+msgid "The kernel's thermal zones, read only. A zone with trip points throttles the cooling devices bound to it at its passive trip; a cooling state of 0 is no throttling."
+msgstr "Οι θερμικές ζώνες του πυρήνα, μόνο για ανάγνωση. Μια ζώνη με σημεία ορίου περιορίζει τις συσκευές ψύξης που είναι συνδεδεμένες σε αυτήν στο παθητικό της όριο· κατάσταση ψύξης 0 σημαίνει χωρίς περιορισμό."
+
+msgid "Zone"
+msgstr "Ζώνη"
+
+msgid "Temperature"
+msgstr "Θερμοκρασία"
+
+msgid "Trip points"
+msgstr "Σημεία ορίου"
+
+msgid "Cooling devices"
+msgstr "Συσκευές ψύξης"
 
 msgid "USB role"
 msgstr "Ρόλος USB"
@@ -489,8 +618,17 @@ msgstr "Σώμα"
 msgid "Form (URL-encoded)"
 msgstr "Φόρμα (κωδικοποίηση URL)"
 
+msgid "Plain text"
+msgstr "Απλό κείμενο"
+
 msgid "Fields: sender, time, text, device, message (the template filled in)"
 msgstr "Πεδία: sender, time, text, device, message (το συμπληρωμένο πρότυπο)"
+
+msgid "Custom body"
+msgstr "Προσαρμοσμένο σώμα"
+
+msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
+msgstr "Κενό: τα τυπικά πεδία (απλό κείμενο: το μήνυμα). Σύμβολα κράτησης θέσης: {sender}, {time}, {text}, {device}, {message}. Κάθε τιμή διαφεύγεται ανάλογα με τον επιλεγμένο τύπο. Αυτό το σώμα εμφανίζεται ξανά εδώ: κρατήστε τα μυστικά στη διεύθυνση ή σε κεφαλίδα."
 
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Επιπλέον κεφαλίδες (μία \"Όνομα: τιμή\" ανά γραμμή)"
@@ -651,6 +789,9 @@ msgstr "Σύνολο απεσταλμένων"
 msgid "Used today"
 msgstr "Χρήση σήμερα"
 
+msgid "SIM source"
+msgstr "Πηγή SIM"
+
 msgid "Session duration"
 msgstr "Διάρκεια συνεδρίας"
 
@@ -719,6 +860,9 @@ msgstr "Μόντεμ"
 
 msgid "Carrier"
 msgstr "Πάροχος"
+
+msgid "Own number"
+msgstr "Δικός αριθμός"
 
 msgid "Module"
 msgstr "Μονάδα"
@@ -858,8 +1002,17 @@ msgstr "Το κλείδωμα απέτυχε: %s"
 msgid "Resetting the network locks to automatic (SFUN restart, about 30 seconds)…"
 msgstr "Επαναφορά των κλειδωμάτων δικτύου σε αυτόματο (επανεκκίνηση SFUN, περίπου 30 δευτερόλεπτα)…"
 
+msgid "Reset failed: %s. The saved lock settings were kept."
+msgstr "Η επαναφορά απέτυχε: %s. Οι αποθηκευμένες ρυθμίσεις κλειδώματος διατηρήθηκαν."
+
 msgid "The lock reset was not confirmed in time; switching anyway."
 msgstr "Η επαναφορά των κλειδωμάτων δεν επιβεβαιώθηκε εγκαίρως· γίνεται εναλλαγή ούτως ή άλλως."
+
+msgid "Internal SIM selected: in use after a reboot"
+msgstr "Επιλέχθηκε η εσωτερική SIM: χρησιμοποιείται μετά από επανεκκίνηση"
+
+msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
+msgstr "Επιλέχθηκε η εσωτερική SIM, αλλά δεν υποστηρίζεται σε αυτή τη συσκευή: χρησιμοποιείται η εξωτερική SIM"
 
 msgid "Uptime %s"
 msgstr "Χρόνος λειτουργίας %s"
@@ -990,9 +1143,6 @@ msgstr "Το πακέτο γλωσσών εγκαταστάθηκε"
 msgid "The language pack could not be installed"
 msgstr "Δεν ήταν δυνατή η εγκατάσταση του πακέτου γλωσσών"
 
-msgid "Upload failed: %s"
-msgstr "Η μεταφόρτωση απέτυχε: %s"
-
 msgid "Language of the browser"
 msgstr "Γλώσσα του προγράμματος περιήγησης"
 
@@ -1013,9 +1163,6 @@ msgstr "Το πακέτο γλωσσών (mu300-extra-lang.tar.gz, περίπο�
 
 msgid "Download from the release"
 msgstr "Λήψη από την έκδοση"
-
-msgid "Upload the file…"
-msgstr "Μεταφόρτωση του αρχείου…"
 
 msgid "Release"
 msgstr "Έκδοση"
@@ -1209,6 +1356,9 @@ msgstr "Η κατάσταση επιβεβαιώθηκε"
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Λήξη χρόνου ανάγνωσης· επιλέξτε «Ανανέωση κατάστασης κλειδώματος»"
 
+msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
+msgstr "Η επαναφορά επαληθεύτηκε: λειτουργία δικτύου αυτόματη, EN-DC ενεργό, όλες οι ζώνες, χωρίς κλείδωμα κυψέλης· οι αποθηκευμένες ρυθμίσεις κλειδώματος διαγράφηκαν"
+
 msgid "Applied (EN-DC does not require a radio-stack restart)"
 msgstr "Εφαρμόστηκε (το EN-DC δεν απαιτεί επανεκκίνηση της στοίβας ραδιοφώνου)"
 
@@ -1235,6 +1385,114 @@ msgstr "Αυτόματο (%d υποστηριζόμενες)"
 
 msgid "%d locked: %s"
 msgstr "%d κλειδωμένες: %s"
+
+msgid "Repair DNS?"
+msgstr "Επισκευή DNS;"
+
+msgid "This removes the DNS forwarder of a package that is no longer installed. If no other DNS server is left, the device then uses the DNS servers of the mobile connection: the carrier sees the names you look up, outside any proxy or VPN."
+msgstr "Αυτό αφαιρεί την προώθηση DNS ενός πακέτου που δεν είναι πλέον εγκατεστημένο. Αν δεν μείνει άλλος διακομιστής DNS, η συσκευή χρησιμοποιεί τους διακομιστές DNS της σύνδεσης κινητής: ο πάροχος βλέπει τα ονόματα που αναζητάτε, έξω από κάθε proxy ή VPN."
+
+msgid "Repair DNS"
+msgstr "Επισκευή DNS"
+
+msgid "Packages installed on the device are not part of a release image. An update writes them down, and the new system installs them again at its first boot, once it is online. Until a package is back its settings are set aside."
+msgstr "Τα πακέτα που εγκαταστάθηκαν στη συσκευή δεν ανήκουν στην εικόνα της έκδοσης. Μια ενημέρωση τα καταγράφει και το νέο σύστημα τα εγκαθιστά ξανά στην πρώτη εκκίνηση, μόλις είναι συνδεδεμένο. Μέχρι να επιστρέψει ένα πακέτο, οι ρυθμίσεις του φυλάσσονται στην άκρη."
+
+msgid "No packages to install again."
+msgstr "Κανένα πακέτο για επανεγκατάσταση."
+
+msgid "All back"
+msgstr "Όλα επέστρεψαν"
+
+msgid "Not installed yet"
+msgstr "Δεν έχει εγκατασταθεί ακόμα"
+
+msgid "Could not be installed again"
+msgstr "Δεν ήταν δυνατή η επανεγκατάσταση"
+
+msgid "Waiting for the internet"
+msgstr "Αναμονή για internet"
+
+msgid "Given up: no internet at five boots"
+msgstr "Εγκαταλείφθηκε: χωρίς internet σε πέντε εκκινήσεις"
+
+msgid "Skipped"
+msgstr "Παραλείφθηκε"
+
+msgid "Written down by the update from %s"
+msgstr "Καταγράφηκε από την ενημέρωση από %s"
+
+msgid "Installed again"
+msgstr "Επανεγκαταστάθηκαν"
+
+msgid "Install them yourself from where you got them (a package file: apk add --allow-untrusted FILE.apk)."
+msgstr "Εγκαταστήστε τα μόνοι σας από εκεί που τα πήρατε (αρχείο πακέτου: apk add --allow-untrusted FILE.apk)."
+
+msgid "Settings set aside in /etc/mu300/orphaned-config"
+msgstr "Ρυθμίσεις στην άκρη στο /etc/mu300/orphaned-config"
+
+msgid "DNS still goes to a package that is not installed: the device has no DNS through it."
+msgstr "Το DNS πηγαίνει ακόμα σε πακέτο που δεν είναι εγκατεστημένο: η συσκευή δεν έχει DNS μέσω αυτού."
+
+msgid "Try again"
+msgstr "Δοκιμή ξανά"
+
+msgid "Dismiss the note"
+msgstr "Απόκρυψη σημείωσης"
+
+msgid "started"
+msgstr "ξεκίνησε"
+
+msgid "asleep now (asked)"
+msgstr "αναστολή τώρα (κατόπιν αιτήματος)"
+
+msgid "woken: power daemon stopping"
+msgstr "αφύπνιση: η υπηρεσία ενέργειας σταματά"
+
+msgid "woken by a key"
+msgstr "αφύπνιση με πλήκτρο"
+
+msgid "woken by the Wi-Fi key"
+msgstr "αφύπνιση με το πλήκτρο Wi-Fi"
+
+msgid "woken (mu300-power wake)"
+msgstr "αφύπνιση (mu300-power wake)"
+
+msgid "woken by a computer on USB"
+msgstr "αφύπνιση από υπολογιστή μέσω USB"
+
+msgid "woken: plugged in"
+msgstr "αφύπνιση: συνδέθηκε στο ρεύμα"
+
+msgid "woken by a Wi-Fi client"
+msgstr "αφύπνιση από πελάτη Wi-Fi"
+
+msgid "charging boot (powered on by the charger)"
+msgstr "εκκίνηση φόρτισης (ενεργοποίηση από τον φορτιστή)"
+
+msgid "the hotspot is down"
+msgstr "το hotspot είναι κλειστό"
+
+msgid "the VPN is still stopped"
+msgstr "το VPN είναι ακόμη σταματημένο"
+
+msgid "5G (EN-DC) is still off after a failed resume"
+msgstr "το 5G (EN-DC) είναι ακόμη κλειστό μετά από αποτυχημένη συνέχιση"
+
+msgid "self-check: %s"
+msgstr "αυτοέλεγχος: %s"
+
+msgid "asleep: no client for %d min (%s)"
+msgstr "αναστολή: κανένας πελάτης για %d λεπ. (%s)"
+
+msgid "asleep: profile now %s"
+msgstr "αναστολή: προφίλ τώρα %s"
+
+msgid "woken by the %s key"
+msgstr "αφύπνιση με το πλήκτρο %s"
+
+msgid "the modem is suspended (%s)"
+msgstr "το μόντεμ έχει ανασταλεί (%s)"
 
 msgid "Enter a whole number from 0 to %d"
 msgstr "Εισαγάγετε έναν ακέραιο από 0 έως %d"
@@ -1437,6 +1695,15 @@ msgstr "Μήνυμα (Enter για αποστολή, Shift+Enter για νέα �
 msgid "Sending uses AT+CMGS (PDU mode); retry if the channel is busy. To delete one message, use the bin icon on its bubble."
 msgstr "Η αποστολή χρησιμοποιεί AT+CMGS (λειτουργία PDU)· δοκιμάστε ξανά αν το κανάλι είναι απασχολημένο. Για διαγραφή ενός μηνύματος, χρησιμοποιήστε το εικονίδιο κάδου στο συννεφάκι του."
 
+msgid "Sending…"
+msgstr "Αποστολή…"
+
+msgid "Sent; the list refreshes shortly."
+msgstr "Εστάλη· η λίστα ανανεώνεται σύντομα."
+
+msgid "Sending failed"
+msgstr "Η αποστολή απέτυχε"
+
 msgid "Syncing from the SIM in the background (AT+CMGL)…"
 msgstr "Συγχρονισμός από τη SIM στο παρασκήνιο (AT+CMGL)…"
 
@@ -1476,15 +1743,6 @@ msgstr "Διαγράφηκε (μόνο τοπικά)"
 msgid "Enter both a number and a message."
 msgstr "Εισαγάγετε αριθμό και μήνυμα."
 
-msgid "Sending…"
-msgstr "Αποστολή…"
-
-msgid "Sent; the list refreshes shortly."
-msgstr "Εστάλη· η λίστα ανανεώνεται σύντομα."
-
-msgid "Sending failed"
-msgstr "Η αποστολή απέτυχε"
-
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d μηνύματα, %d μη αναγνωσμένα · %d συνομιλίες"
 
@@ -1502,6 +1760,39 @@ msgstr "Ελλιπές: έφτασαν %d από %d τμήματα"
 
 msgid "Delete"
 msgstr "Διαγραφή"
+
+msgid "ttyd is not installed."
+msgstr "Το ttyd δεν είναι εγκατεστημένο."
+
+msgid "The terminal is turned off (/etc/config/ttyd)."
+msgstr "Το τερματικό είναι απενεργοποιημένο (/etc/config/ttyd)."
+
+msgid "Too many terminals are opening at once. Try again in a minute."
+msgstr "Ανοίγουν πάρα πολλά τερματικά ταυτόχρονα. Δοκιμάστε ξανά σε ένα λεπτό."
+
+msgid "The terminal is not available."
+msgstr "Το τερματικό δεν είναι διαθέσιμο."
+
+msgid "This is a root shell on the device: every command runs with full rights, and a mistake can make the device unbootable."
+msgstr "Αυτό είναι ένα κέλυφος root της συσκευής: κάθε εντολή εκτελείται με πλήρη δικαιώματα και ένα λάθος μπορεί να κάνει τη συσκευή να μην εκκινεί."
+
+msgid "It is reachable from the LAN only (USB and the hotspot), never from mobile data, and only from this logged-in page."
+msgstr "Είναι προσβάσιμο μόνο από το LAN (USB και hotspot), ποτέ από τα δεδομένα κινητής, και μόνο από αυτή τη σελίδα με σύνδεση."
+
+msgid "It closes after a minute without activity."
+msgstr "Κλείνει μετά από ένα λεπτό χωρίς δραστηριότητα."
+
+msgid "It closes after %d minutes without activity."
+msgstr "Κλείνει μετά από %d λεπτά χωρίς δραστηριότητα."
+
+msgid "Reconnect"
+msgstr "Επανασύνδεση"
+
+msgid "Open in a new tab"
+msgstr "Άνοιγμα σε νέα καρτέλα"
+
+msgid "This page was opened over HTTPS, and the terminal is served over HTTP on the LAN: it opens in a tab of its own."
+msgstr "Αυτή η σελίδα άνοιξε μέσω HTTPS και το τερματικό εξυπηρετείται μέσω HTTP στο LAN: ανοίγει σε δική του καρτέλα."
 
 msgid "The data usage could not be read"
 msgstr "Η χρήση δεδομένων δεν μπόρεσε να διαβαστεί"
@@ -1637,6 +1928,594 @@ msgstr "Απενεργοποίηση"
 
 msgid "64 makes every packet leave like the device's own traffic"
 msgstr "Με 64 κάθε πακέτο φεύγει όπως η κίνηση της ίδιας της συσκευής"
+
+msgid "running"
+msgstr "εκτελείται"
+
+msgid "(about %s)"
+msgstr "(περίπου %s)"
+
+msgid "Install %s?"
+msgstr "Εγκατάσταση του %s;"
+
+msgid "It is installed from this system's package feed."
+msgstr "Εγκαθίσταται από το αποθετήριο πακέτων αυτού του συστήματος."
+
+msgid "It is downloaded from the release of the VPN module and checked against its SHA256SUMS."
+msgstr "Λαμβάνεται από την έκδοση της μονάδας VPN και ελέγχεται με το SHA256SUMS της."
+
+msgid "An engine is tens of MB: on mobile data the download counts towards your plan."
+msgstr "Μια μηχανή είναι δεκάδες MB: στα δεδομένα κινητής η λήψη χρεώνεται στο πακέτο σας."
+
+msgid "Install"
+msgstr "Εγκατάσταση"
+
+msgid "Remove %s?"
+msgstr "Αφαίρεση του %s;"
+
+msgid "Profiles run on it: %s. They cannot start until it is installed again (the module refuses while the running profile needs it)."
+msgstr "Προφίλ που τη χρησιμοποιούν: %s. Δεν μπορούν να ξεκινήσουν μέχρι να εγκατασταθεί ξανά (η μονάδα αρνείται όσο το ενεργό προφίλ τη χρειάζεται)."
+
+msgid "No profile runs on it."
+msgstr "Κανένα προφίλ δεν τη χρησιμοποιεί."
+
+msgid "Removed"
+msgstr "Αφαιρέθηκε"
+
+msgid "Check for updates"
+msgstr "Έλεγχος για ενημερώσεις"
+
+msgid "Each engine is an extra of its own: install only the ones your profiles need. Xray runs vless, vmess, trojan and ss links (with hev-socks5-tunnel), sing-box the same links and its own JSON, mihomo Clash subscriptions, dae hysteria2, tuic and the rest on newer kernels. WireGuard and OpenVPN are packages of the system."
+msgstr "Κάθε μηχανή είναι ξεχωριστό πρόσθετο: εγκαταστήστε μόνο όσες χρειάζονται τα προφίλ σας. Το Xray εκτελεί συνδέσμους vless, vmess, trojan και ss (με το hev-socks5-tunnel), το sing-box τους ίδιους συνδέσμους και το δικό του JSON, το mihomo συνδρομές Clash, το dae hysteria2, tuic και τα υπόλοιπα σε νεότερους πυρήνες. Το WireGuard και το OpenVPN είναι πακέτα του συστήματος."
+
+msgid "Downloads are tens of MB per engine: on mobile data they count towards your plan. Offline, upload the engine's tarball from the release page of the VPN module."
+msgstr "Οι λήψεις είναι δεκάδες MB ανά μηχανή: στα δεδομένα κινητής χρεώνονται στο πακέτο σας. Εκτός σύνδεσης, ανεβάστε το tarball της μηχανής από τη σελίδα εκδόσεων της μονάδας VPN."
+
+msgid "The available versions come from the latest release of the VPN module."
+msgstr "Οι διαθέσιμες εκδόσεις προέρχονται από την τελευταία έκδοση της μονάδας VPN."
+
+msgid "Update"
+msgstr "Ενημέρωση"
+
+msgid "system package"
+msgstr "πακέτο συστήματος"
+
+msgid "in the vpn bundle"
+msgstr "στο πακέτο vpn"
+
+msgid "extra %s"
+msgstr "πρόσθετο %s"
+
+msgid "not installed"
+msgstr "μη εγκατεστημένο"
+
+msgid "cannot run here"
+msgstr "δεν μπορεί να εκτελεστεί εδώ"
+
+msgid "update available"
+msgstr "διαθέσιμη ενημέρωση"
+
+msgid "installed"
+msgstr "εγκατεστημένο"
+
+msgid "Kind"
+msgstr "Είδος"
+
+msgid "Version"
+msgstr "Έκδοση"
+
+msgid "Available"
+msgstr "Διαθέσιμη"
+
+msgid "not checked"
+msgstr "δεν ελέγχθηκε"
+
+msgid "Size"
+msgstr "Μέγεθος"
+
+msgid "Needed by"
+msgstr "Χρησιμοποιείται από"
+
+msgid "no profile"
+msgstr "κανένα προφίλ"
+
+msgid "dae needs a kernel with BTF, 5.17 or newer: not the 5.4 vendor kernel (mu300-update kernel 6.18). It can be installed anyway."
+msgstr "Το dae χρειάζεται πυρήνα με BTF, 5.17 ή νεότερο: όχι τον πυρήνα 5.4 του κατασκευαστή (mu300-update kernel 6.18). Μπορεί να εγκατασταθεί πάντως."
+
+msgid "All engines"
+msgstr "Όλες οι μηχανές"
+
+msgid "Last %s lines"
+msgstr "Τελευταίες %s γραμμές"
+
+msgid "VPN service log"
+msgstr "Αρχείο καταγραφής υπηρεσίας VPN"
+
+msgid "Every 5 s"
+msgstr "Κάθε 5 δ"
+
+msgid "The log is empty."
+msgstr "Το αρχείο καταγραφής είναι κενό."
+
+msgid "The VPN is starting"
+msgstr "Το VPN ξεκινά"
+
+msgid "The VPN is stopped"
+msgstr "Το VPN έχει σταματήσει"
+
+msgid "The VPN is restarting"
+msgstr "Το VPN επανεκκινείται"
+
+msgid "With the kill switch on, nothing leaves the device or the LAN outside the tunnel: while the VPN is down, starting or broken, every connection fails instead of going out directly. It stays up until you stop the VPN here (Stop removes it)."
+msgstr "Με ενεργό το kill switch, τίποτα δεν βγαίνει από τη συσκευή ή το LAN εκτός του τούνελ: όσο το VPN είναι κάτω, ξεκινά ή είναι χαλασμένο, κάθε σύνδεση αποτυγχάνει αντί να βγει απευθείας. Παραμένει ενεργό μέχρι να σταματήσετε το VPN από εδώ (η Διακοπή το αφαιρεί)."
+
+msgid "Without the kill switch, traffic goes out directly, unprotected, whenever the tunnel is down (while it starts, after a crash, when the engine is missing)."
+msgstr "Χωρίς το kill switch, η κίνηση βγαίνει απευθείας, απροστάτευτη, κάθε φορά που το τούνελ είναι κάτω (κατά την εκκίνηση, μετά από κρασάρισμα, όταν λείπει η μηχανή)."
+
+msgid "Turn the kill switch on?"
+msgstr "Ενεργοποίηση του kill switch;"
+
+msgid "Turn the kill switch off?"
+msgstr "Απενεργοποίηση του kill switch;"
+
+msgid "Turn on"
+msgstr "Ενεργοποίηση"
+
+msgid "unknown"
+msgstr "άγνωστο"
+
+msgid "The exit address could not be found (is the tunnel up?)"
+msgstr "Δεν βρέθηκε η διεύθυνση εξόδου (είναι ενεργό το τούνελ;)"
+
+msgid "Connecting…"
+msgstr "Σύνδεση…"
+
+msgid "On, but not running"
+msgstr "Ενεργό, αλλά δεν εκτελείται"
+
+msgid "Stopped"
+msgstr "Σταματημένο"
+
+msgid "Install it"
+msgstr "Εγκατάσταση"
+
+msgid "The engine of the active profile is not installed: %s"
+msgstr "Η μηχανή του ενεργού προφίλ δεν είναι εγκατεστημένη: %s"
+
+msgid "The kill switch keeps everything closed until it is there; the service downloads it by itself when it can."
+msgstr "Το kill switch κρατά τα πάντα κλειστά μέχρι να υπάρξει· η υπηρεσία την κατεβάζει μόνη της όταν μπορεί."
+
+msgid "The VPN cannot start until it is installed."
+msgstr "Το VPN δεν μπορεί να ξεκινήσει μέχρι να εγκατασταθεί."
+
+msgid "%s cannot run on this system"
+msgstr "Το %s δεν μπορεί να εκτελεστεί σε αυτό το σύστημα"
+
+msgid "The VPN is on, but no profile is active: choose one below."
+msgstr "Το VPN είναι ενεργό, αλλά κανένα προφίλ δεν είναι ενεργό: επιλέξτε ένα παρακάτω."
+
+msgid "Profile: %s"
+msgstr "Προφίλ: %s"
+
+msgid "No active profile"
+msgstr "Κανένα ενεργό προφίλ"
+
+msgid "engine %s"
+msgstr "μηχανή %s"
+
+msgid "interface %s"
+msgstr "διεπαφή %s"
+
+msgid "Kill switch active"
+msgstr "Kill switch ενεργό"
+
+msgid "Kill switch on"
+msgstr "Kill switch ενεργοποιημένο"
+
+msgid "Kill switch off"
+msgstr "Kill switch απενεργοποιημένο"
+
+msgid "IPv6 in the tunnel"
+msgstr "IPv6 στο τούνελ"
+
+msgid "IPv6 blocked"
+msgstr "IPv6 αποκλεισμένο"
+
+msgid "IPv6 untouched"
+msgstr "IPv6 ανεπηρέαστο"
+
+msgid "Module %s"
+msgstr "Μονάδα %s"
+
+msgid "Check"
+msgstr "Έλεγχος"
+
+msgid "Uptime"
+msgstr "Χρόνος λειτουργίας"
+
+msgid "Rate"
+msgstr "Ρυθμός"
+
+msgid "Exit address"
+msgstr "Διεύθυνση εξόδου"
+
+msgid "Start"
+msgstr "Εκκίνηση"
+
+msgid "Stop"
+msgstr "Διακοπή"
+
+msgid "Restart"
+msgstr "Επανεκκίνηση"
+
+msgid "Stop the VPN?"
+msgstr "Διακοπή του VPN;"
+
+msgid "Traffic then goes out directly, without the tunnel; the kill switch is taken down with it."
+msgstr "Η κίνηση θα βγαίνει τότε απευθείας, χωρίς το τούνελ· το kill switch αφαιρείται μαζί του."
+
+msgid "The VPN is on: it starts again by itself after a reboot."
+msgstr "Το VPN είναι ενεργό: ξεκινά ξανά αυτόματα μετά από επανεκκίνηση."
+
+msgid "The VPN is off."
+msgstr "Το VPN είναι απενεργοποιημένο."
+
+msgid "Kill switch"
+msgstr "Kill switch"
+
+msgid "Setting"
+msgstr "Ρύθμιση"
+
+msgid "Active: only the tunnel can reach the internet"
+msgstr "Ενεργό: μόνο το τούνελ φτάνει στο διαδίκτυο"
+
+msgid "Not active"
+msgstr "Ανενεργό"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down, so nothing ever leaves without the tunnel. If the tunnel cannot come up (a dead server, an expired account), the device stays offline until you fix the profile or stop the VPN. The panel itself stays reachable from the LAN."
+msgstr "Το kill switch αποκλείει όλη την κίνηση της συσκευής και του LAN όσο το VPN είναι κάτω, ώστε τίποτα να μη βγαίνει ποτέ χωρίς το τούνελ. Αν το τούνελ δεν μπορεί να ανέβει (νεκρός διακομιστής, ληγμένος λογαριασμός), η συσκευή μένει εκτός σύνδεσης μέχρι να διορθώσετε το προφίλ ή να σταματήσετε το VPN. Ο ίδιος ο πίνακας παραμένει προσβάσιμος από το LAN."
+
+msgid "Choose a profile"
+msgstr "Επιλέξτε προφίλ"
+
+msgid "No profiles yet"
+msgstr "Δεν υπάρχουν ακόμη προφίλ"
+
+msgid "engine not installed"
+msgstr "η μηχανή δεν είναι εγκατεστημένη"
+
+msgid "Use"
+msgstr "Χρήση"
+
+msgid "Switched: the VPN restarts on the new profile"
+msgstr "Άλλαξε: το VPN επανεκκινείται με το νέο προφίλ"
+
+msgid "Active profile"
+msgstr "Ενεργό προφίλ"
+
+msgid "A running VPN restarts on the profile you choose; the kill switch stays up in between."
+msgstr "Ένα VPN που εκτελείται επανεκκινείται με το προφίλ που επιλέγετε· το kill switch παραμένει ενεργό στο ενδιάμεσο."
+
+msgid "Manage the profiles"
+msgstr "Διαχείριση των προφίλ"
+
+msgid "Automatic: through the tunnel where the engine can carry it"
+msgstr "Αυτόματο: μέσω του τούνελ όπου η μηχανή μπορεί να το μεταφέρει"
+
+msgid "Ask the engine for IPv6 in the tunnel"
+msgstr "Ζήτηση IPv6 στο τούνελ από τη μηχανή"
+
+msgid "Never through the tunnel (blocked while the VPN is up)"
+msgstr "Ποτέ μέσω του τούνελ (αποκλείεται όσο το VPN είναι ενεργό)"
+
+msgid "Saved: it applies from the next start (Restart)"
+msgstr "Αποθηκεύτηκε: ισχύει από την επόμενη εκκίνηση (Επανεκκίνηση)"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "The tunnel carries IPv6"
+msgstr "Το τούνελ μεταφέρει IPv6"
+
+msgid "Yes"
+msgstr "Ναι"
+
+msgid "IPv6 guard"
+msgstr "Προστασία IPv6"
+
+msgid "Active: IPv6 outside the tunnel is refused"
+msgstr "Ενεργή: το IPv6 εκτός τούνελ απορρίπτεται"
+
+msgid "While the VPN is up, IPv6 never leaves beside a tunnel that does not carry it: it is refused at once, so programs and LAN clients fall back to IPv4 instead of leaking or waiting. Automatic: WireGuard uses the IPv6 addresses of its config, the other engines stay IPv4."
+msgstr "Όσο το VPN είναι ενεργό, το IPv6 δεν βγαίνει ποτέ δίπλα σε τούνελ που δεν το μεταφέρει: απορρίπτεται αμέσως, ώστε τα προγράμματα και οι πελάτες του LAN να περνούν σε IPv4 αντί να διαρρέουν ή να περιμένουν. Αυτόματο: το WireGuard χρησιμοποιεί τις διευθύνσεις IPv6 της διαμόρφωσής του, οι άλλες μηχανές μένουν σε IPv4."
+
+msgid "%d ms"
+msgstr "%d ms"
+
+msgid "UDP: not testable"
+msgstr "UDP: δεν δοκιμάζεται"
+
+msgid "blocked by the kill switch"
+msgstr "αποκλείστηκε από το kill switch"
+
+msgid "A WireGuard or OpenVPN config, a Clash/mihomo YAML, an Xray or sing-box JSON, a dae config"
+msgstr "Διαμόρφωση WireGuard ή OpenVPN, YAML Clash/mihomo, JSON Xray ή sing-box, διαμόρφωση dae"
+
+msgid "After OK, choose the file: a WireGuard .conf, an OpenVPN .ovpn, a Clash/mihomo .yaml, an Xray or sing-box .json or a dae config (at most 1 MiB)."
+msgstr "Μετά το OK, επιλέξτε το αρχείο: ένα .conf WireGuard, ένα .ovpn OpenVPN, ένα .yaml Clash/mihomo, ένα .json Xray ή sing-box ή μια διαμόρφωση dae (έως 1 MiB)."
+
+msgid "From the source"
+msgstr "Από την πηγή"
+
+msgid "Detect"
+msgstr "Εντοπισμός"
+
+msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
+msgstr "Το URL μπορεί να περιέχει διακριτικό: πηγαίνει στη συσκευή χωριστά, ποτέ σε γραμμή εντολών ή αρχείο καταγραφής."
+
+msgid "Type"
+msgstr "Τύπος"
+
+msgid "Share link"
+msgstr "Σύνδεσμος κοινοποίησης"
+
+msgid "Paste"
+msgstr "Επικόλληση"
+
+msgid "File"
+msgstr "Αρχείο"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Not a share link this panel takes"
+msgstr "Δεν είναι σύνδεσμος κοινοποίησης που δέχεται αυτός ο πίνακας"
+
+msgid "The config is empty"
+msgstr "Η διαμόρφωση είναι κενή"
+
+msgid "Not an https URL"
+msgstr "Δεν είναι URL https"
+
+msgid "Invalid name: 1-64 characters, no control characters"
+msgstr "Μη έγκυρο όνομα: 1-64 χαρακτήρες, χωρίς χαρακτήρες ελέγχου"
+
+msgid "Add a profile"
+msgstr "Προσθήκη προφίλ"
+
+msgid "Name"
+msgstr "Όνομα"
+
+msgid "Detect: the module tells the kind from the link or the file. Choose the type for a JSON that could be either Xray or sing-box, or for a link that should run on another engine."
+msgstr "Εντοπισμός: η μονάδα καταλαβαίνει το είδος από τον σύνδεσμο ή το αρχείο. Επιλέξτε τον τύπο για ένα JSON που μπορεί να είναι Xray ή sing-box, ή για έναν σύνδεσμο που πρέπει να εκτελεστεί σε άλλη μηχανή."
+
+msgid "The profile is added"
+msgstr "Το προφίλ προστέθηκε"
+
+msgid "Rename the profile"
+msgstr "Μετονομασία του προφίλ"
+
+msgid "Delete the profile %s?"
+msgstr "Διαγραφή του προφίλ %s;"
+
+msgid "It is the active profile: with the VPN on, the module refuses; stop the VPN or choose another profile first."
+msgstr "Είναι το ενεργό προφίλ: με ενεργό VPN, η μονάδα αρνείται· σταματήστε πρώτα το VPN ή επιλέξτε άλλο προφίλ."
+
+msgid "Its config and credentials are deleted from the device."
+msgstr "Η διαμόρφωση και τα διαπιστευτήριά του διαγράφονται από τη συσκευή."
+
+msgid "Deleted"
+msgstr "Διαγράφηκε"
+
+msgid "The profile passes the check"
+msgstr "Το προφίλ περνά τον έλεγχο"
+
+msgid "Show the config?"
+msgstr "Εμφάνιση της διαμόρφωσης;"
+
+msgid "The config holds the credentials of the profile (keys, passwords, UUIDs). It is shown on this screen only; anyone who can see the screen can read it."
+msgstr "Η διαμόρφωση περιέχει τα διαπιστευτήρια του προφίλ (κλειδιά, κωδικούς, UUID). Εμφανίζεται μόνο σε αυτήν την οθόνη· όποιος βλέπει την οθόνη μπορεί να τη διαβάσει."
+
+msgid "Saving checks the config with the engine first (profile edit); a config that does not pass is not saved and the old one stays."
+msgstr "Η αποθήκευση ελέγχει πρώτα τη διαμόρφωση με τη μηχανή (profile edit)· μια διαμόρφωση που δεν περνά τον έλεγχο δεν αποθηκεύεται και παραμένει η παλιά."
+
+msgid "This profile comes from a subscription: its next refresh replaces your changes."
+msgstr "Αυτό το προφίλ προέρχεται από συνδρομή: η επόμενη ανανέωσή της αντικαθιστά τις αλλαγές σας."
+
+msgid "Config of %s"
+msgstr "Διαμόρφωση του %s"
+
+msgid "Close"
+msgstr "Κλείσιμο"
+
+msgid "Rename"
+msgstr "Μετονομασία"
+
+msgid "Show / edit the config"
+msgstr "Εμφάνιση / επεξεργασία της διαμόρφωσης"
+
+msgid "Test the latency of all"
+msgstr "Δοκιμή καθυστέρησης όλων"
+
+msgid "No profiles yet: add one from a share link, a config file or a subscription."
+msgstr "Δεν υπάρχουν ακόμη προφίλ: προσθέστε ένα από σύνδεσμο κοινοποίησης, αρχείο διαμόρφωσης ή συνδρομή."
+
+msgid "Active"
+msgstr "Ενεργό"
+
+msgid "This profile is the active one now"
+msgstr "Αυτό το προφίλ είναι τώρα το ενεργό"
+
+msgid "More"
+msgstr "Περισσότερα"
+
+msgid "active"
+msgstr "ενεργό"
+
+msgid "subscription"
+msgstr "συνδρομή"
+
+msgid "migrated"
+msgstr "μεταφέρθηκε"
+
+msgid "gone from its subscription"
+msgstr "αφαιρέθηκε από τη συνδρομή του"
+
+msgid "Server"
+msgstr "Διακομιστής"
+
+msgid "Engine"
+msgstr "Μηχανή"
+
+msgid "Latency"
+msgstr "Καθυστέρηση"
+
+msgid "The latency is a TCP connection to the server, through the tunnel when the VPN is up. WireGuard and OpenVPN servers usually speak UDP and cannot be tested this way."
+msgstr "Η καθυστέρηση είναι μια σύνδεση TCP προς τον διακομιστή, μέσω του τούνελ όταν το VPN είναι ενεργό. Οι διακομιστές WireGuard και OpenVPN συνήθως χρησιμοποιούν UDP και δεν μπορούν να δοκιμαστούν έτσι."
+
+msgid "Enter an IPv4 or IPv6 address"
+msgstr "Εισαγάγετε διεύθυνση IPv4 ή IPv6"
+
+msgid "On: nothing leaves outside the tunnel"
+msgstr "Ενεργό: τίποτα δεν βγαίνει εκτός τούνελ"
+
+msgid "Off: traffic goes out directly while the tunnel is down"
+msgstr "Ανενεργό: η κίνηση βγαίνει απευθείας όσο το τούνελ είναι κάτω"
+
+msgid "Yes: Tailscale's own connections go through the tunnel"
+msgstr "Ναι: οι δικές του συνδέσεις του Tailscale περνούν από το τούνελ"
+
+msgid "No: Tailscale connects directly"
+msgstr "Όχι: το Tailscale συνδέεται απευθείας"
+
+msgid "Routing"
+msgstr "Δρομολόγηση"
+
+msgid "The kill switch blocks all traffic of the device and of the LAN while the VPN is down."
+msgstr "Το kill switch αποκλείει όλη την κίνηση της συσκευής και του LAN όσο το VPN είναι κάτω."
+
+msgid "Bypass the tunnel"
+msgstr "Παράκαμψη του τούνελ"
+
+msgid "Enter address ranges like 192.168.0.0/16, separated by commas"
+msgstr "Εισαγάγετε περιοχές διευθύνσεων όπως 192.168.0.0/16, χωρισμένες με κόμματα"
+
+msgid "Address ranges that never go into the tunnel, besides the LAN itself (which never does). Empty: the LAN only."
+msgstr "Περιοχές διευθύνσεων που δεν μπαίνουν ποτέ στο τούνελ, εκτός από το ίδιο το LAN (που δεν μπαίνει ποτέ). Κενό: μόνο το LAN."
+
+msgid "Tailscale through the VPN"
+msgstr "Tailscale μέσω του VPN"
+
+msgid "When Tailscale runs on the device, its WireGuard, DERP and control connections go through whichever tunnel runs (dae catches them like any other)."
+msgstr "Όταν το Tailscale εκτελείται στη συσκευή, οι συνδέσεις WireGuard, DERP και ελέγχου περνούν από όποιο τούνελ εκτελείται (το dae τις πιάνει όπως όλες τις άλλες)."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "DNS through the tunnel"
+msgstr "DNS μέσω του τούνελ"
+
+msgid "The resolver the device's and the LAN's lookups go to, through the tunnel. Nothing goes to the carrier's resolver."
+msgstr "Ο επιλυτής στον οποίο πηγαίνουν, μέσω του τούνελ, τα ερωτήματα της συσκευής και του LAN. Τίποτα δεν πηγαίνει στον επιλυτή του παρόχου."
+
+msgid "Bootstrap DNS"
+msgstr "DNS εκκίνησης"
+
+msgid "Finds the VPN server's own address before the tunnel is up (directly, on the engine's own connection)."
+msgstr "Βρίσκει τη διεύθυνση του ίδιου του διακομιστή VPN πριν ανέβει το τούνελ (απευθείας, με τη δική της σύνδεση της μηχανής)."
+
+msgid "Empty puts a setting back to its default."
+msgstr "Το κενό επαναφέρει μια ρύθμιση στην προεπιλογή της."
+
+msgid "TUN stack"
+msgstr "Στοίβα TUN"
+
+msgid "Default (gvisor)"
+msgstr "Προεπιλογή (gvisor)"
+
+msgid "system (not on the 5.4 kernel)"
+msgstr "system (όχι στον πυρήνα 5.4)"
+
+msgid "set (unchanged unless you type a new one)"
+msgstr "ορίστηκε (αμετάβλητο αν δεν πληκτρολογήσετε νέο)"
+
+msgid "not set"
+msgstr "δεν ορίστηκε"
+
+msgid "Upstream HTTP proxy"
+msgstr "Ανάντη διακομιστής μεσολάβησης HTTP"
+
+msgid "TLS certificate pin (SHA-256)"
+msgstr "Καρφίτσωμα πιστοποιητικού TLS (SHA-256)"
+
+msgid "Enter host:port"
+msgstr "Εισαγάγετε host:port"
+
+msgid "Enter the SHA-256 in hex"
+msgstr "Εισαγάγετε το SHA-256 σε δεκαεξαδική μορφή"
+
+msgid "Profile options"
+msgstr "Επιλογές προφίλ"
+
+msgid "None of the profiles has options of its type."
+msgstr "Κανένα από τα προφίλ δεν έχει επιλογές για τον τύπο του."
+
+msgid "mihomo's mode (rule, global, direct), the engines' log levels, dae's groups and routing are part of each profile's own config: VPN > Profiles, Show / edit the config."
+msgstr "Η λειτουργία του mihomo (rule, global, direct), τα επίπεδα καταγραφής των μηχανών, οι ομάδες και η δρομολόγηση του dae αποτελούν μέρος της διαμόρφωσης κάθε προφίλ: VPN > Προφίλ, Εμφάνιση / επεξεργασία της διαμόρφωσης."
+
+msgid "Delete the subscription %s?"
+msgstr "Διαγραφή της συνδρομής %s;"
+
+msgid "Its profiles can go with it or stay as profiles of their own. The active profile is never removed while the VPN is on."
+msgstr "Τα προφίλ της μπορούν να διαγραφούν μαζί της ή να μείνουν ως ανεξάρτητα προφίλ. Το ενεργό προφίλ δεν αφαιρείται ποτέ όσο το VPN είναι ενεργό."
+
+msgid "Keep the profiles"
+msgstr "Διατήρηση των προφίλ"
+
+msgid "Delete with its profiles"
+msgstr "Διαγραφή μαζί με τα προφίλ"
+
+msgid "Only by hand"
+msgstr "Μόνο χειροκίνητα"
+
+msgid "Every %d h"
+msgstr "Κάθε %d ώρες"
+
+msgid "Share links: one profile per link"
+msgstr "Σύνδεσμοι κοινοποίησης: ένα προφίλ ανά σύνδεσμο"
+
+msgid "Clash/mihomo YAML: one mihomo profile"
+msgstr "YAML Clash/mihomo: ένα προφίλ mihomo"
+
+msgid "dae: one profile with every node in one group"
+msgstr "dae: ένα προφίλ με όλους τους κόμβους σε μία ομάδα"
+
+msgid "Add a subscription"
+msgstr "Προσθήκη συνδρομής"
+
+msgid "Format"
+msgstr "Μορφή"
+
+msgid "The URL usually holds your account token: it is stored on the device readable by root only, and never shown again. The subscription is fetched over the device's own connection: through the tunnel when the VPN is up; with the kill switch up and the tunnel down it cannot be fetched."
+msgstr "Το URL συνήθως περιέχει το διακριτικό του λογαριασμού σας: αποθηκεύεται στη συσκευή αναγνώσιμο μόνο από τον root και δεν εμφανίζεται ξανά. Η συνδρομή λαμβάνεται μέσω της δικής της σύνδεσης της συσκευής: μέσω του τούνελ όταν το VPN είναι ενεργό· με ενεργό kill switch και τούνελ κάτω δεν μπορεί να ληφθεί."
+
+msgid "Refresh all"
+msgstr "Ανανέωση όλων"
+
+msgid "No subscriptions yet."
+msgstr "Δεν υπάρχουν ακόμη συνδρομές."
+
+msgid "Host"
+msgstr "Κεντρικός υπολογιστής"
+
+msgid "Updated"
+msgstr "Ενημερώθηκε"
+
+msgid "Share links"
+msgstr "Σύνδεσμοι κοινοποίησης"
+
+msgid "A refresh keeps the profiles whose name is unchanged, adds the new ones and removes the ones that are gone (the active one stays while the VPN is on, marked as gone). A refresh of the active profile restarts the running VPN."
+msgstr "Η ανανέωση διατηρεί τα προφίλ με αμετάβλητο όνομα, προσθέτει τα νέα και αφαιρεί όσα έχουν φύγει (το ενεργό μένει όσο το VPN είναι ενεργό, σημειωμένο ως αφαιρεμένο). Η ανανέωση του ενεργού προφίλ επανεκκινεί το VPN που εκτελείται."
 
 msgid "Dashboard info failed"
 msgstr "Οι πληροφορίες του πίνακα απέτυχαν"
@@ -1812,6 +2691,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "The packages adapter gave no valid reply"
+msgstr "Ο προσαρμογέας πακέτων δεν έδωσε έγκυρη απάντηση"
+
+msgid "Invalid packages operation"
+msgstr "Μη έγκυρη ενέργεια πακέτων"
+
 msgid "Request too large"
 msgstr "Το αίτημα είναι πολύ μεγάλο"
 
@@ -1820,6 +2705,150 @@ msgstr "Ο κατάλογος εκτέλεσης δεν είναι ασφαλή�
 
 msgid "No such method"
 msgstr "Δεν υπάρχει τέτοια μέθοδος"
+
+msgid "The VPN module refused the request"
+msgstr "Η μονάδα VPN απέρριψε το αίτημα"
+
+msgid "The VPN panel is busy, try again"
+msgstr "Ο πίνακας VPN είναι απασχολημένος, δοκιμάστε ξανά"
+
+msgid "Another VPN task is still running"
+msgstr "Άλλη εργασία VPN εκτελείται ακόμη"
+
+msgid "The exit_ip parameter must be 0 or 1"
+msgstr "Η παράμετρος exit_ip πρέπει να είναι 0 ή 1"
+
+msgid "The VPN status could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση της κατάστασης του VPN"
+
+msgid "The profiles could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των προφίλ"
+
+msgid "The check parameter must be 0 or 1"
+msgstr "Η παράμετρος check πρέπει να είναι 0 ή 1"
+
+msgid "The engines could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των μηχανών"
+
+msgid "The subscriptions could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των συνδρομών"
+
+msgid "The VPN settings could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων του VPN"
+
+msgid "Unknown VPN operation"
+msgstr "Άγνωστη λειτουργία VPN"
+
+msgid "The VPN could not be switched"
+msgstr "Δεν ήταν δυνατή η εναλλαγή του VPN"
+
+msgid "The kill switch is on or off"
+msgstr "Το kill switch είναι ενεργό ή ανενεργό"
+
+msgid "The kill switch could not be changed"
+msgstr "Δεν ήταν δυνατή η αλλαγή του kill switch"
+
+msgid "Invalid profile id"
+msgstr "Μη έγκυρο αναγνωριστικό προφίλ"
+
+msgid "The profile could not be made the active one"
+msgstr "Δεν ήταν δυνατό να γίνει το προφίλ ενεργό"
+
+msgid "Unknown profile source"
+msgstr "Άγνωστη πηγή προφίλ"
+
+msgid "Unknown profile type"
+msgstr "Άγνωστος τύπος προφίλ"
+
+msgid "The config is empty, too large or holds control characters"
+msgstr "Η διαμόρφωση είναι κενή, πολύ μεγάλη ή περιέχει χαρακτήρες ελέγχου"
+
+msgid "Invalid profile request"
+msgstr "Μη έγκυρο αίτημα προφίλ"
+
+msgid "A config from a URL takes the type it says"
+msgstr "Μια διαμόρφωση από URL παίρνει τον τύπο που δηλώνει"
+
+msgid "No uploaded file"
+msgstr "Δεν υπάρχει αρχείο που ανέβηκε"
+
+msgid "The file is larger than 1 MiB"
+msgstr "Το αρχείο είναι μεγαλύτερο από 1 MiB"
+
+msgid "The profile could not be added"
+msgstr "Δεν ήταν δυνατή η προσθήκη του προφίλ"
+
+msgid "The profile could not be renamed"
+msgstr "Δεν ήταν δυνατή η μετονομασία του προφίλ"
+
+msgid "The profile could not be removed"
+msgstr "Δεν ήταν δυνατή η αφαίρεση του προφίλ"
+
+msgid "The profile does not pass the check"
+msgstr "Το προφίλ δεν περνά τον έλεγχο"
+
+msgid "Unknown profile option"
+msgstr "Άγνωστη επιλογή προφίλ"
+
+msgid "Invalid value for this option"
+msgstr "Μη έγκυρη τιμή για αυτήν την επιλογή"
+
+msgid "The option could not be set"
+msgstr "Δεν ήταν δυνατός ο ορισμός της επιλογής"
+
+msgid "The config could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση της διαμόρφωσης"
+
+msgid "The config was not saved"
+msgstr "Η διαμόρφωση δεν αποθηκεύτηκε"
+
+msgid "The latency test failed"
+msgstr "Η δοκιμή καθυστέρησης απέτυχε"
+
+msgid "The refresh interval is 1 to 999 hours"
+msgstr "Το διάστημα ανανέωσης είναι από 1 έως 999 ώρες"
+
+msgid "Unknown subscription type"
+msgstr "Άγνωστος τύπος συνδρομής"
+
+msgid "Invalid subscription id"
+msgstr "Μη έγκυρο αναγνωριστικό συνδρομής"
+
+msgid "The keep parameter must be 0 or 1"
+msgstr "Η παράμετρος keep πρέπει να είναι 0 ή 1"
+
+msgid "The subscription could not be removed"
+msgstr "Δεν ήταν δυνατή η αφαίρεση της συνδρομής"
+
+msgid "The file is too large"
+msgstr "Το αρχείο είναι πολύ μεγάλο"
+
+msgid "Unknown engine"
+msgstr "Άγνωστη μηχανή"
+
+msgid "The unverified parameter must be 0 or 1"
+msgstr "Η παράμετρος unverified πρέπει να είναι 0 ή 1"
+
+msgid "This engine is a system package: it has no file to upload"
+msgstr "Αυτή η μηχανή είναι πακέτο συστήματος: δεν έχει αρχείο για ανέβασμα"
+
+msgid "The engine could not be removed"
+msgstr "Δεν ήταν δυνατή η αφαίρεση της μηχανής"
+
+msgid "mu300-extra is not on this system"
+msgstr "Το mu300-extra δεν υπάρχει σε αυτό το σύστημα"
+
+msgid "Unknown VPN setting"
+msgstr "Άγνωστη ρύθμιση VPN"
+
+msgid "The setting could not be saved"
+msgstr "Η ρύθμιση δεν μπόρεσε να αποθηκευτεί"
+
+msgid "The number of lines is 1 to 1000"
+msgstr "Ο αριθμός γραμμών είναι από 1 έως 1000"
+
+msgid "The log could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση του αρχείου καταγραφής"
 
 msgid "Radio did not come up"
 msgstr "Το ραδιόφωνο δεν ενεργοποιήθηκε"
@@ -1935,6 +2964,9 @@ msgstr "Μη έγκυρη λίστα φίλτρων (έως 50 γραμμές)"
 msgid "The webhook address must be an http:// or https:// URL"
 msgstr "Η διεύθυνση του webhook πρέπει να είναι URL http:// ή https://"
 
+msgid "The webhook body is too long or contains a control character"
+msgstr "Το σώμα του webhook είναι πολύ μεγάλο ή περιέχει χαρακτήρα ελέγχου"
+
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Μη έγκυρη κεφαλίδα (μία \"Όνομα: τιμή\" ανά γραμμή· τα Host, Content-Type, Content-Length, Transfer-Encoding και Connection τα ορίζει η συσκευή)"
 
@@ -1992,17 +3024,47 @@ msgstr "Δεν ήταν δυνατή η αφαίρεση του πακέτου �
 msgid "Lock cache unavailable"
 msgstr "Η κρυφή μνήμη κλειδωμάτων δεν είναι διαθέσιμη"
 
+msgid "The saved locks could not be cleared"
+msgstr "Τα αποθηκευμένα κλειδώματα δεν ήταν δυνατό να διαγραφούν"
+
 msgid "No serving cell to lock to"
 msgstr "Δεν υπάρχει κυψέλη εξυπηρέτησης για κλείδωμα"
+
+msgid "The modem did not answer the mode query; nothing was sent"
+msgstr "Το μόντεμ δεν απάντησε στο ερώτημα λειτουργίας· δεν στάλθηκε τίποτα"
+
+msgid "The modem refused a write"
+msgstr "Το μόντεμ απέρριψε μια εγγραφή"
+
+msgid "The read-back does not match the automatic values"
+msgstr "Η επανάγνωση δεν ταιριάζει με τις αυτόματες τιμές"
+
+msgid "The read-back after the stack restart does not match the automatic values"
+msgstr "Η επανάγνωση μετά την επανεκκίνηση της στοίβας δεν ταιριάζει με τις αυτόματες τιμές"
+
+msgid "The reset was interrupted"
+msgstr "Η επαναφορά διακόπηκε"
+
+msgid "Reinstalling packages is not available on this system"
+msgstr "Η επανεγκατάσταση πακέτων δεν είναι διαθέσιμη σε αυτό το σύστημα"
+
+msgid "No packages were written down by an update"
+msgstr "Καμία ενημέρωση δεν κατέγραψε πακέτα"
+
+msgid "Reinstalling is running already"
+msgstr "Η επανεγκατάσταση εκτελείται ήδη"
+
+msgid "The note could not be dropped"
+msgstr "Η σημείωση δεν ήταν δυνατό να αφαιρεθεί"
+
+msgid "Unknown packages operation"
+msgstr "Άγνωστη ενέργεια πακέτων"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
 
 msgid "Data usage is not available on this system"
 msgstr "Η χρήση δεδομένων δεν είναι διαθέσιμη σε αυτό το σύστημα"
-
-msgid "The setting could not be saved"
-msgstr "Η ρύθμιση δεν μπόρεσε να αποθηκευτεί"
 
 msgid "Unknown data usage operation"
 msgstr "Άγνωστη λειτουργία χρήσης δεδομένων"

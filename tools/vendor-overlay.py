@@ -11,6 +11,10 @@ A subset pulled on Windows holds a file called windows-source.tar.gz (android-ve
 property area is a set of files named u:object_r:<context>:s0, which that file system cannot store, so the whole
 device archive is kept there instead. When it is present the subset is taken from it, not from the tree, so the
 installed system gets the same names and modes a Linux host would have extracted.
+
+A tree is never trusted for its modes (host_free_mode): what a file system reports for a file it cannot keep a mode
+for differs from host to host - 0700 for everything on FAT/exFAT under macOS - and the vendor daemons do not run as
+root.
 """
 import argparse
 import copy
@@ -68,6 +72,21 @@ def add_kernel_bundle(tar, bundle: Path, os_name, seen):
     return krel, len(kos)
 
 
+def host_free_mode(arc, is_dir):
+    """the mode of an entry, from where it goes and never from what the host reports. A tree extracted on a file
+    system that keeps no modes says nothing about them: Windows reports 0666/0777, and macOS shows every file and
+    directory of a FAT or exFAT volume as 0700 - stored like that, the installed vendor daemons (uid 1000, or
+    mu300vnd) could not read their own properties and configuration and the modem never started (issue #127).
+    Directories 0755, the programs (whatever lies in a bin directory) 0755, the property area read-only as
+    Android has it, every other file 0644 - what android-vendor-start's modes block keeps them at on the device."""
+    if is_dir:
+        return 0o755
+    parts = arc.split('/')
+    if 'dev-properties' in parts[:-1]:
+        return 0o444
+    return 0o755 if parts[-2:-1] == ['bin'] else 0o644
+
+
 def add_tree(tar, src: Path, dest: str, seen: set, rename=None):
     for root, dirs, files in os.walk(src, followlinks=False):
         dirs.sort()
@@ -88,11 +107,7 @@ def add_tree(tar, src: Path, dest: str, seen: set, rename=None):
                 continue
             seen.add(arc)
             info = tar.gettarinfo(str(path), arcname=arc)
-            if os.name == 'nt':
-                # Windows knows no mode bits, only a read-only attribute, and gettarinfo therefore reports
-                # 0666/0444 for every file and 0777 for every directory there: write what a Linux host would
-                # have stored (mkdir 0755, adb pull 0644), so the installed system gets the same modes
-                info.mode = 0o755 if info.isdir() else (0o444 if not (info.mode & 0o200) else 0o644)
+            info.mode = 0o777 if info.issym() else host_free_mode(arc, info.isdir())
             info.uid = info.gid = 0
             info.uname = info.gname = 'root'
             if info.isfile():

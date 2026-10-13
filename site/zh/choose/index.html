@@ -110,7 +110,7 @@
 <div class="table-scroll"><table>
 <thead><tr><th scope="col"></th><th scope="col">Ubuntu</th><th scope="col">OpenWrt</th><th scope="col">OpenWrt + 控制面板</th></tr></thead><tbody>
 <tr><th scope="row">最适合</th><td>小型服务器、跑自己的程序、学习 Linux</td><td>在浏览器里配置的 5G 路由器</td><td>还想随时看着基带的 5G 路由器：信号、频段、短信</td></tr>
-<tr><th scope="row">怎么用</th><td>SSH、<code>mu300-toolkit</code></td><td>网页界面（LuCI）、SSH</td><td>带 MU300 页面的网页界面、SSH</td></tr>
+<tr><th scope="row">怎么用</th><td>SSH、<code>mu300-toolkit</code>；可选带 MU300 页面的 Cockpit（<code>panel</code> 扩展，从 v2026.10.20 起）</td><td>网页界面（LuCI）、SSH</td><td>带 MU300 页面的网页界面、SSH</td></tr>
 <tr><th scope="row">装软件</th><td><code>apt</code></td><td><code>apk</code></td><td><code>apk</code></td></tr>
 <tr><th scope="row">登录用户</th><td><code>ubuntu</code></td><td><code>root</code></td><td><code>root</code></td></tr>
 <tr><th scope="row">内存占用（约）</th><td>500 MiB</td><td>140 MiB</td><td>安装程序未列出</td></tr>
@@ -126,7 +126,10 @@
 <li><strong>蜂窝 &gt; 流量统计（Data usage）：</strong>按天、按账单周期统计移动数据，可设每月上限。</li>
 <li><strong>蜂窝 &gt; AT 终端（AT terminal）：</strong>带保护的基带 AT 命令。</li>
 <li><strong>蜂窝 &gt; 设备管理（Device management）：</strong>USB 角色和 USB 网络模式（NCM、ECM 或 RNDIS）。</li>
-<li><strong>系统 &gt; 语言（System &gt; Languages）</strong>、<strong>系统 &gt; 电源（Power）</strong>和<strong>系统 &gt; CPU：</strong>界面语言、电源模式、充电上限和 CPU 模式。</li>
+<li><strong>VPN</strong>（从 v2026.10.20 起，配合 VPN 模块）：概览、配置、订阅、引擎、设置和日志。</li>
+<li><strong>系统 &gt; 语言（System &gt; Languages）</strong>、<strong>系统 &gt; 电源（Power）</strong>和<strong>系统 &gt; CPU：</strong>界面语言、电源模式、充电上限（0-100 %）和 CPU 模式。</li>
+<li><strong>系统 &gt; 终端（Terminal）</strong>（从 v2026.10.20 起）：浏览器里的 root shell，只在局域网上，只为你已登录的会话打开。</li>
+<li><strong>系统 &gt; 更新后的软件包（Packages after an update）</strong>（从 v2026.10.20 起）：更新对你装过的软件包做了什么。</li>
 </ul>
 <p>主题是 eamonxg 的 <a href="https://github.com/eamonxg/luci-theme-aurora">Aurora</a>。完整列表见 <a href="https://github.com/dikeckaan/mu300-linux#openwrt-with-the-mu300-control-panel" hreflang="en">README</a>（英文）。</p>
 
@@ -167,7 +170,8 @@ sudo mu300-os openwrt-luci    <span class="c"># 带控制面板的 OpenWrt</span
 <ul>
 <li><strong>Ubuntu 26.04</strong> 需要 6.18 或 7.2。</li>
 <li><strong>U30 Air 的 USB 主机模式</strong>（通过 OTG 转接头接 U 盘、键盘、以太网转接器）只在主线内核上可用。</li>
-<li><strong>U30 Air 充电：</strong>5.4 上由厂商的充电驱动负责；6.18 和 7.2 上从 v2026.10.12 起由 <code>bq256xx</code> 驱动负责。v2026.10.11 及更早的主线内核不会开启充电，请先更新。</li>
+<li><strong>U30 Air 充电：</strong>5.4 上由厂商的充电驱动负责；6.18 和 7.2 上从 v2026.10.12 起由 <code>bq256xx</code> 驱动负责。v2026.10.11 及更早的主线内核不会开启充电，请先更新。从 v2026.10.20 起，主线内核还会读取 Type-C 口提供的电流（最高 2 A，而不是 500 mA）；充电上限（0-100 %）三个内核都能用。</li>
+<li><strong>dae</strong>（VPN 模块的 eBPF 引擎）需要 v2026.10.20 或更新的 6.18/7.2（带 BTF 和 BPF JIT 的 6.18.56 和 7.2.10）；5.4 跑不了它。</li>
 <li><strong>WireGuard VPN 配置</strong>需要主线内核：按 <a href="https://github.com/dikeckaan/mu300-linux-vpn" hreflang="en">VPN 模块</a>的说明，5.4 厂商内核没有 WireGuard。其他 VPN 类型三个内核都能用。</li>
 <li><strong>内核模块：</strong>主线内核额外带了约 360 个模块：WireGuard、SQM、隧道、USB 转接器和上网卡、NTFS、exFAT、btrfs、NFS、CIFS、dm-crypt、容器。</li>
 <li><strong>6.18</strong> 在部分板子上偶尔会在启动的头几秒卡死（README 在一块板子上测得大约每 20 次启动一次）；这时设备会回到 Android，<code>su -c mu300-linux</code> 就能把 Linux 带回来。见<a href="../troubleshooting/#kernel-618">故障排除</a>。</li>
