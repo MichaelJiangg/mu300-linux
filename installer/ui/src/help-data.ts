@@ -13,6 +13,7 @@ export function helpTopics(language: Language) {
     {id:'purpose', title:zh ? '选择安装方式' : 'Choose your purpose', markdown:sections.get(zh ? '选择用途' : 'Choose your purpose')},
     {id:'storage', title:zh ? 'TF 卡与内置容量' : 'TF card and capacity', markdown:zh ? `### TF 卡\n\n${sections.get('TF 卡')}\n\n### 独立内置分区\n\n${sections.get('独立内置分区')}` : sections.get('Storage and capacity')},
     {id:'reset', title:zh ? 'Android 重置后续装' : 'Resume after Android reset', markdown:sections.get(zh ? '加密 userdata：重置后自动续装' : 'Encrypted userdata and reset')},
+    {id:'update', title:zh ? '更新与自动重启' : 'Updates and automatic restart', markdown:sections.get(zh ? '更新与自动重启' : 'Updates and automatic restart')},
     {id:'recovery', title:zh ? '安装记录与失败恢复' : 'Records and recovery', markdown:sections.get(zh ? '暂停、关闭与失败恢复' : 'Recovery and results')},
     {id:'faq', title:zh ? '连接与常见问题' : 'Connection and troubleshooting', markdown:sections.get(zh ? '连接与常见问题' : 'Connection and troubleshooting')},
   ].map(topic => ({...topic, markdown:topic.markdown || ''}));

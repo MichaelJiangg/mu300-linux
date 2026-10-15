@@ -1,0 +1,159 @@
+power: supply: bq256xx: independent PD sink and USB host roles
+
+--- a/drivers/power/supply/bq256xx_charger.c
++++ b/drivers/power/supply/bq256xx_charger.c
+@@ -16,6 +16,7 @@
+ #include <linux/moduleparam.h>
+ #include <linux/slab.h>
+ #include <linux/acpi.h>
++#include <linux/regulator/driver.h>
+ #include <linux/bitfield.h>
+ #include <linux/devm-helpers.h>
+ #include <linux/extcon.h>
+@@ -275,6 +276,7 @@
+ 	 */
+ 	bool bq2560x_chg;
+ 	bool chg_off;
++	bool pd_active;
+ 	bool iindet_noted;
+ 	int usb_type;
+ 	struct device *pmic;
+@@ -943,6 +945,16 @@
+ 	int ret = -EINVAL;
+ 
+ 	switch (prop) {
++	case POWER_SUPPLY_PROP_USB_TYPE:
++		if (!bq->bq2560x_chg || (val->intval != POWER_SUPPLY_USB_TYPE_PD &&
++		    val->intval != POWER_SUPPLY_USB_TYPE_UNKNOWN))
++			return -EINVAL;
++		WRITE_ONCE(bq->pd_active, val->intval == POWER_SUPPLY_USB_TYPE_PD);
++		if (!READ_ONCE(bq->pd_active))
++			mod_delayed_work(system_power_efficient_wq, &bq->vbus_work, 0);
++		power_supply_changed(psy);
++		return 0;
++
+ 	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT:
+ 		ret = bq->chip_info->bq256xx_set_iindpm(bq, val->intval);
+ 		if (ret)
+@@ -1092,6 +1104,10 @@
+ 		break;
+ 
+ 	case POWER_SUPPLY_PROP_USB_TYPE:
++		if (bq->bq2560x_chg && READ_ONCE(bq->pd_active)) {
++			val->intval = POWER_SUPPLY_USB_TYPE_PD;
++			break;
++		}
+ 		/* "ti,bq2560x_chg": the PMIC's charger detection, when it said something (bq2560x_chg_detect) */
+ 		if (bq->bq2560x_chg && READ_ONCE(bq->usb_type) != POWER_SUPPLY_USB_TYPE_UNKNOWN &&
+ 		    state.vbus_stat != BQ256XX_VBUS_STAT_NO_INPUT &&
+@@ -1291,7 +1307,7 @@
+ 		     BIT(POWER_SUPPLY_USB_TYPE_CDP) |
+ 		     BIT(POWER_SUPPLY_USB_TYPE_DCP) |
+ 		     BIT(POWER_SUPPLY_USB_TYPE_ACA) |
+-		     BIT(POWER_SUPPLY_USB_TYPE_UNKNOWN),
++		     BIT(POWER_SUPPLY_USB_TYPE_UNKNOWN) | BIT(POWER_SUPPLY_USB_TYPE_PD),
+ 	.properties = bq256xx_power_supply_props,
+ 	.num_properties = ARRAY_SIZE(bq256xx_power_supply_props),
+ 	.get_property = bq256xx_get_charger_property,
+@@ -1821,15 +1837,19 @@
+ 	const char *src = "PMIC";
+ 
+ 	mutex_lock(&bq->lock);
+-	ret = regmap_update_bits(bq->regmap, BQ256XX_CHARGER_CONTROL_0, BQ256XX_CHG_CONFIG_MASK,
+-				 off ? 0 : BQ256XX_CHG_CONFIG_MASK);
+-	if (!ret)
+-		ret = regmap_read(bq->regmap, BQ256XX_CHARGER_CONTROL_0, &ctrl0);
++	ret = regmap_read(bq->regmap, BQ256XX_CHARGER_CONTROL_0, &ctrl0);
++	if (!ret && !(ctrl0 & BQ256XX_OTG_CONFIG))
++		ret = regmap_update_bits(bq->regmap, BQ256XX_CHARGER_CONTROL_0,
++			BQ256XX_CHG_CONFIG_MASK, off ? 0 : BQ256XX_CHG_CONFIG_MASK);
+ 	if (!ret)
+ 		ret = regmap_read(bq->regmap, BQ256XX_CHARGER_STATUS_0, &stat);
+ 	/* nothing on VBUS, or the chip's own boost drives it (mu300-usb host) */
+ 	if (ret || (ctrl0 & BQ256XX_OTG_CONFIG) || !(stat & BQ256XX_PG_STAT_MASK) ||
+ 	    (stat & BQ256XX_VBUS_STAT_MASK) == BQ256XX_VBUS_STAT_USB_OTG)
++		goto out;
++
++	/* A negotiated PD contract owns IIN; BC1.2/Rp must not replace it. */
++	if (READ_ONCE(bq->pd_active))
+ 		goto out;
+ 
+ 	type = bq2560x_chg_pmic_type(bq);
+@@ -2097,6 +2117,67 @@
+ 	}
+ 
+ 	return 0;
++}
++
++
++/* The DT's otg-vbus regulator. Data-host does not imply power-source. */
++static int bq2560x_otg_enable(struct regulator_dev *rdev)
++{
++	struct bq256xx_device *bq = rdev_get_drvdata(rdev);
++	int ret;
++
++	mutex_lock(&bq->lock);
++	ret = regmap_update_bits(bq->regmap, BQ256XX_CHARGER_CONTROL_0,
++		BQ256XX_OTG_CONFIG | BQ256XX_CHG_CONFIG_MASK, BQ256XX_OTG_CONFIG);
++	mutex_unlock(&bq->lock);
++	return ret;
++}
++
++static int bq2560x_otg_disable(struct regulator_dev *rdev)
++{
++	struct bq256xx_device *bq = rdev_get_drvdata(rdev);
++	int ret;
++
++	mutex_lock(&bq->lock);
++	ret = regmap_update_bits(bq->regmap, BQ256XX_CHARGER_CONTROL_0,
++		BQ256XX_OTG_CONFIG | BQ256XX_CHG_CONFIG_MASK,
++		READ_ONCE(bq->chg_off) ? 0 : BQ256XX_CHG_CONFIG_MASK);
++	mutex_unlock(&bq->lock);
++	if (!ret)
++		mod_delayed_work(system_power_efficient_wq, &bq->vbus_work, 0);
++	return ret;
++}
++
++static int bq2560x_otg_enabled(struct regulator_dev *rdev)
++{
++	struct bq256xx_device *bq = rdev_get_drvdata(rdev);
++	unsigned int value;
++	int ret = regmap_read(bq->regmap, BQ256XX_CHARGER_CONTROL_0, &value);
++
++	return ret ? ret : !!(value & BQ256XX_OTG_CONFIG);
++}
++
++static const struct regulator_ops bq2560x_otg_ops = {
++	.enable = bq2560x_otg_enable,
++	.disable = bq2560x_otg_disable,
++	.is_enabled = bq2560x_otg_enabled,
++};
++
++static const struct regulator_desc bq2560x_otg_desc = {
++	.name = "otg-vbus", .of_match = "otg-vbus",
++	.type = REGULATOR_VOLTAGE, .owner = THIS_MODULE,
++	.ops = &bq2560x_otg_ops, .n_voltages = 1, .fixed_uV = 5000000,
++};
++
++static int bq2560x_register_otg(struct bq256xx_device *bq)
++{
++	struct regulator_config config = {
++		.dev = bq->dev, .driver_data = bq, .regmap = bq->regmap,
++	};
++	struct regulator_dev *rdev;
++
++	rdev = devm_regulator_register(bq->dev, &bq2560x_otg_desc, &config);
++	return PTR_ERR_OR_ZERO(rdev);
+ }
+ 
+ static int bq256xx_probe(struct i2c_client *client)
+@@ -2256,6 +2337,9 @@
+ 			if (ret)
+ 				return dev_err_probe(dev, ret, "VBUS extcon notifier\n");
+ 		}
++		ret = bq2560x_register_otg(bq);
++		if (ret)
++			return dev_err_probe(dev, ret, "OTG regulator\n");
+ 		mod_delayed_work(system_power_efficient_wq, &bq->vbus_work, 0);
+ 	}
+ 

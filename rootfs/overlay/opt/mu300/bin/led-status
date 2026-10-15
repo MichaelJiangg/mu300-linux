@@ -28,6 +28,10 @@ if [ -d "$LED_ROOT/v50:net1:white" ]; then
 fi
 [ "$(mu300-device 2>/dev/null)" != v50 ] || exit 0
 
+if [ "$(mu300-device 2>/dev/null)" = u30air ]; then
+    exec "${MU300_U30_LED_BACKEND:-/opt/mu300/bin/u30air-led-status}" "$@"
+fi
+
 # --- detect LED paths (F50 sc27xx vs V50 plain)
 RGB_WHITE=0
 if [ -d "$LED_ROOT/aw_led" ] && [ -d "$LED_ROOT/green" ] && [ -d "$LED_ROOT/blue" ]; then

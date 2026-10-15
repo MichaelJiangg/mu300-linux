@@ -21,6 +21,14 @@ def append_once(path, marker, text):
         open(p, 'w').write(s.rstrip('\n') + '\n' + text)
 
 append_once('drivers/clk/sprd/Makefile', 'reset.o', 'clk-sprd-y\t+= reset.o\n')
+append_once('drivers/usb/typec/tcpm/Makefile', 'sc27xx-ump9620.o',
+            'obj-$(CONFIG_TYPEC_SC27XX_UMP9620) += sc27xx-ump9620.o\n')
+append_once('drivers/usb/typec/tcpm/Kconfig', 'config TYPEC_SC27XX_UMP9620',
+            '\nconfig TYPEC_SC27XX_UMP9620\n'
+            '\ttristate "UMP9620 Type-C and PD controller"\n'
+            '\tdepends on TYPEC_TCPM && OF && MFD_SC27XX_PMIC\n'
+            '\tdepends on REGULATOR && POWER_SUPPLY && USB_ROLE_SWITCH && NVMEM\n'
+            '\thelp\n\t  Autonomous Type-C and USB-PD with independent data/power roles.\n')
 append_once('drivers/clk/sprd/Makefile', 'ums9620-clk.o', 'obj-$(CONFIG_SPRD_UMS9620_CLK)\t\t+= ums9620-clk.o\n')
 kc = os.path.join(tree, 'drivers/clk/sprd/Kconfig')
 s = open(kc).read()

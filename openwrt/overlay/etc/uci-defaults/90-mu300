@@ -1,5 +1,5 @@
 #!/bin/sh
-# First boot: one LAN for USB and Wi-Fi (192.168.77.1/24 on an F50, 192.168.78.1/24 on a U30 Air), cellular WAN through the modem, hostname, USB console.
+# First boot: one LAN for USB and Wi-Fi (192.168.77.1/24 on all supported boards), cellular WAN through the modem, hostname, USB console.
 # lan ip6assign 64: a carrier hands out one /64 (the wan_6 that mu300cell adds), and the default /60 request
 # would leave the LAN without IPv6
 usb_host_mac=$(cat /run/mu300-usb-host-mac 2>/dev/null)

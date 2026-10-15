@@ -2,7 +2,7 @@
 # The buttons (Ubuntu and OpenWrt; run by mu300-buttons.service / /etc/init.d/mu300-buttons):
 #   power, short press        wake the LEDs (they go dark after LED_TIMEOUT, see mu300-led)
 #   power, held 3 s           shut down cleanly (the battery-powered U30 Air; the F50 starts again on USB power)
-#   Wi-Fi key, short press    hotspot 2.4 <-> 5 GHz (U30 Air; the Wi-Fi LED shows the band: blue 5, white 2.4)
+#   Wi-Fi key, short press    hotspot 2.4 <-> 5 GHz (U30 Air; the Wi-Fi LED shows the band: white 5, blue 2.4)
 #   Wi-Fi key, held 3 s       hotspot off / on
 # mu300-keys reports the presses; its tick every 5 s lets the LEDs time out. Ubuntu's logind leaves the power key
 # to this script (/etc/systemd/logind.conf.d/mu300-buttons.conf): it used to power the device off at a touch.

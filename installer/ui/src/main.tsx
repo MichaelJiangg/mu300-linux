@@ -90,7 +90,7 @@ function App() {
     }
     if (next.stage === 'openwrt_boot' && verificationTransaction.current !== next.id) {
       verificationTransaction.current = next.id;
-      setHost(next.details?.host || next.choices.host || (next.package.adapter === 'e5' ? '192.168.9.1' : next.device.profile === 'u30air' ? '192.168.78.1' : '192.168.77.1'));
+      setHost(next.details?.host || next.choices.host || (next.package.adapter === 'e5' ? '192.168.9.1' : '192.168.77.1'));
     }
     setTx(next);
   }, [append, t]);

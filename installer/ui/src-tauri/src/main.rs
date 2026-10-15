@@ -62,7 +62,7 @@ fn write_log(state: State<'_, Arc<Bridge>>, path: String, text: String) -> Resul
 #[tauri::command]
 fn open_data(state: State<'_, Arc<Bridge>>) -> Result<(), String> {
     // Fixed directory, never a shell string supplied by the webview.
-    Command::new("explorer.exe").arg(&state.directory).spawn().map_err(|e|e.to_string())?;
+    open_native(&state.directory)?;
     Ok(())
 }
 
@@ -73,20 +73,55 @@ fn open_repository(repository: String) -> Result<(), String> {
         "mu300" => "https://github.com/dikeckaan/mu300-linux",
         _ => return Err("Unknown project repository".into()),
     };
-    Command::new("explorer.exe").arg(url)
-        .spawn().map_err(|e|e.to_string())?;
+    open_native(url)?;
     Ok(())
 }
 
+fn open_native(target: impl AsRef<std::ffi::OsStr>) -> Result<(), String> {
+    #[cfg(target_os = "windows")] let opener = "explorer.exe";
+    #[cfg(target_os = "macos")] let opener = "open";
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))] let opener = "xdg-open";
+    Command::new(opener).arg(target).spawn().map_err(|e|e.to_string())?;
+    Ok(())
+}
+
+fn data_directory() -> PathBuf {
+    #[cfg(target_os = "macos")]
+    return std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(std::env::temp_dir)
+        .join("Library/Application Support/OpenWrt-Installer");
+    #[cfg(not(target_os = "macos"))]
+    return std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(std::env::temp_dir).join("OpenWrt-Installer");
+}
+
+fn distribution_root(executable: &std::path::Path) -> Result<PathBuf, String> {
+    #[cfg(target_os = "macos")]
+    for ancestor in executable.ancestors() {
+        if ancestor.extension().is_some_and(|ext| ext == "app") {
+            let root = ancestor.parent().ok_or("Application has no parent directory")?;
+            if root.join("desktop/manifest.json").is_file() { return Ok(root.to_path_buf()); }
+            // Finder may translocate quarantined applications. Ask for the
+            // extracted package rather than guessing its original location.
+            return rfd::FileDialog::new().set_title("Select extracted OpenWrt package / 选择完整解压的安装包")
+                .pick_folder().ok_or_else(|| "No package selected".into());
+        }
+    }
+    executable.parent().map(|p|p.to_path_buf()).ok_or_else(|| "Executable has no directory".into())
+}
+
 fn main() {
-    let directory = std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(std::env::temp_dir).join("OpenWrt-Installer");
+    let directory = data_directory();
     let bridge = Arc::new(Bridge {input:Mutex::new(None),pending:Mutex::new(HashMap::new()),sequence:AtomicU64::new(1),busy:AtomicBool::new(false),directory,export_log:Mutex::new(None)});
     let setup_state = bridge.clone();
     let app = tauri::Builder::default().manage(bridge.clone())
         .invoke_handler(tauri::generate_handler![backend_request,pick_package,pick_recovery,save_backup,save_log,write_log,open_data,open_repository])
         .setup(move |app| {
-            let root = std::env::current_exe()?.parent().ok_or("Executable has no directory")?.to_path_buf();
-            let mut process = Command::new(root.join("tools/backend/openwrt-backend.exe"));
+            let executable = std::env::current_exe()?;
+            let root = distribution_root(&executable).map_err(std::io::Error::other)?;
+            #[cfg(target_os = "macos")]
+            let backend = "tools/macos/backend/openwrt-backend";
+            #[cfg(not(target_os = "macos"))]
+            let backend = "tools/backend/openwrt-backend.exe";
+            let mut process = Command::new(root.join(backend));
             process.args(["--package-root", &root.to_string_lossy(), "--data-dir", &setup_state.directory.to_string_lossy()]);
             process.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null());
             #[cfg(windows)] { use std::os::windows::process::CommandExt; process.creation_flags(0x08000000); }
@@ -141,7 +176,11 @@ fn main() {
             if matches!(event,tauri::RunEvent::Exit) {bridge.input.lock().unwrap().take();}
         }),
         Err(error) => {
-            rfd::MessageDialog::new().set_title("OpenWrt Installer / WebView2").set_description(format!("Cannot start the system WebView2. Install Microsoft Edge WebView2 Evergreen Runtime and reopen the installer.\n无法启动系统 WebView2。请安装 Microsoft Edge WebView2 Evergreen Runtime 后重试。\nhttps://developer.microsoft.com/microsoft-edge/webview2/\n\n{error}")).set_level(rfd::MessageLevel::Error).show();
+            #[cfg(target_os = "macos")]
+            let message = format!("Cannot start OpenWrt Installer. Keep the app beside tools and payload in the extracted package.\n无法启动安装器，请将 app 与 tools、payload 一起保留在完整解压目录。\n\n{error}");
+            #[cfg(not(target_os = "macos"))]
+            let message = format!("Cannot start the system WebView2. Install Microsoft Edge WebView2 Evergreen Runtime and reopen the installer.\n无法启动系统 WebView2。请安装 Microsoft Edge WebView2 Evergreen Runtime 后重试。\nhttps://developer.microsoft.com/microsoft-edge/webview2/\n\n{error}");
+            rfd::MessageDialog::new().set_title("OpenWrt Installer").set_description(message).set_level(rfd::MessageLevel::Error).show();
         }
     }
 }

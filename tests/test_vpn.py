@@ -34,7 +34,7 @@ class Vpn(ShellTest):
             ('LAN_CIDRS=192.168.77.0/24\n', 'u30air', '192.168.78.1/24', '192.168.77.0/24,192.168.78.0/24'),
             ('LAN_CIDRS=192.168.78.0/24\n', 'u30air', '192.168.78.1/24', '192.168.78.0/24'),
             # br-lan not up yet: the device's default address
-            ('', 'u30air', None, '192.168.78.0/24'),
+            ('', 'u30air', None, '192.168.77.0/24'),
             ('', 'f50', None, '192.168.77.0/24'),
             # an address set in lan.conf / UCI, as br-lan has it
             ('LAN_CIDRS=10.0.0.0/8\n', 'f50', '192.168.5.1/24', '10.0.0.0/8,192.168.5.0/24'),

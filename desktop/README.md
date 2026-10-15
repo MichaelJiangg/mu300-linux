@@ -60,7 +60,7 @@ slot, partition geometry and the on-device token must still match. New records
 also save a `package-manifest.json` beside `transaction.json` for portability.
 `--probe --serial SERIAL` checks the connected Android's model, encryption,
 storage and binary DTB/A/B reads without staging files or writing partitions.
-`--size 10` selects 10 GiB. `--host 192.168.78.1` selects U30Air for updates.
+`--size 10` selects 10 GiB. `--host 192.168.77.1` selects U30Air for updates.
 The installer never changes the computer's network or firewall settings.
 Hotspot keys use visible input. Android image mounting resolves BusyBox's
 `/dev/loopN` to Android's real `/dev/block/loopN` before attachment. Reboot
@@ -100,7 +100,7 @@ to the full partition by default. The initial 2 GiB image is not the installed c
 The first offline boot may take several minutes or longer, then reboots once into OpenWrt; keep power connected.
 Offline operations print a two-second stage/elapsed heartbeat; copying also
 reports bytes. Progress is exposed during that boot at
-`http://192.168.77.1:8089/progress.txt` (U30Air: `192.168.78.1`).
+`http://192.168.77.1:8089/progress.txt` (U30Air: `192.168.77.1`).
 USB networking must be enabled to view it. No permanent polling service is added.
 
 FBE/FDE or `--format-userdata` uses two stages. **Android userdata is erased.**

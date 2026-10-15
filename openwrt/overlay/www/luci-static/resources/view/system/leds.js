@@ -21,6 +21,12 @@ const labels = {
 	'LED Configuration': ['LED 配置', 'LED yapılandırması'],
 	'Configure physical status lamps and optional LED trigger actions.': ['配置物理状态灯与可选的 LED 触发动作。', 'Fiziksel durum ışıklarını ve isteğe bağlı LED tetikleyicilerini yapılandırın.'],
 	'Physical status lamps': ['物理状态灯', 'Fiziksel durum ışıkları'],
+    'Battery lamp': ['电池灯', 'Pil ışığı'],
+    'Battery lamp brightness': ['电池灯亮度', 'Pil ışığı parlaklığı'],
+    'LED timeout (seconds)': ['状态灯自动熄灭（秒）', 'LED kapanma süresi (saniye)'],
+    'While charging lamps stay on. Otherwise 0 keeps them on; press the power key to show them again.': ['充电时状态灯保持点亮；未充电时 0 表示常亮，熄灭后短按电源键可再次点亮。', 'Şarjda ışıklar açık kalır. Diğer durumlarda 0 sürekli açık tutar; yeniden göstermek için güç tuşuna basın.'],
+    'U30 Air: network blue on 4G, white on 5G, red without data. Wi-Fi blue on 2.4 GHz, white on 5 GHz. These lamps support on/off only.': ['U30 Air：网络灯 4G 蓝色、5G 白色、无数据红色；Wi-Fi 灯 2.4 GHz 蓝色、5 GHz 白色。这两组灯仅支持开关。', 'U30 Air: 4G mavi, 5G beyaz, veri yoksa kırmızı. Wi-Fi: 2.4 GHz mavi, 5 GHz beyaz. Bu ışıklar yalnızca açılıp kapatılabilir.'],
+    'Charging: breathing blue; full or normal battery: white; low battery: blinking red.': ['充电时蓝色呼吸；充满或正常电量时白色；低电量时红色闪烁。', 'Şarjda yumuşakça parlayan mavi; dolu veya normal pil beyaz; düşük pil yanıp sönen kırmızı.'],
 	'Signal lamp (LTE / 5G / no service)': ['信号灯（4G / 5G / 无信号）', 'Sinyal ışığı (4G / 5G / servis yok)'],
 	'Signal lamp brightness': ['信号灯亮度', 'Sinyal ışığı parlaklığı'],
 	'Wi-Fi hotspot lamp': ['Wi-Fi 热点灯', 'Wi-Fi erişim noktası ışığı'],
@@ -80,6 +86,7 @@ return view.extend({
 		let m, s, o;
 		const awRgb = !!(leds.aw_led && leds.red && leds.green && leds.blue);
 		const v50 = !!leds['v50:net1:white'];
+		const u30air = !!(leds['zte-ldo0'] && leds['zte-ldo1'] && leds['zte-ldo2'] && leds.net_blue);
 		let wifiMax = leds['keyboard-backlight'] && Number(leds['keyboard-backlight'].max_brightness);
 		if (!Number.isInteger(wifiMax) || wifiMax < 1 || wifiMax > 255) wifiMax = 255;
 		const triggers = [];
@@ -97,15 +104,19 @@ return view.extend({
 		s = m.section(form.NamedSection, 'mu300_leds', 'mu300_leds', label('Physical status lamps'));
 		s.anonymous = true;
 		s.addremove = false;
+		if (u30air) s.description = label('U30 Air: network blue on 4G, white on 5G, red without data. Wi-Fi blue on 2.4 GHz, white on 5 GHz. These lamps support on/off only.');
 		if (v50) s.description = label('Each network lamp shows its own SIM status. Wi-Fi: 5 GHz white, 2.4 GHz blue.');
 		o = s.option(form.Flag, 'signal', label(v50 ? 'NET1 lamp (SIM 1)' : 'Signal lamp (LTE / 5G / no service)'));
 		o.default = '1';
 		o.rmempty = false;
+		if (!u30air) {
 		o = s.option(form.Value, 'signal_brightness', label(v50 ? 'NET1 brightness' : 'Signal lamp brightness'),
 			label('0–255; 0 is dark. LTE stays blue, 5G white, and no service red.'));
 		o.datatype = 'range(0,255)';
 		o.default = '255';
 		o.rmempty = false;
+		}
+
 		if (v50) {
 			o = s.option(form.Flag, 'signal2', label('NET2 lamp (SIM 2)'));
 			o.default = '1'; o.rmempty = false;
@@ -117,12 +128,24 @@ return view.extend({
 		o = s.option(form.Flag, 'wifi', label('Wi-Fi hotspot lamp'));
 		o.default = '1';
 		o.rmempty = false;
+		if (!u30air) {
 		o = s.option(form.Value, 'wifi_brightness', label('Wi-Fi lamp brightness'),
 			label('0 is dark. Hardware maximum: ') + wifiMax);
 		o.datatype = 'range(0,' + wifiMax + ')';
 		o.default = String(Math.min(127, wifiMax));
 		o.rmempty = false;
 		}
+
+		}
+
+        if (u30air) {
+            o = s.option(form.Flag, 'battery', label('Battery lamp'), label('Charging: breathing blue; full or normal battery: white; low battery: blinking red.'));
+            o.default = '1'; o.rmempty = false;
+            o = s.option(form.Value, 'battery_brightness', label('Battery lamp brightness'));
+            o.datatype = 'range(0,255)'; o.default = '255'; o.rmempty = false;
+            o = s.option(form.Value, 'timeout', label('LED timeout (seconds)'), label('While charging lamps stay on. Otherwise 0 keeps them on; press the power key to show them again.'));
+            o.datatype = 'range(0,86400)'; o.default = '60'; o.rmempty = false;
+        }
 
 		s = m.section(form.GridSection, 'led', '');
 		s.anonymous = true;
@@ -134,6 +157,7 @@ return view.extend({
 		s.option(form.Value, 'name', label('Name'));
 		o = s.option(form.ListValue, 'sysfs', label('LED Name'));
 		Object.keys(leds).sort().forEach(function(name) {
+			if (u30air && /^(sc27xx:|zte-ldo|net_|wifi_|pwr_green$|keyboard-backlight$)/.test(name)) return;
 			o.value(name);
 		});
 		o = s.option(form.ListValue, 'trigger', label('Trigger'));

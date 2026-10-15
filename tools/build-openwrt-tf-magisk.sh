@@ -30,6 +30,11 @@ mkdir -p "$TOP/work"
 # desktop code is not added to the Magisk boot image.
 DESKTOP=${MU300_DESKTOP_INSTALLER:-1}
 DESKTOP_TOOLS=${MU300_DESKTOP_TOOLS:-$TOP/work/desktop-tools}
+# Include the native Mac build when it has been downloaded/built alongside the
+# Windows artifact. The assembler checks both against the current source hash.
+if [ -z "${OPENWRT_GUI_MACOS_ARTIFACT:-}" ] && [ -f "$TOP/installer/artifacts/macos-arm64/build.json" ]; then
+    export OPENWRT_GUI_MACOS_ARTIFACT="$TOP/installer/artifacts/macos-arm64"
+fi
 if [ "$DESKTOP" = 1 ]; then
     [ -s "$DESKTOP_TOOLS/lib/ld-musl-aarch64.so.1" ] || {
         echo "desktop maintenance tools missing: $DESKTOP_TOOLS (set MU300_DESKTOP_TOOLS or MU300_DESKTOP_INSTALLER=0)" >&2; exit 1;
@@ -91,6 +96,7 @@ MU300_GPU=0 MU300_INPUTS="$IN" MU300_MAINLINE_OUT="$UO" MU300_LUCI_PLUGIN_SRC="$
 for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./sbin/block ./lib/libblkid-tiny.so ./etc/init.d/fstab ./etc/mu300/block-mount.build-id \
     ./opt/mu300/bin/mu300-keys ./opt/mu300/bin/mu300-bt-init ./opt/mu300/bin/mu300-atd ./opt/mu300/bin/mu300-at ./opt/mu300/bin/mobile-data \
+    ./opt/mu300/bin/u30air-led-status ./etc/hotplug.d/power_supply/70-mu300-led \
     ./opt/mu300/bin/mu300-data-sim-u30 ./opt/mu300/bin/mu300-sim-u30 ./opt/mu300/bin/mu300-sim2-start ./opt/mu300/bin/mu300-sim2-warmup ./opt/mu300/lib/sim-config.sh \
     ./opt/mu300/bin/mu300-user-packages ./etc/init.d/mu300-user-packages ./etc/mu300/image-packages \
     ./opt/mu300/lib/wifi-channels.sh ./usr/share/ucode/wifi/hostapd.uc \

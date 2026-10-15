@@ -19,7 +19,8 @@ def hidden_process():
 class Adb:
     def __init__(self, package, serial=None):
         self.serial = serial
-        paths = [Path(package) / 'tools/adb.exe', Path(package) / 'platform-tools/adb.exe']
+        names = ('tools/adb.exe', 'platform-tools/adb.exe') if os.name == 'nt' else ('tools/macos/adb', 'tools/adb', 'platform-tools/adb', 'tools/adb.exe')
+        paths = [Path(package) / name for name in names]
         self.exe = next((str(p) for p in paths if p.is_file()), shutil.which('adb'))
         if not self.exe:
             raise ValueError('ADB is missing from tools / 安装包缺少 ADB 工具')

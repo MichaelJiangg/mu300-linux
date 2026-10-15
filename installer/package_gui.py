@@ -18,12 +18,16 @@ def digest(path):
 
 
 def sources():
-    paths = [HERE/'backend_entry.py', HERE/'package_gui.py', HERE/'platform-tools.json', HERE/'GUIDE.md']
+    paths = [HERE/n for n in ('backend_entry.py','build.py','package_gui.py','platform-tools.json','platform-tools-macos.json','GUIDE.md')]
     paths += list((HERE/'backend').glob('*.py'))
     paths += [p for p in (HERE/'ui/src').rglob('*') if p.is_file()]
     paths += [HERE/'ui'/n for n in ('package.json','package-lock.json','vite.config.ts','tailwind.config.js','postcss.config.js','tsconfig.json','index.html','rust-toolchain.toml')]
-    paths += [HERE/'ui/src-tauri'/n for n in ('Cargo.toml','Cargo.lock','build.rs','tauri.conf.json','src/main.rs','capabilities/default.json','icons/icon.ico')]
-    return {p.relative_to(HERE).as_posix(): digest(p) for p in sorted(paths)}
+    paths += [HERE/'ui/src-tauri'/n for n in ('Cargo.toml','Cargo.lock','build.rs','tauri.conf.json','src/main.rs','capabilities/default.json','icons/icon.ico','icons/icon.icns','icons/icon.png')]
+    # Git checkouts can normalize CRLF on the native macOS build runner.
+    # Only source text is normalized; binary artifact hashes stay exact.
+    text = {'.py','.ts','.tsx','.json','.toml','.rs','.js','.html','.md','.css','.lock'}
+    return {p.relative_to(HERE).as_posix(): hashlib.sha256(p.read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+            if p.suffix in text else digest(p) for p in sorted(paths)}
 
 
 def attach(package, artifact=None, required=True):
@@ -43,6 +47,22 @@ def attach(package, artifact=None, required=True):
             raise ValueError('Portable build checksum mismatch: '+name)
     shutil.copy2(artifact/'OpenWrt-Installer.exe', package/'OpenWrt-Installer.exe')
     shutil.copytree(artifact/'tools', package/'tools', dirs_exist_ok=True)
+    mac_artifact = os.environ.get('OPENWRT_GUI_MACOS_ARTIFACT')
+    if mac_artifact:
+        mac_artifact = Path(mac_artifact)
+        mac_metadata = mac_artifact/'build.json'
+        mac_build = json.loads(mac_metadata.read_text())
+        if mac_build.get('platform') != 'macos-arm64' or mac_build['source'] != sources():
+            raise ValueError('Apple Silicon GUI build is stale or has the wrong architecture')
+        for name, wanted in mac_build['files'].items():
+            path = (mac_artifact/name).resolve()
+            if not path.is_relative_to(mac_artifact.resolve()) or digest(path) != wanted:
+                raise ValueError('Apple Silicon build checksum mismatch: '+name)
+        # Flatten framework links for ZIP extractors without symlink privileges.
+        shutil.copytree(mac_artifact/'OpenWrt-Installer.app', package/'OpenWrt-Installer.app', dirs_exist_ok=True)
+        shutil.copytree(mac_artifact/'tools', package/'tools', dirs_exist_ok=True)
+        (package/'docs').mkdir(exist_ok=True)
+        shutil.copy2(mac_metadata, package/'docs/GUI-BUILD-macos.json')
     docs = package/'docs'
     docs.mkdir(exist_ok=True)
     shutil.copy2(HERE/'GUIDE.md', docs/'GUI-GUIDE.md')

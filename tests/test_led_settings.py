@@ -168,6 +168,13 @@ for (const [locale, title, signal, wifi] of [
     const adapted = page.render([{ 'v50:net1:white': { max_brightness: 80, triggers: [] } }, []]);
     if (!adapted.sections[0].options.some(o => o.key === 'signal2') ||
         !adapted.sections[0].options.some(o => o.key === 'wifi')) throw Error('V50 physical lamps missing');
+    const u30 = page.render([{ 'zte-ldo0': {max_brightness:1,triggers:[]}, 'zte-ldo1': {max_brightness:1,triggers:[]}, 'zte-ldo2': {max_brightness:1,triggers:[]}, net_blue: {max_brightness:1,triggers:[]} }, []]);
+    const opts = u30.sections[0].options;
+    if (opts.some(o => ['signal_brightness','wifi_brightness','signal2'].includes(o.key))) throw Error('U30 binary lamps must not offer fake brightness or a second SIM lamp');
+    const battery = opts.find(o => o.key === 'battery_brightness');
+    if (!battery || battery.datatype !== 'range(0,255)' || !opts.some(o => o.key === 'battery')) throw Error('U30 battery controls');
+    if (!opts.some(o => o.key === 'timeout' && o.default === '60')) throw Error('U30 idle timeout');
+
 }
 '''
         result = subprocess.run(['node', '-', str(UI)], input=harness, capture_output=True,

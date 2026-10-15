@@ -182,12 +182,13 @@ for f in sbin/block lib/libblkid-tiny.so etc/init.d/fstab; do
     [ -s "$R/$f" ] || { echo "patched block-mount required file missing: $f" >&2; exit 1; }
 done
 chmod 0755 $R/opt/mu300/bin/cpu-voltage-platform $R/etc/init.d/mu300-cpu-driver
-for helper in mu300-data-sim-u30 mu300-sim-u30 mu300-sim2-start mu300-sim2-warmup; do
+for helper in mu300-data-sim-u30 mu300-sim-u30 mu300-sim2-start mu300-sim2-warmup u30air-led-status; do
     [ -s "$R/opt/mu300/bin/$helper" ] || { echo "missing U30 helper: $helper" >&2; exit 1; }
     chmod 0755 "$R/opt/mu300/bin/$helper"
 done
 chroot "$R" /bin/sh -c "command -v flock >/dev/null" || { echo "missing native SIM flock dependency" >&2; exit 1; }
 [ -s "$R/opt/mu300/lib/sim-config.sh" ] || { echo "missing U30 SIM configuration library" >&2; exit 1; }
+chmod 0755 $R/etc/hotplug.d/power_supply/70-mu300-led
 chmod 0755 $R/opt/mu300/bin/mu300-platform-config
 chmod 0755 $R/opt/mu300/bin/v50-led-status
 chmod 0755 $R/opt/mu300/bin/openwrt-board-check

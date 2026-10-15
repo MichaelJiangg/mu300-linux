@@ -249,7 +249,8 @@ def settings(args, image_mib, mode, kernel):
 class Android:
     def __init__(self,args):
         self.args=args
-        self.adb=args.adb or shutil.which('adb') or str(package_root()/'tools/adb.exe')
+        bundled=package_root()/('tools/adb.exe' if os.name=='nt' else 'tools/macos/adb')
+        self.adb=args.adb or (str(bundled) if bundled.is_file() else shutil.which('adb')) or str(bundled)
         listing=self.call('devices').decode(errors='replace')
         serials=[l.split()[0] for l in listing.splitlines() if len(l.split())==2 and l.split()[1]=='device']
         if args.serial: self.serial=args.serial
@@ -681,7 +682,7 @@ def install(args,root,manifest):
     a.run('printf "PART_MIB='+str(size)+'\\nDATA_MIB='+str(target//2048)+'\\nGROW_FS='+str(int(getattr(args,'grow_fs',True)))+'\\nFORMAT_DATA=0\\n" > /data/mu300linux/part-install.conf\nsync')
     identity=':'.join(map(str,(s['CID'],s['NODE'],s['START'],s['SIZE'],target)))
     a.flash(boot(root,m,'install-part',live,a.slot,identity=identity),m.boot_control(live,a.slot))
-    print('Offline shrink/install starts after reboot; progress at http://192.168.77.1:8089/progress.txt (U30Air: .78.1). / 重启后开始离线安装。')
+    print('Offline shrink/install starts after reboot; progress at http://192.168.77.1:8089/progress.txt. / 重启后开始离线安装。')
     print('First boot may take several minutes or longer; do not interrupt power. After installation it reboots once into OpenWrt. / 首次开机缩容安装通常需数分钟，数据多或闪存慢时更久；完成后自动重启一次进入 OpenWrt，请勿中断。')
     a.reboot()
     return Outcome('pending','Payload verified; offline shrink/install is starting / 载荷校验通过，设备将离线缩容并安装。',

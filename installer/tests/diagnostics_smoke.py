@@ -56,7 +56,7 @@ def main():
         bar=page.get_by_role('progressbar',name='当前阶段进度')
         assert bar.get_attribute('aria-valuenow') is None
         assert page.locator('progress').count()==0
-        assert page.get_by_text('此操作没有可靠百分比，正在显示真实阶段与耗时。',exact=True).count()==1
+        assert page.get_by_text('正在处理，请保持设备供电。',exact=True).count()==1
         page.screenshot(path=str(ROOT/'screenshots/install-activity-debug-zh.png'))
         page.evaluate("window.__emitFixture({stage:'openwrt_boot',status:'waiting_user',revision:13,details:{host:'192.168.9.1',reboot_manually:true}})")
         settle(page);layout(page)
@@ -69,7 +69,7 @@ def main():
         confirm=page.get_by_role('button',name='我已进入 OpenWrt，开始校验',exact=True)
         assert confirm.bounding_box()['y']+confirm.bounding_box()['height']<page.locator('.log-panel').bounding_box()['y']
         page.get_by_label('设备管理 IP / 主机名').fill('192.168.9.22')
-        page.get_by_label('SSH root 密码（仅在内存中使用）').fill('fixture-private')
+        page.get_by_label('SSH root 密码（不保存）').fill('fixture-private')
         page.screenshot(path=str(ROOT/'screenshots/manual-restart-log-zh.png'))
         confirm.click();settle(page)
         assert page.evaluate("window.__fixture.calls.filter(c=>c.command==='verify_openwrt').at(-1).params")=={'transaction':'a'*32,'host':'192.168.9.22','password':'fixture-private'}

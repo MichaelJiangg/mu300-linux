@@ -10,7 +10,7 @@ export const helpStrings = {
       ['首次安装从“安装 OpenWrt”开始。TF 卡只格式化选定目标，不重新划卡；内置分区会先检查未分配空间。','核对最终计划里的机型、写入目标、Android 保留空间和数据影响。需要重置时，Android 用户数据会被清空。','已装好 OpenWrt 时可选择更新或临时启动；重装和有 F2FS 损坏风险的实验性镜像放在高级选项。'],
       ['首次离线分区准备可能需要数分钟，之后会自动重启。预期断线、Android 初始化和授权都是等待状态。','重置后完成 Android 初始化、开启 USB 调试并允许授权。已有 root 会直接使用；只有 root 不可用时才需要恢复 Magisk。','安装记录自动保存在电脑。关闭或重启后从“继续未完成的安装”恢复；换电脑前导出完整事务与备份。电脑记录和备份都丢失时，目前无法仅凭设备自动重建续装记录。'],
     ],
-    noAction:'本引导只作说明，不会操作设备。最终安装仍需单独确认。', currentHelp:'查看当前步骤帮助',
+    noAction:'开始安装前，请核对设备、写入目标和数据影响，并备份重要文件。', currentHelp:'查看当前步骤帮助',
   },
   en: {
     help:'Help and user guide', helpIntro:'Available offline. Browse a topic or search for connection, authorization or recovery help.', close:'Close help', closeGuide:'Close getting started',
@@ -23,6 +23,6 @@ export const helpStrings = {
       ['Use Install OpenWrt for a first installation. TF installation formats only the selected target without repartitioning the card. Internal installation checks unallocated space first.','Review the model, write target, retained Android space and data impact in the final plan. A required Android reset erases its user data.','For installed OpenWrt, choose update or a one-time boot. Reinstallation and the experimental image option, which can damage F2FS, live under Advanced options.'],
       ['The first offline preparation may take several minutes and then reboot automatically. Expected USB disconnects, Android setup and authorization are waiting states.','After a reset, complete Android setup, enable USB debugging and grant authorization. Working root is accepted immediately; restore Magisk only if root is unavailable.','Installation records are saved automatically on the computer. After closing or restarting, choose Continue an unfinished installation. Export the full transaction and backups before moving computers. If both records and backups are lost, this version cannot reconstruct a record from the device alone.'],
     ],
-    noAction:'This guide does not operate the device. Installation still requires a separate final confirmation.', currentHelp:'Help for this step',
+    noAction:'Before installing, check the device, write target and data impact, and back up important files.', currentHelp:'Help for this step',
   },
 };

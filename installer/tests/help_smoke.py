@@ -46,6 +46,8 @@ def main():
         dialog.get_by_role('textbox',name='搜索使用指南').fill('Magisk')
         assert dialog.locator('.help-topics button').count()>=1
         dialog.get_by_role('textbox',name='搜索使用指南').fill('')
+        dialog.get_by_role('button',name='更新与自动重启',exact=True).click()
+        dialog.get_by_text('不要因为重启期间连接不上而重新执行更新。',exact=True).wait_for()
         dialog.get_by_role('button',name='连接与常见问题',exact=True).click()
         dialog.get_by_text('电脑记录和导出备份都丢失时',exact=False).wait_for()
         assert dialog.locator('article').evaluate('(el)=>el.scrollHeight>el.clientHeight')
@@ -84,6 +86,8 @@ def main():
         page.keyboard.press('F1')
         dialog=page.get_by_role('dialog',name='Help and user guide');dialog.wait_for();settle(page)
         bounded_dialog(page)
+        dialog.get_by_role('button',name='Updates and automatic restart',exact=True).click()
+        dialog.get_by_text('Do not start another update because the device is unreachable during restart.',exact=True).wait_for()
         dialog.get_by_role('button',name='Connection and troubleshooting',exact=True).click()
         dialog.get_by_text('this version cannot reconstruct a record from the device alone',exact=False).wait_for()
         page.evaluate("window.__emitFixture({stage:'root_permission',status:'waiting_user'})");settle(page)

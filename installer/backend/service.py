@@ -244,7 +244,8 @@ class Service:
             if target.exists():
                 raise ValueError('Transaction already exists')
             if record.get('legacy'):
-                relative = Path(record['legacy']).relative_to(Path(record.get('data_directory', directory)))
+                # macOS /var and /private/var can refer to the same directory.
+                relative = Path(record['legacy']).resolve().relative_to(Path(record.get('data_directory', directory)).resolve())
                 record['legacy'] = str(target/relative)
             record['data_directory'] = str(target)
             shutil.copytree(directory, target)
@@ -371,7 +372,7 @@ class Service:
             r['package']['adapter'] == 'e5' and r['choices']['method'] == 'boot')
         manual = manual and not r.get('openwrt_confirmed',False)
         host = r['choices'].get('host') or ('192.168.9.1' if r['package']['adapter'] == 'e5' else
-                '192.168.78.1' if r['device']['profile'] == 'u30air' else '192.168.77.1')
+                '192.168.77.1')
         context.stage('openwrt_boot', 'waiting_user' if manual or error else 'waiting_device',
                       host=host, reboot_manually=manual, boot_confirmed=bool(r.get('openwrt_confirmed')),
                       verification_error=error, connection_state=connection_state)
@@ -380,7 +381,7 @@ class Service:
         import paramiko
         r = context.record
         host = r['choices'].get('host') or ('192.168.9.1' if r['package']['adapter'] == 'e5' else
-                '192.168.78.1' if r['device']['profile'] == 'u30air' else '192.168.77.1')
+                '192.168.77.1')
         # No network/interface changes and no automatic hotspot connection.
         while True:
             context.boundary()

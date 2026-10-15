@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import re
 import tempfile
@@ -17,6 +18,8 @@ WAITING = {'waiting_device', 'waiting_user'}
 
 
 def app_directory():
+    if sys.platform == 'darwin':
+        return Path.home() / 'Library/Application Support/OpenWrt-Installer'
     return Path(os.environ.get('LOCALAPPDATA', Path.home() / '.local/share')) / 'OpenWrt-Installer'
 
 

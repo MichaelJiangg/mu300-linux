@@ -1,13 +1,13 @@
 #!/bin/sh
 # The USB-C port's role (U30 Air; Ubuntu and OpenWrt, mainline kernels):
 #   mu300-usb             show it
-#   mu300-usb host        host: flash drives, keyboards, modems through an OTG adapter, with 5 V from the charger's
-#                         boost. The USB network to a computer is gone until "device" (it is the same port).
-#   mu300-usb device      back to the USB network / serial console to a computer (the default at every boot)
-#   mu300-usb boot        at boot (mu300-fixups, OpenWrt's mu300-hw): boost off. The charger runs on the battery,
-#                         so its registers outlive a reboot, and a boost left on would meet a computer's 5 V.
-# The role is explicit; the charger driver manages charge current and disables
-# its watchdog. Never re-enable that watchdog while the driver owns the chip.
+#   mu300-usb host        request data host (USB network to a computer disappears).
+#   mu300-usb device      request data device for the computer's USB network.
+#   mu300-usb boot        native PD: leave role/power negotiation to TCPM.
+#                        old kernels: clear stale charger boost before USB attach.
+# Native Type-C/PD controls power separately: host can keep charging via a dock.
+# The legacy path manages boost explicitly, with external-VBUS protection.
+# Never enable the charger watchdog while the kernel driver owns the chip.
 # Battery-less F50/V50 boards never enter this helper's charger register path.
 export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
 R=${MU300_SYSROOT:-}   # (for tests/: a fake /sys)
@@ -52,6 +52,26 @@ setbits() {  # setbits REG MASK VALUE
     v=$(reg "$1") || die "cannot read the charger (I2C $BUS-$ADDR)"
     i2c set "$BUS" $ADDR "$1" $(( (v & ~$2) | $3 )) || die "cannot write the charger"
 }
+
+# A native PD controller owns the boost and negotiates data-role changes.
+# Do not force I2C bits behind it: USB host may legitimately remain a sink.
+if [ "$(mu300-device)" = u30air ]; then
+    for native_port in "$R"/sys/class/typec/port*; do
+        [ -w "$native_port/data_role" ] || continue
+        case ${1:-status} in
+            boot) exit 0 ;;
+            host|device)
+                [ "$(id -u)" = 0 ] || die "run as root"
+                echo "$1" > "$native_port/data_role" || die "the Type-C partner refused the data-role swap"
+                echo "USB data role requested: $1 (power role is negotiated separately)"
+                exit 0 ;;
+            status)
+                printf 'data role: '; cat "$native_port/data_role"
+                printf 'power role: '; cat "$native_port/power_role"
+                exit 0 ;;
+        esac
+    done
+fi
 
 if [ "${1:-}" = boot ]; then
     # quietly, on whatever kernel: the 5.4 one has its own charger driver and no I2C device node for this

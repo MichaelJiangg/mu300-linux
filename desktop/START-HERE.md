@@ -97,7 +97,7 @@ python3 OpenWrt-Installer.py --check
 **缩容安装完成后会自动重启一次，再进入 OpenWrt。**
 
 离线阶段可通过 `http://192.168.77.1:8089/progress.txt` 查看进度；
-U30Air 为 `http://192.168.78.1:8089/progress.txt`。需电脑 USB 网卡启用且可访问设备。
+U30Air 为 `http://192.168.77.1:8089/progress.txt`。需电脑 USB 网卡启用且可访问设备。
 看不到进度页不代表可以中断安装，应以安装器输出和设备实际阶段为准。
 
 ### 加密 userdata，或主动选择格式化
@@ -138,7 +138,7 @@ python3 OpenWrt-Installer.py --resume --transaction "/path/to/transaction.json"
   启动后沿用原有默认启动策略；永久默认启动需在 OpenWrt 中另行设置。
 - **回 Android**：在网页系统切换入口选择 Android，再按提示重启。
 
-管理地址通常是 `http://192.168.77.1`，U30Air 为 `http://192.168.78.1`。
+管理地址通常是 `http://192.168.77.1`，U30Air 为 `http://192.168.77.1`。
 热点名称／密码以安装输出为准，登录后设置自己的管理密码。更新需填写当前实际密码。
 包提供容器所需的内核支持，没有预装 Docker，用户可按需安装。
 

@@ -18,6 +18,7 @@ var CSS = `
 .mud-sim-page .mud-sim-panel h3{margin:0 0 10px;padding:0;border:0;font-size:1rem;font-weight:600;color:var(--text,#222)}
 .mud-sim-page .mud-sim-intro{margin:0 0 16px;line-height:1.65}
 .mud-sim-page .mud-data-sim{display:grid;gap:10px;margin:0;padding:14px;border:1px solid var(--hairline,var(--border-color,#ddd));border-radius:10px;min-width:0}
+.mud-sim-page .mud-data-sim + .mud-data-sim{margin-top:16px}
 .mud-sim-page .mud-data-sim-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
 .mud-sim-page .mud-data-sim-controls label{flex:1;min-width:110px;font-weight:600;margin:0;color:var(--text,#222)}
 .mud-sim-page .mud-data-sim-controls input[type="checkbox"]{width:18px;height:18px;min-height:0;margin:0;flex:none;accent-color:var(--brand,var(--primary,#2f7bf6))}
