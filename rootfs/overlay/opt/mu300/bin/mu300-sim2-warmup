@@ -111,7 +111,10 @@ done
 [[ $ready == 1 ]] || fallback brokers-missing
 # (the radio lock is waited for: netifd's first dial takes it for a moment at about the same time, only to find
 # the radio not ready, and "busy" here would be a cold start that never ran)
-if ! MU300_RADIO_LOCK_WAIT=30 "$MD" radio-locked /bin/bash /opt/mu300/bin/mu300-sim2-start --cold-start; then
+start_rc=0
+MU300_RADIO_LOCK_WAIT=30 "$MD" radio-locked /bin/bash /opt/mu300/bin/mu300-sim2-start --cold-start || start_rc=$?
+if [[ $start_rc == 7 ]]; then exit 0; fi
+if [[ $start_rc != 0 ]]; then
     reason=$(head -c 40 /run/mu300/sim2-cold-start.reason 2>/dev/null | tr -cd 'a-z0-9-')
     fallback "${reason:-cold-start-failed}"
 fi
@@ -126,6 +129,11 @@ if [[ "$wait" == 0 ]]; then atomic "$CHECK" off; exit 0; fi
 end=$(( $(uptime_s) + wait ))
 atomic "$CHECK" "waiting $end"
 while :; do
+    if ! "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$SLOT"; then
+        atomic "$CHECK" kept
+        say "SIM$((SLOT+1)) RF disabled by user: no first-data failure verdict"
+        exit 0
+    fi
     if sim_wan_up sipa_eth8; then
         sim_seen_add 1 || true
         atomic "$CHECK" confirmed
@@ -140,7 +148,8 @@ while :; do
 done
 # No verdict on a card whose data nobody was trying to bring up: taken down by hand, switched off in the settings,
 # suspended by mu300-power, or in the middle of a live switch.
-if sim_wan_held_down || [[ -s /run/mu300-mobile-data.suspend || -e /run/mu300/sim-switching ]] ||
+if ! "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$SLOT" ||
+   sim_wan_held_down || [[ -s /run/mu300-mobile-data.suspend || -e /run/mu300/sim-switching ]] ||
    [[ "$(uci -q get network.$sim_wan.auto 2>/dev/null || true)" == 0 || "$(uci -q get network.$sim_wan.disabled 2>/dev/null || true)" == 1 ]]; then
     atomic "$CHECK" kept
     say "SIM2 has no mobile data, but the connection was off: the choice is kept"

@@ -1,5 +1,7 @@
 """Persistent RF controls through fake existing owners; never access hardware."""
 import json
+import re
+import fcntl
 from helpers import ShellTest, TOP
 
 SCRIPT=TOP/'rootfs/overlay/opt/mu300/bin/mu300-sim-radio'
@@ -13,6 +15,9 @@ class SimRadio(ShellTest):
         self.stub('uci','echo wan')
         self.stub('mu300-device','echo f50')
         self.stub('sync',':')
+        self.stub('flock', '''exec python3 -c 'import fcntl,sys
+try: fcntl.flock(int(sys.argv[-1]),fcntl.LOCK_EX|fcntl.LOCK_NB)
+except OSError: sys.exit(1)' "$@"''')
         self.stub('ubus','printf "%s\\n" "$*" >> "$STUBLOG/ubus"; echo "{}"')
         self.stub('mu300-at', '''exec python3 -c '
 import os,json,sys,re
@@ -37,7 +42,7 @@ esac''')
         source=source.replace('sync -f "$policy"','"$STUBLOG/stubs/sync" -f "$policy"')
         self.controller.write_text(source)
         (self.tmp/'handshake').touch()
-        self.env_extra=dict(CONTROLLER=self.controller,MU300_SIM_MUTEX=self.tmp/'gate',MU300_RIL_HANDSHAKE=self.tmp/'handshake')
+        self.env_extra=dict(CONTROLLER=self.controller,MU300_SIM_MUTEX=self.tmp/'gate',MU300_RIL_HANDSHAKE=self.tmp/'handshake',MU300_SIM_CONTROL_LOCK=self.tmp/'native-control.lock')
         (self.tmp/'state').write_text('[1,1]')
 
     def call(self,shell,*args,**extra):
@@ -92,3 +97,38 @@ esac''')
             result=self.call(shell,'apply','0','0')
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertFalse((self.tmp/'at').exists())
+
+    def test_u30_inactive_permission_changes_preserve_cold_stack_baseline(self):
+        self.stub('mu300-device','echo u30air')
+        for shell in self.each_shell():
+            (self.tmp/'state').write_text('[1,0]')
+            for enabled in ('0','1'):
+                result=self.call(shell,'apply','1',enabled)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(json.loads((self.tmp/'state').read_text()),[1,0])
+                self.assertEqual((self.tmp/'sim-radio-policy').read_text(),f'1 {enabled}\n')
+                self.assertFalse((self.tmp/'at').exists())
+                self.assertFalse((self.tmp/'ubus').exists())
+
+    def test_single_sim_radio_jobs_do_not_require_dual_sim_switch_adapter(self):
+        source=(TOP/'openwrt/luci-app-mu300/root/usr/libexec/unisoc-modem/data-sim').read_text()
+        function=re.search(r'validate_apply\(\) \{.*?^\}',source,re.M|re.S)[0]
+        function=function.replace('/opt/mu300/bin/mu300-sim-radio',str(self.stubs/'mobile-data'))
+        self.stub('uci','echo "${SIM_SLOTS:-1}"')
+        for shell in self.each_shell():
+            for slots in ('1','2'):
+                for slot in ('0','1'):
+                    code=function+'\nadapter=/missing/data-sim\nvalidate_apply data radio-'+slot+'-0\n'
+                    result=self.sh(shell,code,SIM_SLOTS=slots)
+                    self.assertEqual(result.returncode==0,slot=='0' or slots=='2')
+
+    def test_native_switch_lock_blocks_rf_without_changing_intent(self):
+        self.stub('mu300-device','echo u30air')
+        with (self.tmp/'native-control.lock').open('a') as lock:
+            fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            for shell in self.each_shell():
+                result=self.call(shell,'apply','0','0')
+                self.assertNotEqual(result.returncode,0)
+                self.assertIn('modem_busy',result.stderr)
+                self.assertFalse((self.tmp/'sim-radio-policy').exists())
+                self.assertFalse((self.tmp/'at').exists())

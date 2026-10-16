@@ -21,6 +21,9 @@ DEVICE=${MU300_DEVICE_CMD:-/opt/mu300/bin/mu300-device}
 [[ ! -e /run/mu300/charging-boot ]] || exit 0
 SLOT=${MU300_SIM_SLOT:-$(cat /run/mu300/sim-slot 2>/dev/null || echo 1)}
 case "$SLOT" in 0|1) ;; *) exit 2;; esac
+# Called under the RF mutex: recheck after the warm-up's broker wait, before
+# the first handshake or any power command. 7 is user-disabled, not failure.
+"${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$SLOT" || exit 7
 SIM_CONFIG_U30=1
 . "${MU300_SIM_CONFIG_LIB:-/opt/mu300/lib/sim-config.sh}"
 LOG=/run/mu300/sim2-cold-start.log

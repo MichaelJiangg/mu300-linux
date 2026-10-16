@@ -317,7 +317,13 @@ live_switch() {
     fi
     # A card whose SIM power is off answers CME ERROR 10 whatever is in its position: the starting RF state is
     # validated here, the card itself only once its power is on (preflight).
-    check "$old" 1 && check "$target" 0 || { fail 'Unexpected radio state; reboot first'; return 1; }
+    if ! check "$old" 1; then
+        # Explicit flight mode is a known state, not a failed native switch.
+        # Keep the original off/old-SIM-power-off/new-SIM-power-on sequence.
+        ! "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$old" &&
+            check "$old" 4 || { fail 'Unexpected radio state; reboot first'; return 1; }
+    fi
+    check "$target" 0 || { fail 'Unexpected radio state; reboot first'; return 1; }
     local refusal
     refusal=$(preflight "$target") || { fail "$refusal"; return 1; }
     # Did the card in use have data? It decides what a target without data means, below.

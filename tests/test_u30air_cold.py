@@ -286,6 +286,27 @@ echo OK
         self.assertFalse((self.tmp / 'md').exists())
         self.assertFalse((self.tmp / 'reboot').exists())
 
+    def test_disabled_after_broker_wait_is_not_a_cold_start_failure(self):
+        self.stub('mobile-data', '''case $1 in
+radio-locked) shift; printf '1 0\\n' > "$STUBLOG/sim-radio-policy"; exec "$@";;
+*) exit 2;; esac''')
+        result=self.warmup()
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.calls(),[])
+        self.assertEqual(self.settings(),('1\n','1\n',True,None))
+        self.assertFalse((self.tmp/'reboot').exists())
+
+    def test_rf_disabled_during_first_data_wait_keeps_selected_card(self):
+        original=self.stubs/'original-at'
+        (self.stubs/'mu300-at').rename(original)
+        self.stub('mu300-at', '''"$STUBLOG/stubs/original-at" "$@"
+case "$*" in *'AT+SFUN=4') printf '1 0\\n' > "$STUBLOG/sim-radio-policy";; esac''')
+        result=self.warmup()
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(self.check(),'kept')
+        self.assertEqual(self.settings(),('1\n','1\n',False,None))
+        self.assertFalse((self.tmp/'reboot').exists())
+
     def test_failed_cold_start_after_the_radio_was_told_restarts_into_sim1(self):
         # the radio was told to start SIM2 (SPTESTMODEM went out): not undone in a running modem. The settings are
         # SIM1's again and the device restarts once - a card chosen from far away must not strand the device.

@@ -12,13 +12,24 @@ read_policy() {
 case ${1:-} in
 get)
     read_policy
-    printf '{"ok":1,"enabled":[%s,%s]}\n' "${flags% *}" "${flags#* }"
+    second=false
+    [ "$(uci -q get unisoc_modem.main.sim_slots 2>/dev/null)" != 2 ] || second=true
+    printf '{"ok":1,"enabled":[%s,%s],"supported":[true,%s]}\n' "${flags% *}" "${flags#* }" "$second"
     exit 0;;
 apply|--locked)
     case ${2:-}:${3:-} in 0:0|0:1|1:0|1:1) slot=$2; enabled=$3;; *) exit 2;; esac;;
 *) exit 2;;
 esac
 if [ "$1" = apply ]; then
+    # Native switching uses this lock from preflight through route/boot-policy
+    # completion. Share it before the RF mutex so permissions cannot change
+    # halfway through that transaction or read an outdated active slot.
+    if [ "$(mu300-device)" = u30air ]; then
+        native_lock=${MU300_SIM_CONTROL_LOCK:-/run/mu300/sim-control.lock}
+        mkdir -p "$(dirname "$native_lock")"
+        exec 9>"$native_lock"
+        flock -n 9 || { echo modem_busy >&2; exit 1; }
+    fi
     mutex=${MU300_SIM_MUTEX:-/run/unisoc-data-sim-switch}
     mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
     echo $$ > "$mutex/pid"
@@ -59,8 +70,10 @@ wan=$(uci -q get unisoc_modem.main.data_interface) || wan=wan
 case "$wan" in ''|*[!a-zA-Z0-9_]*) exit 2;; esac
 availability() { ubus -t 3 call "network.interface.$wan" notify_proto "{\"action\":5,\"available\":$1}" >/dev/null; }
 if [ "$slot" = "$own" ] && [ "$enabled" = 0 ]; then availability false; fi
-# U30 has one active RF stack. Allowing an inactive slot does not switch it.
-if [ "$(mu300-device)" = u30air ] && [ "$slot" != "$own" ] && [ "$enabled" = 1 ]; then exit 0; fi
+# U30 has one active RF stack. The inactive slot is already RF-off. Changing
+# its permission must not turn its CFUN=0 cold baseline into flight mode,
+# since the native switch requires that baseline before its SFUN sequence.
+if [ "$(mu300-device)" = u30air ] && [ "$slot" != "$own" ]; then exit 0; fi
 # Cold boot is RF-off. Do not let this UI preempt nr1's first SMMSWAP
 # command with CFUN. Enabling delegates to the original initializer below;
 # disabling just retains the cold RF-off state and its saved policy.

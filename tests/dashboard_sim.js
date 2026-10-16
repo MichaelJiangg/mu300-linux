@@ -25,8 +25,8 @@ const tick=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
             if(o.method==='data_sim_status')return Promise.resolve({id:'abcdefghij',state:outcome,ok:outcome==='done',error:'rejected'});
             return Promise.resolve({ok:1,saved_sim:1,actual_sim:1,data_connected:false});
         }};
-        const view=new Function('view','rpc','poll','M','document',fs.readFileSync(dir+'/view/mu300/sim.js','utf8'))(
-            {extend:o=>o},rpc,{add(){},remove(){}},M,{createElement:element});
+        const view=new Function('view','rpc','poll','M','document','SimRadio',fs.readFileSync(dir+'/view/mu300/sim.js','utf8'))(
+            {extend:o=>o},rpc,{add(){},remove(){}},M,{createElement:element},{attach:()=>({refresh:()=>Promise.resolve(),dispose(){}})});
         const root=view.render([{slots:2},{ok:1,ready:true,saved_sim:0,actual_sim:0}]);
         const section=find(root,'section'), row=find(section,'select');
         assert(root.className.includes('mud-sim-page'));
@@ -58,8 +58,8 @@ const tick=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
             }
             return Promise.resolve({id:'abcdefghij',state:'done',ok:1});
         }};
-        const view=new Function('view','rpc','poll','M','document',fs.readFileSync(dir+'/view/mu300/sim.js','utf8'))(
-            {extend:o=>o},rpc,{add(){},remove(){}},M,{createElement:element});
+        const view=new Function('view','rpc','poll','M','document','SimRadio',fs.readFileSync(dir+'/view/mu300/sim.js','utf8'))(
+            {extend:o=>o},rpc,{add(){},remove(){}},M,{createElement:element},{attach:()=>({refresh:()=>Promise.resolve(),dispose(){}})});
         const root=view.render([{slots:2},{...state}]);
         function all(n,tag){return (n.tag===tag?[n]:[]).concat(...n.children.map(c=>all(c,tag)));}
         const [switchButton,saveButton]=all(root,'button');

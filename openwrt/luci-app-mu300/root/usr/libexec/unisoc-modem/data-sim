@@ -10,7 +10,12 @@ validate_apply() {
     [ "$1" = data ] || { echo invalid_sim >&2; return 1; }
     case "$2" in
         0|1) ;;
-        radio-[01]-[01]) ;;
+        radio-[01]-[01])
+            [ -x /opt/mu300/bin/mu300-sim-radio ] || { echo dual_sim_unavailable >&2; return 1; }
+            case "$2" in radio-1-*)
+                [ "$(uci -q get unisoc_modem.main.sim_slots)" = 2 ] || { echo dual_sim_unavailable >&2; return 1; };;
+            esac
+            return 0;;
         u30-hot-[01]|u30-default-[01])
             [ "$(mu300-device 2>/dev/null)" = u30air ] || { echo dual_sim_unavailable >&2; return 1; } ;;
         *) echo invalid_sim >&2; return 1 ;;

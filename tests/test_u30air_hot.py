@@ -144,6 +144,7 @@ esac""")
             self.assertEqual(s['active'],int(public)); self.assertEqual(s['result'],'switched')
         calls=self.calls()
         self.assertIn('0 AT+SPACTCARD=0;+SFUN=2',calls)
+
         self.assertIn('1 AT+SPACTCARD=1;+SFUN=5',calls)
         self.assertNotIn('SPTESTMODEM',' '.join(calls))
         self.assertEqual((self.tmp/'net').read_text(),'down\nup\ndown\nup\n')
@@ -152,6 +153,16 @@ esac""")
         self.assertEqual(sorted(seen.read_text().split()), ['0', '1'])
         self.assertEqual(seen.stat().st_mode & 0o077, 0)
         self.assertFalse((self.run/'mu300/sim-sequence').exists())
+
+    def test_switch_from_user_disabled_active_radio(self):
+        (self.tmp/'sim-radio-policy').write_text('1 0\n')
+        (self.tmp/'radio1').write_text('4\n')
+        result=self.ctl('switch','1')
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertEqual((self.run/'mu300/sim-slot').read_text(),'0\n')
+        self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 0\n')
+        self.assertEqual((self.tmp/'radio1').read_text().strip(),'0')
+        self.assertEqual((self.tmp/'radio0').read_text().strip(),'1')
 
     def test_the_card_in_use_goes_off_before_the_other_one_comes_on(self):
         # measured on our U30 Air: with the target's radio switched on first, its AT+SFUN=4 never answered and the

@@ -151,9 +151,13 @@ m_signal() {
 }
 
 m_act() {
-    local op arg
+    local op arg enabled
     op=$(inp '@.op')
     arg=$(inp '@.arg')
+    if [ "$op" = modem-reset ] &&
+       ! "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "${MU300_SIM_SLOT:-0}"; then
+        printf '{"ok":0,"error":"This SIM radio is disabled by the user"}\n'; return
+    fi
     case "$op" in
         radio|data|modem-reset)
             if [ -d /run/unisoc-modem-lock-apply ] || [ -d /run/unisoc-data-sim-switch ]; then
@@ -161,9 +165,9 @@ m_act() {
             fi ;;
     esac
     case "$op" in
-        radio)      # the SFUN dance can run half a minute: never inside the request
-            setsid "$DASH/action" radio "$arg" >/dev/null 2>&1 &
-            printf '{"ok":1,"started":1,"op":"radio %s"}\n' "$arg"
+        radio)      # Submission is fast; return the actual shared RF job.
+            case "$arg" in on) enabled=1;; off) enabled=0;; *) printf '{"ok":0,"error":"Invalid radio request"}\n'; return;; esac
+            "$DASH/data-sim" start "radio-${MU300_SIM_SLOT:-0}-$enabled"
             ;;
         modem-reset|reboot|vpn)
             setsid "$DASH/action" "$op" "$arg" >/dev/null 2>&1 &
