@@ -1,0 +1,40 @@
+#!/usr/bin/ucode
+import * as fs from 'fs';
+import { cursor } from 'uci';
+import { connect } from 'ubus';
+import * as hotspot from './hotspot.uc';
+let action=ARGV[0] || 'status', c=cursor(), bus=connect(null,2);
+let selected=c.get('unisoc_modem','main','wifi_iface');
+let device=c.get('unisoc_modem','main','wifi_device') || 'wlan0';
+let runtime=bus?.call('network.wireless','status',{}) || {};
+let r;
+if(action=='on' || action=='off') {
+    const lock='/run/unisoc-modem-hotspot.lock';
+    let acquired=fs.mkdir(lock,448);
+    if(!acquired) {
+        let pid=trim(fs.readfile(lock+'/pid') || '');
+        if(match(pid,/^[1-9][0-9]*$/) && !fs.stat('/proc/'+pid)) {
+            fs.unlink(lock+'/pid'); fs.rmdir(lock); acquired=fs.mkdir(lock,448);
+        }
+    }
+    if(!acquired) r={ok:0,error:'热点正在应用配置，请稍后重试'};
+    else {
+        fs.writefile(lock+'/pid',''+fs.readlink('/proc/self'));
+        try {
+            r=hotspot.set(c,action=='on',runtime,selected,device,()=>{
+                let result=bus?.call('network','reload',{});
+                return result!=null;
+            });
+        } catch(e) { r={ok:0,error:'热点配置应用失败'}; }
+        fs.unlink(lock+'/pid'); fs.rmdir(lock);
+    }
+} else r=hotspot.status(c,runtime,selected,device);
+if(action=='fields') {
+    // Key/value lines, no shell eval and no PSK/password in the output.
+    for(let key in ['available','up','pending','enabled','section','radio','device','ssid','enc','hidden','channel','band','htmode','country','error']) {
+        let value=r[key];
+        if(type(value)=='bool') value=value?1:0;
+        printf('%s\n%s\n',key,replace(''+(value??''),/[\r\n]/g,''));
+    }
+} else print(sprintf('%J\n',r));
+exit(r.ok===0?1:0);

@@ -4,16 +4,10 @@ set -e
 cd /src/zte-u30air
 OUT=/src/out-linux
 mkdir -p $OUT
-M="make O=$OUT ARCH=arm64 LLVM=1 LLVM_IAS=1 CC=clang LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)"
+M="make O=$OUT ARCH=arm64 LLVM=1 LLVM_IAS=1 CC=clang LD=ld.lld -j10"
 cp /work/device.config $OUT/.config
 ./scripts/config --file $OUT/.config --enable THINLTO
 KCONFIG_CONFIG=$OUT/.config ./scripts/kconfig/merge_config.sh -m -O $OUT $OUT/.config /work/mu300-linux.fragment > /work/merge.log 2>&1
-# builtin.fragment: force all vendor modules =y (compiled into the kernel Image,
-# not insmod'ed from the initramfs). Without this the modem/watchdog/SIPC drivers
-# are external .ko files that the initramfs may fail to load in the right order.
-if [ -f /work/builtin.fragment ]; then
-    KCONFIG_CONFIG=$OUT/.config ./scripts/kconfig/merge_config.sh -m -O $OUT $OUT/.config /work/builtin.fragment >> /work/merge.log 2>&1
-fi
 $M olddefconfig
 # report fragment options that Kconfig refused (dependency not met / symbol missing)
 python3 - <<'P'

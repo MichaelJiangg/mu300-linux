@@ -1,0 +1,107 @@
+SC2355 PCIe: retry temporary EDMA pressure without flushing; wake from DMA completion.
+
+--- a/sc2355/pcie.c
++++ b/sc2355/pcie.c
+@@ -614,6 +614,36 @@
+ 	}
+ 	sprd_put_vif(vif);
+ 	return -EBUSY;
++}
++
++static int sc2355_pcie_tx_data_complete(int channel, int timeout)
++{
++	struct sprd_hif *hif = sc2355_pcie_get_hif();
++	struct tx_mgmt *tx_mgmt;
++
++	/* The bus calls this after draining its pending queue, with IRQs off. */
++	tx_mgmt = hif ? smp_load_acquire(&hif->tx_mgmt) : NULL;
++	if (!timeout && tx_mgmt && atomic_xchg(&tx_mgmt->pcie_tx_waiting, 0))
++		sc2355_tx_up(tx_mgmt);
++	return 0;
++}
++
++static int sc2355_pcie_tx_data_push(struct sprd_hif *hif,
++				    struct mbuf_t *head, struct mbuf_t *tail,
++				    int num)
++{
++	struct tx_mgmt *tx_mgmt = hif->tx_mgmt;
++	int ret;
++
++	/* Arm before submission: completion may free space before push returns.
++	 * A stored completion also covers the race before the TX thread sleeps.
++	 */
++	atomic_set(&tx_mgmt->pcie_tx_waiting, 1);
++	ret = sc2355_pcie_push_link(hif, hif->tx_data_port, head, tail, num,
++				   sc2355_pcie_tx_data_pop_list);
++	if (ret != -EAGAIN)
++		atomic_set(&tx_mgmt->pcie_tx_waiting, 0);
++	return ret;
+ }
+ 
+ struct mchn_ops_t sc2355_pcie_hif_ops[] = {
+@@ -653,10 +683,10 @@
+ 			NULL, NULL, pcie_suspend_resume_handle),
+ 	INIT_INTF_SC2355(PCIE_TX_DATA_PORT, 1, 1, 0, SPRD_MAX_CMD_TXLEN,
+ 			300, 0, 0, 0, 1, 32, sc2355_pcie_tx_data_pop_list,
+-			NULL, NULL, NULL),
++			NULL, sc2355_pcie_tx_data_complete, NULL),
+ 	INIT_INTF_SC2355(PCIE_TX_ADDR_DATA_PORT, 1, 1, 0, SPRD_MAX_CMD_TXLEN,
+ 			300, 0, 0, 0, 1, 4, sc2355_pcie_tx_data_pop_list,
+-			NULL, NULL, NULL),
++			NULL, sc2355_pcie_tx_data_complete, NULL),
+ };
+ 
+ static void pcie_tx_ba_mgmt(struct sprd_priv *priv, struct sprd_vif *vif,
+@@ -1009,14 +1039,14 @@
+ 		if (hif->mbuf_head) {
+ 			/*ret = mchn_push_link(9, head, tail, pcie_count);*/
+ 			/*edma sync function*/
+-			ret = sc2355_pcie_push_link(hif, hif->tx_data_port,
++			ret = sc2355_pcie_tx_data_push(hif,
+ 					       (struct mbuf_t *)hif->mbuf_head,
+ 					       (struct mbuf_t *)hif->mbuf_tail,
+-					       hif->mbuf_num,
+-					       sc2355_pcie_tx_data_pop_list);
++					       hif->mbuf_num);
+ 			if (ret != 0) {
+ 				/*pr_err("%s: push link fail\n", __func__); */
+-				hif->pushfail_count++;
++				if (ret != -EAGAIN)
++					hif->pushfail_count++;
+ 				sprdwl_list_cut_to_send_list(tx_head,
+ 								 tx_list_tail,
+ 								 tx_count);
+--- a/sc2355/tx.c
++++ b/sc2355/tx.c
+@@ -341,6 +341,12 @@
+ 						credit, SPRD_AC_MAX, coex_bt_on);
+ 			sc2355_handle_tx_return(hif, list, credit, ret);
+ 		}
++		/* A full EDMA pending queue kept ownership with us. The bus
++		 * completion wakes TX again; do not spend the hard-error budget
++		 * or flush packets merely because this retry also met pressure.
++		 */
++		if (hif->hw_type == SPRD_HW_SC2355_PCIE && ret == -EAGAIN)
++			return ret;
+ 		if (ret) {
+ 			pr_err("%s, %d: tx return err!\n", __func__, __LINE__);
+ 			tx_mgmt->xmit_msg_list.failcount++;
+@@ -2036,6 +2042,7 @@
+ 	tx_mgmt->cmd_timeout = msecs_to_jiffies(SPRD_TX_CMD_TIMEOUT);
+ 	tx_mgmt->data_timeout = msecs_to_jiffies(SPRD_TX_DATA_TIMEOUT);
+ 	atomic_set(&tx_mgmt->flow0, 0);
++	atomic_set(&tx_mgmt->pcie_tx_waiting, 0);
+ 	atomic_set(&tx_mgmt->flow1, 0);
+ 	atomic_set(&tx_mgmt->flow2, 0);
+ 
+--- a/sc2355/tx.h
++++ b/sc2355/tx.h
+@@ -135,6 +135,8 @@
+ 	struct sprd_msg_list tx_list_cmd;
+ 	struct sprd_msg_list tx_list_qos_pool;
+ 	struct sprd_xmit_msg_list xmit_msg_list;
++	/* EDMA completion wakes a data submission refused by the pending queue. */
++	atomic_t pcie_tx_waiting;
+ 	struct qos_tx_t *tx_list[SPRD_MODE_MAX];
+ 	int net_stopped;
+ 

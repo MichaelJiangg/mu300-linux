@@ -1,0 +1,19 @@
+#!/bin/sh
+action=${1:-get}
+case "$action" in get|configure|full_once|pause|resume|apply) ;; *) exit 2 ;; esac
+if [ "$action" != get ]; then
+    exec 9> "${MU300_CHARGE_LOCK:-/run/mu300-charge.lock}" || exit 1
+    flock -n 9 || { echo '{"ok":false,"error":"charge_busy"}'; exit 0; }
+fi
+reply=$(ucode "${MU300_CHARGE_LIB:-/usr/libexec/unisoc-modem/charge.uc}" "$action")
+rc=$?
+exec 9>&-
+case "$action" in configure|full_once|pause|resume)
+    if [ "$rc" = 0 ] && [ "$(printf '%s' "$reply" | jsonfilter -e '@.ok')" = true ]; then
+        if ! "${MU300_CHARGE_SERVICE:-/etc/init.d/mu300-charge}" reload >/dev/null 2>&1; then
+            reply='{"ok":false,"saved":true,"error":"charge_reload_failed"}'
+        fi
+    fi
+esac
+printf '%s\n' "$reply"
+exit "$rc"

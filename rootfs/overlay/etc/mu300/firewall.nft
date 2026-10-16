@@ -1,6 +1,6 @@
 #!/usr/sbin/nft -f
 # MU300 host firewall (Ubuntu): nothing on the cellular side may open connections to the device or the LAN.
-# LAN (usb0 + wlan0 via br-lan) and loopback stay open. OpenWrt uses fw4 instead.
+# LAN (usb0/rndis0 + wlan0 via br-lan) and loopback stay open. OpenWrt uses fw4 instead.
 table inet mu300_filter
 delete table inet mu300_filter
 table inet mu300_filter {

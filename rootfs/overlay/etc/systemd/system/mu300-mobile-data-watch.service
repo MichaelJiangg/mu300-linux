@@ -1,5 +1,8 @@
 [Unit]
 # the vendor modem loader exists only in the 5.4 kernel
+# the modem driver, not its device node: the driver is loaded in the initramfs on both kernels, but the node
+# appears later on mainline (+18 s, after sysinit), and a condition checked before that dropped these units
+ConditionPathExists=|/sys/module/sprd_modem_loader
 ConditionPathExists=|/dev/modem
 ConditionPathExists=|/dev/pmsys
 Description=MU300 mobile data watchdog (reconnect after modem resets)

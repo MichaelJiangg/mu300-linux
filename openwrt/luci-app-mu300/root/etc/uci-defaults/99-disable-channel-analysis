@@ -1,0 +1,3 @@
+#!/bin/sh
+# Also handles images assembled from an older prebuilt LuCI root.
+ucode /usr/libexec/unisoc-modem/disable-channel-analysis

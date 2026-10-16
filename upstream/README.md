@@ -1,7 +1,12 @@
-# Mainline (LTS) kernel on the MU300 — boots to userspace
+# Mainline (LTS) kernel on the MU300
 
-Mainline **Linux 6.18.52** boots on the ZTE F50 / MU300 (Unisoc UMS9620): all 8 CPUs (4×A55, 4×A76), GICv3, arch
-timer, PSCI 1.0, 1.5 GiB RAM, pstore/ramoops, initramfs `/init`, and reboot through the UMP9620 PMIC.
+Mainline **Linux 6.18.54** (the current longterm series) runs Ubuntu 24.04 and OpenWrt 25.12 on the ZTE F50 /
+MU300 (Unisoc UMS9620): all 8 CPUs (4×A55, 4×A76), eMMC, USB NCM + ACM, the 5 GHz hotspot, Bluetooth, the modem
+with mobile data (downlink and uplink), SMS, the VPN, the Mali GPU, thermal/cpufreq, the PMIC watchdog and
+reboot. `docs/FINDINGS.md` 31-31f has what it took and what is still open.
+
+On a device: `sudo mu300-update kernel 6.18` (or `7.2`, the newest stable release), and `sudo mu300-update kernel
+5.4` back; the installer offers all three. Every kernel's modules stay installed.
 
 Reference: Unisoc's UMS9620 DT series (LKML, 2023-12-15, "arm64: dts: sprd: Add support for Unisoc's UMS9620", not
 merged) describes the same GIC/UART/timer layout; this device is derived from their ums9620-2h10 reference board.
@@ -22,10 +27,51 @@ merged) describes the same GIC/UART/timer layout; this device is derived from th
 ## Build and test
 ```sh
 docker build -t mu300-mainline-build upstream/
-docker volume create mu300-mainline   # unpack linux-6.18.52 into /src of this volume
+docker volume create mu300-mainline   # build.sh fetches linux-$KV (default 6.18.54) into it, checked against kernel.org
 docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build.sh
+docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build-modules.sh
+upstream/make-bundle.sh mu300-kernel-6.18.tar.gz        # Image for LK, generic ramdisk segment, modules
+# on the device: MU300_KERNEL_BUNDLE=/path/mu300-kernel-6.18.tar.gz mu300-update boot
+```
+The build stops on anything that drifts silently: a patch that neither applies nor is applied, a config option
+Kconfig does not take (unless listed in `config-ignored.txt`), a port edit whose anchor moved, or a module whose
+vermagic does not match the kernel. `tools/make-release.sh` packages the same bundle as `mu300-kernel-6.18.tar.gz`.
+
+### KVM and container kernel support
+
+The shared 6.18/7.2 configuration includes the KVM/container subset of upstream
+commits `59e17d5` and `765da29`: built-in KVM, `/proc/config.gz`, namespace,
+seccomp and cgroup controllers; on-demand vhost-net/vsock, bridge netfilter,
+IPVS, VXLAN/IPvlan, binfmt_misc and FUSE modules. Existing OverlayFS, veth,
+bridge and nftables remain built in. Use the nftables/iptables-nft backend,
+not iptables-legacy. No Docker/QEMU daemon is installed or enabled by this
+kernel change; userspace runtimes are separate and must be installed before use.
+Do not expose an unauthenticated Docker TCP socket.
+
+`build-modules.sh` now installs **in-tree modules as well as vendor modules**,
+stripped and flat under `out/modules`. Only `module-order.txt` goes into the
+early boot ramdisk; optional container/VM drivers are not loaded at boot.
+Partial builds remove previously collected in-tree modules and reject module
+name collisions (including `-`/`_` aliases). The unrelated upstream USB/Wi-Fi,
+RAID, VPN and network-filesystem additions are deliberately not part of this port.
+
+The output also carries `kernel.config`, `kernel.sha256`, `modules.in-tree`
+and `modules.sha256`. `check-container-support.py` verifies the **built** config,
+Image and complete module set before TF/Magisk, generic kernel bundle or
+mainline rootfs assembly. Old output directories lacking this evidence need a
+fresh `build.sh` followed by `build-modules.sh`; copying a new fragment next to
+an old Image is not sufficient. Both commands must use the same `KV`/`OUTDIR`.
+
+After installing and rebooting into a rebuilt kernel, runtime acceptance still
+requires `/dev/kvm`, a successful KVM VM/vCPU run, cgroup controllers mounted
+by the host, and a Docker container with working networking and resource limits.
+Upstream records successful KVM execution on its F50; config/build checks alone
+do not certify the current device or a running Docker service. This feature
+cannot be hot-applied to an already running kernel without KVM.
+
+The bring-up path of old (hand-built image, `init-bringup`, `boot/flash-trial.sh`) still works for experiments:
+```sh
 python3 upstream/wrap-image.py upstream/out/Image upstream/out/Image.lk
-python3 boot/build-boot-image.py --kernel upstream/out/Image.lk --init upstream/init-bringup ... --out boot-mainline.img
 boot/flash-trial.sh boot-mainline.img      # slot b only, falls back to Android
 ```
 
@@ -35,7 +81,40 @@ boot/flash-trial.sh boot-mainline.img      # slot b only, falls back to Android
 * `debug/install-probe.py` (`MU300_PROBE_STAGE=N` for `build.sh`): resets at a chosen boot stage; the cycle time tells
   whether the stage was reached. This located the custom-DTB hang in `setup_machine_fdt`.
 
-## Remaining mainline work
+## Newer kernels (7.x)
+
+The whole port - kernel and all 31 out-of-tree modules - also builds against **7.2.8**, the newest stable release
+(2026-09-26), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
+Wi-Fi access point, mobile data (18.7 MB/s), Bluetooth, the Mali GPU, cpufreq and the modem's AT channel working,
+and no warning or oops in the log. (7.2 is a stable, not a longterm release: 6.18 stays the base, 7.x is how the
+next jump is kept small.) One source serves both:
+
+* `port/install.py` recognises the layout of what it edits (`sprd-sc27xx-spi.c` was reworked in 7.x), and every
+  edit is checked afterwards, so a drifted anchor stops the build instead of being skipped.
+* The modules get the missing pieces from `modules/wcn_bsp/kinclude`: `mu300_compat.h` (7.x-only shims:
+  `strncpy`, alarmtimer, `linux/hex.h`) and `linux/of_gpio.h`, a shim kbuild only finds when the kernel has no
+  such header. API changes that need more than a shim are under `LINUX_VERSION_CODE` (the cfg80211 ops taking a
+  `wireless_dev`, `dma_fence_signal()` returning nothing).
+* `.github/workflows/mainline.yml` builds the port every week against the current longterm and the newest stable
+  release, so the next break shows up as a red run rather than at the next jump.
+
+Releases carry it as `mu300-kernel-7.2.tar.gz`: `sudo mu300-update kernel 7.2` on the device, or choice 3 in the
+installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.8` for `build.sh` and `build-modules.sh`, and
+`MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs both.
+
+## Remaining mainline work (as of 2026-09-26)
+
+- The forced command line still carries `clk_ignore_unused pd_ignore_unused regulator_ignore_unused
+  fw_devlink=permissive`. `regulator_ignore_unused` keeps the SIM's supply on and `fw_devlink=permissive` the USB
+  gadget alive, so both stay; `pd_ignore_unused` changes nothing; `clk_ignore_unused` keeps 315 unused clocks on and
+  is the one worth measuring (FINDINGS 31h).
+- The early crashes and the missing OpenWrt downlink were one bug, the delegate's (FINDINGS 31f), fixed; one
+  Ubuntu boot that died early before the crash capture existed (31d) is unexplained, and has not recurred in the
+  reboot loops since (Ubuntu 6/6, OpenWrt 4/4).
+- Power-off works through the PMIC (FINDINGS 31h); on a powered USB port the battery-less F50 starts again.
+- Audio: not ported (it does not work on 5.4 either).
+
+## Earlier status notes
 Clocks, pinctrl, power domains, USB 3.1 gadget, eMMC, PCIe, thermal, cpufreq, watchdog, LEDs and Wi-Fi/BT are
 working (see the status below). What is still missing:
 
@@ -131,7 +210,8 @@ Fixes needed on top of the port:
 
 - `sdhci-sprd`: UMS9620 has the r11p3 controller; the vendor driver programs DLL phase `0x2`
   (mainline `0x3`). With `0x3` reads work in HS400ES but every write fails with data CRC errors.
-- `sdhci-sprd`: only the non-removable eMMC is probed (the SD slot is unpopulated and floods the log).
+- `sdhci-sprd`: both the soldered eMMC and removable TF controller are probed. The TF controller is needed by
+  the optional OpenWrt-on-TF installer; systems without a card simply continue with the internal rootfs.
 - UMP9620 PMIC watchdog, armed by LK for 300 s, is disabled by `ump9620-pmic-wdt-off`.
 - Userspace config: cgroups/namespaces/seccomp, bridge, nftables, IPv6, zram.
 - Thermal: vendor `sprd_thermal_r5p0` (19 on-die zones) with calibration from the UMS9620 eFuse; the eFuse

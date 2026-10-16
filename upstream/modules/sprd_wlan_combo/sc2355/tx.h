@@ -135,6 +135,8 @@ struct tx_mgmt {
 	struct sprd_msg_list tx_list_cmd;
 	struct sprd_msg_list tx_list_qos_pool;
 	struct sprd_xmit_msg_list xmit_msg_list;
+	/* EDMA completion wakes a data submission refused by the pending queue. */
+	atomic_t pcie_tx_waiting;
 	struct qos_tx_t *tx_list[SPRD_MODE_MAX];
 	int net_stopped;
 

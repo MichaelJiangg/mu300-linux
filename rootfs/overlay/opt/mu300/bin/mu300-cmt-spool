@@ -1,0 +1,21 @@
+#!/bin/sh
+# Persist one unsolicited +CMT PDU before the modem is acknowledged. The AT
+# daemon supplies header and PDU on stdin; SMS data never appears in argv.
+set -eu
+umask 077
+POOL=${MU300_SMS_POOL:-/etc/mu300/sms}
+SPOOL=$POOL/incoming
+IFS= read -r header || exit 1
+IFS= read -r pdu || exit 1
+case $header in '+CMT:'*) ;; *) exit 1 ;; esac
+case $pdu in ''|*[!0123456789abcdefABCDEF]*) exit 1 ;; esac
+[ $(( ${#pdu} % 2 )) = 0 ] && [ ${#pdu} -le 1024 ] || exit 1
+mkdir -p "$SPOOL"
+part=$(mktemp "$SPOOL/.cmt.XXXXXXXX") || exit 1
+trap 'rm -f "$part"' EXIT INT TERM
+printf '%s\n' "$pdu" > "$part"
+mv "$part" "$part.ready"
+trap - EXIT INT TERM
+# Persist this PDU and the directory entry before any network acknowledgement.
+# A global sync needlessly flushes the whole TF card and can stall receipt.
+sync "$part.ready" "$SPOOL" 2>/dev/null || sync

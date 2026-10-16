@@ -1,0 +1,41 @@
+#!/usr/bin/ucode
+// Disable LuCI's active channel analysis, without disabling station discovery.
+import { glob, readfile, writefile, rename, unlink } from 'fs';
+
+let root = ARGV[0] || '';
+let changes = [];
+for (let spec in [
+    [ '/usr/share/luci/menu.d/*.json', 'admin/status/channel_analysis' ],
+    [ '/usr/share/rpcd/acl.d/*.json', 'luci-mod-status-channel_analysis' ]
+]) {
+    for (let path in glob(root + spec[0])) {
+        let data = json(readfile(path));
+        if (type(data) != 'object')
+            die('Invalid LuCI policy: ' + path + '\n');
+        if (exists(data, spec[1])) {
+            delete data[spec[1]];
+            push(changes, [ path, sprintf('%J\n', data) ]);
+        }
+    }
+}
+// Replace the executable view too: old bookmarks must not start a scan.
+let stub = readfile(root + '/usr/share/unisoc-modem/channel-analysis-disabled.js');
+if (!stub)
+    die('Missing disabled channel analysis view\n');
+let view = root + '/www/luci-static/resources/view/status/channel_analysis.js';
+let original = readfile(view);
+if (original != null && original != stub)
+    push(changes, [ view, stub ]);
+
+for (let change in changes) {
+    let temporary = change[0] + '.disable-scan.tmp';
+    if (writefile(temporary, change[1]) != length(change[1]) || !rename(temporary, change[0])) {
+        unlink(temporary);
+        die('Could not disable channel analysis: ' + change[0] + '\n');
+    }
+}
+if (length(changes)) {
+    for (let pattern in [ '/tmp/luci-indexcache*', '/tmp/luci-modulecache/*' ])
+        for (let path in glob(root + pattern))
+            unlink(path);
+}

@@ -1,5 +1,5 @@
 #!/bin/busybox sh
-# MU300 standalone Linux initramfs v10 (switch_root to Ubuntu on the free eMMC region; comm fix; custom kernel + modem_control + node perms + slot a modem) (slot b, tries=2 one-shot trial).
+# MU300 standalone Linux initramfs (opposite-slot Linux trial with Android fallback).
 # Every stage is written to /dev/kmsg at KERN_ERR so it survives in
 # /sys/fs/pstore/console-ramoops-0 after the fallback boot into Android.
 /bin/busybox mkdir -p /bin /sbin /proc /sys /dev /run /tmp /root /etc /config
@@ -26,11 +26,13 @@ log() {
     [ -d /run ] && echo "$(cut -d' ' -f1 /proc/uptime) $*" >> /run/stages
 }
 
-# Persistent log: 8 MiB at 48 MiB inside boot_b, past the image and its AVB data
+# Persistent log: 8 MiB at 48 MiB inside the active Linux boot partition, past the image and its AVB data
 # (image ends near 39 MiB). Survives a cold power cycle, unlike pstore.
-bootb=
+bootdev=
 persist() {
-    [ -n "$bootb" ] && [ -b "$bootb" ] || return
+    # subshells (the reboot timer) started before the eMMC was found learn the device from this file
+    [ -n "$bootdev" ] || bootdev=$(cat /run/bootdev 2>/dev/null)
+    [ -n "$bootdev" ] && [ -b "$bootdev" ] || return
     # the periodic loop and the reboot timer both call this
     mkdir /run/persist.lock 2>/dev/null || return
     {
@@ -51,7 +53,7 @@ persist() {
         echo "MU300-PERSIST-END"
     } > /run/persist.txt 2>&1
     head -c 65536 /dev/zero >> /run/persist.txt
-    dd if=/run/persist.txt of="$bootb" bs=4096 seek=12288 count=2048 conv=notrunc 2>/dev/null
+    dd if=/run/persist.txt of="$bootdev" bs=4096 seek=12288 count=2048 conv=notrunc 2>/dev/null
     sync
     rmdir /run/persist.lock
 }
@@ -65,20 +67,6 @@ mount -t tmpfs tmpfs /tmp
 mount -t debugfs debugfs /sys/kernel/debug
 echo /bin/mdev > /proc/sys/kernel/hotplug
 mdev -s
-
-# Boot chase. /run survives switch_root, so normal userspace can stop this exact
-# process instead of leaving an orphan blinker fighting the final network LED.
-(
-    R=/sys/class/leds/sc27xx:red/brightness
-    W=/sys/class/leds/sc27xx:green/brightness
-    B=/sys/class/leds/sc27xx:blue/brightness
-    while :; do
-        echo 255 > "$R" 2>/dev/null; echo 0 > "$W" 2>/dev/null; echo 0 > "$B" 2>/dev/null; sleep 0.12
-        echo 0 > "$R" 2>/dev/null; echo 255 > "$W" 2>/dev/null; echo 0 > "$B" 2>/dev/null; sleep 0.12
-        echo 0 > "$R" 2>/dev/null; echo 0 > "$W" 2>/dev/null; echo 255 > "$B" 2>/dev/null; sleep 0.12
-    done
-) &
-echo $! > /run/led-status.blink.pid
 log "stage=devfs-ready"
 
 # Turn hangs into panics; the vendor kernel reboots after a panic.
@@ -87,14 +75,53 @@ echo 1 > /proc/sys/kernel/panic_on_oops
 [ -e /proc/sys/kernel/hardlockup_panic ] && echo 1 > /proc/sys/kernel/hardlockup_panic
 echo 1 > /proc/sys/kernel/sysrq
 
-# Safety net: reboot after 5 minutes. By then misc points back at slot a.
+# Safety net: reboot after 90 seconds. By then misc points back at Android's slot.
 # Create /run/stay (e.g. over telnet) to keep Linux running.
-(sleep 300
+(sleep 90
  if [ -e /run/stay ]; then log "stage=timer-skipped"; exit 0; fi
  log "stage=timer-reboot"
  while ! persist_done=$(mkdir /run/persist.lock 2>/dev/null && echo 1); do sleep 1; done
  rmdir /run/persist.lock
  persist; reboot -f; sleep 10; echo b > /proc/sysrq-trigger) &
+
+# Which device this is. The ZTE U30 Air is the F50's board with a battery: ZTE's SQC charger stack, USB-PD, LEDs.
+# It runs the same kernel with its own build of a few modules (linux-modules/u30air/, see kernel/build-u30air.sh)
+# and its own load order; without them the charger manager never probes and USB stays down. The installer names
+# the device in /etc/mu300-device. Hardware takes priority: an old installation
+# may have labelled a V50 as f50, and updates retain that device ramdisk segment.
+if [ -d /proc/device-tree/charger_policy_service ]; then
+    DEVICE=u30air
+elif [ -d /proc/device-tree/soc/soc:ap-ahb/i2c@2270000/aw9523b_led@5b ] ||
+     [ -d /proc/device-tree/soc/ap-ahb/i2c@2270000/aw9523b_led@5b ]; then
+    DEVICE=v50
+elif [ -d /proc/device-tree ]; then
+    DEVICE=f50
+else
+    DEVICE=$(cat /etc/mu300-device 2>/dev/null)
+    case $DEVICE in f50|v50|u30air) ;; *) DEVICE=f50 ;; esac
+fi
+# its modules only for the kernel they were built for (a mainline kernel brings its own set and order)
+MODULE_ORDER=/etc/module-order
+if [ "$DEVICE" != f50 ] && [ -s /etc/module-order-$DEVICE ] &&
+   [ "$(cat /linux-modules/$DEVICE/kernel.release 2>/dev/null)" = "$(uname -r)" ]; then
+    MODULE_ORDER=/etc/module-order-$DEVICE
+else
+    DEVICE_MODULES=none
+fi
+log "stage=device $DEVICE order=$MODULE_ORDER"
+
+# All boards share the default USB/LAN subnet 192.168.77.1. The
+# gadget's MAC addresses and USB serial number go with the device's serial number: two devices on one computer
+# used to have the same ones, and macOS then gave the second one no network interface at all.
+NET=192.168.77
+# (a mainline kernel forces its own command line: the bootloader's is still in the device tree)
+SERIALNO=$(cat /proc/cmdline /proc/device-tree/chosen/bootargs 2>/dev/null | tr '\0' ' ' |
+    sed -n 's/.*androidboot.serialno=\([^ ]*\).*/\1/p' | head -n1)
+h=$(echo "$SERIALNO" | md5sum)
+# Preserve existing USB identities when changing the default subnet.
+MAC_TAG=77
+[ "$DEVICE" != u30air ] || MAC_TAG=78
+MAC=02:50:$(echo "$h" | cut -c1-2):$(echo "$h" | cut -c3-4):$MAC_TAG
 
 load_vendor_modules() {
     loaded=0
@@ -102,53 +129,70 @@ load_vendor_modules() {
     while read module; do
         # vendor_boot's /lib/modules were built for the stock kernel; only our rebuilt copies match
         file="/linux-modules/$module"
+        [ -z "${DEVICE_MODULES:-}" ] && [ -f "/linux-modules/$DEVICE/$module" ] && file="/linux-modules/$DEVICE/$module"
         if insmod "$file" 2>/run/insmod.err; then
             loaded=$((loaded + 1))
         else
             failed=$((failed + 1))
             log "insmod-fail $module $(cat /run/insmod.err)"
         fi
-    done < /etc/module-order
+    done < $MODULE_ORDER
     mdev -s
     log "stage=modules-done loaded=$loaded failed=$failed"
 }
 
-
-# misc and boot_b only exist once the storage drivers are up: the search used to run before
-# load_vendor_modules and burned its 20 retries on a /sys with no mmcblk0 at all, so restore_slot_a
-# silently never found misc and the persistent log never found boot_b. Look for both after the modules.
-find_misc_and_bootb() {
-    misc=
+# misc and boot slots: where they are is known only once the eMMC is there, and its driver (sdhci-sprd) is one of
+# the vendor modules - an earlier lookup found nothing (U30 Air: misc-NOT-FOUND, no persistent log). So this runs
+# after load_vendor_modules; the opposite Android slot is restored only after the rootfs is known.
+misc=
+linux_slot=
+detect_linux_slot() {
+    # misc is the authority: LK may omit the slot suffix from the device tree,
+    # while some mainline kernels replace /proc/cmdline with a fixed string.
+    [ -n "$misc" ] && linux_slot=$(dd if="$misc" bs=1 skip=2048 count=2 2>/dev/null | tr -d '_')
+    case $linux_slot in a|b) return ;; esac
+    for src in /proc/device-tree/chosen/bootargs /proc/cmdline; do
+        [ -r "$src" ] || continue
+        linux_slot=$(tr '\000' ' ' < "$src" | sed -n 's/.*androidboot.slot_suffix=_\([ab]\).*/\1/p')
+        case $linux_slot in a|b) return ;; esac
+    done
+    case $linux_slot in a|b) ;; *) linux_slot=b; log 'stage=slot-unknown (legacy b fallback)' ;; esac
+}
+find_partitions() {
     for n in $(seq 1 20); do
         for u in /sys/class/block/mmcblk*p*/uevent; do
-            grep -qx PARTNAME=misc "$u" 2>/dev/null || continue
-            misc=/dev/$(basename "$(dirname "$u")")
+            grep -qx PARTNAME=misc "$u" 2>/dev/null && misc=/dev/$(basename "$(dirname "$u")")
         done
-        [ -n "$misc" ] && [ -b "$misc" ] && break
-        misc=
+        [ -b "$misc" ] && break
         sleep 1
         mdev -s
     done
+    [ -b "$misc" ] || misc=
+    detect_linux_slot
     for u in /sys/class/block/mmcblk*p*/uevent; do
-        grep -qx PARTNAME=boot_b "$u" 2>/dev/null && bootb=/dev/$(basename "$(dirname "$u")")
+        grep -qx "PARTNAME=boot_$linux_slot" "$u" 2>/dev/null && bootdev=/dev/$(basename "$(dirname "$u")")
     done
+    [ -b "$bootdev" ] || bootdev=
+    echo "$bootdev" > /run/bootdev
+    log "stage=persist-target dev=${bootdev:-none} slot=$linux_slot misc=${misc:-none}"
+    persist
+    (while :; do sleep 15; persist; done) &
 }
 
 write_misc_bc() {  # write_misc_bc FILE STAGE
     [ -n "$misc" ] || { log "stage=misc-NOT-FOUND"; return 1; }
-    dd if="$1" of="$misc" bs=1 seek=2048 conv=notrunc 2>/dev/null
-    sync
-    dd if="$misc" of=/run/bc.bin bs=1 skip=2048 count=32 2>/dev/null
-    if cmp -s /run/bc.bin "$1"; then log "stage=$2 dev=$misc"; else log "stage=$2-MISMATCH dev=$misc"; fi
+    dd if="$1" of="$misc" bs=1 seek=2048 conv=notrunc,fsync 2>/dev/null || return 1
+    dd if="$misc" of=/run/bc.bin bs=512 skip=4 count=1 2>/dev/null || return 1
+    head -c 32 /run/bc.bin > /run/bc-check.bin
+    if cmp -s /run/bc-check.bin "$1"; then log "stage=$2 dev=$misc"; else log "stage=$2-MISMATCH dev=$misc"; return 1; fi
 }
-restore_slot_a() { write_misc_bc /etc/misc-bc-slot-a.bin misc-restored; }
-
-for u in /sys/class/block/mmcblk*p*/uevent; do
-    grep -qx PARTNAME=boot_b "$u" 2>/dev/null && bootb=/dev/$(basename "$(dirname "$u")")
-done
-log "stage=persist-target dev=${bootb:-none}"
-persist
-(while :; do sleep 15; persist; done) &
+restore_android() {
+    if [ "$linux_slot" = a ]; then
+        write_misc_bc /etc/misc-bc-slot-b.bin misc-restored
+    else
+        write_misc_bc /etc/misc-bc-slot-a.bin misc-restored
+    fi
+}
 
 hostname mu300-linux
 ifconfig lo 127.0.0.1 up
@@ -157,37 +201,74 @@ setup_usb_gadget() {
     mount -t configfs configfs /config
     g=/config/usb_gadget/linux
     mkdir -p "$g/strings/0x409" "$g/configs/c.1/strings/0x409"
-    # The USB network function: whichever of these the kernel actually has. Creating one it was not built with
-    # fails here; a function that could not be created is simply skipped. NCM alone: every current Windows,
-    # macOS and Linux host has an NCM class driver (Windows never had an ECM one), and the former ECM+NCM pair
-    # made the host enumerate two network adapters where each OS bound only its own. MU300_USBNET="ecm ncm"
-    # restores that pair for a host that still needs ECM.
-    netfuncs=
-    for f in ${MU300_USBNET:-ncm}; do
-        mkdir -p "$g/functions/$f.usb$f" 2>/dev/null && netfuncs="${netfuncs:+$netfuncs }$f"
+    # The USB network functions: whichever of these the kernel actually has. Creating one it was not built with
+    # fails here, and a gadget that is never bound leaves the device with no console and no network at all - which
+    # is exactly what an "improvement" to NCM cost once (on a mainline build without it; both kernels have it now).
+    # NCM by default, in a single configuration with the ACM console: Windows 10 2004+/11 bind their inbox
+    # UsbNcm.sys to it, macOS and Linux their own drivers - all measured, none needs an INF. ECM, which Windows has
+    # no driver for, is the fallback. MU300_USBNET (kernel command line) picks the functions.
+    # RNDIS uses a single configuration with ACM. Windows does not create its
+    # composite parent for a device with multiple configurations: the old
+    # RNDIS+NCM arrangement bound the whole device to usbser and exposed no
+    # network adapter. macOS has no RNDIS driver, so NCM remains the default.
+    rndis= netfunc=
+    for f in ${MU300_USBNET:-ncm ecm}; do
+        case $f in
+            rndis) [ -z "$rndis" ] && mkdir -p "$g/functions/rndis.rn0" 2>/dev/null && rndis=1 ;;
+            *) [ -z "$netfunc$rndis" ] && mkdir -p "$g/functions/$f.usb0" 2>/dev/null && netfunc=$f ;;
+        esac
     done
-    [ -n "$netfuncs" ] || log "stage=usb-no-net-function (console only)"
+    [ -n "$netfunc$rndis" ] || log "stage=usb-no-net-function (console only)"
+    cdc=c.1
     echo 0x0525 > "$g/idVendor"
     echo 0xa4a1 > "$g/idProduct"
     echo 0x0200 > "$g/bcdUSB"
-    echo MU300LINUX > "$g/strings/0x409/serialnumber"
+    # Windows caches OS-descriptor support by VID/PID/bcdDevice. Use a new
+    # revision for the corrected, single-configuration RNDIS descriptor.
+    if [ -n "$rndis" ]; then echo 0x0302 > "$g/bcdDevice"
+    else echo 0x0301 > "$g/bcdDevice"; fi
+    # Miscellaneous / IAD: the network and the ACM functions each span two interfaces, and without this device class
+    # Windows' composite driver ignores their association descriptors and hands out the interfaces one by one, so a
+    # class driver never sees its function as a whole
+    echo 0xEF > "$g/bDeviceClass"
+    echo 0x02 > "$g/bDeviceSubClass"
+    echo 0x01 > "$g/bDeviceProtocol"
+    echo "MU300LINUX${SERIALNO:+-$SERIALNO}" > "$g/strings/0x409/serialnumber"
     echo Linux > "$g/strings/0x409/manufacturer"
     echo "MU300 Linux USB Ethernet" > "$g/strings/0x409/product"
-    echo "Linux net (${netfuncs:-none}) + ACM console" > "$g/configs/c.1/strings/0x409/configuration"
-    echo 250 > "$g/configs/c.1/MaxPower"
-    i=1; mac=1
-    for f in $netfuncs; do
-        # the first function keeps the original MAC pair; a second one (only with a MU300_USBNET
-        # override) is offset by 2 so the two interfaces never share a MAC
-        echo 02:50:00:00:77:0$((mac + 1)) > "$g/functions/$f.usb$f/dev_addr"
-        echo 02:50:00:00:77:0$((mac + 2)) > "$g/functions/$f.usb$f/host_addr"
-        mac=$((mac + 2))
-        ln -s "$g/functions/$f.usb$f" "$g/configs/c.1/f$i"
-        i=$((i + 1))
-    done
-    # USB serial console alongside the network: recovery/debug access that does not depend on networking
-    mkdir -p "$g/functions/acm.GS0" && ln -s "$g/functions/acm.GS0" "$g/configs/c.1/f$i"
-    log "stage=usb-net-function ${netfuncs:-none}"
+    # USB serial console alongside the network function, in every configuration: recovery/debug access that does
+    # not depend on networking
+    mkdir -p "$g/functions/acm.GS0"
+    if [ -n "$rndis" ]; then
+        echo "RNDIS + ACM console" > "$g/configs/c.1/strings/0x409/configuration"
+        echo 250 > "$g/configs/c.1/MaxPower"
+        echo $MAC:03 > "$g/functions/rndis.rn0/dev_addr"
+        echo $MAC:04 > "$g/functions/rndis.rn0/host_addr"
+        ln -s "$g/functions/rndis.rn0" "$g/configs/c.1/f1"
+        ln -s "$g/functions/acm.GS0" "$g/configs/c.1/f2"
+        # MS OS descriptors: Windows asks for them with vendor request 0xcd and binds rndis.sys by compatible ID.
+        # They are what identifies the function: the stock f_rndis' control interface is 02/02/ff, which Windows
+        # would otherwise hand to usbser. A single configuration lets Windows
+        # enumerate RNDIS and ACM as separate interface collections.
+        echo 1 > "$g/os_desc/use"
+        echo 0xcd > "$g/os_desc/b_vendor_code"
+        echo MSFT100 > "$g/os_desc/qw_sign"
+        echo RNDIS > "$g/functions/rndis.rn0/os_desc/interface.rndis/compatible_id"
+        echo 5162001 > "$g/functions/rndis.rn0/os_desc/interface.rndis/sub_compatible_id"
+        ln -s "$g/configs/c.1" "$g/os_desc/c.1"
+    fi
+    if [ -n "$netfunc" ] || [ -z "$rndis" ]; then
+        mkdir -p "$g/configs/$cdc/strings/0x409"
+        echo "${netfunc:-no} net + ACM console" > "$g/configs/$cdc/strings/0x409/configuration"
+        echo 250 > "$g/configs/$cdc/MaxPower"
+        if [ -n "$netfunc" ]; then
+            echo $MAC:01 > "$g/functions/$netfunc.usb0/dev_addr"
+            echo $MAC:02 > "$g/functions/$netfunc.usb0/host_addr"
+            ln -s "$g/functions/$netfunc.usb0" "$g/configs/$cdc/f1"
+        fi
+        ln -s "$g/functions/acm.GS0" "$g/configs/$cdc/f2"
+    fi
+    log "stage=usb-net-function ${rndis:+rndis+}${netfunc:-none}"
     log "stage=usb-wait-udc"
     for n in $(seq 1 40); do
         [ -e /sys/class/udc/25100000.dwc3 ] && break
@@ -202,74 +283,184 @@ setup_usb_gadget() {
     # Never rebind the gadget from a shell running on its own ACM console: the console dies with the unbind and the
     # rebind never runs, which leaves the device with no USB at all until it is power-cycled.
     log "stage=usb-bind-start"
-    [ -n "$udc" ] && echo "$udc" > "$g/UDC"
-    log "stage=usb-bind-done rc=$?"
+    bound=0
+    [ -n "$udc" ] && echo "$udc" > "$g/UDC" && bound=1
+    log "stage=usb-bind-done bound=$bound"
+    # Consume a one-shot policy only if its requested function was actually
+    # created and the gadget bound successfully, never just because a config
+    # file was readable.
+    if [ "$bound" = 1 ]; then
+        case ${MU300_USB_REQUESTED:-} in
+            ecm|ncm) [ "$netfunc" = "$MU300_USB_REQUESTED" ] && echo "$MU300_USB_REQUESTED" > /run/unisoc-usb-net-applied ;;
+            rndis) [ -n "$rndis" ] && echo rndis > /run/unisoc-usb-net-applied ;;
+        esac
+    fi
     persist
 
-    # Bring the network links up immediately after binding: the host probes the link right after the
-    # gadget enumerates, long before the real system configures it (the old ECM gadget even reported
-    # its link state in its first CONNECT notification, and macOS did not pick up a later one).
-    for u in usb0 usb1 usb2; do [ -e /sys/class/net/$u ] && ifconfig $u up; done
+    # The functions register their netdevs as they are bound, configuration by configuration, so RNDIS would take
+    # usb0 - the name lan-start and the OpenWrt bridge expect for the CDC link. Name them by function instead.
+    if [ -n "$rndis" ]; then
+        r=$(cat "$g/functions/rndis.rn0/ifname" 2>/dev/null)
+        c=
+        [ -z "$netfunc" ] || c=$(cat "$g/functions/$netfunc.usb0/ifname" 2>/dev/null)
+        case $r in ""|"(unnamed net_device)"|rndis0) ;; *) ip link set "$r" name rndis0 ;; esac
+        case $c in ""|"(unnamed net_device)"|usb0) ;; *) ip link set "$c" name usb0 ;; esac
+        log "stage=usb-ifnames rndis=$r->rndis0 cdc=${c:-none}->usb0"
+        ifconfig rndis0 up
+    fi
 
-    # udhcpd cannot answer a useful lease from an unnumbered interface. Give NCM
-    # the final LAN address now, before the host's first DHCP request.
-    [ -e /sys/class/net/usb0 ] && ifconfig usb0 192.168.77.1 netmask 255.255.255.0 up
-
-    # Temporary DHCP from the initramfs: the host asks for a lease the moment the gadget enumerates
-    # and gives up after a few attempts - long before the real system's dnsmasq exists (measured:
-    # over a minute later). The lease must survive the rootfs handoff: a 30-second
-    # lease expired exactly while netifd was creating br-lan and forced Windows
-    # through a second DHCP cycle. The rootfs early server is stopped at LAN ifup.
-    for u in usb0; do
-        [ -e /sys/class/net/$u ] || continue
-        cat > /run/udhcpd-$u.conf <<EOF
-start 192.168.77.200
-end 192.168.77.200
-interface $u
+    # Bring usb0 up immediately after binding, before the host selects the data interface:
+    # f_ecm (and f_ncm alike) reports the link state in its first CONNECT notification, and macOS' ECM driver does not
+    # pick up a later "connected" notification (v10 left usb0 down until systemd ran -> host "inactive").
+    early_net=usb0
+    early_host_mac=$MAC:02
+    if [ -n "$rndis" ] && [ -z "$netfunc" ]; then
+        early_net=rndis0
+        early_host_mac=$MAC:04
+    fi
+    ifconfig "$early_net" up
+    # Windows requests DHCP as soon as NCM enumerates, before OpenWrt starts
+    # dnsmasq. Serve the final LAN address immediately and keep the same host
+    # lease across switch_root. The post-rootfs rebind renews this same lease.
+    if [ -e "/sys/class/net/$early_net" ]; then
+        ifconfig "$early_net" "$NET.1" netmask 255.255.255.0 up
+        echo "$early_host_mac" > /run/mu300-usb-host-mac
+        cat > /run/udhcpd-usb0.conf <<EOF
+start $NET.200
+end $NET.200
+interface $early_net
 option subnet 255.255.255.0
-option router 192.168.77.1
-option lease 600
-lease_file /run/udhcpd-$u.leases
+option router $NET.1
+option dns $NET.1
+option lease 3600
+lease_file /run/udhcpd-usb0.leases
+pidfile /run/udhcpd-usb0.pid
 EOF
-        touch /run/udhcpd-$u.leases
-        udhcpd /run/udhcpd-$u.conf 2>/dev/null &
-    done
+        touch /run/udhcpd-usb0.leases
+        udhcpd /run/udhcpd-usb0.conf 2>/dev/null &
+        log "stage=usb-dhcp-early ip=$NET.1 host=$NET.200"
+    fi
 }
 
 # The vendor modules first, the gadget last. The host starts asking for a DHCP lease the moment the gadget
 # appears and gives up after a few seconds, so the closer the gadget comes to the system that answers (the DHCP
 # server starts right after switch_root), the more reliably the host gets an address.
 load_vendor_modules
-find_misc_and_bootb
-log "stage=persist-target dev=${bootb:-none} misc=${misc:-none}"
-persist
-(while :; do sleep 15; persist; done) &
-setup_usb_gadget
-
-# Early Wi-Fi: the WCN firmware needs minutes to warm up before it will beacon, and that
-# clock only starts when wcn_bsp loads. Loading it here (initramfs, right after the gadget)
-# instead of mu300-hw in the rootfs starts the warm-up ~35 s earlier, in parallel with the
-# rest of the boot; the driver also reads its firmware directly from the wcnmodem partition,
-# which needs the by-name links before it probes.
-mkdir -p /dev/block/by-name
-for u in /sys/class/block/mmcblk0p*/uevent; do
-    d=$(basename "$(dirname "$u")"); n=$(sed -n 's/^PARTNAME=//p' "$u" 2>/dev/null)
-    ln -sf /dev/$d /dev/block/$d; [ -n "$n" ] && ln -sf /dev/$d /dev/block/by-name/$n
-done
-for m in wcn_bsp sprd_wlan_combo; do
-    f=/linux-modules/$m.ko
-    [ -f "$f" ] && insmod "$f" 2>/dev/null && log "stage=early-wifi $m loaded"
-done
-mdev -s
-
-# NO early modem in the initramfs: every variant tested (kill after wait, keep alive
-# through switch_root, wait for "modem run = 1" then kill) ended with the PM watchdog
-# re-armed and a power cut at ~290 s. The rootfs mu300-vendor starts modem_control
-# ~10 s later and handles the watchdog disarm for the lifetime of the system — that
-# is the only configuration that survives past the watchdog line.
-
+find_partitions
+# Read the optional LuCI package's USB policy before configfs enumeration.
+# Use the already-mounted TF root: a separate ro,noload peek can miss a new
+# setting still in the ext4 journal, even after the block device appears.
+read_usb_boot_policy() {
+    [ -z "${MU300_USBNET:-}" ] || return 0
+    for p in /disk/openwrt/etc/unisoc-modem/usb-boot.conf \
+             /disk/etc/unisoc-modem/usb-boot.conf; do
+        [ -r "$p" ] || continue
+        mode=$(sed -n 's/^mode=//p' "$p" | head -n1)
+        case $mode in
+            ecm) MU300_USBNET='ecm ncm' ;;
+            ncm) MU300_USBNET='ncm ecm' ;;
+            rndis) MU300_USBNET='rndis ncm' ;;
+            *) continue ;;
+        esac
+        MU300_USB_REQUESTED=$mode
+        log "stage=usb-boot-policy mode=$mode dev=$sd_root"
+        break
+    done
+}
 ROOT_OFFSET=27762098176   # linux-boot/rootfs-region.env; outside every GPT partition
+# The region is not at the same place on every device (eMMC size, partition layout), and a number in this file is
+# not enough: the installer writes the device's offset in here, but the generic ramdisk segment that updates put
+# behind this one (mu300-update, and a mainline kernel from the installer) carries its own init, which replaces
+# this file - with the default above. Devices whose region is elsewhere then booted into standalone mode and went
+# back to Android. So find it the way the installer places it - the first 2 MiB boundary after the last partition
+# - and take the first candidate that really holds the mu300root filesystem (ext4 magic and label).
+root_region_valid() {
+    # Validate both GPT boundaries BEFORE dd or losetup. Some Android MMC
+    # drivers wedge on out-of-device reads instead of returning an error (#65).
+    case $1 in ''|*[!0-9]*) return 1 ;; esac
+    disk_sectors=$(cat /sys/block/mmcblk0/size) || return 1
+    case $disk_sectors in ''|*[!0-9]*) return 1 ;; esac
+    [ "$1" -gt 0 ] && [ $(( $1 % 512 )) -eq 0 ] || return 1
+    root_sector=$(( $1 / 512 )); partition_end=0
+    for partition in /sys/block/mmcblk0/mmcblk0p*; do
+        [ -r "$partition/start" ] || continue
+        part_start=$(cat "$partition/start") || return 1
+        part_size=$(cat "$partition/size") || return 1
+        case $part_start:$part_size in *[!0-9:]*|:*|*:) return 1 ;; esac
+        part_end=$((part_start + part_size))
+        [ "$part_end" -le "$partition_end" ] || partition_end=$part_end
+    done
+    [ "$partition_end" -gt 0 ] && [ "$root_sector" -ge "$partition_end" ] || return 1
+    [ "$root_sector" -le $((disk_sectors - 34 - 8)) ] || return 1
+    root_bytes=$(( (disk_sectors - 34 - root_sector) * 512 ))
+}
+is_mu300root() {
+    root_region_valid "$1" || return 1
+    dd if=/dev/mmcblk0 of=/run/root-super bs=512 skip="$root_sector" count=8 2>/dev/null || return 1
+    [ "$(wc -c < /run/root-super)" -eq 4096 ] || return 1
+    magic=$(dd if=/run/root-super bs=1 skip=1080 count=2 2>/dev/null | od -An -tx1 | tr -d ' \n')
+    label=$(dd if=/run/root-super bs=1 skip=1144 count=9 2>/dev/null)
+    [ "$magic" = 53ef ] && [ "$label" = mu300root ]
+}
+find_root_offset() {
+    e=0
+    for p in /sys/block/mmcblk0/mmcblk0p*; do
+        [ -r "$p/start" ] || continue
+        x=$(( $(cat "$p/start") + $(cat "$p/size") ))
+        [ "$x" -gt "$e" ] && e=$x
+    done
+    for c in $(( (e / 4096 + 1) * 4096 * 512 )) $ROOT_OFFSET; do
+        is_mu300root "$c" && { echo "$c"; return 0; }
+    done
+    return 1
+}
+# A TF-only image must never fall through to the eMMC free-region probe.
+root_target=$(cat /etc/mu300-root-target 2>/dev/null)
+# Generic images retain the bounded internal-root fallback.
+sd_root=
+for n in $(seq 1 8); do
+    seen=
+    for d in /dev/mmcblk[1-9]p1 /dev/mmcblk[1-9]; do
+        [ -b "$d" ] || continue
+        seen=1
+        sectors=$(cat "/sys/class/block/${d##*/}/size" 2>/dev/null)
+        case $sectors in ''|*[!0-9]*) continue ;; esac
+        [ "$sectors" -ge 8 ] || continue
+        dd if="$d" of=/run/sd-super bs=512 count=8 2>/dev/null || continue
+        [ "$(wc -c < /run/sd-super)" -eq 4096 ] || continue
+        magic=$(dd if=/run/sd-super bs=1 skip=1080 count=2 2>/dev/null | od -An -tx1 | tr -d ' \n')
+        label=$(dd if=/run/sd-super bs=1 skip=1144 count=16 2>/dev/null | tr -d '\000')
+        [ "$magic" = 53ef ] && [ "$label" = mu300sd ] && { sd_root=$d; break 2; }
+    done
+    [ -n "$seen" ] && break
+    mdev -s; sleep 1
+done
+log "stage=sd-scan dev=${sd_root:-none} blocks=$(ls /dev/mmcblk[1-9]* 2>/dev/null | tr '\n' ',')"
+# No additional wait or second mount: the root scan has established the TF
+# device, and the root mount lets us read the current (journaled) policy.
+mkdir -p /disk
+rootloop=
+root_mounted=0
+if [ -n "$sd_root" ]; then
+    rootloop=$sd_root
+    mount -t ext4 -o noatime "$sd_root" /disk 2>>/run/rootmount.err && root_mounted=1
+    log "stage=sd-root dev=$sd_root mounted=$root_mounted"
+fi
+[ "$root_mounted" = 1 ] && read_usb_boot_policy
+setup_usb_gadget
+internal_root=
+if [ "$root_mounted" = 0 ] && [ "$root_target" != sd ]; then
+    if found=$(find_root_offset); then
+        [ "$found" = "$ROOT_OFFSET" ] || log "stage=root-offset found=$found (default $ROOT_OFFSET)"
+        ROOT_OFFSET=$found
+        internal_root=1
+    else
+        log "stage=root-offset not-found (no internal mount attempted)"
+    fi
+fi
 mkdir -p /newroot
+# busybox mount only sets up a loop for regular files; for a block device the loop options would
+# be handed to ext4 (EINVAL), so attach the loop explicitly and verify its offset
 # The ext4 area holds one or more systems: /ubuntu, /openwrt (selected by /.mu300/boot-os), or a single
 # Ubuntu directly in its root (first installs). Pick one and remember how to start it.
 has_init() { [ -x "$1/lib/systemd/systemd" ] || [ -x "$1/sbin/init" ]; }
@@ -281,44 +472,15 @@ pick_root() {
         [ "$os" = ubuntu ] && [ -x /disk/lib/systemd/systemd ] && { echo /disk; return; }
     done
 }
-mkdir -p /disk
-# A TF card rootfs (ext4 label mu300sd) wins over the internal region: on the 32 GB variant the card is
-# the only place for the rootfs, and on any variant taking the card out means booting the internal system.
-# /sys/class/mmc_host/mmc1/mmc1:* exists the moment the driver has detected a card, so an empty slot costs
-# this loop nothing; the block device follows within about a second (one init retry was measured on
-# insertion), and once a card's node exists its label does not change, so there is nothing left to wait for.
-sd_root=
-foreign=
-for n in $(seq 1 5); do
-    ls /sys/class/mmc_host/mmc1/mmc1:* >/dev/null 2>&1 || break
-    for d in /dev/mmcblk1p1 /dev/mmcblk1; do
-        [ -b "$d" ] || continue
-        if [ "$(dd if="$d" bs=1 skip=1144 count=7 2>/dev/null)" = mu300sd ]; then sd_root=$d; break 2; fi
-        foreign=$d
-    done
-    [ -n "$foreign" ] && break
-    mdev -s
-    sleep 1
-done
-rootloop=
-root_mounted=0
-if [ -n "$sd_root" ]; then
-    rootloop=$sd_root
-    mount -t ext4 -o noatime "$sd_root" /disk 2>>/run/rootmount.err && root_mounted=1
-    log "stage=sd-root dev=$sd_root ok=$root_mounted"
-fi
-# busybox mount only sets up a loop for regular files; for a block device the loop options would
-# be handed to ext4 (EINVAL), so attach the loop explicitly and verify its offset
-if [ $root_mounted = 0 ]; then
+if [ "$root_mounted" = 0 ] && [ "$internal_root" = 1 ] && root_region_valid "$ROOT_OFFSET"; then
     rootloop=$(losetup -f 2>/run/rootmount.err)
-    if [ -n "$rootloop" ] && losetup -o $ROOT_OFFSET "$rootloop" /dev/mmcblk0 2>>/run/rootmount.err \
+    if [ -n "$rootloop" ] && losetup -o "$ROOT_OFFSET" -S "$root_bytes" "$rootloop" /dev/mmcblk0 2>>/run/rootmount.err \
        && [ "$(cat /sys/block/${rootloop#/dev/}/loop/offset)" = "$ROOT_OFFSET" ] \
-       && [ "$(dd if="$rootloop" bs=1 skip=1080 count=2 2>/dev/null | od -An -tx1 | tr -d ' ')" = 53ef ] \
        && mount -t ext4 -o noatime "$rootloop" /disk 2>>/run/rootmount.err; then
         root_mounted=1
     fi
 fi
-if [ $root_mounted = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
+if [ "$root_mounted" = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
     # A way back to Android with no computer and no keyboard: cut the power during boot N times in a row (N is
     # .mu300/boot-attempts, 5 without it). Every boot counts up here and mu300-next-boot --rearm clears the count
     # once the system is really up, so only boots that never got that far add up. LK does the same with the
@@ -337,7 +499,7 @@ if [ $root_mounted = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
     if [ "$tries" -gt "$max" ]; then
         log "stage=boot-tries-exceeded count=$tries (booting Android instead)"
         echo 0 > /disk/.mu300/boot-tries && sync
-        restore_slot_a
+        restore_android
         persist
         sync
         reboot -f
@@ -351,24 +513,65 @@ if [ $root_mounted = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
         # keep the whole disk reachable from inside (switching systems, editing the other one)
         mkdir -p /newroot/mnt/mu300-disk && mount --move /disk /newroot/mnt/mu300-disk
     fi
-    # Default-Linux mode: leave LK's decremented tries (b: not successful). Userspace re-arms slot b (tries N+1)
+    # Default-Linux mode: leave LK's decremented tries. Userspace re-arms the Linux slot (tries N+1)
     # once the system is up; N boots in a row that never get there and LK falls back to Android on the next one.
+    trial=1
     if [ "$(cat /newroot/etc/mu300/default-boot 2>/dev/null)" = linux ]; then
-        log "stage=default-boot-linux (slot a restore skipped)"
+        log "stage=default-boot-linux (Android slot restore skipped)"
+        trial=
     else
-        restore_slot_a
+        restore_android
     fi
-    mkdir -p /run/mu300 && cp /etc/misc-bc-slot-a.bin /etc/misc-bc-slot-b-trial.bin /run/mu300/
+    mkdir -p /run/mu300
+    if [ "$linux_slot" = a ]; then
+        cp /etc/misc-bc-slot-b.bin /run/mu300/misc-bc-android.bin
+        cp /etc/misc-bc-slot-a-trial.bin /run/mu300/misc-bc-linux-trial.bin
+    else
+        cp /etc/misc-bc-slot-a.bin /run/mu300/misc-bc-android.bin
+        cp /etc/misc-bc-slot-b-trial.bin /run/mu300/misc-bc-linux-trial.bin
+    fi
+    echo "$linux_slot" > /run/mu300/linux-slot
+    [ "$linux_slot" = a ] && echo b > /run/mu300/android-slot || echo a > /run/mu300/android-slot
     [ -n "$misc" ] && echo "$misc" > /run/mu300/misc-dev
     echo "$rootloop" > /run/mu300/disk-dev
+    echo "$DEVICE" > /run/mu300/device
     init=/sbin/init
     [ -x /newroot/lib/systemd/systemd ] && init=/lib/systemd/systemd
+    # Mainline cpufreq is now modular so an updated rootfs can read a saved
+    # voltage profile before loading it. Old roots still boot at factory voltage.
+    # Do not load it here when the rootfs adapter exists (one-shot firmware ABI).
+    if [ ! -x /newroot/opt/mu300/bin/cpu-voltage-platform ]; then
+        for cpu_ko in /newroot/lib/modules/$(uname -r)/sprd-cpufreq-v2-driver.ko \
+                      /newroot/lib/modules/$(uname -r)/extra/sprd-cpufreq-v2-driver.ko; do
+            [ -f "$cpu_ko" ] || continue
+            insmod "$cpu_ko" voltage_offset_uv=0,0,0 2>/run/cpufreq.err || log 'stage=cpufreq-default-failed'
+            break
+        done
+    fi
     log "stage=switch-root root=$rootdir init=$init os=$(sed -n 's/^PRETTY_NAME=//p' /newroot/etc/os-release)"
     persist
     kill $(jobs -p) 2>/dev/null
-    killall udhcpd 2>/dev/null
     for p in /proc/[0-9]*; do [ "${p#/proc/}" = 1 ] || kill -9 "${p#/proc/}" 2>/dev/null; done
+    # Trial guard, only in images built with --trial-guard SECONDS (tools/flash-trial.sh experiments, never an
+    # install): the timer above ends here, and a trial kernel that boots but never brings up USB (6.18 on the U30
+    # Air) left a device that only failing five boots by hand brought back. So one more timer outlives
+    # switch_root: unless /run/stay exists by then (created over SSH), it reboots - into Android, as its slot is
+    # already restored. switch_root deletes this ramdisk, so it runs from a copy of busybox in /run, reached
+    # through its working directory once /run has moved.
+    # Only in a trial boot: mu300-update keeps the device segment of the Linux boot image, and a guard that
+    # came along from an experiment into an installed system restarted it every 10 minutes (FINDINGS 33e)
+    if [ -s /etc/mu300-trial-guard ] && [ -z "$trial" ]; then
+        log "stage=trial-guard-ignored (Linux is the default: not a trial)"
+    elif [ -s /etc/mu300-trial-guard ]; then
+        g=$(cat /etc/mu300-trial-guard)
+        # (named busybox: busybox takes the applet from its own name when that is not "busybox")
+        mkdir -p /run/.trial-guard && cp /bin/busybox /run/.trial-guard/busybox
+        log "stage=trial-guard ${g}s"
+        (cd /run && exec .trial-guard/busybox sh -c ".trial-guard/busybox sleep $g; [ -e stay ] && exit 0; .trial-guard/busybox sync; .trial-guard/busybox reboot -f") \
+            </dev/null >/dev/null 2>&1 &
+    fi
     umount /config 2>/dev/null
+    killall udhcpd 2>/dev/null
     mkdir -p /newroot/dev /newroot/proc /newroot/sys /newroot/run
     mount --move /dev /newroot/dev
     mount --move /proc /newroot/proc
@@ -377,12 +580,19 @@ if [ $root_mounted = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
     exec switch_root /newroot $init
 fi
 log "stage=rootfs-unavailable $(cat /run/rootmount.err)"
-restore_slot_a
-ifconfig usb0 192.168.77.1 netmask 255.255.255.0 up
+restore_android
+if [ "$root_target" = sd ]; then
+    log 'stage=tf-root-unavailable (returning to Android; eMMC root probe skipped)'
+    # Do not enter the vendor/standalone diagnostic boot on a missing TF root.
+    # No extra global sync into the failed TF; restore_android verifies misc.
+    reboot -f
+    while :; do sleep 1; done
+fi
+ifconfig usb0 $NET.1 netmask 255.255.255.0 up
 log "stage=usb0 $(ifconfig usb0 2>&1 | head -1)"
-cat > /etc/udhcpd.conf <<'EOF'
-start 192.168.77.2
-end 192.168.77.9
+cat > /etc/udhcpd.conf <<EOF
+start $NET.2
+end $NET.9
 interface usb0
 option subnet 255.255.255.0
 option lease 600
@@ -391,10 +601,10 @@ pidfile /run/udhcpd.pid
 EOF
 touch /run/udhcpd.leases
 udhcpd /etc/udhcpd.conf
-telnetd -b 192.168.77.1 -p 23 -l /bin/sh
+telnetd -b $NET.1 -p 23 -l /bin/sh
 mkdir -p /run/www
-echo "MU300 standalone Linux v5: telnet 192.168.77.1; auto reboot to Android after 300s unless /run/stay exists" > /run/www/index.html
-httpd -p 192.168.77.1:80 -h /run/www
+echo "MU300 standalone Linux v5: telnet $NET.1; auto reboot to Android after 90s unless /run/stay exists" > /run/www/index.html
+httpd -p $NET.1:80 -h /run/www
 log "stage=ready"
 
 # Android vendor services in a chroot. modem_control reloads pm_sys through Trusty; only then
@@ -414,12 +624,16 @@ mount -t proc proc $A/proc
 mount -t sysfs sysfs $A/sys
 # modem_control switches to uid system(1000); apply Android's ueventd/init node ownership
 sh /etc/ueventd-perms.sh
-# LK boots us from slot b; the modem images Android uses (and keeps updated) are the _a copies
+# Vendor daemons must read the slot used by Android, not the opposite Linux slot.
 # the vendor daemons read androidboot.* (slot, modem config) from the command line; the mainline kernel forces its
 # own command line, so fall back to the bootargs LK put in the device tree
 src=/proc/cmdline
 grep -q androidboot.slot_suffix /proc/cmdline || [ ! -r /proc/device-tree/chosen/bootargs ] || src=/proc/device-tree/chosen/bootargs
-tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_b/androidboot.slot_suffix=_a/' > /run/cmdline.android
+if [ "$linux_slot" = a ]; then
+    tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_a/androidboot.slot_suffix=_b/' > /run/cmdline.android
+else
+    tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_b/androidboot.slot_suffix=_a/' > /run/cmdline.android
+fi
 mount --bind /run/cmdline.android $A/proc/cmdline
 # liblog sends to logd's datagram socket; capture it so vendor daemons are debuggable
 mkdir -p /dev/socket

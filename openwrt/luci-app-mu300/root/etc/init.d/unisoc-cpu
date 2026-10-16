@@ -1,0 +1,12 @@
+#!/bin/sh /etc/rc.common
+# No daemon/polling; restoring is opt-in and independent of modem startup.
+START=99
+STOP=89
+start() {
+    /usr/libexec/unisoc-modem/cpu boot | logger -t unisoc-cpu
+}
+shutdown() {
+    # Only a real clean system shutdown disarms recovery, not service stop.
+    /usr/libexec/unisoc-modem/cpu-voltage shutdown >/dev/null
+    sync
+}

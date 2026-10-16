@@ -1,0 +1,134 @@
+#!/bin/sh
+# The USB-C port's role (U30 Air; Ubuntu and OpenWrt, mainline kernels):
+#   mu300-usb             show it
+#   mu300-usb host        request data host (USB network to a computer disappears).
+#   mu300-usb device      request data device for the computer's USB network.
+#   mu300-usb boot        native PD: leave role/power negotiation to TCPM.
+#                        old kernels: clear stale charger boost before USB attach.
+# Native Type-C/PD controls power separately: host can keep charging via a dock.
+# The legacy path manages boost explicitly, with external-VBUS protection.
+# Never enable the charger watchdog while the kernel driver owns the chip.
+# Battery-less F50/V50 boards never enter this helper's charger register path.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+R=${MU300_SYSROOT:-}   # (for tests/: a fake /sys)
+ADDR=0x6b
+FORCE=
+REG_CTRL1=0x01      # bit 5 OTG_CONFIG
+REG_TIMER=0x05      # bits 5:4 WATCHDOG (00 off, 01 40 s)
+REG_STATUS=0x08     # bits 7:5 VBUS_STAT (111: OTG), bit 2 PG_STAT (an outside supply on VBUS)
+REG_PART=0x0b
+
+die() { echo "mu300-usb: $*" >&2; exit 1; }
+i2c() {  # i2c get|set ARGS: i2c-tools when there, else busybox's
+    op=$1; shift
+    if command -v "i2c$op" >/dev/null 2>&1 && [ "$(command -v "i2c$op")" != /usr/bin/busybox ]; then "i2c$op" -y $FORCE "$@"
+    elif [ -z "$R" ] && [ -x /opt/mu300/bin/busybox ]; then /opt/mu300/bin/busybox "i2c$op" -y $FORCE "$@"
+    else busybox "i2c$op" -y $FORCE "$@"; fi
+}
+bus() {  # the I2C bus of the charger: the controller at 22a0000 on the UMS9620
+    for a in "$R"/sys/bus/i2c/devices/i2c-*; do
+        case $(readlink -f "$a/of_node" 2>/dev/null) in *i2c@22a0000) echo "${a##*-}"; return 0 ;; esac
+    done
+    return 1
+}
+charger_address() {
+    # No bus scan: only the two charger addresses validated on battery boards.
+    # The 0x1a variant is a dummy I2C client owned by the bound 0x6b driver.
+    [ ! -L "$R/sys/bus/i2c/devices/$BUS-006b/driver" ] || FORCE=-f
+    local part
+    part=$(i2c get "$BUS" 0x6b $REG_PART 2>/dev/null) || part=
+    if [ -n "$part" ] && [ $(( (part >> 3) & 15 )) = 2 ]; then return 0; fi
+    part=$(i2c get "$BUS" 0x1a $REG_PART 2>/dev/null) || return 1
+    [ $(( (part >> 3) & 15 )) = 0 ] || return 1
+    ADDR=0x1a
+}
+watchdog_restore() {
+    # Old kernels without the charger driver retain the previous 40s policy.
+    [ -n "$FORCE" ] || setbits $REG_TIMER 0x30 0x10
+}
+role_switch() { for r in "$R"/sys/class/usb_role/*; do [ -e "$r/role" ] && { echo "$r/role"; return 0; }; done; return 1; }
+reg() { i2c get "$BUS" $ADDR "$1" 2>/dev/null; }
+setbits() {  # setbits REG MASK VALUE
+    v=$(reg "$1") || die "cannot read the charger (I2C $BUS-$ADDR)"
+    i2c set "$BUS" $ADDR "$1" $(( (v & ~$2) | $3 )) || die "cannot write the charger"
+}
+
+# A native PD controller owns the boost and negotiates data-role changes.
+# Do not force I2C bits behind it: USB host may legitimately remain a sink.
+if [ "$(mu300-device)" = u30air ]; then
+    for native_port in "$R"/sys/class/typec/port*; do
+        [ -w "$native_port/data_role" ] || continue
+        case ${1:-status} in
+            boot) exit 0 ;;
+            host|device)
+                [ "$(id -u)" = 0 ] || die "run as root"
+                echo "$1" > "$native_port/data_role" || die "the Type-C partner refused the data-role swap"
+                echo "USB data role requested: $1 (power role is negotiated separately)"
+                exit 0 ;;
+            status)
+                printf 'data role: '; cat "$native_port/data_role"
+                printf 'power role: '; cat "$native_port/power_role"
+                exit 0 ;;
+        esac
+    done
+fi
+
+if [ "${1:-}" = boot ]; then
+    # quietly, on whatever kernel: the 5.4 one has its own charger driver and no I2C device node for this
+    [ "$(mu300-device)" = u30air ] && BUS=$(bus) || exit 0
+    charger_address || exit 0
+    v=$(reg $REG_CTRL1) || exit 0
+    if [ $(( v & 0x20 )) -ne 0 ]; then
+        i2c set "$BUS" $ADDR $REG_CTRL1 $(( v & ~0x20 )) && watchdog_restore
+        echo "mu300-usb: the charger's boost was still on from before the reboot: switched off"
+    fi
+    exit 0
+fi
+[ "$(mu300-device)" = u30air ] || die "only the U30 Air can be a USB host: the F50 is powered through that port"
+ROLE=$(role_switch) || die "no USB role switch (this needs a mainline kernel with dual-role USB, v2026.10.03 or newer)"
+BUS=$(bus) || die "the charger's I2C bus is not there (a kernel without I2C)"
+charger_address || die "no supported charger at 0x6b or 0x1a"
+
+boost() {
+    [ "$(id -u)" = 0 ] || { echo "(run as root to read the charger)"; return; }
+    v=$(reg $REG_CTRL1) || { echo "(cannot read the charger)"; return; }
+    [ $(( v & 0x20 )) -ne 0 ] && echo on || echo off
+}
+powered() { v=$(reg $REG_STATUS) && [ $(( v & 0x04 )) -ne 0 ] && [ $(( v & 0xe0 )) -ne 224 ]; }
+
+case ${1:-status} in
+    status)
+        echo "role: $(cat "$ROLE" 2>/dev/null)"
+        echo "5 V out (OTG boost): $(boost)"
+        if [ -d "$R"/sys/bus/usb/devices ]; then
+            for d in "$R"/sys/bus/usb/devices/[0-9]*; do
+                [ -e "$d/product" ] || continue
+                case ${d##*/} in *:*) continue ;; esac
+                echo "  device: $(cat "$d/manufacturer" 2>/dev/null) $(cat "$d/product") ($(cat "$d/idVendor"):$(cat "$d/idProduct"))"
+            done
+        fi ;;
+    host)
+        [ "$(id -u)" = 0 ] || die "run as root (sudo mu300-usb host)"
+        # the boost drives VBUS: never against a computer or a charger that drives it already
+        setbits $REG_TIMER 0x30 0x00
+        if powered; then
+            # A powered hub supplies VBUS itself. Never drive boost against it.
+            setbits $REG_CTRL1 0x20 0x00
+        else
+            setbits $REG_CTRL1 0x20 0x20
+        fi
+        if ! echo host > "$ROLE"; then
+            setbits $REG_CTRL1 0x20 0x00
+            die "could not switch the role"
+        fi
+        sleep 1
+        echo "USB host: VBUS supplied by boost or the powered hub, plug in the OTG adapter (the USB network is off until: sudo mu300-usb device)" ;;
+    device)
+        [ "$(id -u)" = 0 ] || die "run as root (sudo mu300-usb device)"
+        setbits $REG_CTRL1 0x20 0x00      # boost off before attaching a computer
+        echo device > "$ROLE" || die "could not switch the role"
+        watchdog_restore
+        sleep 1   # the role switch works in the background
+        echo "USB device: the USB network and serial console are back" ;;
+    *) sed -n '2,6s/^# \{0,1\}//p' "$0" >&2; exit 2 ;;
+esac

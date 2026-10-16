@@ -1,0 +1,6 @@
+config charge 'main'
+	option enabled '0'
+	option start '70'
+	option stop '80'
+	option paused '0'
+	option full_once '0'

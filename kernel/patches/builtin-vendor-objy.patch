@@ -1,9 +1,0 @@
---- a/drivers/soc/sprd/Makefile
-+++ b/drivers/soc/sprd/Makefile
-@@ -19,7 +19,7 @@
- obj-$(CONFIG_SPRD_FSA4480_I2C)	+= fsa4480/
- obj-$(CONFIG_SPRD_SFP_SUPPORT)	+= sfp/
--obj-m				+= sprd_manufacturer_model.o
-+obj-y				+= sprd_manufacturer_model.o
- obj-$(CONFIG_SPRD_USBPINMUX)	+= usbpinmux/
- obj-y				+= power/

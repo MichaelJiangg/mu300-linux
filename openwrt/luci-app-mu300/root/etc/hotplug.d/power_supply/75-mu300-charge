@@ -1,0 +1,10 @@
+#!/bin/sh
+[ "$ACTION" = change ] || [ "$ACTION" = add ] || exit 0
+[ "$(cat /run/mu300/device 2>/dev/null)" = u30air ] || exit 0
+# The existing driver retains the pause across VBUS changes. Do not poll it
+# from hotplug, or touch the batteryless F50/V50 power path.
+if [ -s /run/mu300-charge.json ] || [ "$(uci -q get mu300-charge.main.enabled)" = 1 ] ||
+   [ "$(uci -q get mu300-charge.main.paused)" = 1 ]; then
+    /usr/libexec/unisoc-modem/charge apply >/dev/null
+    ubus send mu300.charge '{}' >/dev/null 2>&1
+fi

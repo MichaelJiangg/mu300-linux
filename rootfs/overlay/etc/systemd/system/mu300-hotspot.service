@@ -13,7 +13,9 @@ Conflicts=wpa_supplicant.service
 [Service]
 ExecStart=/opt/mu300/bin/hotspot-start
 ExecStartPost=-/opt/mu300/bin/hotspot-verify
+ExecStartPost=-/opt/mu300/bin/mu300-led wifi on
 ExecStopPost=/opt/mu300/bin/hotspot-stop
+ExecStopPost=-/opt/mu300/bin/mu300-led wifi off
 Restart=always
 RestartSec=10
 

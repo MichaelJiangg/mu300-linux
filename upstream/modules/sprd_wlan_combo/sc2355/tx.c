@@ -21,15 +21,20 @@
 
 #define MAX_FW_TX_DSCR	(1024)
 
+/* complock is also taken from the PCIe tx-complete interrupt (sc2355_pcie_tx_cmd_pop_list ->
+ * sc2355_free_cmd_buf), so it must be taken with interrupts off everywhere: with only bottom halves off, that
+ * interrupt on the same CPU spins on the lock forever (and _bh in hard-irq context warns on newer kernels) */
 static void tx_dequeue_cmd_buf(struct sprd_msg *msg, struct sprd_msg_list *list)
 {
+	unsigned long flags;
+
 	spin_lock_bh(&list->busylock);
 	list_del(&msg->list);
 	spin_unlock_bh(&list->busylock);
 
-	spin_lock_bh(&list->complock);
+	spin_lock_irqsave(&list->complock, flags);
 	list_add_tail(&msg->list, &list->cmd_to_free);
-	spin_unlock_bh(&list->complock);
+	spin_unlock_irqrestore(&list->complock, flags);
 }
 
 static inline void tx_enqueue_data_msg(struct sprd_msg *msg, struct sprd_hif *hif)
@@ -336,6 +341,12 @@ static int tx_handle_to_send_list(struct sprd_hif *hif, enum sprd_mode mode)
 						credit, SPRD_AC_MAX, coex_bt_on);
 			sc2355_handle_tx_return(hif, list, credit, ret);
 		}
+		/* A full EDMA pending queue kept ownership with us. The bus
+		 * completion wakes TX again; do not spend the hard-error budget
+		 * or flush packets merely because this retry also met pressure.
+		 */
+		if (hif->hw_type == SPRD_HW_SC2355_PCIE && ret == -EAGAIN)
+			return ret;
 		if (ret) {
 			pr_err("%s, %d: tx return err!\n", __func__, __LINE__);
 			tx_mgmt->xmit_msg_list.failcount++;
@@ -393,7 +404,7 @@ static int tx_eachmode_data(struct sprd_hif *hif, enum sprd_mode mode)
 	else
 		send_num = sc2355_fc_test_send_num(hif, mode, total);
 	if (total != 0 && send_num <= 0) {
-		pr_err("%s, %d: _fc_ no credit!\n", __func__, __LINE__);
+		pr_debug_ratelimited("%s, %d: _fc_ no credit!\n", __func__, __LINE__);
 		return -ENOMEM;
 	}
 
@@ -927,6 +938,16 @@ static int tx_mc_pkt(struct sk_buff *skb, struct net_device *ndev)
 	vif = netdev_priv(ndev);
 	hif = &vif->priv->hif;
 
+	/* PCIe AP multicast belongs to the flow-controlled data queue, like
+	 * IPv4 multicast. CMD_TX_DATA can reject valid bursts (observed after
+	 * six frames on F50 firmware); further IPv6 frames are rejected by FW
+	 * while the command worker considers them sent. Returning to the IP
+	 * filter preserves the dedicated DHCPv6/VoWiFi command handling.
+	 * Keep the SDIO workaround until its transport is validated separately.
+	 */
+	if (hif->hw_type == SPRD_HW_SC2355_PCIE)
+		return 1;
+
 	if (skb->data) {
 		memcpy(hif->skb_da, skb->data, ETH_ALEN);
 	} else {
@@ -934,7 +955,7 @@ static int tx_mc_pkt(struct sk_buff *skb, struct net_device *ndev)
 	}
 
 	if (tx_is_multicast_mac_addr(hif->skb_da) && vif->mode == SPRD_MODE_AP) {
-		pr_info
+		pr_debug
 		    ("%s,AP mode, multicast bssid: %02x:%02x:%02x:%02x:%02x:%02x\n",
 		     __func__, hif->skb_da[0], hif->skb_da[1], hif->skb_da[2],
 		     hif->skb_da[3], hif->skb_da[4], hif->skb_da[5]);
@@ -1055,6 +1076,17 @@ static int tx_filter_ip_pkt(struct sk_buff *skb, struct net_device *ndev)
 
 	/*as CP request, send data with CMD */
 	if (is_data2cmd) {
+		/* AP DNS is ordinary client traffic.  The board NVM can leave
+		 * special_data_flag outside its 0..2 enum (observed: 32); using
+		 * CMD_TX_DATA for every DNS reply can wedge the firmware command
+		 * queue and assert CP2.  Keep DHCP and VoWiFi on their paths.
+		 */
+		if ((vif->mode == SPRD_MODE_AP ||
+		     vif->mode == SPRD_MODE_P2P_GO) &&
+		    (is_ipv4_dns || is_ipv6_dns) &&
+		    !is_ipv4_dhcp && !is_ipv6_dhcp && !is_vowifi2cmd)
+			return 1;
+
 		if (is_ipv4_dhcp || is_ipv6_dhcp)
 			pr_info("dhcp,check:%x,skb->ip_summed:%d\n",
 				udphdr->check, skb->ip_summed);
@@ -1099,9 +1131,11 @@ static int tx_filter_ip_pkt(struct sk_buff *skb, struct net_device *ndev)
 
 void sc2355_free_cmd_buf(struct sprd_msg *msg, struct sprd_msg_list *list)
 {
-	spin_lock_bh(&list->complock);
+	unsigned long flags;
+
+	spin_lock_irqsave(&list->complock, flags);
 	list_del(&msg->list);
-	spin_unlock_bh(&list->complock);
+	spin_unlock_irqrestore(&list->complock, flags);
 	sprd_free_msg(msg, list);
 }
 
@@ -1840,7 +1874,7 @@ int sc2355_reset_self(struct sprd_priv *priv)
 	}
 
 	hif->drv_resetting = 1;
-	pr_info("enter %s\n", __func__);
+	pr_debug("enter %s\n", __func__);
 
 	list_for_each_entry_safe(vif, tmp, &priv->vif_list, vif_node) {
 		pr_info("%s handle vif : name %s, mode %d, sm_state %d\n", __func__,
@@ -1969,7 +2003,13 @@ void sc2355_tx_drop_tcp_msg(struct sprd_chip *chip, struct sprd_msg *msg)
 
 void sc2355_tx_down(struct tx_mgmt *tx_mgmt)
 {
+	/* the idle tx thread waits here: TASK_IDLE, not an uninterruptible wait, which counted it on the load
+	 * average all the time */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+	wait_for_completion_state(&tx_mgmt->tx_completed, TASK_IDLE);
+#else
 	wait_for_completion(&tx_mgmt->tx_completed);
+#endif
 }
 
 void sc2355_tx_up(struct tx_mgmt *tx_mgmt)
@@ -2012,6 +2052,7 @@ int sc2355_tx_init(struct sprd_hif *hif)
 	tx_mgmt->cmd_timeout = msecs_to_jiffies(SPRD_TX_CMD_TIMEOUT);
 	tx_mgmt->data_timeout = msecs_to_jiffies(SPRD_TX_DATA_TIMEOUT);
 	atomic_set(&tx_mgmt->flow0, 0);
+	atomic_set(&tx_mgmt->pcie_tx_waiting, 0);
 	atomic_set(&tx_mgmt->flow1, 0);
 	atomic_set(&tx_mgmt->flow2, 0);
 
@@ -2045,8 +2086,11 @@ int sc2355_tx_init(struct sprd_hif *hif)
 		goto err_txlist;
 	}
 
-	hif->tx_mgmt = (void *)tx_mgmt;
+	/* publish only once it is complete: the PCIe completion handlers run from the MSI and read it
+	 * with smp_load_acquire()
+	 */
 	tx_mgmt->hif = hif;
+	smp_store_release(&hif->tx_mgmt, (void *)tx_mgmt);
 
 	sprd_qos_reset_wmmac_parameters(tx_mgmt->hif->priv);
 	sprd_qos_reset_wmmac_ts_info(hif->priv);
@@ -2096,6 +2140,13 @@ void sc2355_tx_deinit(struct sprd_hif *hif)
 		kthread_stop(tx_mgmt->tx_thread);
 		tx_mgmt->tx_thread = NULL;
 	}
+
+	/* The completion handlers run from the MSI and may be walking these lists right now: unpublish the
+	 * context and wait for every handler already inside (interrupt context is an RCU read side) before
+	 * anything below frees it. They used to find it freed first and NULL only afterwards.
+	 */
+	WRITE_ONCE(hif->tx_mgmt, NULL);
+	synchronize_rcu();
 
 	/*need to check if there is some data and cmdpending
 	 *or sending by HIF, and wait until tx complete and freed
@@ -2228,6 +2279,12 @@ int sprd_tx_filter_packet(struct sk_buff *skb, struct net_device *ndev)
 #endif
 
 	if (ethhdr->h_proto == htons(ETH_P_ARP)) {
+		/* ARP replies from an AP must use the regular data queue.  Sending
+		 * them one by one through CMD_TX_DATA exhausts the command channel
+		 * under an ARP burst and can leave WCN stuck in carddump status.
+		 */
+		if (vif->mode == SPRD_MODE_AP || vif->mode == SPRD_MODE_P2P_GO)
+			return 1;
 		pr_info("incoming ARP packet\n");
 
 		spin_lock_bh(&adap_info.adap_lock);
@@ -2279,7 +2336,8 @@ int sprd_tx_special_data(struct sk_buff *skb, struct net_device *ndev)
 
 	if (skb->protocol == cpu_to_be16(ETH_P_PAE) ||
 		skb->protocol == cpu_to_be16(WAPI_TYPE)) {
-		pr_err("send %s frame by CMD_TX_DATA\n",
+		/* MU300 (#140): every EAPOL frame of a (re)association takes this path, by design */
+		pr_debug("send %s frame by CMD_TX_DATA\n",
 		skb->protocol == cpu_to_be16(ETH_P_PAE) ? "802.1X" : "WAI");
 		if (sprd_xmit_data2cmd_wq(skb, ndev) == -EAGAIN)
 			return NETDEV_TX_BUSY;
@@ -2305,8 +2363,6 @@ int sc2355_send_data(struct sprd_vif *vif, struct sprd_msg *msg,
 
 	hif = &vif->priv->hif;
 
-	buf = skb->data;
-
 	if (hif->hw_type == SPRD_HW_SC2355_PCIE) {
 		if (sc2355_pcie_hif_fill_msdu_dscr(vif, skb, SPRD_TYPE_DATA, offset))
 			return -EPERM;
@@ -2317,8 +2373,10 @@ int sc2355_send_data(struct sprd_vif *vif, struct sprd_msg *msg,
 
 	sprd_fill_msg(msg, skb, skb->data, skb->len);
 
+	/* Descriptor preparation may move skb->data on either transport. */
+	buf = skb->data + DSCR_LEN + offset;
 	if (hif->hw_type == SPRD_HW_SC2355_PCIE)
-		buf = skb->data + MSDU_DSCR_RSVD + DSCR_LEN;
+		buf += MSDU_DSCR_RSVD;
 
 	if (sc2355_tcp_ack_filter_send(vif->priv, msg, buf, plen))
 		return 0;

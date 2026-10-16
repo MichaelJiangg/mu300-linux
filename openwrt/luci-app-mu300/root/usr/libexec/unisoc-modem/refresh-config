@@ -1,0 +1,11 @@
+#!/usr/bin/ucode
+// Upgrade only the refresh policy; never reset platform or modem settings.
+import { cursor } from 'uci';
+const cfg = cursor();
+if (cfg.get('unisoc_modem', 'main') != 'core') exit(0);
+const value = cfg.get('unisoc_modem', 'main', 'home_refresh_interval');
+const n = +value;
+if (value == null || !(n >= 2 && n <= 60)) {
+	cfg.set('unisoc_modem', 'main', 'home_refresh_interval', '2');
+	cfg.commit('unisoc_modem');
+}

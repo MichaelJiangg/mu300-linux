@@ -8,9 +8,9 @@ filesystems instead of downloading them, or if you maintain the project. See [`.
 ```
 LK (slot b, tries=2) ─► custom 5.4 kernel + vendor_boot DTB
    └─► initramfs /init (boot/init)
-         ├─ load 86 modules in a fixed order (boot/module-order.txt)
+         ├─ load 85 modules in a fixed order (boot/module-order.txt)
          ├─ misc: restore slot a, unless the rootfs says default-boot=linux
-         ├─ bind USB gadget: NCM (usb0 up immediately) + ACM console
+         ├─ bind USB gadget: NCM, else ECM (usb0 up immediately) + ACM console; MU300_USBNET="rndis ncm" adds RNDIS first
          ├─ losetup -o 27762098176 /dev/mmcblk0 → ext4 "mu300root" (free space after userdata)
          └─ switch_root → systemd
                ├─ mu300-vendor   : Android modem_control in a chroot (disarms PM watchdog, boots modem)
@@ -25,6 +25,38 @@ Read [`FINDINGS.md`](FINDINGS.md) for the reasoning behind each step (LK slot ru
 USB dependency chain, the PM watchdog, the `modem_control` process-name check, macOS ECM link state, …).
 
 ## Build steps
+
+### Clean Linux 6.18 / 7.2 + OpenWrt TF Magisk packages
+
+The TF package is deliberately self-contained: it builds against the clean upstream branch, writes the OpenWrt
+rootfs to a card labelled `mu300sd`, writes Linux only to the slot opposite the running Android slot, and arms
+that slot without rebooting from inside Magisk. The installer formats the full selected TF partition as ext4;
+there is no 32 GiB limit. It does not repartition the card.
+If no valid TF filesystem is present at boot, the initramfs falls back to the existing internal `mu300root` rootfs.
+The TF rootfs includes the standalone `openwrt/luci-app-mu300` package by default. The package remains a separate
+LuCI application and can be built for other Unisoc OpenWrt systems; `MU300_LUCI_PLUGIN_SRC` can point to a different
+source checkout when testing a newer plugin version.
+The rootfs also includes the upstream Aurora LuCI theme (pinned APK and SHA256 in `openwrt/build-rootfs.sh`) and
+selects it by default. Bootstrap remains installed and can be selected later in LuCI. A fresh TF installation gets
+this default; an update that preserves `/etc/config` keeps the user's existing theme preference.
+
+```sh
+docker build -t mu300-mainline-build upstream
+docker volume create mu300-mainline
+docker run --rm -e KV=7.2.8 -e OUTDIR=out-7.2 \
+  -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build.sh
+docker run --rm -e KV=7.2.8 -e OUTDIR=out-7.2 \
+  -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build-modules.sh
+MU300_KERNEL=7.2 MU300_INPUTS=/path/to/private-build-inputs \
+  tools/build-openwrt-tf-magisk.sh mu300-linux-openwrt-tf-7.2.zip
+# Build 6.18 with upstream/build.sh and build-modules.sh (their defaults), then:
+MU300_KERNEL=6.18 MU300_INPUTS=/path/to/private-build-inputs \
+  tools/build-openwrt-tf-magisk.sh mu300-linux-openwrt-tf-6.18.zip
+```
+
+The private input directory contains the stock `dumps/boot_a.img`, `dumps/misc-head.bin`, Android-derived vendor
+files and the existing 5.4 device modules. They are consumed during the build but are not committed. During Magisk
+installation, proprietary modem/Wi-Fi firmware is copied from the running Android system into the TF rootfs.
 
 ### 1. Kernel
 One step, from the pinned public sources (kernel tree, realme Wi-Fi/Bluetooth/Mali modules) with all patches applied:
@@ -80,8 +112,8 @@ python3 boot/build-boot-image.py --stock-boot dumps/boot_a.img --misc-head dumps
 3. Assemble and deploy:
 ```sh
 cid=$(docker create mu300-ubuntu:24.04); docker export $cid > rootfs/base.tar; docker rm $cid
-tools/fetch-xray.sh       # xray + hev-socks5-tunnel, mu300-vpn's default engine (pinned, sha256-checked)
-tools/fetch-sing-box.sh   # sing-box engine for mu300-vpn (pinned release, sha256-checked)
+tools/fetch-xray.sh       # optional: xray + hev-socks5-tunnel, mu300-vpn's default engine (pinned, sha256-checked)
+tools/fetch-sing-box.sh   # optional: the sing-box engine for mu300-vpn (pinned release, sha256-checked)
 docker run --rm -v "$PWD/rootfs":/w -v "$PWD/out/modules":/kmods:ro -v "$PWD/out":/kout:ro \
   -v "$PWD/firmware":/firmware:ro -v "$PWD/android-subset":/android-subset:ro -v "$PWD/tools/logdw/logdw":/logdw:ro \
   -v "$PWD/tools/bt-init/mu300-bt-init":/bt-init:ro -v "$PWD/sing-box":/sing-box:ro -v "$PWD/xray":/xray:ro -v "$PWD/hev-socks5-tunnel":/hev-socks5-tunnel:ro mu300-ubuntu:24.04 bash /w/assemble.sh
@@ -89,28 +121,6 @@ docker run --rm -v "$PWD/rootfs":/w -v "$PWD/out/modules":/kmods:ro -v "$PWD/out
 Push `mu300-ubuntu-24.04-rootfs.tar.gz` to the device and extract it with `tools/android-mount-mu300root.sh`.
 `firmware/` holds `wcnmodem.bin`, `gnssmodem.bin` and `wifi_board_config*.ini` from the device's `/odm/firmware`, plus
 `bt_configure_pskey.ini` and `bt_configure_rf.ini` from `/vendor/etc`.
-
-The OpenWrt builder now refuses incomplete inputs before doing any package work and audits the assembled tree before
-creating the tarball. A normal device build requires the static BusyBox, `logdw`, `mu300-bt-init`, all three VPN
-engines, the WCN/WLAN/Bluetooth modules, modem firmware and the Android modem subset. `tools/make-release.sh` alone
-uses `MU300_GENERIC=1`, because published rootfs archives intentionally omit proprietary device files; `install.sh`
-adds a separately audited overlay pulled from the user's own device. Do not use `MU300_GENERIC=1` for a directly
-deployable local image.
-Each completed OpenWrt image also contains `/etc/mu300/build-manifest.sha256`, covering MU300 executables, kernel
-modules and LuCI assets so an installed system can be compared with the exact image contents later.
-
-For a self-contained TF-card installer that is flashed from Magisk while Android slot a is running:
-
-```sh
-MU300_INPUTS=work tools/build-openwrt-tf-magisk.sh mu300-linux-openwrt-tf.zip
-```
-
-The package formats the TF card as `mu300sd`, installs OpenWrt, imports the current device's proprietary vendor
-runtime, writes and verifies `boot_b`, then dynamically arms slot b. It deliberately refuses Android slot b because
-the current boot image's rollback block is defined as Linux-on-b / Android-on-a.
-
-The normal ADB installer has the same storage path: `./install.sh --tf` requires a usable TF card and refuses to
-fall back to the internal free-eMMC region. It can be combined with `--build` for a completely local build.
 
 ### 5. Boot Linux
 ```sh

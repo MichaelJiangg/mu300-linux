@@ -25,6 +25,39 @@ static struct device *dev;
 static struct cluster_info *pclusters;
 static unsigned long boot_done_timestamp;
 
+/* Verified UMS9620 SML boot ABI. This mutates CPU and SRAM tables, so never
+ * repeat DVFS_INIT, unload this driver, or expose a runtime voltage setter.
+ * See docs/cpu-voltage.zh-CN.md for firmware identity and recovery policy.
+ */
+static int voltage_offset_uv[3];
+static unsigned int voltage_offset_count;
+static bool firmware_initialized;
+module_param_array(voltage_offset_uv, int, &voltage_offset_count, 0444);
+MODULE_PARM_DESC(voltage_offset_uv, "Boot offsets for three domains in uV (-50000..25000, step 3125)");
+
+static int sprd_voltage_flag(u32 *flag)
+{
+	int i, uv;
+	u32 encoded;
+
+	if (voltage_offset_count && voltage_offset_count != 3)
+		return -EINVAL;
+	*flag &= 0xff;
+	for (i = 0; i < ARRAY_SIZE(voltage_offset_uv); i++) {
+		uv = voltage_offset_uv[i];
+		if (uv < -50000 || uv > 25000 || uv % 3125)
+			return -ERANGE;
+		if (uv && !of_machine_is_compatible("sprd,ums9620"))
+			return -EOPNOTSUPP;
+		/* Firmware: ceil(magnitude_mV * 1000 / 3125) selector steps. */
+		encoded = abs(uv) / 1000;
+		if (uv < 0)
+			encoded |= 0x80;
+		*flag |= encoded << (8 * (i + 1));
+	}
+	return 0;
+}
+
 /* cluster common interface */
 static struct cluster_info *sprd_cluster_info(u32 cpu_idx)
 {
@@ -514,6 +547,41 @@ static int sprd_cpufreq_offline(struct cpufreq_policy *policy)
 	return 0;
 }
 
+static ssize_t show_scaling_voltage_table(struct cpufreq_policy *policy, char *buf)
+{
+	struct cluster_info *cluster = policy->driver_data;
+	u64 freq, volt;
+	int i, ret, len = 0;
+
+	mutex_lock(&cluster->mutex);
+	for (i = 0; i < cluster->table_entry_num && len < PAGE_SIZE - 64; i++) {
+		ret = cluster->pair_get(cluster->id, i, &freq, &volt);
+		if (ret) { len = ret; break; }
+		len += sysfs_emit_at(buf, len, "%llu %llu\n", freq / 1000, volt);
+	}
+	mutex_unlock(&cluster->mutex);
+	return len;
+}
+cpufreq_freq_attr_ro(scaling_voltage_table);
+
+static ssize_t show_scaling_voltage_offset(struct cpufreq_policy *policy, char *buf)
+{
+	struct cluster_info *cluster = policy->driver_data;
+	return sysfs_emit(buf, "%d\n", cluster->id < 3 ? voltage_offset_uv[cluster->id] : 0);
+}
+cpufreq_freq_attr_ro(scaling_voltage_offset);
+
+static ssize_t show_scaling_voltage_domain(struct cpufreq_policy *policy, char *buf)
+{
+	struct cluster_info *cluster = policy->driver_data;
+	return sysfs_emit(buf, "%u\n", cluster->id);
+}
+cpufreq_freq_attr_ro(scaling_voltage_domain);
+
+static struct freq_attr *sprd_cpufreq_attr[] = {
+	&scaling_voltage_table, &scaling_voltage_offset, &scaling_voltage_domain, NULL,
+};
+
 static struct cpufreq_driver sprd_cpufreq_driver = {
 	.name = "sprd-cpufreq-v2",
 	.flags = CPUFREQ_NEED_INITIAL_FREQ_CHECK |
@@ -529,6 +597,7 @@ static struct cpufreq_driver sprd_cpufreq_driver = {
 	.online = sprd_cpufreq_online,
 	.offline = sprd_cpufreq_offline,
 	.register_em = cpufreq_register_em_with_opp,
+	.attr = sprd_cpufreq_attr,
 };
 
 /* init inerface */
@@ -775,6 +844,11 @@ static int sprd_cpufreq_probe(struct platform_device *pdev)
 	dev_info(dev, "%s: probe sprd cpufreq v2 driver\n", __func__);
 
 	flag = sprd_cpufreq_get_debug_flag();
+	ret = sprd_voltage_flag(&flag);
+	if (ret)
+		return ret;
+	if (firmware_initialized)
+		return -EBUSY;
 	if ((flag & 0xFF) == SPRD_DVFS_DEBUG_MAGIC) {
 		dev_info(dev, "%s: disable apcpu dvfs for debug!\n", __func__);
 		return 0;
@@ -792,6 +866,7 @@ static int sprd_cpufreq_probe(struct platform_device *pdev)
 		return ret;
 	}
 
+	firmware_initialized = true;
 	ret = pclusters->dvfs_init(flag);
 	if (ret) {
 		dev_err(dev, "%s: init dvfs device error\n", __func__);
@@ -917,6 +992,7 @@ static struct platform_driver sprd_cpufreq_platform_driver = {
 	.driver = {
 		.name = "sprd-cpufreq-v2",
 		.of_match_table = sprd_cpufreq_of_match,
+		.suppress_bind_attrs = true,
 	},
 	.probe = sprd_cpufreq_probe,
 };

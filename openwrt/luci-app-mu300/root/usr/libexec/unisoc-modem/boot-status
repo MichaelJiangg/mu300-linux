@@ -1,0 +1,24 @@
+#!/bin/sh
+# Local boot intent only: no AT, misc writes, cache or timer.
+boot_status() {
+    local state=android temporary=true writable=false dir helper runtime slot=b
+    dir=${BOOT_STATE_DIR:-/etc/mu300}
+    helper=${BOOT_CONTROL_HELPER:-/opt/mu300/bin/mu300-next-boot}
+    if [ -e "$dir/default-boot" ]; then
+        IFS= read -r state < "$dir/default-boot" || :
+    fi
+    case "$state" in
+        linux) temporary=false ;;
+        android) ;;
+        *) state=unknown; temporary=null ;;
+    esac
+    runtime=${BOOT_RUNTIME_DIR:-/run/mu300}
+    if [ -r "$runtime/linux-slot" ]; then IFS= read -r slot < "$runtime/linux-slot" || :; fi
+    if [ -x "$helper" ] && [ -s "$runtime/misc-bc-linux-trial.bin" ] && [ -s "$runtime/misc-bc-android.bin" ]; then
+        case "$slot" in a|b) writable=true ;; esac
+    elif [ -x "$helper" ] && [ "$slot" = b ] && [ -s "$runtime/misc-bc-slot-b-trial.bin" ] && [ -s "$runtime/misc-bc-slot-a.bin" ]; then
+        writable=true
+    fi
+    printf '{"default":"%s","temporary":%s,"can_set_default":%s}' "$state" "$temporary" "$writable"
+}
+[ "${BOOT_STATUS_LIBRARY:-0}" = 1 ] || boot_status

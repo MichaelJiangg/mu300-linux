@@ -708,20 +708,20 @@ unsigned char sc2355_find_lut_index(struct sprd_hif *hif, struct sprd_vif *vif)
 		for (i = 0; i < MAX_LUT_NUM; i++) {
 			if ((sc2355_is_group(hif->peer_entry[i].tx.da)) &&
 			    hif->peer_entry[i].ctx_id == vif->ctx_id) {
-				pr_info("%s, %d, group lut_index=%d\n",
+				pr_debug_ratelimited("%s, %d, group lut_index=%d\n",
 					__func__, __LINE__,
 					hif->peer_entry[i].lut_index);
 				return hif->peer_entry[i].lut_index;
 			}
 		}
 		if (vif->mode == SPRD_MODE_AP) {
-			pr_info("%s,AP mode, group bssid,\n"
+			pr_debug("%s,AP mode, group bssid,\n"
 				"lut not found, ctx_id:%d, return lut:4\n",
 				__func__, vif->ctx_id);
 			return 4;
 		}
 		if (vif->mode == SPRD_MODE_P2P_GO) {
-			pr_info("%s,GO mode, group bssid,\n"
+			pr_debug("%s,GO mode, group bssid,\n"
 				"lut not found, ctx_id:%d, return lut:5\n",
 				__func__, vif->ctx_id);
 			return 5;
@@ -751,21 +751,22 @@ unsigned char sc2355_find_lut_index(struct sprd_hif *hif, struct sprd_vif *vif)
 	}
 
 out:
+	/* MU300 (#140): a multicast/broadcast frame has no peer entry by design; the per-mode default is the answer, not an error */
 	if (vif->mode == SPRD_MODE_STATION ||
 		vif->mode == SPRD_MODE_STATION_SECOND ||
 		vif->mode == SPRD_MODE_P2P_CLIENT) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of STA/GC = 0,\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of STA/GC = 0,\n", __func__, vif->ctx_id);
 		return 0;
 	}
 	if (vif->mode == SPRD_MODE_AP) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of AP = 4\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of AP = 4\n", __func__, vif->ctx_id);
 		return 4;
 	}
 	if (vif->mode == SPRD_MODE_P2P_GO) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of GO = 5\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of GO = 5\n", __func__, vif->ctx_id);
 		return 5;
 	}
 	return 0;
@@ -778,7 +779,6 @@ int sc2355_hif_fill_msdu_dscr(struct sprd_vif *vif,
 	struct tx_msdu_dscr *dscr;
 	struct sprd_hif *hif;
 	u8 lut_index;
-	struct sk_buff *temp_skb;
 	unsigned char dscr_rsvd = 0;
 	struct ethhdr *ethhdr = (struct ethhdr *)skb->data;
 	u8 is_special_data = 0;
@@ -796,22 +796,23 @@ int sc2355_hif_fill_msdu_dscr(struct sprd_vif *vif,
 
 	hif = &vif->priv->hif;
 	dscr_rsvd = 0;
-	if (skb_headroom(skb) < (DSCR_LEN + hif->hif_offset +
+	/* Keep the skb object owned by the caller, including on allocation
+	 * failure. Replacing only this local pointer leaves its caller using
+	 * freed memory. Cloned headers must also become writable before push.
+	 */
+	if (skb_headroom(skb) < (DSCR_LEN + offset + hif->hif_offset +
+				 MSG_PTR_LEN + dscr_rsvd) || skb_header_cloned(skb)) {
+		if (skb_cow_head(skb, DSCR_LEN + offset + hif->hif_offset +
 				 MSG_PTR_LEN + dscr_rsvd)) {
-		temp_skb = skb;
-
-		skb = skb_realloc_headroom(skb, (DSCR_LEN + hif->hif_offset +
-						 MSG_PTR_LEN + dscr_rsvd));
-		kfree_skb(temp_skb);
-		if (!skb) {
-			pr_err("%s:%d failed to unshare skbuff: NULL\n",
-			       __func__, __LINE__);
-			return -EPERM;
+			pr_err_ratelimited("%s: failed to prepare skb headroom\n", __func__);
+			return -ENOMEM;
 		}
 #if defined(MORE_DEBUG)
 		hif->stats.tx_realloc++;
 #endif
 	}
+	/* skb_cow_head may have moved the data allocation. */
+	ethhdr = (struct ethhdr *)skb->data;
 
 	if (skb->data) {
 		memcpy(hif->skb_da, skb->data, ETH_ALEN);
@@ -819,7 +820,7 @@ int sc2355_hif_fill_msdu_dscr(struct sprd_vif *vif,
 
 	lut_index = sc2355_find_lut_index(hif, vif);
 	if (lut_index < 6 && (!sc2355_is_group(hif->skb_da))) {
-		pr_err("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
+		pr_debug_ratelimited("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
 		return -EPERM;
 	}
 	skb_push(skb, sizeof(struct tx_msdu_dscr) + offset + dscr_rsvd);
@@ -1003,7 +1004,7 @@ int sc2355_tx_cmd_pop_list(int channel, struct mbuf_t *head,
 	}
 
 	tx_mgmt->cmd_poped += num;
-	pr_info("tx_cmd_pop num: %d,cmd_poped=%d, cmd_send=%d\n",
+	pr_debug("tx_cmd_pop num: %d,cmd_poped=%d, cmd_send=%d\n",
 		num, tx_mgmt->cmd_poped, tx_mgmt->cmd_send);
 	sprdwcn_bus_list_free(channel, head, tail, num);
 

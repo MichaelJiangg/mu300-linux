@@ -1,0 +1,66 @@
+SC2355: do not export STA-wide statistics as AP per-client metrics
+
+--- a/common/cfg80211.c
++++ b/common/cfg80211.c
+@@ -720,6 +720,22 @@
+ 	return 0;
+ }
+ 
++/* AP peers are authoritative; GET_STATION firmware data is STA-wide. */
++static bool sprd_ap_peer(struct sprd_vif *vif, const u8 *mac)
++{
++	struct sprd_hif *hif = &vif->priv->hif;
++	int i;
++
++	if (!is_valid_ether_addr(mac) || ether_addr_equal(mac, vif->ndev->dev_addr))
++		return false;
++	for (i = 0; i < MAX_LUT_NUM; i++) {
++		if (READ_ONCE(hif->peer_entry[i].ctx_id) == vif->ctx_id &&
++		    ether_addr_equal(hif->peer_entry[i].tx.da, mac))
++			return true;
++	}
++	return false;
++}
++
+ int sprd_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev,
+ 			      const u8 *mac, struct station_info *sinfo)
+ {
+@@ -728,6 +744,15 @@
+ 	struct sprd_rate_info *tx_rate;
+ 	struct sprd_rate_info *rx_rate;
+ 	int ret;
++
++	/* GET_STATION has no addressed AP peer statistics in this firmware. */
++	if (vif->wdev.iftype == NL80211_IFTYPE_AP ||
++	    vif->wdev.iftype == NL80211_IFTYPE_P2P_GO) {
++		if (!sprd_ap_peer(vif, mac))
++			return -ENOENT;
++		sinfo->filled = 0;
++		return 0;
++	}
+ 
+ 	sinfo->filled |= BIT(NL80211_STA_INFO_TX_BYTES) |
+ 	    BIT(NL80211_STA_INFO_TX_PACKETS) |
+@@ -1583,7 +1608,7 @@
+ 	struct sprd_hif *hif = &vif->priv->hif;
+ 	int i, n = 0;
+ 
+-	if (vif->wdev.iftype != NL80211_IFTYPE_AP && vif->wdev.iftype != NL80211_IFTYPE_P2P_GO)
++	if (idx < 0 || (vif->wdev.iftype != NL80211_IFTYPE_AP && vif->wdev.iftype != NL80211_IFTYPE_P2P_GO))
+ 		return -ENOENT;
+ 	for (i = 0; i < MAX_LUT_NUM; i++) {
+ 		const u8 *da = hif->peer_entry[i].tx.da;
+@@ -1605,10 +1630,10 @@
+ static int sprd_cfg80211_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, unsigned int link_id,
+ 				     struct cfg80211_chan_def *chandef)
+ {
+-	if ((wdev->iftype != NL80211_IFTYPE_AP && wdev->iftype != NL80211_IFTYPE_P2P_GO) ||
+-	    !wdev->links[link_id].ap.chandef.chan)
++	if (link_id != 0 || (wdev->iftype != NL80211_IFTYPE_AP && wdev->iftype != NL80211_IFTYPE_P2P_GO) ||
++	    !wdev->links[0].ap.chandef.chan)
+ 		return -ENODATA;
+-	*chandef = wdev->links[link_id].ap.chandef;
++	*chandef = wdev->links[0].ap.chandef;
+ 	return 0;
+ }
+ #else

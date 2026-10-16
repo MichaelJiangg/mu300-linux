@@ -1,5 +1,0 @@
-# boot milestones for the boot timeline (/etc/mu300/boot-timeline.txt); see /opt/mu300/bin/boot-milestones.
-# It sends no AT commands and exits once DNS answers (or after its bounded budgets).
-( /opt/mu300/bin/boot-milestones ) >/dev/null 2>&1 &
-
-exit 0

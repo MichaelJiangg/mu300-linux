@@ -1,0 +1,134 @@
+#!/bin/sh
+# Three AW9523B indicators; no PMIC writes, periodic AT checks or blink worker.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+L=${MU300_LED_SYSFS_ROOT:-/sys/class/leds}
+R=${MU300_LED_RUN_DIR:-/run}
+[ -w "$L/v50:net1:white/brightness" ] || exit 0
+cfg() { uci -q get "system.mu300_leds.$1" 2>/dev/null; }
+level() {
+    case $1 in ''|*[!0-9]*) echo "$2" ;; *)
+        value=$1
+        while [ "${value#0}" != "$value" ]; do value=${value#0}; done
+        value=${value:-0}
+        if [ "${#value}" -le 3 ] && [ "$value" -le 255 ]; then echo "$value"; else echo "$2"; fi ;;
+    esac
+}
+lamp() {
+    local bank=$1 color=$2 intensity=$3 blink=${4:-0} node channel maximum value
+    for channel in red white blue; do
+        node=$L/v50:$bank:$channel
+        [ -w "$node/brightness" ] || continue
+        echo none > "$node/trigger" 2>/dev/null
+        value=0
+        if [ "$channel" = "$color" ]; then
+            maximum=$(cat "$node/max_brightness" 2>/dev/null)
+            maximum=$(level "$maximum" 80)
+            value=$(( (intensity * maximum + 127) / 255 ))
+        fi
+        echo "$value" > "$node/brightness"
+        if [ "$value" -gt 0 ] && [ "$blink" -gt 0 ] && grep -qw timer "$node/trigger"; then
+            echo timer > "$node/trigger"
+            echo "$blink" > "$node/delay_on"
+            echo "$blink" > "$node/delay_off"
+        fi
+    done
+}
+network() {
+    local slot=$1 state=$2 key=signal enabled brightness color=none blink=0
+    [ "$slot" = 0 ] || key=signal2
+    enabled=$(cfg "$key")
+    brightness=$(level "$(cfg "${key}_brightness")" 255)
+    [ "$enabled" != 0 ] || brightness=0
+    [ ! -f "$R/mu300/thermal-alarm" ] || state=thermal
+    case $state in
+        online-4g) color=blue ;;
+        online-5g) color=white ;;
+        offline) color=red ;;
+        boot|registering) color=white; blink=500 ;;
+        modem) color=blue; blink=500 ;;
+        thermal) color=red; blink=200 ;;
+    esac
+    lamp net$((slot+1)) "$color" "$brightness" "$blink"
+}
+save_network() {
+    local slot=$1 state=$2 old
+    old=$(cat "$R/led-status.sim$slot" 2>/dev/null)
+    [ "$old" != "$state" ] || return 0
+    printf '%s\n' "$state" > "$R/led-status.sim$slot"
+    network "$slot" "$state"
+}
+wifi() {
+    local state=$(cat "$R/led-status.wifi" 2>/dev/null) color=none freq
+    if [ "$state" = on ] && [ "$(cfg wifi)" != 0 ]; then
+        freq=${MU300_LED_WIFI_FREQ:-$(ubus -t 2 call hostapd.wlan0 get_status 2>/dev/null | jsonfilter -e '@.freq')}
+        case $freq in 2[0-9][0-9][0-9]) color=blue ;; *) color=white ;; esac
+    fi
+    lamp wifi "$color" "$(level "$(cfg wifi_brightness)" 127)"
+}
+registration() {
+    local slot=$1 line=$2 query=${3:-0} value stat act state IFS=,
+    case $slot in 0|1) ;; *) return 1 ;; esac
+    case $line in '+CEREG:'*) ;; *) return 0 ;; esac
+    value=$(printf '%s' "${line#*:}" | tr -d ' \r"')
+    set -f
+    set -- $value
+    [ "$query" != 1 ] || { [ "$#" -gt 0 ] && shift; }
+    stat=${1:-}; act=
+    # Only full responses carry AcT. A short registration event preserves the
+    # previous radio generation until a full response is available.
+    [ "$#" -lt 4 ] || act=$4
+    case $stat in
+        1|5)
+            state=online-4g
+            case $act in 11|12|13|15) state=online-5g ;;
+                '') [ "$(cat "$R/led-status.sim$slot" 2>/dev/null)" != online-5g ] || state=online-5g ;;
+            esac ;;
+        0|2|3|4|6|7|8|9|10)
+            state=offline
+            [ "$(cat "$R/led-status.sim$slot" 2>/dev/null)" != absent ] || state=absent ;;
+        *) return 0 ;;
+    esac
+    save_network "$slot" "$state"
+}
+case ${1:-} in
+    current) cat "$R/led-status.state" 2>/dev/null || echo boot ;;
+    wifi-on|wifi-off)
+        [ "$1" = wifi-on ] && state=on || state=off
+        echo "$state" > "$R/led-status.wifi"; wifi ;;
+    refresh)
+        for slot in 0 1; do network "$slot" "$(cat "$R/led-status.sim$slot" 2>/dev/null || echo absent)"; done
+        wifi ;;
+    sim-status) registration "$2" "$3" "${4:-0}" ;;
+    sim-presence)
+        case ${2:-} in 0|1) ;; *) exit 2 ;; esac
+        case ${3:-} in
+            absent) save_network "$2" absent ;;
+            present)
+                old=$(cat "$R/led-status.sim$2" 2>/dev/null)
+                case $old in absent|'') save_network "$2" registering ;; esac ;;
+            *) exit 2 ;;
+        esac ;;
+    sync)
+        for slot in 0 1; do
+            dir=/run/mu300-at; [ "$slot" != 1 ] || dir=/run/mu300-at4
+            out=$(MU300_AT_DIR=$dir mu300-at -t 3 "AT+SPACTCARD=$slot;+CPIN?" 2>/dev/null)
+            if printf '%s' "$out" | grep -q '+CME ERROR: 10'; then
+                save_network "$slot" absent
+            else
+                out=$(MU300_AT_DIR=$dir mu300-at -t 3 "AT+SPACTCARD=$slot;+CEREG?" 2>/dev/null | sed -n '/^+CEREG:/p' | head -n1)
+                registration "$slot" "$out" 1
+            fi
+        done ;;
+    boot|modem|registering)
+        echo "$1" > "$R/led-status.state"
+        for slot in 0 1; do echo "$1" > "$R/led-status.sim$slot"; network "$slot" "$1"; done ;;
+    thermal) for slot in 0 1; do network "$slot" thermal; done ;;
+    online-4g|online-5g|offline)
+        echo "$1" > "$R/led-status.state"
+        slot=$(cat "$R/mu300-data-sim-actual" 2>/dev/null)
+        case $slot in 0|1) ;; *) slot=$(uci -q get unisoc_modem.main.data_sim);; esac
+        [ "$slot" = 1 ] || slot=0
+        [ "$1" != offline ] || [ "$(cat "$R/led-status.sim$slot" 2>/dev/null)" != absent ] || exit 0
+        echo "$1" > "$R/led-status.sim$slot"; network "$slot" "$1" ;;
+    *) exit 2 ;;
+esac

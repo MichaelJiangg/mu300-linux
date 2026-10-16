@@ -10,20 +10,88 @@
 #   mu300-sms sync               pull everything AT+CMGL lists into the pool
 # All AT traffic goes through mu300-atd (via mu300-at); the AT channel is never opened here.
 set -u
+umask 077
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 
-POOL=${MU300_SMS_POOL:-/var/lib/mu300/sms}
+POOL=${MU300_SMS_POOL:-/etc/mu300/sms}
 MSGDIR=$POOL/msg
 ATDIR=${MU300_AT_DIR:-/run/mu300-at}
 PAGE=${MU300_SMS_PAGE:-10}
+PDU_AWK=${MU300_SMS_PDU_AWK:-/opt/mu300/lib/sms-pdu.awk}
+DIRECT_FLAG=${MU300_SMS_DIRECT_FLAG:-/run/mu300-sms-direct}
+OPLOCK=${MU300_SMS_OP_LOCK:-/tmp/mu300-sms-op.lock}
 
 die() { echo "mu300-sms: $*" >&2; exit 1; }
 
 at() {  # at CMD [timeout] -> reply lines
-    mu300-at -t "${2:-6}" "$1"
+    local cmd=$1
+    case ${MU300_SIM_SLOT:-} in
+        0|1) case "$cmd" in AT*) cmd="AT+SPACTCARD=$MU300_SIM_SLOT;${cmd#AT}" ;; esac ;;
+        '') ;; *) return 1 ;;
+    esac
+    mu300-at -t "${2:-6}" "$cmd"
 }
 
 # ------------------------------------------------------------------ the pool
+sms_clock_cs() {
+    read -r sms_up sms_rest < /proc/uptime
+    sms_frac=${sms_up#*.}
+    sms_now=$(( ${sms_up%.*} * 100 + 1$sms_frac - 100 ))
+}
+at_unlock() {
+    if [ "$(cat "$ATDIR/lock/pid" 2>/dev/null)" = "$$" ]; then
+        rm -f "$ATDIR/lock/pid"
+        rmdir "$ATDIR/lock" 2>/dev/null || true
+    fi
+    unset MU300_AT_LOCK_HELD
+}
+at_lock() {
+    local wait=${MU300_AT_LOCK_WAIT:-12} owner end
+    trap 'at_unlock; sms_op_unlock' EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    case $wait in ''|*[!0-9]*) die "invalid AT lock wait" ;; esac
+    [ ${#wait} -le 3 ] || die "invalid AT lock wait"
+    while [ "${wait#0}" != "$wait" ]; do wait=${wait#0}; done
+    wait=${wait:-0}
+    sms_clock_cs; end=$((sms_now + wait * 100))
+    while ! mkdir "$ATDIR/lock" 2>/dev/null; do
+        owner=$(cat "$ATDIR/lock/pid" 2>/dev/null || true)
+        if [ -n "$owner" ] && ! kill -0 "$owner" 2>/dev/null; then
+            rm -f "$ATDIR/lock/pid"
+            rmdir "$ATDIR/lock" 2>/dev/null || true
+        fi
+        [ -d "$ATDIR/lock" ] || continue
+        sms_clock_cs
+        [ "$sms_now" -lt "$end" ] || die "mu300-at: busy"
+        sleep 0.1 2>/dev/null || sleep 1
+    done
+    echo $$ > "$ATDIR/lock/pid" || die "cannot claim AT lock"
+    export MU300_AT_LOCK_HELD=$$
+}
+
+# PR #177: preserve the modem's SMSC and its current CSCS representation.
+# Refresh failures are diagnostic only: never block the actual submission.
+smsc_refresh() {
+    local reply line addr type written
+    reply=$(at 'AT+CSCA?' 8 2>/dev/null) || {
+        echo 'mu300-sms: SMSC query failed; sending without refresh' >&2; return 0;
+    }
+    line=$(printf '%s\n' "$reply" | tr -d '\r' | sed -n 's/^+CSCA: *//p' | head -n1)
+    addr=; type=
+    case $line in
+        '"'*'",'[0-9]*) addr=${line%,*}; addr=${addr#\"}; addr=${addr%\"}; type=${line##*,} ;;
+    esac
+    case $addr in ''|*[!+0-9A-Fa-f]*) addr= ;; esac
+    case $type in [0-9]|[0-9][0-9]|[0-9][0-9][0-9]) ;; *) addr= ;; esac
+    if [ -z "$addr" ] || [ ${#addr} -gt 64 ]; then
+        echo 'mu300-sms: invalid SMSC reply; sending without refresh' >&2; return 0
+    fi
+    written=$(at "AT+CSCA=\"$addr\",$type" 8 2>/dev/null)
+    case $written in *OK*) ;; *) echo 'mu300-sms: SMSC refresh refused; continuing send' >&2 ;; esac
+    return 0
+}
+
 # One file per message: "field: value" headers, a blank line, then the body verbatim to EOF
 # (bodies span lines). Everything the pool writes goes through name.part + mv so a reader never
 # sees a half-written message; the pool lock keeps two writers from sharing an id.
@@ -50,7 +118,36 @@ pool_lock() {
     echo $$ > "$lock/pid"
 }
 
+# Do not install an EXIT trap for this lock: ash/dash also run it when a
+# command-substitution subshell exits, silently unlocking the live writer.
+# A killed writer leaves a PID-marked lock that pool_lock safely reclaims.
 pool_unlock() { rm -rf "$POOL/.lock" 2>/dev/null || true; }
+
+# A SIM slot can be reused between CMGR and CMGD. Serialize the script's SIM
+# readers/deleters and mode changes, including a concurrent LuCI manual sync.
+sms_op_lock() {
+    local owner n=0
+    while ! mkdir "$OPLOCK" 2>/dev/null; do
+        owner=$(cat "$OPLOCK/pid" 2>/dev/null || true)
+        if [ -n "$owner" ] && [ -d "/proc/$owner" ] &&
+           tr '\0' ' ' < "/proc/$owner/cmdline" 2>/dev/null | grep -q mu300-sms; then
+            n=$((n + 1))
+            [ "$n" -ge 30 ] && die "SMS operation is busy"
+            sleep 1
+        else
+            rm -f "$OPLOCK/pid"
+            rmdir "$OPLOCK" 2>/dev/null || die "stale SMS operation lock could not be removed"
+        fi
+    done
+    echo $$ > "$OPLOCK/pid"
+}
+sms_op_unlock() {
+    if [ "$(cat "$OPLOCK/pid" 2>/dev/null)" = "$$" ]; then
+        rm -f "$OPLOCK/pid"
+        rmdir "$OPLOCK" 2>/dev/null || true
+    fi
+    return 0
+}
 
 hdr() {  # hdr FILE field (headers only: the body may legitimately repeat any "field: " line)
     sed -n "1,/^$/s/^$2: //p" "$1" 2>/dev/null | head -1
@@ -72,13 +169,13 @@ fingerprint() {
 next_id() {
     local id
     id=$(($(cat "$POOL/next_id" 2>/dev/null || echo 0) + 1))
-    echo "$id" > "$POOL/next_id"
+    echo "$id" > "$POOL/next_id" || return 1
     printf '%06d' "$id"
 }
 
-store_msg() {  # store_msg dir status peer scts sim_index coding body -> id on stdout
+store_msg() {  # store_msg dir status peer scts sim_index coding body [fingerprint ref total part source]
     local dir=$1 status=$2 peer=$3 scts=$4 simidx=$5 coding=$6 text=$7 id f part
-    id=$(next_id)
+    id=$(next_id) || return 1
     f=$MSGDIR/$id
     part=$f.part
     {
@@ -88,14 +185,19 @@ store_msg() {  # store_msg dir status peer scts sim_index coding body -> id on s
         if [ "$dir" = mt ]; then printf 'from: %s\n' "$peer"; else printf 'to: %s\n' "$peer"; fi
         printf 'scts: %s\n' "$scts"
         printf 'received: %s\n' "$(date +%s)"
+        printf 'source: %s\n' "${12:-sim}"
         printf 'sim_index: %s\n' "$simidx"
         printf 'coding: %s\n' "$coding"
-        printf 'fingerprint: %s\n' "$(fingerprint "$peer" "$scts" "$text")"
+        printf 'fingerprint: %s\n' "${8:-$(fingerprint "$peer" "$scts" "$text")}"
+        [ -n "${9:-}" ] && printf 'multipart_ref: %s\n' "$9"
+        [ -n "${10:-}" ] && printf 'multipart_total: %s\n' "${10}"
+        [ -n "${11:-}" ] && printf 'multipart_part: %s\n' "${11}"
+        [ -n "${13:-}" ] && printf 'multipart_hashes: %s\n' "${13}"
         printf 'length: %s\n' "$(printf '%s' "$text" | wc -c | tr -d ' ')"
         printf '\n'
         printf '%s\n' "$text"
-    } > "$part"
-    mv "$part" "$f"
+    } > "$part" || return 1
+    mv "$part" "$f" || return 1
     echo "$id"
 }
 
@@ -266,11 +368,15 @@ parse_cmgr() {  # parse_cmgr INDEX
 }
 
 select_storage() {
-    local s reply line used total best= cache=/run/mu300-sms-store
+    local s reply line used total best= cache=${MU300_SMS_STORE_CACHE:-/run/mu300-sms-store}
     if [ -s "$cache" ]; then
         s=$(cat "$cache" 2>/dev/null)
         case $s in SM|MT|ME)
-            at "AT+CPMS=\"$s\"" 6 >/dev/null 2>&1 && { echo "$s"; return 0; }
+            reply=$(at "AT+CPMS=\"$s\"" 6 2>/dev/null) && {
+                record_storage "$s" "$reply"
+                echo "$s"
+                return 0
+            }
             ;;
         esac
         rm -f "$cache"
@@ -286,15 +392,32 @@ select_storage() {
         case "$used:$total" in *[!0-9:]*|:*) continue ;; esac
         if [ "$used" -gt 0 ]; then
             echo "$s" > "$cache"
+            record_storage "$s" "$reply"
             echo "$s"
             return 0
         fi
         [ "$total" -gt 0 ] && [ -z "$best" ] && best=$s
     done
     [ -n "$best" ] || best=ME
-    at "AT+CPMS=\"$best\"" 6 >/dev/null || return 1
+    reply=$(at "AT+CPMS=\"$best\"" 6) || return 1
     echo "$best" > "$cache"
+    record_storage "$best" "$reply"
     echo "$best"
+}
+
+# The daemon syncs periodically; expose its last CPMS reading to the UI without
+# adding another AT consumer to the five-second page refresh. Never infer free
+# capacity from the local pool size (it can contain messages no longer on SIM).
+record_storage() {
+    local store=$1 reply=$2 line used total part
+    line=$(printf '%s\n' "$reply" | grep '^+CPMS:' | head -1)
+    used=$(printf '%s\n' "$line" | awk -F'[,:]' '{gsub(/ /,"",$2); print $2}')
+    total=$(printf '%s\n' "$line" | awk -F'[,:]' '{gsub(/ /,"",$3); print $3}')
+    case "$used:$total" in *[!0-9:]*|:*|*:) return 0 ;; esac
+    [ "$total" -gt 0 ] || return 0
+    part=$POOL/storage.part.$$
+    printf '%s %s %s %s\n' "$store" "$used" "$total" "$(date +%s)" > "$part" &&
+        mv "$part" "$POOL/storage"
 }
 
 # List the SIM as TSV records, by whichever door this firmware opens. The measured cases:
@@ -339,31 +462,22 @@ sim_list() {
 
 # ------------------------------------------------------------------ commands
 cmd_sync() {
+    # Direct delivery is PDU-only. The legacy text-mode reader would leave
+    # CMGF=1 behind and turn the next +CMT into an undecodable body. PDU
+    # archival both imports and frees the exceptional SIM-resident messages.
+    if [ -f "$DIRECT_FLAG" ]; then
+        cmd_archive_sim
+        return $?
+    fi
+    sms_op_lock
     pool_init
     local reply tmp new=0 total=0
     tmp=$(mktemp "${TMPDIR:-/tmp}/mu300-sms.XXXXXX") || die mktemp
     sim_list > "$tmp" || { rm -f "$tmp"; die "cannot list the SIM storage"; }
-    # Concatenated SMS arrive as one SIM record per part; text mode hides the UDH,
-    # but every part of one message carries the same sender and the same SCTS.
-    # Fold parts (CMGL lists them in index order) into one record per (oa,scts).
-    # The odd genuinely-separate same-second pair from one sender folds too - the
-    # same tradeoff the fingerprint dedupe below already makes.
-    local merged
-    merged=$(mktemp "${TMPDIR:-/tmp}/mu300-sms.XXXXXX")
-    LC_ALL=C awk -F'\t' '
-        NF >= 5 {
-            key = $3 "|" $4
-            b = $5; for (i = 6; i <= NF; i++) b = b "\t" $i   # keep tabs inside the body
-            # parts join seamlessly: for UCS2 that is plain hex concatenation (a
-            # separator would break the all-hex test downstream), for GSM text
-            # it is the correct continuation of the message
-            if (key in body) { body[key] = body[key] b; next }
-            body[key] = b; stat[key] = $2; idx[key] = $1; order[++n] = key
-        }
-        END { for (i = 1; i <= n; i++) { k = order[i]; split(k, a, "|"); print idx[k] "\t" stat[k] "\t" a[1] "\t" a[2] "\t" body[k] } }
-    ' "$tmp" > "$merged" && mv "$merged" "$tmp"
+    # Text mode has no UDH: never guess concatenation from sender/timestamp
+    # or SIM index ordering. The daemon prefers archive-sim (PDU), which uses
+    # the same reliable multipart importer as live direct delivery.
     pool_lock
-    trap pool_unlock EXIT INT TERM
     # fingerprints of what the pool already holds, so a sync is idempotent and the SIM index of
     # a still-present message stays current (indexes shift whenever anything deletes from the SIM)
     local fpfile idx stat oa scts body f fpid
@@ -410,7 +524,211 @@ cmd_sync() {
     rm -f "$tmp" "$fpfile"
     echo "sync: $new new, $total on the SIM, $(ids_newest_first | wc -l | tr -d ' ') in the pool"
     pool_unlock
-    trap - EXIT INT TERM
+    sms_op_unlock
+}
+
+# Gregorian UTC seconds from the decoder's SCTS (portable, no date -d or mktime).
+sms_timestamp() {
+    LC_ALL=C awk -v s="$1" 'BEGIN {
+        y=substr(s,1,4)+0; m=substr(s,6,2)+0; d=substr(s,9,2)+0;
+        if(y<1970 || m<1 || m>12 || d<1 || d>31)exit 1;
+        for(a=1970;a<y;a++)days+=365+(a%4==0 && (a%100!=0 || a%400==0));
+        split("31 28 31 30 31 30 31 31 30 31 30 31",months," ");
+        months[2]+=(y%4==0 && (y%100!=0 || y%400==0));
+        for(a=1;a<m;a++)days+=months[a];
+        v=((days+d-1)*24+substr(s,12,2))*3600+substr(s,15,2)*60+substr(s,18,2);
+        zone=substr(s,21,2)*3600+substr(s,24,2)*60;
+        printf "%.0f\n",v+(substr(s,20,1)=="-"?zone:-zone);
+    }'
+}
+
+# Called with the pool lock held, using the importer's decoded variables.
+# Pending parts are durable but NOT visible messages and do not consume IDs;
+# the forwarding cursor therefore never sees half a message. No polling loop.
+import_multipart() {
+    local key epoch group= candidate count=0 delta oldepoch saved= p joined= hashes= finalhash id= finalsource=direct
+    case "$ref:$total:$part" in *[!0-9:]*|:*|*:) return 1 ;; esac
+    [ "$total" -le 255 ] && [ "$part" -ge 1 ] && [ "$part" -le "$total" ] || return 1
+    epoch=$(sms_timestamp "$scts") || return 1
+    key=$(printf '%s|%s|%s|%s' "$peer" "$ref" "$total" "$scheme" | md5sum | cut -d' ' -f1)
+    mkdir -p "$POOL/multipart" || return 1
+    for candidate in "$POOL/multipart/$key".*; do
+        [ -d "$candidate" ] || continue
+        oldepoch=$(cat "$candidate/epoch" 2>/dev/null) || continue
+        case $oldepoch in ''|*[!0-9]*) continue ;; esac
+        delta=$((epoch - oldepoch)); [ "$delta" -lt 0 ] && delta=$((-delta))
+        [ "$delta" -le 600 ] || continue
+        if [ -f "$candidate/$part" ]; then
+            [ "$(hdr "$candidate/$part" fingerprint)" = "$hash" ] || continue
+            group=$candidate; saved=1; break
+        fi
+        count=$((count + 1)); group=$candidate
+    done
+    # Reused references with indistinguishable competing groups cannot be
+    # guessed safely. Keep the original spool/SIM PDU and do not acknowledge it.
+    [ -n "$saved" ] || [ "$count" -le 1 ] || return 1
+    if [ -z "$group" ]; then
+        group=$POOL/multipart/$key.$hash
+        mkdir -p "$group" || return 1
+        printf '%s\n' "$epoch" > "$group/epoch" || return 1
+    fi
+    if [ -z "$saved" ]; then
+        {
+            printf 'fingerprint: %s\nscts: %s\nsource: %s\npdu: %s\n\n%s\n' "$hash" "$scts" "$source" "$pdu" "$body"
+        } > "$group/$part.part" && mv "$group/$part.part" "$group/$part" || return 1
+    fi
+    sync "$group/$part" "$group" "$POOL/multipart" 2>/dev/null || sync
+    p=1
+    while [ "$p" -le "$total" ]; do
+        [ -f "$group/$p" ] || { echo "multipart SMS: saved part $part/$total"; return 0; }
+        hashes="$hashes $(hdr "$group/$p" fingerprint)"
+        joined="$joined$(body_of "$group/$p")"
+        [ "$(hdr "$group/$p" source)" = direct ] || finalsource=sim
+        p=$((p + 1))
+    done
+    finalhash=$(printf '%s' "$hashes" | md5sum | cut -d' ' -f1)
+    for candidate in "$MSGDIR"/[0-9]*; do
+        [ -f "$candidate" ] || continue
+        [ "$(hdr "$candidate" fingerprint)" = "$finalhash" ] && { id=${candidate##*/}; break; }
+    done
+    if [ -z "$id" ]; then
+        id=$(store_msg mt unread "$peer" "$(hdr "$group/1" scts)" "" pdu "$joined" "$finalhash" "$ref" "$total" 1 "$finalsource" "$hashes") || return 1
+    fi
+    sync "$MSGDIR/$id" "$MSGDIR" "$POOL/next_id" "$POOL" 2>/dev/null || sync
+    # Clean only this validated group; complete-message hashes retain dedupe.
+    for candidate in "$group"/[0-9]* "$group/epoch"; do
+        [ ! -f "$candidate" ] || rm -f "$candidate" || return 1
+    done
+    rmdir "$group" || return 1
+    echo "new multipart SMS: $id from $peer ($total parts)"
+}
+
+# Called by mu300-smsd for a PDU that atd has already persisted from +CMT.
+# Idempotent: a network retry with the same PDU must not duplicate the inbox.
+# The modem is acknowledged only *after* this command returns successfully.
+cmd_import_pdu() {
+    local file=${1:-} pdu decoded idx peer scts ref total part body hash text_hash f known= newid= coding=pdu
+    local source=${2:-direct} scheme=
+    case $source in direct|sim) ;; *) die "invalid SMS source" ;; esac
+    [ -f "$file" ] || die "direct SMS spool file is missing"
+    IFS= read -r pdu < "$file" || die "direct SMS spool file is empty"
+    case $pdu in ''|*[!0123456789abcdefABCDEF]*) die "invalid direct SMS PDU" ;; esac
+    [ $(( ${#pdu} % 2 )) = 0 ] || die "odd-length direct SMS PDU"
+    [ -r "$PDU_AWK" ] || die "SMS PDU decoder is missing"
+    # The decoder emits UTF-8 bytes with %c; force byte-oriented awk even on
+    # systems whose default locale treats %c values as Unicode code points.
+    decoded=$(printf '0\t%s\n' "$pdu" | LC_ALL=C awk -F '\t' -v mode=decode -v metadata=1 -f "$PDU_AWK") || decoded=
+    if [ -n "$decoded" ]; then
+        # Tabs are IFS whitespace: read collapses an empty reference field
+        # on single-part messages and shifts the body into multipart_part.
+        # A non-whitespace separator preserves every optional field.
+        IFS="$(printf '\001')" read -r idx peer scts ref total part body scheme <<EOF
+$(printf '%s' "$decoded" | tr '\t' '\001')
+EOF
+    fi
+    if [ -z "${peer:-}" ] || [ -z "${scts:-}" ]; then
+        # An unsupported SMS class/encoding must not pin the SIM forever.
+        # Keep the complete PDU in a visible local record for later decoding.
+        peer=unknown
+        scts=$(date '+%y/%m/%d,%H:%M:%S')
+        body="Undecoded SMS PDU: $pdu"
+        ref= total= part=
+        coding=raw-pdu
+    fi
+    hash=$(printf '%s' "$pdu" | md5sum | cut -d' ' -f1)
+    text_hash=$(fingerprint "$peer" "$scts" "$body")
+    pool_init
+    pool_lock
+    grep -qxF "$hash" "$POOL/deleted" 2>/dev/null && { pool_unlock; return 0; }
+    for f in "$MSGDIR"/[0-9]*; do
+        [ -f "$f" ] || continue
+        case " $(hdr "$f" multipart_hashes) " in *" $hash "*) known=$f; break ;; esac
+        case $(hdr "$f" fingerprint) in
+            "$hash") known=$f; break ;;
+            "$text_hash") [ "${total:-1}" -le 1 ] && { known=$f; break; } ;;
+        esac
+    done
+    if [ -z "$known" ] && [ "${total:-1}" -gt 1 ]; then
+        import_multipart || { pool_unlock; die "could not safely assemble multipart SMS"; }
+        pool_unlock
+        return 0
+    fi
+    if [ -z "$known" ]; then
+        newid=$(store_msg mt unread "$peer" "$scts" "" "$coding" "$body" "$hash" "$ref" "$total" "$part" "$source") ||
+            die "could not save direct SMS"
+        echo "new direct SMS: $newid from $peer"
+    else
+        echo "direct SMS already saved: ${known##*/}"
+    fi
+    if [ -n "$newid" ]; then
+        sync "$MSGDIR/$newid" "$MSGDIR" "$POOL/next_id" "$POOL" 2>/dev/null || sync
+    fi
+    pool_unlock
+}
+
+# Some SMS classes are SIM-resident even with CNMI direct routing. Copy each
+# original PDU to persistent storage, import it into the local pool and read it
+# back before deleting *that exact slot*. A failed step keeps the SIM original.
+# Never issue CMGD=1,4 (wipe all): indices can move as messages arrive/delete.
+cmd_archive_sim() {
+    sms_op_lock
+    pool_init
+    local reply tmp sorted idx stat pdu check hash archive part count=0 planned used
+    reply=$(at 'AT+CPMS="SM"' 6) || die "cannot select SIM storage"
+    printf '%s\n' "$reply" | grep -q '^OK' || die "SIM storage was refused"
+    used=$(printf '%s\n' "$reply" | awk -F'[,:]' '/^\+CPMS:/ { gsub(/ /,"",$2); print $2; exit }')
+    case $used in ''|*[!0-9]*) die "SIM capacity response was invalid" ;; esac
+    record_storage SM "$reply"
+    if [ "$used" -eq 0 ]; then
+        echo "SIM archive: no stored messages"
+        sms_op_unlock
+        return 0
+    fi
+    reply=$(at 'AT+CMGF=0' 6) || die "cannot select PDU mode"
+    printf '%s\n' "$reply" | grep -q '^OK' || die "PDU mode was refused"
+    reply=$(at 'AT+CMGL=4' 20) || die "cannot list SIM PDUs"
+    printf '%s\n' "$reply" | grep -q '^OK' || die "SIM PDU listing was incomplete"
+    tmp=$(mktemp "${TMPDIR:-/tmp}/mu300-sms.XXXXXX") || die mktemp
+    sorted=$(mktemp "${TMPDIR:-/tmp}/mu300-sms.XXXXXX") || { rm -f "$tmp"; die mktemp; }
+    printf '%s\n' "$reply" | awk '
+        /^\+CMGL: *[0-9]+,[0-3],/ {
+            h=$0; sub(/^\+CMGL: */, "", h)
+            split(h, a, ","); idx=a[1]; stat=a[2]; next
+        }
+        /^[0-9A-Fa-f]+$/ { if (idx != "") { print idx "\t" stat "\t" $0; idx="" } }
+    ' > "$tmp"
+    sort -rn "$tmp" > "$sorted"
+    planned=$(wc -l < "$sorted" | tr -d ' ')
+    [ "$planned" -ge "$used" ] || { rm -f "$tmp" "$sorted"; die "SIM listing omitted stored messages; nothing deleted"; }
+    mkdir -p "$POOL/archive"
+    while IFS="$(printf '\t')" read -r idx stat pdu; do
+        [ -n "$idx" ] || continue
+        case $pdu in ''|*[!0123456789abcdefABCDEF]*) break ;; esac
+        [ $(( ${#pdu} % 2 )) = 0 ] || break
+        # Re-read the slot just before deletion; a concurrent arrival or user
+        # action must not turn an old listing into deletion of another message.
+        reply=$(at "AT+CMGR=$idx" 6) || break
+        check=$(printf '%s\n' "$reply" | awk '/^\+CMGR:/ { seen=1; next } seen && /^[0-9A-Fa-f]+$/ { print; exit }')
+        [ "$check" = "$pdu" ] || break
+        hash=$(printf '%s' "$pdu" | md5sum | cut -d' ' -f1)
+        archive=$POOL/archive/$hash.pdu
+        if [ ! -f "$archive" ]; then
+            part=$archive.part.$$
+            printf '%s\n' "$pdu" > "$part" && mv "$part" "$archive" || break
+        fi
+        [ "$(cat "$archive" 2>/dev/null)" = "$pdu" ] || break
+        sync "$archive" "$POOL/archive" 2>/dev/null || sync
+        case $stat in 0|1) "$0" import-pdu "$archive" sim || break ;; esac
+        reply=$(at "AT+CMGD=$idx" 6) || break
+        printf '%s\n' "$reply" | grep -q '^OK' || break
+        count=$((count + 1))
+    done < "$sorted"
+    rm -f "$tmp" "$sorted"
+    reply=$(at 'AT+CPMS="SM"' 6 2>/dev/null || true)
+    record_storage SM "$reply"
+    echo "SIM archive: $count slot(s) freed; original PDUs retained in $POOL/archive"
+    sms_op_unlock
+    [ "$count" -eq "$planned" ] || return 1
 }
 
 cmd_list() {
@@ -528,20 +846,23 @@ cmd_send() {
     len=$(( (${#pdu} - 2) / 2 ))
     echo "submitting to $num ($len octets, $((udl / 2)) UCS-2 units)"
 
+    sms_op_lock
     local r0 r2 submit
+    at_lock
+    smsc_refresh
     r0=$(at 'AT+CAVIMS=1' 6)
     case $r0 in *OK*) ;; *) die "modem refused AT+CAVIMS=1: $r0" ;; esac
     r0=$(at 'AT+CMGF=0' 6)       # PDU mode for the submit
     case $r0 in *OK*) ;; *) die "modem refused AT+CMGF=0: $r0" ;; esac
     submit=$(printf 'AT+CMGS=%s\r%s\032' "$len" "$pdu")
     r2=$(at "$submit" 25)
-    # back to text mode whatever happened: this firmware boots in PDU mode, where a manual
-    # AT+CMGL="ALL" answers +CMS ERROR: 302, and leaving PDU behind after every submit is how
-    # the next reader gets confused
-    at 'AT+CMGF=1' 6 >/dev/null || true
+    # Stay in PDU mode. Switching back to text here corrupts direct +CMT
+    # delivery; the legacy SIM reader selects text explicitly when needed.
     if ! printf '%s\n' "$r2" | grep -q '^+CMGS:'; then
         die "submit failed: $(printf '%s\n' "$r2" | grep -E 'CMS|ERROR' | head -1)"
     fi
+    # Never wait for the local pool while owning the AT channel.
+    at_unlock
     pool_init
     pool_lock
     # bytes above 0x7F mean the text is not plain GSM-7 ASCII and travelled as UCS-2
@@ -549,6 +870,7 @@ cmd_send() {
     [ -n "$(printf '%s' "$text" | LC_ALL=C tr -d '\000-\177')" ] && coding=ucs2
     store_msg mo sent "$num" "$(date '+%y/%m/%d,%H:%M:%S')" "" "$coding" "$text" >/dev/null
     pool_unlock
+    sms_op_unlock
     echo "sent ($(printf '%s\n' "$r2" | sed -n 's/^+CMGS: //p' | head -1))"
 }
 
@@ -564,18 +886,22 @@ cmd_delete() {
     pool_init
     # tombstone every removed message so a later sync does not re-import it
     # from the SIM (a local-only delete must actually delete something)
-    tombstone() { [ -n "$(hdr "$1" fingerprint)" ] &&
-        printf '%s\n' "$(hdr "$1" fingerprint)" >> "$POOL/deleted" 2>/dev/null; }
+    tombstone() {
+        local deleted_hash
+        [ -n "$(hdr "$1" fingerprint)" ] && printf '%s\n' "$(hdr "$1" fingerprint)" >> "$POOL/deleted" 2>/dev/null
+        for deleted_hash in $(hdr "$1" multipart_hashes); do
+            printf '%s\n' "$deleted_hash" >> "$POOL/deleted" || return 1
+        done
+    }
     if [ "$what" = all ]; then
         for id in $(ids_newest_first); do
+            [ "$wantsim" = true ] && sim_delete "$id" || [ "$wantsim" = false ] ||
+                die "SIM deletion failed for $id; remaining messages were kept"
+            pool_lock
             tombstone "$MSGDIR/$id"
-            [ "$wantsim" = true ] && sim_delete "$id"
+            rm -f "$MSGDIR/$id"
+            pool_unlock
         done
-        pool_lock
-        trap pool_unlock EXIT INT TERM
-        rm -f "$MSGDIR"/[0-9]* 2>/dev/null
-        pool_unlock
-        trap - EXIT INT TERM
         echo "pool emptied"
         return 0
     fi
@@ -584,16 +910,48 @@ cmd_delete() {
     id=$(printf '%06d' "$n")
     f=$MSGDIR/$id
     [ -f "$f" ] || die "no message $what"
+    if [ "$wantsim" = true ]; then
+        sim_delete "$id" || die "SIM deletion failed; local copy was kept"
+    fi
+    pool_lock
     tombstone "$f"
-    [ "$wantsim" = true ] && sim_delete "$id"
     rm -f "$f"
+    pool_unlock
     echo "deleted $what"
 }
 
 # CMGD by index alone is dangerous (indexes shift with every deletion), so the SIM is re-listed
-# and the slot whose fingerprint matches the pool entry is the one deleted. No match: nothing
-# happens to the SIM, which is also the answer for a message the SIM never held.
+# and the slot whose fingerprint matches the pool entry is the one deleted.
+SMS_DELETE_PAUSED=0
+sim_delete_restore() {
+    [ "$SMS_DELETE_PAUSED" = 1 ] || return 0
+    SMS_DELETE_PAUSED=0
+    if at 'AT+CMGF=0' 6 | grep -q '^OK' &&
+       at 'AT+CNMI=3,2,2,1,1' 6 | grep -q '^OK'; then
+        return 0
+    fi
+    rm -f "$DIRECT_FLAG"
+    at 'AT+CNMI=2,1,0,0,0' 6 >/dev/null 2>&1 || true
+    echo "mu300-sms: direct SMS delivery could not be restored; SIM fallback enabled" >&2
+    return 1
+}
 sim_delete() {
+    local rc
+    sms_op_lock
+    if [ -f "$DIRECT_FLAG" ]; then
+        if ! at 'AT+CNMI=2,1,0,0,0' 6 | grep -q '^OK'; then
+            sms_op_unlock
+            return 1
+        fi
+        SMS_DELETE_PAUSED=1
+    fi
+    sim_delete_unlocked "$@"
+    rc=$?
+    sim_delete_restore || rc=1
+    sms_op_unlock
+    return "$rc"
+}
+sim_delete_unlocked() {
     local id=$1 f=$MSGDIR/$id want simidx reply idx stat oa scts body fpid
     [ -f "$f" ] || return 0
     want=$(hdr "$f" fingerprint)
@@ -606,15 +964,21 @@ sim_delete() {
             *[!0-9A-Fa-f]*|"") ;;
             *) [ $(( ${#body} % 4 )) -eq 0 ] && body=$(printf '%b' "$(printf '%s\n' "$body" | ucs2_to_esc)") ;;
         esac
+        oa=$(peer_decode "$oa")
         [ "$(fingerprint "$oa" "$scts" "$body")" = "$want" ] && { simidx=$idx; break; }
     done <<EOF
 $(printf '%s\n' "$reply" | tr -d '\r')
 EOF
     if [ -z "$simidx" ]; then
         echo "message $id is not on the SIM (already gone, or never stored there)" >&2
+        return 1
+    fi
+    if at "AT+CMGD=$simidx" 6 | grep -q '^OK'; then
+        echo "deleted SIM slot $simidx for message $id"
         return 0
     fi
-    at "AT+CMGD=$simidx" 6 | grep -q '^OK' && echo "deleted SIM slot $simidx for message $id"
+    echo "mu300-sms: modem refused to delete SIM slot $simidx" >&2
+    return 1
 }
 
 usage() {
@@ -625,6 +989,8 @@ usage: mu300-sms list [PAGE]     paged inbox, newest first (MU300_SMS_PAGE per p
        mu300-sms delete ID|all   pool only; --sim also deletes the matching SIM slot
        mu300-sms mark ID read|unread
        mu300-sms sync            pull everything AT+CMGL lists into the pool
+       mu300-sms import-pdu FILE  save a persisted +CMT PDU before acknowledging it
+       mu300-sms archive-sim      verify local PDU copies, then free SIM slots
 pool: $POOL (MU300_SMS_POOL to move it)
 EOF
 }
@@ -637,6 +1003,8 @@ case ${1:-list} in
     del)    shift; cmd_delete "$@" ;;
     mark)   shift; cmd_mark "$@" ;;
     sync)   cmd_sync ;;
+    import-pdu) shift; cmd_import_pdu "$@" ;;
+    archive-sim) cmd_archive_sim ;;
     -h|--help|help) usage ;;
     *) usage; exit 2 ;;
 esac

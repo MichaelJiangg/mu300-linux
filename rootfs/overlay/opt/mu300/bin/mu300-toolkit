@@ -5,12 +5,22 @@
 #   mu300-toolkit info         one-shot summary
 #   mu300-toolkit profile [eco|balanced|performance]
 #   mu300-toolkit stress [cpu,gpu,net|all] [MINUTES]   stress test with live monitor and a summary (0 = until q)
-#   mu300-toolkit apply        apply the saved settings (boot service)
+#   mu300-toolkit apply        apply the saved settings: performance profile, TTL (boot service)
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 CONF=/etc/mu300/toolkit.conf
 VPN_CONF=/etc/mu300/vpn.conf
 CPUFREQ=/sys/devices/system/cpu/cpufreq
 GPU=$(ls -d /sys/class/devfreq/*.gpu 2>/dev/null | head -n1)
+# The U30 Air's battery: "battery" under 5.4 (the vendor charger manager), "sc27xx-fgu" under mainline. The F50 has
+# none, but the same PMIC: its fuel gauge shows up under mainline too, with made-up values - so only a U30 Air.
+BATDIR=
+if [ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ]; then
+    for d in /sys/class/power_supply/battery /sys/class/power_supply/sc27xx-fgu; do
+        [ -r "$d/capacity" ] && { BATDIR=$d; break; }
+    done
+fi
+BATTERY=$([ -n "$BATDIR" ] && ls "$BATDIR/capacity" "$BATDIR/status" \
+    /sys/class/power_supply/usb/online /sys/class/power_supply/ac/online 2>/dev/null)
 PROFILES="eco balanced performance"
 
 if [ -t 1 ]; then
@@ -125,7 +135,7 @@ snapshot() {
     grep -H . /sys/class/thermal/thermal_zone*/type /sys/class/thermal/thermal_zone*/temp \
         /sys/class/thermal/cooling_device*/cur_state "$CPUFREQ"/policy*/scaling_cur_freq \
         "$CPUFREQ"/policy*/related_cpus "$CPUFREQ"/policy*/scaling_governor \
-        ${GPU:+"$GPU/cur_freq"} 2>/dev/null
+        ${GPU:+"$GPU/cur_freq"} $BATTERY 2>/dev/null
     echo @proc; cat /proc/[0-9]*/stat 2>/dev/null
     if [ -n "$STRESS_DIR" ]; then echo @extra; stress_status; fi
     echo @end
@@ -175,6 +185,9 @@ sec == "sys" {
     else if (leaf == "related_cpus") prel[node] = val
     else if (leaf == "scaling_governor") pgov[node] = val
     else if (leaf == "cur_freq") gpuf = val
+    else if ((node == "battery" || node == "sc27xx-fgu") && leaf == "capacity") bcap = val
+    else if ((node == "battery" || node == "sc27xx-fgu") && leaf == "status") bstat = val
+    else if ((node == "usb" || node == "ac") && leaf == "online" && val == 1) bext = 1
 }
 sec == "extra" { nextra++; extra[nextra] = $0; next }
 sec == "proc" {
@@ -206,6 +219,8 @@ END {
     line(sprintf("%sRAM%s  %s %5.1f%%   used %s / %s  avail %s  cache %s", BO, NO, bar(100 * used / m["MemTotal:"], 30), 100 * used / m["MemTotal:"], human(used), human(m["MemTotal:"]), human(m["MemAvailable:"]), human(m["Cached:"] + m["Buffers:"])))
     if (m["SwapTotal:"] > 0) line(sprintf("  swap %s / %s (zram)", human(m["SwapTotal:"] - m["SwapFree:"]), human(m["SwapTotal:"])))
     if (gpuf != "") line(sprintf("%sGPU%s  %d MHz", BO, NO, gpuf / 1000000))
+    # (no bar: bar() colours a full one red, which is right for load and wrong for a battery)
+    if (bcap != "") line(sprintf("%sBAT%s  %d%%   %s", BO, NO, bcap, bstat == "Charging" ? "charging" : (bstat == "Full" ? "full, on USB power" : (bext ? "on USB power" : "on battery"))))
     line("")
     # temperatures: most useful zones first, then any other readable zone
     split("soc big7 mid4 mid5 lit0 gpu ai0 mm board chg pa nr", want, " ")
@@ -429,6 +444,19 @@ menu_stress() {
 }
 
 # ---------------------------------------------------------------- info
+# charging, full, on battery...: the SQC charger says "Unknown" once the battery is full, so the power source says
+# more than the status alone
+battery_state() {
+    st=$(cat "$BATDIR/status" 2>/dev/null)
+    [ "$st" = Unknown ] && st=
+    ext=0; for s in usb ac; do [ "$(cat /sys/class/power_supply/$s/online 2>/dev/null)" = 1 ] && ext=1; done
+    case $st in
+        Charging) echo charging ;;
+        Full) echo "full, on USB power" ;;
+        Discharging) [ $ext = 1 ] && echo "on USB power, not charging" || echo "on battery" ;;
+        *) [ $ext = 1 ] && echo "on USB power${st:+ ($st)}" || echo "on battery${st:+ ($st)}" ;;
+    esac
+}
 info() {
     . /etc/os-release 2>/dev/null
     printf '%sSystem%s   %s, kernel %s, up %s\n' "$B" "$N" "${PRETTY_NAME:-unknown}" "$(uname -r)" "$(awk '{printf "%dd %dh %dm", $1/86400, $1%86400/3600, $1%3600/60}' /proc/uptime)"
@@ -437,6 +465,9 @@ info() {
     printf '%sStorage%s  %s\n' "$B" "$N" "$(df -h / | awk 'NR==2 {print $3 " used of " $2 " (" $5 ")"}')"
     hot=$(cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | sort -n | tail -n1)
     printf '%sTemp%s     hottest %s C, profile %s\n' "$B" "$N" "$((hot / 1000))" "$(current_profile)"
+    # the U30 Air has a battery (the F50 has none)
+    [ -n "$BATDIR" ] &&
+        printf '%sBattery%s  %s%%, %s\n' "$B" "$N" "$(cat "$BATDIR/capacity")" "$(battery_state)"
     printf '%sNetwork%s\n' "$B" "$N"
     ip -4 -br addr 2>/dev/null | awk '$1 !~ /^(lo|sipa_dummy)/ && $3 != "" {printf "  %-12s %s\n", $1, $3}'
     ip route show default 2>/dev/null | sed 's/^/  default /' | head -n2
@@ -609,11 +640,35 @@ menu_signal() {
     svc start mu300-mobile-data-watch >/dev/null 2>&1
 }
 
+# The TTL (IPv6: hop limit) that everything leaving through mobile data gets (mu300-ttl, /etc/mu300/ttl.conf)
+menu_ttl() {
+    while :; do
+        title "TTL of mobile data"
+        /opt/mu300/bin/mu300-ttl status | sed 's/^/  /'
+        printf '\n  %sHotspot clients send TTL 64 (Windows 128); routed by the device they leave with one less,\n' "$D"
+        printf '  which is how an operator can tell tethered traffic. A fixed TTL makes it all look like the device.%s\n\n' "$N"
+        printf '  %s1%s  Fixed 64 (recommended: what the device, Android and Linux send)\n' "$C" "$N"
+        printf '  %s2%s  Fixed 128 (what Windows sends)\n' "$C" "$N"
+        printf '  %s3%s  Fixed, another value\n' "$C" "$N"
+        printf '  %s4%s  Off - leave the TTL alone (default)\n' "$C" "$N"
+        printf '\n  %s0%s  Back\n\n  > ' "$C" "$N"
+        read -r CHOICE || CHOICE=0
+        case $CHOICE in
+            1) /opt/mu300/bin/mu300-ttl set 64 >/dev/null ;;
+            2) /opt/mu300/bin/mu300-ttl set 128 >/dev/null ;;
+            3) printf '  TTL (1-255): '; read -r v
+               /opt/mu300/bin/mu300-ttl set "$v" >/dev/null || pause ;;
+            4) /opt/mu300/bin/mu300-ttl off >/dev/null ;;
+            *) return ;;
+        esac
+    done
+}
+
 menu_network() {
     while :; do
         menu "Network" "Live traffic (monitor)" "Interfaces and addresses" "Mobile data: status" \
             "Mobile signal (live, for finding a better spot)" "Mobile data: reconnect" "Mobile data: disconnect" \
-            "Wi-Fi (hotspot, or join a network)" "VPN"
+            "Wi-Fi (hotspot, or join a network)" "VPN" "TTL of mobile data (hide hotspot use)"
         case $CHOICE in
             1) monitor ;;
             2) title "Interfaces"; { ip -br addr 2>/dev/null || ip addr; } | grep -vE '^(dummy|tunl|gre|erspan|ip_vti|ip6_vti|sit|ip6tnl|ip6gre|sipa_eth[1-9])' | sed 's/^/  /'
@@ -625,6 +680,7 @@ menu_network() {
             6) if is_openwrt; then ifdown wan; else svc stop mu300-mobile-data; fi; pause ;;
             7) menu_wifi ;;
             8) menu_vpn ;;
+            9) menu_ttl ;;
             *) return ;;
         esac
     done
@@ -743,7 +799,8 @@ case ${1:-menu} in
         stress_run "${2:-all}" $(( ${3:-10} * 60 )) ;;
     apply)
         p=$(conf_get CPU_PROFILE)
-        [ -n "$p" ] && profile_apply "$p" && echo "applied profile $p" ;;
+        [ -n "$p" ] && profile_apply "$p" && echo "applied profile $p"
+        /opt/mu300/bin/mu300-ttl apply ;;
     -h|--help|help) sed -n '2,8s/^# \{0,1\}//p' "$0" ;;
     *) echo "usage: mu300-toolkit [menu|top [seconds]|info|profile [eco|balanced|performance]|stress [cpu,gpu,net|all] [minutes]|apply]" >&2; exit 2 ;;
 esac

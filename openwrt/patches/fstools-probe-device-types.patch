@@ -1,0 +1,20 @@
+--- a/block.c
++++ b/block.c
+@@ -45,5 +45,6 @@
+ #include <libubus.h>
+ 
+ #include "probe.h"
++#include "block-probe-guard.h"
+ 
+ #define AUTOFS_MOUNT_PATH       "/tmp/run/blockd/"
+@@ -533,7 +534,10 @@
+ {
+ 	struct probe_info *pr, *epr;
+ 	char tmppath[64];
+ 
++	/* Never probe communication character devices matched by /dev/sd*. */
++	if (!mu300_probe_allowed(path))
++		return NULL;
+ 	if (!strncmp(path, "/dev/mtdblock", 13) && mtdblock_is_nand(path + 13))
+ 		return NULL;
+ 

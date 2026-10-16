@@ -1,0 +1,54 @@
+Bound stale-client TX diagnostics without changing ownership or error returns.
+
+--- a/sc2355/pcie.c
++++ b/sc2355/pcie.c
+@@ -1077,7 +1077,7 @@
+ 		for (i = 0; i < MAX_LUT_NUM; i++) {
+ 			if ((sc2355_is_group(hif->peer_entry[i].tx.da)) &&
+ 			    hif->peer_entry[i].ctx_id == vif->ctx_id) {
+-				pr_info("%s, %d, group lut_index=%d\n",
++				pr_debug_ratelimited("%s, %d, group lut_index=%d\n",
+ 					__func__, __LINE__,
+ 					hif->peer_entry[i].lut_index);
+ 				return hif->peer_entry[i].lut_index;
+@@ -1187,7 +1187,7 @@
+ 
+ 	lut_index = sc2355_pcie_find_lut_index(hif, vif);
+ 	if (lut_index < 6 && (!sc2355_is_group(hif->skb_da))) {
+-		pr_err("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
++		pr_debug_ratelimited("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
+ 		return -EPERM;
+ 	}
+ 	//skb_push(skb, sizeof(struct tx_msdu_dscr) + offset + dscr_rsvd);
+--- a/sc2355/sdio.c
++++ b/sc2355/sdio.c
+@@ -708,7 +708,7 @@
+ 		for (i = 0; i < MAX_LUT_NUM; i++) {
+ 			if ((sc2355_is_group(hif->peer_entry[i].tx.da)) &&
+ 			    hif->peer_entry[i].ctx_id == vif->ctx_id) {
+-				pr_info("%s, %d, group lut_index=%d\n",
++				pr_debug_ratelimited("%s, %d, group lut_index=%d\n",
+ 					__func__, __LINE__,
+ 					hif->peer_entry[i].lut_index);
+ 				return hif->peer_entry[i].lut_index;
+@@ -820,7 +820,7 @@
+ 
+ 	lut_index = sc2355_find_lut_index(hif, vif);
+ 	if (lut_index < 6 && (!sc2355_is_group(hif->skb_da))) {
+-		pr_err("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
++		pr_debug_ratelimited("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
+ 		return -EPERM;
+ 	}
+ 	skb_push(skb, sizeof(struct tx_msdu_dscr) + offset + dscr_rsvd);
+--- a/common/iface.c
++++ b/common/iface.c
+@@ -742,7 +742,8 @@
+ 	ret = sprd_send_data(vif->priv, vif, msg, skb, SPRD_DATA_TYPE_NORMAL,
+ 			     offset, true);
+ 	if (ret) {
+-		netdev_err(ndev, "%s drop msg due to TX Err\n", __func__);
++		if (net_ratelimit())
++			netdev_err(ndev, "%s drop msg due to TX Err\n", __func__);
+ 		/* FIXME
+ 		 * as debug sdiom later, just drop the msg here
+ 		 * wapi temp drop

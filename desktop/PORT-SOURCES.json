@@ -1,0 +1,10 @@
+{
+  "source": "e5-linux installer, 2026-10-13 working tree",
+  "files": {
+    "boot/install-part.sh": "0a486b69469561ef456a6459faf2e99f4d6233361a380bf3eeb39f612f6c279e",
+    "boot/part-prepare.sh": "d2df4e25b2a98032bbb5733a25f2931cfabba2115c33bea86649d7b213f7d0fe",
+    "boot/part-progress.sh": "a6d6a3651f79240119b07a0c3174d402b41c1031daa1617ebd2bcf6bff85955b",
+    "openwrt/overlay/usr/libexec/e5-gpt": "dda63db567e5916b8772cc5e8fb93e1f1255f229f1702a22118ded9c25d97880"
+  },
+  "adaptation": "MU300 container layout, dynamic slots, separate desktop initramfs only"
+}

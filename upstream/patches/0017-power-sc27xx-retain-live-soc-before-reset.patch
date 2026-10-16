@@ -1,0 +1,101 @@
+power: supply: sc27xx: force retained-register strobes and snapshot live SOC before reset
+
+Dashboard reads are optional; reboot must preserve the latest coulomb count.
+Retained SET/CLEAR registers require unconditional writes even when their
+readback is unchanged. Limit shutdown sampling to populated UMP9620 batteries.
+
+--- a/drivers/power/supply/sc27xx_fuel_gauge.c
++++ b/drivers/power/supply/sc27xx_fuel_gauge.c
+@@ -233,7 +233,7 @@
+ {
+ 	int ret;
+ 
+-	ret = regmap_update_bits(data->regmap,
++	ret = regmap_write_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_MODE_AREA_MASK,
+ 				 SC27XX_FGU_MODE_AREA_MASK);
+@@ -248,7 +248,7 @@
+ 	 */
+ 	udelay(200);
+ 
+-	ret = regmap_update_bits(data->regmap,
++	ret = regmap_write_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_SET,
+ 				 SC27XX_FGU_MODE_AREA_MASK,
+ 				 boot_mode << SC27XX_FGU_MODE_AREA_SHIFT);
+@@ -268,7 +268,7 @@
+ 	 * make the user area data available, otherwise we can not save the user
+ 	 * area data.
+ 	 */
+-	return regmap_update_bits(data->regmap,
++	return regmap_write_bits(data->regmap,
+ 				  data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				  SC27XX_FGU_MODE_AREA_MASK, 0);
+ }
+@@ -277,7 +277,7 @@
+ {
+ 	int ret;
+ 
+-	ret = regmap_update_bits(data->regmap,
++	ret = regmap_write_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_CAP_AREA_MASK,
+ 				 SC27XX_FGU_CAP_AREA_MASK);
+@@ -296,7 +296,7 @@
+ 	if (data->var == &ump9620_info)
+ 		cap = clamp(cap, 0, 100);
+ 
+-	ret = regmap_update_bits(data->regmap,
++	ret = regmap_write_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_SET,
+ 				 SC27XX_FGU_CAP_AREA_MASK, cap);
+ 	if (ret)
+@@ -315,7 +315,7 @@
+ 	 * make the user area data available, otherwise we can not save the user
+ 	 * area data.
+ 	 */
+-	ret = regmap_update_bits(data->regmap,
++	ret = regmap_write_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_CAP_AREA_MASK, 0);
+ 	if (!ret)
+@@ -1551,6 +1551,30 @@
+ }
+ #endif
+ 
++/* SOC may not have been read since the last dashboard visit. Sample the
++ * live coulomb counter before reset, while the PMIC transport is still up.
++ * The retained SET/CLEAR registers are strobes: equal readback must not skip
++ * a write, hence regmap_write_bits() in the save helpers above.
++ */
++static void sc27xx_fgu_shutdown(struct platform_device *pdev)
++{
++	struct sc27xx_fgu_data *data = platform_get_drvdata(pdev);
++	int cap, ret;
++
++	if (data->var != &ump9620_info || !data->bat_present)
++		return;
++
++	mutex_lock(&data->lock);
++	ret = sc27xx_fgu_get_capacity(data, &cap);
++	if (!ret)
++		ret = sc27xx_fgu_save_last_cap(data, cap);
++	if (!ret)
++		ret = sc27xx_fgu_save_boot_mode(data, SC27XX_FGU_NORMAIL_POWERTON);
++	mutex_unlock(&data->lock);
++	if (ret)
++		dev_warn(data->dev, "failed to retain shutdown capacity: %d\n", ret);
++}
++
+ static const struct dev_pm_ops sc27xx_fgu_pm_ops = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(sc27xx_fgu_suspend, sc27xx_fgu_resume)
+ };
+@@ -1563,6 +1587,7 @@
+ MODULE_DEVICE_TABLE(of, sc27xx_fgu_of_match);
+ 
+ static struct platform_driver sc27xx_fgu_driver = {
++	.shutdown = sc27xx_fgu_shutdown,
+ 	.probe = sc27xx_fgu_probe,
+ 	.driver = {
+ 		.name = "sc27xx-fgu",

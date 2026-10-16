@@ -1,0 +1,46 @@
+#!/bin/sh
+# Board defaults and cross-board restore migration, before AT owners open ttys.
+# Same-board preferences, APNs, SMS and traffic history remain user-owned.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+device=$(mu300-device 2>/dev/null)
+case $device in v50|u30air) slots=2 ;; f50) slots=1 ;; *) exit 1 ;; esac
+[ "$(uci -q get unisoc_modem.main)" = core ] || exit 0
+previous=$(uci -q get unisoc_modem.main.platform_defaults)
+# Restore a positively selected internal F50 SIM before the AT owner layout
+# is fixed. Ordinary single-SIM F50 boots get no additional modem commands.
+if [ "$device" = f50 ] && { [ -z "$previous" ] || [ "$previous" = f50 ]; }; then
+    selected=$(uci -q get unisoc_modem.main.data_sim)
+    if [ -z "$previous" ] && [ "$selected" != 0 ] && [ "$selected" != 1 ]; then
+        legacy=$(uci -q get network.wan.sim_slot)
+        if [ "$legacy" = 1 ]; then
+            uci -q set unisoc_modem.main.data_sim=1 || exit 1
+            selected=1
+        fi
+    fi
+    if [ "$selected" = 1 ] && [ "$(uci -q get unisoc_modem.main.sim_slots)" != 2 ]; then
+        uci -q set unisoc_modem.main.sim_slots=2 && uci -q commit unisoc_modem || exit 1
+    fi
+fi
+if [ "$previous" = "$device" ]; then
+    # Upgrade existing U30 profiles once; never reset APNs or the selected card.
+    [ "$device" = u30air ] && [ "$(uci -q get unisoc_modem.main.u30_native_version)" != 1 ] || exit 0
+    uci -q set unisoc_modem.main.sim_slots=2 &&
+        uci -q set unisoc_modem.main.u30_native_version=1 && uci -q commit unisoc_modem
+    exit $?
+fi
+{
+    if [ -n "$previous" ]; then
+        # A different board's backup must not select a nonexistent data SIM or
+        # carry over its custom adapter / interface mapping. Do not erase data.
+        printf "set unisoc_modem.main.sim_slots='%s'\n" "$slots"
+        printf "set unisoc_modem.main.data_sim='0'\n"
+        for key in data_sim_command sim0_device sim1_device; do
+            printf "set unisoc_modem.main.%s=''\n" "$key"
+        done
+    elif [ "$slots" = 2 ]; then
+        printf "set unisoc_modem.main.sim_slots='2'\n"
+    fi
+    if [ "$device" = u30air ]; then printf "set unisoc_modem.main.u30_native_version='1'\n"; fi
+    printf "set unisoc_modem.main.platform_defaults='%s'\n" "$device"
+    printf 'commit unisoc_modem\n'
+} | uci -q batch

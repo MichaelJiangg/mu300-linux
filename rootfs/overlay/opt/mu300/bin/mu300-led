@@ -1,0 +1,260 @@
+#!/bin/sh
+# The device's LEDs by what they mean, so the services need not know which device they run on.
+#   mu300-led power on|off      Linux is up (set at boot, which also wakes the LEDs; cleared at shutdown)
+#   mu300-led data on|5g|off|error  mobile data connected (5g: over 5G) / not connected / no service (no SIM, not
+#                               registered)
+#   mu300-led wifi on|off       the Wi-Fi hotspot is up (U30 Air: white on 5 GHz, blue on 2.4 GHz)
+#   mu300-led wake              show the LEDs again, for LED_TIMEOUT seconds (the power button, mu300-buttons)
+#   mu300-led sleep [--if-due]  dark now (--if-due: only once the timeout has passed; mu300-buttons asks)
+#   mu300-led test              each LED in turn, 2 s each, with its name (to tell which one is where)
+#   mu300-led alarm on|off      too hot (thermal-guard): the battery LED flashes its colours one at a time like a
+#                               siren (U30 Air: red, white, blue), also while the others are dark
+# ZTE F50: one RGB LED of the PMIC: blue is data, red and blue the alarm. ZTE U30 Air (found by lighting each one):
+#   battery  the PMIC's RGB LED: its "green" channel is white (power: Linux is up), red, blue
+#   network  as ZTE's firmware: blue on 4G (a GPIO, net_blue), white on 5G (LDO VDDCAMA0), red without service
+#            (the PMIC's keypad backlight sink, "keyboard-backlight" under 5.4 and mainline)
+#   Wi-Fi    white: LDO VDDCAMA1 (5 GHz); blue: LDO VDDCAMA2 (2.4 GHz)
+# The LDO ones are zte-ldo0..2 under mainline (leds-zte-ldo) and vddcama0..2_status of ZTE's zte_ldo_leds under
+# 5.4; the other GPIO LEDs in its device tree (net_red, net_green, net_white, pwr_green, wifi_*) light nothing,
+# under Android too.
+# The device comes from mu300-device; an LED this device has not is skipped.
+#
+# Timeout: /etc/mu300/led.conf, LED_TIMEOUT=SECONDS (0: always on). Default 60 on the U30 Air, which has a power
+# button to wake them, and 0 on the F50. What each LED should show is kept in /run/mu300/led, so a change while
+# the LEDs are dark shows up on the next wake.
+# Every write is best effort: the PMIC rejects a brightness write now and then (mobile-data), and a cosmetic
+# LED must never make a service fail.
+# (MU300_SYSROOT, MU300_BIN and MU300_LED_CONF are for tests/: a fake /, this directory, a led.conf)
+export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+R=${MU300_SYSROOT:-}
+LEDS=$R/sys/class/leds
+STATE=$R/run/mu300/led
+DEVICE=$(${MU300_BIN:-/opt/mu300/bin}/mu300-device)
+
+# V50's controller is owned by led-status. The old compatibility calls must
+# not overwrite its RGB state or write the unrelated PMIC channels.
+if [ "$DEVICE" = v50 ]; then
+    case ${1:-}:${2:-} in
+        alarm:on) exec /opt/mu300/bin/led-status thermal ;;
+        alarm:off) exec /opt/mu300/bin/led-status refresh ;;
+        *) exit 0 ;;
+    esac
+fi
+
+case $DEVICE in
+    u30air) POWER=sc27xx:green DATA=net_blue DATA5G=zte-ldo0 NODATA=keyboard-backlight WIFI5=zte-ldo1 WIFI24=zte-ldo2
+            DEFAULT_TIMEOUT=60 ;;
+    *)      POWER= DATA=sc27xx:blue DATA5G=sc27xx:blue NODATA= WIFI5= WIFI24= DEFAULT_TIMEOUT=0 ;;
+esac
+# the PMIC's RGB LED on both, one colour at a time (the U30 Air's white, its power LED, outshines the others when
+# mixed): its battery LED, the F50's only one, where green is green and stays out
+case $DEVICE in u30air) SIREN="sc27xx:red sc27xx:green sc27xx:blue" ;; *) SIREN="sc27xx:red sc27xx:blue" ;; esac
+SIREN_PID=$R/run/mu300/led-siren.pid
+TIMEOUT=$(sed -n 's/^LED_TIMEOUT=\([0-9][0-9]*\)$/\1/p' "${MU300_LED_CONF:-/etc/mu300/led.conf}" 2>/dev/null | tail -n1)
+TIMEOUT=${TIMEOUT:-$DEFAULT_TIMEOUT}
+if [ "$DEVICE" = u30air ]; then
+    value=$(uci -q get system.mu300_leds.timeout 2>/dev/null)
+    case $value in ''|*[!0-9]*) ;; *) [ "${#value}" -le 5 ] && [ "$value" -le 86400 ] && TIMEOUT=$value ;; esac
+fi
+cfg() { uci -q get "system.mu300_leds.$1" 2>/dev/null; }
+
+# A power-supply event and the button timeout may arrive together. Keep the
+# power snapshot, desired state and physical writes in one transaction, so an
+# event started before unplug cannot restart breathing after timeout darkening.
+# flock is already a runtime dependency of the native SIM controller.
+if [ "$DEVICE" = u30air ] && [ "${1:-}" != siren ]; then
+    mkdir -p "$STATE" || exit 0
+    exec 9>"$STATE/.lock"
+    flock -w 2 9 || exit 0
+fi
+
+
+external_power() {
+    [ "$DEVICE" = u30air ] || return 1
+    local root=${MU300_POWER_SUPPLY_DIR:-$R/sys/class/power_supply} value
+    if [ -r "$root/bq256xx-charger/online" ]; then
+        IFS= read -r value < "$root/bq256xx-charger/online"
+        [ "$value" = 1 ]; return
+    fi
+    [ -r "$root/sc27xx-fgu/status" ] || return 1
+    IFS= read -r value < "$root/sc27xx-fgu/status"
+    case $value in Charging|Full) return 0 ;; *) return 1 ;; esac
+}
+KEEP_LIT=0
+external_power && KEEP_LIT=1
+
+uptime_s() { cut -d. -f1 "$R/proc/uptime" 2>/dev/null || echo 0; }
+awake() {
+    [ "$KEEP_LIT" != 1 ] || return 0
+    [ "$TIMEOUT" = 0 ] && return 0
+    until=$(cat "$STATE/.awake-until" 2>/dev/null) || return 1
+    [ "$(uptime_s)" -lt "${until:-0}" ]
+}
+vendor_ldo() {  # vendor_ldo zte-ldoN: the 5.4 kernel's switch for that LDO, if there
+    case $1 in zte-ldo[0-9]) ;; *) return 1 ;; esac
+    for f in "$R"/sys/devices/platform/*zte*ldo*leds*/vddcama${1#zte-ldo}_status; do [ -e "$f" ] && { echo "$f"; return 0; }; done
+    return 1
+}
+has_led() { [ -e "$LEDS/$1" ] || vendor_ldo "$1" >/dev/null; }
+write() {  # write NAME 0|1: the LED itself
+    local requested=$2 group= value maximum level pattern
+    if [ "$DEVICE" = u30air ]; then
+        case $1 in
+            net_blue|zte-ldo0|keyboard-backlight) group=signal ;;
+            zte-ldo1|zte-ldo2) group=wifi ;;
+            sc27xx:*) group=battery ;;
+        esac
+        [ -z "$group" ] || [ "$(cfg "$group")" != 0 ] || requested=0
+    fi
+    if [ ! -e "$LEDS/$1" ] && f=$(vendor_ldo "$1"); then echo "$requested" > "$f" 2>/dev/null; return 0; fi
+    [ -w "$LEDS/$1/brightness" ] || return 0
+    maximum=$(cat "$LEDS/$1/max_brightness" 2>/dev/null)
+    case $maximum in ''|*[!0-9]*) maximum=255 ;; esac
+    value=0
+    if [ "$requested" = 1 ]; then
+        value=$maximum
+        if [ "$DEVICE" = u30air ] && [ "$group" = battery ]; then
+            level=$(cfg battery_brightness)
+            case $level in ''|*[!0-9]*) level=255 ;; *) [ "${#level}" -le 3 ] && [ "$level" -le 255 ] || level=255 ;; esac
+            value=$(( (maximum * level + 127) / 255 ))
+        fi
+    fi
+    # SC27xx provides a hardware rise/hold/fall/rest engine. No animation worker.
+    if [ "$value" -gt 0 ] && [ "$(cat "$STATE/.battery-breathe" 2>/dev/null)" = "$1" ] &&
+       grep -qw pattern "$LEDS/$1/trigger"; then
+        # 2.25 s cycle: quicker ramps and a longer full-brightness hold.
+        # Keep the requested peak (up to 255); do not overdrive the PMIC.
+        pattern="0 625 $value 750 0 625 0 250"
+        if ! grep -q '\[pattern\]' "$LEDS/$1/trigger"; then echo pattern > "$LEDS/$1/trigger"; fi
+        if [ -w "$LEDS/$1/hw_pattern" ]; then
+            [ "$(cat "$LEDS/$1/repeat" 2>/dev/null)" = -1 ] || echo -1 > "$LEDS/$1/repeat"
+            [ "$(cat "$LEDS/$1/hw_pattern" 2>/dev/null)" = "$pattern" ] || echo "$pattern" > "$LEDS/$1/hw_pattern"
+            return 0
+        fi
+    fi
+    echo none > "$LEDS/$1/trigger" 2>/dev/null
+    echo "$value" > "$LEDS/$1/brightness" 2>/dev/null
+    if [ "$value" -gt 0 ] && [ "$(cat "$STATE/.battery-blink" 2>/dev/null)" = "$1" ] &&
+       grep -qw timer "$LEDS/$1/trigger"; then
+        echo timer > "$LEDS/$1/trigger"
+        echo 750 > "$LEDS/$1/delay_on"
+        echo 750 > "$LEDS/$1/delay_off"
+    fi
+    return 0
+}
+set_led() {  # set_led NAME 0|1: what it should show; lit only while awake
+    [ -n "$1" ] || return 0
+    has_led "$1" || return 0
+    mkdir -p "$STATE" 2>/dev/null && echo "$2" > "$STATE/$1" 2>/dev/null
+    if [ "$2" = 1 ] && ! awake; then write "$1" 0; else write "$1" "$2"; fi
+}
+wifi_band() {  # 5 or 2.4: the channel the hotspot runs on, else (it has none yet, just started) its setting
+    ch=$(iw dev wlan0 info 2>/dev/null | sed -n 's/.*channel \([0-9]*\).*/\1/p' | head -n1)
+    if [ -n "$ch" ]; then [ "$ch" -gt 14 ] && echo 5 || echo 2.4
+    else "${MU300_BIN:-/opt/mu300/bin}/mu300-wifi-band" 2>/dev/null | sed -n 's/^hotspot: \([0-9.]*\) GHz$/\1/p'; fi
+}
+show_all() {  # every LED as it should be
+    for f in "$STATE"/*; do
+        [ -f "$f" ] || continue
+        write "${f##*/}" "$(cat "$f")"
+    done
+}
+siren_running() { p=$(cat "$SIREN_PID" 2>/dev/null) && [ -n "$p" ] && kill -0 "$p" 2>/dev/null; }
+nap() { sleep "$1" 2>/dev/null || sleep 1; }   # (a busybox without fractional sleep)
+
+battery() {
+    [ "$DEVICE" = u30air ] || return 0
+    local root=${MU300_POWER_SUPPLY_DIR:-$R/sys/class/power_supply} cap status color channel value previous_power
+    cap=$(cat "$root/sc27xx-fgu/capacity" 2>/dev/null)
+    case $cap in ''|*[!0-9]*) return 0 ;; esac
+    [ "$cap" -le 100 ] || return 0
+    status=$(cat "$root/sc27xx-fgu/status" 2>/dev/null)
+    # Charger online changes before the fuel-gauge status sometimes does.
+    # A stale "Charging"/"Full" must not keep the charging indication alive.
+    [ "$KEEP_LIT" != 0 ] || status=Discharging
+    color=sc27xx:green
+    mkdir -p "$STATE"
+    previous_power=$(cat "$STATE/.external-power" 2>/dev/null)
+    echo "$KEEP_LIT" > "$STATE/.external-power"
+    if [ "$previous_power" = 1 ] && [ "$KEEP_LIT" = 0 ] && [ "$TIMEOUT" != 0 ]; then
+        echo $(( $(uptime_s) + TIMEOUT )) > "$STATE/.awake-until"
+    fi
+    rm -f "$STATE/.battery-blink" "$STATE/.battery-breathe"
+    case $status in
+        Charging) color=sc27xx:blue ;;
+        Full) ;;
+        *) if [ "$cap" -le 15 ]; then color=sc27xx:red; fi ;;
+    esac
+    case "$status:$color" in
+        Charging:*) echo "$color" > "$STATE/.battery-breathe" ;;
+        *:sc27xx:red) echo "$color" > "$STATE/.battery-blink" ;;
+    esac
+    for channel in sc27xx:red sc27xx:green sc27xx:blue; do
+        value=0; [ "$channel" != "$color" ] || value=1
+        if siren_running; then echo "$value" > "$STATE/$channel"; else set_led "$channel" "$value"; fi
+    done
+    if [ "$KEEP_LIT" = 1 ] && [ "$previous_power" != 1 ] && ! siren_running; then show_all; fi
+}
+
+case "$1 ${2:-}" in
+    "battery "*) battery ;;
+    "refresh "*) if awake; then show_all; fi ;;
+    "power on")   set_led "$POWER" 1; [ "$TIMEOUT" = 0 ] || { exec 9>&-; exec "$0" wake; } ;;
+    "power off")  set_led "$POWER" 0 ;;
+    "data on")    set_led "$NODATA" 0; [ "$DATA5G" = "$DATA" ] || set_led "$DATA5G" 0; set_led "$DATA" 1 ;;
+    "data 5g")    set_led "$NODATA" 0; [ "$DATA5G" = "$DATA" ] || set_led "$DATA" 0; set_led "$DATA5G" 1 ;;
+    "data off")   set_led "$NODATA" 0; set_led "$DATA5G" 0; set_led "$DATA" 0 ;;
+    "data error") set_led "$DATA" 0; set_led "$DATA5G" 0; set_led "$NODATA" 1 ;;
+    "wifi on")
+        if [ "$(wifi_band)" = 5 ]; then set_led "$WIFI24" 0; set_led "$WIFI5" 1
+        else set_led "$WIFI5" 0; set_led "$WIFI24" 1; fi ;;
+    "wifi off")   set_led "$WIFI5" 0; set_led "$WIFI24" 0 ;;
+    "wake "*)
+        [ "$TIMEOUT" = 0 ] && exit 0
+        mkdir -p "$STATE" 2>/dev/null
+        echo $(( $(uptime_s) + TIMEOUT )) > "$STATE/.awake-until"
+        battery
+        show_all ;;
+    "sleep "*)
+        [ "$TIMEOUT" = 0 ] && exit 0
+        if [ "${2:-}" = --if-due ] && awake; then exit 0; fi
+        [ -e "$STATE/.awake-until" ] || [ "${2:-}" != --if-due ] || exit 0   # dark already
+        rm -f "$STATE/.awake-until"
+        for f in "$STATE"/*; do [ -f "$f" ] && write "${f##*/}" 0; done ;;
+    "alarm on")
+        siren_running && exit 0
+        mkdir -p "${SIREN_PID%/*}" 2>/dev/null
+        "$0" siren 9>&- </dev/null >/dev/null 2>&1 &
+        echo $! > "$SIREN_PID" ;;
+    "alarm off")
+        siren_running || { rm -f "$SIREN_PID"; exit 0; }
+        kill "$p" 2>/dev/null
+        rm -f "$SIREN_PID"
+        nap 0.2
+        for l in $SIREN; do write "$l" 0; done
+        if awake; then show_all; fi ;;   # the U30 Air's white is its power LED, the F50's blue its data LED
+    "siren "*)   # (alarm on runs this in the background)
+        # Only the siren named in the pid file runs: one left behind (its alarm switched off while it was
+        # between writes, a restarted service) stops by itself instead of flashing along with the new one.
+        # The file is written just after the start, so a missing one counts only after the first round.
+        n=0
+        while :; do
+            own=$(cat "$SIREN_PID" 2>/dev/null)
+            if [ -n "$own" ]; then [ "$own" = $$ ] || exit 0
+            elif [ $n -gt 0 ]; then exit 0; fi
+            n=$((n + 1))
+            for on in $SIREN; do
+                for l in $SIREN; do [ "$l" = "$on" ] || write "$l" 0; done
+                write "$on" 1; nap 0.25
+            done
+        done ;;
+    "test "*)
+        for l in "$LEDS"/*; do
+            n=${l##*/}
+            case $n in mmc*|*backlight*) continue ;; esac
+            old=$(cat "$l/brightness" 2>/dev/null)
+            echo "$n"; write "$n" 1; sleep 2; echo "${old:-0}" > "$l/brightness" 2>/dev/null
+        done ;;
+    *) sed -n '2,10s/^# \{0,1\}//p' "$0" >&2; exit 2 ;;
+esac
+exit 0

@@ -1,0 +1,93 @@
+#!/bin/sh
+# Called under mobile-data's radio mutex, AFTER nr1's first SMMSWAP handshake.
+# Both URC streams must have persistent readers before either stack is raised.
+export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+target=${MU300_SIM_SLOT:-0}
+case "$target" in 0|1) ;; *) exit 1 ;; esac
+client=${MU300_DUAL_AT_CLIENT:-/opt/mu300/bin/mu300-at}
+root=${MU300_DUAL_RUN:-/run}
+query() {
+    local dir=$root/mu300-at
+    [ "$1" != 1 ] || dir=$root/mu300-at4
+    MU300_AT_DIR=$dir "$client" -t "${3:-3}" "AT+SPACTCARD=$1;${2#AT}" | tr -d '\r'
+}
+ok() { query "$1" "$2" "${3:-4}" | grep -qx OK; }
+cfun() { query "$1" 'AT+CFUN?' | sed -n 's/^+CFUN: *\([01]\)$/\1/p'; }
+fail() { echo "dual-radio: $*" >&2; exit 1; }
+# Do not close or steal the old NR3 owner on a live system. Configuration
+# migration requires a clean reboot. The drainer announces readiness on open.
+[ ! -p "$root/mu300-at3/cmd" ] || fail 'NR3 is still a command owner; reboot required'
+for stream in "$root/mu300-at/urc/stty_nr0.ready" "$root/mu300-at4/urc/stty_nr3.ready"; do
+    reader=$(cat "$stream" 2>/dev/null)
+    [ -n "$reader" ] && kill -0 "$reader" 2>/dev/null || fail 'URC reader not ready'
+done
+present0=1; present1=1
+for card in 0 1; do
+    pin=$(query "$card" 'AT+CPIN?')
+    case "$pin" in
+        *'+CME ERROR: 10'*) [ "$card" != 0 ] && present1=0 || present0=0 ;;
+        *'+CPIN:'*) ;;
+        *) fail "SIM $card presence unreadable" ;;
+    esac
+    if [ -x /opt/mu300/bin/v50-led-status ]; then
+        state=present
+        case "$pin" in *'+CME ERROR: 10'*) state=absent ;; esac
+        /opt/mu300/bin/v50-led-status sim-presence "$card" "$state" 2>/dev/null || :
+    fi
+done
+present() { case $1 in 0) [ "$present0" = 1 ] ;; 1) [ "$present1" = 1 ] ;; *) return 1 ;; esac; }
+cf0=$(cfun 0); cf1=$(cfun 1)
+if { [ "$present0" = 0 ] || [ "$cf0" = 1 ]; } && { [ "$present1" = 0 ] || [ "$cf1" = 1 ]; }; then
+    actual=$(query 0 'AT+SPSWDATA?' | sed -n 's/^+SPSWDATA: *\([01]\)$/\1/p')
+    case "$actual" in 0|1) printf '%s\n' "$actual" > "$root/mu300-data-sim-actual" ;; *) fail 'data SIM readback unavailable' ;; esac
+    : > "$root/mu300-dual-radio-ready"; exit 0
+fi
+check0=$cf0; check1=$cf1
+[ "$present0" != 0 ] || check0=0
+[ "$present1" != 0 ] || check1=0
+case "$check0:$check1" in
+    0:0) ;;
+    0:1|1:0)
+        echo 'dual-radio: mixed radio power state; fresh dual-SIM boot required' >&2
+        exit 4 ;;
+    *) fail 'radio state unreadable' ;;
+esac
+# Only a positively absent card is skipped. The E5 RIL comparison found that
+# raising an empty first stack with only SIM2 inserted asserts mnphone_api.c.
+# A PIN-locked card is still present; registration is handled by the dial path.
+modes=$(query 0 'AT+SPTESTMODE?' | sed -n 's/^+SPTESTMODE: *//p' | tr -d ' ')
+printf '%s\n' "$modes" | grep -qE '^[0-9]+,[0-9]+,[01](,[0-9]+)*$' || fail 'invalid work mode readback'
+pair=$(printf '%s' "$modes" | cut -d, -f1-2)
+# No band policy is invented here. Retain the user's existing per-card modes
+# and lock replay; T551M-specific NR locks must never be forced onto an F50.
+for card in 0 1; do
+    present "$card" || continue
+    ok "$card" 'AT+SFUN=2' || fail "SIM $card power-on rejected"
+done
+for card in 1 0; do
+    present "$card" || continue
+    ok "$card" "AT+SPTESTMODEM=$pair" || fail "SIM $card mode initialization rejected"
+done
+if [ -x /usr/libexec/unisoc-modem/lock ]; then
+    for card in 0 1; do
+        present "$card" || continue
+        (
+            . /usr/libexec/unisoc-modem/sim-scope.sh
+            sim_scope "$card" && /usr/libexec/unisoc-modem/lock replay early
+        ) || logger -t mu300-dual-radio "SIM $card early replay unverified"
+    done
+fi
+if present "$target"; then
+    ok "$target" 'AT+SPSWDATA' || fail 'data SIM selection rejected'
+fi
+actual=$(query "$target" 'AT+SPSWDATA?' | sed -n 's/^+SPSWDATA: *\([01]\)$/\1/p')
+case "$actual" in 0|1) ;; *) fail 'data SIM readback unavailable' ;; esac
+if present "$target"; then [ "$actual" = "$target" ] || fail 'data SIM readback mismatch'; fi
+printf '%s\n' "$actual" > "$root/mu300-data-sim-actual"
+for card in 0 1; do
+    present "$card" || continue
+    ok "$card" 'AT+SFUN=4' 20 || fail "SIM $card radio-on rejected"
+    [ "$(cfun "$card")" = 1 ] || fail "SIM $card radio-on readback mismatch"
+done
+: > "$root/mu300-dual-radio-ready"
+echo 'dual-radio: both SIM stacks ready' >&2

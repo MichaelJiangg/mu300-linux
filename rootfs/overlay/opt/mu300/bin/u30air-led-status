@@ -1,0 +1,33 @@
+#!/bin/sh
+# Independent U30 Air network, Wi-Fi and battery lamps. No AT or polling.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+RUN=${MU300_LED_RUN_DIR:-${MU300_SYSROOT:-}/run}
+LED=${MU300_BIN:-/opt/mu300/bin}/mu300-led
+mkdir -p "$RUN"
+network() {
+    case "$1" in
+        online-5g) "$LED" data 5g ;;
+        online-4g) "$LED" data on ;;
+        offline) "$LED" data error ;;
+        *) "$LED" data off ;;
+    esac
+}
+case "${1:-}" in
+    current) cat "$RUN/led-status.state" 2>/dev/null || echo boot ;;
+    wifi-on|wifi-off)
+        [ "$1" = wifi-on ] && state=on || state=off
+        echo "$state" > "$RUN/led-status.wifi"
+        "$LED" wifi "$state" ;;
+    battery) "$LED" battery ;;
+    refresh)
+        network "$(cat "$RUN/led-status.state" 2>/dev/null)"
+        "$LED" wifi "$(cat "$RUN/led-status.wifi" 2>/dev/null || echo off)"
+        "$LED" battery
+        "$LED" refresh ;;
+    thermal) "$LED" alarm on ;;
+    boot|modem|registering|online-4g|online-5g|offline)
+        echo "$1" > "$RUN/led-status.state"
+        network "$1"
+        "$LED" battery ;;
+    *) exit 1 ;;
+esac

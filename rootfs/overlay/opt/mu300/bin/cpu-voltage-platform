@@ -1,0 +1,57 @@
+#!/bin/sh
+# Platform adapter only. The standalone LuCI package owns UI/profile policy.
+# Never write firmware partitions or voltage regulators from userspace.
+set -eu
+module=sprd_cpufreq_v2_driver
+ko=/lib/modules/$(uname -r)/sprd-cpufreq-v2-driver.ko
+[ -f "$ko" ] || ko=/lib/modules/$(uname -r)/extra/sprd-cpufreq-v2-driver.ko
+helper=/usr/libexec/unisoc-modem/cpu-voltage
+supported() {
+    tr '\000' '\n' </sys/firmware/devicetree/base/compatible | grep -qx 'sprd,ums9620' || return 1
+    for slot in a b; do
+        part=/dev/disk/by-partlabel/sml_$slot
+        [ -b "$part" ] || part=/dev/block/by-name/sml_$slot
+        if [ ! -b "$part" ]; then
+            # Android-style by-name links are created by vendor startup, later
+            # than S08. Resolve already-present kernel partition labels now;
+            # never delay CPU/network boot waiting for those optional symlinks.
+            set -- $(grep -l "^PARTNAME=sml_$slot\$" /sys/class/block/*/uevent)
+            [ "$#" = 1 ] || return 1
+            part=${1%/uevent}
+            part=/dev/${part##*/}
+        fi
+        [ -b "$part" ] || return 1
+        real=$(readlink -f "$part") || return 1
+        [ "$(cat "/sys/class/block/${real##*/}/size")" = 2048 ] || return 1
+        hash=$(sha256sum "$part") || return 1
+        # V50 has the same verified executable and DVFS tables as F50; only
+        # 512 bytes in the authentication trailer differ. Keep an exact hash
+        # allowlist, never infer voltage support from the SoC name alone.
+        case ${hash%% *} in
+            ff4782690fd805ff54fe34853ef8ee5c7e51c3259e20077c55373b50a4b259c2|\
+            5b3183f17af9b416e71dea61e578c61824e4e1df43737a1179032f4b20466b2b) ;;
+            *) return 1 ;;
+        esac
+    done
+}
+case ${1:-load} in
+    check) supported ;;
+    load)
+        [ -f "$ko" ] || exit 0 # Old/built-in driver; do not reinitialize it.
+        mkdir -p /run
+        exec 9>/run/mu300-cpu-driver.lock
+        flock -x 9
+        [ ! -d /sys/module/$module ] || exit 0
+        offsets=0,0,0
+        if [ -x "$helper" ]; then
+            offsets=$("$helper" boot-args) || offsets=0,0,0
+        fi
+        # Defense in depth before passing any non-factory value to firmware.
+        if [ "$offsets" != 0,0,0 ]; then
+            supported || offsets=0,0,0
+            sync # Persist the crash guard BEFORE the one-shot DVFS_INIT.
+        fi
+        insmod "$ko" "voltage_offset_uv=$offsets"
+        ;;
+    *) exit 2 ;;
+esac

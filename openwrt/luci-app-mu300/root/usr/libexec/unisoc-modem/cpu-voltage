@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+if [ "${1:-get}" != get ]; then
+    mkdir -p /run
+    exec 9>/run/unisoc-cpu-voltage.lock
+    flock -x 9
+fi
+exec ucode "${MU300_CPU_VOLTAGE_UC:-/usr/libexec/unisoc-modem/cpu-voltage.uc}" "${1:-get}"

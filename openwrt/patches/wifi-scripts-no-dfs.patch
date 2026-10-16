@@ -1,0 +1,67 @@
+--- a/usr/share/ucode/wifi/hostapd.uc
++++ b/usr/share/ucode/wifi/hostapd.uc
+@@ -3,5 +3,5 @@
+ import {
+ 	append, append_raw, append_vars, dump_config, flush_config, set_default,
+-	wiphy_info, wiphy_band
++	wiphy_info, wiphy_band, log
+ } from 'wifi.common';
+ import { validate } from 'wifi.validate';
+@@ -469,4 +469,6 @@
+ 	phy = wiphy_info(phy);
+ 	let band = wiphy_band(phy, config.band);
++	phy_features.radar_detect = length(filter(phy.interface_combinations ?? [], (c) => c.radar_detect_widths)) > 0;
++	phy_capabilities.freqs = band?.freqs ?? [];
+ 
+ 	phy_capabilities.ht_capa = band.ht_capa ?? 0;
+@@ -486,4 +488,43 @@
+ }
+ 
++/* mu300: an AP on a DFS channel needs radar detection; without it hostapd's start_dfs_cac() fails and the AP never
++ * comes up (the SC2355 driver: mu300-linux docs/FINDINGS.md 40). For such a driver an explicit DFS channel becomes
++ * channel 36, keeping htmode exactly as configured. Never select 149 or narrow the bandwidth.
++ * Keep regulatory restrictions: fail if channel 36 cannot fit that width. "auto" excludes DFS. */
++function device_no_dfs(config) {
++	if (config.band != '5g' || phy_features.radar_detect)
++		return;
++
++	let radar = {}, usable = [], widths = {};
++	for (let f in phy_capabilities.freqs) {
++		let chan = (f.freq - 5000) / 5;
++		if (f.radar)
++			radar[chan] = true;
++		else if (!f.disabled && !f.no_ir) {
++			push(usable, chan);
++			widths[chan] = f;
++		}
++	}
++
++	if (!config.channel) {
++		config.acs_exclude_dfs = true;
++		return;
++	}
++	if (!radar[config.channel])
++		return;
++
++	/* MU300 policy: only change the channel; never assign config.htmode here. */
++	let m = match(config.htmode, /^(HT|VHT|HE|EHT)([0-9]+)$/);
++	let width = m ? +m[2] : (config.htmode == 'NOHT' ? 20 : 0);
++	if (!(width in [ 20, 40, 80, 160 ]))
++		die(`DFS channel ${config.channel}: cannot validate channel 36 with ${config.htmode}; bandwidth left unchanged`);
++	for (let c = 36; c < 36 + width / 5; c += 4) {
++		if (!(c in usable) || (width >= 80 && widths[c].no_80mhz) || (width >= 160 && widths[c].no_160mhz))
++			die(`DFS channel ${config.channel}: channel 36 with ${config.htmode} is not permitted; bandwidth left unchanged`);
++	}
++	log(`channel ${config.channel} is a DFS channel and this driver cannot detect radar: using channel 36, keeping ${config.htmode}`);
++	config.channel = 36;
++}
++
+ function generate(config) {
+ 	if (!config)
+@@ -495,4 +536,6 @@
+ 
+ 	set_device_defaults(config);
++
++	device_no_dfs(config);
+ 
+ 	device_log_append(config);

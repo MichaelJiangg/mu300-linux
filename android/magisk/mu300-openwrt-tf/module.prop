@@ -1,6 +1,6 @@
 id=mu300_linux_tf_deploy
 name=MU300 Linux OpenWrt TF deployer
-version=v2.0
-versionCode=20
+version=v3.0-7.2
+versionCode=30
 author=mu300-linux
-description=Installs a complete OpenWrt rootfs to the TF card, writes Linux to boot_b and safely arms one Linux boot. ZTE F50/MU300, Android slot a only.
+description=Installs OpenWrt on TF, writes Linux to the slot opposite Android and safely arms one Linux boot.

@@ -1,22 +1,81 @@
 #!/bin/sh
-# Thermal safety for kernels without SoC trip points (mainline: the stock DT only has trips on the vendor virtual
-# zone). Reads the hottest on-die sensor every 5 s: above HOT caps every cpufreq policy one step lower, below COOL
-# lifts the cap one step, above CRIT powers off. The 5.4 vendor kernel throttles itself, so this exits there.
+# Thermal safety for kernels without functional CPU cooling bindings. The mainline virtual sensor, when
+# available, restores the stock DT trips and lets native cooling handle frequency limits. Otherwise above HOT
+# caps each policy one step lower, below COOL lifts the cap. Mainline keeps CRIT emergency shutdown either way.
+# The 5.4 vendor kernel throttles/protects itself, so there this script only watches.
+# On every kernel: the SoC at HOT or (U30 Air) the battery at BATT_HOT (tenths of a degree, as power_supply reports it) sets
+# off the LED alarm (mu300-led alarm: a red and blue siren), until the SoC is down to COOL and the battery to
+# BATT_COOL.
 HOT=${MU300_THERMAL_HOT:-85000}
 COOL=${MU300_THERMAL_COOL:-75000}
 CRIT=${MU300_THERMAL_CRIT:-105000}
+BATT_HOT=${MU300_BATTERY_HOT:-500}
+BATT_COOL=${MU300_BATTERY_COOL:-450}
+R=${MU300_SYSROOT:-}   # (for tests/: a fake /, one round)
+LED=${MU300_BIN:-/opt/mu300/bin}/mu300-led
 
-for z in /sys/class/thermal/thermal_zone*; do
-    [ -e "$z/trip_point_0_temp" ] && { echo "kernel thermal trips present, nothing to do"; exit 0; }
+throttle=1
+for z in "$R"/sys/class/thermal/thermal_zone*; do
+    [ -e "$z/trip_point_0_temp" ] && { throttle=0; echo "kernel thermal trips present: only the LED alarm here"; break; }
 done
+legacy_throttle=$throttle
+[ -d "$R/sys/module/mu300_thermal" ] && legacy_throttle=1
+
+# The mainline virtual sensor can probe after this service starts. Only hand
+# frequency control over when every existing CPU cooling device is bound to
+# the enabled stock zone. Keep our more conservative 105 C shutdown protection.
+native_cpu_cooling() {
+    local zone mode kind dev link found trip value passive=0 count=0
+    [ -d "$R/sys/module/mu300_thermal" ] || return 1
+    for zone in "$R"/sys/class/thermal/thermal_zone*; do
+        read -r kind < "$zone/type" 2>/dev/null || continue
+        [ "$kind" = soc-thmzone ] || continue
+        read -r mode < "$zone/mode" 2>/dev/null || continue
+        [ "$mode" = enabled ] || return 1
+        # PR #190: bindings alone cannot prove that the sensor can throttle.
+        read -r value < "$zone/temp" 2>/dev/null || return 1
+        case $value in ''|*[!0-9]*) return 1 ;; esac
+        [ "$value" -ge "$(( ${1:-0} - 15000 ))" ] || return 1
+        for trip in "$zone"/trip_point_*_type; do
+            read -r kind < "$trip" 2>/dev/null || continue
+            [ "$kind" = passive ] || continue
+            read -r value < "${trip%_type}_temp" 2>/dev/null || continue
+            case $value in ''|*[!0-9]*) continue ;; esac
+            [ "$value" -le "$HOT" ] && passive=1
+        done
+        [ "$passive" = 1 ] || return 1
+        for dev in "$R"/sys/class/thermal/cooling_device*; do
+            read -r kind < "$dev/type" 2>/dev/null || continue
+            case "$kind" in cpufreq-*) ;; *) continue ;; esac
+            count=$((count + 1)); found=0
+            for link in "$zone"/cdev[0-9]*; do
+                [ "$link" -ef "$dev" ] && { found=1; break; }
+            done
+            [ "$found" = 1 ] || return 1
+        done
+        [ "$count" -gt 0 ] && return 0
+    done
+    return 1
+}
 
 hottest() {
     local max=0 t
-    for z in /sys/class/thermal/thermal_zone*/temp; do
+    for z in "$R"/sys/class/thermal/thermal_zone*/temp; do
         read -r t < "$z" 2>/dev/null || continue
         [ "$t" -gt "$max" ] 2>/dev/null && max=$t
     done
     echo "$max"
+}
+DEVICE=$(${MU300_BIN:-/opt/mu300/bin}/mu300-device)
+battery() {  # the battery's temperature in tenths of a degree; the U30 Air only
+    local b t
+    # The F50 has no battery, but under mainline the PMIC's fuel gauge probes on it too and reports one, at a
+    # temperature read from an unconnected NTC input (750: 75 C): the alarm went on at every boot and never off.
+    [ "$DEVICE" = u30air ] || return 0
+    for b in "$R"/sys/class/power_supply/*; do
+        [ "$(cat "$b/type" 2>/dev/null)" = Battery ] || continue
+        read -r t < "$b/temp" 2>/dev/null && [ -n "$t" ] && { echo "$t"; return; }
+    done
 }
 
 # step POLICY DIR (-1 lower, +1 higher): move scaling_max_freq to the neighbouring available frequency
@@ -33,22 +92,82 @@ step() {
     [ -n "$next" ] && echo "$next" > "$p/scaling_max_freq"
 }
 
+# the alarm's state outlives a restart of this service, so a cooled device is never left flashing
+ALARM=$R/run/mu300/thermal-alarm
+CAPS=$R/run/mu300/thermal-caps
+# Remember only limits this guard set, preserving a user's lower ceiling.
+guard_lower() {
+    local p=$1 current ceiling applied file=$CAPS/${1##*/}
+    read -r current < "$p/scaling_max_freq" || return 1
+    ceiling=$current
+    if [ -r "$file" ]; then
+        IFS='|' read -r ceiling applied < "$file" || ceiling=$current
+        [ "$current" = "$applied" ] || ceiling=$current
+    fi
+    step "$p" -1 || return 0
+    read -r applied < "$p/scaling_max_freq" || return 1
+    mkdir -p "$CAPS" && printf '%s|%s\n' "$ceiling" "$applied" > "$file"
+}
+guard_release() {
+    local p=$1 current ceiling applied file=$CAPS/${1##*/}
+    [ -r "$file" ] || return 0
+    IFS='|' read -r ceiling applied < "$file" || return 1
+    read -r current < "$p/scaling_max_freq" || return 1
+    case $ceiling:$applied in *[!0-9:]*|:*|*:) return 1 ;; esac
+    # If another controller/user changed it, that newer choice wins.
+    [ "$current" != "$applied" ] || printf '%s\n' "$ceiling" > "$p/scaling_max_freq" || return 1
+    rm -f "$file"
+}
+guard_raise() {
+    local p=$1 current ceiling applied next f file=$CAPS/${1##*/}
+    [ -r "$file" ] || return 0
+    IFS='|' read -r ceiling applied < "$file" || return 1
+    read -r current < "$p/scaling_max_freq" || return 1
+    case $ceiling:$applied in *[!0-9:]*|:*|*:) return 1 ;; esac
+    if [ "$current" != "$applied" ] || [ "$current" -ge "$ceiling" ]; then
+        rm -f "$file"; return 0
+    fi
+    # Keep the previous gradual cool-down recovery, bounded by the user's cap.
+    next=$ceiling
+    for f in $(tr ' ' '\n' < "$p/scaling_available_frequencies" | sort -n); do
+        if [ "$f" -gt "$current" ] && [ "$f" -lt "$next" ]; then next=$f; fi
+    done
+    printf '%s\n' "$next" > "$p/scaling_max_freq" || return 1
+    if [ "$next" = "$ceiling" ]; then rm -f "$file"
+    else printf '%s|%s\n' "$ceiling" "$next" > "$file"; fi
+}
 while :; do
     t=$(hottest)
-    if [ "$t" -ge "$CRIT" ]; then
+    throttle=$legacy_throttle
+    emergency=$legacy_throttle
+    if [ -d "$R/sys/module/mu300_thermal" ]; then
+        throttle=1; emergency=1
+        if native_cpu_cooling "$t"; then
+            throttle=0
+            for p in "$R"/sys/devices/system/cpu/cpufreq/policy*; do guard_release "$p"; done
+        fi
+    fi
+    b=$(battery)
+    if [ "$t" -ge "$CRIT" ] && [ "$emergency" = 1 ]; then
         logger -t thermal-guard "critical temperature ${t} mC, powering off"
-        led-status thermal 2>/dev/null
         poweroff
-    elif [ "$t" -ge "$HOT" ]; then
-        for p in /sys/devices/system/cpu/cpufreq/policy*; do step "$p" -1; done
-        # red blink while hot; led-status restores the network color when it cools
-        led-status thermal 2>/dev/null
+    elif [ "$t" -ge "$HOT" ] && [ "$throttle" = 1 ]; then
+        for p in "$R"/sys/devices/system/cpu/cpufreq/policy*; do guard_lower "$p"; done
         logger -t thermal-guard "hot (${t} mC): lowered cpufreq limits"
-    elif [ "$t" -le "$COOL" ]; then
-        led-status current >/dev/null 2>&1 && led-status "$(led-status current)" 2>/dev/null
-        for p in /sys/devices/system/cpu/cpufreq/policy*; do
-            [ "$(cat $p/scaling_max_freq)" -lt "$(cat $p/cpuinfo_max_freq)" ] && step "$p" 1
+    elif [ "$t" -le "$COOL" ] && [ "$throttle" = 1 ]; then
+        for p in "$R"/sys/devices/system/cpu/cpufreq/policy*; do
+            guard_raise "$p"
         done
     fi
+    if [ ! -e "$ALARM" ] && { [ "$t" -ge "$HOT" ] || [ "${b:-0}" -ge "$BATT_HOT" ]; }; then
+        mkdir -p "${ALARM%/*}" && : > "$ALARM"
+        logger -t thermal-guard "too hot (SoC ${t} mC, battery ${b:--} dC): LED alarm on"
+        "$LED" alarm on
+    elif [ -e "$ALARM" ] && [ "$t" -le "$COOL" ] && [ "${b:-0}" -le "$BATT_COOL" ]; then
+        rm -f "$ALARM"
+        logger -t thermal-guard "cooled down (SoC ${t} mC, battery ${b:--} dC): LED alarm off"
+        "$LED" alarm off
+    fi
+    [ -n "$R" ] && exit 0
     sleep 5
 done

@@ -1,5 +1,5 @@
 #!/bin/sh
-# After a trial falls back to Android: collect LK log, pstore and the init log persisted in boot_b.
+# After a trial falls back to Android: collect LK log, pstore and the init log persisted in the Linux slot.
 set -eu
 OUT=${1:-logs-$(date +%Y%m%d-%H%M%S)}
 mkdir -p "$OUT"
@@ -13,8 +13,10 @@ dev_pull() {
 for f in $(adb shell "su -c 'ls /sys/fs/pstore'" | tr -d '\r'); do dev_pull "/sys/fs/pstore/$f" "$OUT/$f"; done
 dev_pull /dev/block/by-name/uboot_log "$OUT/uboot_log.raw"
 strings -n 6 "$OUT/uboot_log.raw" > "$OUT/uboot_log.txt"
-# init writes stages + dmesg to boot_b at 48 MiB (8 MiB)
-adb shell "su -c 'dd if=/dev/block/by-name/boot_b bs=4096 skip=12288 count=2048 2>/dev/null > /data/local/tmp/mu300-pull.bin'" </dev/null >/dev/null
+# init writes stages + dmesg to the Linux boot slot at 48 MiB (8 MiB)
+android_slot=$(adb shell getprop ro.boot.slot_suffix | tr -d '\r')
+case $android_slot in _a) linux_slot=b ;; _b) linux_slot=a ;; *) echo "unknown Android slot: $android_slot" >&2; exit 1 ;; esac
+adb shell "su -c 'dd if=/dev/block/by-name/boot_$linux_slot bs=4096 skip=12288 count=2048 2>/dev/null > /data/local/tmp/mu300-pull.bin'" </dev/null >/dev/null
 adb pull /data/local/tmp/mu300-pull.bin "$OUT/linux-persist.raw" >/dev/null 2>&1
 adb shell "su -c 'rm -f /data/local/tmp/mu300-pull.bin'" </dev/null >/dev/null
 tr -d '\000' < "$OUT/linux-persist.raw" > "$OUT/linux-persist.txt" && rm -f "$OUT/linux-persist.raw"

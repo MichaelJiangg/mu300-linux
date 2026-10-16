@@ -1,6 +1,8 @@
 # device dumps, proprietary blobs and build outputs never belong in this repository
 dumps/
 firmware/
+# ...but not the kernel source directory of that name in the mainline port
+!upstream/port/drivers/firmware/
 android-subset/
 out/
 *.img
@@ -18,6 +20,7 @@ __pycache__/
 tools/bt-init/mu300-bt-init
 tools/gpu/cltest
 work/
+work-*/
 openwrt/*.tar.gz
 upstream/stub/*.elf
 upstream/stub/*.bin
@@ -30,7 +33,14 @@ backup/
 arch/*.tar.gz
 arch/ArchLinuxARM-*
 android/magisk/*.zip
+/mu300-linux-openwrt-tf*.zip
 /tools/pcmhost/pcmhost
-kernel/builtin-rejected.txt
-kernel/builtin.fragment
-kernel/merge-builtin.log
+
+# built by tools/ctlset/build.sh
+tools/ctlset/ctlset
+
+# written by the installer self-update in copies without git
+.mu300-source
+upstream/out-*/
+# the user's own list of files the self-update leaves alone (tools/self-update.sh, install.ps1)
+.mu300-keep

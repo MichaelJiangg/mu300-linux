@@ -1,0 +1,22 @@
+WCN PCIe: return EAGAIN when the pending ring refuses ownership.
+
+--- a/drivers/unisoc_platform/sprdwcn/pcie/edma_engine.c
++++ b/drivers/unisoc_platform/sprdwcn/pcie/edma_engine.c
+@@ -15,6 +15,7 @@
+ #include <linux/atomic.h>
+ #include <linux/moduleparam.h>
+ #include <linux/ratelimit.h>
++#include <linux/errno.h>
+ #include <misc/marlin_platform.h>
+ #include <misc/wcn_bus.h>
+ #include <linux/pci.h>
+@@ -1037,7 +1038,8 @@
+ 			pr_warn("WARN %s(%d) full (rejected submissions=%lld)\n",
+ 				__func__, chn,
+ 				(long long)atomic64_read(&edma_pending_full[chn]));
+-		return ERROR;
++		/* No ownership transfer: the producer may retry after completion. */
++		return -EAGAIN;
+ 	}
+ 	q->ring[q->wt].head = head;
+ 	q->ring[q->wt].tail = tail;

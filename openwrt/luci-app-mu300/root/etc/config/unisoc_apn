@@ -1,0 +1,4 @@
+config profile 'automatic'
+	option name 'SIM default'
+	option apn ''
+	option pdptype 'IPV4V6'

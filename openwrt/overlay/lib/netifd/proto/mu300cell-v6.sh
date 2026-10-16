@@ -4,7 +4,7 @@
 # IPv6 is supplied by RA, so address and route netlink notifications are the
 # authoritative source (including lifetime refreshes). IPv4 and peer DNS are
 # supplied by CGCONTRDP; nr0 announces PDP changes with +CGEV, at which point a
-# single read refreshes them. This process is owned by netifd via
+# state/address check refreshes them. This process is owned by netifd via
 # proto_run_command and also implements the standard WAN renew signal (USR1).
 #
 # Every update is sent address-external (matching the setup in mu300cell.sh):
@@ -35,20 +35,41 @@ dns1=$5
 dns2=$6
 peerdns=$7
 urclog=${MU300_URC_LOG:-/run/mu300-at/urc/stty_nr0.log}
+sim_slot=${9:-${MU300_SIM_SLOT:-0}}
+case "$sim_slot" in 0|1) ;; *) exit 1 ;; esac
+[ "$sim_slot" != 1 ] || urclog=${MU300_URC_LOG:-/run/mu300-at4/urc/stty_nr3.log}
 logtag=mu300cell-renew
 
 mask2prefix() {
-	local m=$1 bits=0 o IFS=.
+	local m=$1 bits=0 o partial=0 IFS=.
 	for o in $m; do
+		[ "$partial" = 0 ] || [ "$o" = 0 ] || return 1
 		case $o in
-			255) bits=$((bits + 8)) ;; 254) bits=$((bits + 7)) ;;
-			252) bits=$((bits + 6)) ;; 248) bits=$((bits + 5)) ;;
-			240) bits=$((bits + 4)) ;; 224) bits=$((bits + 3)) ;;
-			192) bits=$((bits + 2)) ;; 128) bits=$((bits + 1)) ;;
-			0) ;; *) echo 32; return ;;
+			255) bits=$((bits + 8)) ;;
+			254) bits=$((bits + 7)); partial=1 ;;
+			252) bits=$((bits + 6)); partial=1 ;;
+			248) bits=$((bits + 5)); partial=1 ;;
+			240) bits=$((bits + 4)); partial=1 ;;
+			224) bits=$((bits + 3)); partial=1 ;;
+			192) bits=$((bits + 2)); partial=1 ;;
+			128) bits=$((bits + 1)); partial=1 ;;
+			0) partial=1 ;; *) return 1 ;;
 		esac
 	done
 	echo "$bits"
+}
+
+valid_ipv4() {
+	local value=$1 a b c d rest
+	IFS=. read -r a b c d rest <<-EOF
+	$value
+	EOF
+	[ -z "$rest" ] && [ -n "$d" ] || return 1
+	for value in "$a" "$b" "$c" "$d"; do
+		case "$value" in ''|*[!0-9]*) return 1 ;; esac
+		[ "$value" -le 255 ] || return 1
+	done
+	[ "$a.$b.$c.$d" != 0.0.0.0 ]
 }
 
 # One record per address: CIDR|preferred seconds|valid seconds. Including the
@@ -98,6 +119,9 @@ report() {
 	# Mark the report external so netifd records it without replacing a finite
 	# SLAAC lifetime with a permanent static address or route.
 	proto_init_update "$ifname" 1 1
+	# A complete external snapshot replaces old IP/DNS but leaves finite
+	# SLAAC lifetimes and the kernel routes under their existing owners.
+	proto_set_keep 0
 	[ -n "$ip4" ] && {
 		proto_add_ipv4_address "$ip4" "${prefix4:-32}"
 		proto_add_ipv4_route "0.0.0.0" 0
@@ -124,9 +148,11 @@ report() {
 
 read_bearer() {
 	local d out line addrmask mask new_ip4 new_prefix new_dns1 new_dns2
-	for d in /run/mu300-at6 /run/mu300-at7 /run/mu300-at; do
+	local channels='/run/mu300-at6 /run/mu300-at7 /run/mu300-at'
+	[ "$sim_slot" != 1 ] || channels=/run/mu300-at4
+	for d in $channels; do
 		[ -p "$d/cmd" ] || continue
-		out=$(MU300_AT_LOCK_WAIT=0 MU300_AT_DIR="$d" mu300-at -t 3 'AT+CGCONTRDP=1' 2>/dev/null) || continue
+		out=$(MU300_AT_LOCK_WAIT=0 MU300_AT_DIR="$d" mu300-at -t 3 "AT+SPACTCARD=$sim_slot;+CGCONTRDP=1" 2>/dev/null) || continue
 		line=$(printf '%s\n' "$out" | awk -F, '/^\+CGCONTRDP:/ {
 			a=$4; gsub(/"/, "", a); n=split(a, x, ".")
 			if (n==8 && x[1]+0>0) { print; exit }
@@ -134,40 +160,83 @@ read_bearer() {
 		[ -n "$line" ] && break
 	done
 	[ -n "$line" ] || return 1
-	addrmask=$(printf '%s\n' "$line" | cut -d, -f4 | tr -d '"')
+	addrmask=$(printf '%s\n' "$line" | cut -d, -f4 | tr -d '"\r ')
 	new_ip4=$(printf '%s\n' "$addrmask" | cut -d. -f1-4)
 	mask=$(printf '%s\n' "$addrmask" | cut -d. -f5-8)
-	new_prefix=$(mask2prefix "$mask")
-	new_dns1=$(printf '%s\n' "$line" | cut -d, -f6 | tr -d '"')
-	new_dns2=$(printf '%s\n' "$line" | cut -d, -f7 | tr -d '"')
-	[ -n "$new_ip4" ] || return 1
+	new_prefix=$(mask2prefix "$mask") || return 1
+	new_dns1=$(printf '%s\n' "$line" | cut -d, -f6 | tr -d '"\r ')
+	new_dns2=$(printf '%s\n' "$line" | cut -d, -f7 | tr -d '"\r ')
+	[ "$new_dns1" != 0.0.0.0 ] || new_dns1=
+	[ "$new_dns2" != 0.0.0.0 ] || new_dns2=
+	valid_ipv4 "$new_ip4" || return 1
+	[ -z "$new_dns1" ] || valid_ipv4 "$new_dns1" || return 1
+	[ -z "$new_dns2" ] || valid_ipv4 "$new_dns2" || return 1
 	BEARER_IP4=$new_ip4
 	BEARER_PREFIX4=$new_prefix
 	BEARER_DNS1=$new_dns1
 	BEARER_DNS2=$new_dns2
 }
 
+# Only explicit inactivity is evidence to reconnect. AT owners can be busy
+# while moving between cells; a timeout/empty response must keep WAN intact.
+context_active() {
+	local d out
+	local channels='/run/mu300-at6 /run/mu300-at7 /run/mu300-at'
+	[ "$sim_slot" != 1 ] || channels=/run/mu300-at4
+	for d in $channels; do
+		[ -p "$d/cmd" ] || continue
+		out=$(MU300_AT_LOCK_WAIT=0 MU300_AT_DIR="$d" mu300-at -t 3 "AT+SPACTCARD=$sim_slot;+CGACT?" 2>/dev/null) || continue
+		printf '%s\n' "$out" | tr -d '\r' |
+			grep -Eq '\+CGACT:[[:space:]]*1,1([^0-9]|$)' && return 0
+		printf '%s\n' "$out" | tr -d '\r' |
+			grep -Eq '\+CGACT:[[:space:]]*1,0([^0-9]|$)' && return 1
+	done
+	return 2
+}
+
 refresh_bearer() {
-	local reason=$1 old old_ip4 old_prefix4
+	local reason=$1 old old_ip4 old_prefix4 old_dns1 old_dns2 state try kernel_addresses
 	old="$ip4/$prefix4 $dns1 $dns2"
 	old_ip4=$ip4; old_prefix4=$prefix4
-	if ! read_bearer; then
+	old_dns1=$dns1; old_dns2=$dns2
+	context_active
+	state=$?
+	try=0
+	while [ "$state" = 1 ] && [ "$try" -lt 3 ]; do
+		sleep 2
+		try=$((try + 1))
+		context_active
+		state=$?
+	done
+	if [ "$state" = 1 ]; then
+		logger -t "$logtag" "$reason: PDP context 1 remains inactive; requesting netifd recovery"
+		return 2
+	fi
+	# A failed state read or an active context with no fresh address does not
+	# justify disrupting the connection, including stale CGCONTRDP replies.
+	if [ "$state" != 0 ] || ! read_bearer; then
 		logger -t "$logtag" "$reason: PDP active address is not available; keeping the last netifd state"
 		return 1
 	fi
 	ip4=$BEARER_IP4; prefix4=$BEARER_PREFIX4
 	dns1=$BEARER_DNS1; dns2=$BEARER_DNS2
-	if [ "$old" != "$ip4/$prefix4 $dns1 $dns2" ]; then
+	kernel_addresses=$(ip -4 -o addr show dev "$ifname" scope global 2>/dev/null | awk '{print $4}')
+	if [ "$old" != "$ip4/$prefix4 $dns1 $dns2" ] ||
+		! printf '%s\n' "$kernel_addresses" | grep -Fxq "$ip4/$prefix4"; then
 		# Add the replacement before deleting the old address. There is no
 		# ifdown, CGACT cycle or USB event, so an address handover only loses
 		# packets during the carrier's own transition.
-		if [ "$old_ip4/$old_prefix4" != "$ip4/$prefix4" ]; then
-			ip -4 addr add "$ip4/$prefix4" dev "$ifname" 2>/dev/null ||
-				ip -4 addr replace "$ip4/$prefix4" dev "$ifname"
-			[ -n "$old_ip4" ] && ip -4 addr del "$old_ip4/${old_prefix4:-32}" dev "$ifname" 2>/dev/null || true
-			ip -4 route replace default dev "$ifname"
+		if ! { ip -4 addr add "$ip4/$prefix4" dev "$ifname" 2>/dev/null ||
+			ip -4 addr replace "$ip4/$prefix4" dev "$ifname"; } ||
+			! ip -4 route replace default dev "$ifname" || ! report; then
+			ip4=$old_ip4; prefix4=$old_prefix4
+			dns1=$old_dns1; dns2=$old_dns2
+			logger -t "$logtag" "$reason: update failed; keeping previous snapshot for retry"
+			return 1
 		fi
-		report
+		if [ "$old_ip4/$old_prefix4" != "$ip4/$prefix4" ]; then
+			[ -z "$old_ip4" ] || ip -4 addr del "$old_ip4/${old_prefix4:-32}" dev "$ifname" 2>/dev/null || true
+		fi
 		logger -t "$logtag" "$reason: bearer updated to $ip4/$prefix4"
 	else
 		logger -t "$logtag" "$reason: bearer unchanged"
@@ -199,7 +268,8 @@ reap "ip -6 monitor route dev $ifname"
 reap "tail -n 0 -F $urclog"
 
 events=/run/mu300cell-${config}.events
-rm -f "$events"
+pdp_pending=$events.pdp
+rm -f "$events" "$pdp_pending"
 mkfifo -m 600 "$events" || exit 1
 exec 3<>"$events"
 
@@ -212,12 +282,20 @@ exec 3<>"$events"
 	tail -n 0 -F "$urclog" 2>/dev/null |
 	while IFS= read -r line; do
 		case $line in
-			*+CGEV:*PDN*|*+CGEV:*MODIFY*) printf 'pdp\n' ;;
+			# Besides standard PDN/MODIFY reports, Unisoc emits abbreviated
+			# "NW ACT <p_cid>,<cid>" and +SPPCODATA (PCO updates).
+			# All are hints to perform one coalesced CGCONTRDP refresh.
+			*+CGEV:*PDN*|*+CGEV:*ACT*|*+CGEV:*DETACH*|*+CGEV:*MODIFY*|*+SPPCODATA:*)
+				# One queued hint covers the entire burst. A hint arriving during
+				# an AT read queues another refresh, so cooldown never loses it.
+				[ -e "$pdp_pending" ] || { : >"$pdp_pending"; printf 'pdp\n'; }
+				;;
 		esac
 	done > "$events" ) & urcmon=$!
 
 renew_pending=0
 cleanup() {
+	local rc=$1
 	trap - INT TERM EXIT USR1
 	kill "$addrmon" "$routemon" "$urcmon" 2>/dev/null
 	# Killing a subshell does not kill the pipeline it feeds; reap the
@@ -226,17 +304,19 @@ cleanup() {
 	reap "ip -6 monitor route dev $ifname"
 	reap "tail -n 0 -F $urclog"
 	exec 3>&-
-	rm -f "$events"
-	exit 0
+	rm -f "$events" "$pdp_pending"
+	exit "$rc"
 }
-trap cleanup INT TERM EXIT
+trap 'cleanup 0' INT TERM
+trap 'cleanup $?' EXIT
 trap 'renew_pending=1' USR1
 
 last_pdp=0
 while :; do
 	if [ "$renew_pending" = 1 ]; then
 		renew_pending=0
-		refresh_bearer manual-renew || true
+		refresh_bearer manual-renew
+		[ "$?" != 2 ] || exit 2
 		last_pdp=$(date +%s)
 	fi
 	event=
@@ -249,17 +329,22 @@ while :; do
 		v6)
 			now=$(v6_snapshot)
 			[ "$now" = "$last_v6" ] && continue
+			report || continue
 			last_v6=$now
-			report
 			logger -t "$logtag" "IPv6 RA address/route state refreshed"
 			;;
 		pdp)
 			now=$(date +%s)
-			[ $((now - last_pdp)) -lt 2 ] && continue
+			gap=$((now - last_pdp))
+			# A backward NTP correction must not turn cooldown into a long stall.
+			[ "$gap" -ge 0 ] || gap=0
+			[ "$gap" -ge 2 ] || sleep "$((2 - gap))"
 			# Networks commonly emit DEACT plus several ACT notifications as one
 			# transition. Let the burst settle, then perform exactly one AT read.
 			sleep 1
-			refresh_bearer cgev || true
+			rm -f "$pdp_pending"
+			refresh_bearer cgev
+			[ "$?" != 2 ] || exit 2
 			last_pdp=$(date +%s)
 			;;
 	esac

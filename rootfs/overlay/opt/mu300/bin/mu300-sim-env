@@ -1,0 +1,28 @@
+#!/bin/sh
+# Source this platform mapping. The standalone plugin never assumes SIPA names.
+mu300_sim_env() {
+    local selected=${1:-} device
+    if [ -z "$selected" ] && [ "$("${MU300_DEVICE_CMD:-/opt/mu300/bin/mu300-device}" 2>/dev/null)" = u30air ]; then
+        selected=$(cat /run/mu300/sim-slot 2>/dev/null || true)
+    fi
+    [ -n "$selected" ] || selected=$(uci -q get unisoc_modem.main.data_sim 2>/dev/null || true)
+    selected=${selected:-0}
+    case "$selected" in 0|1) ;; *) return 1 ;; esac
+    if [ "$selected" = 1 ]; then
+        [ "$(uci -q get unisoc_modem.main.sim_slots 2>/dev/null)" = 2 ] || return 1
+        MU300_SIM_DIAL=/run/mu300-at5
+        MU300_SIM_SHARED=/run/mu300-at4
+        MU300_SIM_URC=/run/mu300-at4/urc/stty_nr3.log
+        device=sipa_eth8
+    else
+        MU300_SIM_DIAL=/run/mu300-at2
+        MU300_SIM_SHARED=/run/mu300-at
+        MU300_SIM_URC=/run/mu300-at/urc/stty_nr0.log
+        device=sipa_eth0
+    fi
+    MU300_SIM_DEVICE=$(uci -q get "unisoc_modem.main.sim${selected}_device" 2>/dev/null || true)
+    MU300_SIM_DEVICE=${MU300_SIM_DEVICE:-$device}
+    case "$MU300_SIM_DEVICE" in ''|*[!a-zA-Z0-9_.:-]*) return 1 ;; esac
+    [ "${#MU300_SIM_DEVICE}" -le 15 ] || return 1
+    export MU300_SIM_SLOT=$selected MU300_SIM_DIAL MU300_SIM_SHARED MU300_SIM_DEVICE MU300_SIM_URC
+}

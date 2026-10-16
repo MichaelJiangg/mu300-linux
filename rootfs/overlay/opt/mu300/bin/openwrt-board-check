@@ -1,0 +1,30 @@
+#!/bin/sh
+# Validate generated board metadata, preserving valid custom data and UCI.
+# Run once during hardware bring-up, before wifi-scripts parses board.json.
+set -eu
+R=${MU300_SYSROOT:-}
+parser=${MU300_BOARD_UCODE:-ucode}
+detector=${MU300_BOARD_DETECTOR:-/bin/board_detect}
+config=$R/etc/board.json
+valid() {
+    "$parser" -e 'import {readfile,stat} from "fs"; try { let s=stat(ARGV[0]); if(!s || s.size>1048576) exit(1); let x=json(readfile(ARGV[0])); exit(type(x)=="object"?0:1); } catch(e) { exit(1); }' "$1" >/dev/null 2>&1
+}
+valid "$config" && exit 0
+[ ! -L "$config" ] || { echo 'board.json is a symlink; refusing automatic replacement' >&2; exit 1; }
+[ -x "$detector" ] || { echo 'board_detect unavailable; cannot recover board.json' >&2; exit 1; }
+temp=$config.rebuild.$$
+[ ! -e "$temp" ] || exit 1
+trap 'rm -f "$temp"' EXIT
+"$detector" "$temp" >/dev/null
+valid "$temp" || { echo 'board_detect returned invalid JSON; original retained' >&2; exit 1; }
+if [ -f "$config" ]; then
+    # Do not discard the original evidence or overwrite a previous backup.
+    backup=$config.corrupt.$$
+    [ ! -e "$backup" ] || exit 1
+    cp -p "$config" "$backup"
+fi
+chmod 0644 "$temp"
+mv "$temp" "$config"
+trap - EXIT
+sync
+echo 'Recovered generated board.json; wireless settings retained'

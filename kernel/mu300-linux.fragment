@@ -127,6 +127,11 @@ CONFIG_IKHEADERS=m
 # --- USB gadget serial console (CDC-ACM) for recovery access over USB
 CONFIG_USB_CONFIGFS_ACM=y
 CONFIG_USB_F_ACM=y
+# --- the stock RNDIS function, for Windows without NCM (boot/init, MU300_USBNET="rndis ncm"). Unisoc's own
+# sprd_usb_f_rndis is no substitute: with CONFIG_USB_PAM it hands the data path to the IPA hardware on connect,
+# and its netdev never passes a packet (measured: Windows binds, rndis0 stays at 0/0).
+CONFIG_USB_CONFIGFS_RNDIS=y
+CONFIG_USB_F_RNDIS=y
 
 # --- userspace hardware access and regulatory
 CONFIG_I2C_CHARDEV=m

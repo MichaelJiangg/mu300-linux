@@ -1,0 +1,42 @@
+#!/bin/sh
+# One recovery owner even when multiple firmware-reset notifications arrive.
+# No boot service, polling loop, artificial delay, or persistent configuration writes.
+lock=/run/mu300-wcn-reopen.lock
+mkdir "$lock" 2>/dev/null || exit 0
+trap 'rmdir "$lock" 2>/dev/null' EXIT
+trap 'exit 1' HUP INT TERM
+
+. /lib/functions.sh
+config_load wireless
+
+wcn_radio() {
+    local section=$1 phy path p module syspath disabled
+    config_get_bool disabled "$section" disabled 0
+    [ "$disabled" = 0 ] || return 0
+    config_get phy "$section" phy
+    config_get path "$section" path
+    for p in /sys/class/ieee80211/*; do
+        [ -e "$p" ] || continue
+        module=$(readlink -f "$p/device/driver/module")
+        [ "${module##*/}" = sprd_wlan_combo ] || continue
+        syspath=$(readlink -f "$p/device")
+        if [ -n "$phy" ]; then
+            [ "$phy" = "${p##*/}" ] || continue
+        elif [ -n "$path" ]; then
+            case "$syspath" in */"$path") ;; *) continue ;; esac
+        else
+            # Do not guess which adapter an unbound radio belongs to.
+            continue
+        fi
+        logger -t mu300-wcn "reopening $section after WCN reset"
+        # Always attempt up, even if down reports that the crashed firmware is gone.
+        wifi down "$section"
+        # Respect a user disabling this radio while the reset/down was running.
+        config_load wireless
+        config_get_bool disabled "$section" disabled 0
+        [ "$disabled" = 0 ] || return 0
+        wifi up "$section" || logger -t mu300-wcn "reopen failed: $section; no automatic reboot"
+        return 0
+    done
+}
+config_foreach wcn_radio wifi-device

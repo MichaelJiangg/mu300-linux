@@ -1,0 +1,22 @@
+SC2355 PCIe: use the flow-controlled data queue for ordinary IPv6 multicast.
+Preserve DHCPv6/VoWiFi command filtering and the existing SDIO workaround.
+
+--- a/sc2355/tx.c
++++ b/sc2355/tx.c
+@@ -938,6 +938,16 @@ static int tx_mc_pkt(struct sk_buff *skb, struct net_device *ndev)
+ 	vif = netdev_priv(ndev);
+ 	hif = &vif->priv->hif;
+ 
++	/* PCIe AP multicast belongs to the flow-controlled data queue, like
++	 * IPv4 multicast. CMD_TX_DATA can reject valid bursts (observed after
++	 * six frames on F50 firmware); further IPv6 frames are rejected by FW
++	 * while the command worker considers them sent. Returning to the IP
++	 * filter preserves the dedicated DHCPv6/VoWiFi command handling.
++	 * Keep the SDIO workaround until its transport is validated separately.
++	 */
++	if (hif->hw_type == SPRD_HW_SC2355_PCIE)
++		return 1;
++
+ 	if (skb->data) {
+ 		memcpy(hif->skb_da, skb->data, ETH_ALEN);
+ 	} else {

@@ -259,12 +259,6 @@ static int sprd_ipc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-#if defined(CONFIG_DEBUG_FS)
-	smem_init_debug();
-	smsg_init_debug();
-	sbuf_init_debug();
-	sblock_init_debug();
-#endif
 	return 0;
 out:
 	if (!IS_ERR(ipc->chan))
@@ -302,12 +296,33 @@ static struct platform_driver sprd_ipc_driver = {
 
 static int __init sprd_ipc_init(void)
 {
+	int ret;
+
 	smsg_init_wakeup();
 	smsg_init_channel2index();
 #if IS_ENABLED(CONFIG_SPRD_SIPC)
 	atomic_notifier_chain_register(&panic_notifier_list, &senddie_panic_nb);
 #endif
-	return platform_driver_register(&sprd_ipc_driver);
+	ret = platform_driver_register(&sprd_ipc_driver);
+	if (ret) {
+#if IS_ENABLED(CONFIG_SPRD_SIPC)
+		atomic_notifier_chain_unregister(&panic_notifier_list, &senddie_panic_nb);
+#endif
+		smsg_remove_wakeup();
+		return ret;
+	}
+
+	/* These global classes belong to the SIPC module, not to each remote
+	 * processor. Recreating them in probe loses their pointers and warns
+	 * for every additional IPC device. Teardown already lives in exit.
+	 */
+#if defined(CONFIG_DEBUG_FS)
+	smem_init_debug();
+	smsg_init_debug();
+	sbuf_init_debug();
+	sblock_init_debug();
+#endif
+	return 0;
 }
 
 static void __exit sprd_ipc_exit(void)

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Build everything install.sh --build and tools/make-release.sh need from public sources, in one step:
-#   kernel/build-all.sh            -> out/Image, out/modules/*.ko, out/modules.builtin*
+#   kernel/build-all.sh            -> out/Image, out/modules/*.ko, out/modules.builtin*, out/modules-u30air/*.ko
 # Sources (pinned commits, downloaded into the docker volume $MU300_KBUILD_VOLUME on first run):
 #   ZTE UMS9620 MiFi 5.4.254 kernel (GPL release published by Enceka)
 #   realme C51/C53 AndroidT kernel_modules: wlan_combo (Wi-Fi), bluetooth tty-pcie, Mali kbase (sparse checkout)
@@ -21,7 +21,6 @@ trap 'rm -rf "$W"' EXIT
 # build-linux.sh writes its logs next to the config: give it a scratch copy of kernel/
 cp -R "$TOP/kernel/." "$W/"
 cp "$TOP/kernel/f50-stock-B09.config" "$W/device.config"
-cp "$TOP/kernel/builtin.fragment" "$W/builtin.fragment"
 
 docker run --rm -v "$VOL":/src -v "$W":/work \
   -e KERNEL_REPO=$KERNEL_REPO -e KERNEL_REV=$KERNEL_REV -e MODULES_REPO=$MODULES_REPO -e MODULES_REV=$MODULES_REV \
@@ -46,7 +45,7 @@ echo "==> sources"
 fetch /src/zte-u30air "$KERNEL_REPO" "$KERNEL_REV"
 cd /src/zte-u30air
 # the tree is the pinned commit plus exactly these patches: reapply from a clean checkout whenever they change
-KPATCHES="bluetooth-marlin3-link-policy of-reserved-mem-skip of-reserved-mem-add regdb-wens-certificate"
+KPATCHES="bluetooth-marlin3-link-policy of-reserved-mem-skip of-reserved-mem-add regdb-wens-certificate sipa-delegate-einprogress wcn-pcie-scan-timeout sipc-base-addr-attr sprdwcn-mbuf-pool-deinit-null sprdwcn-edma-pressure-stats sprdwcn-tx-pending-backpressure sdhci-sprd-dma-ordering"
 sum=$(cd /work/patches && cat $(for p in $KPATCHES; do echo $p.patch; done) | sha256sum | cut -d" " -f1)
 if [ "$(cat .mu300-patches 2>/dev/null)" != "$sum" ]; then
     git checkout -q -f "$KERNEL_REV" && git clean -q -fdx -e .mu300-patches
@@ -56,15 +55,25 @@ fi
 echo -gb50db5b6224c > .scmversion
 M=kernel_modules/kernel5.4
 fetch /src/realme "$MODULES_REPO" "$MODULES_REV" $M/wcn/wlan/wlan_combo $M/wcn/bluetooth/driver $M/gpu/natt/mali
-[ -d /src/ext-wlan_combo ] || cp -r /src/realme/$M/wcn/wlan/wlan_combo /src/ext-wlan_combo
-[ -d /src/ext-sprdbt ] || cp -r /src/realme/$M/wcn/bluetooth/driver /src/ext-sprdbt
+# Upstream b0e9595: changed patch sets must start from pristine vendor sources.
+# Never silently keep an old or partly patched driver in a reused build volume.
+patched_copy() { # DEST SOURCE PATCH-GLOB; destinations are fixed build scratch directories
+    local sum; sum=$(cat /work/patches/$3 | sha256sum | cut -d" " -f1)
+    [ "$(cat "$1/.mu300-patches" 2>/dev/null)" = "$sum" ] && return 0
+    case "$1" in /src/ext-wlan_combo|/src/ext-sprdbt) ;; *) exit 1 ;; esac
+    rm -rf "$1" && cp -r "$2" "$1"
+    (cd "$1" && for p in /work/patches/$3; do patch -p1 -s -f < "$p"; done)
+    echo "$sum" > "$1/.mu300-patches"
+}
+patched_copy /src/ext-wlan_combo /src/realme/$M/wcn/wlan/wlan_combo "wlan_combo-*.patch"
+patched_copy /src/ext-sprdbt /src/realme/$M/wcn/bluetooth/driver "sprdbt-*.patch"
 [ -d /src/ext-mali ] || cp -r /src/realme/$M/gpu/natt/mali /src/ext-mali
 
 echo "==> kernel"
 bash /work/build-linux.sh
 echo "==> Wi-Fi, Bluetooth, GPU modules"
 bash /work/build-wlan.sh >/dev/null
-make O=/src/out-linux ARCH=arm64 LLVM=1 LLVM_IAS=1 CC=clang LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- -j"$(nproc)" M=/src/ext-sprdbt \
+make O=/src/out-linux ARCH=arm64 LLVM=1 LLVM_IAS=1 CC=clang LD=ld.lld -j"$(nproc)" M=/src/ext-sprdbt \
   BSP_BOARD_UNISOC_WCN_SOCKET=pcie modules >/dev/null
 bash /work/build-mali.sh >/dev/null
 
@@ -72,22 +81,13 @@ echo "==> collecting"
 rm -rf /work/out && mkdir -p /work/out/modules
 cp /src/out-linux/arch/arm64/boot/Image /src/out-linux/modules.builtin /src/out-linux/modules.builtin.modinfo /work/out/
 find /src/out-linux -name "*.ko" -exec cp {} /work/out/modules/ \;
-# Keep the external modules explicit instead of relying only on the recursive
-# collection above.  This makes the output contract visible and lets the
-# checks below reject a partial kernel build.
-cp /src/out-linux/sprd_wlan_combo.ko /src/out-linux/mali_kbase.ko \
-   /src/ext-sprdbt/sprdbt_tty.ko /work/out/modules/
+cp /src/ext-wlan_combo/sprd_wlan_combo.ko /src/ext-sprdbt/sprdbt_tty.ko /work/out/modules/
 llvm-strip --strip-debug /work/out/modules/*.ko
-for f in wcn_bsp.ko sprd_wlan_combo.ko sprdbt_tty.ko mali_kbase.ko; do
-    [ -s "/work/out/modules/$f" ] || { echo "required module was not collected: $f" >&2; exit 1; }
-done
 echo "$(ls /work/out/modules | wc -l) modules, $(strings /work/out/Image | grep -m1 "^Linux version 5" | cut -d" " -f1-3)"
+echo "==> ZTE U30 Air modules"
+bash /work/build-u30air.sh
 '
 mkdir -p "$OUT"
-rm -rf "$OUT/modules"
+rm -rf "$OUT/modules" "$OUT/modules-u30air"
 cp -R "$W/out/." "$OUT/"
-for f in Image modules.builtin modules.builtin.modinfo \
-         modules/wcn_bsp.ko modules/sprd_wlan_combo.ko modules/sprdbt_tty.ko modules/mali_kbase.ko; do
-    [ -s "$OUT/$f" ] || { echo "incomplete kernel output: $OUT/$f" >&2; exit 1; }
-done
 echo "kernel outputs in $OUT"

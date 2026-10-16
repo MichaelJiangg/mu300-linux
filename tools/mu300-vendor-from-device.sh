@@ -1,25 +1,25 @@
 #!/system/bin/sh
 # Add this device's proprietary modem/WCN runtime to a generic rootfs.
-# Usage: mu300-vendor-from-device.sh ROOT [openwrt|ubuntu]
 set -eu
 R=${1:?rootfs destination required}
 OS=${2:-openwrt}
-
-case $OS in
-    openwrt) F=$R/lib/firmware ;;
-    ubuntu)  F=$R/usr/lib/firmware ;;
-    *) echo "unsupported system: $OS" >&2; exit 2 ;;
-esac
+case $OS in openwrt) F=$R/lib/firmware ;; ubuntu) F=$R/usr/lib/firmware ;; *) exit 2 ;; esac
 mkdir -p "$F"
 for f in wcnmodem.bin gnssmodem.bin wifi_board_config.ini wifi_board_config_ab.ini \
          bt_configure_pskey.ini bt_configure_rf.ini; do
     found=
     for d in /odm/firmware /vendor/firmware /vendor/etc; do
-        if [ -s "$d/$f" ]; then cp -p "$d/$f" "$F/$f"; found=1; break; fi
+        [ -s "$d/$f" ] && { cp -p "$d/$f" "$F/$f"; found=1; break; }
     done
-    [ -n "$found" ] || { echo "device firmware is missing $f" >&2; exit 1; }
+    [ -n "$found" ] || {
+        if [ "${MU300_INSTALL_LANG:-en}" = zh ]; then
+            echo "设备缺少固件 $f" >&2
+        else
+            echo "device firmware is missing $f" >&2
+        fi
+        exit 1
+    }
 done
-
 A=$R/opt/mu300/android
 S=${TMPDIR:-/data/local/tmp}/mu300-vendor-subset.$$.tar
 rm -f "$S"
@@ -37,15 +37,18 @@ tar -chf "$S" \
   /vendor/bin/sh /vendor/bin/toybox_vendor /vendor/bin/getprop \
   /vendor/etc/modem_cp_info.xml /vendor/etc/modem_sp_info.xml /vendor/etc/modem_ch_info.xml \
   /vendor/etc/cp_dump_info.xml /vendor/etc/ueventd.rc /dev/__properties__
-rm -rf "$A"
-mkdir -p "$A"
-tar -xf "$S" -C "$A"
-rm -f "$S"
-[ -d "$A/dev/__properties__" ] || { echo "Android property snapshot is missing" >&2; exit 1; }
-mv "$A/dev/__properties__" "$A/dev-properties"
-rmdir "$A/dev" 2>/dev/null || true
+rm -rf "$A"; mkdir -p "$A"; tar -xf "$S" -C "$A"; rm -f "$S"
+[ -d "$A/dev/__properties__" ] || {
+    if [ "${MU300_INSTALL_LANG:-en}" = zh ]; then
+        echo '缺少 Android 属性快照' >&2
+    else
+        echo 'Android property snapshot is missing' >&2
+    fi
+    exit 1
+}
+mv "$A/dev/__properties__" "$A/dev-properties"; rmdir "$A/dev" 2>/dev/null || true
 mkdir -p "$A/system/bin" "$A/linkerconfig"
-ln -sfn /apex/com.android.runtime/bin/linker64 "$A/system/bin/linker64" 2>/dev/null \
-    || cp "$A/apex/com.android.runtime/bin/linker64" "$A/system/bin/linker64"
+ln -sfn /apex/com.android.runtime/bin/linker64 "$A/system/bin/linker64" 2>/dev/null || \
+    cp "$A/apex/com.android.runtime/bin/linker64" "$A/system/bin/linker64"
 : > "$A/linkerconfig/ld.config.txt"
-[ -x "$A/vendor/bin/modem_control" ] || chmod 755 "$A/vendor/bin/modem_control"
+chmod 755 "$A/vendor/bin/modem_control"

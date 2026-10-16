@@ -1,5 +1,5 @@
 [Unit]
-Description=MU300 LAN bridge br-lan (USB + Wi-Fi, 192.168.77.1/24, DHCP/DNS)
+Description=MU300 LAN bridge br-lan (USB + Wi-Fi, 192.168.77.1/24 on an F50 and 192.168.78.1/24 on a U30 Air by default, see /etc/mu300/lan.conf, DHCP/DNS)
 After=network-pre.target
 Wants=network-pre.target
 

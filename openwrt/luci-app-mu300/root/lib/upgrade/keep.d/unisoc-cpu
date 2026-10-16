@@ -1,0 +1,4 @@
+/etc/unisoc-modem/cpu.json
+/etc/unisoc-modem/cpu-voltage.json
+# Preserve an armed profile's guard: an unclean upgrade must not bypass recovery.
+/etc/unisoc-modem/cpu-voltage-armed.json

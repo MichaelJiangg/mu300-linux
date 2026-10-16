@@ -20,6 +20,7 @@
 #     sbuf_read until the modem says something - possibly for ever.
 # bash and busybox ash both implement -t with poll(), which this driver does support, so run under one of them.
 set -u
+umask 077  # URC logs may contain SMS content; only root may read them
 # OpenWrt keeps the applets this needs (timeout, dd) in the static busybox next to us
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 if [ -n "$(read -t 1 _probe </dev/null 2>&1)" ]; then
@@ -76,12 +77,24 @@ mkfifo -m 600 "$CMD"
 
 # the one open that everything else borrows
 open_tty() {
-    exec 3<&- 2>/dev/null || true
-    exec 3<>"$DEV" || return 1
+    exec 3<&- || true
+    # command suppresses exec redirection's fatal-special-builtin behavior in
+    # ash/dash. A failed FIRST open is retryable; a successful open is retained.
+    command exec 3<>"$DEV" || return 1
     # on fd 3, not "stty -F $DEV": the -F form opens and closes the tty a second time
     stty raw -echo <&3 2>/dev/null || true
 }
-open_tty || { echo "mu300-atd: cannot open $DEV" >&2; exit 1; }
+if ! open_tty; then
+    echo "mu300-atd: $DEV exists but is not usable; waiting for first open" >&2
+    first_open_end=$(( $(date +%s) + ${MU300_AT_INITIAL_WAIT:-30} ))
+    until open_tty; do
+        [ "$(date +%s)" -lt "$first_open_end" ] || {
+            echo "mu300-atd: $DEV never became usable; check CP firmware and eMMC availability" >&2
+            exit 1
+        }
+        sleep 1
+    done
+fi
 
 # Keep the other AT channels drained, the way Android's RIL does - it holds nr0-nr5 open and reads all six.
 # /dev/stty_nr0 carries the modem's unsolicited output (+SIND, +ECIND, +SPERRLOG, ...), and each stty_nr<n> is
@@ -97,7 +110,32 @@ open_tty || { echo "mu300-atd: cannot open $DEV" >&2; exit 1; }
 # purpose: reopening a SIPC channel is the one operation that can lose it.
 URCDIR=$DIR/urc
 URCMAX=${MU300_AT_URC_MAX:-65536}
+REGISTRATION_LIB=${MU300_REGISTRATION_LIB:-/opt/mu300/lib/registration.sh}
+[ ! -r "$REGISTRATION_LIB" ] || . "$REGISTRATION_LIB"
+
+CMT_SPOOL=${MU300_CMT_SPOOL_BIN:-/opt/mu300/bin/mu300-cmt-spool}
 mkdir -p "$URCDIR"
+CMT_PENDING_FILE=$URCDIR/$(basename "$DEV").cmt-pending
+# +CMT is a two-line unsolicited frame. A capped RAM log is not a safe inbox:
+# persist the PDU before mu300-smsd acknowledges it to the network. This runs
+# for both nr0 and nr1 (a +CMT can arrive on either channel), including while
+# the command channel is collecting an unrelated AT reply.
+capture_cmt() {
+    # collect() runs in a command-substitution subshell. Keep the header in a
+    # per-channel tmpfs file so a PDU arriving in the next drain() is paired
+    # with it, never with a header from another AT channel.
+    if [ -s "$CMT_PENDING_FILE" ]; then
+        case $1 in
+            ''|*[!0123456789abcdefABCDEF]*) ;;
+            *) if [ "$(( $(date +%s) - $(date -r "$CMT_PENDING_FILE" +%s 2>/dev/null || echo 0) ))" -le 10 ]; then
+                   printf '%s\n%s\n' "$(cat "$CMT_PENDING_FILE")" "$1" | "$CMT_SPOOL" ||
+                       echo "mu300-atd: could not persist direct SMS" >&2
+               fi ;;
+        esac
+        rm -f "$CMT_PENDING_FILE"
+    fi
+    case $1 in '+CMT:'*) printf '%s\n' "$1" > "$CMT_PENDING_FILE" ;; esac
+}
 # Use '-' rather than ':-': an explicitly empty value means this secondary
 # daemon must not open any URC channel. With ':-', atd2 and atd3 both fell back
 # to nr0 and three readers split/lost the unsolicited stream.
@@ -108,12 +146,50 @@ for n in ${MU300_AT_URC_CHANNELS-0}; do
     (
         exec 3<&-   # the command channel belongs to the parent, not to a drainer
         log=$URCDIR/$(basename "$other").log
+        CMT_PENDING_FILE=$URCDIR/$(basename "$other").cmt-pending
         : > "$log"
+        # A new owner must not inherit a registered cache from a dead CP.
+        case "$n" in
+            0|3) rm -f "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/slot$((n / 3)).json" \
+                       "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/sim$((n / 3)).json" \
+                       "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/sim-power$((n / 3))" ;;
+        esac
+        # A late URC channel must also survive ENODEV on its first open. Never
+        # probe with a separate open/close or reopen a successful descriptor.
+        if ! command exec 4< "$other"; then
+            urc_open_end=$(( $(date +%s) + ${MU300_AT_INITIAL_WAIT:-30} ))
+            until command exec 4< "$other"; do
+                [ "$(date +%s)" -lt "$urc_open_end" ] || exit 1
+                sleep 1
+            done
+        fi
+        # $$ remains the parent's PID in ash subshells. Read our actual PID
+        # without forking so a dead drainer cannot pass the readiness check.
+        read -r reader_pid reader_stat < /proc/self/stat
+        echo "$reader_pid" > "$URCDIR/$(basename "$other").ready"
         while IFS= read -r urc; do
-            printf '%s\n' "${urc%"$CR"}" >> "$log"
+            urc=${urc%"$CR"}
+            capture_cmt "$urc"
+            # Registration changes already arrive on the persistent URC owner.
+            # No new AT query or polling timer for V50's second network lamp.
+            case "$n:$urc" in
+                0:+CEREG:*|3:+CEREG:*)
+                    [ ! -d /sys/class/leds/v50:net1:white ] ||
+                        /opt/mu300/bin/led-status sim-status "$((n / 3))" "$urc" >/dev/null 2>&1 ;;
+            esac
+            case "$n:$urc" in
+                0:+ECIND:*|3:+ECIND:*)
+                    ! command -v mu300_sim_changed >/dev/null 2>&1 ||
+                        mu300_sim_changed "$((n / 3))" "$urc" ;;
+                0:+CEREG:*|3:+CEREG:*)
+                    ! command -v mu300_registration_save >/dev/null 2>&1 ||
+                        mu300_registration_save "$((n / 3))" "$urc" ;;
+            esac
+            printf '%s\n' "$urc" >> "$log"
             # cheap cap: start over rather than grow without end, /run is RAM
             [ "$(wc -c < "$log" 2>/dev/null || echo 0)" -gt "$URCMAX" ] && : > "$log"
-        done < "$other"
+        done <&4
+        rm -f "$URCDIR/$(basename "$other").ready"
     ) &
     drainers="$drainers $!"
 done
@@ -128,7 +204,7 @@ now() { date +%s; }
 # Has the modem said anything at all lately? The drainers above append every unsolicited line to a log, so a log
 # that has been written to in the last few minutes means the modem is running, whatever it thinks of our
 # commands. With no drainer (a single-channel device) there is nothing to go on, and this answers "no".
-URCLOG=$URCDIR/$(basename "${DEV%[0-9]}0").log
+URCLOG=${MU300_AT_ALIVE_LOG:-$URCDIR/$(basename "${DEV%[0-9]}0").log}
 modem_alive() {
     [ -f "$URCLOG" ] || return 1
     [ "$(( $(now) - $(date -r "$URCLOG" +%s 2>/dev/null || echo 0) ))" -lt "${MU300_AT_URC_QUIET:-240}" ]
@@ -153,7 +229,11 @@ drain() {  # throw away whatever the modem sent while nobody was asking (URCs), 
         # Thrown away for the purpose of the next command, but not lost: answers that arrive after their OK
         # land here, and some of them matter. +CUSD is the plain case - the network's reply to *101# comes
         # seconds after the modem has already said OK - and +CMTI, announcing a new SMS, is another.
-        [ -n "$junk" ] && printf '%s\n' "${junk%"$CR"}" >> "$URCDIR/$(basename "$DEV").log" 2>/dev/null
+        if [ -n "$junk" ]; then
+            junk=${junk%"$CR"}
+            capture_cmt "$junk"
+            printf '%s\n' "$junk" >> "$URCDIR/$(basename "$DEV").log" 2>/dev/null
+        fi
     done
 }
 
@@ -164,6 +244,7 @@ collect() {  # collect TIMEOUT -> the reply lines, up to the final result code
         IFS= read -r -t 2 l <&3 || continue
         l=${l%"$CR"}
         [ -n "$l" ] || continue
+        capture_cmt "$l"
         echo "$l"
         case $l in
             OK|ERROR|+CME\ ERROR*|+CMS\ ERROR*|CONNECT*|NO\ CARRIER) return 0 ;;
@@ -214,7 +295,7 @@ while :; do
     # gone away, and then there is nothing left to lose.
     if [ -z "$reply" ]; then
         silent=$((silent + 1))
-        if [ "$silent" -ge 5 ] && [ $(( $(now) - last_reopen )) -ge 300 ] && ! modem_alive; then
+        if [ "${MU300_AT_DISABLE_REOPEN:-0}" != 1 ] && [ "$silent" -ge 5 ] && [ $(( $(now) - last_reopen )) -ge 300 ] && ! modem_alive; then
             echo "mu300-atd: no reply and no URCs either, the modem looks gone; reopening $DEV" >&2
             last_reopen=$(now)
             if open_tty; then
@@ -227,6 +308,9 @@ while :; do
     else
         silent=0
     fi
+    # A bare CPIN has no reliable card identity: SPACTCARD can stick on this
+    # channel. Only explicitly addressed transactions enter the SIM cache.
+    ! command -v mu300_sim_reply >/dev/null 2>&1 || mu300_sim_reply "$cmd" "$reply"
     if [ -n "$answer" ]; then
         # write it complete, then move it into place, so the client never reads half an answer
         printf '%s\n' "$reply" > "$answer.part" 2>/dev/null && mv "$answer.part" "$answer" 2>/dev/null

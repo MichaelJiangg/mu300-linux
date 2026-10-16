@@ -2,8 +2,9 @@
 # MU300/V50 status LED controller.
 #
 # The F50 has three LED channels under sc27xx:*, where "green" is physically WHITE
-# (verified: the vendor's own userspace treats it as white). The V50 has separate
-# /sys/class/leds/{red,white,blue}/ paths. This script auto-detects both.
+# (verified: the vendor's own userspace treats it as white). V50/MU3351 has an
+# AW9523B controller with three independent red/white/blue indicators, AND
+# unused sc27xx nodes. Its hardware groups are owned by v50-led-status.
 #
 # States (one multi-color LED, priority order):
 #   boot           red/white/blue chase - Linux is booting
@@ -11,31 +12,86 @@
 #   online-5g      solid white         - data connected, 5G NR
 #   offline        solid red           - booted, no data
 #   thermal        red blink           - SoC above 85C (overrides network color)
-#   wifi-on        remember AP state   - never contaminates the exact network colour
+#   wifi-on        WiFi lamp on        - independent from the exact network colour
 #
 # Usage:  led-status <state>          set a state
 #         led-status wifi-on/off     remember the hotspot state
 #         led-status current         print the last set state
 
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+LED_ROOT=${MU300_LED_SYSFS_ROOT:-/sys/class/leds}
+RUN_DIR=${MU300_LED_RUN_DIR:-/run}
+
+# The V50 has three independently wired red/white/blue indicators.
+if [ -d "$LED_ROOT/v50:net1:white" ]; then
+    exec "${MU300_LED_BACKEND:-/opt/mu300/bin/v50-led-status}" "$@"
+fi
+[ "$(mu300-device 2>/dev/null)" != v50 ] || exit 0
+
+if [ "$(mu300-device 2>/dev/null)" = u30air ]; then
+    exec "${MU300_U30_LED_BACKEND:-/opt/mu300/bin/u30air-led-status}" "$@"
+fi
 
 # --- detect LED paths (F50 sc27xx vs V50 plain)
-if [ -d /sys/class/leds/sc27xx:blue ]; then
-    LED_R=/sys/class/leds/sc27xx:red/brightness
-    LED_W=/sys/class/leds/sc27xx:green/brightness   # physically white on the F50
-    LED_B=/sys/class/leds/sc27xx:blue/brightness
-elif [ -d /sys/class/leds/blue ]; then
-    LED_R=/sys/class/leds/red/brightness
-    LED_W=/sys/class/leds/white/brightness
-    LED_B=/sys/class/leds/blue/brightness
+RGB_WHITE=0
+if [ -d "$LED_ROOT/aw_led" ] && [ -d "$LED_ROOT/green" ] && [ -d "$LED_ROOT/blue" ]; then
+    LED_R=$LED_ROOT/red/brightness
+    LED_W=$LED_ROOT/green/brightness
+    LED_B=$LED_ROOT/blue/brightness
+    RGB_WHITE=1
+elif [ -d "$LED_ROOT/sc27xx:blue" ]; then
+    LED_R=$LED_ROOT/sc27xx:red/brightness
+    LED_W=$LED_ROOT/sc27xx:green/brightness   # physically white on the F50
+    LED_B=$LED_ROOT/sc27xx:blue/brightness
+elif [ -d "$LED_ROOT/blue" ]; then
+    LED_R=$LED_ROOT/red/brightness
+    LED_W=$LED_ROOT/white/brightness
+    LED_B=$LED_ROOT/blue/brightness
 else
     exit 0
 fi
 [ -w "$LED_B" ] || exit 0
 
-STATE_FILE=/run/led-status.state
-WIFI_FILE=/run/led-status.wifi
-BLINK_PID=/run/led-status.blink.pid
+# On the F50 the keyboard-backlight class is the separate hotspot indicator.
+# Do not use it on the U30 Air: that model assigns the same class to another
+# front-panel function.  Keeping this separate also guarantees that LTE stays
+# pure blue (B=255, R=W=0), 5G pure white and offline pure red.
+WIFI_LED=
+if [ "$(mu300-device 2>/dev/null)" = f50 ] && [ -w "$LED_ROOT/keyboard-backlight/brightness" ]; then
+    WIFI_LED=$LED_ROOT/keyboard-backlight/brightness
+fi
+
+STATE_FILE=$RUN_DIR/led-status.state
+WIFI_FILE=$RUN_DIR/led-status.wifi
+BLINK_PID=$RUN_DIR/led-status.blink.pid
+SIGNAL_ENABLED=$(uci -q get system.mu300_leds.signal 2>/dev/null)
+WIFI_ENABLED=$(uci -q get system.mu300_leds.wifi 2>/dev/null)
+[ "$SIGNAL_ENABLED" = 0 ] || SIGNAL_ENABLED=1
+[ "$WIFI_ENABLED" = 0 ] || WIFI_ENABLED=1
+
+level() {  # validated 0-255 UCI value, otherwise the legacy brightness
+    value=$1 fallback=$2
+    case $value in ''|*[!0-9]*) echo "$fallback"; return ;; esac
+    while [ "${value#0}" != "$value" ]; do value=${value#0}; done
+    [ -n "$value" ] || value=0
+    [ "$value" -le 255 ] && echo "$value" || echo "$fallback"
+}
+hw_max() {
+    value=$(cat "$(dirname "$1")/max_brightness" 2>/dev/null)
+    level "$value" 255
+}
+SIGNAL_BRIGHTNESS=$(level "$(uci -q get system.mu300_leds.signal_brightness 2>/dev/null)" 255)
+WIFI_BRIGHTNESS=$(level "$(uci -q get system.mu300_leds.wifi_brightness 2>/dev/null)" 127)
+R_MAX=$(hw_max "$LED_R")
+W_MAX=$(hw_max "$LED_W")
+B_MAX=$(hw_max "$LED_B")
+[ -n "$WIFI_LED" ] && WIFI_MAX=$(hw_max "$WIFI_LED") || WIFI_MAX=255
+
+scaled() {  # channel intensity, configured brightness, hardware maximum
+    value=$(( ($1 * $2 + 127) / 255 ))
+    [ "$value" -le "$3" ] || value=$3
+    echo "$value"
+}
 
 # Status reads must be side-effect free. In particular, dashboards and event
 # handlers may query this during boot and must not stop the chase animation.
@@ -43,6 +99,36 @@ if [ "${1:-}" = current ]; then
     cat "$STATE_FILE" 2>/dev/null || echo boot
     exit 0
 fi
+
+# LuCI's System > LED Configuration stores the two physical lamps separately.
+# Reapply their current logical states after a UCI reload without waiting for
+# the next modem or hostapd event.
+if [ "${1:-}" = refresh ]; then
+    case "$(cat "$WIFI_FILE" 2>/dev/null)" in
+        on) "$0" wifi-on ;;
+        *)  "$0" wifi-off ;;
+    esac
+    state=$(cat "$STATE_FILE" 2>/dev/null)
+    [ -n "$state" ] || state=offline
+    exec "$0" "$state"
+fi
+
+# WiFi changes must not cancel the boot chase, thermal alarm, or modem/network
+# animation.  They only drive the F50's independent hotspot lamp.
+case "${1:-}" in
+wifi-on|wifi-off)
+    [ "${1:-}" = wifi-on ] && wifi_state=on || wifi_state=off
+    echo "$wifi_state" > "$WIFI_FILE"
+    if [ -n "$WIFI_LED" ]; then
+        echo none > "$(dirname "$WIFI_LED")/trigger" 2>/dev/null
+        if [ "$wifi_state" = on ] && [ "$WIFI_ENABLED" = 1 ]; then
+            scaled 255 "$WIFI_BRIGHTNESS" "$WIFI_MAX" > "$WIFI_LED"
+        else
+            echo 0 > "$WIFI_LED"
+        fi
+    fi
+    exit 0 ;;
+esac
 
 # stop any previous user-space blinker
 [ -f "$BLINK_PID" ] && kill "$(cat "$BLINK_PID")" 2>/dev/null
@@ -54,9 +140,15 @@ for f in $(dirname "$LED_R")/trigger $(dirname "$LED_W")/trigger $(dirname "$LED
 done
 
 set_rgb() {  # R W B (0-255)
-    echo "${1:-0}" > "$LED_R" 2>/dev/null
-    echo "${2:-0}" > "$LED_W" 2>/dev/null
-    echo "${3:-0}" > "$LED_B" 2>/dev/null
+    [ "$SIGNAL_ENABLED" = 1 ] || set -- 0 0 0
+    if [ "$RGB_WHITE" = 1 ] && [ "${2:-0}" -gt 0 ]; then
+        # AW9523B has true RGB: white uses all three groups.
+        [ "${1:-0}" -ge "$2" ] || set -- "$2" "$2" "${3:-0}"
+        [ "${3:-0}" -ge "$2" ] || set -- "$1" "$2" "$2"
+    fi
+    scaled "${1:-0}" "$SIGNAL_BRIGHTNESS" "$R_MAX" > "$LED_R" 2>/dev/null
+    scaled "${2:-0}" "$SIGNAL_BRIGHTNESS" "$W_MAX" > "$LED_W" 2>/dev/null
+    scaled "${3:-0}" "$SIGNAL_BRIGHTNESS" "$B_MAX" > "$LED_B" 2>/dev/null
 }
 
 pause_us() {
@@ -69,16 +161,13 @@ pause_us() {
 }
 
 start_blink() {  # R W B ON_MS OFF_MS
+    [ "$SIGNAL_ENABLED" = 1 ] || { set_rgb 0 0 0; return 0; }
     _r=$1; _w=$2; _b=$3; _on=$4; _off=$5
     (
         while :; do
-            echo "$_r" > "$LED_R" 2>/dev/null
-            echo "$_w" > "$LED_W" 2>/dev/null
-            echo "$_b" > "$LED_B" 2>/dev/null
+            set_rgb "$_r" "$_w" "$_b"
             pause_us "$_on"
-            echo 0 > "$LED_R" 2>/dev/null
-            echo 0 > "$LED_W" 2>/dev/null
-            echo 0 > "$LED_B" 2>/dev/null
+            set_rgb 0 0 0
             pause_us "$_off"
         done
     ) &
@@ -86,11 +175,12 @@ start_blink() {  # R W B ON_MS OFF_MS
 }
 
 start_chase() {
+    [ "$SIGNAL_ENABLED" = 1 ] || { set_rgb 0 0 0; return 0; }
     (
         while :; do
-            echo 255 > "$LED_R" 2>/dev/null; echo 0 > "$LED_W" 2>/dev/null; echo 0 > "$LED_B" 2>/dev/null; pause_us 120000
-            echo 0 > "$LED_R" 2>/dev/null; echo 255 > "$LED_W" 2>/dev/null; echo 0 > "$LED_B" 2>/dev/null; pause_us 120000
-            echo 0 > "$LED_R" 2>/dev/null; echo 0 > "$LED_W" 2>/dev/null; echo 255 > "$LED_B" 2>/dev/null; pause_us 120000
+            set_rgb 255 0 0; pause_us 120000
+            set_rgb 0 255 0; pause_us 120000
+            set_rgb 0 0 255; pause_us 120000
         done
     ) &
     echo $! > "$BLINK_PID"
@@ -132,15 +222,9 @@ offline)        # solid red: no data
     restore_steady ;;
 thermal)        # red blink: SoC too hot (called by thermal-guard)
     start_blink 255 0 0 200000 200000 ;;
-wifi-on)
-    echo on > "$WIFI_FILE"
-    restore_steady ;;
-wifi-off)
-    echo off > "$WIFI_FILE"
-    restore_steady ;;
 current)
     cat "$STATE_FILE" 2>/dev/null || echo boot ;;
 *)
-    echo "usage: $0 boot|modem|registering|online-4g|online-5g|offline|thermal|wifi-on|wifi-off|current" >&2
+    echo "usage: $0 boot|modem|registering|online-4g|online-5g|offline|thermal|wifi-on|wifi-off|current|refresh" >&2
     exit 1 ;;
 esac

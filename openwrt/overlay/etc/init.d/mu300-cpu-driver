@@ -1,0 +1,7 @@
+#!/bin/sh /etc/rc.common
+# Rootfs is mounted; load cpufreq before modem/network bring-up, with or without
+# the optional dashboard. Factory offsets if the plugin is not installed.
+START=08
+start() {
+    /opt/mu300/bin/cpu-voltage-platform load
+}

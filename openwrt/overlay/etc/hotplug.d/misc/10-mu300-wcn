@@ -1,0 +1,5 @@
+#!/bin/sh
+# WCN has completed a chip reset. Reconcile only its configured Wi-Fi radios;
+# never restart network/USB, redial cellular, or change saved wireless settings.
+[ "$ACTION" = change ] && [ "$SOURCE" = unisocwl ] && [ "$EVENT" = FW_ERROR ] || exit 0
+/opt/mu300/bin/wcn-reopen </dev/null >>/tmp/mu300-wcn-recovery.log 2>&1 &

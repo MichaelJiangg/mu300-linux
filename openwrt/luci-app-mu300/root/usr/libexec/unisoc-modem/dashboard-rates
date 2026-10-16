@@ -1,0 +1,34 @@
+#!/usr/bin/ucode
+// No AT, interface dump, process list or traffic-ledger query on the 1 s lane.
+import { readfile } from 'fs';
+import { cursor } from 'uci';
+import { connect } from 'ubus';
+
+const cfg = cursor();
+let device = cfg.get('unisoc_modem', 'main', 'data_device');
+if (!device) {
+	const bus = connect();
+	const iface = cfg.get('unisoc_modem', 'main', 'data_interface') || 'wan';
+	let status;
+	try { status = bus?.call('network.interface.' + iface, 'status', {}); } catch (e) {}
+	device = status?.l3_device || 'sipa_eth0';
+}
+if (!match(device, /^[A-Za-z0-9_.:-]{1,15}$/)) {
+	print('{"available":false}\n');
+	exit(0);
+}
+const path = '/sys/class/net/' + device + '/';
+const rx = readfile(path + 'statistics/rx_bytes');
+const tx = readfile(path + 'statistics/tx_bytes');
+const index = readfile(path + 'ifindex');
+const uptime = readfile('/proc/uptime');
+const valid = rx != null && tx != null && index != null && uptime != null;
+printf('%J\n', {
+	available: valid,
+	device: device,
+	ifindex: valid ? int(index) : null,
+	boot_id: trim(readfile('/proc/sys/kernel/random/boot_id') || ''),
+	ts: valid ? +split(uptime, ' ')[0] : null,
+	rx: valid ? +trim(rx) : null,
+	tx: valid ? +trim(tx) : null
+});

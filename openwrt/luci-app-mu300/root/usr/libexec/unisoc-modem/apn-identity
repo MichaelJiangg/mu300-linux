@@ -1,0 +1,12 @@
+#!/bin/sh
+# Read the requested card through the plugin's configured AT adapter.
+case ${1:-} in 0|1) slot=$1 ;; *) exit 2 ;; esac
+LIB=${MU300_DASH_BIN:-/usr/libexec/unisoc-modem}
+out=$(MU300_SIM_SLOT=$slot "$LIB/at" -t 3 'AT+CCID' 2>/dev/null) || exit 1
+iccid=$(printf '%s\n' "$out" | tr -d '\r' | sed -n 's/^+CCID:[[:space:]]*"\{0,1\}\([0-9]*\)"\{0,1\}[[:space:]]*$/\1/p' | head -n1)
+case "$iccid" in ''|*[!0-9]*) exit 1 ;; esac
+[ ${#iccid} -ge 18 ] && [ ${#iccid} -le 22 ] || exit 1
+umask 077
+json=$(printf '{"iccid":"%s"}' "$iccid")
+printf '%s\n' "$json" > "/run/unisoc-apn-sim$slot.json.new.$$" && mv "/run/unisoc-apn-sim$slot.json.new.$$" "/run/unisoc-apn-sim$slot.json"
+printf '%s\n' "$json"

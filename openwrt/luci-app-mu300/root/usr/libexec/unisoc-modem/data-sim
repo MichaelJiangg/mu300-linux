@@ -1,0 +1,28 @@
+#!/bin/sh
+# Independent UI job adapter; platform-specific switching lives outside LuCI.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+LIB=${MU300_DASH_BIN:-/usr/libexec/unisoc-modem}
+RUNDIR=${MU300_DATA_SIM_RUN:-/tmp/unisoc-data-sim}
+adapter=${MU300_DATA_SIM_ADAPTER:-$(uci -q get unisoc_modem.main.data_sim_command 2>/dev/null)}
+[ -n "$adapter" ] || adapter=/opt/mu300/bin/mu300-data-sim
+qs() { [ -n "$1" ] && printf '"%s"' "$(printf '%s' "$1" | sed 's/\\/\\\\/g;s/"/\\"/g' | tr -d '\r\n')" || echo null; }
+validate_apply() {
+    [ "$1" = data ] || { echo invalid_sim >&2; return 1; }
+    case "$2" in
+        0|1) ;;
+        u30-hot-[01]|u30-default-[01])
+            [ "$(mu300-device 2>/dev/null)" = u30air ] || { echo dual_sim_unavailable >&2; return 1; } ;;
+        *) echo invalid_sim >&2; return 1 ;;
+    esac
+    [ "$(uci -q get unisoc_modem.main.sim_slots)" = 2 ] && [ -x "$adapter" ] || { echo dual_sim_unavailable >&2; return 1; }
+}
+[ "$(mu300-device 2>/dev/null)" != u30air ] || MU300_JOB_TIMEOUT=360
+. "$LIB/lock-jobs.sh"
+case ${1:-} in
+get) [ -x "$adapter" ] && "$adapter" get || printf '{"ok":0,"error":"dual_sim_unavailable"}\n' ;;
+start) job_start data "${2:-}" ;;
+status) job_status "${2:-}" ;;
+worker) job_worker "$2" "$3" "$4" ;;
+apply) validate_apply "$2" "$3" && exec "$adapter" apply "$3" ;;
+*) exit 2 ;;
+esac

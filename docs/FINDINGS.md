@@ -246,22 +246,6 @@ second after taking it, and the next daemon walked straight in - the very failur
 happening every few seconds. Clean up on `INT`/`TERM` only, and only when the pid in the lock is still ours.
 
 ### 13b-2. The modem stops answering on Linux - and it is not the mainline port (open)
-**2026-09-28 update: the failure is no longer reproducible with the corrected consumers, so this is not an
-unconditional Linux/CP failure.** On the live OpenWrt system, with only persistent nr0-nr7 owners, the command
-plane remained healthy through 300 s with the radio off, through another 120 s after `AT+SFUN=4`, and through a
-complete data call. With all normal services restored it was still returning real final `OK` codes after four
-minutes, while CPU was 97% idle. The failure was amplified by two userspace behaviours:
-
-* registration startup sent `AT+CEREG?` every 0.3 s (up to 200 queries when signal was poor); it now consumes
-  nr0 registration URCs immediately and uses one query every five seconds only as a fallback;
-* `mu300-atwatch` killed and reopened ATD descriptors after missed probes. Closing a live SIPC descriptor is the
-  destructive operation documented in 13b, so the watchdog could turn a transient busy/silent period into a
-  boot-long outage. It now records health only; dashboard work uses the persistent, slot-0-capable nr6/nr7
-  pool (nr3-nr5 are slot 1 and must not supply slot 0 status).
-
-The old measurements below remain useful history, but the word "every" describes the old service set, not an
-intrinsic limit of the Linux modem stack.
-
 **Measured on both kernels and on stock Android, in that order, and the answer is not what it looked like.** The
 modem stops talking to the AP partway through every Linux boot and never comes back without a reboot:
 
@@ -633,7 +617,6 @@ buffers to the bus and leave when there is no tx context yet.
 
 ### 15. Radio, registration and the data bearer
 * AT channels: `/dev/stty_nr0` carries unsolicited results (URCs); `/dev/stty_nr1` is a clean command channel.
-  Where those six channels come from and who owns which is in 15b, from reversing `libimpl-ril.so`.
 * After `modem_control` boots the modem the radio is off (`+CFUN: 0`). Android's RIL (`libimpl-ril.so`) uses the Unisoc
   commands `AT+SFUN=2` (SIM on) and `AT+SFUN=4` (protocol stack on); afterwards `+CFUN: 1` and the modem registers
   (`+CEREG: 2,1,...,13` = E-UTRA-NR dual connectivity, i.e. 5G NSA).
@@ -648,56 +631,6 @@ buffers to the bus and leave when there is no tx context yet.
   reboot after changing the SIM.
 * A SIM without an active data plan still registers and gets an address; TCP handshakes may even succeed, but no data
   flows. Check the plan before debugging the data path.
-
-### 15b. Who opens which AT channel: reversing `libimpl-ril.so`
-The Android firmware's RIL implementation (`vendor/lib64/libimpl-ril.so`, loaded by `urild` → `librilcore.so`;
-ARM64, stripped but with a `.gnu_debugdata` mini symbol table that yields `mainLoop`, `openModemDev`,
-`sendHandshakeCmd`, `resetModem`, `at_open` …) was reversed to answer one question: which `stty_nr*` port belongs
-to whom. The analysis scripts (capstone xref scanner + annotated disassembler + the extracted symbol list) are in
-`tools/analysis/`; addresses below are file offsets in that `.so`.
-
-**The channel name is a formula, not a list.** `mainLoop` (at `0x2a490`) does:
-
-```
-property_get("ro.vendor.modem.tty", buf, "/dev/sdiomux");     /* build.prop: /dev/stty_nr */
-for (i = socket_id*3; i < socket_id*3+3; i++) {
-    snprintf(dev, "%s%d", buf, i);                            /* fmt @0x16f49 */
-    fd = open(dev, O_RDWR|O_NONBLOCK);                        /* + tcsetattr raw */
-    at_open(fd, i, "Channel%d", onUnsolicited);               /* one readerLoop thread per channel */
-}
-```
-
-`RIL_Init` creates **two** `mainLoop` threads unconditionally, one per RIL socket, and rejects `socket_id >= 2`
-("Invalid socket_id"); it logs `RIL_Init, SIM_COUNT: 2`. So the six ports are two groups of three, one group per
-SIM slot, on the single NR modem:
-
-| Device | Owner | Role |
-|---|---|---|
-| `/dev/stty_nr0..nr2` | RIL socket 0 (SIM slot 0) | 3 AT channels for slot 0 |
-| `/dev/stty_nr3..nr5` | RIL socket 1 (SIM slot 1) | 3 AT channels for slot 1 |
-| `/dev/stty_nr31` | engpc (`etc/engpc/dev/cp.conf`, `COM_AT`) | engineering AT port |
-
-The driver exposes at least 32 (`ueventd.rc` matches `/dev/stty_nr*`, 0660 radio:system); ports 6-30 are not
-touched by the RIL or engpc. This is also why `mu300-atd`'s choices match Android's own usage exactly: `nr1` is a
-command channel and `nr0` a URC channel for socket 0, and the measured "nr2-nr5 say nothing" (13b) is expected -
-they belong to socket 0's spare and all of socket 1's, which has no SIM activity to report.
-
-**Within a group, `i % 3 == 1` is the handshake channel.** The modem power-on state machine ("Modem Alive, do
-handshake first", around `0x269e0`) opens the literal name `<prop>1` - always `/dev/stty_nr1`, whichever socket it
-is acting for - and `sendHandshakeCmd` writes `AT+SMMSWAP=0\r` (or plain `AT\r` when a single-SIM flag global is
-set) before anything else. The exported `resetModem` (`0x235d0`) likewise opens `<prop>1` and writes
-`AT^CURC=%d` to quiet URCs across a reset. Requests then carry an absolute channel id (`socket_id*3 + i`, 0-5) in
-their AT-command context (`at_send_command_full`, `0x24840`), with a per-channel mutex array at `0xa5d80`.
-
-**UAC reporting is not in this library.** Its whole unsolicited-prefix table was enumerated (100+ `+SP*`/`^*`
-prefixes: network, SIM, IMS, calls - no audio of any kind). Whatever talks UAC state over `stty_nr0` on this
-firmware is another process opening the node directly, not the RIL; with the 0660 radio:system permissions any
-uid-system process can. If that daemon is ever identified, `nr0` has to be taken from `mu300-atd`'s drain loop
-first (13b: exactly one reader per channel).
-
-Two smaller facts worth keeping: the fallback prefix is `/dev/sdiomux`, so a firmware without
-`ro.vendor.modem.tty` set names its channels `/dev/sdiomux0..5`; and the modem's non-AT nodes all follow the same
-pattern in `build.prop` - `spipe_nr0` (command), `spipe_nr2` (assert/alive), `sdiag_nr`, `slog_nr`, `snv_nr`.
 
 ### 16. Rootfs details found while testing data
 * `docker export` leaves an empty `/etc/resolv.conf`: `resolvectl query` works but glibc programs cannot resolve names.
@@ -1038,246 +971,6 @@ Three separate traps, and the first one hid the other two for an evening. `mu300
   old layout if no `/ubuntu` exists.
 
 ## Audio
-
-### 31. USB DHCP handoff and early radio warm-up (2026-09-28)
-
-* PDP activation and WAN IPv6 do **not** require USB re-enumeration. On a clean
-  boot the gadget enumerates once at about 24 s; netifd moves `usb0` into
-  `br-lan` at about 64 s without changing the host-facing LAN.
-* The apparent USB failure was a DHCP handoff bug. Windows kept asking for
-  `192.168.77.200` after removing it locally; dnsmasq logged repeated OFFERs,
-  but they were unicast to the address the host no longer owned, so no REQUEST
-  followed and Windows fell back to APIPA. A fixed host entry with
-  `broadcast=1` produced the complete DISCOVER/OFFER/REQUEST/ACK exchange and a
-  12-hour lease. A 180 s warm-reboot run crossed the old 104 s failure point
-  without losing the address.
-* Do not infer host health from two missed ARPs during the `usb0` -> `br-lan`
-  transition. The old guard did exactly that and reset a healthy UDC. Normal
-  boot no longer runs `mu300-usb-reset`; it remains a manual disaster-recovery
-  tool. Shutdown unbinds the UDC cleanly so the next warm boot has one fresh
-  enumeration, the same as cold power-on.
-* Radio warm-up now starts from the nr1 AT-daemon readiness event, independently
-  of PDP setup. Across the verified boots CFUN reached 1 at 45.8-46.1 s instead
-  of waiting for netifd around 64 s; a bounded lock prevents warm-up and dial-up
-  from running two SFUN state machines at once.
-
-### 31a. Persistent modem locks belong inside radio-on (2026-09-28)
-
-Network mode, EN-DC, LTE/NR band and serving-cell locks do not all survive a CP
-power cycle. Replaying them from a late rc.d service is unsafe: START=96 raced
-netifd's dial attempt and ran `SFUN=5 -> SFUN=4` while the radio was already
-starting. On the measured failure this added about 16 seconds and could leave
-the command path and dialer disagreeing about the modem state.
-
-The replay now runs exactly once from `mobile-data radio-on`, after nr1's required
-`AT+SMMSWAP=0` handshake and before CFUN is raised, under the existing radio-on
-mutex. It does not poll for readiness again and does not issue an SFUN cycle in
-this early phase. A one-second AT-client collision budget avoids throwing away
-the whole early attempt for a sub-second dashboard/watch probe; a dead command
-path still fails promptly and is retried by the normal owner.
-
-State is kept one setting per file under `/etc/mu300/dash/lock-state.d`; an empty
-band file intentionally means automatic selection, so replay tests file existence
-rather than file size. Cell locks are one `rat:frequency,pci` entry per line and
-are cleared then rebuilt exactly. `auto_apply=off` suppresses boot replay without
-deleting any saved values. Verified on hardware: USB enumeration 31.3 s, DHCP
-38.6 s, SSH 50.9 s, CFUN=1 by the first check at 55 s, all nr1-nr7 command
-channels still returned `OK` and USB retained `192.168.77.200` at 254 s; CPU was
-97% idle. A fresh seven-setting read completed in 0.20 s.
-
-### 31b. Event-driven cellular lease renewal (2026-09-28)
-
-Carrier lease refreshes are followed by events, not polling: nr0 has `AT+CGEREP` 1,0 and really delivers
-`+CGEV: NW PDN ACT/DEACT`, the kernel emits netlink notifications for every RA address/route change
-(including lifetime refreshes), and `ubus call network.interface.wan renew` is wired as a standard netifd
-renew handler. `mu300cell-v6.sh` (the protocol task `proto_run_command` owns) consumes all three: a CGEV
-burst is debounced for 1 s and answered with exactly one `AT+CGCONTRDP` read, a netlink change is answered
-from the kernel's own state, and USR1 (renew) re-reads the bearer in place. No periodic AT traffic, no CGACT
-cycling, no USB involvement. Verified on the device: renew keeps the link (`manual-renew: bearer unchanged`,
-interface uptime preserved), a synthesized `+CGEV: NW PDN ACT` produced `cgev: bearer unchanged` without a
-restart, and a test v6 address added/removed by hand was reported to netifd within 2 s in both directions
-while the kernel kept exactly its own state.
-
-The design stands on netifd's `address-external` semantics (from netifd's interface-ip.c): an external report
-is tracked for status, LuCI and firewall but never installed or removed; switching an interface from managed
-to external *deletes the managed kernel state* (the flag is part of the vlist key, so the old node is removed
-with `system_del_address`); external entries survive teardown; the expiry sweeper only drops netifd's
-tracking, never the kernel address. Therefore:
-
-* Setup (`mu300cell.sh`) and monitor both report external from the very first update. A mixed mode (setup
-  installing the v4, monitor later reporting external) deletes the v4 from the kernel when the first external
-  report lands; the mobile-data watchdog then saw an address-less WAN and re-dialled every 60 s - which is
-  exactly the failure this migration started from.
-* The bearer v4 is installed by the proto itself (`ip addr replace`, stray-address cleanup, default route);
-  `mobile-data`'s netifd path never touches the kernel, and teardown flushes the v4 - otherwise external
-  state is immortal. SLAAC stays kernel-owned: this carrier advertises *infinite* address lifetimes and a
-  finite (~18 h) route lifetime, so `dynamic mngtmpaddr ... valid_lft forever` is the honest RA state, not a
-  zombie. The real zombies were netifd-era statics: a duplicate `proto static metric 4096` default route
-  survived every ifup and had to be deleted by hand once during migration.
-* Toggling data from the dashboard stacked *multiple* global v6 addresses: a redial on a new prefix leaves
-  the old prefix's address behind forever (infinite lifetimes again), and the monitor faithfully reports
-  every address the kernel has. Setup and teardown now flush the previous dial's global v6 addresses and
-  routes. Subtlety found the hard way: after `ip -6 route flush dev X` the kernel does NOT rebuild the
-  link-local on-link route and RA processing silently stops - setup therefore also cycles
-  `disable_ipv6` 1->0, which restarts addrconf, rebuilds the route and fires a fresh RS (address back in
-  ~1 s). The `proto static metric 4096` default route reappears on some device transitions (netifd
-  re-applies it from its state); it shares the RA route's next hop with a worse metric, so it is cosmetic -
-  delete it when it bothers.
-* `proto_kill_command` needs a numeric signal (`$(kill -l SIGUSR1)`, like OpenWrt's dhcp proto). The proto
-  declares `renew_handler=1`, but netifd only re-scans proto scripts at startup, so the declaration goes live
-  at the next `network restart` (one was run as a regression test: with the fixes below, LAN and WAN both
-  come back cleanly). During that debugging the USB link also looked dead - first attributed to the restarts,
-  but the LAN ifup hook does not re-enumerate the gadget at all (the old macOS re-enumeration hook is long
-  gone); the real cause was the boot enumeration itself, see 31c.
-
-Four shell/netifd traps on the way, each verified on the device:
-
-* netifd's proto-directory scan execs every executable `*.sh` as `<script> "" dump` - an *empty* proto name
-  in `$1`, `dump` in `$2`. A helper that only checks `$1` falls through: the "dump" process runs monitor code
-  with no config, creates `/run/mu300cell-.events` and blocks on its O_RDWR fifo forever. That single line
-  hung every `network restart` since the helper first appeared. `case "${1:-}-${2:-}" in *-dump|dump-*)
-  exit 0 ;; esac` answers both this probe and a manual `script dump`.
-* busybox ash delivers a trap by interrupting the `read` builtin, which then returns an error without
-  consuming fifo data. The monitor loop must `continue` (and service the pending renew), never `break`:
-  leaving the loop exits the protocol task and netifd tears the interface down. An O_RDWR fifo never sees
-  EOF, so `continue` cannot spin.
-* netifd's teardown signal does not reach pipeline members. Each missed kill left a whole event farm behind
-  (30+ monitors and their `ip -6 monitor`/`tail` children accumulated in one debugging session, feeding the
-  redial loop). The monitor now reaps same-command-line processes at startup (a fresh instance always
-  displaces older ones) and again in cleanup. The ps snapshot is written to a file first: an env prefix does
-  not cross a pipe, and `awk -v` would otherwise match the awk process itself.
-* an awk program "wrapped" in an extra closing brace (the indentation suggests a program-level block that
-  awk does not have) is a syntax error - and because the failing pipeline still exits 0 through `sort`, the
-  monitor silently sent empty v6 state for hours. The program must end at the last rule's brace; `bash -n`
-  cannot catch this.
-
-Windows-side console helpers for this work: `tools/mu300-uart.py` (marker-based command runner over the
-UART console) and `tools/mu300-uart-push.py` (heredoc uploader with md5 verification - bare `\n` only,
-because the console tty's ICRNL turns `\r\n` into blank lines inside heredocs).
-
-### 31c. Boot-time NCM TX flake and the once-per-boot self-heal rebind (2026-09-28)
-
-After the kernel rebuild that made the vendor modules builtin (probing order changed), two consecutive
-boots - one warm, one after a full power pull - came up with the NCM **TX endpoint dead**: the host's
-packets arrive (dnsmasq sees DHCPDISCOVER and sends broadcast OFFERs), but nothing leaves the device, so
-Windows ends up on APIPA with no ping and no page. br-lan, dnsmasq, uhttpd are all healthy; only a UDC
-rebind recovers it. A third boot was fine - the flake is intermittent per enumeration, and a bus-level
-replug (no device reboot) wedged the ACM console the same way: writes to the COM port block forever, and
-neither a PnP restart nor a full Windows re-enumeration clears it. Full device reboots have always brought
-the console back.
-
-Every manual `mu300-usb-reset` (both the 3 s-disconnect and the 100 ms fast path) healed the link, and
-Windows kept its 192.168.77.200 lease across the blip. So the boot now heals itself: the LAN ifup hotplug
-hook (`/etc/hotplug.d/iface/10-mu300-usb`) touches `/run/mu300-usb-healed` and, once per boot, runs
-`mu300-usb-reset` five seconds after the LAN settles. Verified end to end after `reboot`: marker present,
-Windows holds .200, ping 1 ms-class, LuCI answering HTTP 200 in 82 ms - with no manual step and no
-re-plug. The cost is one short USB blip per boot right after the lease handoff; the broadcast OFFER/ACK
-completes the renewal immediately.
-
-Windows-side tools for this episode: `tools/mu300-ssh-win.py` (paramiko SSH runner; the device's dropbear
-has no SFTP, so `--put` streams the file over an exec channel - set `MU300_PASS`, and remember Git Bash's
-MSYS path conversion rewrites leading-slash arguments), `tools/com-probe.py` (raw COM port classifier).
-Keep console/SSH handles closed before any gadget rebind: a Windows handle held across the device's
-re-enumeration wedges the port open forever, and only a replug clears that.
-
-### 31d. Lock-page logout: rpcd segfault during lock applies (2026-09-28)
-
-Clicking 切网/EN-DC/锁频段 on the lock page had a "high probability" of bouncing the browser to the
-LuCI login page. The chain, captured live: during a lock apply the **rpcd process segfaults**
-(kernel "Before coredump, show user regs" record for the old rpcd pid at exactly that moment), procd
-respawns it, and **every ubus session dies with it** - the next page request through the ucode
-dispatcher gets 403 + `X-LuCI-Login-Required` and LuCI redirects to login. The ubus endpoint itself
-never returns that header (a dead token there is a plain JSON error), which is why the polling never
-logouts directly - the bounce always needs a page navigation.
-
-What it is not: `ifup wan` alone (watcher showed rpcd untouched), sequential signal polls through a
-lock apply, readback `lock_get` polling, or 3-wide concurrent /ubus hammering - none reproduced it.
-The crash regs (NULL first argument in a shared library, fd-sized integers around it) point at
-rpcd's script-plugin reply path (`plugin.c`: script stdout is fed chunk-wise into
-`json_tokener_parse_ex` and then converted to blobmsg), i.e. a narrow race between specific reply
-content and chunk boundaries while a lock apply restarts the protocol stack.
-
-Mitigation deployed (openwrt overlay `usr/libexec/rpcd/mu300dash`), three browser-driven applies
-survived with zero logouts afterwards:
-
-* every method's raw stdout is appended to `/tmp/mu300-dash/last-outputs.log` (last 400 entries) -
-  if rpcd ever crashes here again, the final entry is the exact input that killed the parser;
-* while `/run/mu300-dash-apply` exists (the apply's own mutex dir), `signal` answers from the
-  cached snapshot instead of spawning live AT collectors, and `status` stops kicking its refresh
-  tiers - the modem answers garbage mid-SFUN and these were the highest-frequency calls in the
-  crash window. The guard is verified by hand (marker present -> cached ts served).
-
-The system clock was also found set to Europe/Istanbul (UTC+3) instead of the local zone - display
-only, sessions use UTC internally; worth correcting in the LuCI settings when convenient.
-
-Follow-up, same day - the lock toggles felt dead ("半天打不开/关不上"). Two backend causes, both
-fixed in `mu300-dash-lock` / the rpcd plugin / `locks.js`: (a) `do_apply` took the apply mutex for
-EVERY kind, so the `auto_apply` toggle - which only writes a state file, no AT, no SFUN - silently
-queued behind a 40 s+ stack restart; it now bypasses the mutex entirely and answers on the first
-page poll (~2 s). (b) an EN-DC apply updated the lock cache only via the background seven-command
-`get fresh` (~7-10 s), while the page re-reads the cache 1.5 s after the click - the stale value
-flipped the toggle back and looked like a lost click; the apply now patches the cached `endc`
-field in place and the page polls until the value confirms (optimistic state held up to 15 s,
-explicit timeout note after). `lock_set` replies also carry `queued:1` when another apply holds
-the mutex, though the flag can miss applies younger than the script's own startup time.
-
-### 31e. Band capability: SP5GCMDS is the authority, SPLBAND=4 decoding was wrong (2026-09-29)
-
-The dashboard's NR band capability came from decoding `AT+SPLBAND=4` masks ("553,0,528" -> n1 n5 n8
-n28 n41 **n79**) - and that decode was wrong: the module does not support n79 at all and the list also
-missed n6. The UI happily offered n79 as lockable; locking it left the CP searching a band its RF chain
-cannot use, and after some minutes of searching the firmware wedged entirely (AT silent, only a power
-cycle recovers - twice reproduced). The SPTESTMODE write rejections observed the previous day started
-in the same band/cell locking session, so the unsupported lock had been degrading the modem all along.
-
-The authoritative capability source (from ufi_tools, verified on the unit) is:
-
-    AT+SP5GCMDS="get nr support_band"
-    +SP5GCMDS: get nr support_band,6,41,78,1,8,28,5      -> supported: 1,5,6,8,28,41,78
-
-For LTE no capability command exists - ufi_tools uses the fixed table
-B1/B3/B5/B8/B34/B38/B39/B40/B41, and so do we now. Beyond the correct read, `mu300-dash-lock` filters
-**every band write** (apply and boot replay) against the supported set, so a stale saved lock - like
-the poisoned n79 replaying on every boot - is dropped before it ever reaches the modem. After
-deploying: caps read back exactly the measured list, the saved lock (all supported bands) verified
-clean, registration and WAN healthy.
-
-Switching OS from the Android side, for the record: arm slot b by writing the 32-byte
-bootloader_control block to misc offset 2048 (the trial block is a fixed constant for this device,
-`work/boot-linux-slotb.misc-slot-b-trial.bin`), verify by reading it back, then reboot; inside Linux
-`mu300-next-boot linux` makes it the default again. The Android web UI gets a proper panel for this:
-`android/webui-plugins/mu300-system-switch.js` (checks `ro.boot.slot_suffix` is `_a` before writing,
-compares the readback, only reboots on an exact match).
-
-### 31f. SMS receive: pool split, CNMI, text-mode parsing (2026-09-29)
-
-Incoming SMS needed a manual "从 SIM 同步" click to appear, senders showed as ASCII-hex
-("17674544422" -> "313736373435...3232"), concatenated messages arrived as separate truncated
-parts, and previews died mid-character. Four causes, all fixed:
-
-* **Pool split** (the real "must sync by hand" root cause): init.d gave the daemon
-  `MU300_SMS_POOL=/etc/mu300/sms` while the rpcd backend and manual runs default to
-  `/var/lib/mu300/sms` - the daemon faithfully synced a pool nobody read. The rpcd plugin now
-  exports the same /etc pool; /var/lib was migrated away.
-* **CNMI was 0,0,0,1,0**: the modem files incoming messages silently, so the daemon's
-  +CMTI md5 trigger never fired and arrival waited for the 30 s full-sync net. The daemon now
-  arms `AT+CNMI=2,1,0,0,0` at startup; arrival syncs in ~7 s (5 s poll + 2 s settle).
-* **Text mode hides the UDH**, so concatenated parts are indistinguishable except by sender
-  and SCTS: parts of one message carry identical service-centre timestamps (measured), so
-  sync folds rows sharing (oa, scts) into one record, concatenating part hex seamlessly
-  (UCS2 hex concat = the whole message; GSM text concat likewise). Peer numbers arrive as
-  ASCII-hex (a CSCS=UCS2 text-mode artifact) and are decoded back byte-pair-wise, gated on
-  printable + digit-major so a plain numeric address is never mangled.
-* **Previews**: `cut -c1-44` counts BYTES - 44 bytes is 14 Chinese characters, and the cut
-  lands mid-character (the � the UI showed). The preview now backs off to a UTF-8 boundary -
-  drop continuation bytes, drop the lead byte ONCE and stop; an unconditional byte-walk eats
-  whole all-multibyte lines to nothing (bug shipped once, measured). Bubbles always fetch the
-  full text now (pool file read, cheap) instead of guessing from preview length.
-
-UI: unread badges center (flex), the SMS page polls every 5 s (scroll preserved), and every
-mu300 page runs M.watchSms(): a 5 s pool-page-1 read that pops a phone-notification banner
-(sender + two-line preview, M.notify) when a new mt id appears; a pool wipe (ids falling)
-silently re-baselines.
 
 ### 24. No internal audio hardware
 * The DT enables a sound card, the UMP9620 codec and an AW883xx amplifier at `6-0034`, and Android disables audio.
@@ -1688,6 +1381,12 @@ board under stock Android: VoLTE drops a call that sends no media, and the modem
 DSP. That is the same symptom one layer down: the DSP runs, answers commands, and moves no audio in any scene.
 The one route known to work on Android is a Bluetooth headset over SCO, where the BT controller clocks the IIS.
 
+**The DSP-side registers are not AP-addressable.** The driver's `/proc/asound/<card>/vbc` dump reads DSP-side
+registers (base `0x01700000` in the driver's numbering) through the DSP, by IPC (`SND_VBC_DSP_IO`). Reading the same
+offset directly from the AP at `0x56510000 + 0xe7c` - outside the 1 KiB AP VBC window - hangs the bus: the board
+drops off USB and the network. To change a DSP-side register, write `"<reg> <val>"` in hex to that proc file
+instead (`vbc_proc_write` -> `dsp_vbc_reg_write`, e.g. `echo 1700eb0 1`); never map it from the AP.
+
 ## Bluetooth
 
 ### 25. SC2355 Bluetooth on BlueZ
@@ -1708,3 +1407,545 @@ The one route known to work on Android is a Bluetooth headset over SCO, where th
 * Verified: `bluetoothd` powers the adapter and LE/BR-EDR scanning lists nearby devices.
 * Rebuilding with a modified tree appends `-dirty` to the kernel release and breaks module loading; `.scmversion` with
   `-gb50db5b6224c` in the source tree keeps the release string stable.
+
+## Mainline 6.18 as a daily kernel
+
+Everything here was measured on the test device (64 GB F50, Vodafone TR, 5G NSA) with 6.18.54 and the
+upstream/ modules, running the release's Ubuntu and OpenWrt images.
+
+### 31. Ubuntu on 6.18, and what it takes
+Ubuntu had never been booted on the mainline kernel. With the kernel bundle from `upstream/make-bundle.sh`,
+installed by `mu300-update` (modules into every system, the boot image built on the device), it boots in under
+45 s and runs the hotspot, USB NCM, Bluetooth, the modem with SMS, the VPN and mobile data - the downlink
+included, which had never been shown on 6.18: the delegate's handshake completes and a 20 MB download goes
+through.
+
+Speed at one spot, alternating kernels within minutes (signal -99 to -107 dBm, so downloads say little):
+upload is about twice as fast on 6.18 (0.29-0.34 MB/s against 5.4's 0.167 MB/s). 5.4 never exceeded exactly
+166 650 B/s in any upload, with or without the VPN - a ceiling that constant is the device's, not the network's.
+
+### 31a. Wi-Fi RX: sync_for_device stopped invalidating (hang under load)
+A client uploading over Wi-Fi hung the board within 40 s. The Marlin3 driver waits for the device to finish an
+RX buffer by reading a flag in it and "refreshed" the buffer between retries with `dma_sync_single_for_device()`.
+On arm64 that call invalidated `DMA_FROM_DEVICE` buffers until 5.19 and cleans them since, so the CPU kept
+reading a stale line: every check failed (`hw still writing`, 369 times in the hung boot's log), the checksum
+taken from the same stale descriptor was wrong (`hw csum failure`), and each failure went to the 115200 baud
+console at loglevel 8 from the RX path. `dma_sync_single_for_cpu()` is the call for reading what the device
+wrote. After the fix: 3 x 15 MB uploads and a 30 MB download over Wi-Fi, no error. The IPA driver syncs the right
+way round already.
+
+Consequence for 5.4: IPv6 TCP and UDP from Wi-Fi clients get through on 6.18 (SSH and DNS over IPv6 measured),
+but not on 5.4, whose Wi-Fi driver carries `wlan_combo-rx-software-checksum.patch` - the only difference in that
+path. The patch's "hw csum failure" may well have had this stale read as its cause too.
+
+### 31b. The modem units' ordering cycle (both kernels)
+`cp_diskserver` was ordered before `mu300-vendor`, which runs before `sysinit.target`, while its default
+dependencies put it after `sysinit.target`: a cycle, which systemd broke by dropping `cp_diskserver` and
+`refnotify` from the boot transaction (on 5.4 it happened to break it elsewhere). On 6.18 it showed because the
+modem's nodes appear about 18 s in, after the units' `ConditionPathExists=/dev/modem` had been evaluated.
+`cp_diskserver` has no default dependencies now, the conditions look for the driver
+(`/sys/module/sprd_modem_loader`), and `mu300-vendor` waits for the node.
+
+### 31c. A context that comes back with a new address (both kernels)
+After the radio or the network dropped the bearer, the LTE modem attaches again by itself and the default context
+is active again - with a new address, while `sipa_eth0` keeps the old one: it sends and never receives. The
+watchdog only asked whether the context was active and the interface had an address. It compares the address
+(`AT+CGPADDR`) now. `AT+CFUN=4` from scratch: radio back on, new address noticed, internet back after 72 s.
+
+### 31d. Evidence of a failed boot
+Two boots in about twenty (one Ubuntu, one OpenWrt) died shortly after `switch_root` - the OpenWrt one between 11
+and 21 s by the early recorder - and left nothing. Three gaps, all closed:
+* The 6.18 config had no lockup detectors, so `softlockup_panic`/`hardlockup_panic` from `boot/init` had nothing
+  behind them. Soft and (buddy) hard lockup detectors now panic; hung tasks are only reported.
+* `mu300-early-recorder` was never enabled in the Ubuntu image; it is, and writes every 2 s for the first 90 s.
+* pstore works: `sysrq-c` -> panic -> Linux again a minute later, with the panic in
+  `/var/lib/systemd/pstore/dmesg-ramoops-0`. `systemd-pstore` moves the records out of `/sys/fs/pstore` at boot,
+  which is why that directory looked empty after the failures.
+Also: the Wi-Fi driver's per-frame traces pushed a boot's messages out of the ring buffer within a minute (now
+`pr_debug`, and `log_buf_len=4M`), and systemd's 10 min reboot watchdog was rejected by the UMP9620 PMIC watchdog
+(maximum 300 s), so a hang during reboot was not caught (`RebootWatchdogSec=2min`).
+
+### 31e. sipa-set-rps: a thread that never started
+The vendor comments the thread's wake-up out ("zsw changed", to keep `rps_cpus` fixed) but still creates it, so it
+sat in its pre-start state - uninterruptible - for good: one more on the load average, and on 6.18 a hung-task
+report every two minutes. It is not created any more.
+
+### 31f. The delegate on OpenWrt: -EINPROGRESS taken for a failure
+On OpenWrt the downlink died on some boots and the board crashed on others, and the recorder and pstore (31d)
+caught both crashes in the delegate's connection thread `dele-4-5`: a call through NULL (`pc : 0x0`,
+`lr : conn_thread+0x188 [sipa_dele]`) and a soft lockup, 22 s in `console_flush_all`. The probe log explains
+them:
+
+    sipa_rm: driver CB returned with -115
+    sipa_rm: SIPA_RM_RES_PROD_CP state changed 1->3
+    sipa_rm: SIPA_RM_RES_PROD_CP does not exist
+    sipa_delegate soc:ipa-apb:sipa-dele: cp_delegator_init failed: -22
+
+OpenWrt brings the WAN up before the delegate is loaded (at ~80 s), so `CONS_WWAN_UL` is already granted when
+`sipa_delegator_start()` makes it depend on `PROD_CP`. That starts requesting the producer and returns
+`-EINPROGRESS` - which the vendor code took for a failure: it deleted `PROD_CP` again, `cp_delegator_init()`
+ignored that result, failed on the next dependency ("does not exist"), and the failed probe freed the delegator
+under the connection thread it had already started. On Ubuntu the delegate is loaded before there is traffic,
+the call returns 0, and none of this happens. Fixed in the module: `-EINPROGRESS` is success, the result of
+`sipa_delegator_start()` is checked, the Wi-Fi offload dependencies (unused here) are warnings, and the delegator
+is no longer devm-allocated. The 5.4 kernel has the same driver in its own tree and the same crash on OpenWrt ("Kernel
+panic - not syncing: CFI failure (target: 0x0)" in `dele-4-5`, caught while testing v2026.09.29); it gets the same
+fix as `kernel/patches/sipa-delegate-einprogress.patch`.
+
+On 2026-10-02 a separate delegate bug caused a 6.18.54 trial to panic after 4792 seconds and fall back to Android.
+The CP sent ENABLE while the IPA device was already runtime-active. `pm_runtime_get_sync()` returned 1 (success), but
+`cp_dele_on_commad()` treated every nonzero result as failure and retried forever with `mdelay(1)` and a printk on
+each iteration. The `dele-4-5` thread then hit a 22-second soft lockup in `console_flush_all`. The handler now uses
+`pm_runtime_resume_and_get()` (0 on success, negative on failure), acknowledges errors without spinning, and avoids
+taking a second reference for a repeated ENABLE. The matching 6.18.54 and 7.2.8 `sipa-dele.ko` modules were rebuilt.
+
+### 31g. Three warnings on every boot, three vendor bugs
+6.18 printed three `WARNING:`s on every boot; each one is a bug in the vendor drivers:
+* `kernel/softirq.c:429 __local_bh_enable_ip` from `sc2355_free_cmd_buf`: the Wi-Fi command list's `complock` is
+  taken with `spin_lock_bh` in the PCIe tx-complete interrupt, and the same lock is taken with only bottom halves off
+  in process context - that interrupt arriving on the CPU holding it spins forever. Both places now use
+  `spin_lock_irqsave`.
+* `tty_port_link_device` from `mtty_probe` (`sprdbt_tty`): the tty driver is allocated with one line and a second,
+  never used port is linked at index 1 - past the end of `driver->ports[]`. 5.4 has no check there and writes it;
+  6.18 refuses with the warning. The second port is no longer linked.
+* `dev_addr_check`, "sipa_eth0: Incorrect netdev->dev_addr": `sipa_eth`, `seth` and `sipa_usb` wrote their random
+  MAC straight into `netdev->dev_addr`; `eth_hw_addr_random()` sets it through `dev_addr_set()`.
+
+A look at `dmesg` itself (Ubuntu's journal misses the first seconds of the kernel log) found two more:
+* `device_create_file` / `sysfs_create_file_ns`, "Attribute base_addr: read permission without 'show'", four times
+  per boot: `sipx`, `sblock`, `sbuf`, `smem`, `smsg` and the mailbox each created a `base_addr` attribute with
+  neither show nor store, on an embedded `platform_device` that is never registered - it could never be read. Gone.
+* `dev_addr_check` for `sipa_dummy0`: the same direct `dev_addr` write as above; now `eth_hw_addr_set()`.
+
+And the idle load average of 2.0 was two kernel threads parked in D state for good: `slog-0-0` polls every 2 s for
+the modem log to be switched on with an uninterruptible `msleep()`, and the Wi-Fi `SC2355_TX_THREAD` waits for work
+with `wait_for_completion()`. They now sleep interruptibly and in `TASK_IDLE`; the idle load is about 0.4.
+
+7.x adds one of its own: a workqueue has to say whether it is per-CPU or unbound (`WQ_PERCPU`, which 6.18 has
+too, or `WQ_UNBOUND`), and `trusty` and six Mali queues said neither ("trusty-nop-wq is using neither WQ_PERCPU or
+WQ_UNBOUND"). They say `WQ_PERCPU` now - what the kernel picked for them anyway.
+
+The Wi-Fi lock and the Bluetooth port come from the same vendor sources as the 5.4 modules, so the 5.4 build
+patches them as well (`kernel/patches/wlan_combo-tx-complock-irqsave.patch`, `sprdbt-tty-one-port.patch`); there
+the second port really was written past the end of `ports[]`, since 5.4 does not check.
+
+The 6.18 bundle also carries `modules.builtin` and `modules.builtin.modinfo` now: without them depmod warned and
+`modprobe` of a built-in driver failed. Three boots after the fixes: no warnings, Wi-Fi AP, mobile data, Bluetooth
+(24 devices in a scan) up.
+
+### 31h. Power-off, and the command line's crutches
+6.18 had only the PMIC restart (patch 0001): `poweroff` fell through to PSCI `SYSTEM_OFF`. The same patch now
+registers a power-off handler that does what the vendor's `sc27xx-poweroff` does for the UMP9620 - clear
+`LDO_XTL_EN` and `SLP_LDO_PD_EN` in `SLP_CTRL` (0x2248), then write 1 to `PWR_PD_HW` (0x2020). It cuts the power:
+ramoops lives in RAM, and after `reboot` the next boot finds the old console there ("reboot: Restarting system"),
+after `poweroff` it finds nothing. The F50 has no battery, so on a powered USB port the PMIC switches it on again
+about a minute later; unplugged, it stays off.
+
+The command line still carries four bring-up flags. Measured on the running system, what each one keeps:
+* `clk_ignore_unused`: 315 of 551 clocks are on with no driver holding them (bus, config, DSP, camera, thermal,
+  PWM clocks ...). This is where power could be saved - and where the risk is, because the modem, the Wi-Fi
+  firmware and the vendor modules touch hardware behind some of them without the clock API. Not changed yet.
+* `pd_ignore_unused`: nothing - the only generic power domain (`sipa-sys`) has active devices (USB, IPA).
+* `regulator_ignore_unused`: one regulator, `LDO_VDDSIM0` - the SIM's supply, which the modem uses and no Linux
+  driver claims. Without the flag the kernel would switch the SIM off. Required.
+* `fw_devlink=permissive`: required. Without it (and `pd_ignore_unused`) the board booted but the USB gadget
+  never came up - it waits for suppliers in the vendor device tree that no driver provides - and since Linux
+  itself was fine, the boot counted as good and the board stayed in a Linux without USB until it was forced back
+  to Android.
+
+### 31i. A Wi-Fi card that is late at boot panicked the board
+Rebooting OpenWrt on 5.4 again and again (testing v2026.09.29), one boot ended in "WCN BOOT: error: Waiting for
+PCIe scan card timeout", `sprd_pcie_remove`, "Unable to handle kernel paging request at virtual address
+ffffffffffffffe8" in `__wake_up_locked` from `complete()`, and a panic - back to Android. The SC2355 does not always
+show up on the PCIe bus within the 5 s the vendor driver waits; the timeout then removes the half-probed card, and
+`sprd_pcie_remove()` completes `remove_done`, which only `sprd_pcie_remove_card()` initialises - a completion that
+was never set up. It is initialised before every scan now, `remove` checks for a probe that never set its data, and
+a timed-out scan is tried once more before Wi-Fi and Bluetooth are given up. Both copies of the driver: the 5.4
+tree (`kernel/patches/wcn-pcie-scan-timeout.patch`) and `upstream/modules/wcn_bsp`.
+
+## Updating on the device
+
+### 32. Old kernels, an idle IPA, and an update that ended in Android
+A report: a device on the vendor 5.4 kernel, updated with `mu300-update`, only ever started Android afterwards.
+Reproduced on the test board with an older installer boot image (kernel #11 of 20 September) and the systems of
+v2026.09.21. The boot image of v2026.09.27 (kernel #13) does not have the problem below: its downlink works after
+four and a half idle minutes, with the same failed power-off messages in the log. Which of the published boot
+images have it was not established, so the update protects all of them:
+
+* After about two minutes without mobile traffic the IPA tries to power off and fails
+  (`Polling check power off reg timed out`, `sipa power off maybe fail`). From then on the downlink is dead
+  until the next boot: `rx_packets` of `sipa_eth0` stops, TLS handshakes time out, and neither the data
+  watchdog (the address is still right) nor a reconnect of mobile data brings it back.
+* The old `mu300-update` downloaded one system, unpacked it for a few minutes - exactly the quiet time the IPA
+  needs - and then started the next download. `curl` had no timeout and hung there, and twice the board reset
+  without a trace (no pstore, no persistent log) right when the next network transfer started: once between
+  the two systems, once at the start of the boot image step. A reset while boot_b is being written leaves slot b
+  unbootable, and LK then falls back to Android on every boot - the reported symptom.
+
+A reset does not have to hit the boot_b write to end in Android, though. With the boot scheme of the older boot
+images slot b is armed for one boot (`tries_remaining 2`, see 1); a crash leaves it at 1, and LK's log on the next
+start reads `check rollback slot 1 tries: 1` - `Have not get right slot` - Android, for good, with boot_b intact.
+`su -c mu300-linux` in Android (or the Magisk module's button) arms slot b again and Linux starts as before; the
+newer boot images count failed boots instead (5 in a row before Android).
+
+`mu300-update` now:
+* downloads everything the update needs (the systems and the kernel bundle) first, checks every file against
+  the release's `SHA256SUMS`, and only then changes anything; the unpacking and the boot_b write need no network;
+* keeps the IPA from going idle while it runs: a ping every 3 s (to 1.1.1.1 and to 223.5.5.5, which is reachable
+  from mainland China). With it, a 26 MB download after four otherwise quiet minutes on kernel #11 ran at 5 MB/s;
+  without it the download after the same pause never started;
+* cuts off stalled transfers (`--connect-timeout`, `--speed-limit`) and resumes partial files, so a dead downlink
+  is an error message ("reboot, then run mu300-update apply right away") instead of a hang;
+* stops the data watchdog while it installs, so no redial happens in the middle of the boot_b write.
+
+The full old-user path (installer boot_b with kernel #11, both systems reinstalled, boot image written) then took
+40 s, and the board started the new kernel.
+
+### 32a. The offset in init, replaced by every boot image update
+A user installed 6.18 with the installer and got "MU300 standalone Linux ... automatically reboots to Android
+after 300 seconds": the root filesystem was not found. `boot/init` finds the Linux region at `ROOT_OFFSET`, a number
+in the file - our test board's region (27762098176). The installer writes the device's own offset into that
+line, but that init lives in the device's ramdisk segment, and the generic segment behind it - what
+`mu300-update` puts there for every kernel and boot image update since v2026.09.27, and what the installer adds for
+a mainline kernel - brings its own init, which replaces the file, with the default. On every device whose region
+is somewhere else, each such boot image went looking at the test board's offset, dropped into standalone mode and
+went back to Android: the boot image did not have to be broken for "the update always ends in Android", which is
+very likely what the report of section 32 was too. The test board never showed it: its region is the default.
+
+init now finds the region itself, as the installer places it - the first 2 MiB boundary after the last partition
+(from sysfs) - and takes the first candidate that holds the mu300root filesystem (ext4 magic and label), the
+number in the file only as the last one. Tested with a generic segment whose default was wrong on purpose:
+"stage=root-offset found=27762098176 (default 12884901888)", and the board booted. A device left in Android by
+this needs one reinstall from a computer (the installer's `update` keeps settings and data); from v2026.09.29 on
+every generic segment carries the new init.
+
+Found on the way: the account merge rewrote `/etc/passwd` and friends in place (a reader at first boot could see a
+half-written file: `Failed to resolve user 'messagebus'`); it now writes a copy and renames it, and
+`mu300-accounts` runs before tmpfiles, sysusers and D-Bus. `rollback` removed `<os>.broken` even when that was the
+system still running (only rm's `--preserve-root` stopped it), and `apply`, `rollback` and `clean` could remove
+`<os>.old` while it was the running system (an apply or rollback without the reboot in between); all of them now
+check whether a directory is the running root (`[ / -ef dir ]`) first.
+
+## ZTE U30 Air
+
+### 33. The same board with a battery
+
+The U30 Air (`ro.product.device` U30Air, firmware `U30Air_SSV1.0.0B14`) is `ums9620_2h10_feimao` like the F50: same
+SoC, same 64 GB eMMC and partition layout (partitions end at sector 54218752, so the Linux region is at the same
+offset), and its stock kernel is the very source this project builds (Enceka's tree is named after it). Its
+`/proc/config.gz` differs from the F50's in 19 symbols, all about the battery and its surroundings: ZTE's "SQC"
+charger stack (`sqc_charger`, `sqc_bq2560x`, `sqc_netlink`, `charger_policy_service`, `zte_power_supply`,
+`zte_misc`), `SC27XX_PD`, GPIO and LDO LEDs, a SAR sensor (`SAR_PARA` bougain instead of anthurium) and an NFC tag.
+Two are built in on the U30 Air (`I2C_CHARDEV`, `I2C_SMBUS`); everything else is a module or a bool that only
+changes modules.
+
+The first boot with the F50 modules (one-shot trial) reached switch_root and ran, but the host never saw USB:
+`sprd-charger-manager` probed with -517 for good, because the U30 Air's device tree describes the SQC charger
+manager, and the F50 build of that module is `charger-manager.c` while `VENDOR_SQC_CHARGER` swaps in
+`charger-manager-sqc-comm.c`. The USB PHY and dwc3 wait on the charger/Type-C side, so no gadget.
+
+`kernel/build-u30air.sh` builds the F50 config plus `kernel/u30air.fragment` in a second build directory and keeps
+what differs. The Image has to stay the F50 one, so the check is the set of symbols vmlinux exports: `I2C_SMBUS=m`
+changed it (the i2c core gains `of_i2c_setup_smbus_alert`), and no U30 Air driver needs it, so it is left out;
+`I2C_CHARDEV` is a module. Comparing whole files marks nearly every module as different (build id, symbol table
+order), so the comparison is on `.text`, `.rodata`, `.data`, `.modinfo` and `__ksymtab_strings`; that leaves 15
+modules. The load order (`boot/module-order-u30air.txt`) is the F50's with the charger block replaced, checked
+against every module's `depends=` (the fuel gauge needs the charger manager, which needs the SQC modules and
+`charger_policy_service`).
+
+init picks the set: `/etc/mu300-device` (written by the installer into the device segment of the ramdisk, which an
+update's generic segment does not replace), else the device tree (`/charger_policy_service` exists only on the U30
+Air). The set is used only when `linux-modules/u30air/kernel.release` matches `uname -r`, since a mainline kernel's
+generic segment brings its own modules and order but leaves these in place.
+
+With them: 93/93 modules, USB network, the hotspot, Bluetooth, mobile data, `/sys/class/power_supply/battery`
+(capacity, status) and the charger's `usb`/`ac` online flags. The battery LED is the charger's own; the others are
+`gpio-leds` (`pwr_green`, `net_blue`/`net_red`/`net_green`/`net_white`, `wifi_blue`/`wifi_white`), driven by
+`mu300-led`. No `LEDS_TRIGGER_NETDEV` in this kernel, so the Wi-Fi LED follows the hotspot service, not traffic.
+
+### 33a. misc and boot_b were looked up before the eMMC existed
+
+`sdhci-sprd` is one of the vendor modules, so the eMMC appears only once they are loaded (about 10 s in). init looked
+for misc and boot_b before that: 20 s of polling for nothing, then `misc-NOT-FOUND` - slot a was never restored by
+init, and there was no persistent log (`persist-target dev=none`). It happened on the F50 as well; the trial boots
+there were rescued by the bootloader's own counting. The lookup now runs after the modules (misc and boot_b at
+10.7 s on both devices), and the reboot timer, which started earlier, reads boot_b from `/run/bootb`.
+
+### 33b. Two devices on one computer
+
+Every device had `192.168.77.1` and the same USB MAC addresses (`02:50:00:00:77:0x`). The subnet now goes with the
+kind of device (F50 `.77`, U30 Air `.78`; `mu300-lan-ip`, `lan.conf` still overrides it) and the gadget MACs are
+`02:50:<md5 of the serial>:<subnet>:0x`. `mu300-vpn` always keeps the device's own LAN out of the tunnel: a
+`vpn.conf` copied from an F50 said `LAN_CIDRS=192.168.77.0/24`, which on a `.78` device would have sent every reply
+to its USB and Wi-Fi clients into the tunnel.
+
+### 33c. Mainline on the U30 Air: the USB PHY waited for a Type-C driver that does not exist
+
+The first 6.18 boot on the U30 Air came up completely - systemd, mobile data, the VPN, the hotspot - with no USB at
+all: no network, no serial console. Its persistent log said `25310000.ssphy: cannot add phy` and `dwc3: failed to
+initialize core`. After LK's dtbo merge the PHY's `extcon` on the F50 is `/extcon-gpio` (`linux,extcon-usb-gpio`,
+which mainline has), on the U30 Air `typec@380` - the PMIC's Type-C block, `sprd,sc27xx-typec`, which has no driver
+under mainline, so `usb_add_phy_dev()` deferred for ever. Both boards have the VBUS GPIO node: the ssphy driver now
+points the property at it when it names the Type-C block. Found with the device's own log, since there was no USB to
+look through: init persists it into boot_b, and it was read from Android afterwards (`tools/collect-logs.sh`).
+
+A boot without USB is also a boot you cannot end: it counted as good, so only failing five boots by hand brought
+the device back. `build-boot-image.py --trial-guard SECONDS` is for such experiments: init leaves a timer running
+past switch_root (from a copy of busybox in `/run`, reached through its working directory, since switch_root deletes
+the ramdisk and moves `/run`) that reboots unless `/run/stay` exists by then; with a one-shot trial that is back in
+Android. A reading of the PMIC registers through debugfs (`regmap/spi4.0/registers`) during these tests locked up a
+CPU for 23 s and panicked the board - the ADI bus does not take a full register sweep.
+
+Two more things that only show with two devices on one computer: every gadget had the USB serial number
+`MU300LINUX`, and macOS gave the second device a serial port but no network interface; it is now
+`MU300LINUX-<serial number>`. And under mainline `/proc/cmdline` is the kernel's forced command line, without
+`androidboot.serialno`: init reads the bootloader's from `/chosen/bootargs` in the device tree.
+
+Under 6.18 and 7.2 the U30 Air has USB, mobile data, the VPN, the hotspot, Bluetooth and its LEDs
+(`CONFIG_LEDS_GPIO`). The battery is not reported: its charger and fuel gauge (the SQC stack and `sc27xx-fgu` on
+the UMP9620) have no mainline drivers; the charger IC keeps charging on its own defaults. Kernel bundles now name
+the devices they run on (`./devices`): mu300-update and the installers do not put a bundle from before this onto a
+U30 Air.
+
+### 33d. The U30 Air's battery under mainline
+
+Under 6.18 the PMIC's efuse, ADC and fuel gauge (`sprd,ump9620-efuse/-adc/-fgu`) appeared as platform devices with
+no driver: mainline's sc27xx drivers know the SC2731/SC2730 family only. Patches 0004-0006 add UMP9620 from the
+values in Unisoc's 5.4 drivers:
+
+- efuse: 64 blocks, read directly from a window at 0x40 once the controller's RTC clock is on and ungated
+- ADC: its own scale table and ratios, a battery-voltage detection graph for scale 1, calibration from two efuse
+  words per graph (bits 15:4), and a vote for its 26 MHz clock in an AON register (`sprd_adc_pm_reg`) around each
+  conversion
+- fuel gauge: enable bits at 0x2008/0x2010, the 4200 mV calibration in bits 15:7. `bat-temp` is the NTC's voltage
+  on this board, not a temperature (71.2 "degrees" at first): the battery node's `voltage-temp-table` converts it.
+  The charger IC has no driver, so the status comes from the battery current. Mainline read a discharge current
+  as ~2 billion: `u32 cur - 8192` wraps below zero; the vendor driver casts to s64 first.
+
+The first status fallback asked for the capacity, whose calibration asks for the status: a stack overflow in the
+first second of every boot. Five of them in a row put the device back into Android by itself - the fallback did
+its job - and the panic was in pstore.
+
+The charger (SGM41511, `ti,bq2560x_chg` on I2C) still has no driver under mainline: it charges on its power-on
+defaults and reports nothing; I2C is not even enabled there. Under 5.4 the vendor SQC stack drives it.
+
+### 33e. USB host on the U30 Air, and a trial guard that outlived its trial
+
+Mainline had the gadget side of the dwc3 only: no host stack, no `/sys/bus/usb` at all. With dual-role dwc3, xHCI,
+mass storage, HID and the USB network/serial drivers it is a host as well, and it still starts as a gadget (the
+dwc3 node has `usb-role-switch` and no default mode: peripheral), so the USB network to a computer comes up as
+before. Two things the vendor stack does elsewhere:
+
+- The role. Under 5.4 the PMIC's Type-C block decides; it has no mainline driver, so the role is chosen from
+  userspace: dwc3 opens its role switch to it in 7.2, patch `6.18/0007` does it on UMS9620 in 6.18 (a patch 7.2
+  does not need goes into `patches/<version>/`). dwc3 tells the PHY about the role through `otg_set_vbus()`, which
+  the PHY did not provide: it has an otg structure now (host eye pattern, A-type ID, D+/D- pull-downs).
+- The 5 V. `vbus-supply` is the charger's `otg-vbus` regulator, and the charger (SGM41511, part 0010 in REG0B, on
+  the I2C controller at 22a0000) has no driver under mainline. `mu300-usb` sets its OTG_CONFIG bit (REG01 bit 5)
+  and turns its watchdog off (REG05 5:4), which would otherwise return it to its defaults 40 s after the write,
+  boost included. It refuses host mode while REG08 reports power good (a computer or charger on VBUS), and turns
+  the boost off at boot: the chip runs on the battery and keeps its registers across a reboot.
+
+A Logitech receiver (HID) and a flash drive (FAT, mounted and read) worked through a USB-C adapter under 6.18 and
+7.2. The drive read at ~3 MB/s with or without the PHY's host settings; it is an old stick, not yet compared
+elsewhere. HDMI through the same adapter needs DisplayPort alternate mode over USB-C, which this project has on
+neither kernel.
+
+Two restarts during these tests, both about 600 s after boot, were not the USB: `mu300-update` keeps the device
+segment of whatever image is in boot_b, and boot_b held a `--trial-guard 600` experiment - so every boot restarted
+after ten minutes. init now honours a guard only in a trial boot (Linux not the default), and says so.
+
+### 33f. The U30 Air's LEDs: three kinds of wiring, and lights that never went out
+
+Under mainline the network and Wi-Fi lights stayed lit whatever Linux did. Lighting each LED the kernel knew, one
+at a time, while someone watched the device, showed where they are:
+
+| light | colour | wired to |
+|---|---|---|
+| battery | white, red, blue | the PMIC's RGB LED (`sc27xx-bltc`): its *green* channel is white |
+| network | blue | GPIO 117 (`net_blue`) |
+| network | white | LDO VDDCAMA0 |
+| network | red | the PMIC's keypad backlight sink (`keyboard-backlight`) |
+| Wi-Fi | white | LDO VDDCAMA1 |
+| Wi-Fi | blue | LDO VDDCAMA2 |
+
+The device tree's six other GPIO LEDs (`pwr_green`, `net_red`, `net_green`, `net_white`, `wifi_blue`,
+`wifi_white`) light nothing; they come from a ZTE board file shared with other products, and Android never writes
+them either. The lights that never went out were the LDO ones: ZTE's `zte_ldo_leds` switches the camera supplies
+VDDCAMA0-2 (3.3 V) through `vddcamaN_status`, mainline had no consumer for them, and `regulator_ignore_unused`
+kept the bootloader's "on". `leds-zte-ldo` (upstream/port) makes them `zte-ldo0..2` and starts them dark, and
+`leds-sc27xx-kpled` (after Unisoc's keypad driver, current mode) brings the red back under its Android name. What
+each colour means was read from Android: sampling `/sys/class/leds` with the radio off shows the network LED
+cycling red / white / off, and `vddcama0` lit on 5G. mu300-led now follows it (blue on 4G, white on 5G, red
+without service); `mobile-data` reads the access technology (`AT+COPS?`) again on every watchdog round, since it
+changes under a live connection.
+
+The PMIC's LED also carries the heat alarm (`thermal-guard`, now running on 5.4 too, where it only watches): one
+colour at a time, since the white outshines red and blue when they are mixed.
+
+### 33g. The U30 Air's NFC tag
+
+The device tree's `st,st21nfc` at `i2c@2260000` 0x08 is a leftover: nothing answers there. The tag is a Fudan FM11NT08
+dual-interface EEPROM at 0x57 on the same bus (I2C bus 2), which answers only while GPIO 190 (ZTE's
+`ntag-reset-gpio`, driven by its `fm11tag` module under 5.4) is low; GPIO 127 is its field-detect interrupt. The
+memory is NTAG-like: UID and lock bytes, the capability container `e1 10 6d 00` (872 bytes of NDEF), then the NDEF
+TLV from 0x10. ZTE's `Fm11ntagService` writes a WSC Wi-Fi record (WPA2-PSK, AES) with the hotspot's name and
+password; `mu300-nfc wifi` writes the same bytes (compared page by page against ZTE's: nothing to write).
+
+A phone got nothing from the tag at first, under Linux and under Android alike, although the field-detect interrupt
+counted every tap. ZTE's web interface had NFC off (`settings global webserver_nfc_switch_status=0`, the factory
+state of this unit); switching it on there once made the tag answer phones from then on, under Linux too, so the
+switch is kept in the chip, presumably in its configuration block at 0x3b0 (which also holds the I2C address).
+The data area was unchanged by it: reading all 1 KiB with the switch on and off, the only difference is bit 5 of
+byte 0x3bf (0x20 set: off), in the configuration block at 0x3b0 that also holds the I2C address (0x57 at 0x3b3).
+`mu300-nfc on|off` changes that bit alone. With it on, URLs and text written by `mu300-nfc` reached a phone; a
+Wi-Fi record joins Android phones, while iOS reads URL records by itself but does nothing with a WSC record.
+
+### 33i. USB ping is not the Wi-Fi latency baseline
+
+On the 6.18 trial boot, Windows 11's `UsbNcm.sys` on the high-speed (480 Mb/s) gadget link pinged
+`192.168.77.1` at 3–7 ms (20 packets, mean 4 ms); the device pinged Windows at
+0.924–6.362 ms (20 packets, mean 4.586 ms). The same device pinging its own
+`192.168.77.1` was 0.062–0.437 ms (mean 0.280 ms), with no loss in any series.
+The gadget NCM transmit aggregation timeout in the 6.18 source is 300 microseconds,
+so it cannot by itself explain a consistent 4–5 ms. The extra time lies around
+the USB transfer and host path, not the bridge or Linux IP response: simultaneous
+`tcpdump` on `usb0` measured just 0.130–0.176 ms from request ingress to reply
+egress while Windows reported 3–6 ms RTT. This does **not** establish a common
+IP-stack delay that would also explain the phone's 10–15 ms Wi-Fi RTT.
+
+CPU0 deep idle is, however, a demonstrated contributor to USB RTT. At 100 ms
+intervals, disabling the 20 ms `cluster-pd` cpuidle state on all CPUs reduced
+Windows USB RTT from 4.375 to 2.325 ms (40 packets each); restoring it returned
+RTT to 4.475 ms. Disabling that state only on CPU0, where dwc3 and WCN IRQs
+actually execute, yielded 2.625 ms; disabling CPU0's shallower `core-sleep-lit`
+as well yielded 2.325 ms. At the normal one-second ping interval, CPU0
+`cluster-pd` disabled yielded 1–4 ms, mean 2 ms (12 packets). All cpuidle
+settings were restored after the tests. Whether this also improves Wi-Fi RTT
+needs a phone-side comparison; a previous CPU0-only Wi-Fi test showed no clear
+benefit. Permanently disabling deep idle trades standby power for latency and
+is not yet a chosen fix.
+
+Removing two misleading SC2355 idle-path log messages (`to free list empty` and
+`out of time` between normal TX completions) eliminated those messages in the
+live 6.18 driver, but the user's phone ping did not noticeably improve. This is
+log-overhead cleanup, not a demonstrated Wi-Fi latency fix. The 6.18 driver
+must not be hot-unloaded while hostapd is active: an earlier `wifi down` returned
+before hostapd exited, and unloading it then caused a hostapd cfg80211 use-after-free
+and a panic. Replace the module file and reboot instead.
+
+A second controlled check disabled `wlan0` RPS temporarily (`04` → `00`), keeping
+the hotspot up. The phone reported no meaningful RTT change, so RPS was restored
+to `04`; there is no reason to persist that setting. During this check, 20 ICMP
+request/reply pairs captured on `wlan0` spent only 0.15–0.33 ms between Linux RX
+and Linux TX. As on USB, most measured RTT is outside the Linux IP response path.
+At the time, `wlan0` had zero link errors/drops and CPU was mostly idle. The
+two media have not been shown to share a single larger bottleneck: CPU0 deep
+idle explains about 2 ms of the USB RTT, but the phone did not show a comparable
+Wi-Fi gain when it was disabled. Do not attribute the remaining Wi-Fi 10–15 ms
+to RPS, flow offload, or the Linux bridge without new evidence.
+
+### 33j. USB NCM short-frame latency, fixed in the 6.18 trial
+
+The gadget NCM function delayed an underfilled NTB for 300 microseconds and
+completed it from a soft hrtimer callback. Although the timer value is short,
+the actual short-frame path added several milliseconds on this device. The
+`0008-usb-ncm-flush-small-frames.patch` trial packages frames of at most 256
+bytes immediately, leaving the ordinary aggregation window for larger frames.
+It changes neither USB enumeration nor the early DHCP/host-lease recovery path.
+
+On the same Windows USB NCM link, 100 ICMP pings at 100 ms intervals went from
+mean 4.42 ms (40-packet pre-change baseline, 2–7 ms) to mean 1.02 ms (100
+packets, 0–3 ms), with no loss. The device's cpuidle settings were both back
+to their defaults (`state1/disable=0`, `state2/disable=0`) for the patched
+measurement. At the standard one-second interval, 20 pings were all at most
+3 ms and most were under 1 ms. `iperf3` on the USB link transferred 321 Mbit/s
+host-to-device and 342 Mbit/s device-to-host using two streams, with no TCP
+retransmits reported in the reverse test. USB came back automatically after
+the kernel-only trial boot; no manual replug was needed. The user's Android
+default-boot choice and five-failure fallback were restored after validation.
+
+### 33h. A trial guard that outlived its experiment, again
+
+The U30 Air restarted about every ten minutes after coming back from Android (`su -c mu300-linux`). init said
+`stage=trial-guard 600s`: the device segment of boot_b still held the guard of an old `--trial-guard 600`
+experiment, and `mu300-update` keeps that segment. 33e made init honour a guard only in a trial boot, but a boot
+from Android with mu300-linux is exactly that. The generic ramdisk segment, which every update appends behind the
+device segment, now carries an empty `etc/mu300-trial-guard` (a later file replaces an earlier one), and an
+experiment's guard goes into a segment of its own behind the generic one.
+
+## 2026-10-13: Mobility renewal gaps in the OpenWrt protocol
+
+The existing event monitor was only started for dual-stack contexts. IPv4-only
+connections therefore missed in-place address/DNS renewal, while the watchdog
+redialled when CGPADDR differed from the kernel address. Both families now use
+the same event owner; the watchdog requests renew for an active context and
+does not confuse failed AT reads with detach or radio-off. ACT/DETACH/PCO hints
+are coalesced without dropping hints during cooldown. Persistent explicit
+inactivity still requests netifd recovery after bounded confirmation.
+
+Replacement addresses are installed before old ones are withdrawn; failed
+updates retain the previous snapshot for retry. External IPv6 reporting and
+finite RA lifetimes remain intact. There is no ModemManager registration
+timeout here, so the E5/T551M 45-second change was not copied.
+
+20 focused checks passed, including dash/bash/BusyBox renewal tests; adjacent
+IPv6 regressions passed with dash/bash (35 combined checks). No MU300 device
+was deployed or tested for this change. See
+[implementation and validation](CELLULAR-MOBILITY-20261013.zh-CN.md).
+
+## 2026-10-13：对齐 T551M 发现的 Wi-Fi 接入缺陷
+
+MU300 的 AP/GO RX 同样把网络字节序 h_proto 与主机字节序协议常量直接
+比较，导致 IP 组播进入额外复制转发分支。已修正主线共用源码，并补齐
+5.4 构建补丁；保留单播 W2W、非 IP、桥接与 IPv6。
+
+PCIe/SDIO 的过期客户端丢弃和组播 LUT 查找日志收敛，上层 TX 错误限速，
+队列、credit 和 skb/message 释放路径不变。现有 WCN 事件恢复保留，补上
+down 后复查 disabled，避免恢复期间用户关闭 Wi-Fi 仍被重新打开。
+
+34 项 RX/TX/WCN/蜂窝相关测试通过，全部 5.4 Wi-Fi 补丁从原始厂商源码
+实际应用成功。未部署 MU300 实机，不能把 T551M 的现场结果当作 MU300
+验证。详见 [Wi-Fi 对齐记录](WIFI-FORWARDING-20261013.zh-CN.md)。
+
+## 2026-10-14：公共 eMMC 策略与默认启动提示
+
+旧 V50/AW9523B 门槛改为公共非可移除 eMMC 策略，禁用 runtime/system sleep、
+内外 CLK_AUTO，并按 E5 既有路径以刷缓存实现 FUA 持久化。TF/SDIO 保留原策略。
+6.18.54 与 7.2.8 的最终 Image/modules 编译通过；新完整策略尚未刷入实机。
+
+看板按保存的启动意图提示临时 OpenWrt，用户确认后设置默认，不立即重启。
+启动控制写入加入校验、失败回退和 rearm 互斥。V50 已热更新并正确显示默认 Linux。
+
+V50 当前 p76 的 EXT4 8 GiB 与分区长度一致，旧 #17 宿主 on/active、错误计数 0。
+旧 inode 不一致属于元数据版本不一致，不能把 fsck、短时稳定或 runtime PM 关联
+当作唯一底层根因。M8 的已确认铃声损坏原因也不能混作 inode 故障证据。
+详见 [两仓库报告](DUAL-SIM-BOOT-EMMC-20261014.zh-CN.md)。
+
+后续按用户要求撤销公共 eMMC 运行时常驻和 CLK_AUTO 禁用，恢复原有运行时省电。
+系统休眠保护改为专用回调，FUA 兼容保留；构建缓存一并迁移。实机仍运行旧 #17，
+本次未刷内核或切换运行时 sysfs 策略。
+
+### 2026-10-14：F50 / V50 共用固件的机型隔离
+
+旧 `install.sh` 会把 V50 当成未识别设备，用户确认后写入 f50 标记；
+initramfs 又优先相信该标记。现与桌面安装器对齐 V50/MU3351/ums9620 校验，
+启动和运行时均以本机设备树为准。跨机恢复配置在 AT 服务启动前纠正卡槽及映射，
+同机型自定义设置与短信/流量/APN 数据保留。网页灯控仍按实际 LED 节点隔离。
+V50 更新要求包明确支持，主线包和共用 TF 包检查内置 AW9523B 支持。
+详见 [V50 记录](V50-MU3351-20261014.zh-CN.md#f50--v50-共用固件的机型隔离)。
+本轮仅修改代码与回归验证，未重新编译、打包或刷机。
+
+## 2026-10-14：六项上游修复的公共适配
+
+按 #199 / #184 / #217 / #190 / #211 / #228 移植权限、TF 检测、升级锁、温控保护、转发结果及内核/打包检查。保留机型边界和现有双卡后端；E5 无相同升级保活链路，因此不引入 MU300 更新器。E5/T551M 原厂虚拟温区同类提前返回问题也纳入公共修正，M8 同步。正常导入树不重复改权限；不预装 Docker，不增加常驻 AT/温控轮询。详见 [范围与验证](UPSTREAM-BACKPORT-20261014.zh-CN.md)。尚未统一构建安装包或部署实机。
+
+
+## 2026-10-14：eMMC DMA/MMIO 排序与 E5、V50 实机验证
+
+公共 SDHCI 适配器改用有序 MMIO 访问器，修补 ADMA 描述符提交与完成读取之间的排序缺口；保留寄存器特殊处理、HS400 和运行时省电。E5 的修复前块记录存在另一 inode 表的完整内容，E5/V50 旧驱动普通文件测试均曾触发 ADMA 错误，不能仅按断电未刷盘解释。
+
+E5 完成 896 MiB 写入及等量直接读回、3584 次元数据更新、重启后 224 MiB 校验和两遍离线只读 fsck。V50 按用户要求重装现有 8 GiB OpenWrt 分区、重新提取本机固件，完整系统两轮 256 MiB 写读、1024 次元数据更新、重启后 64 MiB 校验通过。两机保持 HS400/200 MHz，错误计数为 0、运行时休眠启用；不把有界测试宣布为所有硬件永久可靠。V50 曾有本次部署漏同步模块导致的 BTF 不匹配，以及旧根目录脱落导致基础程序缺失，已在报告中分别记录。详见 [证据、范围及限制](EMMC-DMA-ORDERING-20261014.zh-CN.md)。未统一构建发行包，T551M/M8 未实机部署本次内核。
+
+
+2026-10-14 补齐排序修复覆盖：E5/T551M/M8 的三个机型内核入口及公共 Docker/本机交叉编译、MU300/F50/V50/U30 Air 两条主线版本均接入公共适配器；另补入两仓库旧 5.4 补丁链，不带入主线专属 PM/FUA 改动。发布 CI 增加实际访问器 C 编译执行检查。实际 6.18、7.2、原厂 5.4 参考驱动测试通过；尚未逐个重编和升级全部机型，详见同一调查报告的构建覆盖表。

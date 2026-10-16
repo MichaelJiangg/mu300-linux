@@ -5,6 +5,8 @@ set -e
 A=/opt/mu300/android
 mark() { [ -x /opt/mu300/bin/bootmark ] && /opt/mu300/bin/bootmark "$@" || true; }
 mark vendor-start
+. /opt/mu300/lib/android-import-perms.sh
+android_import_perms "$A" dev-properties || { echo 'Cannot repair imported Android permissions' >&2; exit 1; }
 # wait for the modem stack: on the mainline kernel the modules are loaded by userspace (see extra-modules), so
 # this service can start before /dev/modem exists
 for n in $(seq 1 90); do
@@ -12,7 +14,7 @@ for n in $(seq 1 90); do
     break
 done
 mark vendor-stack-present
-mkdir -p /dev/socket /dev/block/by-name
+mkdir -p /dev/socket /dev/block/by-name /var/log
 # No need to wait for logdw's socket. modem_control is still more than a second away (the chroot mounts, the
 # node ownership and the cmdline bind all come first), and /dev is rbind-mounted into the chroot, so a socket
 # that appears late shows up in $A/dev just the same. The old flat "sleep 1" was a second of the boot waiting
@@ -52,7 +54,12 @@ mountpoint -q $A/sys || mount -t sysfs sysfs $A/sys
 # own command line, so fall back to the bootargs LK put in the device tree
 src=/proc/cmdline
 grep -q androidboot.slot_suffix /proc/cmdline || [ ! -r /proc/device-tree/chosen/bootargs ] || src=/proc/device-tree/chosen/bootargs
-tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_b/androidboot.slot_suffix=_a/' > /run/mu300-cmdline.android
+android_slot=$(cat /run/mu300/android-slot 2>/dev/null || echo a)
+if [ "$android_slot" = b ]; then
+    tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_a/androidboot.slot_suffix=_b/' > /run/mu300-cmdline.android
+else
+    tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_b/androidboot.slot_suffix=_a/' > /run/mu300-cmdline.android
+fi
 mount --bind /run/mu300-cmdline.android $A/proc/cmdline
 # sprd_modem_loader only accepts a task whose comm is exactly "modem_control": exec it directly
 # OpenWrt's procd preloads /lib/libsetlbf.so into services; the bionic linker in the chroot cannot load it

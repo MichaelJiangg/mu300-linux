@@ -1,0 +1,197 @@
+power: supply: UMP9620 retained SOC and full qualification follow stock
+
+Actual connected U30 Air vendor sc27xx_fuel_gauge.ko decodes percent in
+bits 7:0 and tenths in bits 11:8 (probe 0x1bd0), and saves via masked RMW
+with 200 us waits (save_last_cap 0x4ba4). Drop the ambiguous-value/50 mA
+migration heuristic; do not overwrite a valid stock-format retained value.
+Keep shutdown sampling. Replace the invented 70-percent OCV full threshold
+with the original battery-node full voltage/current thresholds, requiring
+a real charger Full indication as before. Do not change charger limits.
+
+--- a/drivers/power/supply/sc27xx_fuel_gauge.c
++++ b/drivers/power/supply/sc27xx_fuel_gauge.c
+@@ -75,10 +75,6 @@
+ #define UMP9620_FGU_CAP_INTEGER_MASK	GENMASK(7, 0)
+ #define UMP9620_FGU_CAP_DECIMAL_MASK	GENMASK(11, 8)
+ #define UMP9620_FGU_CAP_DECIMAL_SHIFT	8
+-/* below this current (mA) the battery is at rest, and its voltage is its open-circuit voltage */
+-#define UMP9620_FGU_RELAXED_MA		50
+-/* the charger's Full sets 100 % only with the OCV table at this capacity or more */
+-#define UMP9620_FGU_FULL_MIN_CAP	70
+ 
+ #define SC27XX_FGU_CUR_BASIC_ADC	8192
+ #define SC27XX_FGU_SAMPLE_HZ		2
+@@ -166,6 +162,7 @@
+ 	int calib_resist;
+ 	/* UMP9620: the whole percent last written to the user area, -1 for none */
+ 	int saved_cap;
++	u32 full_voltage_uv, full_current_ua;
+ 	struct power_supply_battery_ocv_table *cap_table;
+ 	struct power_supply_resistance_temp_table *resist_table;
+ };
+@@ -233,7 +230,7 @@
+ {
+ 	int ret;
+ 
+-	ret = regmap_write_bits(data->regmap,
++	ret = regmap_update_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_MODE_AREA_MASK,
+ 				 SC27XX_FGU_MODE_AREA_MASK);
+@@ -248,7 +245,7 @@
+ 	 */
+ 	udelay(200);
+ 
+-	ret = regmap_write_bits(data->regmap,
++	ret = regmap_update_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_SET,
+ 				 SC27XX_FGU_MODE_AREA_MASK,
+ 				 boot_mode << SC27XX_FGU_MODE_AREA_SHIFT);
+@@ -268,7 +265,7 @@
+ 	 * make the user area data available, otherwise we can not save the user
+ 	 * area data.
+ 	 */
+-	return regmap_write_bits(data->regmap,
++	return regmap_update_bits(data->regmap,
+ 				  data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				  SC27XX_FGU_MODE_AREA_MASK, 0);
+ }
+@@ -277,7 +274,7 @@
+ {
+ 	int ret;
+ 
+-	ret = regmap_write_bits(data->regmap,
++	ret = regmap_update_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_CAP_AREA_MASK,
+ 				 SC27XX_FGU_CAP_AREA_MASK);
+@@ -296,7 +293,7 @@
+ 	if (data->var == &ump9620_info)
+ 		cap = clamp(cap, 0, 100);
+ 
+-	ret = regmap_write_bits(data->regmap,
++	ret = regmap_update_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_SET,
+ 				 SC27XX_FGU_CAP_AREA_MASK, cap);
+ 	if (ret)
+@@ -315,7 +312,7 @@
+ 	 * make the user area data available, otherwise we can not save the user
+ 	 * area data.
+ 	 */
+-	ret = regmap_write_bits(data->regmap,
++	ret = regmap_update_bits(data->regmap,
+ 				 data->base + SC27XX_FGU_USER_AREA_CLEAR,
+ 				 SC27XX_FGU_CAP_AREA_MASK, 0);
+ 	if (!ret)
+@@ -342,17 +339,12 @@
+  * calculate the battery open circuit voltage, and get current battery
+  * capacity according to the capacity table.
+  */
+-/*
+- * UMP9620, not a first power-on: the capacity Android (or this driver) saved, in Android's format. The first
+- * version of patch 0011 saved it in 0.1 % (580 for 58 %), which can read as a valid value in that format too
+- * (0x244 = 68.2 %): such a value, or one that is no capacity at all, is decided by the open-circuit voltage
+- * instead, from the battery node's OCV table - right away when the battery is at rest (under 50 mA). An ambiguous
+- * value with the battery under load is taken in Android's format.
+- */
++/* Stock retained format is authoritative when valid. OCV is only used
++ * for an invalid/missing retained capacity, never for low-current migration. */
+ static int ump9620_fgu_get_boot_capacity(struct sc27xx_fgu_data *data, int *cap)
+ {
+-	int ret, value, whole, tenths, cur = 0, ocv;
+-	bool valid, ambiguous;
++	int ret, value, whole, tenths, ocv;
++	bool valid;
+ 
+ 	ret = regmap_read(data->regmap,
+ 			  data->base + SC27XX_FGU_USER_AREA_STATUS, &value);
+@@ -363,15 +355,9 @@
+ 	whole = value & UMP9620_FGU_CAP_INTEGER_MASK;
+ 	tenths = (value & UMP9620_FGU_CAP_DECIMAL_MASK) >> UMP9620_FGU_CAP_DECIMAL_SHIFT;
+ 	valid = whole <= 100 && tenths <= 9 && !(whole == 100 && tenths);
+-	ambiguous = tenths && value <= 1000 && !(value % 10);
+-
+-	if (ambiguous) {
+-		ret = sc27xx_fgu_get_current(data, &cur);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	if (valid && (!ambiguous || abs(cur) >= UMP9620_FGU_RELAXED_MA)) {
++	/* Stock U30 Air probe at 0x1bd0 decodes low-byte percent plus
++	 * high-nibble tenths. A valid saved value is never a migration guess. */
++	if (valid) {
+ 		*cap = DIV_ROUND_CLOSEST(whole * 10 + tenths, 10);
+ 		data->saved_cap = *cap;
+ 		dev_info(data->dev, "boot capacity %d %% (saved 0x%03x)\n", *cap, value);
+@@ -384,8 +370,7 @@
+ 
+ 	data->boot_volt = ocv;
+ 	*cap = power_supply_ocv2cap_simple(data->cap_table, data->table_len, ocv);
+-	dev_info(data->dev, "boot capacity %d %% from the OCV (%d uV), saved 0x%03x is %s\n", *cap, ocv, value,
+-		 valid ? "ambiguous" : "no capacity");
++	dev_info(data->dev, "boot capacity %d %% from the OCV (%d uV), invalid saved 0x%03x\n", *cap, ocv, value);
+ 
+ 	ret = sc27xx_fgu_save_last_cap(data, *cap);
+ 	if (ret)
+@@ -976,6 +961,21 @@
+ 	return false;
+ }
+ 
++/* Electrical full thresholds come from this board's stock battery node.
++ * An arbitrary OCV percentage must not turn a partly charged cell into 100%. */
++static bool ump9620_fgu_full_qualified(struct sc27xx_fgu_data *data)
++{
++	int voltage_mv, current_ma;
++
++	if (!data->full_voltage_uv || !data->full_current_ua)
++		return false;
++	if (sc27xx_fgu_get_vbat_vol(data, &voltage_mv) ||
++	    sc27xx_fgu_get_current(data, &current_ma))
++		return false;
++	return voltage_mv >= DIV_ROUND_UP(data->full_voltage_uv, 1000) &&
++	       current_ma >= 0 && current_ma <= data->full_current_ua / 1000;
++}
++
+ static void sc27xx_fgu_capacity_calibration(struct sc27xx_fgu_data *data,
+ 					    int cap, bool int_mode)
+ {
+@@ -1000,14 +1000,10 @@
+ 	if (chg_sts == POWER_SUPPLY_STATUS_CHARGING)
+ 		return;
+ 
+-	/*
+-	 * UMP9620: the U30 Air's charger ends a charge at its 4.208 V, below the top of the battery's OCV table, so
+-	 * the OCV never reaches 100 % below. The charger's Full does (not 0006's guess from the current: the status
+-	 * comes from a charger driver), unless the OCV says the battery is far from full.
+-	 */
++	/* Full is electrically qualified using the stock battery thresholds. */
+ 	if (data->var == &ump9620_info && chg_sts == POWER_SUPPLY_STATUS_FULL && cap != 100 &&
+ 	    sc27xx_fgu_has_charger() &&
+-	    power_supply_ocv2cap_simple(data->cap_table, data->table_len, ocv) >= UMP9620_FGU_FULL_MIN_CAP) {
++	    ump9620_fgu_full_qualified(data)) {
+ 		dev_info(data->dev, "charge full: capacity %d %% -> 100 %%\n", cap);
+ 		sc27xx_fgu_adjust_cap(data, 100);
+ 		return;
+@@ -1383,6 +1379,11 @@
+ 		struct device_node *bat = of_parse_phandle(dev->of_node, "monitored-battery", 0);
+ 		int n = bat ? of_property_count_u32_elems(bat, "voltage-temp-table") : 0;
+ 
++		if (data->var == &ump9620_info && bat) {
++			of_property_read_u32(bat, "fullbatt-voltage", &data->full_voltage_uv);
++			of_property_read_u32(bat, "fullbatt-current", &data->full_current_ua);
++		}
++
+ 		if (n >= 4 && !(n % 2)) {
+ 			data->vt_table = devm_kcalloc(dev, n, sizeof(u32), GFP_KERNEL);
+ 			if (data->vt_table && !of_property_read_u32_array(bat, "voltage-temp-table",
+@@ -1553,8 +1554,7 @@
+ 
+ /* SOC may not have been read since the last dashboard visit. Sample the
+  * live coulomb counter before reset, while the PMIC transport is still up.
+- * The retained SET/CLEAR registers are strobes: equal readback must not skip
+- * a write, hence regmap_write_bits() in the save helpers above.
++ * Use the original masked RMW latch sequence, including its 200 us delays.
+  */
+ static void sc27xx_fgu_shutdown(struct platform_device *pdev)
+ {

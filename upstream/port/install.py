@@ -21,6 +21,14 @@ def append_once(path, marker, text):
         open(p, 'w').write(s.rstrip('\n') + '\n' + text)
 
 append_once('drivers/clk/sprd/Makefile', 'reset.o', 'clk-sprd-y\t+= reset.o\n')
+append_once('drivers/usb/typec/tcpm/Makefile', 'sc27xx-ump9620.o',
+            'obj-$(CONFIG_TYPEC_SC27XX_UMP9620) += sc27xx-ump9620.o\n')
+append_once('drivers/usb/typec/tcpm/Kconfig', 'config TYPEC_SC27XX_UMP9620',
+            '\nconfig TYPEC_SC27XX_UMP9620\n'
+            '\ttristate "UMP9620 Type-C and PD controller"\n'
+            '\tdepends on TYPEC_TCPM && OF && MFD_SC27XX_PMIC\n'
+            '\tdepends on REGULATOR && POWER_SUPPLY && USB_ROLE_SWITCH && NVMEM\n'
+            '\thelp\n\t  Autonomous Type-C and USB-PD with independent data/power roles.\n')
 append_once('drivers/clk/sprd/Makefile', 'ums9620-clk.o', 'obj-$(CONFIG_SPRD_UMS9620_CLK)\t\t+= ums9620-clk.o\n')
 kc = os.path.join(tree, 'drivers/clk/sprd/Kconfig')
 s = open(kc).read()
@@ -42,14 +50,48 @@ if 'SPRD_UMS9620_IPA_PD' not in k:
 # UMP9620 PMIC: MFD match data (IRQ base 0x80, 11 IRQs) and the ported regulator driver
 mfd = os.path.join(tree, 'drivers/mfd/sprd-sc27xx-spi.c')
 m = open(mfd).read()
-if 'ump9620' not in m:
-    m = m.replace('static const struct sprd_pmic_data sc2731_data = {',
-                  'static const struct sprd_pmic_data ump9620_data = {\n\t.irq_base = 0x80,\n\t.num_irqs = 11,\n\t.charger_det = SPRD_SC2730_CHG_DET,\n};\n\nstatic const struct sprd_pmic_data sc2731_data = {', 1)
-    m = m.replace('\t{ .compatible = "sprd,sc2731", .data = &sc2731_data },\n',
-                  '\t{ .compatible = "sprd,sc2731", .data = &sc2731_data },\n\t{ .compatible = "sprd,ump9620", .data = &ump9620_data },\n', 1)
-    m = m.replace('\t{ .name = "sc2731", .driver_data = (unsigned long)&sc2731_data },\n',
-                  '\t{ .name = "sc2731", .driver_data = (unsigned long)&sc2731_data },\n\t{ .name = "ump9620", .driver_data = (unsigned long)&ump9620_data },\n', 1)
-    open(mfd, 'w').write(m)
+def once(marker, old, new):
+    """replace old by new unless marker is there already: every edit on its own, so a tree a failed run left
+    half-edited is finished rather than skipped"""
+    global m
+    if marker not in m:
+        m = m.replace(old, new, 1)
+# The UMP9620's BC1.2 result (CHARGE_STATUS, Unisoc's sprd-bc1p2.h) is at 0x239c, with the SC27xx bits (DONE 11, SDP 7,
+# DCP 6, CDP 5). The first version of this edit pointed it at the SC2730's 0x1b9c, where detection never finished on
+# the U30 Air: a tree prepared with that is corrected.
+UMP9620_DATA = ('/* UMP9620 BC1.2 status (CHARGE_STATUS) */\n#define SPRD_UMP9620_CHG_DET\t\t0x239c\n\n'
+                'static const struct sprd_pmic_data ump9620_data = {\n\t.irq_base = 0x80,\n\t.num_irqs = 11,\n'
+                '\t.charger_det = SPRD_UMP9620_CHG_DET,\n};\n')
+m = m.replace('static const struct sprd_pmic_data ump9620_data = {\n\t.irq_base = 0x80,\n\t.num_irqs = 11,\n'
+              '\t.charger_det = SPRD_SC2730_CHG_DET,\n};\n', UMP9620_DATA)
+once('ump9620_data = {', 'static const struct sprd_pmic_data sc2731_data = {',
+     UMP9620_DATA + '\nstatic const struct sprd_pmic_data sc2731_data = {')
+if 'enum sprd_pmic_type' not in m:
+    # up to 6.x: the match data is the pmic data, and the DT's sub-nodes are populated as they are
+    once('"sprd,ump9620"', '\t{ .compatible = "sprd,sc2731", .data = &sc2731_data },\n',
+         '\t{ .compatible = "sprd,sc2731", .data = &sc2731_data },\n\t{ .compatible = "sprd,ump9620", .data = &ump9620_data },\n')
+    once('.name = "ump9620"', '\t{ .name = "sc2731", .driver_data = (unsigned long)&sc2731_data },\n',
+         '\t{ .name = "sc2731", .driver_data = (unsigned long)&sc2731_data },\n\t{ .name = "ump9620", .driver_data = (unsigned long)&ump9620_data },\n')
+else:
+    # 7.x: the match data is a PMIC type, and each type brings a list of MFD cells. The vendor DT's sub-nodes are
+    # in no list, so UMP9620 gets no cells and its sub-nodes populated as before.
+    once('PMIC_TYPE_UMP9620,', '\tPMIC_TYPE_SC2731,\n', '\tPMIC_TYPE_SC2731,\n\tPMIC_TYPE_UMP9620,\n')
+    once('case PMIC_TYPE_UMP9620:', '\tdefault:\n\t\tdev_err(&spi->dev, "Invalid device ID\\n");',
+         '\tcase PMIC_TYPE_UMP9620:\n\t\t/* MU300: no cells; the DT\'s own sub-nodes are populated below */\n'
+         '\t\tpdata = &ump9620_data;\n\t\tcells = NULL;\n\t\tnum_cells = 0;\n\t\tbreak;\n'
+         '\tdefault:\n\t\tdev_err(&spi->dev, "Invalid device ID\\n");')
+    once('if (pmic_type == PMIC_TYPE_UMP9620) {',
+         '\t\tdev_err(&spi->dev, "Failed to populate sub-devices %d\\n", ret);\n\t\treturn ret;\n\t}\n',
+         '\t\tdev_err(&spi->dev, "Failed to populate sub-devices %d\\n", ret);\n\t\treturn ret;\n\t}\n\n'
+         '\tif (pmic_type == PMIC_TYPE_UMP9620) {\n\t\tret = devm_of_platform_populate(&spi->dev);\n'
+         '\t\tif (ret)\n\t\t\treturn ret;\n\t}\n')
+    once('"sprd,ump9620"', '\t{ .compatible = "sprd,sc2731", .data = (void *)PMIC_TYPE_SC2731 },\n',
+         '\t{ .compatible = "sprd,sc2731", .data = (void *)PMIC_TYPE_SC2731 },\n'
+         '\t{ .compatible = "sprd,ump9620", .data = (void *)PMIC_TYPE_UMP9620 },\n')
+    once('.name = "ump9620"', '\t{ .name = "sc2731", .driver_data = PMIC_TYPE_SC2731 },\n',
+         '\t{ .name = "sc2731", .driver_data = PMIC_TYPE_SC2731 },\n\t{ .name = "ump9620", .driver_data = PMIC_TYPE_UMP9620 },\n')
+    once('linux/of_platform.h', '#include <linux/module.h>', '#include <linux/module.h>\n#include <linux/of_platform.h>')
+open(mfd, 'w').write(m)
 append_once('drivers/regulator/Makefile', 'ump9620-regulator.o', 'obj-$(CONFIG_REGULATOR_UMP9620) += ump9620-regulator.o\n')
 rk = os.path.join(tree, 'drivers/regulator/Kconfig')
 r = open(rk).read()
@@ -80,19 +122,55 @@ for path, anchor, line in [
 
 append_once('drivers/watchdog/Makefile', 'ump9620-pmic-wdt.o', 'obj-$(CONFIG_MFD_SC27XX_PMIC) += ump9620-pmic-wdt.o\n')
 
-# sdhci-sprd: the SD card controller is not populated on the MU300 and floods the log; probe only the eMMC
+# sdhci-sprd: this branch supports a root filesystem on the removable TF card,
+# so keep both the non-removable eMMC and removable SD controller available.
+# Also undo the old eMMC-only injection in an already prepared kernel tree.
 sp = os.path.join(tree, 'drivers/mmc/host/sdhci-sprd.c')
 t = open(sp).read()
 marker = 'MU300: only the non-removable eMMC'
-if marker not in t:
-    anchor = 'static int sdhci_sprd_probe(struct platform_device *pdev)\n{\n'
-    i = t.index(anchor) + len(anchor)
-    j = t.index('\n\n', i) + 1          # after the local variable declarations
-    t = t[:j] + '\t/* ' + marker + ' is used */\n\tif (!of_property_read_bool(pdev->dev.of_node, "non-removable"))\n\t\treturn -ENODEV;\n' + t[j:]
+old = '\t/* ' + marker + ' is used */\n\tif (!of_property_read_bool(pdev->dev.of_node, "non-removable"))\n\t\treturn -ENODEV;\n'
+t = t.replace(old, '')
+# PR #184 maps all EIC banks so the stock card-detect GPIO uses interrupts.
+# A genuine GPIO deferral still has a TF-only fallback: re-run the full parse
+# without cd-gpios, rather than skipping bus modes/power sequence after it.
+parse_old = '\tret = mmc_of_parse(host->mmc);\n\tif (ret)\n\t\treturn ret;\n'
+parse_new = '''\tret = mmc_of_parse(host->mmc);
+\tif (ret == -EPROBE_DEFER &&
+\t    of_property_match_string(pdev->dev.of_node, "sprd,name", "sdio_sd") >= 0) {
+\t\tstruct property *cd = of_find_property(pdev->dev.of_node, "cd-gpios", NULL);
+\t\tif (cd && !of_remove_property(pdev->dev.of_node, cd)) {
+\t\t\tdev_warn(&pdev->dev, "MU300: CD GPIO deferred, polling removable TF slot\\n");
+\t\t\tret = mmc_of_parse(host->mmc);
+\t\t\thost->mmc->caps |= MMC_CAP_NEEDS_POLL;
+\t\t}
+\t}
+\tif (ret)
+\t\treturn dev_err_probe(&pdev->dev, ret, "MU300: mmc_of_parse failed\\n");
+'''
+# Migrate the earlier cached adaptation, which only masked the deferral.
+masked = '''\tret = mmc_of_parse(host->mmc);
+\tif (ret == -EPROBE_DEFER &&
+\t    of_property_read_bool(pdev->dev.of_node, "cd-gpios") &&
+\t    of_property_match_string(pdev->dev.of_node, "sprd,name", "sdio_sd") >= 0) {
+\t\tdev_warn(&pdev->dev, "MU300: CD GPIO deferred, polling removable TF slot\\n");
+\t\thost->mmc->caps |= MMC_CAP_NEEDS_POLL;
+\t\tret = 0;
+\t}
+\tif (ret)
+\t\treturn dev_err_probe(&pdev->dev, ret, "MU300: mmc_of_parse failed\\n");
+'''
+t = t.replace(masked, parse_old)
+if 'of_remove_property(pdev->dev.of_node, cd)' not in t:
+    if parse_old not in t:
+        sys.exit('port: sdhci-sprd mmc_of_parse anchor changed')
+    t = t.replace(parse_old, parse_new, 1)
 # UMS9620 has the r11p3 controller: the vendor driver programs DLL phase 0x2 (mainline 0x3,
 # which gives data CRC errors on HS400ES writes while reads work)
 t = t.replace('#define  SDHCI_SPRD_DLL_PHASE_INTERNAL\t0x3', '#define  SDHCI_SPRD_DLL_PHASE_INTERNAL\t0x2 /* MU300 r11p3 */')
 open(sp, 'w').write(t)
+# Shared durability policy; migrate cached keep-awake trees back to runtime PM.
+from emmc import apply as apply_emmc_policy
+apply_emmc_policy(tree)
 # thermal: UMS9620 on-die sensors (vendor sprd_thermal_r5p0), calibration from eFuse
 append_once('drivers/thermal/Makefile', 'sprd_thermal_r5p0.o', 'obj-$(CONFIG_SPRD_THERMAL_R5P0) += sprd_thermal_r5p0.o\n')
 append_once('drivers/thermal/Kconfig', 'SPRD_THERMAL_R5P0', '''
@@ -124,11 +202,25 @@ config SPRD_SIP_SVC
 append_once('drivers/cpufreq/Makefile', 'sprd-cpufreq-v2-driver.o', 'obj-$(CONFIG_ARM_SPRD_CPUFREQ_V2) += sprd-cpufreq-v2-driver.o\n')
 append_once('drivers/cpufreq/Kconfig.arm', 'ARM_SPRD_CPUFREQ_V2', '''
 config ARM_SPRD_CPUFREQ_V2
-	bool "Unisoc UMS9620 cpufreq (v2, ATF DVFS)"
+	tristate "Unisoc UMS9620 cpufreq (v2, ATF DVFS)"
 	depends on SPRD_SIP_SVC && NVMEM
 	select PM_OPP
 ''')
 # PCIe RC for the Marlin3 (SC2355) Wi-Fi/BT chip: vendor pcie-sprd glue ported to the 6.18 DWC host API
+cp = os.path.join(tree, 'drivers/cpufreq/Kconfig.arm')
+ct = open(cp).read()
+ct = ct.replace('bool "Unisoc UMS9620 cpufreq (v2, ATF DVFS)"',
+                'tristate "Unisoc UMS9620 cpufreq (v2, ATF DVFS)"')
+open(cp, 'w').write(ct)
+# The vendor driver updates scheduler frequency invariance after DVFS. Mainline
+# has no export for modular cpufreq drivers; retain the call, export GPL-only.
+ap = os.path.join(tree, 'drivers/base/arch_topology.c')
+at = open(ap).read()
+if 'EXPORT_SYMBOL_GPL(topology_set_freq_scale)' not in at:
+    start = at.index('void topology_set_freq_scale(')
+    end = at.index('\n}', start) + 2
+    at = at[:end] + '\nEXPORT_SYMBOL_GPL(topology_set_freq_scale);' + at[end:]
+    open(ap, 'w').write(at)
 append_once('drivers/pci/controller/dwc/Makefile', 'pcie-sprd.o', 'obj-$(CONFIG_PCIE_SPRD) += pcie-sprd-misc.o pcie-sprd.o\n')
 append_once('drivers/pci/controller/dwc/Kconfig', 'config PCIE_SPRD', '''
 config PCIE_SPRD
@@ -143,4 +235,58 @@ t = open(rp).read()
 if 'ump96xx-rtc' not in t:
     t = t.replace('\t{ .compatible = "sprd,sc2731-rtc", },\n', '\t{ .compatible = "sprd,sc2731-rtc", },\n\t{ .compatible = "sprd,ump96xx-rtc", },\n', 1)
     open(rp, 'w').write(t)
+# The ZTE U30 Air's charger (SGM41511, a bq25601): its vendor DT compatible in bq256xx's OF and I2C tables; the
+# driver's handling of that node (no IRQ, no input current in the DT, the chip as Android left it) is patch 0009. The
+# I2C table is an edit rather than part of the patch: 6.18 writes its entries positionally, 7.x with .name/.driver_data.
+bp = os.path.join(tree, 'drivers/power/supply/bq256xx_charger.c')
+t = open(bp).read()
+if '"ti,bq2560x_chg"' not in t:
+    t = t.replace('\t{ .compatible = "ti,bq25601", .data = &bq256xx_chip_info_tbl[BQ25601] },\n',
+                  '\t{ .compatible = "ti,bq25601", .data = &bq256xx_chip_info_tbl[BQ25601] },\n'
+                  '\t{ .compatible = "ti,bq2560x_chg", .data = &bq256xx_chip_info_tbl[BQ25601] },\n', 1)
+if '"bq2560x_chg"' not in t:
+    for line in ('\t{ "bq25601", (kernel_ulong_t)&bq256xx_chip_info_tbl[BQ25601] },\n',
+                 '\t{ .name = "bq25601", .driver_data = (kernel_ulong_t)&bq256xx_chip_info_tbl[BQ25601] },\n'):
+        # the I2C table comes first; the ACPI table has the same positional line further down
+        i = t.find(line, t.index('bq256xx_i2c_ids[]'))
+        if i >= 0 and i < t.index('MODULE_DEVICE_TABLE(i2c'):
+            t = t[:i + len(line)] + line.replace('"bq25601"', '"bq2560x_chg"') + t[i + len(line):]
+            break
+open(bp, 'w').write(t)
+# Every edit above is a text substitution, and one whose anchor drifted in a new kernel release changes nothing
+# without saying so. Check the result rather than trusting the substitutions.
+expect = [
+    ('drivers/power/supply/bq256xx_charger.c', ['\"ti,bq2560x_chg\"', '\"bq2560x_chg\"']),
+    ('drivers/mfd/sprd-sc27xx-spi.c', ['SPRD_UMP9620_CHG_DET\t\t0x239c', 'ump9620_data = {', '"sprd,ump9620"', '.name = "ump9620"']
+     + (['case PMIC_TYPE_UMP9620:', 'if (pmic_type == PMIC_TYPE_UMP9620) {', 'linux/of_platform.h']
+        if 'enum sprd_pmic_type' in open(os.path.join(tree, 'drivers/mfd/sprd-sc27xx-spi.c')).read() else [])),
+    ('drivers/mmc/host/sdhci-sprd.c', ['DLL_PHASE_INTERNAL\t0x2 /* MU300 r11p3 */',
+                                      'MU300: CD GPIO deferred']),
+    ('drivers/nvmem/sprd-efuse.c', ['"sprd,qogirn6pro-efuse"', 'econfig.read_only = true;']),
+    ('drivers/rtc/rtc-sc27xx.c', ['"sprd,ump96xx-rtc"']),
+    ('drivers/usb/dwc3/dwc3-of-simple.c', ['"sprd,qogirn6pro-dwc3"']),
+    ('drivers/usb/dwc3/core.c', ['"snps,sprd-dwc3"']),
+]
+missing = [(p, w) for p, ws in expect for w in ws if w not in open(os.path.join(tree, p)).read()]
+if missing:
+    sys.exit('port: edits did not apply (anchor changed in this kernel?): ' + '; '.join(f'{p}: {w}' for p, w in missing))
 print('port installed')
+
+# LEDs of the ZTE U30 Air: its white ones on PMIC LDOs (leds-zte-ldo.c), and its red on the PMIC's keypad backlight
+# sink (leds-sc27xx-kpled.c)
+LED_DRIVERS = (
+    ('LEDS_AW9523B', 'leds-aw9523b', 'AW9523B LED groups (ZTE V50)',
+     'LEDS_CLASS && I2C && OF', 'The V50/MU3351 RGB controller with its original Android DT binding.'),
+    ('LEDS_ZTE_LDO', 'leds-zte-ldo', 'LEDs on PMIC LDOs (ZTE U30 Air)', 'LEDS_CLASS && REGULATOR && OF',
+     "The ZTE U30 Air's white LEDs, powered by three PMIC LDOs."),
+    ('LEDS_SC27XX_KPLED', 'leds-sc27xx-kpled', 'Spreadtrum/Unisoc PMIC keypad backlight',
+     'LEDS_CLASS && MFD_SC27XX_PMIC && OF', "The PMIC's keypad backlight sink: the U30 Air's red network LED."),
+)
+kl = os.path.join(tree, 'drivers/leds/Kconfig')
+kls = open(kl).read()
+for sym, obj, title, deps, text in LED_DRIVERS:
+    append_once('drivers/leds/Makefile', obj + '.o', f'obj-$(CONFIG_{sym})\t\t+= {obj}.o\n')
+    if f'config {sym}\n' not in kls:
+        i = kls.rindex('endif # NEW_LEDS')
+        kls = kls[:i] + f'config {sym}\n\ttristate "{title}"\n\tdepends on {deps}\n\thelp\n\t  {text}\n\n' + kls[i:]
+open(kl, 'w').write(kls)

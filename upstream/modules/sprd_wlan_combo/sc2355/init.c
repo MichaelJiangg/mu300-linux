@@ -418,6 +418,16 @@ void sc2355_setup_wiphy(struct wiphy *wiphy, struct sprd_priv *priv)
 	wiphy_ext_feature_set(wiphy,
 			      NL80211_EXT_FEATURE_SCHED_SCAN_RELATIVE_RSSI);
 	wiphy->features |= NL80211_FEATURE_SAE;
+	/* Standard password transport; four-way handshake stays in hostapd. */
+	if ((priv->extend_feature & SPRD_EXTEND_SOATAP_WPA3) &&
+	    (priv->fw_capa & SPRD_CAPA_AP_SME) &&
+	    (priv->fw_std & SPRD_STD_11W)) {
+		wiphy_ext_feature_set(wiphy, NL80211_EXT_FEATURE_SAE_OFFLOAD_AP);
+		/* Mixed mode carries PSK, PSK-SHA256 and SAE. A default limit
+		 * of two makes hostapd omit AKM_SUITES entirely (including SAE).
+		 */
+		wiphy->max_num_akm_suites = 3;
+	}
 
 	if (priv->extend_feature & SPRD_EXTEND_FEATURE_OCE) {
                 pr_info("\tOCE supported\n");

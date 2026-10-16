@@ -1,0 +1,109 @@
+{
+	"admin/home": {
+		"title": "状态看板",
+		"order": 5,
+		"action": {
+			"type": "view",
+			"path": "mu300/home"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+
+	"admin/modem": {
+		"title": "蜂窝",
+		"order": 25,
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+
+	"admin/modem/apn": {
+		"title": "接入点 APN",
+		"order": 10,
+		"action": { "type": "view", "path": "mu300/apn" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	},
+	"admin/modem/locks": {
+		"title": "网络锁定",
+		"order": 1,
+		"action": {
+			"type": "view",
+			"path": "mu300/locks"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+
+	"admin/modem/sms": {
+		"title": "短信",
+		"order": 2,
+		"action": {
+			"type": "view",
+			"path": "mu300/sms"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+
+	"admin/modem/forward": {
+		"title": "短信转发",
+		"order": 3,
+		"action": { "type": "view", "path": "mu300/forward" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	},
+
+	"admin/modem/at": {
+		"title": "AT 终端",
+		"order": 4,
+		"action": {
+			"type": "view",
+			"path": "mu300/at"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+
+	"admin/modem/settings": {
+		"title": "适配设置",
+		"order": 7,
+		"action": {
+			"type": "view",
+			"path": "mu300/settings"
+		},
+		"depends": {
+			"acl": [ "luci-app-mu300" ]
+		}
+	},
+	"admin/modem/device": {
+		"title": "设备管理",
+		"order": 6,
+		"action": { "type": "view", "path": "mu300/device" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	},
+	"admin/modem/sim": {
+		"title": "SIM 卡管理",
+		"order": 9,
+		"action": { "type": "view", "path": "mu300/sim" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	},
+	"admin/modem/cpu": {
+		"title": "CPU 设置",
+		"order": 8,
+		"action": { "type": "view", "path": "mu300/cpu" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	},
+	"admin/modem/traffic": {
+		"title": "流量池",
+		"order": 5,
+		"action": { "type": "view", "path": "mu300/traffic" },
+		"depends": { "acl": [ "luci-app-mu300" ] }
+	}
+}

@@ -1,4 +1,18 @@
-# Linux on the ZTE F50 / MU300
+# Linux on the ZTE F50 / MU300 and U30 Air
+
+Maintainer notes: [stock behavior and new-device adaptation checklist](docs/NEW-DEVICE-STOCK-ADAPTATION.zh-CN.md),
+[U30 Air charge/power/recovery evidence](docs/U30AIR-STOCK-CHARGE-20261016.zh-CN.md).
+
+Windows desktop installer: extract the complete release package and run root `OpenWrt-Installer.exe`. Device selection, persistent recovery and the two-stage Android reset flow share the existing backend. Python/CLI and Magisk entries remain available. See the bilingual [user guide](installer/GUIDE.md), [build instructions](installer/README.md), and [verification/screenshots](installer/VERIFICATION.md). Multiple ADB devices can be selected in the GUI or interactive CLI, or explicitly bound with `--serial SERIAL`.
+
+
+U30 Air mainline updates now include both charger variants, corrected fuel-gauge persistence,
+Type-C current detection, OTG boost control and native dual-SIM boot/live switching.
+See the [U30 Air port and verification record](docs/U30AIR-UPSTREAM-20261015.zh-CN.md).
+
+V50/MU3351 desktop-installer support and the new LED driver are documented in
+[the V50 adaptation record](docs/V50-MU3351-20261014.zh-CN.md), including what has
+been checked on hardware and what remains unverified.
 
 [![Latest Release](https://img.shields.io/github/v/release/dikeckaan/mu300-linux?logo=github)](https://github.com/dikeckaan/mu300-linux/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/dikeckaan/mu300-linux/total?color=blue&logo=github)](https://github.com/dikeckaan/mu300-linux/releases)
@@ -13,11 +27,44 @@ to it at any time.
 
 Think of it as a Raspberry Pi that already has a 5G modem, a Wi-Fi access point and 32 GB of storage inside.
 
+OpenWrt TF ZIPs can also be extracted and used with the [desktop installer](desktop/README.md):
+TF deployment, userdata images, independent internal partitions and SSH updates.
+The original Magisk TF installation remains unchanged.
+Desktop independent-partition installation checks GPT free ranges first. If the
+chosen size fits, it adds `mu300root` there and preserves Android userdata,
+including encrypted userdata. Only insufficient contiguous space requires a
+userdata shrink/reset. This desktop path writes a new GPT entry; the legacy
+raw-region installation described below leaves GPT unchanged on 64 GB devices.
+
+The **ZTE U30 Air** is supported too: the same board and chip with a battery. The installer recognises which one it
+is talking to; see [Supported devices](#supported-devices).
+
 > **Türkçe:** ZTE F50 / MU300'ü küçük bir Linux bilgisayarına çevirir: Ubuntu 24.04 veya OpenWrt; SSH, Wi-Fi,
 > Bluetooth ve 5G modem çalışır. Android cihazda kalır, istediğiniz an geri dönersiniz. Kurulum: önce
 > `./install.sh --check` ile cihazınıza bakın, sonra `./install.sh` ile kurun; `./uninstall.sh` ile kaldırın.
+> ZTE U30 Air de desteklenir (aynı kart, pilli); kurulum programı cihazı kendisi tanır.
 
 ---
+
+## Supported devices
+
+| | ZTE F50 / MU300 | ZTE U30 Air |
+|---|---|---|
+| Board, chip | `ums9620_2h10_feimao`, Unisoc T760 (UMS9620) | the same |
+| Power | USB only | battery (4050 mAh), charger and fuel gauge |
+| LEDs used by Linux | the blue LED: mobile data | as in ZTE's firmware: battery (white: Linux is up), network (blue: 4G, white: 5G, red: no service), Wi-Fi (white: 2.4 GHz, blue: 5 GHz) |
+| Heat alarm | the LED flashes red and blue | the battery LED flashes red, white, blue in turn: the SoC at 85 °C or the battery at 50 °C, until they cool down (`thermal-guard`) |
+| USB network | `192.168.77.1` | `192.168.78.1` (so both can be plugged into one computer) |
+| Tested | everything below | 5.4, 6.18 and 7.2: USB, Wi-Fi hotspot, Bluetooth, mobile data, VPN, LEDs |
+| Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit` and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`) |
+| USB host (OTG) | - (its USB port is its power supply) | `sudo mu300-usb host` with an OTG adapter: flash drives (FAT, exFAT), keyboards and mice, USB modems and Ethernet adapters, with 5 V from the battery; `sudo mu300-usb device` back to the computer (the default at every boot). Mainline kernels; HDMI through USB-C adapters does not work |
+| Buttons | power: held 3 s shuts down | power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down; double-press the Wi-Fi key within 500 ms to switch 2.4 / 5 GHz (a single press only wakes the LEDs), held 3 s turns it off or on |
+| NFC | - | a phone held to the device joins the hotspot, as with ZTE's firmware: `sudo mu300-nfc` shows the tag, `wifi` writes the hotspot's name and password (again at every hotspot start), `url https://...` or `text ...` anything else, `clear` empties it, `on`/`off` is the NFC switch of ZTE's web interface (kept in the tag) |
+
+Both run the same kernel, the same systems and the same releases; what differs is a handful of drivers for the U30
+Air's charger and LEDs, which its boot image loads in place of the F50's ([`kernel/u30air.fragment`](kernel/u30air.fragment)).
+Nothing about the device has to be chosen by hand: the installer reads it from Android, and the boot image, the
+LEDs and the default address follow. The U30 **Pro** is a different chip (UMS9632) and is not supported.
 
 ## What you get
 
@@ -25,7 +72,7 @@ Think of it as a Raspberry Pi that already has a 5G modem, a Wi-Fi access point 
   LuCI web interface.
 * **Internet over 5G/LTE**, shared with everything connected to the device.
 * **A Wi-Fi hotspot** (5 GHz or 2.4 GHz) and **USB networking**: plug it into a computer and it shows up as a network adapter.
-* **SSH access** at `192.168.77.1`, plus a USB serial console.
+* **SSH access** at `192.168.77.1` (U30 Air: `192.168.78.1`), plus a USB serial console.
 * **Bluetooth** and the **Mali GPU** (OpenCL; no screen output).
 * **`mu300-toolkit`**, a menu like `raspi-config`: temperatures, CPU and RAM use, network speeds, performance
   profiles, stress tests, VPN and services.
@@ -57,10 +104,12 @@ need `adb` on your computer. Getting to that point is not part of this project.
 * `./uninstall.sh` puts everything back.
 
 **You need:**
-* A ZTE F50 / MU300, rooted, connected by USB, with USB debugging enabled.
-* A computer with `adb` and Python 3:
-  * **macOS or Linux:** also `lz4` and `curl` (both usually already installed).
-  * **Windows 10/11:** PowerShell, plus `pip install lz4`. Use `install.ps1` / `uninstall.ps1` below.
+* A ZTE F50 / MU300 or U30 Air, rooted, connected by USB, with USB debugging enabled.
+* A computer with `adb`:
+  * **macOS or Linux:** also Python 3, `lz4` and `curl` (usually already installed).
+  * **Windows 10/11:** PowerShell. The installer installs Python 3 (for your user, with winget or from
+    python.org) and its `lz4` module itself when they are missing. Use `install.ps1` / `uninstall.ps1` below,
+    or `install.cmd` / `uninstall.cmd` from cmd.exe (no execution-policy change needed).
 * About 15 minutes.
 
 ## Install
@@ -81,6 +130,7 @@ repository: it contains your IMEI.
 ```sh
 ./install.sh --check          # macOS / Linux
 .\install.ps1 -Check          # Windows (PowerShell)
+install.cmd -Check            # Windows (cmd)
 ```
 
 It reports the storage size, where Android's partitions end and how much free space follows them. On the 64 GB
@@ -95,12 +145,40 @@ neither case, stop and open an issue with what `--check` printed; they identify 
 
 ```sh
 ./install.sh                  # macOS / Linux
-.\install.ps1                 # Windows
+.\install.ps1                 # Windows (PowerShell)
+install.cmd                   # Windows (cmd)
 ```
+
+![The installer: language, checks, systems and Ubuntu release](docs/images/installer/installer-1-start.png)
 
 It asks a few questions (Ubuntu, OpenWrt or both; which one boots; a password), downloads the ready-made images,
 copies the Wi-Fi and modem files from your own device, shows exactly what it is about to write, and waits for you to
 type `INSTALL`. Then it reboots into Linux.
+
+The installer speaks **English, Türkçe and 中文**: it asks at the start (English is the default; `MU300_LANG=tr`
+or `.\install.ps1 -Lang zh` skips the question). Adding a language is one file: see `i18n/README.md`. Before anything else it brings your copy of the project up to date
+with GitHub - a `git clone` is fast-forwarded, a downloaded zip gets the files that changed - and restarts itself if
+there was anything new; without GitHub it simply continues (`MU300_NO_SELF_UPDATE=1` / `-NoSelfUpdate` skips it).
+
+With Ubuntu it asks for the release: **24.04 LTS** (the default, the longest tested) or **26.04 LTS (beta)** - the
+newest, with systemd 259; tested on the device for a shorter time. An installed Ubuntu moves
+to the other release with `sudo MU300_UBUNTU=26.04 mu300-update apply` (or `24.04`), keeping settings and data.
+
+It also asks for the **kernel**:
+
+| choice | kernel | |
+|---|---|---|
+| 1 | 5.4 | Unisoc's vendor kernel (Android 12 base): the longest tested, everything this project supports |
+| 2 | 6.18 | mainline Linux, the current long-term (LTS) release: newer drivers and security fixes, the same functions (hotspot, mobile data, SMS, Bluetooth, VPN, GPU); no USB-C video output yet |
+| 3 | latest stable (7.2 for now) | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 6.18 |
+
+It can be changed later on the device with `sudo mu300-update kernel 5.4`, `... kernel 6.18` or `... kernel 7.2`.
+
+![The kernel question, in Turkish](docs/images/installer/installer-2-kernel-tr.png)
+
+Before it writes anything it shows what it is about to do and waits for `INSTALL`:
+
+![The summary before installing, and the end of the install](docs/images/installer/installer-3-summary.png)
 
 If Linux is already installed it asks whether to **update** or **wipe**:
 
@@ -118,7 +196,8 @@ into Android for you over SSH.
 ssh ubuntu@192.168.77.1        # the password you chose during the install
 ```
 
-For OpenWrt use `ssh root@192.168.77.1`, or open `http://192.168.77.1` in a browser for LuCI.
+For OpenWrt use `ssh root@192.168.77.1`, or open `http://192.168.77.1` in a browser for LuCI. On a U30 Air the
+address is `192.168.78.1` instead.
 
 The Wi-Fi network the device broadcasts is its hotspot; unless you chose otherwise it uses the name and password
 copied from Android.
@@ -133,12 +212,11 @@ copied from Android.
 | Make it faster, or cooler and quieter | `sudo mu300-toolkit profile performance` (also `eco`, `balanced`) |
 | Test stability under load | `sudo mu300-toolkit stress all 10` |
 | Check the mobile connection | `sudo mobile-data status` |
-| Read SMS (local pool, newest first) | `mu300-sms list`, then `mu300-sms show ID`; `mu300-smsd` keeps the pool in step with the SIM |
-| Send an SMS | `mu300-sms send 10086 你好` (UCS-2 submit, non-ASCII travels correctly) |
 | Set the APN | Ubuntu: `/etc/mu300/mobile-data.conf` (`MU300_APN`, `MU300_PDP_TYPE`). OpenWrt: LuCI → Network → Interfaces → wan, or `uci set network.wan.apn='…'; uci commit network; ifup wan`. Leave it empty to keep the context the SIM defines, which is what most carriers expect |
 | Change the Wi-Fi name or password | edit `/etc/mu300/hotspot.conf`, then `sudo systemctl restart mu300-hotspot` |
 | Connect the device to someone else's Wi-Fi | `sudo mu300-toolkit` → Network → Wi-Fi → "Join a network", or `sudo wifi-client scan` then `sudo wifi-client connect "NAME" "PASSWORD"` |
 | Update to the newest release | `sudo mu300-update check` then `sudo mu300-update apply` |
+| Fixed TTL for mobile data (so the operator cannot tell hotspot traffic from the device's own) | `sudo mu300-ttl set 64` (`sudo mu300-ttl off` goes back to the default), or `mu300-toolkit` -> Network -> TTL |
 | Switch between OpenWrt and Ubuntu | `sudo mu300-os openwrt` / `sudo mu300-os ubuntu` |
 | Failed boots in a row before it falls back to Android (1-6, default 5) | `sudo mu300-next-boot attempts N` |
 | Go back to Android | `sudo mu300-next-boot android`, then `sudo reboot` |
@@ -173,9 +251,10 @@ mu300-vpn status
 The device can update itself from a published release, without a computer:
 
 ```sh
-sudo mu300-update check      # installed version vs newest release
-sudo mu300-update apply      # download, unpack, switch; then reboot
-sudo mu300-update rollback   # back to the previous version
+sudo mu300-update check           # installed version vs newest release
+sudo mu300-update apply           # system, kernel and boot image: download, unpack, switch; then reboot
+sudo mu300-update rollback        # back to the previous system
+sudo mu300-update rollback-boot   # back to the previous kernel and boot image
 ```
 
 `mu300-toolkit` offers the same under System -> Software update. Your settings, users, `/usr/local` and the vendor
@@ -183,8 +262,30 @@ files (Wi-Fi firmware, Android modem userspace) are carried over, and the previo
 a rollback until you run `mu300-update clean`. The new filesystem is unpacked beside the old one and only swapped in
 at the end, so an interrupted download cannot leave a half-updated system.
 
-The kernel and the boot image are **not** updated this way: they have to be built with your device's own Android
-files, which only `./install.sh` on a computer can do.
+The kernel and the boot image are updated too. The boot image keeps your device's own part (its Android files and
+the stock header) as it is and gets the release's kernel and the generic part of its ramdisk, so no computer and
+nothing from Android are needed. The previous image is kept for `rollback-boot`, and a kernel that does not start
+sends the device back to Android on its own after the usual number of failed boots.
+
+`mu300-update apply` downloads and checks every file first and changes nothing before all of them are there; from
+v2026.09.28 on it also switches to the updater of the release it installs before it starts.
+
+**Updating from v2026.09.27 or older?** Fetch the new updater first, then update; do both right after a reboot
+(older boot images can lose mobile data after a few quiet minutes, see docs/FINDINGS.md 32):
+
+```sh
+sudo curl -fL https://github.com/dikeckaan/mu300-linux/releases/latest/download/mu300-update -o /opt/mu300/bin/mu300-update
+sudo mu300-update apply
+```
+
+On OpenWrt, as root: `wget -O /opt/mu300/bin/mu300-update https://github.com/dikeckaan/mu300-linux/releases/latest/download/mu300-update`
+and then `mu300-update apply`. Reboot afterwards to start the new system and kernel.
+
+**Back in Android after an update?** With the older boot images a single crash or reset of Linux (the update could
+cause one, see above) makes the device fall back to Android and stay there. Start Linux again with the Linux button
+of the Magisk module or `su -c mu300-linux`, then update as above. If Linux does not start any more, the boot image
+did not survive: run the installer again from a computer and choose `update` - it writes a fresh boot image and
+keeps your settings and data.
 
 ## Uninstall
 
@@ -192,7 +293,8 @@ With the device back in Android:
 
 ```sh
 ./uninstall.sh                # macOS / Linux
-.\uninstall.ps1               # Windows
+.\uninstall.ps1               # Windows (PowerShell)
+uninstall.cmd                 # Windows (cmd)
 ```
 
 It makes Android the boot system again, restores the second boot partition and erases the Linux filesystem. Your
@@ -216,7 +318,7 @@ Like the installer, it offers to reboot the device from Linux into Android first
 | Ubuntu 24.04 LTS / OpenWrt 25.12 | ✅ boots, no failed services |
 | Mobile data (5G NSA / LTE) | ✅ shared with Wi-Fi and USB clients; reconnects by itself after modem resets |
 | Wi-Fi access point | ✅ 5 GHz (802.11ac) or 2.4 GHz, one at a time |
-| USB network + serial console | ✅ `192.168.77.1`, `screen /dev/cu.usbmodem* 115200` |
+| USB network + serial console | ✅ `192.168.77.1` (U30 Air `192.168.78.1`), `screen /dev/cu.usbmodem* 115200` |
 | SSH, telnet | ✅ |
 | Bluetooth | ✅ BlueZ, scanning works |
 | GPU (Mali-G57) | ✅ OpenCL 3.0, headless |
@@ -243,6 +345,12 @@ The kernel is built from ZTE's published (GPL) source. The reasoning behind each
 
 **The device does not come back after installing.** Wait two minutes. If there is still nothing, unplug and replug
 it: the bootloader will have returned to Android on its own. Collect logs with `tools/collect-logs.sh`.
+
+**The computer sees the device but gets no address (macOS).** macOS does not set up a network interface it has
+never seen while the screen is locked. Each device has its own USB MAC address, so the first time one is plugged in
+(or after an update that brought these addresses) unlock the Mac, and the interface appears. With both an F50 and a
+U30 Air plugged in, they are `192.168.77.1` and `192.168.78.1`; two of the same kind need `/etc/mu300/lan.conf` to
+tell them apart.
 
 **No internet.** Check that the SIM has a data plan, then run `sudo mobile-data status`. A missing plan looks like a
 connection that keeps dropping.
@@ -280,13 +388,11 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 * [`upstream/`](upstream/) — the mainline 6.18 kernel port.
 * [Releases](https://github.com/dikeckaan/mu300-linux/releases) — prebuilt images. They contain **no proprietary
   files**; the installer takes those from your own device.
-* [Release Download Stats](https://tooomm.github.io/github-release-stats/?username=dikeckaan&repository=mu300-linux) — detailed per-asset download metrics across all versions.
-* [Traffic & Clones](https://github.com/dikeckaan/mu300-linux/graphs/traffic) — GitHub visitor insights and clone graphs.
 
 | Path | Contents |
 |---|---|
 | `install.sh`, `uninstall.sh` | installer and remover for macOS/Linux |
-| `install.ps1`, `uninstall.ps1` | the same for Windows (PowerShell) |
+| `install.ps1`, `uninstall.ps1` | the same for Windows (PowerShell); `install.cmd`, `uninstall.cmd` launch them from cmd.exe |
 | `kernel/` | kernel build environment, config, patches |
 | `boot/` | initramfs `init`, boot image builder, slot handling |
 | `rootfs/` | Ubuntu image: `Dockerfile`, `assemble.sh`, services and scripts in `overlay/` |
@@ -297,123 +403,6 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 
 The kernel source used here is mirrored at
 [`dikeckaan/zte-ums9620-kernel-5.4.254`](https://github.com/dikeckaan/zte-ums9620-kernel-5.4.254).
-
-## Project statistics
-
-Track community adoption, download numbers, and repository traffic:
-
-* **Live Dashboards:**
-  * [GitHub Traffic & Clone Graphs](https://github.com/dikeckaan/mu300-linux/graphs/traffic)
-  * [Release Download Statistics Dashboard](https://tooomm.github.io/github-release-stats/?username=dikeckaan&repository=mu300-linux)
-
-<!-- STATS:START -->
-> *Last updated: **2026-09-28 05:10:45 UTC** (tracked automatically via GitHub Actions)*
-
-### Overview
-
-| Metric | Count | Details |
-|---|---|---|
-| ⭐ **Stars** | **61** | Stargazers |
-| 🍴 **Forks** | **20** | Forks (33% fork-to-star ratio) |
-| 📥 **Release Asset Downloads** | **464** | 310 OS/Kernel images, 154 checksums |
-| 👥 **Page Views (Archived)** | **1,154** | ~487 unique visitors |
-| 💻 **Git Clones (Archived)** | **668** | ~291 unique cloners |
-
-### Daily Traffic & Git Clones
-
-| Date | Page Views | Unique Visitors | Git Clones | Unique Cloners |
-|---|---|---|---|---|
-| **2026-09-19** | 131 | 47 | 110 | 51 |
-| **2026-09-18** | 347 | 105 | 196 | 87 |
-| **2026-09-17** | 657 | 328 | 300 | 125 |
-| **2026-09-16** | 19 | 7 | 62 | 28 |
-
-### Top Referring Sites
-
-| Referrer | Total Views | Unique Visitors |
-|---|---|---|
-| github.com | 57 | 32 |
-| Google | 6 | 4 |
-| github-com.translate.goog | 6 | 3 |
-| coolapk.com | 3 | 2 |
-| Bing | 2 | 2 |
-| chatgpt.com | 1 | 1 |
-| web.telegram.org | 1 | 1 |
-
-### Release Downloads Breakdown
-
-| Release | Asset | Size | Downloads |
-|---|---|---|---|
-| **v2026.09.30** | `mu300-kernel-6.18.tar.gz` | 8.3 MB | **7** |
-|  | `mu300-kernel-7.2.tar.gz` | 8.5 MB | **1** |
-|  | `mu300-kernel.tar.gz` | 25.2 MB | **11** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **9** |
-|  | `mu300-ubuntu-26.04-rootfs.tar.gz` | 131.0 MB | **5** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 119.5 MB | **4** |
-|  | `mu300-update` | 36.1 KB | **4** |
-|  | `SHA256SUMS` | 632 B | **10** |
-| **v2026.09.29** | `mu300-kernel-6.18.tar.gz` | 8.3 MB | **2** |
-|  | `mu300-kernel-7.2.tar.gz` | 8.5 MB | **2** |
-|  | `mu300-kernel.tar.gz` | 25.2 MB | **3** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **3** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 119.5 MB | **6** |
-|  | `mu300-update` | 33.5 KB | **0** |
-|  | `SHA256SUMS` | 533 B | **5** |
-| **v2026.09.28** | `mu300-kernel-6.18.tar.gz` | 8.3 MB | **9** |
-|  | `mu300-kernel.tar.gz` | 25.2 MB | **13** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **18** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 119.5 MB | **13** |
-|  | `mu300-update` | 31.8 KB | **5** |
-|  | `SHA256SUMS` | 443 B | **18** |
-| **v2026.09.27** | `mu300-kernel.tar.gz` | 25.2 MB | **8** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **9** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 119.5 MB | **3** |
-|  | `SHA256SUMS` | 273 B | **15** |
-| **v2026.09.26** | `mu300-kernel.tar.gz` | 22.7 MB | **22** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **18** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 119.5 MB | **7** |
-|  | `SHA256SUMS` | 273 B | **26** |
-| **v2026.09.25** | `mu300-kernel.tar.gz` | 22.7 MB | **3** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **1** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 116.2 MB | **2** |
-|  | `SHA256SUMS` | 273 B | **2** |
-| **v2026.09.24** | `mu300-kernel.tar.gz` | 22.7 MB | **1** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **0** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 116.2 MB | **0** |
-|  | `SHA256SUMS` | 273 B | **0** |
-| **v2026.09.23** | `mu300-kernel.tar.gz` | 22.7 MB | **1** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 58.4 MB | **0** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 116.2 MB | **0** |
-|  | `SHA256SUMS` | 273 B | **0** |
-| **v2026.09.22** | `mu300-kernel.tar.gz` | 22.7 MB | **12** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **11** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.3 MB | **3** |
-|  | `SHA256SUMS` | 273 B | **22** |
-| **v2026.09.21** | `mu300-kernel.tar.gz` | 22.7 MB | **25** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **21** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.3 MB | **14** |
-|  | `SHA256SUMS` | 273 B | **27** |
-| **v2026.09.20** | `mu300-kernel.tar.gz` | 22.7 MB | **11** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **9** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.2 MB | **5** |
-|  | `SHA256SUMS` | 273 B | **11** |
-| **v2026.09.19** | `mu300-kernel.tar.gz` | 22.7 MB | **5** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **5** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.2 MB | **2** |
-|  | `SHA256SUMS` | 273 B | **6** |
-| **v2026.09.18** | `mu300-kernel.tar.gz` | 22.7 MB | **0** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **0** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.2 MB | **0** |
-|  | `SHA256SUMS` | 273 B | **0** |
-| **v2026.09.17** | `mu300-kernel.tar.gz` | 22.7 MB | **3** |
-|  | `mu300-openwrt-rootfs.tar.gz` | 44.2 MB | **1** |
-|  | `mu300-ubuntu-rootfs.tar.gz` | 104.2 MB | **2** |
-|  | `SHA256SUMS` | 273 B | **3** |
-<!-- STATS:END -->
-
-### Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=dikeckaan/mu300-linux&type=Date)](https://star-history.com/#dikeckaan/mu300-linux&Date)
 
 ## Credits and licenses
 

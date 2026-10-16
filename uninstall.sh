@@ -25,9 +25,12 @@ for c in adb python3; do command -v $c >/dev/null || die "$c not found"; done
 . "$TOP/tools/linux-mode.sh"
 require_android
 [ "$(su_do 'id -u')" = 0 ] || die "su does not work on the device"
+if [ "$(su_do 'for u in /sys/class/block/mmcblk*p*/uevent; do grep -qx PARTNAME=mu300root "$u" && { echo internal-partition; break; }; done; true')" = internal-partition ]; then
+    die 'Use OpenWrt-Installer.exe: Advanced options -> Uninstall and return space, with the original installation records. This legacy script cannot remove a GPT mu300root partition safely.'
+fi
 model="$(su_do 'getprop ro.product.model') / $(su_do 'getprop ro.product.device')"
 echo "device: $model"
-case "$model" in *MU300*|*F50*|*mu300*) ;; *) die "this does not look like a ZTE F50/MU300" ;; esac
+case "$model" in *MU300*|*F50*|*mu300*|*U30Air*|*U30_Air*) ;; *) die "this does not look like a ZTE F50/MU300 or U30 Air" ;; esac
 [ "$(su_do 'getprop ro.boot.slot_suffix')" = _a ] || die "Android must be running from slot a (boot Android first: mu300-next-boot android)"
 
 say "Looking for the Linux installation"
@@ -37,6 +40,7 @@ last_end=$1; disk=$2
 OFF=; SIZE=
 start=$(( (last_end / 4096 + 1) * 4096 * 512 ))
 for cand in $start 27762098176; do
+    [ "$cand" -ge 0 ] && [ $((cand + 2048)) -le $((disk * 512)) ] || continue
     m=$(su_do "dd if=/dev/block/mmcblk0 bs=1 skip=$((cand + 1080)) count=2 2>/dev/null | od -An -tx1" | tr -d ' ')
     l=$(su_do "dd if=/dev/block/mmcblk0 bs=1 skip=$((cand + 1144)) count=16 2>/dev/null" | tr -d '\000')
     if [ "$m" = 53ef ] && [ "$l" = mu300root ]; then

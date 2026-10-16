@@ -13,21 +13,81 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $T = '/data/local/tmp'
+# the USB network of each kind of device: F50 192.168.77.1, U30 Air 192.168.78.1; $MU300_IP is set to the one
+# that answers
 $MU300_IP = '192.168.77.1'
+function LinuxRunning {
+    foreach ($ip in @('192.168.77.1', '192.168.78.1')) {
+        if (Test-NetConnection -ComputerName $ip -Port 22 -InformationLevel Quiet -WarningAction SilentlyContinue) { $script:MU300_IP = $ip; return $true }
+    }
+    return $false
+}
+# cmd.exe runs a program from the current directory, PowerShell does not: with adb.exe next to the project (or
+# in the directory the installer is started from) but not on PATH, `adb devices` worked in cmd and the installer
+# said "adb not found". Look where people usually put platform-tools, and put the one found on PATH.
+function FindAdb {
+    if (Get-Command adb -CommandType Application -ErrorAction SilentlyContinue) { return }
+    $base = if ($Top) { $Top } elseif ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+    $dirs = @($base, (Join-Path $base 'platform-tools'), (Get-Location).Path, (Join-Path (Get-Location).Path 'platform-tools'))
+    if ($env:LOCALAPPDATA) { $dirs += Join-Path $env:LOCALAPPDATA 'Android\Sdk\platform-tools' }
+    if ($env:ANDROID_HOME) { $dirs += Join-Path $env:ANDROID_HOME 'platform-tools' }
+    if ($env:USERPROFILE) { $dirs += @((Join-Path $env:USERPROFILE 'platform-tools'), (Join-Path $env:USERPROFILE 'Downloads\platform-tools'), (Join-Path $env:USERPROFILE 'Desktop\platform-tools')) }
+    $dirs += @('C:\platform-tools', 'C:\adb', 'C:\Android\platform-tools')
+    foreach ($d in $dirs) {
+        if ($d -and (Test-Path (Join-Path $d 'adb.exe'))) { $env:PATH = "$d;$env:PATH"; return }
+    }
+}
 
 function Say($m) { Write-Host "`n==> $m" -ForegroundColor Cyan }
 function Die($m) { Write-Host "`nERROR: $m" -ForegroundColor Red; exit 1 }
+# Windows PowerShell 5.1 turns every stderr line of a native command into an ErrorRecord once stderr is
+# redirected, and with ErrorActionPreference Stop that aborts the script (adb's "daemon not running",
+# "no devices", push progress). Run such commands with Continue and drop their stderr.
+# The parameter must not share a name with any variable the blocks use: a scriptblock looks its variables up where
+# it runs, names are case-insensitive, and with it called $Cmd, SuDo's { adb shell "su -c '$cmd'" } ran
+# `su -c '<the text of the block>'` - so "su does not work on the device" on every Windows machine (issue #4).
+function Quiet([scriptblock]$QuietBlock_) { $ErrorActionPreference = 'Continue'; & $QuietBlock_ 2>$null }
+# With more than one adb device attached (a phone, an emulator, a device over the network) every plain adb command
+# fails with "more than one device/emulator", which read as "no adb device". Pick the F50 and point adb at it with
+# ANDROID_SERIAL: the only device, else the only one that says it is an F50/MU300 or a U30 Air, else ask (-Quiet
+# never asks).
+function SelectDevice([switch]$Quiet) {
+    if ($env:ANDROID_SERIAL) { return }
+    $all = @((Quiet { adb devices -l }) | Where-Object { $_ -match '^\S+\s+device\b' })
+    if ($all.Count -eq 0) { return }
+    $f50 = @($all | Where-Object { $_ -match 'model:F50|product:MU300|device:MU300|device:U30Air' })
+    # the only adb device, and an F50/U30 Air: nothing to ask
+    if ($all.Count -eq 1 -and $f50.Count -eq 1) { $env:ANDROID_SERIAL = ($all[0] -split '\s+')[0]; return }
+    # -Quiet (waiting for the device to come back): only the one F50/U30 Air. Otherwise always ask: a phone or
+    # tablet next to it is what this must never touch.
+    if ($Quiet) {
+        if ($f50.Count -eq 1) { $env:ANDROID_SERIAL = ($f50[0] -split '\s+')[0] }
+        return
+    }
+    Write-Host ('  ' + 'which adb device is the F50 or U30 Air?')
+    $def = 1
+    for ($i = 0; $i -lt $all.Count; $i++) {
+        $model = if ($all[$i] -match 'model:(\S+)') { $Matches[1] } else { '' }
+        Write-Host ('    {0}) {1} {2}' -f ($i + 1), ($all[$i] -split '\s+')[0], $model)
+        if ($f50.Count -eq 1 -and $all[$i] -eq $f50[0]) { $def = $i + 1 }
+    }
+    $n = 0
+    if (-not [int]::TryParse((Ask 'Device' "$def"), [ref]$n) -or $n -lt 1 -or $n -gt $all.Count) { Die 'invalid choice' }
+    $env:ANDROID_SERIAL = ($all[$n - 1] -split '\s+')[0]
+}
+# [string]: with no device adb prints nothing, and `-notmatch` on that empty result is falsy, not true
+function AdbState { SelectDevice -Quiet; [string](Quiet { adb get-state }) }
 function Ask($question, $default) {
     $a = Read-Host "$question [$default]"
     if ([string]::IsNullOrWhiteSpace($a)) { return $default } else { return $a.Trim() }
 }
-function SuDo($cmd) { (& adb shell "su -c '$cmd'" 2>$null) -join "`n" -replace "`r", '' }
+function SuDo($cmd) { (Quiet { adb shell "su -c '$cmd'" }) -join "`n" -replace "`r", '' }
 # see install.ps1: `su -c` may run on a pty that rewrites LF as CRLF, so binaries are written on the device
 # and pulled rather than streamed (issue #2)
 function SuDoToFile($cmd, $path) {
     $dev = '/data/local/tmp/mu300-pull.bin'
     & adb shell "su -c '$cmd > $dev'" | Out-Null
-    & adb pull $dev "$path" 2>$null | Out-Null
+    Quiet { adb pull $dev "$path" } | Out-Null
     & adb shell "su -c 'rm -f $dev'" | Out-Null
 }
 $script:PyExe = $null
@@ -44,9 +104,14 @@ function Python { param([Parameter(ValueFromRemainingArguments = $true)][string[
 function Hex32 { (SuDo 'dd if=/dev/block/by-name/misc bs=1 skip=2048 count=32 2>/dev/null | od -An -tx1') -replace '\s', '' }
 
 Say 'Checking host tools and device'
+FindAdb
 if (-not (Get-Command adb -ErrorAction SilentlyContinue)) { Die 'adb not found' }
-if ((& adb get-state 2>$null) -notmatch 'device') {
-    $linux = Test-NetConnection -ComputerName $MU300_IP -Port 22 -InformationLevel Quiet -WarningAction SilentlyContinue
+# the device in Linux, and only a phone or tablet in Android: that is not the one to touch - reboot the device first
+$target = @((Quiet { adb devices -l }) | Where-Object { $_ -match '^\S+\s+device\b' -and $_ -match 'model:F50|product:MU300|device:MU300|device:U30Air' })
+$linuxFirst = (-not $env:ANDROID_SERIAL) -and $target.Count -eq 0 -and (LinuxRunning)
+if (-not $linuxFirst) { SelectDevice }
+if ($linuxFirst -or (AdbState) -notmatch 'device') {
+    $linux = $linuxFirst -or (LinuxRunning)
     if (-not $linux) { Die 'no adb device (boot Android, enable USB debugging)' }
     Say 'The device is running MU300 Linux, not Android'
     Write-Host '  Uninstalling happens from Android (slot a), so the device has to reboot first.'
@@ -65,15 +130,18 @@ if ((& adb get-state 2>$null) -notmatch 'device') {
     }
     Write-Host '  waiting for Android'
     for ($i = 0; $i -lt 60; $i++) {
-        if ((& adb get-state 2>$null) -match 'device') { break }
+        if ((AdbState) -match 'device') { break }
         Start-Sleep 5
     }
-    if ((& adb get-state 2>$null) -notmatch 'device') { Die 'the device did not come back as Android' }
+    if ((AdbState) -notmatch 'device') { Die 'the device did not come back as Android' }
 }
 if ((SuDo 'id -u') -ne '0') { Die 'su does not work on the device' }
+if ((SuDo 'for u in /sys/class/block/mmcblk*p*/uevent; do grep -qx PARTNAME=mu300root "$u" && { echo internal-partition; break; }; done; true') -eq 'internal-partition') {
+    Die 'Use OpenWrt-Installer.exe: Advanced options -> Uninstall and return space, with the original installation records. This legacy script cannot safely remove a GPT mu300root partition.'
+}
 $model = "$(SuDo 'getprop ro.product.model') / $(SuDo 'getprop ro.product.device')"
 Write-Host "device: $model"
-if ($model -notmatch 'MU300|F50|mu300') { Die 'this does not look like a ZTE F50/MU300' }
+if ($model -notmatch 'MU300|F50|mu300|U30Air|U30_Air') { Die 'this does not look like a ZTE F50/MU300 or U30 Air' }
 if ((SuDo 'getprop ro.boot.slot_suffix') -ne '_a') { Die 'Android must be running from slot a (boot Android first: mu300-next-boot android)' }
 
 Say 'Looking for the Linux installation'
@@ -83,6 +151,8 @@ if ($parts.Count -ne 2) { Die 'could not read the partition table from the devic
 [int64]$OFF = 0; [int64]$SIZE = 0
 [int64]$start = [math]::Floor($lastEnd / 4096 + 1) * 4096 * 512
 foreach ($cand in @($start, 27762098176)) {
+    # Upstream 486856c: do not read a legacy/dynamic superblock past the eMMC.
+    if ($cand -lt 0 -or ($cand + 2048) -gt ($disk * 512)) { continue }
     $m = (SuDo "dd if=/dev/block/mmcblk0 bs=1 skip=$($cand + 1080) count=2 2>/dev/null | od -An -tx1") -replace '\s', ''
     $l = (SuDo "dd if=/dev/block/mmcblk0 bs=1 skip=$($cand + 1144) count=16 2>/dev/null") -replace '\0', ''
     if ($m -eq '53ef' -and $l.Trim() -eq 'mu300root') {
@@ -155,7 +225,7 @@ Write-Host 'boot_b = boot_a'
 
 if ($wipe -ne 'keep') {
     Say "Erasing the Linux filesystem ($wipe)"
-    $busy = SuDo "for o in /sys/block/loop*/loop/offset; do [ ""`$(cat `$o 2>/dev/null)"" = $OFF ] && echo `${o%/loop/offset}; done"
+    $busy = SuDo "for o in /sys/block/loop*/loop/offset; do [ x`$(cat `$o 2>/dev/null) = x$OFF ] && echo `${o%/loop/offset}; done"
     if ($busy) { Die "the Linux region is still attached ($busy); reboot Android and run again" }
     [int64]$skip = $OFF / 1MB; [int64]$mib = $SIZE / 1MB
     if ($wipe -eq 'quick') {
@@ -168,7 +238,7 @@ if ($wipe -ne 'keep') {
     if ($m -eq '53ef') { Die 'the filesystem signature is still there' }
     if ($wipe -eq 'secure') {
         $step = [int64]($mib / 32) + 1
-        $left = [int](SuDo "n=0; s=$skip; e=$($skip + $mib); while [ `$s -lt `$e ]; do c=`$(dd if=/dev/block/mmcblk0 bs=1048576 skip=`$s count=1 2>/dev/null | tr -d `"\000`" | wc -c); [ `$c -gt 0 ] && n=`$((n + 1)); s=`$((s + $step)); done; echo `$n").Trim()
+        $left = [int](SuDo "n=0; s=$skip; e=$($skip + $mib); while [ `$s -lt `$e ]; do c=`$(dd if=/dev/block/mmcblk0 bs=1048576 skip=`$s count=1 2>/dev/null | tr -d \\000 | wc -c); [ `$c -gt 0 ] && n=`$((n + 1)); s=`$((s + $step)); done; echo `$n").Trim()
         if ($left -ne 0) { Die "$left of 32 samples still contain data; run the secure erase again" }
         Write-Host 'erased and verified (32 samples across the region are empty)'
     } else {
@@ -176,7 +246,8 @@ if ($wipe -ne 'keep') {
     }
 }
 
-SuDo "grep -q "" $T/mu300root "" /proc/mounts || rm -rf $T/mu300root; rm -f $T/mu300-* $T/android-install.sh $T/android-mount-mu300root.sh" | Out-Null
+# (no double quotes in a command for the device: Windows PowerShell 5.1 drops them on the way to adb)
+SuDo "grep -qw $T/mu300root /proc/mounts || rm -rf $T/mu300root; rm -f $T/mu300-* $T/android-install.sh $T/android-mount-mu300root.sh" | Out-Null
 # the on-device switch would point at a boot_b that is Android again
 Say 'Removing the on-device switch (Magisk module)'
 if ((SuDo 'magisk -v')) { SuDo '[ -d /data/adb/modules/mu300_linux_switch ] && touch /data/adb/modules/mu300_linux_switch/remove' | Out-Null }

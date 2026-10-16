@@ -9,6 +9,10 @@
 * as published by the Free Software Foundation.
 */
 
+#include <linux/icmp.h>
+#include <linux/ip.h>
+#include <linux/ktime.h>
+#include <linux/moduleparam.h>
 #include <net/ip6_checksum.h>
 
 #include "cmdevt.h"
@@ -19,6 +23,65 @@
 #include "common/chip_ops.h"
 #include "rx.h"
 #include "txrx.h"
+
+/* Opt-in diagnostic: driver ingress to network-stack delivery for ICMP.
+ * No timestamping or per-packet accounting occurs while disabled. */
+static bool mu300_rx_probe;
+static atomic64_t mu300_rx_0_5 = ATOMIC64_INIT(0);
+static atomic64_t mu300_rx_5_10 = ATOMIC64_INIT(0);
+static atomic64_t mu300_rx_10_20 = ATOMIC64_INIT(0);
+static atomic64_t mu300_rx_20_50 = ATOMIC64_INIT(0);
+static atomic64_t mu300_rx_50_plus = ATOMIC64_INIT(0);
+module_param_named(mu300_rx_probe, mu300_rx_probe, bool, 0644);
+
+static int mu300_rx_stats_get(char *buffer, const struct kernel_param *kp)
+{
+	return scnprintf(buffer, 160, "lt5=%lld 5to10=%lld 10to20=%lld 20to50=%lld ge50=%lld\n",
+		(long long)atomic64_read(&mu300_rx_0_5),
+		(long long)atomic64_read(&mu300_rx_5_10),
+		(long long)atomic64_read(&mu300_rx_10_20),
+		(long long)atomic64_read(&mu300_rx_20_50),
+		(long long)atomic64_read(&mu300_rx_50_plus));
+}
+
+static const struct kernel_param_ops mu300_rx_stats_ops = {
+	.get = mu300_rx_stats_get,
+};
+module_param_cb(mu300_rx_stats, &mu300_rx_stats_ops, NULL, 0444);
+
+static void mu300_rx_probe_icmp(struct sk_buff *skb)
+{
+	const struct ethhdr *eth;
+	const struct iphdr *ip;
+	const struct icmphdr *icmp;
+	s64 ms;
+
+	if (skb->len < ETH_HLEN + sizeof(*ip))
+		return;
+	eth = (const struct ethhdr *)skb->data;
+	if (eth->h_proto != htons(ETH_P_IP))
+		return;
+	ip = (const struct iphdr *)(skb->data + ETH_HLEN);
+	if (ip->protocol != IPPROTO_ICMP || ip->ihl < 5 ||
+	    skb->len < ETH_HLEN + ip->ihl * 4 + sizeof(*icmp))
+		return;
+	icmp = (const struct icmphdr *)(skb->data + ETH_HLEN + ip->ihl * 4);
+	if (icmp->type != ICMP_ECHO && icmp->type != ICMP_ECHOREPLY)
+		return;
+	if (!ktime_to_ns(skb->tstamp))
+		return;
+	ms = ktime_ms_delta(ktime_get(), skb->tstamp);
+	if (ms < 5)
+		atomic64_inc(&mu300_rx_0_5);
+	else if (ms < 10)
+		atomic64_inc(&mu300_rx_5_10);
+	else if (ms < 20)
+		atomic64_inc(&mu300_rx_10_20);
+	else if (ms < 50)
+		atomic64_inc(&mu300_rx_20_50);
+	else
+		atomic64_inc(&mu300_rx_50_plus);
+}
 
 static bool rx_mh_ipv6_ext_hdr(unsigned char nexthdr)
 {
@@ -191,6 +254,10 @@ static void rx_skb_process(struct sprd_priv *priv, struct sk_buff *skb)
 	ndev = vif->ndev;
 	skb_reserve(skb, msdu_desc->msdu_offset);
 	skb_put(skb, msdu_desc->msdu_len);
+	if (unlikely(READ_ONCE(mu300_rx_probe))) {
+		mu300_rx_probe_icmp(skb);
+		skb->tstamp = 0;
+	}
 
 	eth = (struct ethhdr *)skb->data;
 	if (eth->h_proto == htons(ETH_P_IPV6))
@@ -217,8 +284,9 @@ static void rx_skb_process(struct sprd_priv *priv, struct sk_buff *skb)
 		    msdu_desc->bc_mc_w2w_flag) {
 			struct ethhdr *eth = (struct ethhdr *)skb->data;
 
-			if (eth->h_proto != ETH_P_IP &&
-			    eth->h_proto != ETH_P_IPV6) {
+			/* IP multicast is forwarded by the host network stack. */
+			if (eth->h_proto != htons(ETH_P_IP) &&
+			    eth->h_proto != htons(ETH_P_IPV6)) {
 				tx_skb = pskb_copy(skb, GFP_ATOMIC);
 				if (likely(tx_skb)) {
 					tx_skb->dev = ndev;
@@ -313,7 +381,6 @@ sc2355_rx_mh_addr_process(struct rx_mgmt *rx_mgmt, void *data,
 	struct sprd_common_hdr *hdr =
 	    (struct sprd_common_hdr *)(data + hif->hif_offset);
 	struct sprd_work *misc_work = NULL;
-	static unsigned long time;
 
 	pr_debug("%s: rx_data_addr=0x%lx\n", __func__, (unsigned long)data);
 
@@ -325,14 +392,6 @@ sc2355_rx_mh_addr_process(struct rx_mgmt *rx_mgmt, void *data,
 
 	} else {
 		pr_debug("%s: Add TX complete code here\n", __func__);
-
-		if (time != 0 && ((jiffies - time) >= msecs_to_jiffies(1000))) {
-			pr_err("%s: out of time %d\n",
-			       __func__, jiffies_to_msecs(jiffies - time));
-		}
-
-		time = jiffies;
-
 		sc2355_tx_free_data_num(hif, (unsigned char *)data);
 		misc_work = sprd_alloc_work(sizeof(void *));
 
@@ -370,21 +429,17 @@ static void rx_net_work_queue(struct work_struct *work)
 
 inline int sc2355_fill_skb_csum(struct sk_buff *skb, unsigned short csum)
 {
-	int ret = 0;
-
-	if (csum) {
-		ret = rx_ipv6_csum(skb->data, (__force __wsum)csum);
-		if (!ret) {
-			skb->ip_summed = CHECKSUM_COMPLETE;
-			skb->csum = (__force __wsum)csum;
-		} else if (ret > 0) {
-			skb->ip_summed = CHECKSUM_UNNECESSARY;
-		}
-	} else {
-		skb->ip_summed = CHECKSUM_NONE;
-	}
-
-	return ret;
+	/*
+	 * The firmware checksum does not match what the stack expects for CHECKSUM_COMPLETE: forwarded frames trigger
+	 * "hw csum failure" with a full packet dump each time. Let the stack verify checksums in software.
+	 * (Same as kernel/patches/wlan_combo-rx-software-checksum.patch does for the 5.4 build: without this,
+	 * rx_ipv6_csum() returns -1 for IPv6 TCP/UDP frames whose msdu_len counts WiFi padding, and mm.c then
+	 * drops the skb before netif_rx - every client IPv6 TCP/UDP frame over Wi-Fi vanished there.)
+	 */
+	(void)rx_ipv6_csum;
+	(void)csum;
+	skb->ip_summed = CHECKSUM_NONE;
+	return 0;
 }
 
 void sc2355_rx_send_cmd(struct sprd_hif *hif, void *data, int len,
@@ -399,10 +454,14 @@ void sc2355_queue_rx_buff_work(struct sprd_priv *priv, unsigned char id)
 {
 	struct sprd_work *misc_work;
 	struct sprd_vif *tmp_vif;
+	struct rx_mgmt *rx_mgmt = priv->hif.rx_mgmt;
+
+	if (!rx_mgmt || READ_ONCE(rx_mgmt->stopping))
+		return;
 
 	misc_work = sprd_alloc_work(0);
 	if (!misc_work) {
-		pr_err("%s out of memory\n", __func__);
+		pr_err_ratelimited("%s out of memory\n", __func__);
 		return;
 	}
 	spin_lock_bh(&priv->list_lock);
@@ -413,6 +472,15 @@ void sc2355_queue_rx_buff_work(struct sprd_priv *priv, unsigned char id)
 		}
 	}
 	spin_unlock_bh(&priv->list_lock);
+	/*
+	 * MU300: sc2355_do_delay_work() dereferences work->vif for both ids, and with no interface open there is no
+	 * RX ring to refill or flush. The vendor queued it anyway; the refill's timed retry can now fire after the
+	 * last interface closed.
+	 */
+	if (!misc_work->vif) {
+		kfree(misc_work);
+		return;
+	}
 	switch (id) {
 	case SPRD_PCIE_RX_ALLOC_BUF:
 	case SPRD_PCIE_RX_FLUSH_BUF:
@@ -433,10 +501,33 @@ void sc2355_rx_up(struct rx_mgmt *rx_mgmt)
 
 void sc2355_rx_process(struct rx_mgmt *rx_mgmt, struct sk_buff *pskb)
 {
+	if (pskb && unlikely(READ_ONCE(mu300_rx_probe)))
+		pskb->tstamp = ktime_get();
 	sc2355_reorder_data_process(&rx_mgmt->ba_entry, pskb);
 
 	if (!work_pending(&rx_mgmt->rx_net_work))
 		queue_work(rx_mgmt->rx_net_workq, &rx_mgmt->rx_net_work);
+}
+
+/*
+ * MU300: back-off for an RX refill that got nowhere. The vendor requeued the refill at once whenever buffers were
+ * still owed, so when the chip stopped taking them (issue #94: channel 10's links refused for minutes while the
+ * WCN sat in dump status) the shared sprd_work worker retried back to back, printing on every attempt, until a CPU
+ * soft-locked in printk and softlockup_panic rebooted the device. An attempt that neither allocates a buffer nor
+ * sends the pending address list now retries from a timer, 20 ms doubling to 1 s; one that makes progress
+ * resets it and requeues at once, as before.
+ */
+#define SPRD_REFILL_BACKOFF_MIN_MS	20U
+#define SPRD_REFILL_BACKOFF_MAX_MS	1000U
+
+static void rx_refill_retry(struct work_struct *work)
+{
+	struct rx_mgmt *rx_mgmt =
+	    container_of(to_delayed_work(work), struct rx_mgmt, refill_retry);
+
+	/* back onto the ordered sprd_work queue: a refill must not run beside another one */
+	if (!READ_ONCE(rx_mgmt->stopping))
+		sc2355_queue_rx_buff_work(rx_mgmt->hif->priv, SPRD_PCIE_RX_ALLOC_BUF);
 }
 
 int sc2355_mm_fill_buffer(struct sprd_hif *hif)
@@ -444,17 +535,44 @@ int sc2355_mm_fill_buffer(struct sprd_hif *hif)
 	struct rx_mgmt *rx_mgmt =
 	    (struct rx_mgmt *)hif->rx_mgmt;
 	struct mem_mgmt *mm_entry = &rx_mgmt->mm_entry;
-	unsigned int num = 0, alloc_num = atomic_xchg(&mm_entry->alloc_num, 0);
+	unsigned int num = 0, alloc_num;
+	bool had_trans, progress;
+
+	if (READ_ONCE(rx_mgmt->stopping))
+		return 0;
+
+	/* MU300: a retry is already timed; RX events (mm_buffer_unlink) must not bypass the back-off */
+	if (delayed_work_pending(&rx_mgmt->refill_retry))
+		return atomic_read(&mm_entry->alloc_num);
+
+	alloc_num = atomic_xchg(&mm_entry->alloc_num, 0);
+	had_trans = rx_mgmt->addr_trans_head != NULL;
 
 	num = sc2355_mm_buffer_alloc(&rx_mgmt->mm_entry, alloc_num);
+	progress = num < alloc_num;
 	if (hif->ops->tx_addr_trans)
 		hif->ops->tx_addr_trans(hif, NULL, 0, true);
+	if (had_trans && !rx_mgmt->addr_trans_head)
+		progress = true;
 	if (num)
 		num = atomic_add_return(num, &mm_entry->alloc_num);
 
-	if (num > SPRD_MAX_ADD_MH_BUF_ONCE || rx_mgmt->addr_trans_head)
-		sc2355_queue_rx_buff_work(rx_mgmt->hif->priv,
-					  SPRD_PCIE_RX_ALLOC_BUF);
+	if (progress)
+		rx_mgmt->refill_backoff_ms = 0;
+
+	if (num > SPRD_MAX_ADD_MH_BUF_ONCE || rx_mgmt->addr_trans_head) {
+		if (progress) {
+			sc2355_queue_rx_buff_work(rx_mgmt->hif->priv,
+						  SPRD_PCIE_RX_ALLOC_BUF);
+		} else {
+			rx_mgmt->refill_backoff_ms =
+			    clamp(rx_mgmt->refill_backoff_ms * 2,
+				  SPRD_REFILL_BACKOFF_MIN_MS,
+				  SPRD_REFILL_BACKOFF_MAX_MS);
+			queue_delayed_work(system_wq, &rx_mgmt->refill_retry,
+					   msecs_to_jiffies(rx_mgmt->refill_backoff_ms));
+		}
+	}
 
 	return num;
 }
@@ -489,6 +607,9 @@ void sc2355_rx_flush_buffer(void *hif)
 	}
 
 	sc2355_mm_flush_buffer(mm_entry);
+	/* MU300: the ring is gone, and with it any timed refill (not _sync: this can run in RX context) */
+	cancel_delayed_work(&rx_mgmt->refill_retry);
+	rx_mgmt->refill_backoff_ms = 0;
 }
 
 int sc2355_rx_init(struct sprd_hif *hif)
@@ -552,6 +673,7 @@ int sc2355_rx_init(struct sprd_hif *hif)
 	}
 
 	sc2355_reorder_init(&rx_mgmt->ba_entry);
+	INIT_DELAYED_WORK(&rx_mgmt->refill_retry, rx_refill_retry);
 
 	hif->lp = 0;
 	hif->rx_mgmt = (void *)rx_mgmt;
@@ -577,11 +699,22 @@ int sc2355_rx_deinit(struct sprd_hif *hif)
 {
 	struct rx_mgmt *rx_mgmt = (struct rx_mgmt *)hif->rx_mgmt;
 
+	/* Draining a producer is not enough if another queued work can re-arm its timer. */
+	WRITE_ONCE(rx_mgmt->stopping, true);
+
+	/*
+	 * Stop the timer, drain RX producers, then drain sprd_work. An in-flight
+	 * refill may have passed its stopping check before teardown and re-armed
+	 * the timer after the first cancel, so cancel again after all producers.
+	 */
+	cancel_delayed_work_sync(&rx_mgmt->refill_retry);
 	flush_workqueue(rx_mgmt->rx_queue);
 	destroy_workqueue(rx_mgmt->rx_queue);
 
 	flush_workqueue(rx_mgmt->rx_net_workq);
 	destroy_workqueue(rx_mgmt->rx_net_workq);
+	sprd_clean_work(hif->priv);
+	cancel_delayed_work_sync(&rx_mgmt->refill_retry);
 
 	sprd_deinit_msg(&rx_mgmt->rx_list);
 

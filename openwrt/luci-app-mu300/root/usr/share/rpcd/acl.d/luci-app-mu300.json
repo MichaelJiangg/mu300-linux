@@ -1,0 +1,27 @@
+{
+ "luci-app-mu300": {
+  "description": "MU300 控制中心：状态看板、网络锁定、AT 终端与短信",
+  "read": {
+   "ubus": {
+    "mu300dash": [
+     "apn_get", "sysinfo", "status", "rates", "cells", "signal", "at_history",
+     "lock_get", "lock_status", "sms_list", "sms_show", "forward_get",
+     "forward_status", "traffic_get", "usb_get", "usb_net_list", "cpu_get", "cpu_voltage_get", "sim_get", "data_sim_get", "data_sim_status"
+    ],
+    "mu300-charge": [ "get" ]
+   },
+   "uci": {
+    "unisoc_modem": [ "*" ]
+   }
+  },
+  "write": {
+   "ubus": {
+    "mu300dash": [ "*" ],
+    "mu300-charge": [ "configure", "full_once", "pause", "resume" ]
+   },
+   "uci": {
+    "unisoc_modem": [ "*" ]
+   }
+  }
+ }
+}

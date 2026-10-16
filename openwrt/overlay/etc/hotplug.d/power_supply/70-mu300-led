@@ -1,0 +1,4 @@
+#!/bin/sh
+[ "$ACTION" = change ] || [ "$ACTION" = add ] || exit 0
+[ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] || exit 0
+/opt/mu300/bin/led-status battery

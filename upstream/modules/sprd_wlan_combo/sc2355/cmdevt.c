@@ -428,7 +428,7 @@ static int cmdevt_lock_cmd(struct sprd_cmd *cmd, struct sprd_hif *hif)
 #endif
 	if (hif->priv->is_suspending == 0)
 		__pm_stay_awake(cmd->wake_lock);
-	pr_info("cmd->refcnt=%x\n", atomic_read(&cmd->refcnt));
+	pr_debug("cmd->refcnt=%x\n", atomic_read(&cmd->refcnt));
 
 	return 0;
 }
@@ -459,12 +459,13 @@ static int cmdevt_send_cmd(struct sprd_priv *priv, struct sprd_msg *msg)
 	if (hdr->common.rsp)
 		cmdevt_set_cmd(&priv->cmd, hdr);
 
-	pr_warn("[%u]ctx_id %d send[%s]\n",
+	pr_debug("[%u]ctx_id %d send[%s]\n",
 		le32_to_cpu(hdr->mstime),
 		hdr->common.mode, cmdevt_cmd2str(hdr->cmd_id));
 
 	if (sprd_get_debug_level() >= L_DBG)
-		print_hex_dump_debug("CMD: ", DUMP_PREFIX_OFFSET, 16, 1,
+		if (hdr->cmd_id != CMD_SET_SAE_PARAM)
+			print_hex_dump_debug("CMD: ", DUMP_PREFIX_OFFSET, 16, 1,
 				     (u8 *)hdr, hdr->plen, 0);
 
 	ret = sprd_chip_tx(&priv->chip, msg);
@@ -681,7 +682,9 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 	}
 
 	ret = sc2355_api_version_available_check(priv, msg);
-	if (ret || cmdevt_lock_cmd(cmd, hif)) {
+	if (!ret)
+		ret = cmdevt_lock_cmd(cmd, hif);
+	if (ret) {
 		sprd_chip_free_msg(&priv->chip, msg);
 		kfree(msg->tran_data);
 		if (rlen)
@@ -696,6 +699,9 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 
 	if (atomic_read(&priv->hif.block_cmd_after_close) == 1) {
 		if (cmd_id != CMD_CLOSE) {
+			ret = -EBUSY;
+			if (rlen)
+				*rlen = 0;
 			pr_info("%s need block cmd after close : %s\n",
 				__func__, cmdevt_cmd2str(cmd_id));
 			sprd_chip_free_msg(&priv->chip, msg);
@@ -707,6 +713,9 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 
 	if (atomic_read(&priv->hif.change_iface_block_cmd) == 1) {
 		if (cmd_id != CMD_CLOSE && cmd_id != CMD_OPEN) {
+			ret = -EBUSY;
+			if (rlen)
+				*rlen = 0;
 			pr_info("%s need block cmd while change iface : %s\n",
 				__func__, cmdevt_cmd2str(cmd_id));
 			sprd_chip_free_msg(&priv->chip, msg);
@@ -733,6 +742,10 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 
 	ret = cmdevt_recv_rsp_timeout(priv, timeout);
 	if (ret != -1) {
+		/* SAE rejection must not become a successful START_AP. */
+		if (cmd_id == CMD_SET_SAE_PARAM &&
+		    (!cmd->data || ((struct sprd_cmd_hdr *)cmd->data)->status))
+			ret = -EIO;
 #ifndef DRV_RESET_SELF
 		if (rbuf && rlen && *rlen) {
 #else
@@ -1877,14 +1890,21 @@ int sc2355_set_sae_ie(struct sprd_priv *priv, struct sprd_vif *vif,
 	return cmdevt_set_ie(priv, vif, SPRD_IE_SAE, ie, len);
 }
 
+#include "sae.h"
+
 int sc2355_start_ap(struct sprd_priv *priv, struct sprd_vif *vif, u8 *beacon,
 		    u16 len, struct cfg80211_ap_settings *settings)
 {
+	int ret;
 	struct sprd_msg *msg;
 	struct cmd_start_ap *p;
 	u16 datalen = sizeof(*p) + len;
 	struct sprd_api_version_t *api = (&priv->sync_api)->api_array;
 	u8 fw_ver = 0;
+
+	ret = sc2355_prepare_sae(priv, vif, settings);
+	if (ret)
+		return ret;
 
 	fw_ver = (api + CMD_SCAN)->fw_version;
 	if (vif->priv->hif.hw_type == SPRD_HW_SC2355_PCIE) {
@@ -1931,7 +1951,7 @@ int sc2355_get_station(struct sprd_priv *priv, struct sprd_vif *vif,
 		       struct sprd_sta_info *sta)
 {
 	struct sprd_msg *msg;
-	struct cmd_get_station get_sta;
+	struct cmd_get_station get_sta = {};
 	u8 *r_buf = (u8 *)&get_sta;
 	u16 r_len = sizeof(get_sta);
 	int ret;
@@ -2646,6 +2666,13 @@ int sprd_xmit_data2cmd_wq(struct sk_buff *skb, struct net_device *ndev)
 			return -EPERM;
 		}
 	}
+	/* PCIe prepended its address prefix; SDIO has not added FLAG_SIZE yet.
+	 * Select the real descriptor before adding the SDIO transport prefix.
+	 * E5's SDIO driver likewise uses skb->data + hif->dscr_rsvd here.
+	 */
+	dscr = (struct tx_msdu_dscr *)(skb->data +
+		(hif->hw_type == SPRD_HW_SC2355_PCIE ? MSDU_DSCR_RSVD : 0));
+
 	/*alloc five byte for fw 16 byte need
 	 *dscr:11+flag:5 =16
 	 */
@@ -2653,12 +2680,11 @@ int sprd_xmit_data2cmd_wq(struct sk_buff *skb, struct net_device *ndev)
 		skb_push(skb,FLAG_SIZE);
 		memcpy(skb->data,temp_flag,FLAG_SIZE);
 	}
-	    /*send group in BK to avoid FW hang*/
-	    dscr = (struct tx_msdu_dscr *)skb->data;
+	/*send group in BK to avoid FW hang*/
 	if ((vif->mode == SPRD_MODE_AP ||
 	     vif->mode == SPRD_MODE_P2P_GO) && dscr->sta_lut_index < 6) {
 		dscr->buffer_info.msdu_tid = prio_1;
-		pr_info("%s, %d, SOFTAP/GO group go as BK\n", __func__,
+		pr_debug("%s, %d, SOFTAP/GO group go as BK\n", __func__,
 			__LINE__);
 	}
 
@@ -3948,7 +3974,8 @@ unsigned short sc2355_rx_evt_process(struct sprd_priv *priv, u8 *msg)
 		return plen;
 	}
 
-	print_hex_dump_debug("EVENT: ", DUMP_PREFIX_OFFSET, 16, 1,
+	if (hdr->cmd_id != EVT_NEW_STATION)
+		print_hex_dump_debug("EVENT: ", DUMP_PREFIX_OFFSET, 16, 1,
 			     (u8 *)hdr, hdr->plen, 0);
 
 	len = plen - sizeof(*hdr);
@@ -4136,7 +4163,7 @@ unsigned short sc2355_rx_rsp_process(struct sprd_priv *priv, u8 *msg)
 	spin_lock_bh(&cmd->lock);
 	if (!cmd->data && SPRD_GET_LE32(hdr->mstime) == cmd->mstime &&
 	    hdr->cmd_id == cmd->cmd_id) {
-		pr_info("ctx_id %d recv rsp[%s]\n",
+		pr_debug("ctx_id %d recv rsp[%s]\n",
 			hdr->common.mode, cmdevt_cmd2str(hdr->cmd_id));
 		if (unlikely(hdr->status != 0)) {
 			pr_err("%s ctx_id %d recv rsp[%s] status[%s]\n",

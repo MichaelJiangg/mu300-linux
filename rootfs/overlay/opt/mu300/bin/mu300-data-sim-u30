@@ -1,0 +1,39 @@
+#!/bin/sh
+# Native U30 controller adapted to the shared dashboard's zero-based SIM API.
+export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
+[ "$(mu300-device 2>/dev/null)" = u30air ] || exit 1
+NATIVE=${MU300_NATIVE_SIM_CMD:-/opt/mu300/bin/mu300-sim-u30}
+field() { printf '%s' "$view" | jsonfilter -e "@.$1" 2>/dev/null; }
+case ${1:-} in
+get)
+    view=$("$NATIVE" status) || { printf '{"ok":0,"error":"dual_sim_unavailable"}\n'; exit 1; }
+    actual=$(field active); saved=$(field default); hot=$(field hot)
+    case "$actual" in 1|2) actual=$((actual-1));; *) actual=null;; esac
+    case "$saved" in 1|2) saved=$((saved-1));; *) saved=0;; esac
+    case "$hot" in 0|1) ;; *) hot=0;; esac
+    ready=false; [ "$(field available)" != 1 ] || ready=true
+    connected=false; [ "$(field wan_up)" != true ] || connected=true
+    printf '{"ok":1,"native":true,"ready":%s,"saved_sim":%s,"actual_sim":%s,"hot":%s,"data_connected":%s,"devices":["sipa_eth0","sipa_eth8"],"native_status":%s}\n' "$ready" "$saved" "$actual" "$hot" "$connected" "$view"
+    ;;
+apply)
+    case ${2:-} in
+        0|1) operation=switch; value=$(( $2+1 ));;
+        u30-hot-[01]) operation=hot; value=${2##*-};;
+        u30-default-[01]) operation=default; value=$(( ${2##*-}+1 ));;
+        *) echo invalid_sim >&2; exit 1;;
+    esac
+    mutex=${MU300_SIM_MUTEX:-/run/unisoc-data-sim-switch}
+    mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
+    echo $$ > "$mutex/pid"
+    trap 'rm -f "$mutex/pid"; rmdir "$mutex" 2>/dev/null || true' EXIT
+    trap 'exit 143' INT TERM
+    [ ! -d /run/unisoc-modem-lock-apply ] || { echo modem_busy >&2; exit 1; }
+    rc=0; view=$("$NATIVE" "$operation" "$value") || rc=$?
+    if [ "$rc" != 0 ]; then
+        reason=$(field error)
+        printf '%s\n' "${reason:-sim_rollback_failed}" >&2
+    fi
+    exit "$rc"
+    ;;
+*) exit 2;;
+esac

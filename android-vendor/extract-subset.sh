@@ -5,9 +5,6 @@
 set -eu
 OUT=${1:-android-subset}
 TMP=$(mktemp -d)
-# Git Bash (MSYS) rewrites device paths (/data/local/tmp/...) into Windows paths before adb.exe sees
-# them, which breaks adb pull; exempt the Android prefixes (semicolon-separated; macOS/Linux ignore it)
-adb() { MSYS2_ARG_CONV_EXCL="/data;/dev;/system;/vendor;/odm;/sdcard;/storage;/apex" command adb "$@"; }
 # The tar is built on the device and pulled as a file, never streamed through `adb exec-out "su -c ..."`:
 # on some devices su gives the command a pty whose ONLCR turns every LF into CRLF, and a tar mangled that way
 # fails with "Skipping to next header" / "A lone zero block" - or, worse, extracts a few entries and looks
@@ -34,11 +31,7 @@ tar -cf - apex/com.android.runtime/bin/linker64 apex/com.android.runtime/lib64/b
   vendor/etc/ueventd.rc dev/__properties__ | tar -xf - -C "$OUT"
 cd /
 mkdir -p "$OUT/system/bin" "$OUT/linkerconfig"
-# the interpreter path of the vendor binaries inside the chroot. ln -sfn first (macOS/Linux make a
-# dangling link, which is what this is); on Git Bash ln defaults to COPYING the target, which cannot
-# work for a path that only exists inside the chroot - a real copy of the linker is equivalent there
-ln -sfn /apex/com.android.runtime/bin/linker64 "$OUT/system/bin/linker64" 2>/dev/null \
-  || cp "$OUT/apex/com.android.runtime/bin/linker64" "$OUT/system/bin/linker64"
+ln -sfn /apex/com.android.runtime/bin/linker64 "$OUT/system/bin/linker64"
 : > "$OUT/linkerconfig/ld.config.txt"
 rm -rf "$TMP"
 du -sh "$OUT"

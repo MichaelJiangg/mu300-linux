@@ -1,0 +1,9 @@
+#!/bin/sh
+# Serialize writes across the web editor and the one-shot boot restore.
+action=${1:-get}
+case "$action" in get|apply|boot|forget) ;; *) exit 2 ;; esac
+if [ "$action" != get ]; then
+    exec 9> "${MU300_CPU_LOCK:-/run/unisoc-modem-cpu.lock}" || exit 1
+    flock -n 9 || { echo '{"ok":0,"error":"CPU 设置正忙，请稍后重试"}'; exit 1; }
+fi
+exec ucode "${MU300_CPU_LIB:-/usr/libexec/unisoc-modem/cpu.uc}" "$action"

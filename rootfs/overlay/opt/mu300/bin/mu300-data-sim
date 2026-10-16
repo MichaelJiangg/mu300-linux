@@ -1,0 +1,119 @@
+#!/bin/sh
+# MU300 netifd adapter. No tty opens, RIL handshake changes or USB operations.
+export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+# The U30 has one active RF stack; a V50-style SPSWDATA-only switch is unsafe.
+if [ "$(mu300-device 2>/dev/null)" = u30air ]; then
+    exec /opt/mu300/bin/mu300-data-sim-u30 "$@"
+fi
+. "${MU300_SIM_ENV_LIB:-/opt/mu300/bin/mu300-sim-env}"
+cfg() { uci -q get "unisoc_modem.main.$1" 2>/dev/null || true; }
+wan=$(cfg data_interface); wan=${wan:-wan}
+case "$wan" in ''|*[!a-zA-Z0-9_]*) exit 1 ;; esac
+saved=$(cfg data_sim); saved=${saved:-0}
+ready=${MU300_DUAL_READY:-/run/mu300-dual-radio-ready}
+actual_file=${MU300_DATA_SIM_ACTUAL:-/run/mu300-data-sim-actual}
+case "$saved" in 0|1) ;; *) exit 1 ;; esac
+mu300_sim_env 0 || exit 1
+dev0=$MU300_SIM_DEVICE
+dev1=
+if [ "$(cfg sim_slots)" = 2 ]; then mu300_sim_env 1 || exit 1; dev1=$MU300_SIM_DEVICE; fi
+[ "$dev0" != "$dev1" ] || exit 1
+net_status() { ubus -t 3 call "network.interface.$wan" status 2>/dev/null; }
+field() { printf '%s' "$status" | jsonfilter -e "@.$1" 2>/dev/null; }
+at_slot() {
+    mu300_sim_env "$1" || return 1
+    [ -p "$MU300_SIM_SHARED/cmd" ] || return 1
+    MU300_AT_DIR=$MU300_SIM_SHARED mu300-at -t "${3:-3}" "AT+SPACTCARD=$1;${2#AT}"
+}
+data_card() { at_slot 0 'AT+SPSWDATA?' | tr -d '\r' | sed -n 's/^+SPSWDATA:[[:space:]]*\([01]\)[[:space:]]*$/\1/p' | head -n1; }
+record_card() { printf '%s\n' "$1" > "$actual_file.new.$$" && mv "$actual_file.new.$$" "$actual_file"; }
+select_card() {
+    at_slot "$1" 'AT+SPSWDATA' 5 >/dev/null || true
+    [ "$(data_card)" = "$1" ] && record_card "$1"
+}
+save_card() {
+    uci -q set "unisoc_modem.main.data_sim=$1" && uci -q commit unisoc_modem && return 0
+    uci -q revert unisoc_modem.main.data_sim
+    return 1
+}
+wait_down() {
+    local n=0
+    while [ "$n" -lt 10 ]; do
+        status=$(net_status)
+        [ "$(field up)" = false ] && [ "$(field pending)" != true ] && return 0
+        sleep 1; n=$((n+1))
+    done
+    return 1
+}
+case ${1:-} in
+get)
+    status=$(net_status); actual=$(cat "$actual_file" 2>/dev/null)
+    case "$actual" in 0|1) ;; *) actual=null ;; esac
+    connected=false
+    if [ "$(field up)" = true ]; then
+        connected=true
+        dev=$(field l3_device)
+        [ "$dev" != "$dev0" ] || actual=0
+        [ -z "$dev1" ] || [ "$dev" != "$dev1" ] || actual=1
+    fi
+    initialized=false; [ ! -f "$ready" ] || initialized=true
+    printf '{"ok":1,"ready":%s,"saved_sim":%s,"actual_sim":%s,"data_connected":%s,"devices":["%s","%s"]}\n' "$initialized" "$saved" "$actual" "$connected" "$dev0" "$dev1"
+    ;;
+apply)
+    target=${2:-}
+    case "$target" in 0|1) ;; *) echo invalid_sim >&2; exit 1 ;; esac
+    [ -n "$dev1" ] || { echo dual_sim_unavailable >&2; exit 1; }
+    [ -f "$ready" ] || { echo dual_boot_required >&2; exit 1; }
+    # A separate switch gate blocks interactive writes, but permits the dial
+    # path's pre-radio replay to take the short modem mutex itself. Holding
+    # that mutex throughout ifup would deadlock our own replay hook.
+    mutex=${MU300_SIM_MUTEX:-/run/unisoc-data-sim-switch}
+    mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
+    echo $$ > "$mutex/pid"
+    trap 'rm -f "$mutex/pid"; rmdir "$mutex" 2>/dev/null' EXIT
+    trap 'exit 1' INT TERM
+    [ ! -d /run/unisoc-modem-lock-apply ] || { echo modem_busy >&2; exit 1; }
+    current=$(data_card)
+    case "$current" in 0|1) ;; *) echo sim_read_failed >&2; exit 1 ;; esac
+    if [ "$current" = "$target" ]; then
+        # Even an intentionally disconnected WAN must stay disconnected.
+        save_card "$target" || { echo storage_failed >&2; exit 1; }
+        record_card "$target"
+        exit 0
+    fi
+    at_slot "$target" 'AT+CPIN?' | grep -q '^+CPIN: READY' || { echo sim_not_ready >&2; exit 1; }
+    status=$(net_status); was_up=$(field up); was_pending=$(field pending); was_autostart=$(field autostart)
+    restore_original() {
+        ifdown "$wan"; wait_down || return 1
+        select_card "$current" || return 1
+        save_card "$saved" || return 1
+        if [ "$was_up" = true ] || [ "$was_pending" = true ]; then ifup "$wan" || return 1; fi
+        return 0
+    }
+    # A normal worker termination also restores the previous card. SIGKILL
+    # cannot be caught; the job status then explicitly reports interruption.
+    trap 'restore_original || echo sim_rollback_failed >&2; exit 1' INT TERM
+    ifdown "$wan" || { echo data_disconnect_failed >&2; exit 1; }
+    if ! wait_down; then
+        [ "$was_up" != true ] || ifup "$wan"
+        echo data_disconnect_failed >&2; exit 1
+    fi
+    # Selection is a modem operation, NOT an Internet connectivity test.
+    # An unpaid/no-signal SIM can be selected. netifd may attach later; its
+    # asynchronous registration result must never undo the user's choice.
+    if select_card "$target" && save_card "$target"; then
+        # An explicit ifdown/data-cap action remains off after selection.
+        # Existing autostart intent includes a WAN waiting for registration.
+        if [ "$was_autostart" != false ]; then
+            ifup "$wan" || logger -t mu300-data-sim 'Data SIM selected; netifd start failed'
+        fi
+        exit 0
+    fi
+    # Only selection/readback/storage failures restore the previous choice.
+    if restore_original; then
+        echo sim_switch_failed_restored >&2; exit 1
+    fi
+    echo sim_rollback_failed >&2; exit 1
+    ;;
+*) exit 2 ;;
+esac

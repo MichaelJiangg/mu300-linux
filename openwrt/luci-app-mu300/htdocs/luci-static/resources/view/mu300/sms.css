@@ -1,0 +1,58 @@
+/* Scoped to the SMS view; size against LuCI's content, not the browser sidebar. */
+.mud.mud-sms{container-type:inline-size;min-width:0}
+.mud-sms,.mud-sms *{box-sizing:border-box}
+.mud-sms-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 14px;margin-bottom:18px}
+.mud-sms .mud-sms-heading h2{margin:0;padding:0;border:0;font-size:1.35rem;font-weight:650;letter-spacing:0}
+.mud-sms #mud-sms-stat{margin:0;font-size:.8rem}
+.mud-sms #mud-sms-capacity{margin:0 0 12px}
+.mud-sms-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.mud-sms-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mud-sms #mud-sms-clear{margin-left:auto}
+.mud-sms .mud-btn{min-height:40px;height:auto;line-height:1.3;margin-top:0;margin-bottom:0;white-space:nowrap;font-size:.82rem;padding:9px 14px}
+.mud-sms input,.mud-sms select,.mud-sms textarea{min-width:0;max-width:100%;margin:0;border:1px solid var(--hairline,var(--border,#ccc));border-radius:var(--radius-base,.5rem);background:var(--surface,var(--background,#fff));color:var(--text,#222);font:inherit;box-shadow:none}
+.mud-sms input,.mud-sms select{height:40px;min-height:40px;padding:8px 11px;line-height:1.4}
+.mud-sms select{padding-right:30px}
+.mud-sms :is(input,select,textarea,button):focus-visible{outline:2px solid var(--brand,var(--primary,#2f7bf6));outline-offset:2px}
+.mud-sms .mud-chat{display:grid;grid-template-columns:minmax(180px,28%) minmax(0,1fr);gap:0;min-height:440px;height:clamp(440px,65vh,660px);border:1px solid var(--hairline,var(--border,#ddd));border-radius:12px;overflow:hidden;background:var(--surface,var(--background,#fff))}
+.mud-sms-sidebar{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--surface-sunken,rgba(127,127,127,.04))}
+.mud-sms .mud-sms-pane-title{display:flex;align-items:center;flex:0 0 auto;min-height:50px;padding:14px 18px;border-bottom:1px solid var(--hairline,var(--border,#ddd));font-size:.85rem;font-weight:600;overflow-wrap:anywhere}
+.mud-sms .mud-convs{flex:1;min-height:0;max-height:none;padding:8px;overflow:auto}
+.mud-sms .mud-conv{padding:12px;margin-bottom:4px}
+.mud-sms .mud-conv .n{font-size:.9rem}
+.mud-sms .mud-conv .p{margin-top:5px;line-height:1.5}
+.mud-sms .mud-thread{min-height:0;padding:0;border-top:0;border-left:1px solid var(--hairline,var(--border,#ddd))}
+.mud-sms .mud-msgs{min-height:120px;max-height:none;padding:18px;gap:12px;overscroll-behavior:contain}
+.mud-sms .mud-bub{max-width:88%;padding:10px 32px 10px 13px;line-height:1.55}
+.mud-sms-empty{display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;text-align:center;color:var(--text-muted,var(--text-light,#787d85));padding:18px 8px;font-size:.8rem;line-height:1.65}
+.mud-sms-empty svg{opacity:.65;margin-bottom:2px;flex-shrink:0}
+.mud-sms-empty strong{font-size:.95rem;font-weight:500;color:var(--text,#222)}
+.mud-sms-empty span{max-width:280px}
+.mud-sms-list-empty{display:flex;flex-direction:column;gap:8px;padding:20px 12px;color:var(--text-muted,var(--text-light,#787d85));font-size:.8rem;line-height:1.7}
+.mud-sms-list-empty strong{font-weight:500;color:var(--text,#222)}
+.mud-sms-compose{flex:0 0 auto;padding:16px 18px;border-top:1px solid var(--hairline,var(--border,#ddd))}
+.mud-sms-address{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.mud-sms .mud-sms-address label{display:flex;flex-direction:column;gap:7px;margin:0;min-width:0;font-size:.8rem;color:var(--text-muted,var(--text-light,#787d85))}
+.mud-sms-address input,.mud-sms-address select{width:100%}
+.mud-sms .mud-comp{gap:10px;align-items:flex-end;margin-top:12px}
+.mud-sms .mud-comp textarea{display:block;min-height:82px;max-height:120px;padding:10px 12px;line-height:1.5;font-size:.85rem}
+.mud-sms #mud-sms-send{flex-shrink:0;min-width:72px}
+.mud-sms #mud-sms-note{margin:12px 2px 0;font-size:.75rem;line-height:1.7}
+@container(max-width:680px){
+  .mud-sms .mud-chat{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .mud-sms-sidebar{max-height:200px}
+  .mud-sms .mud-convs{flex:auto;max-height:150px}
+  .mud-sms .mud-thread{border-left:0;border-top:1px solid var(--hairline,var(--border,#ddd));min-height:400px;max-height:620px}
+  .mud-sms .mud-msgs{flex:1;max-height:300px}
+  .mud-sms-list-empty{padding:12px;gap:4px}
+}
+@container(max-width:460px){
+  .mud-sms-toolbar{gap:10px 8px}
+  .mud-sms .mud-btn{padding:9px 10px;font-size:.78rem}
+  .mud-sms .mud-sms-pane-title{padding:12px 14px;min-height:44px}
+  .mud-sms-compose{padding:14px}
+  .mud-sms-address{grid-template-columns:minmax(0,1fr)}
+  .mud-sms .mud-thread{min-height:470px}
+  .mud-sms #mud-sms-send{min-width:60px}
+}
+.mud-sms .mud-bub{overflow-wrap:anywhere;word-break:break-word}
+.mud-sms .mud-conv .n,.mud-sms .mud-conv .p{overflow-wrap:anywhere}

@@ -12,6 +12,8 @@
 #include <linux/io.h>
 #include <linux/regmap.h>
 #include <linux/of_device.h>
+#include <linux/atomic.h>
+#include <linux/moduleparam.h>
 
 #include <misc/marlin_platform.h>
 
@@ -27,6 +29,36 @@
 
 #define SPRD_NORMAL_MEM	0
 #define SPRD_DEFRAG_MEM	1
+
+/* Count pressure without printk on every TX scheduling pass. These are
+ * checks/failed submissions, not unique packets or packet-drop counters.
+ * Static storage survives a WCN power cycle; reads never touch the device.
+ */
+static atomic64_t tx_credit_limited = ATOMIC64_INIT(0);
+static atomic64_t tx_zero_credit = ATOMIC64_INIT(0);
+static atomic64_t tx_push_failures = ATOMIC64_INIT(0);
+
+static int mu300_tx_fc_stats_get(char *buffer, const struct kernel_param *kp)
+{
+	return scnprintf(buffer, PAGE_SIZE,
+		"credit_limited_checks=%lld zero_credit_checks=%lld push_failures=%lld\n",
+		(long long)atomic64_read(&tx_credit_limited),
+		(long long)atomic64_read(&tx_zero_credit),
+		(long long)atomic64_read(&tx_push_failures));
+}
+
+static const struct kernel_param_ops mu300_tx_fc_stats_ops = {
+	.get = mu300_tx_fc_stats_get,
+};
+module_param_cb(mu300_tx_fc_stats, &mu300_tx_fc_stats_ops, NULL, 0444);
+MODULE_PARM_DESC(mu300_tx_fc_stats, "TX credit checks and failed submissions (not packet drops)");
+
+static void sc2355_pcie_note_credit_limit(int remaining)
+{
+	atomic64_inc(&tx_credit_limited);
+	if (remaining <= 0)
+		atomic64_inc(&tx_zero_credit);
+}
 
 #define INIT_INTF_SC2355(num, type, out, interval, bsize, psize, max, \
 		threshold, time, in_irq, pending, pop, push, complete, suspend) \
@@ -111,8 +143,9 @@ static int pcie_tx_one(struct sprd_hif *hif, unsigned char *data,
 	ret = sprdwcn_bus_list_alloc(chn, &head, &tail, &num);
 	//ret = 0;
 	if (ret || !head || !tail) {
-		pr_err("%s:%d sprdwcn_bus_list_alloc fail\n",
-		       __func__, __LINE__);
+		/* MU300: rate-limited, it fails on every command while the WCN is in dump status (issue #94) */
+		pr_err_ratelimited("%s:%d sprdwcn_bus_list_alloc fail\n",
+				   __func__, __LINE__);
 		return -1;
 	}
 
@@ -365,8 +398,9 @@ static int pcie_rx_common_push(int chn, struct mbuf_t **head,
 
 	ret = sprdwcn_bus_list_alloc(chn, head, tail, num);
 	if (ret || head == NULL || tail == NULL || *head == NULL || *tail == NULL) {
-		pr_err("%s:%d sprdwcn_bus_list_alloc fail\n", __func__,
-		       __LINE__);
+		/* MU300: rate-limited, as in pcie_tx_one */
+		pr_err_ratelimited("%s:%d sprdwcn_bus_list_alloc fail\n", __func__,
+				   __LINE__);
 		ret = -ENOMEM;
 	} else {
 		ret = pcie_rx_fill_mbuf(*head, *tail, *num, len);
@@ -386,13 +420,27 @@ static int pcie_rx_handle(int chn, struct mbuf_t *head,
 			  struct mbuf_t *tail, int num)
 {
 	struct sprd_hif *hif = sc2355_pcie_get_hif();
-	struct rx_mgmt *rx_mgmt = (struct rx_mgmt *)hif->rx_mgmt;
+	struct rx_mgmt *rx_mgmt;
 	struct sprd_msg *msg = NULL;
 	int buf_num = 0, len = 0, ret = 0;
 	struct mbuf_t *pos = head;
 
 	pr_debug("%s: channel:%d head:%p tail:%p num:%d\n",
 	       __func__, chn, head, tail, num);
+
+	/*
+	 * MU300: an RX interrupt outside the channels' lifetime (post_init publishes hif before it registers
+	 * them, post_deinit clears it after it unregistered them, sprd_iface_set_power serialises the two).
+	 * Without hif there is no device to unmap the buffers from and no queue to hand them to, and the
+	 * channel's mbuf pool is already freed (no sprdwcn_bus_list_free): the data buffers of this one list
+	 * leak, and it is said once.  A NULL here was a panic in hard IRQ (FINDINGS 31n).
+	 */
+	rx_mgmt = hif ? (struct rx_mgmt *)READ_ONCE(hif->rx_mgmt) : NULL;
+	if (unlikely(!rx_mgmt)) {
+		pr_err_once("%s: RX on channel %d with no Wi-Fi context, %d buffer(s) dropped\n",
+			    __func__, chn, num);
+		return 0;
+	}
 
 	for (buf_num = num; buf_num > 0; buf_num--, pos = pos->next) {
 		if (unlikely(!pos)) {
@@ -568,6 +616,36 @@ static int pcie_suspend_resume_handle(int chn, int mode)
 	return -EBUSY;
 }
 
+static int sc2355_pcie_tx_data_complete(int channel, int timeout)
+{
+	struct sprd_hif *hif = sc2355_pcie_get_hif();
+	struct tx_mgmt *tx_mgmt;
+
+	/* The bus calls this after draining its pending queue, with IRQs off. */
+	tx_mgmt = hif ? smp_load_acquire(&hif->tx_mgmt) : NULL;
+	if (!timeout && tx_mgmt && atomic_xchg(&tx_mgmt->pcie_tx_waiting, 0))
+		sc2355_tx_up(tx_mgmt);
+	return 0;
+}
+
+static int sc2355_pcie_tx_data_push(struct sprd_hif *hif,
+				    struct mbuf_t *head, struct mbuf_t *tail,
+				    int num)
+{
+	struct tx_mgmt *tx_mgmt = hif->tx_mgmt;
+	int ret;
+
+	/* Arm before submission: completion may free space before push returns.
+	 * A stored completion also covers the race before the TX thread sleeps.
+	 */
+	atomic_set(&tx_mgmt->pcie_tx_waiting, 1);
+	ret = sc2355_pcie_push_link(hif, hif->tx_data_port, head, tail, num,
+				   sc2355_pcie_tx_data_pop_list);
+	if (ret != -EAGAIN)
+		atomic_set(&tx_mgmt->pcie_tx_waiting, 0);
+	return ret;
+}
+
 struct mchn_ops_t sc2355_pcie_hif_ops[] = {
 	/* ADD HIF ops config here */
 	/* NOTE: Requested by SDIO team, pool_size MUST be 1 in RX */
@@ -605,10 +683,10 @@ struct mchn_ops_t sc2355_pcie_hif_ops[] = {
 			NULL, NULL, pcie_suspend_resume_handle),
 	INIT_INTF_SC2355(PCIE_TX_DATA_PORT, 1, 1, 0, SPRD_MAX_CMD_TXLEN,
 			300, 0, 0, 0, 1, 32, sc2355_pcie_tx_data_pop_list,
-			NULL, NULL, NULL),
+			NULL, sc2355_pcie_tx_data_complete, NULL),
 	INIT_INTF_SC2355(PCIE_TX_ADDR_DATA_PORT, 1, 1, 0, SPRD_MAX_CMD_TXLEN,
 			300, 0, 0, 0, 1, 4, sc2355_pcie_tx_data_pop_list,
-			NULL, NULL, NULL),
+			NULL, sc2355_pcie_tx_data_complete, NULL),
 };
 
 static void pcie_tx_ba_mgmt(struct sprd_priv *priv, struct sprd_vif *vif,
@@ -660,7 +738,7 @@ out:
 
 struct sprd_hif *sc2355_pcie_get_hif(void)
 {
-	return (struct sprd_hif *)sc2355_hif.hif;
+	return (struct sprd_hif *)smp_load_acquire(&sc2355_hif.hif);
 }
 
 #define INTF_IS_PCIE \
@@ -690,8 +768,12 @@ inline int sc2355_tx_addr_trans_pcie(struct sprd_hif *hif,
 		ret = sprdwcn_bus_list_alloc(hif->tx_data_port,
 					     &head, &tail, &num);
 		if (ret || !head || !tail) {
-			pr_err("%s:%d sprdwcn_bus_list_alloc fail, chn: %d\n",
-			       __func__, __LINE__, hif->tx_data_port);
+			/*
+			 * MU300: rate-limited. The RX refill retries this, and in issue #94 (the WCN in dump status for
+			 * minutes) it and its siblings flooded the console until a CPU soft-locked in printk.
+			 */
+			pr_err_ratelimited("%s:%d sprdwcn_bus_list_alloc fail, chn: %d\n",
+					   __func__, __LINE__, hif->tx_data_port);
 		} else {
 			mbuf = head;
 			mbuf->buf = data;
@@ -957,14 +1039,14 @@ int sc2355_pcie_hif_tx_list(struct sprd_hif *hif,
 		if (hif->mbuf_head) {
 			/*ret = mchn_push_link(9, head, tail, pcie_count);*/
 			/*edma sync function*/
-			ret = sc2355_pcie_push_link(hif, hif->tx_data_port,
+			ret = sc2355_pcie_tx_data_push(hif,
 					       (struct mbuf_t *)hif->mbuf_head,
 					       (struct mbuf_t *)hif->mbuf_tail,
-					       hif->mbuf_num,
-					       sc2355_pcie_tx_data_pop_list);
+					       hif->mbuf_num);
 			if (ret != 0) {
 				/*pr_err("%s: push link fail\n", __func__); */
-				hif->pushfail_count++;
+				if (ret != -EAGAIN)
+					hif->pushfail_count++;
 				sprdwl_list_cut_to_send_list(tx_head,
 								 tx_list_tail,
 								 tx_count);
@@ -1025,20 +1107,20 @@ unsigned char sc2355_pcie_find_lut_index(struct sprd_hif *hif, struct sprd_vif *
 		for (i = 0; i < MAX_LUT_NUM; i++) {
 			if ((sc2355_is_group(hif->peer_entry[i].tx.da)) &&
 			    hif->peer_entry[i].ctx_id == vif->ctx_id) {
-				pr_info("%s, %d, group lut_index=%d\n",
+				pr_debug_ratelimited("%s, %d, group lut_index=%d\n",
 					__func__, __LINE__,
 					hif->peer_entry[i].lut_index);
 				return hif->peer_entry[i].lut_index;
 			}
 		}
 		if (vif->mode == SPRD_MODE_AP) {
-			pr_info("%s,AP mode, group bssid,\n"
+			pr_debug("%s,AP mode, group bssid,\n"
 				"lut not found, ctx_id:%d, return lut:4\n",
 				__func__, vif->ctx_id);
 			return 4;
 		}
 		if (vif->mode == SPRD_MODE_P2P_GO) {
-			pr_info("%s,GO mode, group bssid,\n"
+			pr_debug("%s,GO mode, group bssid,\n"
 				"lut not found, ctx_id:%d, return lut:5\n",
 				__func__, vif->ctx_id);
 			return 5;
@@ -1068,20 +1150,21 @@ unsigned char sc2355_pcie_find_lut_index(struct sprd_hif *hif, struct sprd_vif *
 	}
 
 out:
+	/* MU300 (#140): a multicast/broadcast frame has no peer entry by design; the per-mode default is the answer, not an error */
 	if (vif->mode == SPRD_MODE_STATION ||
 	    vif->mode == SPRD_MODE_P2P_CLIENT) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of STA/GC = 0,\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of STA/GC = 0,\n", __func__, vif->ctx_id);
 		return 0;
 	}
 	if (vif->mode == SPRD_MODE_AP) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of AP = 4\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of AP = 4\n", __func__, vif->ctx_id);
 		return 4;
 	}
 	if (vif->mode == SPRD_MODE_P2P_GO) {
-		pr_err("%s,%d,bssid not found, multicast?\n"
-		       "default of GO = 5\n", __func__, vif->ctx_id);
+		pr_debug("%s,%d,bssid not found, multicast?\n"
+			 "default of GO = 5\n", __func__, vif->ctx_id);
 		return 5;
 	}
 	return 0;
@@ -1094,7 +1177,6 @@ int sc2355_pcie_hif_fill_msdu_dscr(struct sprd_vif *vif,
 	struct tx_msdu_dscr *dscr;
 	struct sprd_hif *hif;
 	u8 lut_index;
-	struct sk_buff *temp_skb;
 	unsigned char dscr_rsvd = 0;
 	struct ethhdr *ethhdr = (struct ethhdr *)skb->data;
 	u8 is_special_data = 0;
@@ -1113,28 +1195,29 @@ int sc2355_pcie_hif_fill_msdu_dscr(struct sprd_vif *vif,
 
 	hif = &vif->priv->hif;
 	dscr_rsvd = INTF_IS_PCIE ? MSDU_DSCR_RSVD : 0;
-	if (skb_headroom(skb) < (DSCR_LEN + hif->hif_offset +
+	/* Keep the skb object owned by the caller, including on allocation
+	 * failure. Replacing only this local pointer leaves its caller using
+	 * freed memory. Cloned headers must also become writable before push.
+	 */
+	if (skb_headroom(skb) < (DSCR_LEN + offset + hif->hif_offset +
+				 MSG_PTR_LEN + dscr_rsvd) || skb_header_cloned(skb)) {
+		if (skb_cow_head(skb, DSCR_LEN + offset + hif->hif_offset +
 				 MSG_PTR_LEN + dscr_rsvd)) {
-		temp_skb = skb;
-
-		skb = skb_realloc_headroom(skb, (DSCR_LEN + hif->hif_offset +
-						 MSG_PTR_LEN + dscr_rsvd));
-		kfree_skb(temp_skb);
-		if (!skb) {
-			pr_err("%s:%d failed to unshare skbuff: NULL\n",
-			       __func__, __LINE__);
-			return -EPERM;
+			pr_err_ratelimited("%s: failed to prepare skb headroom\n", __func__);
+			return -ENOMEM;
 		}
 #if defined(MORE_DEBUG)
 		hif->stats.tx_realloc++;
 #endif
 	}
+	/* skb_cow_head may have moved the data allocation. */
+	ethhdr = (struct ethhdr *)skb->data;
 
 	memcpy(hif->skb_da, skb->data, ETH_ALEN);
 
 	lut_index = sc2355_pcie_find_lut_index(hif, vif);
 	if (lut_index < 6 && (!sc2355_is_group(hif->skb_da))) {
-		pr_err("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
+		pr_debug_ratelimited("%s, %d, sta disconn, no data tx!", __func__, __LINE__);
 		return -EPERM;
 	}
 	//skb_push(skb, sizeof(struct tx_msdu_dscr) + offset + dscr_rsvd);
@@ -1309,7 +1392,7 @@ int sc2355_pcie_tx_data_pop_list(int channel, struct mbuf_t *head,
 		__func__, channel, head, tail, num);
 
 	/* same window as in sc2355_pcie_tx_cmd_pop_list() below */
-	if (!hif || !hif->tx_mgmt) {
+	if (!hif || !smp_load_acquire(&hif->tx_mgmt)) {
 		pr_warn("%s: no tx context yet, freeing %d buffer(s)\n", __func__, num);
 		sprdwcn_bus_list_free(channel, head, tail, num);
 		return 0;
@@ -1392,7 +1475,7 @@ int sc2355_tx_free_pcie_data(unsigned char *data)
 {
 	int i;
 	struct sprd_hif *hif = sc2355_pcie_get_hif();
-	struct tx_mgmt *tx_mgmt = (struct tx_mgmt *)hif->tx_mgmt;
+	struct tx_mgmt *tx_mgmt = (struct tx_mgmt *)smp_load_acquire(&hif->tx_mgmt);
 	void *data_addr_ptr;
 	unsigned long pcie_addr;
 	unsigned short data_num;
@@ -1408,6 +1491,10 @@ int sc2355_tx_free_pcie_data(unsigned char *data)
 
 	pr_debug("%s:=0x%x %p %p\n", __func__, data, tx_mgmt, hif);
 
+	/* a TX-complete event outside the tx context's lifetime (see sc2355_pcie_tx_cmd_pop_list) */
+	if (!tx_mgmt)
+		return 0;
+
 	if (tx_mgmt->net_stopped == 1) {
 		sprd_net_flowcontrl(priv, SPRD_MODE_NONE, true);
 		tx_mgmt->net_stopped = 0;
@@ -1418,12 +1505,12 @@ int sc2355_tx_free_pcie_data(unsigned char *data)
 	tx_mgmt->txc_num += data_num;
 	tmp = (unsigned char *)txc_addr;
 	pr_debug("%s: seq_num=0x%x", __func__, *(tmp + 1));
-	pr_info("%s, total free num:%lu; total tx_num:%lu\n", __func__,
+	pr_debug("%s, total free num:%lu; total tx_num:%lu\n", __func__,
 		 tx_mgmt->txc_num, tx_mgmt->tx_num);
 
 
 	if (printk_timed_ratelimit(&caller_jiffies, 1000)) {
-		pr_info("%s, free_num: %d, to_free_list num: %d\n",
+		pr_debug("%s, free_num: %d, to_free_list num: %d\n",
 			__func__, data_num,
 			atomic_read(&tx_mgmt->xmit_msg_list.free_num));
 	}
@@ -1480,12 +1567,15 @@ int sc2355_pcie_tx_cmd_pop_list(int channel, struct mbuf_t *head,
 	 * sc2355_pcie_tx_cmd_pop_list+0x2c, "paging request at 00000000000030b0"). The buffers still have to
 	 * go back to the bus, so hand them over and leave.
 	 */
-	if (!hif || !hif->tx_mgmt) {
+	/* one acquire load: tx_init() publishes tx_mgmt with a release store once it is complete, and
+	 * tx_deinit() clears it and waits (synchronize_rcu) for handlers like this one before freeing it
+	 */
+	tx_mgmt = hif ? (struct tx_mgmt *)smp_load_acquire(&hif->tx_mgmt) : NULL;
+	if (!tx_mgmt) {
 		pr_warn("%s: no tx context yet, freeing %d buffer(s)\n", __func__, num);
 		sprdwcn_bus_list_free(channel, head, tail, num);
 		return 0;
 	}
-	tx_mgmt = (struct tx_mgmt *)hif->tx_mgmt;
 
 	pr_debug("%s len: %d buf: %s\n", __func__, head->len, head->buf + 4);
 
@@ -1515,7 +1605,7 @@ int sc2355_pcie_tx_cmd_pop_list(int channel, struct mbuf_t *head,
 	}
 
 	tx_mgmt->cmd_poped += num;
-	pr_info("tx_cmd_pop num: %d,cmd_poped=%d, cmd_send=%d\n",
+	pr_debug("tx_cmd_pop num: %d,cmd_poped=%d, cmd_send=%d\n",
 		num, tx_mgmt->cmd_poped, tx_mgmt->cmd_send);
 	sprdwcn_bus_list_free(channel, head, tail, num);
 
@@ -1551,7 +1641,8 @@ int sc2355_pcie_push_link(struct sprd_hif *hif, int chn,
 	time = jiffies - time;
 
 	if (ret) {
-		pr_err("%s: push link fail: %d, chn: %d!\n", __func__, ret,
+		atomic64_inc(&tx_push_failures);
+		pr_err_ratelimited("%s: push link fail: %d, chn: %d!\n", __func__, ret,
 		       chn);
 	}
 	return ret;
@@ -1794,7 +1885,7 @@ void sc2355_pcie_handle_tx_return(struct sprd_hif *hif,
 {
 	if (ret == -2) {
 		atomic_sub(send_num, &list->ref);
-		pr_info("%s,%d,debug: %d\n", __func__, __LINE__, atomic_read(&list->ref));
+		pr_debug("%s,%d,debug: %d\n", __func__, __LINE__, atomic_read(&list->ref));
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0))
 		usleep_range_state(100, 200, TASK_UNINTERRUPTIBLE);
 #else
@@ -1809,7 +1900,7 @@ void sc2355_pcie_handle_tx_return(struct sprd_hif *hif,
 #endif
 		return;
 	} else {
-		pr_info("%s,%d,debug: %d\n", __func__, __LINE__, atomic_read(&list->ref));
+		pr_debug("%s,%d,debug: %d\n", __func__, __LINE__, atomic_read(&list->ref));
 	}
 }
 
@@ -1904,7 +1995,6 @@ int sc2355_pcie_fc_get_send_num(struct sprd_hif *hif,
 {
 	int free_num = 0;
 	struct tx_mgmt *tx_mgmt = hif->tx_mgmt;
-	static unsigned long caller_jiffies;
 	/*send all data in buff with PCIe interface*/
 	unsigned int tx_buf_max = get_max_fw_tx_dscr() >
 				  pcie_get_tx_buf_num() ?
@@ -1915,15 +2005,10 @@ int sc2355_pcie_fc_get_send_num(struct sprd_hif *hif,
 		return 0;
 
 	free_num = atomic_read(&tx_mgmt->xmit_msg_list.free_num);
-	if (printk_timed_ratelimit(&caller_jiffies, 1000)) {
-		pr_info("%s, free_num=%d, data_num=%d\n", __func__,
-			free_num, data_num);
-		if (list_empty(&tx_mgmt->xmit_msg_list.to_free_list))
-			pr_info("%s: to free list empty\n", __func__);
-	}
 
 	if ((free_num + data_num) >= tx_buf_max) {
-		pr_info("%s, free_num=%d, data_num=%d\n", __func__,
+		sc2355_pcie_note_credit_limit(tx_buf_max - free_num);
+		pr_debug_ratelimited("%s, free_num=%d, data_num=%d\n", __func__,
 				   free_num, data_num);
 		return (tx_buf_max - free_num);
 	} else {
@@ -1937,7 +2022,6 @@ int sc2355_pcie_fc_test_send_num(struct sprd_hif *hif,
 {
 	int free_num = 0;
 	struct tx_mgmt *tx_mgmt = hif->tx_mgmt;
-	static unsigned long caller_jiffies;
 	/*send all data in buff with PCIe interface, TODO*/
 	unsigned int tx_buf_max = get_max_fw_tx_dscr() >
 				  pcie_get_tx_buf_num() ?
@@ -1948,15 +2032,11 @@ int sc2355_pcie_fc_test_send_num(struct sprd_hif *hif,
 		return 0;
 
 	free_num = atomic_read(&tx_mgmt->xmit_msg_list.free_num);
-	if (printk_timed_ratelimit(&caller_jiffies, 1000)) {
-		pr_info("%s,%d free_num=%d, data_num=%d\n", __func__,
-			__LINE__, free_num, data_num);
-		if (list_empty(&tx_mgmt->xmit_msg_list.to_free_list))
-			pr_info("%s: to free list empty\n", __func__);
-	}
 
 	if ((free_num + data_num) >= tx_buf_max) {
-		pr_err("%s,%d free_num=%d, data_num=%d\n",
+		/* Credit exhaustion is normal backpressure, not a firmware error. */
+		sc2355_pcie_note_credit_limit(tx_buf_max - free_num);
+		pr_debug_ratelimited("%s,%d free_num=%d, data_num=%d\n",
 				   __func__, __LINE__, free_num, data_num);
 		return (tx_buf_max - free_num);
 	} else {
@@ -2026,7 +2106,16 @@ int pcie_post_init(struct sprd_hif *hif)
 {
 	int ret = -EINVAL, chn = 0;
 
-	sc2355_hif.hif = (void *)hif;
+	/* MU300: published before any channel can interrupt (the RX/TX callbacks read it in hard IRQ) */
+	smp_store_release(&sc2355_hif.hif, (void *)hif);
+	/*
+	 * MU300 (from kanoqwq/mu300-linux): a failed/aborted earlier power cycle clears this pointer in the
+	 * error path below.  The vendor driver only restores it in pcie_init(),
+	 * but a later WCN power-on may call post_init directly.  Passing
+	 * &NULL[0] to mchn_init then makes Wi-Fi permanently fail until reboot.
+	 * The channel table is static, so make every post-init self-contained.
+	 */
+	sc2355_hif.mchn_ops = sc2355_pcie_hif_ops;
 	sc2355_hif.max_num =
 		sizeof(sc2355_pcie_hif_ops) / sizeof(struct mchn_ops_t);
 
@@ -2048,7 +2137,9 @@ int pcie_post_init(struct sprd_hif *hif)
 err:
 	pr_err("%s: unregister %d ops\n", __func__, sc2355_hif.max_num);
 
-	for (; chn > 0; chn--)
+	/* MU300: undo the channels that were set up and the one that failed, chn .. 0 (the vendor loop stopped at
+	 * 1; a failed channel can be registered with half its EDMA state, and deinit skips one never registered) */
+	for (; chn >= 0; chn--)
 		sprdwcn_bus_chn_deinit(&sc2355_hif.mchn_ops[chn]);
 	sc2355_hif.mchn_ops = NULL;
 	sc2355_hif.max_num = 0;
@@ -2062,7 +2153,8 @@ void pcie_post_deinit(struct sprd_hif *hif)
 
 	for (chn = 0; chn < sc2355_hif.max_num; chn++)
 		sprdwcn_bus_chn_deinit(&sc2355_hif.mchn_ops[chn]);
-	sc2355_hif.hif = NULL;
+	/* MU300: cleared only after every channel is unregistered (the callbacks check for NULL) */
+	WRITE_ONCE(sc2355_hif.hif, NULL);
 	sc2355_hif.max_num = 0;
 
 }

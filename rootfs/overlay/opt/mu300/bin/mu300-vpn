@@ -11,11 +11,21 @@
 #   mu300-vpn status    service, tunnel, exit IP
 set -e
 CONF=${MU300_VPN_CONF:-/etc/mu300/vpn.conf}
-RUN=/run/mu300-vpn
+RUN=${MU300_VPN_RUN:-/run/mu300-vpn}   # (MU300_VPN_RUN, MU300_LAN_CONF, MU300_BIN, MU300_LIB: for tests/)
 MARK=0x2d0           # routing mark on the engine's own connections: they bypass the tunnel and the kill switch
 [ -r "$CONF" ] && . "$CONF"
 ENABLE=${ENABLE:-0}; KILL_SWITCH=${KILL_SWITCH:-1}; REMOTE_DNS=${REMOTE_DNS:-1.1.1.1}
-BOOTSTRAP_DNS=${BOOTSTRAP_DNS:-1.1.1.1}; LAN_CIDRS=${LAN_CIDRS:-192.168.77.0/24}; IPV6=${IPV6:-0}
+BOOTSTRAP_DNS=${BOOTSTRAP_DNS:-1.1.1.1}; IPV6=${IPV6:-0}
+# The device's own LAN always stays local, whatever LAN_CIDRS says: a vpn.conf copied from another device, or one
+# written before the LAN address changed (the U30 Air is on 192.168.78.0/24), would send the replies to its USB
+# and Wi-Fi clients into the tunnel. The address br-lan has is the truth (lan.conf or UCI); before it is up, the
+# configured one.
+own=$(ip -4 -o addr show br-lan 2>/dev/null | awk '{print $4; exit}')
+# (only a readable lan.conf is sourced: dash leaves the whole subshell when "." cannot open its file)
+own=${own%/*}; [ -n "$own" ] || own=$(f=${MU300_LAN_CONF:-/etc/mu300/lan.conf}; [ -r "$f" ] && . "$f"
+    echo "${LAN_IP:-$(${MU300_BIN:-/opt/mu300/bin}/mu300-lan-ip)}")
+own=${own%.*}.0/24
+case ",${LAN_CIDRS:-}," in *",$own,"*) ;; *) LAN_CIDRS=${LAN_CIDRS:+$LAN_CIDRS,}$own ;; esac
 # Xray is the default, except with the kill switch on. The kill switch drops everything unmarked on the cellular
 # interface, and before the tunnel exists the server's name is looked up through dnsmasq and its certificate
 # fetched with openssl - both unmarked. sing-box does its bootstrap lookup on its own marked socket, so it works
@@ -405,6 +415,9 @@ routing_cleanup() {
     [ "$n" -gt 0 ] && echo "removed $n stale routing rule(s) left by a VPN engine"
     return 0
 }
+
+# tests/ source this file for its functions only
+[ -z "${MU300_LIB:-}" ] || return 0
 
 case "${1:-status}" in
     gen) gen ;;

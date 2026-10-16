@@ -14,9 +14,13 @@ wifi_state() {
 network_state() {
     if ubus call network.interface.wan status 2>/dev/null | grep -q '"up": true'; then
         case "$(led-status current 2>/dev/null)" in
-            online-4g|online-5g) return ;;
+            online-4g) led-status online-4g; return ;;
+            online-5g) led-status online-5g; return ;;
         esac
-        act=$(mu300-at -t 3 'AT+CEREG?' 2>/dev/null | grep '+CEREG:' | head -1 | awk -F, '{print $NF}' | tr -d '" ')
+        # View the selected data stack, not slot 0 unconditionally.
+        slot=$(uci -q get unisoc_modem.main.data_sim); [ "$slot" = 1 ] || slot=0
+        dir=/run/mu300-at; [ "$slot" != 1 ] || dir=/run/mu300-at4
+        act=$(MU300_AT_DIR=$dir mu300-at -t 3 "AT+SPACTCARD=$slot;+CEREG?" 2>/dev/null | grep '+CEREG:' | head -1 | awk -F, '{print $NF}' | tr -d '" ')
         case "$act" in
             11|12|13|15) led-status online-5g ;;
             *)           led-status online-4g ;;
@@ -28,6 +32,7 @@ network_state() {
 
 network_state
 wifi_state
+[ ! -d /sys/class/leds/v50:net1:white ] || /opt/mu300/bin/v50-led-status sync
 ubus listen 2>/dev/null | while IFS= read -r event; do
     case "$event" in
         *network.interface*) network_state ;;
