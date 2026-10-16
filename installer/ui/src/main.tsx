@@ -4,12 +4,12 @@ import {invoke} from '@tauri-apps/api/core';
 import {AnimatePresence, domAnimation, LazyMotion, m, MotionConfig, useReducedMotion} from 'motion/react';
 import {toast} from 'sonner';
 import {Toaster} from './components/ui/sonner';
-import {ArrowRight, BookOpen, Check, CheckCircle2, ChevronDown, CircleAlert, CircleHelp, Copy, Download, FolderOpen, HardDrive, LoaderCircle, Monitor, Moon, Pause, RefreshCw, RotateCcw, Settings2, ShieldCheck, Smartphone, Sun, Upload, Usb} from 'lucide-react';
+import {ArrowRight, BookOpen, Check, CheckCircle2, ChevronDown, CircleAlert, CircleHelp, Copy, Download, FolderOpen, HardDrive, LoaderCircle, Monitor, Moon, Pause, RefreshCw, RotateCcw, Settings2, ShieldCheck, Smartphone, Sun, Upload, Usb, Wifi, WifiOff} from 'lucide-react';
 import {Button} from './components/ui/button';
 import {SupportDialog, SupportInfo, type RepositoryId} from './components/support';
 import {helpStrings} from './help-i18n';
 import {strings, type Language} from './i18n';
-import {gib, native, request, stateGroup, subscribe, type Device, type Package, type Transaction, type Transfer} from './protocol';
+import {gib, native, request, stateGroup, subscribe, type AdbConnection, type Device, type Package, type Transaction, type Transfer} from './protocol';
 import './style.css';
 
 const HelpCenter = lazy(() => import('./components/help-center').then(module => ({default:module.HelpCenter})));
@@ -35,6 +35,8 @@ function App() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [serial, setSerial] = useState('');
+  const [wirelessAddress, setWirelessAddress] = useState('192.168.0.1');
+  const [wirelessBusy, setWirelessBusy] = useState<'connect' | 'disconnect' | null>(null);
   const [device, setDevice] = useState<Device>();
   const [records, setRecords] = useState<Transaction[]>([]);
   const [tx, setTx] = useState<Transaction>();
@@ -116,6 +118,7 @@ function App() {
   }, [theme]);
   useEffect(() => {localStorage.setItem('language', lang); document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';}, [lang]);
   useEffect(() => {pageRef.current?.querySelector<HTMLElement>('h1')?.focus({preventScroll: true});}, [view]);
+  useEffect(() => {if (tx?.device.serial.includes(':')) setWirelessAddress(tx.device.serial);}, [tx?.id]);
   const timingActive = tx && ['running','waiting_user','waiting_device'].includes(tx.status);
   const elapsed = tx ? Math.max(0,Math.floor(((tx.stage_finished_at ? tx.stage_finished_at*1000 : timingActive ? clock : tx.updated*1000) - (tx.stage_started_at ? tx.stage_started_at*1000 : since))/1000)) : 0;
   useEffect(() => {
@@ -167,6 +170,27 @@ function App() {
       else if (values.length > 1) toast.info(t.multipleDevices, {id:'device-selection'});
       else toast.success(t.refreshed, {id:'device-selection'});
     } else {setDevices([]); setSerial('');}
+  };
+  const connectWireless = async () => {
+    setWirelessBusy('connect'); setDevice(undefined);
+    try {
+      const result = await task(() => request<AdbConnection>('adb_connect', {address:wirelessAddress}));
+      if (!result) return;
+      setDevices(result.devices); setDevicesLoaded(true); setWirelessAddress(result.endpoint);
+      setSerial(old => result.devices.length === 1 ? result.devices[0].serial : result.devices.some(d => d.serial === old) ? old : '');
+      if (result.state === 'unauthorized') toast.info(t.wirelessAuthorize, {id:'wireless-adb'});
+      else if (result.state === 'offline') toast.info(t.wirelessOffline, {id:'wireless-adb'});
+      else toast.success(t.wirelessConnected, {id:'wireless-adb'});
+      if (result.devices.length > 1) toast.info(t.multipleDevices, {id:'device-selection'});
+    } finally {setWirelessBusy(null);}
+  };
+  const disconnectWireless = async () => {
+    const selected = serial;
+    setWirelessBusy('disconnect'); setDevice(undefined);
+    try {
+      const result = await task(() => request<AdbConnection>('adb_disconnect', {serial:selected}), t.wirelessDisconnected);
+      if (result) {setDevices(result.devices); setDevicesLoaded(true); setSerial(old => old === selected ? '' : old);}
+    } finally {setWirelessBusy(null);}
   };
   const inspect = async () => {
     setDevice(undefined);
@@ -265,6 +289,15 @@ function App() {
   const impact = tx?.plan.wipe ? t.wipe : tx?.choices.method === 'tf' ? t.tfErase : tx?.choices.method === 'reinstall' ? t.reinstallErase : tx?.choices.method === 'image' ? t.imageImpact : tx?.choices.method === 'update' ? t.updateImpact : tx?.choices.method === 'boot' ? t.bootImpact : t.preserve;
   const waitingForOpenwrt = tx?.stage === 'openwrt_boot' && tx.status.startsWith('waiting') && !tx.unsafe;
   const manualRestart = waitingForOpenwrt && tx?.details?.reboot_manually !== false;
+  const waitingForAndroid = tx?.status.startsWith('waiting') && !tx.unsafe && ['android_boot','android_setup','usb_debugging','debug_authorization','magisk','root_permission'].includes(tx.stage);
+  const wirelessControls = (reconnectOnly = false) => <details className="wireless-adb" open={reconnectOnly ? true : undefined}>
+    <summary><Wifi size={15}/>{t.wirelessTitle}</summary>
+    <div className="wireless-controls"><label>{t.wirelessAddress}<input disabled={busy} value={wirelessAddress} placeholder="192.168.0.1:5555" onChange={e => setWirelessAddress(e.target.value)} onKeyDown={e => {if (e.key === 'Enter' && !busy && wirelessAddress.trim()) {e.preventDefault();void connectWireless();}}} autoComplete="off" spellCheck={false}/></label>
+      <Button variant="outline" disabled={busy || !wirelessAddress.trim()} onClick={connectWireless}>{wirelessBusy === 'connect' ? <LoaderCircle size={15} className="spin"/> : <Wifi size={15}/>} {t.connectWireless}</Button>
+      {!reconnectOnly && <Button variant="ghost" disabled={busy || !!active || !devices.some(d => d.serial === serial && d.wireless)} onClick={disconnectWireless}>{wirelessBusy === 'disconnect' ? <LoaderCircle size={15} className="spin"/> : <WifiOff size={15}/>} {t.disconnectWireless}</Button>}
+    </div><p className="device-hint">{t.wirelessHelp}</p>
+    {!reconnectOnly && devices.some(d => d.serial === serial && d.wireless) && <p className="device-hint wireless-target">{t.wirelessTarget}: <code>{serial}</code></p>}
+  </details>;
   return <div className="app-shell">
     <header><div className="brand"><div className="brand-icon"><HardDrive size={20}/></div><div><strong>{t.title}</strong><small>{t.subtitle}</small></div></div>
       <div className="preferences"><label className="sr-only" htmlFor="language">{t.language}</label><select id="language" value={lang} onChange={e => setLang(e.target.value as Language)}><option value="zh">中文</option><option value="en">English</option></select>
@@ -286,8 +319,8 @@ function App() {
       {['install','update','boot','advanced'].includes(view) && <><h1 tabIndex={-1}>{purposes.find(p => p.id === view)?.title}</h1><p className="intro">{purposes.find(p => p.id === view)?.description}</p>
         <div className="page-scroll scroll-area"><section><div className="section-title"><h2>{t.package}</h2>{pkg && <span className="badge"><Check size={13}/>{t.verified}</span>}</div>
           <div className="package-row"><div className="file-path" title={path}>{pkg?.name || path || t.choosePackage}</div><Button variant="outline" disabled={busy} onClick={choosePackage}><FolderOpen size={16}/>{t.choosePackage}</Button><Button disabled={busy || !path} onClick={() => verify()}>{t.verify}</Button></div></section>
-        {view === 'update' ? <section><h2>{t.device}</h2><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div><Button variant="outline" disabled={busy || !pkg} onClick={async () => {setDevice(undefined); const d = await task(() => request<Device>('probe_update', {host, password}), t.inspected); if (d) setDevice(d);}}>{t.checkUpdate}</Button></section> : <section><div className="section-title"><h2>{t.device}</h2><Button variant="ghost" disabled={busy} onClick={refresh}><RefreshCw size={15}/>{t.refresh}</Button></div><div className="device-select"><Smartphone size={18}/><select disabled={busy} aria-label={t.select} value={serial} onChange={e => {setSerial(e.target.value); setDevice(undefined);}}><option value="">{devicesLoaded && !devices.length ? t.noDevicesShort : t.select}</option>{devices.map(d => <option key={d.serial} value={d.serial}>{d.label} · ••••{d.serial.slice(-4)} · {t.deviceStates[d.state as keyof typeof t.deviceStates] || d.state}</option>)}</select><Button variant="outline" disabled={!serial || !pkg || busy} onClick={inspect}>{t.inspect}</Button></div>{devicesLoaded && !devices.length && <p className="device-hint" role="status">{t.noDevices}</p>}{!pkg && <p className="device-hint">{t.inspectNeedsPackage}</p>}</section>}
-        {view === 'boot' && <section><h2>{t.visit}</h2><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div></section>}
+        {view === 'update' ? <section><h2>{t.device}</h2><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div><p className="device-hint">{t.existingLogin}</p><Button variant="outline" disabled={busy || !pkg} onClick={async () => {setDevice(undefined); const d = await task(() => request<Device>('probe_update', {host, password}), t.inspected); if (d) setDevice(d);}}>{t.checkUpdate}</Button></section> : <section><div className="section-title"><h2>{t.device}</h2><Button variant="ghost" disabled={busy} onClick={refresh}><RefreshCw size={15}/>{t.refresh}</Button></div><div className="device-select"><Smartphone size={18}/><select disabled={busy} aria-label={t.select} value={serial} onChange={e => {setSerial(e.target.value); setDevice(undefined);}}><option value="">{devicesLoaded && !devices.length ? t.noDevicesShort : t.select}</option>{devices.map(d => <option key={d.serial} value={d.serial}>{d.label} · {d.wireless ? d.serial : '••••'+d.serial.slice(-4)} · {t.deviceStates[d.state as keyof typeof t.deviceStates] || d.state}</option>)}</select><Button variant="outline" disabled={!serial || !pkg || busy} onClick={inspect}>{t.inspect}</Button></div>{devicesLoaded && !devices.length && <p className="device-hint" role="status">{t.noDevices}</p>}{!pkg && <p className="device-hint">{t.inspectNeedsPackage}</p>}{wirelessControls()}</section>}
+        {view === 'boot' && <section><h2>{t.visit}</h2><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div><p className="device-hint">{t.existingLogin}</p></section>}
         {device && <div className="device-card"><div><small>{t.model}</small><strong>{device.model || t.unknown}</strong></div><div><small>{t.os}</small><strong>{device.system || t.unknown}</strong></div><div><small>{t.slot}</small><strong>{device.slot || t.unknown}</strong></div><div><small>{t.root}</small><strong className={device.root ? 'good-text' : ''}>{device.root ? t.ready : t.unavailable}</strong></div></div>}
         {device?.readiness && device.readiness !== 'ready' && <div className="alert"><CircleAlert size={19}/><div><strong>{stageLabel(device.readiness)}</strong><p>{t.waitingAndroid}</p></div></div>}
         {view !== 'update' && view !== 'boot' && <section><h2>{t.install}</h2><div className="method-options" role="group" aria-label={t.install}>{(view === 'advanced' ? ['reinstall','image'] : ['tf','part','reinstall']).map(m => <button disabled={busy} key={m} aria-pressed={method === m} className={method === m ? 'selected' : ''} onClick={() => setMethod(m)}>{m === 'tf' ? <Usb size={17}/> : <HardDrive size={17}/>}{(t as unknown as Record<string,string>)[m]}{(m === 'tf' && device?.tf || m === 'reinstall' && device?.existing) && <span>{t.recommended}</span>}</button>)}</div>
@@ -309,15 +342,16 @@ function App() {
       </>}
       {view === 'progress' && tx && <><div className="eyebrow">{t.progress} · {tx.device.model}</div><h1 tabIndex={-1}>{tx.status === 'completed' ? tx.choices.method === 'boot' ? t.successBoot : tx.choices.method === 'update' ? t.successUpdate : t.success : manualRestart ? t.rebootNow : waitingForOpenwrt && tx.choices.method === 'update' ? tx.details?.connection_state === 'reconnecting' ? t.updateReconnecting : t.updateReboot : stageLabel(tx.stage)}</h1><div className="status-line"><span className={'status-dot '+tx.status}/><span>{statusLabel(tx.status)}</span><span className="elapsed">{t.elapsed} {elapsed}s</span></div>
         {waitingForOpenwrt && <div className="boot-guidance"><Smartphone size={21}/><p>{tx.choices.method === 'update' ? t.updateRebootDesc : tx.details?.boot_confirmed ? t.bootConfirmed : manualRestart ? t.rebootManual : t.rebootAutomatic}</p></div>}
-        <div className="page-scroll scroll-area">{tx.status === 'completed' ? <section className="success-panel"><m.div className="success-icon" initial={{opacity:0,scale:reduceMotion ? 1 : .9}} animate={{opacity:1,scale:1}} transition={{duration:reduceMotion ? 0 : .24}}><CheckCircle2 size={42} className="good-text"/></m.div><dl className="plan-list"><div><dt>{t.actual}</dt><dd>{gib(tx.result?.filesystem_bytes)}</dd></div><div><dt>{t.visit}</dt><dd>{tx.result?.url}</dd></div></dl><h2>{t.next}</h2><p>{tx.choices.method === 'update' ? t.updateNext : t.nextDesc}</p></section> : <>
+        <div className="page-scroll scroll-area">{tx.status === 'completed' ? <section className="success-panel"><m.div className="success-icon" initial={{opacity:0,scale:reduceMotion ? 1 : .9}} animate={{opacity:1,scale:1}} transition={{duration:reduceMotion ? 0 : .24}}><CheckCircle2 size={42} className="good-text"/></m.div><dl className="plan-list"><div><dt>{t.actual}</dt><dd>{gib(tx.result?.filesystem_bytes)}</dd></div><div><dt>{t.visit}</dt><dd>{tx.result?.url}</dd></div></dl><h2>{t.next}</h2><p>{tx.choices.method === 'update' ? t.updateNext : t.nextDesc}</p><p className="device-hint login-hint">{['update','boot'].includes(tx.choices.method) ? t.existingLogin : t.defaultLogin}</p></section> : <>
           {waitingForOpenwrt ? <div className="network-guidance"><p>{t.waitingOpenwrt}</p><Button variant="ghost" className="context-help" onClick={openHelp}><CircleHelp size={16}/>{help.currentHelp}</Button></div> : <section className="activity"><m.div key={tx.stage+tx.status} className="activity-heading" initial={{opacity:reduceMotion ? 1 : 0,y:reduceMotion ? 0 : 4}} animate={{opacity:1,y:0}} transition={{duration:reduceMotion ? 0 : .18}}>{tx.status === 'failed' ? <CircleAlert size={28}/> : tx.status === 'running' ? <LoaderCircle size={28} className="spin"/> : tx.status.startsWith('waiting') ? <Smartphone size={28}/> : <Pause size={28}/>}<div><h2>{stageLabel(tx.stage)}</h2><p>{tx.package.name}{tx.details?.tool ? " · "+tx.details.tool : ""}</p></div></m.div>
             <div className="stage-progress"><small>{t.phase} {Math.min(5,stateGroup(tx.stage)+1)} / 5 · {statusLabel(tx.status)}</small>{(!transfer || tx.status !== 'running') && <><div className={'indeterminate-progress '+(tx.status === 'running' ? 'is-running' : '')} role="progressbar" aria-label={t.stageProgress} aria-valuetext={`${stageLabel(tx.stage)} · ${statusLabel(tx.status)}`}><div/></div><small>{tx.status === 'running' ? t.noPercentage : statusLabel(tx.status)}</small></>}</div>
             {transfer && tx.status === 'running' && <div className="transfer"><div><span>{transfer.name}</span><span>{Math.floor(transfer.bytes/transfer.total*100)}%</span></div><progress value={transfer.bytes} max={transfer.total}/><small>{t.bytes}: {transfer.bytes.toLocaleString()} / {transfer.total.toLocaleString()} B · {t.speed}: {(transfer.bytes_per_second/1048576).toFixed(1)} MiB/s</small></div>}
             {tx.status.startsWith('waiting') && <><p className="waiting-guidance">{tx.stage === 'openwrt_boot' ? t.waitingOpenwrt : t.waitingAndroid}</p><Button variant="ghost" className="context-help" onClick={openHelp}><CircleHelp size={16}/>{help.currentHelp}</Button></>}
+            {waitingForAndroid && wirelessControls(true)}
             {tx.unsafe && <div className="alert danger"><ShieldCheck size={19}/><p>{t.unsafe}</p></div>}
             {tx.error && <div className="alert danger"><CircleAlert size={20}/><div><p className="error-message">{tx.error.message}</p><Button className="copy-diagnostics" variant="outline" disabled={busy} onClick={copyDiagnostics}><Copy size={15}/>{t.copyDiagnostics}</Button></div></div>}
           </section>}</>} </div>
-        {waitingForOpenwrt && <div className="verification-controls"><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div>{tx.details?.verification_error && <p className="verification-error" role="status">{tx.details.verification_error}</p>}</div>}
+        {waitingForOpenwrt && <div className="verification-controls"><div className="form-grid"><label>{t.host}<input disabled={busy} value={host} onChange={e => setHost(e.target.value)} autoComplete="off"/></label><label>{t.password}<input disabled={busy} type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="off"/></label></div><p className="device-hint login-hint">{['update','boot'].includes(tx.choices.method) ? t.existingLogin : t.defaultLogin}</p>{tx.details?.verification_error && <p className="verification-error" role="status">{tx.details.verification_error}</p>}</div>}
         {tx.status !== 'completed' && <div className="actions">{waitingForOpenwrt && <Button disabled={busy || !host.trim()} onClick={() => task(async () => (await request<{accepted:boolean}>('verify_openwrt', {transaction:tx.id, host:host.trim(), password})).accepted, t.verificationRequested)}><CheckCircle2 size={16}/>{t.confirmOpenwrt}</Button>}{active ? <Button variant="outline" disabled={busy} onClick={() => task(async () => (await request<{accepted:boolean}>('cancel')).accepted, t.pauseRequested)}><Pause size={16}/>{t.pause}</Button> : <Button disabled={busy || tx.error?.retryable === false} onClick={() => start('retry')}>{t.retry}<RotateCcw size={16}/></Button>}</div>
         }
         <div className="backup-actions"><Button disabled={busy} variant="outline" onClick={exportBackup}><Download size={16}/>{t.exportBackup}</Button><Button disabled={busy} variant="ghost" onClick={openData}><FolderOpen size={16}/>{t.openData}</Button></div>

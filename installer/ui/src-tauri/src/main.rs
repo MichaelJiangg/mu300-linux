@@ -6,7 +6,7 @@ use std::{collections::HashMap, io::{BufRead, BufReader, Write}, path::PathBuf,
 use tauri::{Emitter, Manager, State};
 use tokio::sync::oneshot;
 
-const COMMANDS: &[&str] = &["hello","snapshot","list","package","devices","probe","probe_update","plan","start","resume","retry","cancel","can_close","export","import","diagnostics","verify_openwrt"];
+const COMMANDS: &[&str] = &["hello","snapshot","list","package","devices","adb_connect","adb_disconnect","probe","probe_update","plan","start","resume","retry","cancel","can_close","export","import","diagnostics","verify_openwrt"];
 struct Bridge {
     input: Mutex<Option<ChildStdin>>,
     pending: Mutex<HashMap<u64, oneshot::Sender<Result<Value, String>>>>,

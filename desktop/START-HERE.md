@@ -1,3 +1,6 @@
+New installations use username `root` and password `root`. Updates preserve the existing password.
+首次安装默认账号／密码为 `root`／`root`；保留配置更新沿用原密码。
+
 # MU300 / F50 / V50 / U30Air：OpenWrt 使用指南
 
 **电脑安装和维护从根目录的 `OpenWrt-Installer.exe` 或 `OpenWrt-Installer.py` 开始。**
@@ -40,7 +43,7 @@ python3 -m pip install paramiko lz4
 | 4 — Reinstall internal system | 重装已有内置 OpenWrt | 清空原 OpenWrt 分区和配置，不重复缩容 userdata |
 | 5 — Resume after Android reset | 加密 data 缩容、重置 Android 后续装 | 写入已准备的分区，不重新执行缩容 |
 | 6 — Update OpenWrt | 保留配置更新正在运行的 OpenWrt | 替换系统和内核，完成后重启 |
-| 7 — Boot OpenWrt once | Android 临时启动已安装的 OpenWrt | 仅修改 misc；成功后手动重启，不改默认启动设置 |
+| 7 — Boot OpenWrt once | Android 临时启动已安装的 OpenWrt | 仅修改 misc；校验成功后自动重启，不改默认启动设置 |
 
 **菜单 2 是实验性功能：userdata 镜像模式可能破坏 Android 的 F2FS 文件系统。**
 一般选 TF 卡或独立内置分区。它只接受确认未加密、未经过加密映射的 userdata。
@@ -129,11 +132,12 @@ python3 OpenWrt-Installer.py --resume --transaction "/path/to/transaction.json"
 
 - **更新（6）**：设备运行 OpenWrt，通过 USB 网络连接电脑。输入实际 root 密码，
   电脑经 SSH 上传、验证并更新系统，保留配置和原容量，完成后重启。
-  重要文件仍需事先备份；旧的无分区表原始偏移安装不适用此桌面更新入口。
+  重要文件仍需事先备份。旧版使用 eMMC 隐藏额外空间的安装也可更新；安装器确认
+  当前挂载及空间范围后保留原布局和容量，无法确认时会停止。不要为更新改选重装。
 - **重装（4）**：设备运行 Android，仅覆盖已有 `mu300root` 和 Linux 启动镜像。
   原 OpenWrt 配置会清除，Android userdata 不重新缩容。
 - **切回 OpenWrt（7）**：设备运行 Android，检查另一槽的 Linux 启动镜像后选择它，
-  仅修改并回读 misc 的 32 字节启动控制块，成功后按提示手动重启。
+  仅修改并回读 misc 的 32 字节启动控制块，校验成功后自动重启。
   不挂载／修复 OpenWrt 分区，不改根选择文件、默认启动设置，不自动同步启动链。
   启动后沿用原有默认启动策略；永久默认启动需在 OpenWrt 中另行设置。
 - **回 Android**：在网页系统切换入口选择 Android，再按提示重启。

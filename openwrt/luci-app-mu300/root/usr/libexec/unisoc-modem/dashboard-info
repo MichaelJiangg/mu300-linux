@@ -267,6 +267,16 @@ if W_STATIONS=$(t3 iw dev "$WIFI_DEVICE" station dump 2>/dev/null); then
 elif [ ! -d "/sys/class/net/$WIFI_DEVICE" ]; then
     W_CN=0
 fi
+# Empty successful dumps also need hostapd on older SC2355 modules.
+if [ -z "$W_CLIENTS" ] && [ -d "/sys/class/net/$WIFI_DEVICE" ] &&
+   [ -x /usr/libexec/unisoc-modem/wifi-hostapd-clients ]; then
+    if W_ASSOC=$(t3 ubus call "hostapd.$WIFI_DEVICE" get_clients 2>/dev/null); then
+        if W_FALLBACK=$(printf '%s' "$W_ASSOC" | /usr/libexec/unisoc-modem/wifi-hostapd-clients); then
+            W_CLIENTS=$W_FALLBACK
+            W_CN=0
+        fi
+    fi
+fi
 while IFS='|' read -r mac sig txr rxr ct; do
     [ -n "$mac" ] || continue
     line=$(awk -v m="$mac" 'tolower($2) == m { print $3 "|" $4; exit }' /tmp/dhcp.leases 2>/dev/null)

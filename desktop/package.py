@@ -45,8 +45,9 @@ MODPATH=$MU300_DEPLOY_ROOT
 unset MU300_DEPLOY_ROOT
 ''',newline='\n')
     dest = stage/'desktop'; assets = dest/'files/boot'; assets.mkdir(parents=True)
-    for n in ('installer.py', 'boot_image.py', 'android-image.sh', 'android-write-part.sh', 'android-write-free.sh', 'android-loop.sh', 'local-update.sh', 'configure.sh', 'PORT-SOURCES.json'):
-        shutil.copyfile(TOP/'desktop'/n, dest/n)
+    for n in ('installer.py', 'binary_io.py', 'boot_control.py', 'update_control.py', 'boot_image.py', 'android-image.sh', 'android-write-part.sh', 'android-write-free.sh', 'android-loop.sh', 'local-update.sh', 'configure.sh', 'PORT-SOURCES.json'):
+        shared={'binary_io.py':'binary_io.py','boot_control.py':'boot_image.py','update_control.py':'mu300_update.py'}
+        shutil.copyfile(TOP/'installer/backend'/shared[n] if n in shared else TOP/'desktop'/n, dest/n)
     # Desktop fixes must apply even when augmenting an older Magisk archive;
     # its original scripts stay byte-for-byte unchanged.
     shutil.copyfile(TOP/'tools/android-bootchain.sh', dest/'android-bootchain.sh')
@@ -86,6 +87,13 @@ unset MU300_DEPLOY_ROOT
             shutil.copyfile(Path(adb_dir)/n,stage/'tools'/n)
     if os.environ.get('OPENWRT_GUI_OPTIONAL') != '1':
         runpy.run_path(str(TOP/'installer/package_gui.py'))['attach'](stage,exe if exe and Path(exe).is_dir() else None)
+    # This guide is packaged per firmware; keep the shared GUI sources unchanged.
+    guide = stage/'START-HERE.md'
+    login = ('**MU300 / F50 / V50 / U30Air initial login:** username `root`, password `root`. '
+             'Updates that preserve settings retain your existing password.\n\n'
+             '**MU300 / F50 / V50 / U30Air 首次登录：**用户名 `root`，默认密码 `root`。'
+             '保留配置更新继续使用原密码。\n\n')
+    guide.write_text(login + guide.read_text(encoding='utf-8'), encoding='utf-8', newline='\n')
     after={n:sha(stage/layout[n]) for n in before}
     if after!=before: raise ValueError('original Magisk payload changed')
     relocated={layout[n]:h for n,h in before.items()}

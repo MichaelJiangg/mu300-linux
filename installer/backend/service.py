@@ -18,7 +18,7 @@ import zipfile
 from .adapter import Adapter, installation_committed
 from .package import inspect_package
 from .state import Cancelled, Context, DeviceLock, Pending, RecoveryRequired, Store, compatible
-from .transport import Adb
+from .transport import Adb, wireless_serial
 
 METHODS = {'tf', 'part', 'reinstall', 'image', 'boot', 'update'}
 
@@ -165,6 +165,26 @@ class Service:
                         parts.append(name+'\n'+stream.read().decode('utf-8','replace'))
             if len(parts)==1:parts.append('This older transaction has no debug log. Retry with the current installer to record detailed diagnostics.')
             return {'text':'\n\n'.join(parts)}
+        if command == 'adb_connect':
+            if self.worker and self.worker.is_alive():
+                record = self.active.record if self.active else {}
+                if (record.get('unsafe') or record.get('status') not in ('waiting_user','waiting_device') or
+                        record.get('stage') not in ('android_boot','android_setup','usb_debugging',
+                                                    'debug_authorization','magisk','root_permission')):
+                    raise ValueError('Pause before changing ADB connections / 请先暂停任务，再更改 ADB 连接')
+            return Adb(self.package_root).connect(p.get('address'))
+        if command == 'adb_disconnect':
+            if self.worker and self.worker.is_alive():
+                raise ValueError('Pause before disconnecting a device / 请先暂停任务，再断开设备')
+            serial = p.get('serial')
+            if not wireless_serial(serial):
+                raise ValueError('Select a wireless ADB device / 请选择无线 ADB 设备')
+            with ExitStack() as locks:
+                try:
+                    locks.enter_context(DeviceLock(self.store.base, serial))
+                except (OSError, RuntimeError):
+                    raise ValueError('Another installer is using this device; pause it first / 另一个安装器正在操作此设备，请先暂停其任务') from None
+                return Adb(self.package_root).disconnect(serial)
         if self.worker and self.worker.is_alive() and command not in ('export',):
             raise ValueError('An operation is active / 任务正在执行')
         if command == 'package':

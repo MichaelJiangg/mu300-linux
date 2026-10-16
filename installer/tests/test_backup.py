@@ -104,13 +104,8 @@ class Backup(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'staging space'):self.adb.backup_partition('boot_a',self.target,self.ctx)
         self.assertFalse(any('dd if=' in command for command in self.commands))
 
-    def test_metadata_read_is_binary_and_serial_bound(self):
-        result=type('Result',(),{'returncode':0,'stdout':self.data,'stderr':b''})()
-        with patch('backend.transport.subprocess.run',return_value=result) as run:
-            self.assertEqual(self.adb.read('bounded read'),self.data)
-        args=run.call_args.args[0]
-        self.assertEqual(args[:4],['adb','-s','selected','exec-out'])
-        self.assertNotIn('base64',args[-1])
+    # Metadata byte/serial integrity is covered by test_binary_io using the
+    # actual staging/pull helper, including corrupt and interrupted downloads.
 
 
 if __name__=='__main__':unittest.main()

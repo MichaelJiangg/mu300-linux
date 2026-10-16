@@ -39,7 +39,7 @@ class Helpers(unittest.TestCase):
         self.script.write_text('raise RuntimeError("converter-specific failure")\n')
         with self.assertRaisesRegex(ValueError,'converter-specific failure'):
             run_helper(self.ctx,self.root,self.script,[])
-        self.assertIn('Traceback',(self.ctx.directory/'debug.ndjson').read_text())
+        self.assertIn('Traceback',(self.ctx.directory/'debug.ndjson').read_text(encoding='utf-8'))
 
     def test_converter_timeout_is_bounded(self):
         self.script.write_text('import time\ntime.sleep(30)\n')

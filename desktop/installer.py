@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """MU300 desktop installer. The ZIP's original Magisk deployment is independent."""
 import argparse
-import base64
 from contextlib import contextmanager
 import getpass
 import hashlib
@@ -330,12 +329,17 @@ class Android:
             p=Path(t)/'upload';p.write_bytes(data.encode() if isinstance(data,str) else data)
             return self.push(p,name)
 
+    def download(self,command,destination,expected_size=None):
+        helper=package_root()/'desktop/binary_io.py'
+        spec=importlib.util.spec_from_file_location('desktop_binary_io',helper)
+        binary=importlib.util.module_from_spec(spec);spec.loader.exec_module(binary)
+        return binary.pull_binary(self.call,self.shell,command,destination,expected_size)
+
     def read(self,command):
-        # Some rooted Android builds transform raw su output even through
-        # exec-out. ASCII transport preserves all boot/GPT/misc bytes.
-        encoded='set -o pipefail; '+command+' | base64'
-        cmd='su -c '+shlex.quote(encoded) if self.su else 'sh -c '+shlex.quote(encoded)
-        return base64.b64decode(b''.join(self.call('exec-out',cmd).split()),validate=True)
+        with tempfile.TemporaryDirectory() as temp:
+            local=Path(temp)/'read.bin'
+            self.download(command,local)
+            return local.read_bytes()
 
     def run(self,body,effect=None):
         if GUI and effect:
@@ -424,8 +428,11 @@ class Android:
             for slot in ('a','b'):items[f'{n}_{slot}.img']=f'cat /dev/block/by-name/{n}_{slot}'
         for n,cmd in items.items():
             print('Backing up / 备份:',n)
-            path.joinpath(n).write_bytes(self.read(cmd+' 2>/dev/null'))
-            if not path.joinpath(n).stat().st_size:raise ValueError('Empty backup: '+n)
+            if n=='misc-head.bin':size=4096
+            elif n=='gpt-first.bin':size=front*512
+            elif n=='gpt-last.bin':size=(s['DISK_SIZE']-tail)*512
+            else:size=int(self.shell('blockdev --getsize64 /dev/block/by-name/'+n.removesuffix('.img')).strip())
+            self.download(cmd+' 2>/dev/null',path/n,expected_size=size)
         first=path.joinpath('gpt-first.bin').read_bytes();last=path.joinpath('gpt-last.bin').read_bytes()
         if len(first)!=front*512 or len(last)!=(s['DISK_SIZE']-tail)*512:raise ValueError('Incomplete GPT backup')
         table,count,entry=struct.unpack_from('<QII',primary,72)
@@ -553,15 +560,9 @@ def install(args,root,manifest):
     a=Android(args);m=module(root)
     print('Device / 设备:',a.model,'Android',a.slot,'Linux',a.linux)
     if args.boot_openwrt:
-        for n in ('busybox','android-bootchain.sh','switch.sh'):
-            a.push(root/'desktop'/n if n=='android-bootchain.sh' else payload_file(root,n),n)
-        a.shell('chmod 755 '+a.bb)
-        a.run('"$BB" sh "$P/android-bootchain.sh" check')
-        header=a.read('dd if=/dev/block/by-name/boot_'+a.linux+' bs=1 skip=44 count=11 2>/dev/null')
-        if header!=b'loglevel=5\0':raise ValueError('The other slot does not contain a MU300 Linux boot image')
-        a.run('"$BB" sh "$P/switch.sh" --no-reboot')
-        return Outcome('success','OpenWrt trial selected; only misc changed / 已选择临时启动 OpenWrt，仅修改 misc。',
-                       'Reboot manually; existing default-boot settings are unchanged / 请手动重启；原默认启动设置保持不变。')
+        helper=importlib.util.spec_from_file_location('desktop_boot_control',root/'desktop/boot_control.py')
+        control=importlib.util.module_from_spec(helper);helper.loader.exec_module(control)
+        return control.boot_installed_mu300(globals(),a,root)
     s=a.storage()
     if args.tf:
         sd=a.shell('if [ -b /dev/block/mmcblk1p1 ]; then echo /dev/block/mmcblk1p1; elif [ -b /dev/block/mmcblk1 ]; then echo /dev/block/mmcblk1; fi').strip()
@@ -778,55 +779,13 @@ def ssh_upload(c,path,destination):
 
 
 def update(args,root):
-    import paramiko
-    c=paramiko.SSHClient()
-    # Several physical devices share the USB management address. Accept the
-    # key for this connection without loading or saving a persistent IP pin.
-    c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    host=args.host or input('Device IP / 设备 IP [192.168.77.1]: ').strip() or '192.168.77.1'
-    c.connect(host,username='root',password=GUI.password if GUI else os.environ.get('MU300_SSH_PASSWORD') or getpass.getpass('SSH root password: '),timeout=15,look_for_keys=False,allow_agent=False)
-    if GUI:GUI.validate_ssh(c)
-    try:
-        info=ssh_exec(c,'''set -e
-cat /run/mu300/device
-cat /run/mu300/linux-slot
-cat /run/mu300/misc-dev
-if [ -s /etc/mu300/desktop-mode ]; then cat /etc/mu300/desktop-mode; else
-    d=$(cat /run/mu300/disk-dev)
-    case "$d" in /dev/mmcblk[1-9]*) echo sd ;; *) echo legacy ;; esac
-fi''').strip().splitlines()
-        if len(info)!=4 or info[0] not in ('f50','v50','u30air') or info[1] not in ('a','b') or not re.fullmatch(r'/dev/mmcblk\d+p\d+',info[2]):raise ValueError('Not a supported MU300 runtime')
-        mode=info[3]
-        if mode not in ('sd','part','data-image'):raise ValueError('Unsupported root layout; use native mu300-update for legacy installations')
-        family=json.loads((root/'desktop/manifest.json').read_text())['kernel']
-        running=ssh_exec(c,'uname -r').strip()
-        if not running.startswith(family+'.'):raise ValueError('Kernel family mismatch: running '+running+', package '+family)
-        live=ssh_read_exact(c,f'dd if={info[2]} bs=1 skip=2048 count=32',32)
-        slot='b' if info[1]=='a' else 'a';m=module(root)
-        newboot=boot(root,m,mode,live,slot);bc=m.boot_control(live,slot)
-        confirm('Update OpenWrt while preserving settings and disk size; then reboot / 保留配置及容量更新，完成后重启。')
-        # Stage on the Linux filesystem: sufficient space for a new root + old
-        # root and upload, without consuming all tmpfs/RAM on a 256 MiB unit.
-        p='/mnt/mu300-disk/.mu300-desktop-'+secrets.token_hex(6)
-        ssh_exec(c,'mkdir -m 700 '+p)
-        def send(local,name):
-            ssh_upload(c,local,p+'/'+name)
-            got=ssh_exec(c,'sha256sum '+p+'/'+name).split()[0]
-            if got!=digest(local):raise ValueError('SSH upload checksum: '+name)
-        with payload_rootfs(root) as archive:
-            send(archive,'mu300-openwrt-rootfs.tar.gz')
-        for name in ('local-update.sh','mu300-update-library.sh'):send(root/'desktop'/name,name)
-        send(payload_file(root,'busybox'),'busybox')
-        for name in ('rootfs-critical.sha256','rootfs.requirements'):send(payload_file(root,name),name)
-        with tempfile.TemporaryDirectory() as t:
-            for name,data in (('boot-desktop.img',newboot),('misc-linux.bin',bc)):
-                f=Path(t)/name;f.write_bytes(data);send(f,name)
-        command='chmod 700 '+p+'/busybox && sh '+p+'/local-update.sh '+p
-        if GUI:GUI.action('update-commit',lambda:ssh_exec(c,command))
-        else:ssh_exec(c,command)
-    finally:c.close()
-    return Outcome('success','Update verified; device is rebooting / 更新校验完成，设备正在重启。',
-                   'Wait for OpenWrt to start / 等待 OpenWrt 启动。')
+    # Same implementation as the GUI backend, including older hidden-area roots.
+    helper=Path(__file__).resolve().parent/'update_control.py'
+    if not helper.is_file():helper=Path(root)/'desktop/update_control.py'
+    spec=importlib.util.spec_from_file_location('mu300_update_control',helper)
+    control=importlib.util.module_from_spec(spec);spec.loader.exec_module(control)
+    return control.update_mu300(globals(),args,root)
+
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)

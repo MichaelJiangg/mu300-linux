@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-mu300
 PKG_VERSION:=1.2.0
-PKG_RELEASE:=13
+PKG_RELEASE:=14
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=MU300 Linux contributors
 PKGARCH:=all

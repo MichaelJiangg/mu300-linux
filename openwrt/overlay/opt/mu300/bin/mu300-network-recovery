@@ -1,0 +1,66 @@
+#!/usr/bin/ucode
+// Resume an unmet data request after EPS registration, preserving user intent.
+import * as fs from 'fs';
+import * as ubus from 'ubus';
+import * as uci from 'uci';
+import * as uloop from 'uloop';
+import * as policy from '../lib/network-recovery.uc';
+
+const wan = getenv('MU300_WAN') || 'wan';
+if (!match(wan, /^[A-Za-z0-9_]+$/))
+    die('Invalid cellular interface name\n');
+const root = getenv('MU300_REGISTRATION_DIR') || '/run/mu300-registration';
+const cfg = uci.cursor();
+const runtime = '/run/mu300';
+const previous = { key: null, attempted: false };
+function read_json(path) {
+    try { return json(fs.readfile(path)); } catch (e) { return null; }
+}
+function selected_slot() {
+    // Native U30 boot selection takes precedence over a next-boot UI choice.
+    let native = trim(fs.readfile(runtime + '/sim-slot') || '');
+    let value = native || cfg.get('unisoc_modem', 'main', 'data_sim') || '0';
+    return value == '0' ? 0 : value == '1' ? 1 : null;
+}
+function blocked() {
+    for (let path in [
+        runtime + '/sim-switching', runtime + '/sim-active-unknown',
+        '/run/unisoc-data-sim-switch',
+        '/run/mu300-mobile-data-manual-down'
+    ])
+        if (fs.stat(path)) return true;
+    return policy.radio_blocked(!!fs.stat('/run/mu300-radio-freeze'),
+                                !!fs.stat(runtime + '/sim-radio-ready'));
+}
+uloop.init();
+const bus = ubus.connect(null, 2);
+if (!bus) die('Cellular recovery: ubus unavailable\n');
+function evaluate() {
+    cfg.unload('unisoc_modem');
+    let slot = selected_slot();
+    if (slot == null) return;
+    let wait = trim(fs.readfile('/run/mu300cell-' + wan + '.registration-wait') || '');
+    let wait_slot = wait == '0' ? 0 : wait == '1' ? 1 : null;
+    policy.recovery(
+        (method, data) => bus.call('network.interface.' + wan, method, data),
+        read_json(root + '/slot' + slot + '.json'), wait_slot, slot, blocked(), previous
+    );
+}
+// The short one-shot only coalesces event bursts. No timer runs while idle.
+let pending = false;
+const deferred = uloop.timer(-1, function() {
+    pending = false;
+    evaluate();
+});
+function schedule() {
+    if (!pending) { pending = true; deferred.set(50); }
+}
+const registration = bus.listener('mu300.registration', (name, data) => schedule());
+const network = bus.listener('network.interface', (name, data) => {
+    if (data?.interface == wan) schedule();
+});
+if (!registration || !network) die('Cellular recovery: event subscription failed\n');
+const term = uloop.signal(15, () => uloop.end());
+const intr = uloop.signal(2, () => uloop.end());
+evaluate();
+uloop.run();

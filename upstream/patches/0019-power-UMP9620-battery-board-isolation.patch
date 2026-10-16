@@ -1,0 +1,52 @@
+power: supply: isolate UMP9620 battery drivers before register access
+
+The shared batteryless F50/V50 device tree may have the same charger, FGU
+and PD nodes as U30 Air. Checking only a fallback I2C address leaves the
+primary-address path able to initialize and charge a nonexistent battery.
+Require an enabled stock charger policy service for these vendor paths;
+unrelated generic BQ and SC27xx platforms keep their existing behavior.
+
+--- a/drivers/power/supply/bq256xx_charger.c
++++ b/drivers/power/supply/bq256xx_charger.c
+@@ -9,6 +9,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/power_supply.h>
++#include <linux/power/ump9620-battery.h>
+ #include <linux/regmap.h>
+ #include <linux/types.h>
+ #include <linux/usb/phy.h>
+@@ -2190,6 +2191,11 @@
+ 
+ 	int ret;
+ 
++	/* Do not touch either charger address on a batteryless board. */
++	if (of_device_is_compatible(dev->of_node, "ti,bq2560x_chg") &&
++	    !ump9620_has_battery_policy())
++		return -ENODEV;
++
+ 	bq = devm_kzalloc(dev, sizeof(*bq), GFP_KERNEL);
+ 	if (!bq)
+ 		return -ENOMEM;
+--- a/drivers/power/supply/sc27xx_fuel_gauge.c
++++ b/drivers/power/supply/sc27xx_fuel_gauge.c
+@@ -12,6 +12,7 @@
+ #include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/power_supply.h>
++#include <linux/power/ump9620-battery.h>
+ #include <linux/property.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
+@@ -1351,6 +1352,11 @@
+ 	struct sc27xx_fgu_data *data;
+ 	int ret, irq;
+ 
++	/* F50/V50 keep these PMIC nodes but have no battery to account for. */
++	if (of_device_is_compatible(dev->of_node, "sprd,ump9620-fgu") &&
++	    !ump9620_has_battery_policy())
++		return -ENODEV;
++
+ 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return -ENOMEM;

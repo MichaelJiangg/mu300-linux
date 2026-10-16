@@ -109,13 +109,20 @@ class MethodRouting(unittest.TestCase):
                     root=Path(directory);(root/'desktop').mkdir();(root/'desktop/manifest.json').write_text('{}')
                     record=Store(root/'app').create({'path':directory,'adapter':kind},{'serial':SERIAL},{'method':method},{'method':method,'openwrt_bytes':4<<30})
                     a=self.adapter(kind);a.root=root;a.ctx=Context(Store(root/'app'),record,lambda *_:None)
-                    a.probe=Mock();a.backup=Mock();a.stage=Mock();a.update_e5=Mock()
+                    a.probe=Mock();a.backup=Mock();a.stage=Mock();a.update_e5=Mock();a.boot_mu300=Mock()
                     a.legacy=SimpleNamespace(**{n:Mock() for n in ('install_sd','install','part_two_stage','boot_openwrt','install_part','update')})
                     flags=args_for(record,root)
                     self.assertEqual(sum(bool(getattr(flags,n)) for n in ('tf','part','reinstall_part','data','boot_openwrt')),0 if method=='update' else 1)
-                    a.execute()
+                    with patch('backend.adapter.update_mu300') as shared_update:
+                        a.execute()
                     if method=='update':
-                        (a.update_e5 if kind=='e5' else a.legacy.update).assert_called_once()
+                        if kind=='e5':a.update_e5.assert_called_once();shared_update.assert_not_called()
+                        else:
+                            shared_update.assert_called_once()
+                            self.assertIs(shared_update.call_args.args[0],vars(a.legacy))
+                            a.legacy.update.assert_not_called()
+                    elif kind=='mu300' and method=='boot':
+                        a.boot_mu300.assert_called_once();a.legacy.install.assert_not_called()
                     elif kind=='mu300':a.legacy.install.assert_called_once()
                     else:
                         target={'tf':'install_sd','part':'install_part','reinstall':'part_two_stage','image':'install','boot':'boot_openwrt'}[method]

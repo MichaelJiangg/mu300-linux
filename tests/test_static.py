@@ -149,11 +149,11 @@ class Rules(unittest.TestCase):
         rootfs = (TOP / 'openwrt' / 'build-rootfs.sh').read_text()
         builder = (TOP / 'tools' / 'build-openwrt-tf-magisk.sh').read_text()
         self.assertIn('luci-theme-aurora-1.4.0-r20260920.apk', rootfs)
-        self.assertIn('apk add --allow-untrusted /in/luci-theme-aurora.apk', rootfs)
+        self.assertRegex(rootfs, r'apk(?:_retry)? add --allow-untrusted /in/luci-theme-aurora\.apk')
         self.assertIn('Aurora theme is not the LuCI default', rootfs)
         self.assertIn('./www/luci-static/aurora/main.css', builder)
         self.assertIn('built rootfs does not enable Aurora by default', builder)
-        self.assertIn('apk add --allow-untrusted /in/luci-app-aurora-config.apk', rootfs)
+        self.assertRegex(rootfs, r'apk(?:_retry)? add --allow-untrusted /in/luci-app-aurora-config\.apk')
         self.assertIn('Aurora config APK checksum mismatch', rootfs)
         for path in ('www/luci-static/resources/view/aurora/studio.js',
                      'www/luci-static/resources/view/aurora/marketplace.js',

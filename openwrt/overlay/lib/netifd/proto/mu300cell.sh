@@ -35,6 +35,7 @@ proto_mu300cell_init_config() {
 proto_mu300cell_setup() {
 	local config="$1"
 	local apn pdptype peerdns out ifname ip prefix dns1 dns2 iid zone slot rc auth username password roaming attach
+	rm -f "/run/mu300cell-$config.registration-wait"
 	json_get_vars apn pdptype peerdns auth username password roaming attach
 	. /opt/mu300/bin/mu300-sim-env
 	mu300_sim_env || { proto_notify_error "$config" INVALID_SIM; return 1; }
@@ -59,6 +60,14 @@ proto_mu300cell_setup() {
 		logger -t mu300cell "$(cat /tmp/mu300cell.err)"
 		proto_notify_error "$config" NO_MODEM
 		proto_block_restart "$config"
+		return 1
+	fi
+	if [ "$rc" = 5 ]; then
+		# Out of PS coverage is transient. Keep autostart and wait for the
+		# existing owner's registration event, rather than blocking restart.
+		printf '%s\n' "$slot" > "/run/mu300cell-$config.registration-wait"
+		proto_notify_error "$config" REGISTRATION_WAIT
+		proto_set_available "$config" 0
 		return 1
 	fi
 	ip=$(echo "$out" | sed -n 's/^IP=//p')
@@ -152,7 +161,7 @@ proto_mu300cell_teardown() {
 	mu300_sim_env "$slot" || return 1
 	[ -n "$ifname" ] || ifname=$MU300_SIM_DEVICE
 	case "$ifname" in *[!a-zA-Z0-9_.:-]*) return 1 ;; esac
-	MU300_SIM_SLOT=$MU300_SIM_SLOT /opt/mu300/bin/mobile-data down >/dev/null 2>&1
+	MU300_NETIFD=1 MU300_SIM_SLOT=$MU300_SIM_SLOT /opt/mu300/bin/mobile-data down >/dev/null 2>&1
 	# External state is not removed by netifd on ifdown, so clean the bearer
 	# ourselves - both families. v6 must go too: this carrier's RAs carry
 	# INFINITE lifetimes, so an unflushed SLAAC address (and the default route

@@ -17,6 +17,7 @@ def main():
         page.goto('http://127.0.0.1:1420')
         page.get_by_role('button',name='安装 OpenWrt',exact=False).click();settle(page)
         refresh=page.get_by_role('button',name='刷新设备',exact=True)
+        assert page.locator('.wireless-adb summary').inner_text()=='无线 ADB 连接'
         assert refresh.is_enabled()
         assert page.get_by_role('button',name='检查设备',exact=True).is_disabled()
         assert page.get_by_role('button',name='查看安装计划',exact=True).is_disabled()
@@ -69,6 +70,7 @@ def main():
             page.get_by_role('button',name='返回',exact=True).click();settle(page)
         page.get_by_label('语言').select_option('en')
         page.get_by_role('button',name='Advanced options',exact=False).click();settle(page)
+        assert page.locator('.wireless-adb summary').inner_text()=='Wireless ADB connection'
         page.locator('.page-scroll').evaluate('(el)=>el.scrollTop=el.scrollHeight')
         page.get_by_role('button',name='Userdata image',exact=True).click()
         selection(page,'input[type=number]','text')

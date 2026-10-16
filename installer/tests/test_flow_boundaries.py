@@ -84,7 +84,7 @@ class FlowBoundaries(unittest.TestCase):
     def test_restart_between_final_write_and_wait_checkpoint(self):
         for kind, method, final in [('e5','tf','misc-trial'), ('e5','part','misc-trial'),
                                     ('e5','image','misc-trial'), ('e5','boot','misc-trial'),
-                                    ('mu300','tf','root-tf-write'), ('mu300','part','boot-and-misc-1234'),
+                                    ('mu300','boot','misc-trial'), ('mu300','tf','root-tf-write'), ('mu300','part','boot-and-misc-1234'),
                                     ('mu300','reinstall','boot-and-misc-5678'), ('mu300','image','boot-and-misc-90ab')]:
             with self.subTest(adapter=kind,method=method):
                 self.record.update(package={**PACKAGE,'adapter':kind}, choices={'method':method},

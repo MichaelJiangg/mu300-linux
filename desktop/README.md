@@ -1,3 +1,6 @@
+New installations use username `root` and password `root`. Updates preserve the existing password.
+首次安装默认账号／密码为 `root`／`root`；保留配置更新沿用原密码。
+
 User instructions: open **START-HERE.md** at the package root, then run **OpenWrt-Installer.exe** or **OpenWrt-Installer.py**. This document describes technical details.
 
 # MU300 desktop deployment
@@ -25,7 +28,7 @@ desktop helpers and ADB in `desktop/` and `tools/`.
 | install-to-internal-storage | Independent `mu300root`; use unallocated eMMC first, otherwise offline userdata shrink |
 | reinstall-internal-system | Erase and reinstall only existing `mu300root` |
 | resume-internal-install | Continue after encrypted-data preparation and Android reset |
-| switch-to-openwrt | Select installed Linux without automatic reboot |
+| switch-to-openwrt | Verify misc and restart into installed Linux |
 | update-openwrt | SSH upload, preserve settings/capacity, then reboot |
 
 Windows uses `OpenWrt-Installer.exe` when included. Otherwise install Python
@@ -132,8 +135,11 @@ Runtime firmware comes from the existing installation. A plain filesystem
 view excludes live vendor device/proc mounts during copying. Root/boot checks
 precede slot selection; boot failures attempt root and boot restoration.
 The persistent boot log and filesystem capacity are preserved.
-Use the package for the intended kernel family. Legacy raw free-region installs
-continue using native `mu300-update`; desktop updating rejects that layout.
+Use the package for the intended kernel family. Legacy eMMC hidden-area installs
+are also supported after verifying the live OpenWrt container, its loop backing,
+ext4 identity, GPT boundaries and boot-discovery offset. Updating preserves that
+layout and capacity; it does not create a partition or resize Android. An
+unrecognized or inconsistent layout stops before uploading or writing.
 
 ## Building
 

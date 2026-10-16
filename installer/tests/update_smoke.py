@@ -54,6 +54,8 @@ def main():
         page.get_by_label('语言').select_option('en');page.get_by_label('Theme').select_option('dark')
         settle(page);layout(page)
         assert page.locator('h1').inner_text()=='OpenWrt updated and verified'
+        assert 'Updates keep the existing password' in page.locator('.success-panel .login-hint').inner_text()
+        assert 'Fresh installation' not in page.locator('.success-panel .login-hint').inner_text()
         assert 'device restarted' in page.locator('.success-panel').inner_text()
         assert page.locator('.elapsed').inner_text()=='Stage elapsed 8s'
         page.screenshot(path=str(ROOT/'screenshots/update-complete-clock-en.png'))

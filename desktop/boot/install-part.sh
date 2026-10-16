@@ -13,6 +13,21 @@
 #
 # Sourced by boot/init; install_part_pending DEV is called once per boot with
 # userdata's device.  Logs through the caller's log().
+# A bounded answer declines the optional host-directory orphan dump. -f
+# already enables filesystem fixes; -y alone does not suppress this prompt.
+# Never inherit the console or feed unlimited answers to a metadata checker.
+part_fsck() {
+    local dev=$1 output=$2 worker rc
+    printf "n\n" > /run/part-fsck.stdin || return 8
+    /repair/lib/ld-musl-aarch64.so.1 --library-path /repair/lib \
+        /repair/sbin/fsck.f2fs -f "$dev" < /run/part-fsck.stdin >"$output" 2>&1 &
+    worker=$!
+    printf "%s %s\n" "$worker" "$output" > /run/part-check
+    wait "$worker"; rc=$?
+    rm -f /run/part-check /run/part-fsck.stdin
+    return "$rc"
+}
+
 install_part_pending() {
     . /etc/part-progress.sh
     local dev=$1 node=${1##*/} disk=${1%p*}
@@ -109,8 +124,7 @@ install_part_pending() {
         echo "2/6 shrinking userdata (fsck)" > /run/part-status
         log "stage=part-install shrink cur=$((cur / 2048))MiB target=$((target / 2048))MiB"
         blockdev --setrw "$dev" || { part_fail 'userdata read-only'; return 1; }
-        /repair/lib/ld-musl-aarch64.so.1 --library-path /repair/lib \
-            /repair/sbin/fsck.f2fs -f "$dev" >/run/part-fsck.log 2>&1
+        part_fsck "$dev" /run/part-fsck.log
         rc=$?
         case "$rc" in 0|1) ;; *) part_fail "F2FS check failed rc=$rc"; return 1 ;; esac
         echo "2/6 shrinking userdata (moving blocks; this can take several minutes)" > /run/part-status
@@ -128,8 +142,7 @@ install_part_pending() {
     # Check also when a previous attempt already changed the block count.
     # A new count alone cannot prove that all block moves/checkpoints finished.
     echo "2/6 verifying shrunk userdata" > /run/part-status
-    /repair/lib/ld-musl-aarch64.so.1 --library-path /repair/lib \
-        /repair/sbin/fsck.f2fs -f "$dev" >/run/part-shrink-check.log 2>&1
+    part_fsck "$dev" /run/part-shrink-check.log
     rc=$?
     case "$rc" in 0|1) ;; *) part_fail "shrunk userdata check failed rc=$rc"; return 1 ;; esac
     low=$(od -An -tx4 -j 1060 -N 4 "$dev" | tr -d ' \n')

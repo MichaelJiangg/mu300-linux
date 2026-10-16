@@ -1,0 +1,23 @@
+#!/usr/bin/ucode
+// Actual associations only. Leases and AP-wide metrics are not peers.
+import { readfile } from 'fs';
+
+try {
+    let data = json(readfile('/dev/stdin'));
+    if (type(data) != 'object' || type(data.clients) != 'object')
+        exit(1);
+    let peers = {};
+    for (let mac, client in data.clients) {
+        if (!match(mac, /^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/))
+            continue;
+        mac = lc(mac);
+        if ((int(substr(mac, 0, 2), 16) & 1) || mac == '00:00:00:00:00:00')
+            continue;
+        if (type(client) == 'object' && (client.assoc === true || client.assoc === 1))
+            peers[mac] = true;
+    }
+    for (let mac in sort(keys(peers)))
+        printf('%s||||\n', mac);
+} catch (e) {
+    exit(1);
+}

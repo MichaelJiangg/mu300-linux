@@ -98,6 +98,9 @@ open_tty || { echo "mu300-atd: cannot open $DEV" >&2; exit 1; }
 # purpose: reopening a SIPC channel is the one operation that can lose it.
 URCDIR=$DIR/urc
 URCMAX=${MU300_AT_URC_MAX:-65536}
+REGISTRATION_LIB=${MU300_REGISTRATION_LIB:-/opt/mu300/lib/registration.sh}
+[ ! -r "$REGISTRATION_LIB" ] || . "$REGISTRATION_LIB"
+
 CMT_SPOOL=${MU300_CMT_SPOOL_BIN:-/opt/mu300/bin/mu300-cmt-spool}
 mkdir -p "$URCDIR"
 CMT_PENDING_FILE=$URCDIR/$(basename "$DEV").cmt-pending
@@ -133,6 +136,10 @@ for n in ${MU300_AT_URC_CHANNELS-0}; do
         log=$URCDIR/$(basename "$other").log
         CMT_PENDING_FILE=$URCDIR/$(basename "$other").cmt-pending
         : > "$log"
+        # A new owner must not inherit a registered cache from a dead CP.
+        case "$n" in
+            0|3) rm -f "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/slot$((n / 3)).json" ;;
+        esac
         exec 4< "$other" || exit 1
         # $$ remains the parent's PID in ash subshells. Read our actual PID
         # without forking so a dead drainer cannot pass the readiness check.
@@ -147,6 +154,11 @@ for n in ${MU300_AT_URC_CHANNELS-0}; do
                 0:+CEREG:*|3:+CEREG:*)
                     [ ! -d /sys/class/leds/v50:net1:white ] ||
                         /opt/mu300/bin/led-status sim-status "$((n / 3))" "$urc" >/dev/null 2>&1 ;;
+            esac
+            case "$n:$urc" in
+                0:+CEREG:*|3:+CEREG:*)
+                    ! command -v mu300_registration_save >/dev/null 2>&1 ||
+                        mu300_registration_save "$((n / 3))" "$urc" ;;
             esac
             printf '%s\n' "$urc" >> "$log"
             # cheap cap: start over rather than grow without end, /run is RAM

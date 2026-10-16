@@ -17,6 +17,8 @@ from types import SimpleNamespace
 from . import gpt
 from .state import Pending, RecoveryRequired, atomic_json, sha
 from .transport import Adb, push_chunks
+from .boot_image import boot_installed_e5, boot_installed_mu300
+from .mu300_update import update_mu300
 from .diagnostics import DebugStream, traced
 
 
@@ -65,7 +67,7 @@ def installation_committed(record):
     if record['package']['adapter'] == 'e5':
         return method in ('tf', 'part', 'image', 'boot') and 'misc-trial' in done
     return record['package']['adapter'] == 'mu300' and (
-            method == 'tf' and 'root-tf-write' in done or
+            method == 'boot' and 'misc-trial' in done or method == 'tf' and 'root-tf-write' in done or
             method in ('part', 'reinstall', 'image') and any(name.startswith('boot-and-misc-') for name in done))
 
 
@@ -79,8 +81,15 @@ class Adapter:
         self.legacy.GUI = self
         if self.kind == 'e5':
             self.legacy.B, self.legacy.F, self.legacy.SCRIPTS = str(self.root), str(self.root/'files'), str(self.root/'scripts')
+            # Old compatible package scripts must not retain their exact-hash
+            # gate when selecting the already installed system.
+            self.legacy.boot_openwrt = lambda args:boot_installed_e5(vars(self.legacy), self.adb.read)
         else:
             self.legacy.package_root = lambda: self.root
+            # Override older compatible packages too: no legacy binary codec
+            # or second full device backup may run behind the GUI coordinator.
+            self.legacy.Android.read = lambda android, command:self.read_legacy(android, command)
+            self.legacy.Android.backup = lambda android, path, storage:self.backup_legacy(android, path, storage)
         self.adb = None
         self.password = ''
         self.expected_ssh_key = None
@@ -135,6 +144,37 @@ class Adapter:
 
     def backup_base(self):
         return str(self.ctx.directory)
+
+    def read_legacy(self, android, command):
+        if not self.adb or android.serial != self.adb.serial:
+            raise ValueError('Binary read device differs from the selected device')
+        return self.adb.read(command)
+
+    def backup_legacy(self, android, directory, storage):
+        import shutil
+        if not self.ctx or not self.adb or android.serial != self.ctx.record['device']['serial']:
+            raise ValueError('Backup device differs from the saved transaction')
+        expected=self.ctx.record['device']['storage']
+        if any(storage.get(k)!=expected.get(k) for k in ('CID','NODE','START','SIZE','DISK_SIZE')):
+            raise ValueError('Storage changed since the verified backup / 分区与已校验备份不一致')
+        directory=Path(directory).resolve()
+        if not directory.is_relative_to(self.ctx.directory.resolve()):
+            raise ValueError('Legacy backup directory is outside the transaction')
+        self.backup(self.ctx.record['device'])
+        source=self.ctx.directory/'backup'
+        sums=json.loads((source/'checksums.json').read_text())
+        mapping={'misc-head.bin':'misc.bin','gpt-first.bin':'gpt-first.bin','gpt-last.bin':'gpt-last.bin'}
+        mapping.update({f'{name}_{slot}.img':f'{name}_{slot}.bin' for name in ('boot','uboot','sml','teecfg','trustos','vbmeta') for slot in ('a','b')})
+        if any(name not in sums or sha(source/name)!=sums[name] for name in mapping.values()):
+            raise ValueError('Verified backup is incomplete or damaged / 已校验备份缺失或损坏')
+        directory.mkdir(parents=True,exist_ok=False)
+        atomic_json(directory/'identity.json',{**storage,'serial':android.serial,'android_slot':android.slot})
+        for target,name in mapping.items():
+            self.ctx.boundary()
+            shutil.copyfile(source/name,directory/target)
+            if sha(directory/target)!=sums[name]:raise ValueError('Legacy backup copy checksum mismatch')
+        (directory/'SHA256SUMS').write_text(''.join(sums[name]+'  '+target+'\n' for target,name in mapping.items()),encoding='utf-8')
+        self.ctx.log('Reused verified computer backups for the compatible installer; no second device backup',scope='backup')
 
     def wait_android(self, *_):
         self.stage('android_boot', 'waiting_device')
@@ -334,7 +374,9 @@ class Adapter:
                 self.stage('transfer_install')
                 if self.kind == 'e5':
                     return self.update_e5(a)
-                return self.legacy.update(a, self.root)
+                # Older compatible package entries reject the native hidden
+                # eMMC layout. Use the shared update path for those entries too.
+                return update_mu300(vars(self.legacy), a, self.root)
             self.probe(record['device']['serial'], method)
             if record.get('legacy'):
                 self.stage('recheck')
@@ -370,6 +412,8 @@ class Adapter:
             self.backup(record['device'])
             self.stage('prepare')
             if self.kind == 'mu300':
+                if method == 'boot':
+                    return self.boot_mu300(a)
                 return self.legacy.install(a, self.root, json.loads((self.root/'desktop/manifest.json').read_text()))
             if method == 'tf':
                 return self.legacy.install_sd(a)
@@ -382,6 +426,9 @@ class Adapter:
             if record['plan'].get('gap_start') is not None:
                 return self.e5_free(a)
             return self.legacy.install_part(a)
+
+    def boot_mu300(self,args):
+        return boot_installed_mu300(vars(self.legacy),self.legacy.Android(args),self.root)
 
     def e5_free(self, args):
         """Add a GPT entry in verified free space, then use the existing writer.

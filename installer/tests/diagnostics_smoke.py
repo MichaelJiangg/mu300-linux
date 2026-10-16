@@ -61,6 +61,7 @@ def main():
         page.evaluate("window.__emitFixture({stage:'openwrt_boot',status:'waiting_user',revision:13,details:{host:'192.168.9.1',reboot_manually:true}})")
         settle(page);layout(page)
         assert page.locator('h1').inner_text()=='请现在手动重启设备'
+        assert '用户名 root，默认密码 root' in page.locator('.login-hint').inner_text()
         guidance=page.locator('.boot-guidance')
         assert '已开始重启或已进入 OpenWrt' in guidance.inner_text()
         box=guidance.bounding_box()

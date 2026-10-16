@@ -150,7 +150,7 @@ apk_retry update >/dev/null
 # i2c-tools, gpiod-tools: mu300-usb (the charger of the U30 Air) and mu300-nfc (its NFC tag)
 apk_retry add --allow-untrusted /in/wifi-sae/*.apk >/dev/null
 apk_retry add iwinfo wireless-regdb iw bash ip-full coreutils-stty openssl-util curl ca-bundle msmtp ucode ucode-mod-fs ucode-mod-ubus ucode-mod-uci ucode-mod-uloop ucode-mod-socket \
-    i2c-tools gpiod-tools flock >/dev/null
+    i2c-tools gpiod-tools flock ttyd luci-app-ttyd luci-i18n-ttyd-zh-cn luci-i18n-ttyd-tr >/dev/null
 apk_retry add --allow-untrusted /in/block-mount-mu300.apk >/dev/null
 apk_retry add --allow-untrusted /in/luci-theme-aurora.apk >/dev/null
 apk_retry add --allow-untrusted /in/luci-app-aurora-config.apk /in/aurora-config-zh-cn.apk /in/aurora-config-tr.apk >/dev/null
@@ -190,6 +190,7 @@ chroot "$R" /bin/sh -c "command -v flock >/dev/null" || { echo "missing native S
 [ -s "$R/opt/mu300/lib/sim-config.sh" ] || { echo "missing U30 SIM configuration library" >&2; exit 1; }
 chmod 0755 $R/etc/hotplug.d/power_supply/70-mu300-led
 chmod 0755 $R/opt/mu300/bin/mu300-platform-config
+chmod 0755 $R/opt/mu300/bin/mu300-network-recovery $R/etc/init.d/mu300-network-recovery
 chmod 0755 $R/opt/mu300/bin/v50-led-status
 chmod 0755 $R/opt/mu300/bin/openwrt-board-check
 chmod 0755 $R/opt/mu300/bin/ra-deprecate $R/opt/mu300/bin/wcn-reopen
@@ -257,10 +258,17 @@ printf "%s\n" "${MU300_VERSION:-dev}" > $R/etc/mu300/image-version
 # Record image packages so upgrades can restore only user additions.
 (MU300_LIB=1; . $R/opt/mu300/bin/mu300-update; upk_manual $R openwrt) > $R/etc/mu300/image-packages
 [ -s $R/etc/mu300/image-packages ] || { echo "missing image-packages" >&2; exit 1; }
+# --- default-root-password begin ---
+# Fresh installs use root/root; account merging preserves passwords on updates.
+root_hash="\$6\$mu300root\$O/wH3K.NhG6ZZOMSOTLlNNHv08B1RRcRsec0Xc54SuqhFhgPwmQUnxo782srY03f5mYk.Gv0qJ8JGfcrJvYKs."
+grep -q "^root:" "$R/etc/shadow" || { echo "missing root account" >&2; exit 1; }
+sed -i "s|^root:[^:]*:|root:$root_hash:|" "$R/etc/shadow"
+unset root_hash
+# --- default-root-password end ---
 # enable the services (rc.common "enable" needs ubus, which is not running in the build container)
 # accounts still those of the image until an installer or mu300-update puts the device ones in place
 : > $R/etc/.mu300-accounts-from-image
-for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-hw mu300-post mu300-toolkit mu300-atd mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages; do
+for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-hw mu300-post mu300-toolkit mu300-atd mu300-network-recovery mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages ttyd; do
     n=$(sed -n "s/^START=//p" $R/etc/init.d/$s)
     ln -sf ../init.d/$s $R/etc/rc.d/S$n$s
 done

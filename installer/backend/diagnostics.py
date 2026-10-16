@@ -55,7 +55,7 @@ def traced(context, label, operation, output=False):
         raise
     context.log(f'END {label} ({time.monotonic()-started:.2f}s)', scope='transport')
     if output and isinstance(result, str) and result.strip():
-        # Large base64/root-image output is not a useful CLI diagnostic.
+        # Large encoded or root-image output is not a useful CLI diagnostic.
         if len(result) > 32768:context.log(f'Captured {len(result)} characters; tail:\n'+result[-4096:], scope='transport')
         else:context.log(result, scope='transport')
     return result

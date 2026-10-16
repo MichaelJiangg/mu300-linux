@@ -12,6 +12,9 @@ IFACE=sipa_eth$((CID - 1))
 mu300_sim_env "${MU300_SIM_SLOT:-}" || { echo 'Invalid SIM configuration' >&2; exit 2; }
 IFACE=$MU300_SIM_DEVICE
 DEVICE=$(/opt/mu300/bin/mu300-device 2>/dev/null || echo f50)
+REGISTRATION_LIB=${MU300_REGISTRATION_LIB:-/opt/mu300/lib/registration.sh}
+[ ! -r "$REGISTRATION_LIB" ] || . "$REGISTRATION_LIB"
+
 
 # The blue LED only reports whether data is up. The PMIC rejects a brightness write now and then (seen as
 # "write error: Invalid argument"), and under `set -e` that killed up() one line before it could report the
@@ -524,6 +527,8 @@ wait_registered() {
         start=$((size + 1))
         if [ "$SECONDS" -ge "$next_query" ]; then
             out=$(at 'AT+CEREG?' 3 2>&1 || true)
+            ! command -v mu300_registration_reply >/dev/null 2>&1 ||
+                mu300_registration_reply "${MU300_SIM_SLOT:-0}" "$out"
             echo "$out" | is_registered && return 0
             next_query=$((SECONDS + 5))
         fi
@@ -662,7 +667,7 @@ up_locked() {
         [ "$boot_slot" = "$MU300_SIM_SLOT" ] || return 1
     fi
     modem_stack || { echo "no modem stack in this kernel ($(uname -r))" >&2; exit 3; }
-    rm -f /run/mu300-mobile-data-down
+    rm -f /run/mu300-mobile-data-down /run/mu300-mobile-data-manual-down
     tty_setup
     radio_on || return $?
     if [ "$DEVICE" = u30air ] && [ "$MU300_SIM_SLOT" = 0 ] && [ ! -e /run/mu300-radio-freeze ] && [ -e /etc/mu300/sim-data-route-2 ]; then
@@ -693,7 +698,7 @@ up_locked() {
     # Android's RIL enables the IMS bearer used by SMS. This is idempotent;
     # keep it on the normal radio bring-up path and do not wait for IMS here.
     at 'AT+CAVIMS=1' 5 >/dev/null || true
-    wait_registered || { echo "not registered on the network" >&2; exit 1; }
+    wait_registered || { echo "not registered on the network" >&2; exit 5; }
     mark dial-registered
     radio_say "注册完成"
 
@@ -811,6 +816,9 @@ NFT
 }
 
 down() {
+    # A direct user disconnect must not be undone by a registration event.
+    # netifd teardown has a separate autostart intent and may be automatic.
+    [ "${MU300_NETIFD:-0}" = 1 ] || touch /run/mu300-mobile-data-manual-down
     touch /run/mu300-mobile-data-down   # tells watch not to reconnect
     led-status offline 2>/dev/null
     nft delete table ip mu300_nat 2>/dev/null || true

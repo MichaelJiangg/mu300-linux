@@ -1,5 +1,8 @@
 # Linux on the ZTE F50 / MU300 and U30 Air
 
+Maintainer notes: [stock behavior and new-device adaptation checklist](docs/NEW-DEVICE-STOCK-ADAPTATION.zh-CN.md),
+[U30 Air charge/power/recovery evidence](docs/U30AIR-STOCK-CHARGE-20261016.zh-CN.md).
+
 Windows desktop installer: extract the complete release package and run root `OpenWrt-Installer.exe`. Device selection, persistent recovery and the two-stage Android reset flow share the existing backend. Python/CLI and Magisk entries remain available. See the bilingual [user guide](installer/GUIDE.md), [build instructions](installer/README.md), and [verification/screenshots](installer/VERIFICATION.md). Multiple ADB devices can be selected in the GUI or interactive CLI, or explicitly bound with `--serial SERIAL`.
 
 

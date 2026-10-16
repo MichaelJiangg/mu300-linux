@@ -16,6 +16,7 @@
 #include <linux/of_irq.h>
 #include <linux/platform_device.h>
 #include <linux/power_supply.h>
+#include <linux/power/ump9620-battery.h>
 #include <linux/property.h>
 #include <linux/regmap.h>
 #include <linux/regulator/consumer.h>
@@ -520,6 +521,10 @@ static int sc27xx_probe(struct platform_device *pdev)
 		PROPERTY_ENTRY_U32_ARRAY("sink-pdos", snk),
 		PROPERTY_ENTRY_U32("op-sink-microwatt", 10000000), {}
 	};
+
+	/* Batteryless F50/V50 must retain their stock USB power path. */
+	if (!ump9620_has_battery_policy())
+		return -ENODEV;
 
 	typec = of_get_compatible_child(dev->parent->of_node, "sprd,sc27xx-typec");
 	if (!typec)

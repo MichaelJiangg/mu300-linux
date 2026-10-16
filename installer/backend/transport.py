@@ -1,5 +1,6 @@
 """Serial-bound ADB operations. Frontend never supplies shell text."""
 import os
+import ipaddress
 from pathlib import Path
 import re
 import secrets
@@ -10,10 +11,54 @@ import time
 
 from .state import sha
 from .diagnostics import traced
+from .binary_io import pull_binary
 
 
 def hidden_process():
     return {'creationflags': subprocess.CREATE_NO_WINDOW} if os.name == 'nt' else {}
+
+
+def adb_endpoint(value):
+    """Validate one TCP endpoint, never options or command text."""
+    invalid = 'Enter an address such as 192.168.0.1:5555 / 请输入地址，例如 192.168.0.1:5555'
+    if not isinstance(value, str) or len(value) > 270:
+        raise ValueError(invalid)
+    value = value.strip()
+    port = '5555'
+    if value.startswith('['):
+        match = re.fullmatch(r'\[([0-9a-fA-F:.]+)\](?::([0-9]{1,5}))?', value)
+        if not match: raise ValueError(invalid)
+        try: host = '['+str(ipaddress.IPv6Address(match[1]))+']'
+        except ValueError: raise ValueError(invalid) from None
+        port = match[2] or port
+    elif value.count(':') > 1:
+        try: host = '['+str(ipaddress.IPv6Address(value))+']'
+        except ValueError: raise ValueError(invalid) from None
+    else:
+        host, separator, supplied_port = value.partition(':')
+        if separator: port = supplied_port
+        if re.fullmatch(r'[0-9.]+', host or ''):
+            try: host = str(ipaddress.IPv4Address(host))
+            except ValueError: raise ValueError(invalid) from None
+        elif (len(host) > 253 or not host or
+              any(not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', label)
+                  for label in host.split('.'))):
+            raise ValueError(invalid)
+        host = host.lower()
+    if not re.fullmatch(r'[0-9]{1,5}', port) or not 1 <= int(port) <= 65535:
+        raise ValueError(invalid)
+    return host+':'+str(int(port))
+
+
+def wireless_serial(serial):
+    if not isinstance(serial, str): return False
+    if re.fullmatch(r'adb-[A-Za-z0-9_-]{1,200}\._adb-tls-connect\._tcp\.?', serial):
+        return True
+    if ':' not in serial: return False
+    try:
+        return adb_endpoint(serial) == serial.lower()
+    except ValueError:
+        return False
 
 
 class Adb:
@@ -30,7 +75,7 @@ class Adb:
 
     def call(self, *args, timeout=20, check=True):
         cmd = [self.exe]
-        if self.serial and args[0] != 'devices':
+        if self.serial and args[0] not in ('devices', 'connect', 'disconnect'):
             cmd += ['-s', self.serial]
         def perform():
             result = subprocess.run(cmd + list(args), capture_output=True, timeout=timeout, **hidden_process())
@@ -46,8 +91,33 @@ class Adb:
             values = line.split()
             if len(values) >= 2:
                 result.append({'serial': values[0], 'state': values[1],
+                               'wireless': wireless_serial(values[0]),
                                'label': next((v[6:] for v in values[2:] if v.startswith('model:')), values[0][-4:])})
         return result
+
+    def connect(self, address):
+        endpoint = adb_endpoint(address)
+        try:
+            self.call('connect', endpoint, timeout=15)
+        except subprocess.TimeoutExpired:
+            raise ConnectionError('Wireless ADB connection timed out; check the address, network and device debugging / 无线 ADB 连接超时，请检查地址、网络和设备调试设置') from None
+        devices = self.devices()
+        found = next((d for d in devices if d['serial'] == endpoint), None)
+        if not found:
+            raise ConnectionError('Wireless ADB did not connect; check the address/port and enable wireless ADB on the device / 无线 ADB 未连接，请核对地址和端口，并在设备上开启无线 ADB')
+        return {'endpoint': endpoint, 'state': found['state'], 'devices': devices}
+
+    def disconnect(self, serial):
+        if not wireless_serial(serial) or not any(d['serial'] == serial for d in self.devices()):
+            raise ValueError('Select a connected wireless ADB device / 请选择列表中已连接的无线 ADB 设备')
+        try:
+            self.call('disconnect', serial, timeout=10)
+        except subprocess.TimeoutExpired:
+            raise ConnectionError('Disconnect timed out; refresh the device list / 断开连接超时，请刷新设备列表') from None
+        devices = self.devices()
+        if any(d['serial'] == serial for d in devices):
+            raise ConnectionError('Wireless ADB is still connected; refresh and retry / 无线 ADB 仍然连接，请刷新后重试')
+        return {'endpoint': serial, 'devices': devices}
 
     def shell(self, script, root=False, timeout=20):
         if root and self.su is None:
@@ -75,16 +145,13 @@ class Adb:
         return 'root_permission' if found else 'magisk'
 
     def read(self, script):
-        """Small binary metadata reads; partition backups use dd + adb pull."""
+        """Small metadata uses the same verified staging/pull transport as CLI."""
         if self.su is None:raise ValueError('Root has not been verified / 尚未验证 root')
-        command=(self.su+' -c ' if self.su else 'sh -c ')+shlex.quote('stty raw -echo -onlcr 2>/dev/null || true; '+script)
-        args=[self.exe]+(['-s',self.serial] if self.serial else [])+['exec-out',command]
-        def perform():
-            result=subprocess.run(args,capture_output=True,timeout=45,**hidden_process())
-            if result.returncode or not result.stdout:
-                raise ConnectionError('ADB metadata read failed / ADB 元数据读取失败')
-            return result.stdout
-        return traced(self.context,'ADB metadata read '+script,perform)
+        import tempfile
+        with tempfile.TemporaryDirectory() as temp:
+            local=Path(temp)/'metadata.bin'
+            pull_binary(self.call,self.shell,script,local)
+            return local.read_bytes()
 
     def _backup_directory(self, context, total):
         free=int(self.shell("df -Pk /data/local/tmp | tail -n1 | awk '{print $4}'").strip())*1024

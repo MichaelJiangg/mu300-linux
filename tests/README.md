@@ -1,5 +1,10 @@
 # Tests
 
+Cellular registration recovery: `python3 -m unittest discover -s tests -p 'test_registration*.py'`.
+With OpenWrt ucode modules available, run `ucode tests/network_recovery.uc`.
+Run `sh tests/network-recovery-runtime.sh` only in an isolated OpenWrt container;
+it starts its own ubusd. See [the stock adaptation checklist](../docs/NEW-DEVICE-STOCK-ADAPTATION.zh-CN.md).
+
 ```sh
 python3 -m unittest discover -s tests            # everything this machine can run
 MU300_TEST_SHELLS="busybox sh" python3 -m unittest discover -s tests   # one shell only

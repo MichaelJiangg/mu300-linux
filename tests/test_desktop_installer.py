@@ -1,6 +1,5 @@
 """Desktop boot and archive regressions; these tests never connect to a device."""
 import hashlib
-import base64
 import importlib.util
 import io
 import json
@@ -254,13 +253,19 @@ desktop_free_loop
     def test_android_binary_reads_survive_su_crlf_translation(self):
         android=object.__new__(installer.Android);android.su=True
         data=bytes(range(256))*4
-        transported=base64.encodebytes(data).replace(b'\n',b'\r\n')
-        with patch.object(android,'call',return_value=transported) as call:
+        checksum=hashlib.sha256(data).hexdigest()
+        def shell(script,**kwargs):
+            if script.startswith('df '):return '1048576'
+            if script.startswith('set -e;'):return f'{len(data)}\r\n{checksum}  data.bin\r\n{checksum}  -\r\n'
+            return ''
+        def pull(*args,**kwargs):
+            self.assertEqual(args[0],'pull');Path(args[2]).write_bytes(data);return b'1 file pulled'
+        with patch.object(android,'shell',side_effect=shell),patch.object(android,'call',side_effect=pull) as call:
             self.assertEqual(android.read('cat /sys/firmware/fdt'),data)
-            self.assertEqual(call.call_args.args[0],'exec-out')
-            self.assertIn('set -o pipefail;',call.call_args.args[1])
-            self.assertIn('| base64',call.call_args.args[1])
-        with patch.object(android,'call',return_value=b'corrupt!'):
+            self.assertEqual(call.call_args.args[0],'pull')
+            self.assertTrue(call.call_args.args[1].startswith('/data/local/tmp/openwrt-read-'))
+        def corrupt(*args,**kwargs):Path(args[2]).write_bytes(b'corrupt!');return b'1 file pulled'
+        with patch.object(android,'shell',side_effect=shell),patch.object(android,'call',side_effect=corrupt):
             with self.assertRaises(ValueError):android.read('cat /sys/firmware/fdt')
 
     def test_large_gpt_backup_covers_all_entries_and_rejects_bad_crc(self):
@@ -428,14 +433,19 @@ desktop_free_loop
             off=(8192+len(ram)+4095)&~4095;base[off:off+64]=b'V'*64;base[-64:-60]=b'AVBf';struct.pack_into('>IIQQQ',base,len(base)-60,1,0,off,off,64)
             before=bytes(base)
             for slot in ('a','b'):
-                out=boot.build(before,assets,'prepare',live(slot),slot,prepare='request')
-                self.assertEqual(out[4096:8192],kernel);self.assertEqual(out[44:55],b'loglevel=5\0')
-                rs=struct.unpack_from('<I',out,12)[0]
-                streams=unpack_frames(out[8192:8192+rs]);self.assertEqual(streams[0],b'original ramdisk')
-                contents=cpio_files(streams[-1]);self.assertEqual(contents['etc/mu300-desktop-root-mode'],b'prepare\n')
-                self.assertEqual(contents['etc/mu300-desktop-prepare'],b'request\n')
-                self.assertNotIn(b'e5root',contents['init'])
-                self.assertEqual(len(out),len(before));self.assertEqual(out[48<<20:56<<20],before[48<<20:56<<20])
+                for mode in ('prepare','legacy'):
+                    out=boot.build(before,assets,mode,live(slot),slot,prepare='request' if mode=='prepare' else None)
+                    self.assertEqual(out[4096:8192],kernel);self.assertEqual(out[44:55],b'loglevel=5\0')
+                    rs=struct.unpack_from('<I',out,12)[0]
+                    streams=unpack_frames(out[8192:8192+rs]);self.assertEqual(streams[0],b'original ramdisk')
+                    contents=cpio_files(streams[-1]);self.assertEqual(contents['etc/mu300-desktop-root-mode'],(mode+'\n').encode())
+                    if mode=='prepare':self.assertEqual(contents['etc/mu300-desktop-prepare'],b'request\n')
+                    else:
+                        self.assertNotIn('etc/mu300-desktop-prepare',contents)
+                        self.assertIn(b'find_root_offset',contents['init'])
+                        self.assertIn(b'root_target=auto',contents['init'])
+                    self.assertNotIn(b'e5root',contents['init'])
+                    self.assertEqual(len(out),len(before));self.assertEqual(out[48<<20:56<<20],before[48<<20:56<<20])
             self.assertEqual(bytes(base),before)
 
     def test_tool_architecture_guard(self):
@@ -478,26 +488,25 @@ desktop_free_loop
                 self.assertEqual(result.returncode,0,result.stderr)
                 self.assertEqual(result.stdout.splitlines(),[(stage/'payload').as_posix(),stage.as_posix()])
             installer.verify(stage)
-            result=subprocess.run([sys.executable,str(stage/'OpenWrt-Installer.py'),'--check'],capture_output=True,text=True)
+            result=subprocess.run([sys.executable,'-X','utf8',str(stage/'OpenWrt-Installer.py'),'--check'],capture_output=True,text=True,encoding='utf-8')
             self.assertEqual(result.returncode,0,result.stderr)
             (stage/'desktop/configure.sh').write_text('tampered')
             with self.assertRaises(ValueError):installer.verify(stage)
 
     def test_switch_boot_does_not_require_userdata_or_root_image_detection(self):
-        android=Mock(model='V50',slot='a',linux='b',bb='/tmp/busybox')
-        android.storage.side_effect=AssertionError('Switching must not depend on userdata geometry/encryption')
-        android.read.return_value=b'loglevel=5\0'
-        with patch.object(installer,'Android',return_value=android), patch.object(installer,'module'):
-            result=installer.install(Mock(boot_openwrt=True),Path('/test/package'),{})
-        self.assertEqual(result.state,'success')
-        android.storage.assert_not_called()
-        self.assertEqual([c.args[0] for c in android.run.call_args_list],
-                         ['"$BB" sh "$P/android-bootchain.sh" check',
-                          '"$BB" sh "$P/switch.sh" --no-reboot'])
-        android.put.assert_not_called()
-        self.assertIn('only misc changed',result.message)
-        self.assertIn('default-boot settings are unchanged',result.next_step)
-        android.flash.assert_not_called()
+        sys.path.insert(0,str(TOP/'installer/tests'))
+        from test_mu300_boot_switch import AndroidFixture
+        for slot in ('a','b'):
+            android=AndroidFixture(slot,'V50')
+            android.storage=Mock(side_effect=AssertionError('Switching must not depend on userdata'))
+            android.flash=Mock(side_effect=AssertionError('Switching must not rewrite boot'))
+            with patch.object(installer,'Android',return_value=android), patch.object(installer,'module'):
+                result=installer.install(Mock(boot_openwrt=True),TOP,{})
+            self.assertEqual(result.state,'success')
+            android.storage.assert_not_called();android.flash.assert_not_called()
+            self.assertIn('only misc changed',result.message)
+            self.assertIn('default-boot settings are unchanged',result.next_step)
+            self.assertEqual(android.calls[-1],('reboot',))
 
     def test_menu_warns_about_userdata_image_f2fs_risk(self):
         with patch.object(installer,'package_root',return_value=Path('/test/package')), \

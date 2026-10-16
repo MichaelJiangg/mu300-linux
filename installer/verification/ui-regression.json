@@ -46,5 +46,11 @@
     "exit": 0,
     "output": "Support smoke passed: every-launch voluntary dialog despite old acknowledgement, GitHub icons and fixed Star link, visible text support button, sequential onboarding, exact group copying, keyboard close, online/failure/timeout fallback, bilingual 800x650 layout; no device requests\r\n",
     "error": ""
+  },
+  {
+    "test": "wireless_smoke",
+    "exit": 0,
+    "output": "Wireless ADB smoke passed: retry, Enter connect without package, explicit multi-device target, exact disconnect, USB protection, authorization/offline, bound Android resume and unsafe-stage exclusion, bilingual 800x650 layout; no real device access\r\n",
+    "error": ""
   }
 ]

@@ -6,9 +6,11 @@
 
 安装前备份重要文件，确认安装包适用于你的机型，并保持设备稳定供电。在 Android 中开启 USB 调试，允许这台电脑调试，并准备好 Magisk/root。
 
-Apple Silicon Mac（M1 及更新芯片）完整解压后，打开根目录的 **OpenWrt-Installer.app**。无需另装 Python、ADB 或 Rosetta；请将 app 与 tools、payload 等目录放在一起，不要单独拖入“应用程序”。如果系统将 app 隔离运行、要求选择安装包，请选择包含 payload 与 desktop 的解压根目录。此版本采用临时签名，未做 Apple 公证；首次启动若被系统拦截，可在“系统设置 → 隐私与安全性”中核对来源并允许打开。
+只有无线 ADB 时，先将电脑连接到设备所在网络，展开设备选择区的“无线 ADB 连接”，填写 `192.168.0.1` 并点击“连接”。地址或端口不同请填写实际值，例如 `192.168.0.1:5555`。设备需已开启无线 ADB；Android 要求配对时，先按设备提示完成配对。
 
-Linux、Intel Mac 或需要命令行操作时，可使用 **OpenWrt-Installer.py**，需另行安装 Python 和依赖。使用 Magisk 安装时，直接选择完整 ZIP；这会部署到 TF 卡并清空选定目标，请先备份卡内数据。
+也可手动运行 `adb connect 192.168.0.1`。Windows 可在安装包目录打开 PowerShell，运行 `.\tools\adb.exe connect 192.168.0.1`。
+
+Linux、macOS 或需要命令行操作时，可使用 **OpenWrt-Installer.py**，需另行安装 Python 和依赖。使用 Magisk 安装时，直接选择完整 ZIP；这会部署到 TF 卡并清空选定目标，请先备份卡内数据。
 
 ### 选择用途
 
@@ -76,6 +78,8 @@ Linux、Intel Mac 或需要命令行操作时，可使用 **OpenWrt-Installer.py
 
 看到完成页面后，按显示的管理地址访问设备，检查服务并修改管理员与无线密码。E5/M8/T551M 默认地址为 `http://192.168.9.1`，MU300/F50/V50/U30Air 为 `http://192.168.77.1`；修改过地址时使用实际值。保留安装记录和备份，以便后续恢复。
 
+**全新安装的管理页面和 SSH 登录用户名为 `root`，默认密码为 `root`。** 登录后请修改密码。更新会保留原密码；之前改过密码的设备，请使用当前密码。
+
 ### 连接与常见问题
 
 #### 第一次使用，从哪里开始？
@@ -85,6 +89,10 @@ Linux、Intel Mac 或需要命令行操作时，可使用 **OpenWrt-Installer.py
 #### 没有发现设备，或者同时连接了多台设备？
 
 确认 USB 线支持数据传输，Android 已开启 USB 调试，然后点击“刷新设备”。仍无设备时，尝试更换线缆或 USB 口，并在 Windows 设备管理器中检查 USB 驱动。多台设备会显示在设备列表中，请核对型号和序列号末四位后选择。
+
+只有无线 ADB 时，展开“无线 ADB 连接”，填写地址并连接。未授权时请在设备上允许调试；离线时检查设备调试状态后刷新。多台设备连接时，列表会显示无线设备的地址，请选准目标。
+
+要断开某台无线设备，先在列表中选择它，再点击“断开所选无线设备”。USB 设备不能用此按钮断开；任务执行中需要先暂停。重置 Android 后等待重连时，也可在当前页面重新连接原设备的无线 ADB。
 
 #### 显示“等待调试授权”或“离线”？
 
@@ -108,9 +116,11 @@ Extract the complete package and run **OpenWrt-Installer.exe** at its root. Keep
 
 Back up important files, check that the package matches your model and keep the device powered. Enable USB debugging in Android, authorize this computer and have Magisk/root ready.
 
-On Apple Silicon Macs (M1 or newer), extract everything and open **OpenWrt-Installer.app** at the package root. Python, ADB and Rosetta are not required. Keep the app beside tools, payload and desktop; do not move it into Applications alone. If macOS translocates the app and a folder picker appears, select the extracted package root containing payload and desktop. This build is ad-hoc signed and not Apple-notarized. If macOS blocks the first launch, review the source and allow opening in System Settings → Privacy & Security.
+For wireless ADB only, connect the computer to the device’s network, expand Wireless ADB connection, enter `192.168.0.1` and select Connect. Use the actual address and port if different, for example `192.168.0.1:5555`. Wireless ADB must already be enabled. If Android requires pairing, complete it on the device first.
 
-For Linux, Intel Macs or command-line use, run **OpenWrt-Installer.py** with Python and its dependencies installed. To install through Magisk, select the complete ZIP. This installs to the TF card and erases the selected target, so back up the card first.
+Alternatively, manually run `adb connect 192.168.0.1`. On Windows, open PowerShell in the package folder and run `.\tools\adb.exe connect 192.168.0.1`.
+
+For Linux, macOS or command-line use, run **OpenWrt-Installer.py** with Python and its dependencies installed. To install through Magisk, select the complete ZIP. This installs to the TF card and erases the selected target, so back up the card first.
 
 ### Choose your purpose
 
@@ -172,6 +182,8 @@ When asked to restart manually, use the device’s normal restart control. Do no
 
 After completion, open the management address shown, check services and change administrator and wireless passwords. Default addresses are `http://192.168.9.1` for E5/M8/T551M and `http://192.168.77.1` for MU300/F50/V50/U30Air. Use the actual address if changed. Keep the installation record and backups for recovery.
 
+**A fresh installation uses username `root` and default password `root` for the management page and SSH.** Change the password after signing in. Updates preserve the existing password; use the current password if it has been changed.
+
 ### Connection and troubleshooting
 
 #### Where should a beginner start?
@@ -181,6 +193,10 @@ Extract the complete package and open the root EXE. Read Getting started, then c
 #### No devices, or several devices connected?
 
 Use a data-capable USB cable, enable Android USB debugging and select Refresh devices. If the list stays empty, try another cable or USB port and check the USB driver in Windows Device Manager. With multiple devices, check the model and last four serial characters before selecting one.
+
+For wireless ADB only, expand Wireless ADB connection, enter the address and connect. Allow debugging on the device if it is unauthorized; check debugging and refresh if offline. When several devices are connected, use the addresses shown in the list to select the intended wireless device.
+
+To disconnect one wireless device, select it in the list and choose Disconnect selected wireless device. This button cannot disconnect USB devices. Pause an active task first. While waiting for Android after a reset, the current page also lets you reconnect the original device’s wireless ADB.
 
 #### Awaiting debugging authorization, or offline?
 

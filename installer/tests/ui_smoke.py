@@ -122,6 +122,7 @@ def main():
         page.screenshot(path=str(out/'wait-root-dark-en.png'),full_page=True)
         page.evaluate("window.__emitFixture({stage:'complete',status:'completed',result:{filesystem_bytes:10737418240,url:'http://192.168.9.1',backup_directory:'fixture'}})")
         page.get_by_role('heading',name='OpenWrt installed and verified').wait_for()
+        assert 'username root, default password root' in page.locator('.success-panel .login-hint').inner_text()
         settle(page);layout(page)
         page.screenshot(path=str(out/'complete-dark-en.png'),full_page=True)
         # Smallest supported native window: large list and long log scroll independently.

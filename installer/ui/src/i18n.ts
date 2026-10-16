@@ -2,6 +2,11 @@ export const strings = {
   zh: {
     author:'作者', qqGroup:'Q群', copyGroup:'复制群号', groupCopied:'群号已复制', repositoryOpened:'已打开项目仓库', support:'赞赏支持作者', closeSupport:'关闭赞赏提示',
     installerAuthor:'安装器作者',
+    defaultLogin:'全新安装的管理页面和 SSH：用户名 root，默认密码 root。登录后请修改密码。',
+    existingLogin:'用户名 root；请使用当前密码，未修改过时默认密码为 root。更新会保留原密码。',
+    wirelessTitle:'无线 ADB 连接', wirelessAddress:'设备地址 / 地址:端口', connectWireless:'连接', disconnectWireless:'断开所选无线设备', wirelessTarget:'所选无线设备',
+    wirelessHelp:'设备需已开启无线 ADB，并与电脑网络互通。不填端口时使用 5555；如需配对，请先按 Android 的提示完成配对。',
+    wirelessConnected:'无线 ADB 已连接', wirelessDisconnected:'所选无线 ADB 已断开', wirelessAuthorize:'已连接，请在设备上允许调试', wirelessOffline:'设备已添加但仍离线，请检查调试状态后刷新',
     starTitle:'喜欢这个项目？点个 Star 吧', starDescription:'你的 Star，是持续维护与更新的动力。', starAction:'去 GitHub 给项目点 Star',
     supportDescription:'本安装器可以被打赏。如果它帮到了你，欢迎自愿赞赏，支持 Minikano 的开发与维护。', supportOptional:'自愿赞赏，可直接关闭继续使用。', continueUsing:'继续使用', supportImageAlt:'Minikano 赞赏码', supportImageLoading:'正在加载赞赏码…', supportImageUnavailable:'赞赏码暂时无法显示，可以稍后从侧栏重新打开。',
     copyDiagnostics:'复制诊断信息给开发者', phase:'阶段', stageProgress:'当前阶段进度', noPercentage:'正在处理，请保持设备供电。',
@@ -43,6 +48,11 @@ export const strings = {
   en: {
     author:'Author', qqGroup:'QQ group ', copyGroup:'Copy group number', groupCopied:'Group number copied', repositoryOpened:'Project repository opened', support:'Support the author', closeSupport:'Close support notice',
     installerAuthor:'Installer author',
+    defaultLogin:'Fresh installation, management page and SSH: username root, default password root. Change it after signing in.',
+    existingLogin:'Username root. Use the current password; the unchanged default is root. Updates keep the existing password.',
+    wirelessTitle:'Wireless ADB connection', wirelessAddress:'Device address / address:port', connectWireless:'Connect', disconnectWireless:'Disconnect selected wireless device', wirelessTarget:'Selected wireless device',
+    wirelessHelp:'Enable wireless ADB on the device and connect the computer to its network. The default port is 5555. If Android requires pairing, complete it first.',
+    wirelessConnected:'Wireless ADB connected', wirelessDisconnected:'Selected wireless ADB disconnected', wirelessAuthorize:'Connected. Allow debugging on the device.', wirelessOffline:'Device added but still offline. Check debugging and refresh.',
     starTitle:'Enjoying the project? Give it a Star', starDescription:'Your Star encourages continued maintenance and updates.', starAction:'Star the project on GitHub',
     supportDescription:'This installer accepts donations. If it helped you, you are welcome to support Minikano’s development and maintenance.', supportOptional:'Donations are optional. Close to continue.', continueUsing:'Continue', supportImageAlt:'Minikano donation code', supportImageLoading:'Loading donation code…', supportImageUnavailable:'The donation code is unavailable. You can reopen it from the sidebar later.',
     copyDiagnostics:'Copy diagnostics for the developer', phase:'Phase', stageProgress:'Current phase progress', noPercentage:'Processing. Keep the device powered.',

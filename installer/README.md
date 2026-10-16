@@ -41,6 +41,8 @@ For the complete browser regression suite, install development-only Playwright (
 
 ## Desktop layout, feedback and motion
 
+MU300 updates use `backend/mu300_update.py`; packaging generates the compatible CLI helper `desktop/update_control.py` from the same file. The adapter calls the shared implementation even when an older package's Python entry rejects `legacy`. Hidden-area support requires the live OpenWrt container, ext4 label/capacity and loop backing/offset/extent to agree with eMMC/GPT bounds and the packaged boot's existing discovery logic. Checks run before uploads and immediately before commit. The native upgrade lock, config/account/vendor migration, disk staging, rollback and readback checks remain in the packaged updater. Unknown layouts stop; no GPT edit, resize or format is introduced by this compatibility path.
+
 The window has a fixed viewport: header, sidebar, primary actions and footer stay visible. Purpose lists, recovery records, installation content and expanded logs have independent scroll areas. The package extraction reminder and transaction-folder shortcut stay at the bottom of the sidebar. Recovery controls remain compact at the minimum 800×650 window size, including when the log is open.
 
 Device enumeration is independent of payload verification: the install/advanced/one-time-boot views refresh once on entry, and Refresh devices remains available with an empty list or before verification. Device inspection and installation still require a verified package. Every refresh clears the old inspection so stale root/readiness cannot authorize a later action. Empty responses and enumeration failures clear stale selection; multiple-device responses retain only an explicitly selected device that is still present.

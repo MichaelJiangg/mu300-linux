@@ -24,7 +24,7 @@ class AndroidUpgrade(ShellTest):
                         'etc/unisoc-modem/sms.json': 'messages\n',
                         'etc/mu300/hotspot.conf': 'SSID=Personal\nPSK=personal-password\n',
                         'etc/rc.local': 'personal rc\n'})
-            write(image, {'etc/shadow': 'root::0:0:99999:7:::\n', 'etc/config/sqm': 'image sqm\n',
+            write(image, {'etc/shadow': 'root:new-image-default-hash:0:0:99999:7:::\n', 'etc/config/sqm': 'image sqm\n',
                           'etc/init.d/dnsmasq': '#!/bin/sh\n', 'sbin/init': '#!/bin/sh\n'})
             (image / 'etc/init.d/dnsmasq').chmod(0o755)
             (image / 'etc/rc.d').mkdir()

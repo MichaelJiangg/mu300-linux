@@ -1,0 +1,44 @@
+// Pure policy shared with offline tests. State comes from the existing AT
+// owner, not a second modem manager or a guessed time-based registration.
+export function radio_blocked(frozen, ready) {
+    // U30 native SIM management keeps freeze for the whole boot: it inhibits
+    // the legacy SFUN bring-up, not PDP dialing after native RF is ready.
+    return frozen && !ready;
+};
+
+export function registration_key(state, slot) {
+    if (type(state) != 'object' || state.slot !== slot ||
+        (state.stat !== 1 && state.stat !== 5))
+        return null;
+    if (state.rat != null && (type(state.rat) != 'int' || state.rat < 0 || state.rat >= 255))
+        return null;
+    return sprintf('%d:%d:%s', slot, state.stat, state.rat ?? 'eps');
+};
+
+export function can_resume(status, wait_slot, selected, blocked) {
+    if (blocked || type(status) != 'object' || status.proto != 'mu300cell' ||
+        status.autostart !== true || status.up === true || status.pending === true ||
+        status.available !== false || wait_slot !== selected)
+        return false;
+    for (let error in status.errors ?? [])
+        if (error.code != 'REGISTRATION_WAIT')
+            return false;
+    return true;
+};
+
+export function recovery(call, state, wait_slot, selected, blocked, previous) {
+    let key = registration_key(state, selected);
+    if (key != previous.key) {
+        previous.key = key;
+        previous.attempted = false;
+    }
+    let status = call('status', {});
+    if (status?.up === true)
+        previous.attempted = false;
+    if (key == null || previous.attempted ||
+        !can_resume(status, wait_slot, selected, blocked))
+        return false;
+    // Set before notifying: the resulting netifd event must not loop.
+    previous.attempted = true;
+    return call('notify_proto', { action: 5, available: true }) != null;
+};
