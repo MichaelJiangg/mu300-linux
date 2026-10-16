@@ -1,7 +1,5 @@
 # Building the desktop installer
 
-Apple Silicon macOS builds use the same `python installer/build.py` entry on an ARM64 Mac with Xcode command-line tools, Rust 1.90, Node 22 and Python 3.12. The build outputs `artifacts/macos-arm64/OpenWrt-Installer.app` plus native backend and official ADB under `tools/macos`, verifies the ARM64 Mach-O and applies an ad-hoc signature. It is not notarized. `.github/workflows/gui-macos.yml` builds on the native ARM64 `macos-15` runner. CI artifacts use a tar archive to preserve framework links and executable permissions. Set `OPENWRT_GUI_MACOS_ARTIFACT` to the extracted artifact directory when assembling a combined Windows/macOS firmware package. The Mac uses system WebKit, no bundled browser runtime. Installation records live under `~/Library/Application Support/OpenWrt-Installer`.
-
 The shared sidebar credits installer author Minikano and provides four copy-number QQ buttons plus two fixed project links. E5 points to `https://github.com/sprd-linux-devs/e5-linux` (Enceka and Minikano), and MU300 points to `https://github.com/dikeckaan/mu300-linux` (dikeckaan and Minikano). Minikano is credited as co-author of both. Native `open_repository` accepts only the IDs `e5` and `mu300`, which map to those two literal URLs; it does not accept a URL or shell command.
 
 `ui/src/components/support.tsx` provides an optional donation notice on every application launch, followed by onboarding when applicable. Closing it lasts for that window only; older `support-notice-v1` acknowledgements are ignored. A labeled sidebar button reopens it. Both repository entries include a Lucide GitHub icon, and the dialog invites a Star through the same fixed-ID repository opener. Opening the page does not automatically star anything. Only the donation image host is added to CSP `img-src`; scripts and IPC/network command permissions remain restricted. Online loading uses a normal no-referrer image request, with a five-second timeout/error fallback to `ui/src/assets/donation-fallback.png`. The checked-in 613×514 PNG was downloaded from `https://api.kanokano.cn/pay/zsm.png` on 2026-10-15: 161,701 bytes, SHA-256 `22c0d03221750cfb7a8c59692ff0e7d7530e56b807fe731ed23522403ce99be3`. It is fingerprinted and embedded in the GUI release, not the device rootfs. To refresh it, download that exact source, inspect the image and update this provenance before rebuilding.
@@ -13,6 +11,28 @@ python -m pip install pyinstaller paramiko lz4
 python -m unittest discover -s installer/tests -v
 python installer/build.py
 ```
+
+## Apple Silicon macOS and combined releases
+
+Run the same `python installer/build.py` on an Apple Silicon Mac with Xcode Command Line Tools, native ARM64 Python 3.12, Node 22 and Rust 1.90.0. Install the same Python build dependencies first. It creates `installer/artifacts/macos-arm64/OpenWrt-Installer.app`, `tools/macos/adb`, the private Python backend under `tools/macos/backend`, and a source/binary fingerprint manifest. macOS uses system WebKit, the native `open` command and `~/Library/Application Support/OpenWrt-Installer` for recovery records. The app locates either E5's `files/device-profile.json` or MU300's `desktop/manifest.json`; Finder translocation prompts for the extracted package folder. The macOS command-line launcher uses the same bundled backend, without a system Python dependency.
+
+The build checks GUI architecture, applies and verifies an ad-hoc app signature, and pins Google's Darwin platform-tools archive in `platform-tools-macos.json`. The bundle version and identifier come from Tauri configuration. This is ARM64 support only; it does not produce an Intel or universal app. Ad-hoc signing is not Developer ID signing or Apple notarization, so downloaded applications may require explicit permission in Privacy & Security. See [Tauri's macOS distribution instructions](https://v2.tauri.app/distribute/macos-application-bundle/) and [signing documentation](https://v2.tauri.app/distribute/sign/macos/).
+
+`.github/workflows/gui-macos.yml` supports reusable calls, manual dispatch and `build/macos-*` branch pushes. It uses GitHub's native ARM64 `macos-15` runner, runs backend tests, builds release binaries and checks the frozen backend protocol, ADB, GUI architecture and signature without connecting to devices. The artifact is transported as `openwrt-installer-macos-arm64.tar.gz` to preserve executable permissions. [Runner architecture reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
+E5's main release workflow now requires **both** GUI jobs. It downloads Windows files, restores the macOS tar artifact on the Linux packaging runner, then sets `OPENWRT_GUI_MACOS_ARTIFACT` before assembling the firmware archive. This path is shared by the E5, M8 and T551M package assemblers. For a local combined release, provide both artifact directories:
+
+```sh
+export OPENWRT_GUI_ARTIFACT=/path/to/windows-artifact
+export OPENWRT_GUI_MACOS_ARTIFACT=/path/to/macos-arm64-artifact
+# Run the existing model-specific firmware package builder afterward.
+```
+
+`package_gui.attach` also detects a local `installer/artifacts/macos-arm64/build.json` automatically. **Every normal desktop release requires both Windows and Apple Silicon macOS artifacts**, including local profile builds and installer refreshes. Missing Mac output fails before copying either platform; it never silently produces a Windows-only release. Both artifacts must match the current source and their platform, complete file lists and binary checksums before either is attached. Text fingerprints normalize Git CRLF/LF differences; binary hashes remain exact. Runtime directories are replaced so removed dependencies do not survive a refresh. The root EXE and APP share one firmware payload; desktop dependencies stay outside device payloads. `size_report` includes separate `gui_windows_bytes` and `gui_macos_bytes`, their total `gui_bytes`, backend/tools, firmware and archive sizes. The shared ZIP writer records Unix execute permissions for the Mac app, backend, ADB and command-line launchers even when packaging on Windows. `OPENWRT_GUI_OPTIONAL=1` remains for source-only test fixtures, not a desktop release.
+
+To validate this integration without compiling anything, run `python -m unittest discover -s installer/tests -p test_macos_integration.py -v`. External build/signing commands are intercepted and attachment checks use tiny disposable text fixtures. This does not establish native macOS runtime or hardware compatibility; those checks run when the Mac workflow is actually invoked.
+
+## Shared runtime and packaging
 
 `ui/rust-toolchain.toml`, Cargo.lock and package-lock.json pin the build graph. `build.py` runs a Tauri release build with size optimization/LTO/strip and builds a console-protocol Python sidecar. The Tauri host spawns it with CREATE_NO_WINDOW. `installer/artifacts/windows` contains `OpenWrt-Installer.exe`, `tools/backend/`, and `build.json` with source/binary hashes. No browser runtime, Node, Rust, Python installation, cache, large fonts or development dependencies are shipped. The bundled interpreter is private to the sidecar.
 

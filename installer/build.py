@@ -20,14 +20,25 @@ def run(*args, cwd=HERE):
     subprocess.run(list(map(str,args)),cwd=cwd,check=True)
 
 
+def native_platform(system=None, machine=None):
+    system = sys.platform if system is None else system
+    machine = platform.machine() if machine is None else machine
+    if system == 'darwin' and machine == 'arm64':
+        return 'macos-arm64'
+    if system == 'win32' and machine.lower() in ('amd64', 'x86_64'):
+        return 'windows-x64'
+    raise ValueError('Build natively on Windows x64 or Apple Silicon macOS (Rust 1.90, Node and Python required).')
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--skip-ui', action='store_true')
     p.add_argument('--adb-dir', type=Path, help='optional pre-fetched platform-tools directory')
     a = p.parse_args()
-    mac = sys.platform == 'darwin'
-    if os.name != 'nt' and not (mac and platform.machine() == 'arm64'):
-        raise SystemExit('Build natively on Windows x64 or Apple Silicon macOS (Rust 1.90, Node and Python required).')
+    target = native_platform()
+    mac = target == 'macos-arm64'
+    if mac:
+        os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', '11.0')
     before = sources()
     npm = 'npm' if mac else 'npm.cmd'
     if not a.skip_ui:
@@ -49,7 +60,7 @@ def main():
         for name in names:
             shutil.copy2(a.adb_dir/name, tools/('ADB-NOTICE.txt' if name=='NOTICE.txt' else name))
     else:
-        dependency = json.loads((HERE/('platform-tools-macos.json' if mac else 'platform-tools.json')).read_text())
+        dependency = json.loads((HERE/('platform-tools-macos.json' if mac else 'platform-tools.json')).read_text(encoding='utf-8'))
         cache = HERE.parent/'work/installer-platform-tools'/('platform-tools-macos-pinned.zip' if mac else 'platform-tools-pinned.zip')
         cache.parent.mkdir(parents=True,exist_ok=True)
         if not cache.is_file() or digest(cache) != dependency['sha256']:
@@ -68,10 +79,11 @@ def main():
         executable.chmod(0o755)
         (app/'Contents/Resources').mkdir(exist_ok=True)
         shutil.copy2(HERE/'ui/src-tauri/icons/icon.icns',app/'Contents/Resources/icon.icns')
-        info = {'CFBundleExecutable':'openwrt-installer','CFBundleIdentifier':'org.openwrt.desktop-installer',
+        config = json.loads((HERE/'ui/src-tauri/tauri.conf.json').read_text(encoding='utf-8'))
+        info = {'CFBundleExecutable':'openwrt-installer','CFBundleIdentifier':config['identifier'],
                 'CFBundleName':'OpenWrt Installer','CFBundleDisplayName':'OpenWrt Installer',
                 'CFBundleIconFile':'icon.icns',
-                'CFBundlePackageType':'APPL','CFBundleShortVersionString':'1.0.0','CFBundleVersion':'1.0.0',
+                'CFBundlePackageType':'APPL','CFBundleShortVersionString':config['version'],'CFBundleVersion':config['version'],
                 'LSMinimumSystemVersion':'11.0','NSHighResolutionCapable':True,
                 'NSAppTransportSecurity':{'NSAllowsLocalNetworking':True}}
         (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info))
@@ -91,8 +103,8 @@ def main():
     subprocess.run([str(tools/('adb' if mac else 'adb.exe')),'version'],check=True,stdout=subprocess.DEVNULL)
     if sources() != before:
         raise ValueError('Source changed during compilation; rebuild before packaging')
-    files = {p.relative_to(artifact).as_posix():digest(p) for p in artifact.rglob('*') if p.is_file() and p.name!='build.json'}
-    (artifact/'build.json').write_text(json.dumps({'protocol':1,'platform':'macos-arm64' if mac else 'windows-x64','source':before,'files':files},indent=2)+'\n',encoding='utf-8')
+    files = {p.relative_to(artifact).as_posix():digest(p) for p in artifact.rglob('*') if p.is_file() and p != artifact/'build.json'}
+    (artifact/'build.json').write_text(json.dumps({'protocol':1,'platform':target,'source':before,'files':files},indent=2)+'\n',encoding='utf-8')
     print(artifact)
 
 

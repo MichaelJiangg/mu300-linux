@@ -29,6 +29,8 @@ def inspect_linux_boot(read, size, family, slot):
         raise ValueError('No recognized '+family+' Linux boot in slot '+slot+' / 目标槽未识别到相应机型系列的 Linux 启动镜像')
     if any(item.startswith('e5.part_prepare=') for item in command):
         raise ValueError('Partition preparation is pending; resume the saved installation / 分区准备尚未完成，请从保存记录续装')
+    if 'openwrt.uninstall=1' in command:
+        raise ValueError('Uninstall is pending; resume its saved record instead of booting OpenWrt / 卸载尚未完成，请从保存记录继续，不要临时启动 OpenWrt')
     end=4096+((kernel+4095)//4096)*4096+((ramdisk+4095)//4096)*4096
     footer=tail[-64:]
     if footer[:4]!=b'AVBf':

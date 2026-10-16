@@ -136,6 +136,9 @@ if ($linuxFirst -or (AdbState) -notmatch 'device') {
     if ((AdbState) -notmatch 'device') { Die 'the device did not come back as Android' }
 }
 if ((SuDo 'id -u') -ne '0') { Die 'su does not work on the device' }
+if ((SuDo 'for u in /sys/class/block/mmcblk*p*/uevent; do grep -qx PARTNAME=mu300root "$u" && { echo internal-partition; break; }; done; true') -eq 'internal-partition') {
+    Die 'Use OpenWrt-Installer.exe: Advanced options -> Uninstall and return space, with the original installation records. This legacy script cannot safely remove a GPT mu300root partition.'
+}
 $model = "$(SuDo 'getprop ro.product.model') / $(SuDo 'getprop ro.product.device')"
 Write-Host "device: $model"
 if ($model -notmatch 'MU300|F50|mu300|U30Air|U30_Air') { Die 'this does not look like a ZTE F50/MU300 or U30 Air' }

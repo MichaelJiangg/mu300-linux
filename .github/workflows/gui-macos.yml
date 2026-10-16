@@ -1,6 +1,7 @@
 name: Apple Silicon installer
 
 on:
+  workflow_call:
   workflow_dispatch:
   push:
     branches: ['build/macos-*']

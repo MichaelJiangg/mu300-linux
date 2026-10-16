@@ -103,12 +103,34 @@ tf_read_super() {
     dd if="$1" of="$T/tf-super" bs=512 count=8 || return 1
     [ "$(wc -c < "$T/tf-super")" -eq 4096 ] || return 1
 }
+tf_read_requirements() {
+    # Packaging may run on Windows. Accept LF/CRLF without modifying the
+    # checksummed payload file; reject malformed/extra fields or records.
+    tf_requirements=$(awk '
+        NR == 1 {
+            sub(/\r$/, "")
+            if (NF != 2 || $1 !~ /^[0-9]+$/ || $2 !~ /^[0-9]+$/) exit 1
+            print $1, $2
+            next
+        }
+        { exit 1 }
+        END { if (NR != 1) exit 1 }
+    ' "$1") || return 1
+    IFS=' ' read -r required_kib required_inodes <<EOF
+$tf_requirements
+EOF
+    [ "$required_kib" -gt 0 ] && [ "$required_inodes" -gt 0 ]
+}
+
 tf_capacity() {
     # Arguments are sectors, required KiB and required inodes. Sector arithmetic
     # avoids Android mksh byte overflow. We run TF workers with 64-bit BusyBox ash.
+    tf_capacity_error='invalid sector count or rootfs requirements'
     case $1:$2:$3 in *[!0-9:]*|:*|*::*|*:) return 1 ;; esac
     [ "$1" -gt 0 ] && [ "$2" -gt 0 ] && [ "$3" -gt 0 ] || return 1
+    tf_capacity_error="target=$(( $1 / 2 )) KiB, required=$2 KiB"
     [ $(( $1 / 2 )) -ge "$2" ] || return 1
+    tf_capacity_error=
 }
 
 if [ "${1:-}" = --release ]; then

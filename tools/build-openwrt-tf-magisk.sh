@@ -30,8 +30,8 @@ mkdir -p "$TOP/work"
 # desktop code is not added to the Magisk boot image.
 DESKTOP=${MU300_DESKTOP_INSTALLER:-1}
 DESKTOP_TOOLS=${MU300_DESKTOP_TOOLS:-$TOP/work/desktop-tools}
-# Include the native Mac build when it has been downloaded/built alongside the
-# Windows artifact. The assembler checks both against the current source hash.
+# Desktop releases require both native platforms. Resolve the default Mac
+# artifact here; package_gui rejects missing/stale artifacts before attachment.
 if [ -z "${OPENWRT_GUI_MACOS_ARTIFACT:-}" ] && [ -f "$TOP/installer/artifacts/macos-arm64/build.json" ]; then
     export OPENWRT_GUI_MACOS_ARTIFACT="$TOP/installer/artifacts/macos-arm64"
 fi
@@ -187,14 +187,16 @@ if [ "$DESKTOP" = 1 ]; then
     fi
 fi
 rm -f "$OUT"
-python3 - "$STAGE" "$OUT" <<'PY'
+python3 - "$TOP" "$STAGE" "$OUT" <<'PY'
 import os, sys, zipfile
+sys.path.insert(0, os.path.join(sys.argv.pop(1), 'installer'))
+from archive_tools import write_member
 src, out = map(os.path.abspath, sys.argv[1:])
 with zipfile.ZipFile(out, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for root, dirs, files in os.walk(src):
         dirs.sort()
         for name in sorted(files):
             p = os.path.join(root, name)
-            z.write(p, os.path.relpath(p, src).replace(os.sep, '/'))
+            write_member(z, p, os.path.relpath(p, src).replace(os.sep, '/'))
 PY
 echo "built $OUT (kernel $rel)"

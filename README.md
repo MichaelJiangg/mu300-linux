@@ -58,7 +58,7 @@ is talking to; see [Supported devices](#supported-devices).
 | Tested | everything below | 5.4, 6.18 and 7.2: USB, Wi-Fi hotspot, Bluetooth, mobile data, VPN, LEDs |
 | Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit` and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`) |
 | USB host (OTG) | - (its USB port is its power supply) | `sudo mu300-usb host` with an OTG adapter: flash drives (FAT, exFAT), keyboards and mice, USB modems and Ethernet adapters, with 5 V from the battery; `sudo mu300-usb device` back to the computer (the default at every boot). Mainline kernels; HDMI through USB-C adapters does not work |
-| Buttons | power: held 3 s shuts down | power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down; the Wi-Fi key switches the hotspot 2.4 / 5 GHz, held 3 s turns it off or on |
+| Buttons | power: held 3 s shuts down | power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down; double-press the Wi-Fi key within 500 ms to switch 2.4 / 5 GHz (a single press only wakes the LEDs), held 3 s turns it off or on |
 | NFC | - | a phone held to the device joins the hotspot, as with ZTE's firmware: `sudo mu300-nfc` shows the tag, `wifi` writes the hotspot's name and password (again at every hotspot start), `url https://...` or `text ...` anything else, `clear` empties it, `on`/`off` is the NFC switch of ZTE's web interface (kept in the tag) |
 
 Both run the same kernel, the same systems and the same releases; what differs is a handful of drivers for the U30

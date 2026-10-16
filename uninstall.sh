@@ -25,6 +25,9 @@ for c in adb python3; do command -v $c >/dev/null || die "$c not found"; done
 . "$TOP/tools/linux-mode.sh"
 require_android
 [ "$(su_do 'id -u')" = 0 ] || die "su does not work on the device"
+if [ "$(su_do 'for u in /sys/class/block/mmcblk*p*/uevent; do grep -qx PARTNAME=mu300root "$u" && { echo internal-partition; break; }; done; true')" = internal-partition ]; then
+    die 'Use OpenWrt-Installer.exe: Advanced options -> Uninstall and return space, with the original installation records. This legacy script cannot remove a GPT mu300root partition safely.'
+fi
 model="$(su_do 'getprop ro.product.model') / $(su_do 'getprop ro.product.device')"
 echo "device: $model"
 case "$model" in *MU300*|*F50*|*mu300*|*U30Air*|*U30_Air*) ;; *) die "this does not look like a ZTE F50/MU300 or U30 Air" ;; esac

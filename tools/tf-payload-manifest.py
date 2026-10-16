@@ -41,7 +41,7 @@ def manifest(stage):
     # Space for vendor runtime, metadata and configuration; inode count is
     # explicit at format time, so a small card need not be limited to 1 inode/MiB.
     (stage / 'rootfs.requirements').write_text(
-        f'{kib + max(kib // 4, 262144)} {len(members) + 16384}\n', encoding='ascii')
+        f'{kib + max(kib // 4, 262144)} {len(members) + 16384}\n', encoding='ascii', newline='\n')
     names = ['mu300-openwrt.tar.gz', 'boot-linux.img', 'rootfs.requirements', 'rootfs-critical.sha256',
              'android-bootchain.sh', 'bootchain.sh']
     with (stage / 'payload.sha256').open('w', newline='\n') as checks:

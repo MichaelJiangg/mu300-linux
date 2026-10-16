@@ -7,6 +7,7 @@ import secrets
 import shlex
 import shutil
 import subprocess
+import sys
 import time
 
 from .state import sha
@@ -64,7 +65,9 @@ def wireless_serial(serial):
 class Adb:
     def __init__(self, package, serial=None):
         self.serial = serial
-        names = ('tools/adb.exe', 'platform-tools/adb.exe') if os.name == 'nt' else ('tools/macos/adb', 'tools/adb', 'platform-tools/adb', 'tools/adb.exe')
+        names = ('tools/adb.exe', 'platform-tools/adb.exe') if sys.platform == 'win32' else (
+            'tools/macos/adb', 'tools/adb', 'platform-tools/adb') if sys.platform == 'darwin' else (
+            'tools/adb', 'platform-tools/adb')
         paths = [Path(package) / name for name in names]
         self.exe = next((str(p) for p in paths if p.is_file()), shutil.which('adb'))
         if not self.exe:

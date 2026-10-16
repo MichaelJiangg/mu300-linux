@@ -23,6 +23,8 @@ from .diagnostics import DebugStream, traced
 
 
 def load(path, name):
+    # /var and /private/var may name the same package on macOS.
+    path = Path(path).resolve()
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -225,7 +227,7 @@ class Adapter:
             self.legacy.find_adb = lambda: None
 
     def probe(self, serial, method='part'):
-        if method not in ('tf', 'part', 'reinstall', 'image', 'boot'):
+        if method not in ('tf', 'part', 'reinstall', 'image', 'boot', 'uninstall'):
             raise ValueError('Unsupported Android installation method / 不支持的 Android 安装方式')
         self.bind(serial)
         devices = self.adb.devices()

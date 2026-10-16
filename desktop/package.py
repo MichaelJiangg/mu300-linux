@@ -78,7 +78,10 @@ unset MU300_DEPLOY_ROOT
     for name,flags in actions.items():
         cmd='@echo off\r\ncd /d "%~dp0.."\r\nif exist "tools\\backend\\openwrt-backend.exe" (\r\n  "tools\\backend\\openwrt-backend.exe" --cli --package-root "%cd%" '+flags+' --no-pause %*\r\n) else (\r\n  py -3 "OpenWrt-Installer.py" '+flags+' --no-pause %*\r\n)\r\npause\r\n'
         (launchers/(name+'.cmd')).write_bytes(cmd.encode())
-        (launchers/(name+'.sh')).write_text('#!/bin/sh\ncd "$(dirname "$0")/.." || exit 1\nexec python3 OpenWrt-Installer.py '+flags+' "$@"\n',newline='\n')
+        (launchers/(name+'.sh')).write_text('#!/bin/sh\ncd "$(dirname "$0")/.." || exit 1\n'
+            'if [ "$(uname -s)" = Darwin ] && [ -x ./tools/macos/backend/openwrt-backend ]; then\n'
+            '  exec ./tools/macos/backend/openwrt-backend --cli --package-root "$PWD" '+flags+' "$@"\n'
+            'fi\nexec python3 OpenWrt-Installer.py '+flags+' "$@"\n',newline='\n')
         (launchers/(name+'.sh')).chmod(0o755)
     adb_dir=os.environ.get('MU300_DESKTOP_ADB_DIR')
     if adb_dir:

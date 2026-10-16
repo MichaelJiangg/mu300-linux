@@ -33,7 +33,7 @@ if [ "${SD_MODE:-0}" = 1 ]; then
     . "$P/tf-storage.sh"
     mkdir -p "$T"
     if [ -n "${MU300_TF_STATE:-}" ]; then
-        read -r required_kib required_inodes < "$P/rootfs.requirements"
+        tf_read_requirements "$P/rootfs.requirements" || { tf_die 'invalid rootfs.requirements'; exit 1; }
     fi
     R=${SD_DEV:?SD_DEV is not set}
     [ -b "$R" ] || { say_i18n "找不到块设备 $R（TF 卡是否已插入？）" \
@@ -61,7 +61,7 @@ if [ "${SD_MODE:-0}" = 1 ]; then
             # the sparse 1 MiB/inode layout. No filesystem-size argument/cap.
             inode_args=
             if [ -n "${MU300_TF_STATE:-}" ]; then
-                read -r required_kib required_inodes < "$P/rootfs.requirements"
+                tf_read_requirements "$P/rootfs.requirements" || { tf_die 'invalid rootfs.requirements'; exit 1; }
                 [ $((tf_sectors / 2048)) -ge $((required_inodes + 1024)) ] || inode_args="-N $((required_inodes + 1024))"
             fi
             /system/bin/mke2fs -t ext4 -F -b 4096 -m 0 -i 1048576 \

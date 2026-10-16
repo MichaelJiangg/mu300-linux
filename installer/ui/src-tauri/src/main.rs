@@ -98,7 +98,10 @@ fn distribution_root(executable: &std::path::Path) -> Result<PathBuf, String> {
     for ancestor in executable.ancestors() {
         if ancestor.extension().is_some_and(|ext| ext == "app") {
             let root = ancestor.parent().ok_or("Application has no parent directory")?;
-            if root.join("desktop/manifest.json").is_file() { return Ok(root.to_path_buf()); }
+            if root.join("OpenWrt-Installer.py").is_file()
+                && (root.join("desktop/manifest.json").is_file() || root.join("files/device-profile.json").is_file()) {
+                return Ok(root.to_path_buf());
+            }
             // Finder may translocate quarantined applications. Ask for the
             // extracted package rather than guessing its original location.
             return rfd::FileDialog::new().set_title("Select extracted OpenWrt package / 选择完整解压的安装包")
@@ -177,7 +180,7 @@ fn main() {
         }),
         Err(error) => {
             #[cfg(target_os = "macos")]
-            let message = format!("Cannot start OpenWrt Installer. Keep the app beside tools and payload in the extracted package.\n无法启动安装器，请将 app 与 tools、payload 一起保留在完整解压目录。\n\n{error}");
+            let message = format!("Cannot start OpenWrt Installer. Keep the app beside tools and files in the extracted package.\n无法启动安装器，请将 app 与 tools、files 一起保留在完整解压目录。\n\n{error}");
             #[cfg(not(target_os = "macos"))]
             let message = format!("Cannot start the system WebView2. Install Microsoft Edge WebView2 Evergreen Runtime and reopen the installer.\n无法启动系统 WebView2。请安装 Microsoft Edge WebView2 Evergreen Runtime 后重试。\nhttps://developer.microsoft.com/microsoft-edge/webview2/\n\n{error}");
             rfd::MessageDialog::new().set_title("OpenWrt Installer").set_description(message).set_level(rfd::MessageLevel::Error).show();

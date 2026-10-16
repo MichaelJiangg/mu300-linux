@@ -1,0 +1,499 @@
+"""Journaled removal of a proven installer-created internal partition.
+
+No device writes during planning. All GPT changes run in the existing model's
+initramfs, with stock recovery owning Android reset and encryption.
+"""
+import hashlib
+import json
+from pathlib import Path
+import re
+import shlex
+import struct
+import subprocess
+import time
+import zlib
+
+from . import gpt
+from .boot_image import inspect_linux_boot, trial_control
+from .state import Cancelled, RecoveryRequired, atomic_json, sha
+from .transport import push_chunks
+from .uninstall_boot import build
+
+
+def partition(info, name):
+    rows = [p for p in info['parts'] if p['name'] == name]
+    if len(rows) != 1:
+        raise RecoveryRequired('Ambiguous or missing partition / 分区缺失或存在重名: '+name)
+    return rows[0]
+
+
+def table(first):
+    at, count = struct.unpack_from('<QI', first, 584)
+    return first[at*512:at*512+count*128]
+
+
+def restored_layout(original, current, sectors, name):
+    """Keep current GPT metadata; reverse only the proven root/data entry edits."""
+    old = gpt.gpt_space(*original, sectors)
+    now = gpt.gpt_space(*current, sectors)
+    data, root = partition(now, 'userdata'), partition(now, name)
+    prior = partition(old, 'userdata')
+    oldtable, newtable = table(original[0]), table(current[0])
+    if (original[0][568:584] != current[0][568:584] or old['front'] != now['front'] or
+            old['tail'] != now['tail'] or len(oldtable) != len(newtable) or data['n'] != prior['n'] or
+            data['start'] != prior['start'] or root['n']-1 not in old['empty']):
+        raise RecoveryRequired('Original GPT identity differs / 原安装备份与当前 GPT 身份不符')
+    for index in range(len(newtable)//128):
+        a, b = oldtable[index*128:(index+1)*128], newtable[index*128:(index+1)*128]
+        if index == data['n']-1:
+            if a[:40]+a[48:] != b[:40]+b[48:]:
+                raise RecoveryRequired('Userdata identity changed / userdata 身份发生变化')
+        elif index != root['n']-1 and a != b:
+            raise RecoveryRequired('Another partition changed; refusing rollback / 其他分区已变化，不能恢复原布局')
+    wipe = prior['end'] > data['end']
+    if wipe:
+        expected_size = ((prior['end']-prior['start']+1-(root['end']-root['start']+1))//2048)*2048
+        if (root['start'] != data['end']+1 or root['end'] > prior['end'] or
+                data['end']-data['start']+1 != expected_size):
+            raise RecoveryRequired('OpenWrt is not inside the proven reclaimed userdata range / OpenWrt 不在原缩容范围内')
+    elif prior['end'] != data['end'] or not any(
+            a <= root['start'] and root['end'] < a+n for a, n in old['gaps']):
+        raise RecoveryRequired('Unallocated-space origin cannot be proven / 无法确认原未分配空间范围')
+    updated = bytearray(newtable)
+    updated[(root['n']-1)*128:root['n']*128] = oldtable[(root['n']-1)*128:root['n']*128]
+    struct.pack_into('<Q', updated, (data['n']-1)*128+40, prior['end'])
+    output = []
+    for raw, header, offset in ((current[0], 512, struct.unpack_from('<Q', current[0], 584)[0]*512),
+                                (current[1], len(current[1])-512, 0)):
+        raw = bytearray(raw); raw[offset:offset+len(updated)] = updated
+        struct.pack_into('<I', raw, header+88, zlib.crc32(updated))
+        struct.pack_into('<I', raw, header+16, 0)
+        length = struct.unpack_from('<I', raw, header+12)[0]
+        struct.pack_into('<I', raw, header+16, zlib.crc32(raw[header:header+length]))
+        output.append(bytes(raw))
+    verified = gpt.gpt_space(*output, sectors)
+    if any(p['name'] == name for p in verified['parts']):
+        raise RecoveryRequired('Root entry was not removed')
+    return output, prior, root, wipe
+
+
+def android_volume(adb, device):
+    source = adb.shell('readlink -f '+shlex.quote(device['storage']['SOURCE']), root=True).strip()
+    if not re.fullmatch(r'/dev/(?:block/)?(?:mmcblk\d+p\d+|dm-\d+)', source):
+        raise RecoveryRequired('Cannot identify Android data mapping / 无法确认 Android data 映射设备')
+    mapped = int(adb.shell('cat /sys/class/block/'+source.rsplit('/',1)[-1]+'/size', root=True).strip())*512
+    raw = adb.read('dd if='+source+' bs=1024 skip=1 count=1 2>/dev/null')
+    if len(raw) != 1024:
+        raise RecoveryRequired('Incomplete Android filesystem superblock / Android 文件系统超级块读取不完整')
+    if raw[56:58] == b'\x53\xef':
+        from .service import verify_ext4_capacity
+        size, kind = verify_ext4_capacity(raw, 0), 'ext4'
+    elif raw[:4] == bytes.fromhex('1020f5f2'):
+        shift = struct.unpack_from('<I', raw, 16)[0]
+        if shift != 12:
+            raise RecoveryRequired('Unsupported Android F2FS block size')
+        size, kind = struct.unpack_from('<Q', raw, 36)[0]*(1 << shift), 'f2fs'
+    else:
+        raise RecoveryRequired('Android data is not a readable ext4/F2FS filesystem / 无法读取 Android data 的 ext4/F2FS 文件系统')
+    if not 0 < size <= mapped <= device['userdata_bytes'] or mapped-size > 4 << 20:
+        raise RecoveryRequired('Android filesystem/mapping capacity differs / Android 文件系统或映射容量不符: '
+                               f'filesystem={size}, mapped={mapped}, userdata={device["userdata_bytes"]} bytes')
+    return {'source': source, 'mapped_bytes': mapped, 'filesystem_bytes': size, 'filesystem': kind,
+            'mapping_overhead': device['userdata_bytes']-mapped}
+
+
+def prepare(adapter, store, device):
+    if device.get('readiness') != 'ready' or not device.get('existing'):
+        raise RecoveryRequired('Boot rooted Android with an installed internal partition / 请先启动有 root 的 Android，并确认存在内置 OpenWrt 分区')
+    storage = device['storage']; total = storage['DISK_SIZE']
+    space = adapter.read_gpt(storage)
+    current = (space['first'], space['last'])
+    name = 'e5root' if adapter.kind == 'e5' else 'mu300root'
+    matches = []
+    for source in store.list():
+        if (source['choices'].get('method') != 'part' or source['device'].get('cid') != device['cid'] or
+                source['package'].get('adapter') != adapter.kind or source['device'].get('profile') != device['profile']):
+            continue
+        try:
+            folder = store.directory(source['id'])/'backup'
+            sums = json.loads((folder/'checksums.json').read_text())
+            for filename in ('gpt-first.bin','gpt-last.bin','identity.json'):
+                if not 0 < (folder/filename).stat().st_size <= 2 << 20 or sha(folder/filename) != sums[filename]:
+                    raise ValueError('Damaged original backup')
+            identity = json.loads((folder/'identity.json').read_text())
+            if identity['cid'] != device['cid'] or identity['storage']['DISK_SIZE'] != total:
+                raise ValueError('Original backup identity differs')
+            original = ((folder/'gpt-first.bin').read_bytes(), (folder/'gpt-last.bin').read_bytes())
+            after, data, root, wipe = restored_layout(original, current, total, name)
+            if source['plan']['openwrt_bytes'] != (root['end']-root['start']+1)*512:
+                raise ValueError('Installed root allocation differs')
+            if not wipe and source['plan'].get('gap_start') != root['start']:
+                raise ValueError('Recorded unallocated-space location differs')
+            matches.append((source, after, data, root, wipe))
+        except (OSError, ValueError, KeyError, RecoveryRequired):
+            continue
+    if not matches:
+        raise RecoveryRequired('No matching original installation record and verified GPT backup. Import the original recovery folder; do not use legacy uninstall scripts. / 缺少匹配的原安装记录和已校验 GPT 备份。请导入原安装备份目录；不要运行旧卸载脚本。')
+    # Conflicting historical layouts must be reviewed rather than guessed.
+    if any(item[1] != matches[0][1] for item in matches[1:]):
+        raise RecoveryRequired('Original records disagree about Android capacity / 原安装记录对 Android 容量的记载冲突')
+    source, after, data, root, wipe = matches[0]
+    node = storage['NODE'].split('p')[0]
+    if (storage['ROOT'] != node+'p'+str(root['n']) or storage['START'] != data['start'] or
+            storage['SIZE']*512 != device['userdata_bytes']):
+        raise RecoveryRequired('Kernel partition nodes differ from GPT; reboot Android / 内核分区节点与 GPT 不符，请重启 Android')
+    for bootname in ('boot_a','boot_b','misc'):
+        partition(space, bootname)
+    volume = android_volume(adapter.adb, device)
+    plan = {'method':'uninstall','target':storage['ROOT'],'wipe':wipe,'two_stage':True,'offline':True,
+            'grow':False, 'openwrt_bytes':(root['end']-root['start']+1)*512,
+            'android_bytes':(data['end']-data['start']+1)*512,
+            'previous_android_bytes':device['userdata_bytes'],
+            'reclaimed_bytes':(data['end']-data['start']+1)*512-device['userdata_bytes'],
+            'source_transaction':source['id']}
+    metadata = {'version':1,'total':total,'front':space['front'],'tail':space['tail'],
+                'root_start':root['start'],'root_size':root['end']-root['start']+1,
+                'nodes':{p['name']:node+'p'+str(p['n']) for p in space['parts']
+                         if p['name'] in ('userdata',name,'misc','boot_a','boot_b')}, 'volume':volume}
+    files = dict(zip(('before-first','before-last','after-first','after-last'), (*current,*after)))
+    return plan, metadata, files
+
+
+def persist(context, metadata, files):
+    folder = context.directory/'uninstall'; folder.mkdir(parents=True,exist_ok=True)
+    for name, data in files.items():
+        (folder/name).write_bytes(data)
+    metadata['checksums'] = {name:sha(folder/name) for name in files}
+    context.record['uninstall'] = metadata
+    context.store.save(context.record)
+
+
+class Uninstaller:
+    def __init__(self, service, context, adapter):
+        self.service, self.ctx, self.adapter = service, context, adapter
+        self.r = context.record
+        self.meta = self.r['uninstall']
+        self.folder = context.directory/'uninstall'
+        self.files = {}
+        for name, expected in self.meta['checksums'].items():
+            if (name not in ('before-first','before-last','after-first','after-last') or
+                    not 0 < (self.folder/name).stat().st_size <= 2 << 20 or sha(self.folder/name) != expected):
+                raise RecoveryRequired('Uninstall snapshot is damaged / 卸载分区快照损坏')
+            self.files[name] = (self.folder/name).read_bytes()
+        self.validate_snapshots()
+
+    def validate_snapshots(self):
+        """Imported journals must prove the same limited edits, not just hashes."""
+        required = {'before-first','before-last','after-first','after-last'}
+        if set(self.files) != required or self.meta.get('version') != 1 or self.r['plan'].get('method') != 'uninstall':
+            raise RecoveryRequired('Incomplete uninstall journal / 卸载记录不完整')
+        storage = self.r['device']['storage']
+        total = storage['DISK_SIZE']
+        before = (self.files['before-first'],self.files['before-last'])
+        after = (self.files['after-first'],self.files['after-last'])
+        family = self.r['package']['adapter']
+        name = 'e5root' if family == 'e5' else 'mu300root'
+        calculated, prior, root, wipe = restored_layout(after,before,total,name)
+        info = gpt.gpt_space(*before,total)
+        data = partition(info,'userdata')
+        disk = storage['NODE'].split('p')[0]
+        expected_nodes = {label:disk+'p'+str(partition(info,label)['n'])
+                          for label in ('userdata',name,'misc','boot_a','boot_b')}
+        if (calculated != list(after) or self.meta['total'] != total or self.meta['front'] != info['front'] or
+                self.meta['tail'] != info['tail'] or self.meta['nodes'] != expected_nodes or
+                self.meta['root_start'] != root['start'] or self.meta['root_size'] != root['end']-root['start']+1 or
+                storage['NODE'] != expected_nodes['userdata'] or storage['START'] != data['start'] or
+                storage['SIZE'] != data['end']-data['start']+1 or
+                self.r['device']['userdata_bytes'] != storage['SIZE']*512 or
+                self.r['plan']['previous_android_bytes'] != storage['SIZE']*512 or
+                self.r['plan']['target'] != expected_nodes[name] or self.r['plan']['wipe'] is not wipe or
+                self.r['plan']['android_bytes'] != (prior['end']-prior['start']+1)*512 or
+                self.r['plan']['reclaimed_bytes'] != self.r['plan']['android_bytes']-storage['SIZE']*512 or
+                self.r['plan']['openwrt_bytes'] != (root['end']-root['start']+1)*512):
+            raise RecoveryRequired('Uninstall plan/snapshot geometry differs / 卸载计划与分区快照范围不符')
+
+    def current(self):
+        adb = self.adapter.adb
+        disk = '/dev/block/'+self.r['device']['storage']['NODE'].split('p')[0]
+        front, tail, total = (self.meta[k] for k in ('front','tail','total'))
+        return (adb.read(f'dd if={disk} bs=512 count={front} 2>/dev/null'),
+                adb.read(f'dd if={disk} bs=512 skip={tail} count={total-tail} 2>/dev/null'))
+
+    def layout_state(self):
+        first, last = self.current()
+        if (first,last) == (self.files['after-first'],self.files['after-last']):
+            return 'after'
+        if (first,last) == (self.files['before-first'],self.files['before-last']):
+            return 'before'
+        raise RecoveryRequired('GPT is changed or partially written. Keep backups; offline recovery is required. / GPT 已变化或写入不完整，请保留备份并进行离线恢复；不会自动重跑卸载。')
+
+    def ready(self):
+        device = self.adapter.probe(self.r['device']['serial'], 'uninstall')
+        if device.get('readiness') == 'ready' and any(
+                device.get(k) != self.r['device'].get(k) for k in ('cid','profile','slot')):
+            raise RecoveryRequired('Uninstall device or Android slot changed / 卸载设备身份或 Android 槽位发生变化')
+        return device
+
+    def arm(self, device):
+        from .adapter import debug_output
+        adb = self.adapter.adb
+        slot = device['slot'].removeprefix('_'); other = 'b' if slot == 'a' else 'a'
+        with debug_output(self.ctx):
+            if not self.r.get('uninstall_retry_linux_sha256'):
+                inspect_linux_boot(adb.read, int(adb.shell('blockdev --getsize64 /dev/block/by-name/boot_'+other,root=True)), self.adapter.kind, other)
+            self.adapter.backup(device)
+        self.ctx.stage('uninstall_prepare')
+        if self.layout_state() != 'before':
+            raise RecoveryRequired('Layout changed during backup')
+        backup = self.ctx.directory/'backup'
+        before = (backup/'misc.bin').read_bytes()[:4096]
+        if len(before) != 4096 or before[:32].strip(b'\0'):
+            raise RecoveryRequired('A recovery operation is already pending / 设备已有待执行的 Recovery 操作')
+        control = before[2048:2080]
+        trial = trial_control(control, slot)
+        android = bytearray(control); android[:4] = ('_'+slot).encode()+b'\0\0'
+        android[12], android[14] = (0x9f,0x1e) if slot == 'a' else (0x1e,0x9f)
+        struct.pack_into('<I',android,28,zlib.crc32(android[:28]))
+        bcb = bytearray(2048); bcb[:13] = b'boot-recovery'
+        message = b'recovery\n--wipe_data\n--reason=openwrt-uninstall\n'
+        bcb[64:64+len(message)] = message
+        boot_bytes = (backup/('boot_'+slot+'.bin')).stat().st_size
+        android_sha = sha(backup/('boot_'+slot+'.bin'))
+        if boot_bytes != 64 << 20 or (backup/('boot_'+other+'.bin')).stat().st_size != boot_bytes:
+            raise RecoveryRequired('Unsupported boot partition sizes')
+        with (backup/('boot_'+slot+'.bin')).open('rb') as stream:
+            android_header = stream.read(4096)
+        with (backup/('boot_'+other+'.bin')).open('rb') as stream:
+            linux_header = stream.read(4096)
+        if android_header[:8] != b'ANDROID!' or android_header == linux_header:
+            raise RecoveryRequired('Current Android boot cannot be distinguished from Linux / 无法区分当前 Android 与 Linux 启动镜像')
+        nodes = self.meta['nodes']; rootname = 'e5root' if self.adapter.kind == 'e5' else 'mu300root'
+        request = [device['cid'],device['storage']['NODE'].split('p')[0],nodes['userdata'],nodes[rootname],
+                   nodes['misc'],nodes['boot_'+slot],nodes['boot_'+other]]
+        request += [self.meta[k] for k in ('total','front','tail','root_start','root_size')]
+        request += [int(self.r['plan']['wipe']),boot_bytes,android_sha]
+        files = {'openwrt-uninstall/'+name:content for name,content in self.files.items()}
+        files.update({'openwrt-uninstall/request':(':'.join(map(str,request))+'\n').encode(),
+                      'openwrt-uninstall/before-bcb':before[:2048],
+                      'openwrt-uninstall/recovery-bcb':bytes(bcb),'openwrt-uninstall/android-bc':bytes(android)})
+        files['openwrt-uninstall/SHA256SUMS'] = ''.join(hashlib.sha256(content).hexdigest()+'  '+name.split('/')[-1]+'\n'
+            for name,content in files.items()).encode()
+        if self.adapter.kind == 'e5':
+            base = (self.adapter.root/'files/boot.img').read_bytes()
+        else:
+            base = self.adapter.legacy.payload_file(self.adapter.root,'boot-linux.img').read_bytes()
+        image = build(base,self.adapter.kind,files)
+        path = self.folder/'boot-uninstall.img'; path.write_bytes(image)
+        (self.folder/'trial.bin').write_bytes(trial)
+        remote = '/data/local/tmp/openwrt-uninstall-'+self.r['id']
+        self.r['uninstall_remote'] = remote
+        self.r['uninstall_boot_sha256'] = sha(path)
+        self.r['uninstall_android_sha256'] = android_sha
+        self.r['uninstall_trial_sha256'] = hashlib.sha256(trial).hexdigest()
+        self.ctx.store.save(self.r)
+        adb.shell('umask 077; mkdir -p '+remote+'; chown 2000:2000 '+remote+'; chmod 700 '+remote,root=True)
+        for local, name in ((path,'boot.img'),(self.folder/'trial.bin','trial.bin')):
+            push_chunks(adb.call,lambda script:adb.shell(script,root=True),local,remote+'/'+name,self.ctx)
+        bootdev = '/dev/block/by-name/boot_'+other
+        disk = '/dev/block/'+device['storage']['NODE'].split('p')[0]
+        layout_checks = (
+            f'[ "$(dd if={disk} bs=512 count={self.meta["front"]} | sha256sum | cut -d" " -f1)" = {hashlib.sha256(self.files["before-first"]).hexdigest()} ]; '
+            f'[ "$(dd if={disk} bs=512 skip={self.meta["tail"]} count={self.meta["total"]-self.meta["tail"]} | sha256sum | cut -d" " -f1)" = {hashlib.sha256(self.files["before-last"]).hexdigest()} ]; ')
+        script = ('set -eu; set -o pipefail; '
+                  '[ "$(getprop ro.boot.slot_suffix)" = "_'+slot+'" ]; '
+                  + layout_checks +
+                  '[ "$(sha256sum /dev/block/by-name/boot_'+slot+' | cut -d" " -f1)" = '+android_sha+' ]; '
+                  '[ "$(sha256sum '+bootdev+' | cut -d" " -f1)" = '+self.r.get('uninstall_retry_linux_sha256',sha(backup/('boot_'+other+'.bin')))+' ]; '
+                  'dd if='+bootdev+' of='+remote+'/before-boot.img bs=1048576; '
+                  'dd if=/dev/block/by-name/misc of='+remote+'/before-bc bs=1 skip=2048 count=32; '
+                  '[ "$(sha256sum '+remote+'/before-bc | cut -d" " -f1)" = '+hashlib.sha256(control).hexdigest()+' ]; '
+                  'dd if='+remote+'/boot.img of='+bootdev+' bs=1048576 conv=fsync; '
+                  '[ "$(sha256sum '+bootdev+' | cut -d" " -f1)" = '+sha(path)+' ]; '
+                  'if dd if='+remote+'/trial.bin of=/dev/block/by-name/misc bs=1 seek=2048 count=32 conv=notrunc,fsync && '
+                  '[ "$(dd if=/dev/block/by-name/misc bs=1 skip=2048 count=32 | sha256sum | cut -d" " -f1)" = '+hashlib.sha256(trial).hexdigest()+' ]; then :; '
+                  'else dd if='+remote+'/before-bc of=/dev/block/by-name/misc bs=1 seek=2048 count=32 conv=notrunc,fsync; exit 1; fi')
+        self.ctx.stage('uninstall_prepare')
+        def commit_boot():
+            # Cancellation is deferred by Context.effect. Do not terminate a
+            # boot write because a host-side command deadline expired.
+            adb.shell(script,root=True,timeout=None)
+            self.r['uninstall_armed'] = True
+            self.ctx.store.save(self.r)
+        self.ctx.effect('uninstall-arm',commit_boot)
+        self.ctx.stage('uninstall_offline','waiting_device',reboot_manually=False)
+        try:
+            adb.call('reboot')
+        except (ConnectionError,OSError,subprocess.TimeoutExpired):
+            self.ctx.log('Expected ADB loss after the verified offline uninstall request',scope='uninstall')
+
+    def run(self):
+        armed = self.r['effects'].get('uninstall-arm')
+        if armed and armed['state'] != 'done':
+            armed = self.recover_arm()
+        if not armed:
+            device = self.ready()
+            if device.get('readiness') != 'ready':
+                raise RecoveryRequired('Android/root is not ready; no uninstall request written / Android 或 root 尚未就绪，未写入卸载请求')
+            if self.layout_state() != 'before':
+                raise RecoveryRequired('Unconfirmed layout changed; create a new plan')
+            self.arm(device)
+        else:
+            self.r['uninstall_armed'] = True
+        while True:
+            self.ctx.boundary()
+            try:
+                device = self.ready()
+                readiness = device.get('readiness','android_boot')
+                if readiness != 'ready':
+                    self.ctx.stage(readiness,'waiting_device' if readiness == 'android_boot' else 'waiting_user')
+                elif device.get('boot_id') == self.r['device'].get('boot_id'):
+                    self.ctx.stage('uninstall_offline','waiting_user',reboot_manually=True)
+                elif self.layout_state() == 'before':
+                    raise RecoveryRequired('Android returned before offline removal completed. Keep backups and export diagnostics. / Android 已返回但离线卸载未完成，请保留备份并导出诊断。')
+                else:
+                    break
+            except (ConnectionError,OSError,TimeoutError,subprocess.TimeoutExpired):
+                self.ctx.stage('uninstall_offline','waiting_device',reboot_manually=False)
+            if self.service.stop.wait(3):
+                raise Cancelled()
+        # No reboot is expected during final checks/boot cleanup. A command or
+        # write failure here must be reported, rather than hidden in a wait loop.
+        return self.finish(device)
+
+    def recover_arm(self):
+        """Recover boot staging by exact readback; never replay a completed GPT edit."""
+        if (not re.fullmatch('[a-f0-9]{64}',self.r.get('uninstall_boot_sha256','')) or
+                not (self.folder/'trial.bin').is_file() or not (self.ctx.directory/'backup/misc.bin').is_file()):
+            raise RecoveryRequired('Uninstall staging was interrupted without sufficient readback evidence / 卸载准备中断且回读证据不足，请保留备份恢复')
+        while True:
+            self.ctx.boundary()
+            try:
+                device = self.ready()
+                readiness = device.get('readiness','android_boot')
+                if readiness == 'ready':
+                    break
+                self.ctx.stage(readiness,'waiting_device' if readiness == 'android_boot' else 'waiting_user')
+            except (ConnectionError,OSError,TimeoutError,subprocess.TimeoutExpired):
+                self.ctx.stage('android_boot','waiting_device')
+            if self.service is None:
+                raise RecoveryRequired('Reconnect rooted Android to inspect the interrupted boot write / 请连接有 root 的 Android，复核中断的启动写入')
+            if self.service.stop.wait(3):
+                raise Cancelled()
+        state = self.layout_state()
+        if state == 'before':
+            adb = self.adapter.adb
+            slot = device['slot'].removeprefix('_'); other = 'b' if slot == 'a' else 'a'
+            original = (self.ctx.directory/'backup/misc.bin').read_bytes()[2048:2080]
+            trial = (self.folder/'trial.bin').read_bytes()
+            checksums = json.loads((self.ctx.directory/'backup/checksums.json').read_text())
+            if (sha(self.ctx.directory/'backup/misc.bin') != checksums.get('misc.bin') or
+                    hashlib.sha256(trial).hexdigest() != self.r.get('uninstall_trial_sha256')):
+                raise RecoveryRequired('Interrupted uninstall backups are damaged / 中断卸载的备份损坏')
+            bc = adb.read('dd if=/dev/block/by-name/misc bs=1 skip=2048 count=32 2>/dev/null')
+            active = adb.shell('sha256sum /dev/block/by-name/boot_'+slot,root=True).split()[0]
+            target = adb.shell('sha256sum /dev/block/by-name/boot_'+other,root=True).split()[0]
+            if active != self.r.get('uninstall_android_sha256') or not re.fullmatch('[a-f0-9]{64}',target):
+                raise RecoveryRequired('Android boot identity changed during interrupted uninstall / 中断卸载期间 Android 启动身份已变化')
+            if bc == original:
+                # Explicit resume, unchanged GPT/misc/Android: only the inactive
+                # boot write is retried. No partition or recovery request ran.
+                self.r['uninstall_retry_linux_sha256'] = target
+                self.r['effects'].pop('uninstall-arm')
+                self.r['unsafe'] = False
+                self.ctx.store.save(self.r)
+                self.ctx.log('Verified original GPT, misc and Android boot; retrying inactive boot staging only',scope='recovery')
+                return None
+            if bc != trial or target != self.r.get('uninstall_boot_sha256'):
+                raise RecoveryRequired('Interrupted boot/misc readback is not recognized / 中断的 boot/misc 回读不符合已保存记录，请保留备份恢复')
+        self.r['effects']['uninstall-arm'] = {'state':'done','time':time.time(),'result':'verified by recovery readback'}
+        if 'uninstall-arm' not in self.r['completed']:
+            self.r['completed'].append('uninstall-arm')
+        self.r['unsafe'] = False
+        self.r['uninstall_armed'] = True
+        self.ctx.store.save(self.r)
+        return self.r['effects']['uninstall-arm']
+
+    def finish(self, device):
+        self.ctx.stage('verify_android')
+        if device.get('existing') or device['userdata_bytes'] != self.r['plan']['android_bytes']:
+            raise RecoveryRequired('Android partition capacity was not restored / Android 分区容量未恢复')
+        volume = android_volume(self.adapter.adb,device)
+        expected = device['userdata_bytes']-self.meta['volume']['mapping_overhead']
+        self.r['android_capacity_check'] = {**volume,'expected_mapped_bytes':expected}
+        self.ctx.log(json.dumps(self.r['android_capacity_check']),scope='capacity')
+        if abs(volume['mapped_bytes']-expected) > 4 << 20 or not expected-(4 << 20) <= volume['filesystem_bytes'] <= expected:
+            raise RecoveryRequired('Android filesystem has not reached the restored allocation / Android 文件系统尚未达到恢复后的分配容量: '
+                                   f'{volume["filesystem_bytes"]} != {expected} bytes')
+        # The request must have been consumed by stock recovery, not just a GPT
+        # enlargement followed by a boot of the previous smaller filesystem.
+        adb = self.adapter.adb
+        bcb = adb.read('dd if=/dev/block/by-name/misc bs=2048 count=1 2>/dev/null')
+        if len(bcb) != 2048 or bcb[:32].strip(b'\0'):
+            raise RecoveryRequired('Recovery reset is still pending / 原厂 Recovery 重置尚未完成')
+        self.finish_boot(device)
+        remote = '/data/local/tmp/openwrt-uninstall-'+self.r['id']
+        try:
+            # Fixed filenames in this transaction's own staging directories.
+            # Never recursively remove userdata paths or other installations.
+            adb.shell('rm -f '+remote+'/boot.img '+remote+'/trial.bin '+remote+'/before-boot.img '+remote+'/before-bc '+
+                      remote+'-finish/android-bc; rmdir '+remote+' '+remote+'-finish 2>/dev/null || true',root=True)
+        except (OSError,ConnectionError,TimeoutError) as error:
+            self.ctx.log('Uninstall verified; temporary staging cleanup can be retried: '+str(error),level='warning',scope='cleanup')
+        self.r['result'] = {'uninstalled':True,'filesystem_bytes':volume['filesystem_bytes'],
+                            'android_bytes':device['userdata_bytes'],'reclaimed_bytes':self.r['plan']['reclaimed_bytes'],
+                            'released_bytes':self.r['plan']['openwrt_bytes'],
+                            'backup_directory':str(self.ctx.directory/'backup'),'url':'','temporary':False}
+        self.ctx.stage('complete','completed')
+
+    def finish_boot(self, device):
+        """Verify/finish only inactive boot and default selection after Android is back."""
+        adb = self.adapter.adb
+        slot = device['slot'].removeprefix('_'); other = 'b' if slot == 'a' else 'a'
+        bc = adb.read('dd if=/dev/block/by-name/misc bs=1 skip=2048 count=32 2>/dev/null')
+        if (len(bc) != 32 or bc[4:8] != b'BCAB' or bc[8] != 1 or bc[9]&7 != 2 or
+                zlib.crc32(bc[:28]) != struct.unpack_from('<I',bc,28)[0] or
+                not bc[12 if slot == 'a' else 14]&0x80 or bc[13]&1 or bc[15]&1):
+            raise RecoveryRequired('Android boot control is not healthy / Android 启动控制尚未就绪')
+        desired = bytearray(bc); desired[:4] = ('_'+slot).encode()+b'\0\0'
+        current_index,other_index = (12,14) if slot == 'a' else (14,12)
+        if (bc[other_index]&15 > bc[current_index]&15 and
+                ((bc[other_index]>>4)&7 > 1 or bc[other_index]&0x80)):
+            raise RecoveryRequired('Another Android slot update is pending / 另一 Android 槽位存在待执行更新，请先处理')
+        desired[12],desired[14] = (0x9f,0x1e) if slot == 'a' else (0x1e,0x9f)
+        struct.pack_into('<I',desired,28,zlib.crc32(desired[:28]))
+        values = adb.shell('sha256sum /dev/block/by-name/boot_'+slot+' /dev/block/by-name/boot_'+other,root=True).splitlines()
+        if len(values) != 2 or any(not re.fullmatch('[a-f0-9]{64}',row.split()[0]) for row in values):
+            raise RecoveryRequired('Cannot verify restored Android boot')
+        source_hash, target_hash = (row.split()[0] for row in values)
+        if source_hash != self.r.get('uninstall_android_sha256'):
+            # Restoring Magisk after a reset can legitimately change Android's
+            # boot. Back up that working image before copying it to the other slot.
+            post_reset = self.ctx.directory/'backup/boot-android-after-reset.bin'
+            adb.backup_partition('boot_'+slot,post_reset,self.ctx)
+            checksums = json.loads((self.ctx.directory/'backup/checksums.json').read_text())
+            checksums[post_reset.name] = sha(post_reset)
+            atomic_json(self.ctx.directory/'backup/checksums.json',checksums)
+        if source_hash == target_hash and bc == desired:
+            entry = self.r['effects'].get('uninstall-final-boot')
+            if entry:
+                entry.update(state='done',result='verified by readback')
+                self.r['unsafe'] = False
+                self.ctx.store.save(self.r)
+            return
+        self.ctx.stage('uninstall_restore_boot')
+        remote = '/data/local/tmp/openwrt-uninstall-'+self.r['id']+'-finish'
+        adb.shell('umask 077; mkdir -p '+remote+'; chown 2000:2000 '+remote+'; chmod 700 '+remote,root=True)
+        local = self.folder/'android-final-bc'; local.write_bytes(desired)
+        push_chunks(adb.call,lambda script:adb.shell(script,root=True),local,remote+'/android-bc',self.ctx)
+        if self.r['effects'].get('uninstall-final-boot'):
+            # The restored GPT/FS and current Android were verified above.
+            # Repeating a copy to its inactive slot is safe; no reset is armed.
+            self.r['effects'].pop('uninstall-final-boot')
+            self.ctx.log('Retrying verified inactive Android boot restoration; no partition/reset replay',scope='recovery')
+        script = ('set -eu; [ "$(getprop ro.boot.slot_suffix)" = "_'+slot+'" ]; '
+                  '[ "$(sha256sum /dev/block/by-name/boot_'+slot+' | cut -d" " -f1)" = '+source_hash+' ]; '
+                  'dd if=/dev/block/by-name/boot_'+slot+' of=/dev/block/by-name/boot_'+other+' bs=1048576 conv=fsync; '
+                  '[ "$(sha256sum /dev/block/by-name/boot_'+other+' | cut -d" " -f1)" = '+source_hash+' ]; '
+                  'dd if='+remote+'/android-bc of=/dev/block/by-name/misc bs=1 seek=2048 count=32 conv=notrunc,fsync; '
+                  '[ "$(dd if=/dev/block/by-name/misc bs=1 skip=2048 count=32 | sha256sum | cut -d" " -f1)" = '+hashlib.sha256(desired).hexdigest()+' ]')
+        self.ctx.effect('uninstall-final-boot',lambda:adb.shell(script,root=True,timeout=None))

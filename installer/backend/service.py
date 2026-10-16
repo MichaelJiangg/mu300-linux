@@ -19,8 +19,9 @@ from .adapter import Adapter, installation_committed
 from .package import inspect_package
 from .state import Cancelled, Context, DeviceLock, Pending, RecoveryRequired, Store, compatible
 from .transport import Adb, wireless_serial
+from .uninstall import Uninstaller, prepare as prepare_uninstall, persist as persist_uninstall
 
-METHODS = {'tf', 'part', 'reinstall', 'image', 'boot', 'update'}
+METHODS = {'tf', 'part', 'reinstall', 'image', 'boot', 'update', 'uninstall'}
 
 
 def plan_install(package, device, choices):
@@ -29,15 +30,18 @@ def plan_install(package, device, choices):
         raise ValueError('Unknown installation method')
     if device.get('readiness') != 'ready':
         raise ValueError('Device is not ready / 设备尚未就绪')
+    if method == 'uninstall':
+        raise ValueError('Uninstall requires verified original installation backups / 卸载需要验证原安装备份')
     if method == 'update':
         return {'method': method, 'wipe': False, 'openwrt_bytes': device['capacity'], 'two_stage': False,
-                'preserves_settings': True, 'host': choices['host']}
+                'preserves_settings': True, 'host': choices['host'], 'grow': True}
     size = choices.get('size_gib', 4)
     if type(size) not in (float, int) or not math.isfinite(size) or size <= 0:
         raise ValueError('Size must be a positive number / 容量必须为正数')
     size_bytes = math.ceil(size*1024/4)*4*(1 << 20)
     plan = {'method': method, 'wipe': False, 'two_stage': False, 'openwrt_bytes': size_bytes,
-            'android_bytes': device['userdata_bytes'], 'grow': choices.get('grow', True),
+            'android_bytes': device['userdata_bytes'],
+            'grow': choices.get('grow', True) if method in ('part','reinstall') else True,
             'target': None, 'data_impact': method}
     storage = device['storage']
     if method == 'boot':
@@ -152,7 +156,7 @@ class Service:
         if command == 'diagnostics':
             record = self.store.load(p['transaction'])
             ctx = Context(self.store, record, lambda *_:None)
-            header = {key:record.get(key) for key in ('version','revision','stage','status','choices','plan','completed','error')}
+            header = {key:record.get(key) for key in ('version','revision','stage','status','choices','plan','completed','error','capacity_check','android_capacity_check')}
             header['model'] = record['device'].get('model')
             header['package'] = {key:record['package'].get(key) for key in ('adapter','profile','kernel','layout')}
             parts = ['OpenWrt Installer diagnostics (redacted)\n'+ctx.sanitize(json.dumps(header,ensure_ascii=False,indent=2))]
@@ -169,7 +173,7 @@ class Service:
             if self.worker and self.worker.is_alive():
                 record = self.active.record if self.active else {}
                 if (record.get('unsafe') or record.get('status') not in ('waiting_user','waiting_device') or
-                        record.get('stage') not in ('android_boot','android_setup','usb_debugging',
+                        record.get('stage') not in ('uninstall_offline','android_boot','android_setup','usb_debugging',
                                                     'debug_authorization','magisk','root_permission')):
                     raise ValueError('Pause before changing ADB connections / 请先暂停任务，再更改 ADB 连接')
             return Adb(self.package_root).connect(p.get('address'))
@@ -207,13 +211,35 @@ class Service:
             choices = p['choices']
             if choices.get('method') == 'update':
                 device = self.probe_update(p)
+            elif choices.get('method') == 'uninstall':
+                uninstall_adapter = self.adapter()
+                device = uninstall_adapter.probe(p['serial'], 'uninstall')
             else:
-                device = self.adapter().probe(p['serial'], choices['method'])
-            plan = plan_install(self.package, device, choices)
+                plan_adapter = self.adapter()
+                device = plan_adapter.probe(p['serial'], choices['method'])
+            if choices.get('method') != 'update' and device.get('readiness') == 'ready':
+                active_slot = device.get('slot')
+                if active_slot not in ('_a','_b'):
+                    raise ValueError('Cannot identify current Android slot')
+                probe_adapter = uninstall_adapter if choices.get('method') == 'uninstall' else plan_adapter
+                other = 'b' if active_slot == '_a' else 'a'
+                header = probe_adapter.adb.read('dd if=/dev/block/by-name/boot_'+other+' bs=512 count=8 2>/dev/null')
+                if len(header) != 4096:
+                    raise ValueError('Incomplete opposite boot header / 另一启动槽读取不完整')
+                pending = any(item['choices'].get('method') == 'uninstall' and item['device'].get('cid') == device.get('cid')
+                              and item['status'] != 'completed' and item['effects'].get('uninstall-arm') for item in self.store.list())
+                if pending or b'openwrt.uninstall=1' in header[44:1580].split(b'\0',1)[0].split():
+                    raise RecoveryRequired('Uninstall is already pending. Resume/import its saved record; do not create another operation. / 已有未完成的卸载，请继续或导入卸载记录，不要创建新操作。')
+            if choices.get('method') == 'uninstall':
+                plan, uninstall_metadata, uninstall_files = prepare_uninstall(uninstall_adapter, self.store, device)
+            else:
+                plan = plan_install(self.package, device, choices)
             record = self.store.create(self.package, device, choices, plan)
             record['data_directory'] = str(self.store.directory(record['id']))
             record['secrets'] = {'wifi_key': secrets.token_urlsafe(12)}
             self.store.save(record)
+            if choices.get('method') == 'uninstall':
+                persist_uninstall(Context(self.store, record, lambda *_:None), uninstall_metadata, uninstall_files)
             return self.public(record)
         if command in ('start', 'resume', 'retry'):
             record = self.store.load(p['transaction'])
@@ -227,6 +253,9 @@ class Service:
                 raise ValueError('Confirm the displayed plan / 请确认安装计划')
             if command != 'start' and record['status'] == 'ready':
                 raise ValueError('This plan has not been confirmed / 此计划尚未确认')
+            if (command != 'start' and record['choices']['method'] == 'uninstall' and
+                    p.get('serial') and p['serial'] != record['device']['serial']):
+                self.rebind_uninstall(record, p['serial'], current)
             self.store.save(record)
             context = Context(self.store, record, self.emit)
             context.private.append(p.get('password', ''))
@@ -272,6 +301,22 @@ class Service:
             self.store.save(record)
             return self.public(record)
         raise ValueError('Unsupported command / 不支持的命令')
+
+    def rebind_uninstall(self, record, serial, package):
+        """Explicit paused-resume transport selection, bound to the original hardware."""
+        if not isinstance(serial,str) or not serial or len(serial)>512 or '\0' in serial:
+            raise ValueError('Select a connected device / 请选择已连接的设备')
+        with ExitStack() as locks:
+            for identity in sorted({serial,record['device']['cid']}):
+                locks.enter_context(DeviceLock(self.store.base,identity))
+            actual = self.adapter(package).probe(serial,'uninstall')
+            if actual.get('readiness') != 'ready':
+                raise ValueError('Finish Android setup, debugging and root before selecting the new connection / 请先完成 Android 初始化、调试授权和 root，再选择新连接')
+            if any(actual.get(key) != record['device'].get(key) for key in ('cid','profile','slot')):
+                raise RecoveryRequired('Selected connection belongs to another device or Android slot / 所选连接并非原设备或 Android 槽位不符')
+            record.setdefault('transport_history',[]).append({'serial':record['device']['serial'],'changed_at':time.time()})
+            record['device']['serial'] = serial
+            self.store.save(record)
 
     def probe_update(self, p):
         import paramiko
@@ -321,6 +366,8 @@ class Service:
             with ExitStack() as locks:
                 for identity in sorted({r['device']['serial'], r['device']['cid']}):
                     locks.enter_context(DeviceLock(self.store.base, identity))
+                if r['choices']['method'] == 'uninstall':
+                    return Uninstaller(self, context, adapter).run()
                 if r['stage'] in ('openwrt_boot', 'verify_capacity') or installation_committed(r):
                     self.openwrt_wait_stage(context)
                     return self.wait_openwrt(context, adapter)
@@ -356,9 +403,10 @@ class Service:
             for private in (r['device'].get('serial'), r['device'].get('cid'), adapter.password,
                             r.get('secrets', {}).get('wifi_key')):
                 if private: message = message.replace(private, '[redacted]')
-            r['error'] = {'code': 'recovery_required' if isinstance(error, RecoveryRequired) else 'operation_failed',
+            r['error'] = {'code': ('recovery_required' if isinstance(error, RecoveryRequired) else
+                                   'capacity_mismatch' if isinstance(error, FilesystemCapacityError) else 'operation_failed'),
                           'message': message,
-                          'retryable': not r['unsafe'] or bool(r.get('legacy'))}
+                          'retryable': not r['unsafe'] or bool(r.get('legacy')) or r['choices']['method'] == 'uninstall'}
             context.stage(r['stage'], 'failed')
 
     def wait_android(self, context, adapter):
@@ -452,7 +500,27 @@ class Service:
                 if not re.fullmatch(r'/dev/(?:block/)?(?:mmcblk\d+(?:p\d+)?|loop\d+)', dev):
                     raise ValueError('Cannot identify installed root block device')
                 raw = read_bytes(f'dd if={dev} bs=1024 skip=1 count=1 2>/dev/null')
-                capacity = verify_ext4_capacity(raw, r['plan']['openwrt_bytes'] if r['plan'].get('grow', True) else 0)
+                # Older records may store the growth choice only in choices.
+                # Never interpret an explicit no-grow installation as a failed resize.
+                grow = (r['plan'].get('grow', r['choices'].get('grow', True))
+                        if r['choices']['method'] in ('part', 'reinstall') else True)
+                expected = r['plan']['openwrt_bytes'] if grow else 0
+                capacity = verify_ext4_capacity(raw, 0)
+                r['capacity_check'] = {'device': dev, 'filesystem_bytes': capacity,
+                                       'allocated_bytes': r['plan']['openwrt_bytes'],
+                                       'expected_bytes': expected, 'grow': grow,
+                                       'adapter': r['package']['adapter'], 'model': r['device']['model'],
+                                       'method': r['choices']['method'], 'status': 'checking'}
+                try:
+                    verify_ext4_capacity(raw, expected)
+                except FilesystemCapacityError:
+                    r['capacity_check']['status'] = 'mismatch'
+                    raise
+                else:
+                    r['capacity_check']['status'] = 'verified'
+                finally:
+                    self.store.save(r)
+                    context.log(json.dumps(r['capacity_check'], ensure_ascii=False), scope='capacity')
                 # Mounted and usable, not just a larger partition entry.
                 read('test -s /etc/openwrt_release && test -x /sbin/init')
                 r['result'] = {'filesystem_bytes': capacity, 'url': 'http://'+host,
@@ -485,6 +553,17 @@ class Service:
                 if self.stop.wait(.1):raise Cancelled()
 
 
+class FilesystemCapacityError(ValueError):
+    def __init__(self, actual, expected):
+        self.actual, self.expected = actual, expected
+        super().__init__(
+            f'Filesystem capacity differs from allocation / 文件系统容量与分配不符: {actual} != {expected}. '
+            f'Actual / 实际 {actual/(1 << 30):.2f} GiB; expected / 预期 {expected/(1 << 30):.2f} GiB. '
+            'OpenWrt has started, but capacity verification is incomplete. Keep the system and backups; '
+            'copy diagnostics for review. Retrying only rechecks capacity. / '
+            'OpenWrt 已启动，但容量校验未通过。请保留当前系统和备份，复制诊断日志；重试只复核容量。')
+
+
 def verify_ext4_capacity(superblock, expected):
     import struct
     if len(superblock) < 340 or superblock[56:58] != b'\x53\xef':
@@ -494,8 +573,10 @@ def verify_ext4_capacity(superblock, expected):
     if shift > 6:
         raise ValueError('Invalid ext4 block size')
     capacity = blocks*(1024 << shift)
-    if capacity <= 0 or expected and not expected-(4 << 20) <= capacity <= expected:
-        raise ValueError(f'Filesystem capacity differs from allocation / 文件系统容量与分配不符: {capacity} != {expected}')
+    if capacity <= 0:
+        raise ValueError('Invalid ext4 filesystem capacity / ext4 文件系统容量无效')
+    if expected and not expected-(4 << 20) <= capacity <= expected:
+        raise FilesystemCapacityError(capacity, expected)
     return capacity
 
 

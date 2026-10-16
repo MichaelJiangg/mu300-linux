@@ -335,6 +335,10 @@ class WifiBand(ShellTest):
 
 
 class Buttons(ShellTest):
+    def setUp(self):
+        super().setUp()
+        self.stub('mu300-device', 'echo "${TEST_BUTTON_DEVICE:-f50}"')
+
     def test_actions(self):
         self.stub('mu300-keys', 'cat "$STUBLOG/keys.in"')
         for name in ('mu300-led', 'mu300-wifi-band', 'systemctl', 'logger', 'poweroff'):
@@ -353,6 +357,29 @@ class Buttons(ShellTest):
                 self.assertEqual(r.returncode, 0, r.stderr)
                 calls = (self.tmp / 'calls').read_text().splitlines() if (self.tmp / 'calls').exists() else []
                 self.assertEqual([c for c in calls if not c.startswith('logger')], want, event)
+
+    def test_u30air_band_requires_two_short_presses(self):
+        for name in ('mu300-led', 'mu300-wifi-band', 'systemctl', 'logger', 'poweroff'):
+            self.stub(name, f'echo "{name} $*" >> "$STUBLOG/calls"; [ "{name} $*" != "systemctl is-active --quiet mu300-hotspot" ]')
+        self.stub('date', 'echo "unexpected wall-clock read" >&2; exit 99')
+        cases = [
+            ('echo "138 short"', 0, 0),
+            ('echo "138 short"; sleep 0.08; echo "138 short"', 1, 0),
+            ('echo "138 short"; sleep 0.65; echo "138 short"', 0, 0),
+            ('echo "138 short"; sleep 0.08; echo "138 short"; sleep 0.08; echo "138 short"', 1, 0),
+            ('echo "138 short"; echo "138 long"; echo "138 short"', 0, 1),
+            ('echo "138 short"; echo "116 short"; echo "138 short"', 0, 0),
+        ]
+        for shell in self.each_shell():
+            for events, toggles, hotspot in cases:
+                with self.subTest(shell=shell, events=events):
+                    self.stub('mu300-keys', events)
+                    (self.tmp/'calls').write_text('')
+                    result = self.script(shell, BIN/'mu300-buttons', TEST_BUTTON_DEVICE='u30air')
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    calls = (self.tmp/'calls').read_text().splitlines()
+                    self.assertEqual(calls.count('mu300-wifi-band toggle'), toggles, calls)
+                    self.assertEqual(calls.count('systemctl start mu300-hotspot'), hotspot, calls)
 
 
 class ThermalGuard(ShellTest):

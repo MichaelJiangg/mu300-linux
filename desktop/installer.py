@@ -248,7 +248,8 @@ def settings(args, image_mib, mode, kernel):
 class Android:
     def __init__(self,args):
         self.args=args
-        bundled=package_root()/('tools/adb.exe' if os.name=='nt' else 'tools/macos/adb')
+        bundled=package_root()/('tools/adb.exe' if sys.platform=='win32' else
+                                'tools/macos/adb' if sys.platform=='darwin' else 'tools/adb')
         self.adb=args.adb or (str(bundled) if bundled.is_file() else shutil.which('adb')) or str(bundled)
         listing=self.call('devices').decode(errors='replace')
         serials=[l.split()[0] for l in listing.splitlines() if len(l.split())==2 and l.split()[1]=='device']

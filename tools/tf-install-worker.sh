@@ -25,9 +25,10 @@ case ${1:-} in
         /system/bin/mke2fs -V
         [ -b "$SD_DEV" ]
         [ -b "$MU300_TF_BOOTDEV" ]
-        read -r required_kib required_inodes < rootfs.requirements
+        tf_read_requirements rootfs.requirements || tf_die 'invalid rootfs.requirements: expected positive KiB and inode counts'
         sectors=$(blockdev --getsz "$SD_DEV")
-        tf_capacity "$sectors" "$required_kib" "$required_inodes" || tf_die 'TF capacity too small / invalid requirements'
+        printf '[TF] capacity: target=%s sectors; required=%s KiB, %s inodes\n' "$sectors" "$required_kib" "$required_inodes"
+        tf_capacity "$sectors" "$required_kib" "$required_inodes" || tf_die "TF capacity check failed: $tf_capacity_error"
         boot_sectors=$(blockdev --getsz "$MU300_TF_BOOTDEV")
         boot_bytes=$(stat -c %s boot-linux.img)
         [ "$boot_bytes" -gt 0 ] && [ $(( (boot_bytes + 4095) / 4096 * 8 )) -le "$boot_sectors" ] || tf_die 'boot image/aligned readback exceeds partition'

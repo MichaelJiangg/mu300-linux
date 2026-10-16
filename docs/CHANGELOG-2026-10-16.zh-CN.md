@@ -83,3 +83,11 @@ U30 Air 的电池、灯和 PD 功能按机型隔离，不套用到无电池的 F
 - [上游核对、采用项与未采用项](UPSTREAM-AUDIT-20261016.zh-CN.md)
 - [新机型适配清单](NEW-DEVICE-STOCK-ADAPTATION.zh-CN.md)
 - [安装器验证记录](../installer/VERIFICATION.md)
+
+## 补齐 macOS 安装器
+
+- 正式包默认同时包含 Windows EXE 与 Apple Silicon macOS APP，共用一份系统镜像；缺少任一平台或源码版本不符会停止打包。
+- 修复 Windows 重打包造成 Mac 程序失去执行权限的问题；ZIP 保留 APP、ADB、后端和命令行入口所需权限。
+- 统一两仓库的 Mac 包目录识别、恢复记录路径及使用指南，刷新 MU300 旧包时同步升级 Mac 命令行入口。
+- 本轮仅更新电脑端安装工具与归档，保留此前的系统功能、内核和模块；Mac 为 ARM64 原生版本。
+- 详细说明：[Windows 与 Apple Silicon 安装器打包](MACOS-INSTALLER-PACKAGING-20261016.zh-CN.md)。

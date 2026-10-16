@@ -28,6 +28,12 @@ class ReadOnlyAdb:
     def devices(self):return [{'serial':SERIAL,'state':'device'}]
     def properties(self):return {'ro.product.model':'E5','ro.product.device':'fixture','ro.board.platform':'fixture','ro.boot.slot_suffix':'_a','ro.boot.verifiedbootstate':'orange','ro.crypto.state':'unencrypted','ro.crypto.type':'','sys.boot_completed':'1'}
     def root_status(self):return 'ready'
+    def read(self,script):
+        self.commands.append(script)
+        if script in ('dd if=/dev/block/by-name/boot_b bs=512 count=8 2>/dev/null',
+                      'dd if=/dev/block/by-name/boot_a bs=512 count=8 2>/dev/null'):
+            return bytes(4096)
+        raise AssertionError('Unexpected binary read: '+script)
     def shell(self,script,root=False):
         self.commands.append(script)
         if script=='cat /proc/sys/kernel/random/boot_id':return 'boot-fixture'

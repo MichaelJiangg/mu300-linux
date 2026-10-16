@@ -3,12 +3,14 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import runpy
 import shutil
 import zipfile
 
 from backend.package import inspect_package
 from package_gui import attach, digest, size_report
+from archive_tools import write_member
 
 TOP=Path(__file__).resolve().parents[1]
 
@@ -35,8 +37,16 @@ def refresh(package):
             s=cmd.read_text(encoding='utf-8')
             s=s.replace('if exist "OpenWrt-Installer.exe" (','if exist "tools\\backend\\openwrt-backend.exe" (').replace('  "OpenWrt-Installer.exe" ','  "tools\\backend\\openwrt-backend.exe" --cli --package-root "%cd%" ')
             cmd.write_bytes(s.replace('\r\n','\n').replace('\n','\r\n').encode('utf-8'))
+        for launcher in (package/'launchers').glob('*.sh'):
+            text = launcher.read_text(encoding='utf-8')
+            if 'tools/macos/backend/openwrt-backend' not in text:
+                text = re.sub(r'^exec python3 OpenWrt-Installer.py (.*)$',
+                    lambda m: 'if [ "$(uname -s)" = Darwin ] && [ -x ./tools/macos/backend/openwrt-backend ]; then\n'
+                    '  exec ./tools/macos/backend/openwrt-backend --cli --package-root "$PWD" '+m[1]+'\n'
+                    'fi\n'+m[0], text, flags=re.M)
+                launcher.write_text(text, encoding='utf-8', newline='\n')
         # Launchers changed after attachment, so include their final bytes.
-        manifest['desktop'].update({p.relative_to(package).as_posix():digest(p) for p in (package/'launchers').glob('*.cmd')})
+        manifest['desktop'].update({p.relative_to(package).as_posix():digest(p) for p in (package/'launchers').iterdir() if p.is_file()})
         manifest_path.write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
     else:
         runpy.run_path(str(TOP/'openwrt/bundle/install-entrypoints.py'))['assemble'](package)
@@ -51,7 +61,7 @@ def archive(package, target):
     with zipfile.ZipFile(partial,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
         for p in sorted(package.rglob('*')):
             if p.is_file() and '__pycache__' not in p.parts:
-                z.write(p,p.relative_to(package).as_posix(),compress_type=zipfile.ZIP_STORED if p.suffix=='.gz' else zipfile.ZIP_DEFLATED)
+                write_member(z,p,p.relative_to(package).as_posix())
     with zipfile.ZipFile(partial) as z:
         bad=z.testzip()
         if bad:raise ValueError('ZIP CRC failure: '+bad)
@@ -74,7 +84,7 @@ def main():
         package=a.destination.resolve();refresh(package)
         after=inspect_package(package)
         if before['payloads']!=after['payloads']:raise ValueError('Device firmware payload changed')
-        target=package.with_suffix('.zip')
+        target=package.parent/(package.name+'.zip')
         if a.no_zip:
             print(package);return
         archive(package,target)
