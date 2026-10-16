@@ -90,7 +90,8 @@ class Update(ShellTest):
                  'lib/firmware/regulatory.db': b'old',
                  'lib/modules/7.2.8/wcn_bsp.ko': b'module',
                  'etc/unisoc-modem/cpu-voltage.json': b'{"offsets":[0,0,0]}',
-                 'etc/config/wireless': b'my-settings'}
+                 'etc/config/wireless': b'my-settings',
+                 'etc/crontabs/root': b'*/5 * * * * /root/check-link\n'}
         for name, data in files.items():
             path = old / name
             path.parent.mkdir(parents=True, exist_ok=True)

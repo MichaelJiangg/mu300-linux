@@ -13,6 +13,9 @@ if [ "$2" = get ]; then
  unisoc_modem.main) echo core ;;
  *.u30_native_version) echo "${TEST_NATIVE_VERSION:-1}" ;;
  *.platform_defaults) echo "${TEST_DEFAULTS:-}" ;;
+ *.data_sim) echo "${TEST_DATA_SIM-0}" ;;
+ *.sim_slots) echo "${TEST_SLOTS:-1}" ;;
+ network.wan.sim_slot) echo "${TEST_LEGACY_SLOT:-}" ;;
  esac
 elif [ "$2" = batch ]; then cat > "$STUBLOG/batch"
 elif [ "$2" = set ] || [ "$2" = commit ]; then echo "$*" >> "$STUBLOG/direct"; fi
@@ -32,6 +35,33 @@ elif [ "$2" = set ] || [ "$2" = commit ]; then echo "$*" >> "$STUBLOG/direct"; f
                     if device in ('v50','u30air'):self.assertIn("sim_slots='2'",commands)
                     else:self.assertNotIn('sim_slots=',commands)
                     self.assertNotIn('data_sim=',commands)
+
+    def test_selected_f50_internal_card_enables_owners_before_boot(self):
+        for shell in self.each_shell():
+            direct=self.tmp/'direct';direct.unlink(missing_ok=True)
+            r=self.script(shell,SCRIPT,TEST_DEVICE='f50',TEST_DEFAULTS='f50',TEST_DATA_SIM='1')
+            self.assertEqual(r.returncode,0,r.stderr)
+            self.assertIn('sim_slots=2',direct.read_text())
+            self.assertNotIn('data_sim=',direct.read_text())
+
+    def test_legacy_f50_selection_migrates_only_before_current_board_defaults(self):
+        for shell in self.each_shell():
+            direct=self.tmp/'direct';direct.unlink(missing_ok=True)
+            r=self.script(shell,SCRIPT,TEST_DEVICE='f50',TEST_LEGACY_SLOT='1',TEST_DATA_SIM='')
+            self.assertEqual(r.returncode,0,r.stderr)
+            self.assertIn('data_sim=1',direct.read_text())
+            self.assertIn('sim_slots=2',direct.read_text())
+            direct.unlink()
+            r=self.script(shell,SCRIPT,TEST_DEVICE='f50',TEST_DEFAULTS='f50',TEST_LEGACY_SLOT='1')
+            self.assertEqual(r.returncode,0,r.stderr)
+            self.assertFalse(direct.exists())
+
+    def test_current_selection_wins_over_stale_legacy_setting(self):
+        for shell in self.each_shell():
+            direct=self.tmp/'direct';direct.unlink(missing_ok=True)
+            r=self.script(shell,SCRIPT,TEST_DEVICE='f50',TEST_LEGACY_SLOT='1',TEST_DATA_SIM='0')
+            self.assertEqual(r.returncode,0,r.stderr)
+            self.assertFalse(direct.exists())
 
     def test_cross_board_restore_resets_only_adapter_configuration(self):
         for shell in self.each_shell():

@@ -186,10 +186,14 @@ int cp_delegator_init(struct sipa_delegator_create_params *params)
 	s_cp_delegator->delegator.pd_get_flag = false;
 	s_cp_delegator->delegator.smsg_cnt = 0;
 	/* MU300: its result used to be ignored, so a PROD_CP it had deleted again went unnoticed */
-	ret = sipa_delegator_start(&s_cp_delegator->delegator);
-	if (ret)
-		return ret;
+	/* The thread can receive ENABLE as soon as start runs. Its runtime-PM
+	 * device must already be enabled; no extra wait or handshake is needed. */
 	pm_runtime_enable(s_cp_delegator->delegator.pdev);
+	ret = sipa_delegator_start(&s_cp_delegator->delegator);
+	if (ret) {
+		pm_runtime_disable(s_cp_delegator->delegator.pdev);
+		return ret;
+	}
 
 	/*
 	 * MU300: the Wi-Fi offload path, which this device does not use (the CONS_WIFI resources stay released): a

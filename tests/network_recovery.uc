@@ -42,3 +42,24 @@ policy.recovery(call, {slot:1,stat:2,rat:7}, 1, 1, false, previous);
 s = status();
 check(policy.recovery(call, registered, 1, 1, false, previous), 'next registration resumes');
 printf('PASS: %d recovery policy checks\n', count);
+
+let absent = { slot: 1, state: 'absent' }, ready = { slot: 1, state: 'ready' };
+let action = null;
+function sim_call(method, payload) {
+    if (method == 'status') return s;
+    action = payload;
+    return {};
+}
+s = status(); s.available = true; s.pending = true;
+check(policy.recovery(sim_call, registered, 1, 1, false, previous, absent), 'no SIM cancels registration');
+check(action.action == 5 && action.available === false, 'availability only; no RF reset');
+s.available = false; s.pending = false; s.errors = [{code:'SIM_MISSING'}];
+action = null;
+check(!policy.recovery(sim_call, registered, 1, 1, false, previous, absent) && action == null, 'absence does not loop');
+check(policy.recovery(sim_call, null, 1, 1, false, previous, ready), 'inserted SIM resumes before registration');
+check(!policy.recovery(sim_call, null, 1, 1, false, previous, ready), 'one resume per insertion');
+s.autostart = false;
+previous = {key:null,attempted:false};
+check(!policy.recovery(sim_call, null, 1, 1, false, previous, ready), 'manual down remains off after insertion');
+check(!policy.recovery(sim_call, null, 1, 1, false, previous, {slot:0,state:'ready'}), 'other slot does not resume');
+printf('PASS: %d recovery and SIM policy checks\n', count);

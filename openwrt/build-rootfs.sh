@@ -191,6 +191,7 @@ chroot "$R" /bin/sh -c "command -v flock >/dev/null" || { echo "missing native S
 chmod 0755 $R/etc/hotplug.d/power_supply/70-mu300-led
 chmod 0755 $R/opt/mu300/bin/mu300-platform-config
 chmod 0755 $R/opt/mu300/bin/mu300-network-recovery $R/etc/init.d/mu300-network-recovery
+chmod 0755 $R/etc/uci-defaults/92-mu300-uhttpd-key
 chmod 0755 $R/opt/mu300/bin/v50-led-status
 chmod 0755 $R/opt/mu300/bin/openwrt-board-check
 chmod 0755 $R/opt/mu300/bin/ra-deprecate $R/opt/mu300/bin/wcn-reopen
@@ -259,6 +260,9 @@ printf "%s\n" "${MU300_VERSION:-dev}" > $R/etc/mu300/image-version
 (MU300_LIB=1; . $R/opt/mu300/bin/mu300-update; upk_manual $R openwrt) > $R/etc/mu300/image-packages
 [ -s $R/etc/mu300/image-packages ] || { echo "missing image-packages" >&2; exit 1; }
 # --- default-root-password begin ---
+# PR #264: uhttpd creates a pair on the device, never in a shared image.
+rm -f $R/etc/uhttpd.key $R/etc/uhttpd.crt
+[ ! -e $R/etc/uhttpd.key ] || { echo "the image holds a TLS key" >&2; exit 1; }
 # Fresh installs use root/root; account merging preserves passwords on updates.
 root_hash="\$6\$mu300root\$O/wH3K.NhG6ZZOMSOTLlNNHv08B1RRcRsec0Xc54SuqhFhgPwmQUnxo782srY03f5mYk.Gv0qJ8JGfcrJvYKs."
 grep -q "^root:" "$R/etc/shadow" || { echo "missing root account" >&2; exit 1; }

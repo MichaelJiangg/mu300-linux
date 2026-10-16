@@ -517,6 +517,7 @@ wait_registered() {
     start=$((size + 1))
     while [ "$SECONDS" -lt "$deadline" ]; do
         [ ! -e /run/mu300-mobile-data-down ] || return 1
+        if command -v mu300_sim_absent >/dev/null 2>&1 && mu300_sim_absent "$MU300_SIM_SLOT"; then return 6; fi
         size=$(wc -c < "$urclog" 2>/dev/null || echo 0)
         # start points ONE byte beyond the previous end, so size == start-1
         # is an unchanged log, not truncation (which would replay old URCs).
@@ -669,6 +670,9 @@ up_locked() {
     modem_stack || { echo "no modem stack in this kernel ($(uname -r))" >&2; exit 3; }
     rm -f /run/mu300-mobile-data-down /run/mu300-mobile-data-manual-down
     tty_setup
+    if command -v mu300_sim_absent >/dev/null 2>&1 && mu300_sim_absent "$MU300_SIM_SLOT"; then
+        echo 'SIM absent; waiting for card state event' >&2; return 6
+    fi
     radio_on || return $?
     if [ "$DEVICE" = u30air ] && [ "$MU300_SIM_SLOT" = 0 ] && [ ! -e /run/mu300-radio-freeze ] && [ -e /etc/mu300/sim-data-route-2 ]; then
         current=$(at 'AT+SPSWDATA?' 4 | tr -d '\r' | sed -n 's/^+SPSWDATA: *\([01]\) *$/\1/p' | head -n1) || current=
@@ -698,7 +702,12 @@ up_locked() {
     # Android's RIL enables the IMS bearer used by SMS. This is idempotent;
     # keep it on the normal radio bring-up path and do not wait for IMS here.
     at 'AT+CAVIMS=1' 5 >/dev/null || true
-    wait_registered || { echo "not registered on the network" >&2; exit 5; }
+    local registration_rc=0
+    wait_registered || registration_rc=$?
+    if [ "$registration_rc" != 0 ]; then
+        [ "$registration_rc" != 6 ] || { echo 'SIM absent; waiting for card state event' >&2; return 6; }
+        echo "not registered on the network" >&2; exit 5
+    fi
     mark dial-registered
     radio_say "注册完成"
 

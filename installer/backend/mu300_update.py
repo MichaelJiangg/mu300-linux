@@ -74,9 +74,11 @@ def update_mu300(api, args, root):
     root = Path(root)
     gui = api.get('GUI')
     execute, read_exact = api['ssh_exec'], api['ssh_read_exact']
+    if gui and not args.host:
+        raise ValueError('Enter the management address in the GUI / 请在图形界面填写管理地址')
+    host = args.host or input('Device IP / 设备 IP [192.168.77.1]: ').strip() or '192.168.77.1'
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    host = args.host or input('Device IP / 设备 IP [192.168.77.1]: ').strip() or '192.168.77.1'
     try:
         client.connect(host, username='root', password=gui.password if gui else os.environ.get('MU300_SSH_PASSWORD') or getpass.getpass('SSH root password: '),
                        timeout=15, look_for_keys=False, allow_agent=False)
@@ -114,7 +116,10 @@ fi''').strip().splitlines()
         module = api['module'](root)
         newboot = api['boot'](root, module, mode, live, slot)
         control = module.boot_control(live, slot)
-        api['confirm']('Update OpenWrt while preserving settings and disk size; then reboot / 保留配置及容量更新，完成后重启。')
+        if gui:
+            gui.ctx.boundary()
+        else:
+            api['confirm']('Update OpenWrt while preserving settings and disk size; then reboot / 保留配置及容量更新，完成后重启。')
         # Stage on disk, never upload a complete rootfs to the device's tmpfs.
         destination = '/mnt/mu300-disk/.mu300-desktop-'+secrets.token_hex(6)
         execute(client, 'mkdir -m 700 '+destination)

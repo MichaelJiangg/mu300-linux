@@ -112,6 +112,9 @@ lang = 'tr';
 if (M.carrierName({name: '中国联通'}) !== 'China Unicom') throw Error('Turkish carrier name');
 lang = 'zh';
 if (M.carrierName({name: '中国联通'}) !== '中国联通') throw Error('Chinese carrier name');
+for (const name of ['CHINA BROADNET','China Broadnet','china_broadnet','CHN-BG'])
+    if (M.carrierName({name}) !== '中国广电') throw Error('Broadnet case alias: '+name);
+if (M.carrierName({name:'Unknown Foreign Carrier',plmn:'23410'}) !== 'Unknown Foreign Carrier') throw Error('Foreign carrier changed');
 """)
 
     def test_official_theme_bridge_keeps_aurora_intact(self):

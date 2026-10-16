@@ -1,0 +1,1803 @@
+{
+  "main": "2c13e7bb5227055561363c5a8150350e9a518058",
+  "commit_metadata_count": 1162,
+  "issues": [
+    {
+      "number": 259,
+      "title": "SMS webhook \"Custom body\" placeholder uses Feishu format — fails for WeCom (企业微信) group bots",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/259"
+    },
+    {
+      "number": 253,
+      "title": "U30air modem does not start  from a cold start",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/253"
+    },
+    {
+      "number": 231,
+      "title": "[Bug] Carrier name translation fails when letter case differs",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/231"
+    },
+    {
+      "number": 229,
+      "title": "5.4 kernel: sprd_cpu_cooling fails to bind thermal zones — no CPU throttling, device overheats and thermally shuts down",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/229"
+    },
+    {
+      "number": 226,
+      "title": "mu300-atd exits when modem TTY devices are not ready yet — no wait/retry (like mu300-adbd has for FunctionFS)",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/226"
+    },
+    {
+      "number": 225,
+      "title": "[Bug][F50] Kernel v2026.10.25 false-probes SGM41513 at 0x1a on ZTE F50, causing phantom charger binding & PMIC over-voltage reboot loop",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/225"
+    },
+    {
+      "number": 222,
+      "title": "[Bug] WiFi connection fails when switching encryption protocols (Only WPA2-PSK works)",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/222"
+    },
+    {
+      "number": 220,
+      "title": "Both mainline kernels (7.2.10 AND 6.18.56) hard-hang at ~17 s on this ZTE F50 (B09) — identical failure: sipc-pmsys can't parse \"mboxes\" + sprd_serial DMA ENODEV, log ends with no panic",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/220"
+    },
+    {
+      "number": 202,
+      "title": "sing-box driver: server domain not resolved, missing server-ip routing exclusion, no IPv6 in auto mode",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/202"
+    },
+    {
+      "number": 194,
+      "title": "U30 Air internal SIM rejected by mu300-sim despite being selectable in LuCI",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/194"
+    },
+    {
+      "number": 188,
+      "title": "Is there a plan to support the U30pro SoC, which is the Unisoc T780?",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/188"
+    },
+    {
+      "number": 181,
+      "title": "7.2.10 (F50): mmc1 \"Got command interrupt 0x00000001 even though no command operation was in progress\" with a full SDHCI register dump every few minutes",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/181"
+    },
+    {
+      "number": 176,
+      "title": "[OpenWrt SMS] China Broadnet sends fail with IMS 600; unchanged SMSC refresh + serialized send succeeds",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/176"
+    },
+    {
+      "number": 174,
+      "title": "[Feature Request] Add MSISDN display and improve Carrier name decoding in the OpenWrt panel",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/174"
+    },
+    {
+      "number": 172,
+      "title": "[U20/F50, 7.2.9] Unused SD host keeps logging command interrupts long after boot",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/172"
+    },
+    {
+      "number": 171,
+      "title": "Allow Custom Webhook Body for SMS Forwarding",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/171"
+    },
+    {
+      "number": 170,
+      "title": "Modem CP never starts on mainline kernels (6.18.55, 7.2.9) on ZTE F50 — vendor 5.4 works",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/170"
+    },
+    {
+      "number": 169,
+      "title": "Enable CONFIG_NFT_QUEUE in the kernel (needed by kmod-nft-queue / sing-box nftables mode on OpenWrt)",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/169"
+    },
+    {
+      "number": 167,
+      "title": "A system added later by mu300-update has an unusable root password: mu300-os openwrt-luci locks the user out",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/167"
+    },
+    {
+      "number": 156,
+      "title": "Installers: refuse early on a locked bootloader (ro.boot.flash.locked=1) with the LK verify_ret:0x3 explanation",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/156"
+    },
+    {
+      "number": 146,
+      "title": "Unloading sprd_wlan_combo while idle panics in __run_timers (a timer left in freed module memory)",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/146"
+    },
+    {
+      "number": 144,
+      "title": "[Feature request / hardware test results] Enable BPF JIT and BTF on MU300/F50 for honk",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/144"
+    },
+    {
+      "number": 140,
+      "title": "[request] Excessive use of KERN_ERR for routine messages",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/140"
+    },
+    {
+      "number": 135,
+      "title": "F50 (eSIM variant + user-added nano-SIM slot): no cellular on OpenWrt — modem (CP) never boots",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/135"
+    },
+    {
+      "number": 134,
+      "title": "[F50 B13] v2026.10.18 / 7.2.9 trial returns to Android; LK boot verification returns 0x3",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/134"
+    },
+    {
+      "number": 127,
+      "title": "[F50 / OpenWrt] Imported Android files installed as 0700 block modem startup; fixing permissions restores connectivity on 7.2.9",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/127"
+    },
+    {
+      "number": 116,
+      "title": "mu300-update does not preserve third-party packages but keeps their configuration",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/116"
+    },
+    {
+      "number": 105,
+      "title": "F50: v2026.10.16 and v2026.10.15 kernels hard-power-off at ~13s; v2026.10.11 works",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/105"
+    },
+    {
+      "number": 103,
+      "title": "Kernel 5.4 panics in xfrm_sysctl_fini during network namespace cleanup",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/103"
+    },
+    {
+      "number": 102,
+      "title": "U30 Air (firmware variant ABSSV): I2C bus 6 dead under mainline (no pinctrl driver in the build) - charger never binds, no charging on 7.2/6.18",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/102"
+    },
+    {
+      "number": 96,
+      "title": "No Service",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/96"
+    },
+    {
+      "number": 95,
+      "title": "fw4 restart fails with Resource busy and No such file or directory on 5.4 kernel when flow_offloading is enabled",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/95"
+    },
+    {
+      "number": 94,
+      "title": "[bug]u30air reboot unexpectedly",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/94"
+    },
+    {
+      "number": 87,
+      "title": "IPv6 relay does not withdraw stale prefixes after cellular /64 changes",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/87"
+    },
+    {
+      "number": 86,
+      "title": "[bug] install.sh rejects devices where Android runs from slot b, although build-boot-image.py and Magisk installer already support it",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/86"
+    },
+    {
+      "number": 75,
+      "title": "BUG: SMS reception silently stops once the SIM storage fills up",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/75"
+    },
+    {
+      "number": 71,
+      "title": "要是能把中兴MU5002 给刷了就完美了",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/71"
+    },
+    {
+      "number": 70,
+      "title": "smsforward",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/70"
+    },
+    {
+      "number": 68,
+      "title": "RFC: quiet 5.4 vendor driver log spam (~700 to ~10 lines/min) - patches available",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/68"
+    },
+    {
+      "number": 67,
+      "title": "openwrt-luci: LAN firewall/NAT rules missing after every boot (fw4 flowtable reload failure on 5.4 kernel)",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/67"
+    },
+    {
+      "number": 65,
+      "title": "Installer hangs and the device overheats on an F50 whose GPT ends at the end of the eMMC",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/65"
+    },
+    {
+      "number": 64,
+      "title": "ipv6 relay or nat66",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/64"
+    },
+    {
+      "number": 61,
+      "title": "Stuck on openwrt with no way to reboot to Android",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/61"
+    },
+    {
+      "number": 54,
+      "title": "OpenWrt, it is limited to USB 2.0 (480 Mbps)",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/54"
+    },
+    {
+      "number": 52,
+      "title": "Magisk installer hangs on large `dd bs=1 skip=...` while installing OpenWrt to SD card",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/52"
+    },
+    {
+      "number": 45,
+      "title": "Switching to RNDIS breaks the LAN: rndis0 keeps the LAN address while br-lan holds the same one",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/45"
+    },
+    {
+      "number": 43,
+      "title": "During installation, `region_find_existing` executes very slowly.",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/43"
+    },
+    {
+      "number": 32,
+      "title": "Windows installer has no \"make room\" path: a 64 GB unit whose partition table was replaced by a vendor flash is unrecoverable from install.ps1",
+      "state": "open",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/32"
+    },
+    {
+      "number": 29,
+      "title": "suggestion of esim management",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/29"
+    },
+    {
+      "number": 24,
+      "title": "Request for ZTE F50 Pro support",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/24"
+    },
+    {
+      "number": 20,
+      "title": "Kernel panic: soft lockup in `sipa_dele` (`cp_dele_on_commad`) causes automatic reboot on Unisoc UMS9620",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/20"
+    },
+    {
+      "number": 9,
+      "title": "u30air",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/9"
+    },
+    {
+      "number": 8,
+      "title": "OpenWrt: LuCI \"已连接站点\" is always empty — hostapd has the clients, the vendor driver exposes no station table",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/8"
+    },
+    {
+      "number": 7,
+      "title": "Windows: install.ps1 always fails with an empty device log — the .sh files pushed from the working tree have CRLF endings",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/7"
+    },
+    {
+      "number": 6,
+      "title": "Windows: `install.ps1` dies on `/dev/__properties__` and the GPU closure pull is unusable",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/6"
+    },
+    {
+      "number": 5,
+      "title": "mainline kernel: install lands in standalone mode when the release's kernel bundle is older than the checkout",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/5"
+    },
+    {
+      "number": 4,
+      "title": "Bug: \"su does not work on the device\" false positive due to PowerShell 5.1 stderr redirection",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/4"
+    },
+    {
+      "number": 3,
+      "title": "Windows install.ps1 fails to detect Python due to function name shadowing",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/3"
+    },
+    {
+      "number": 2,
+      "title": "adb exec-out \"su -c ...\" corrupts every binary read (LF→CRLF via a pty): broken boot image, silently no Wi-Fi",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/2"
+    },
+    {
+      "number": 1,
+      "title": "Question: does this project support F50 units with built-in eSIM (eUICC)?",
+      "state": "closed",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/issues/1"
+    }
+  ],
+  "prs": [
+    {
+      "number": 266,
+      "title": "An update writes only what changed: unchanged binaries are linked, the room is counted first, nothing is left behind",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/266"
+    },
+    {
+      "number": 265,
+      "title": "the release source: a Mirror (release files) field, and a fallback when it is unreachable",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/265"
+    },
+    {
+      "number": 264,
+      "title": "No shared uhttpd TLS key: out of the image, and removed on devices that got it (security, FINDINGS 132)",
+      "state": "closed",
+      "merged_at": "2026-10-16T07:30:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/264"
+    },
+    {
+      "number": 263,
+      "title": "wlan (SC2355): a command never sent is an error; get_station's reply zeroed (FINDINGS 106)",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/263"
+    },
+    {
+      "number": 262,
+      "title": "Add GitHub Actions workflow for kernel build",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/262"
+    },
+    {
+      "number": 261,
+      "title": "mainline: the U30 Air's battery capacity kept at a power-off (FINDINGS 105)",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/261"
+    },
+    {
+      "number": 260,
+      "title": "U30 Air live SIM switch: mobile data switched off stays off (FINDINGS 104)",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/260"
+    },
+    {
+      "number": 258,
+      "title": "Docker in the images (Ubuntu installed, OpenWrt ready), data beside the systems; no shared uhttpd key",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/258"
+    },
+    {
+      "number": 257,
+      "title": "docs: validate U30 Air SAE clients on Linux 7.2.10",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/257"
+    },
+    {
+      "number": 256,
+      "title": "Mainline 6.18.57 and 7.2.11 with every module the boards can use; KVM and dockur checked (FINDINGS 130)",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/256"
+    },
+    {
+      "number": 255,
+      "title": "An update asks whether to keep the password, and checks the current one on the device",
+      "state": "closed",
+      "merged_at": "2026-10-16T07:14:35Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/255"
+    },
+    {
+      "number": 254,
+      "title": "magisk.yml: download the images' manifests too (Magisk zips of v2026.10.16.1)",
+      "state": "closed",
+      "merged_at": "2026-10-16T01:43:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/254"
+    },
+    {
+      "number": 252,
+      "title": "Make-room resume on a device (F50-C): two installer fixes, FINDINGS 112",
+      "state": "closed",
+      "merged_at": "2026-10-15T22:40:57Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/252"
+    },
+    {
+      "number": 251,
+      "title": "Make room: the region is the size asked for; plan figures right on macOS (first device run, FINDINGS 112)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:51:59Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/251"
+    },
+    {
+      "number": 250,
+      "title": "Integration: kano ports 233-236 and 240-243, device-tested",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:46Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/250"
+    },
+    {
+      "number": 249,
+      "title": "Release names: vYYYY.MM.DD.N (the real day and its number)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:40:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/249"
+    },
+    {
+      "number": 248,
+      "title": "Data roaming switch: held back in the dial and its watchdog, in every front end (FINDINGS 120)",
+      "state": "closed",
+      "merged_at": "2026-10-15T23:31:27Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/248"
+    },
+    {
+      "number": 247,
+      "title": "Make room on an encrypted Android: reset by recovery, then resume the install (EXPERIMENTAL, kano's flow)",
+      "state": "closed",
+      "merged_at": "2026-10-15T19:44:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/247"
+    },
+    {
+      "number": 246,
+      "title": "Magisk zips: also an offline installer when unpacked on a computer",
+      "state": "closed",
+      "merged_at": "2026-10-15T19:21:08Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/246"
+    },
+    {
+      "number": 245,
+      "title": "[ImgBot] Optimize images",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/245"
+    },
+    {
+      "number": 244,
+      "title": "Web installer: a device manager for MU300 Linux (mu300-api)",
+      "state": "closed",
+      "merged_at": "2026-10-16T00:11:53Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/244"
+    },
+    {
+      "number": 243,
+      "title": "wlan (mainline): TX keeps the caller's skb; AP IPv6 multicast by data queue; EDMA backpressure (FINDINGS 103)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/243"
+    },
+    {
+      "number": 242,
+      "title": "sipa_eth: a busy retry gets the skb back as it came (FINDINGS 102)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/242"
+    },
+    {
+      "number": 241,
+      "title": "Magisk switch: no file on the way to misc, misc resolved once (FINDINGS 101)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/241"
+    },
+    {
+      "number": 240,
+      "title": "mu300-next-boot: misc first, then the default boot; one change at a time (FINDINGS 100)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/240"
+    },
+    {
+      "number": 239,
+      "title": "ZTE V50 (MU3351): experimental third device, ported from kano's line",
+      "state": "closed",
+      "merged_at": "2026-10-15T16:56:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/239"
+    },
+    {
+      "number": 238,
+      "title": "FINDINGS 72: the browser's download from the real release mirror, measured",
+      "state": "closed",
+      "merged_at": "2026-10-15T17:49:35Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/238"
+    },
+    {
+      "number": 237,
+      "title": "U30 Air: add experimental mixed WPA2-PSK/WPA3-SAE AP offload integration",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/237"
+    },
+    {
+      "number": 236,
+      "title": "mainline: sdhci-sprd accessors with the generic SDHCI ordering (FINDINGS 93)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/236"
+    },
+    {
+      "number": 235,
+      "title": "wlan: per-frame TX log lines bounded; the AP multicast branch documented (FINDINGS 92)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/235"
+    },
+    {
+      "number": 234,
+      "title": "relay monitor: the active card's channels, a validated bearer, no lost hint (FINDINGS 91)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/234"
+    },
+    {
+      "number": 233,
+      "title": "mobile-data watch: a modem that does not answer is not a lost bearer (FINDINGS 90)",
+      "state": "closed",
+      "merged_at": "2026-10-15T20:27:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/233"
+    },
+    {
+      "number": 232,
+      "title": "mainline: the SGM41513 at 0x1a only on a board with a battery (fixes #225)",
+      "state": "closed",
+      "merged_at": "2026-10-15T07:44:23Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/232"
+    },
+    {
+      "number": 230,
+      "title": "mu300-update: an update keeps the jobs of System > Scheduled Tasks",
+      "state": "closed",
+      "merged_at": "2026-10-15T06:40:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/230"
+    },
+    {
+      "number": 228,
+      "title": "mainline: expand VM, routing, storage and USB modules",
+      "state": "closed",
+      "merged_at": "2026-10-14T08:52:29Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/228"
+    },
+    {
+      "number": 227,
+      "title": "power: reject dummy 0x00 part reads for SGM41513 at 0x1a on ZTE F50 (fixes #225)",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/227"
+    },
+    {
+      "number": 224,
+      "title": "An update keeps everything the user made (mu300-update, the installers, the Magisk zip)",
+      "state": "closed",
+      "merged_at": "2026-10-16T01:02:04Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/224"
+    },
+    {
+      "number": 223,
+      "title": "Web installer: first run on an F50, the device downloads the release itself, out of beta",
+      "state": "closed",
+      "merged_at": "2026-10-13T11:23:53Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/223"
+    },
+    {
+      "number": 221,
+      "title": "panel: System > Update - update the device from the browser, from GitHub or from a release file",
+      "state": "closed",
+      "merged_at": "2026-10-15T17:39:29Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/221"
+    },
+    {
+      "number": 219,
+      "title": "install.ps1, uninstall.ps1: the Linux-device check no longer throws on Android",
+      "state": "closed",
+      "merged_at": "2026-10-13T08:14:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/219"
+    },
+    {
+      "number": 218,
+      "title": "wiki: what v2026.10.25 changes",
+      "state": "closed",
+      "merged_at": "2026-10-13T07:43:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/218"
+    },
+    {
+      "number": 217,
+      "title": "Two faults of the v2026.10.24 pre-release: the updater's own lock, and adb missing on OpenWrt after a boot",
+      "state": "closed",
+      "merged_at": "2026-10-13T07:17:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/217"
+    },
+    {
+      "number": 216,
+      "title": "Integration: build retry, lock state, SMS references, APN credentials, adb default, CI test tags",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:28Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/216"
+    },
+    {
+      "number": 215,
+      "title": "ci: test pre-releases are not announced and get no Magisk zips",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/215"
+    },
+    {
+      "number": 214,
+      "title": "Web installer (beta): install and manage Linux from the browser over WebUSB",
+      "state": "closed",
+      "merged_at": "2026-10-13T07:28:46Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/214"
+    },
+    {
+      "number": 213,
+      "title": "VPN page: what IPV6=auto means now that the module asks the tunnel (#202)",
+      "state": "closed",
+      "merged_at": "2026-10-16T00:11:58Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/213"
+    },
+    {
+      "number": 212,
+      "title": "adb to Linux: on by default and open to every computer; keys and off for those who want it closed",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/212"
+    },
+    {
+      "number": 211,
+      "title": "panel: SMS webhook checks the service's answer; a Clear button for the delivery log (#171)",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:17:43Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/211"
+    },
+    {
+      "number": 210,
+      "title": "OpenWrt image build: a package download that breaks off is tried again",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/210"
+    },
+    {
+      "number": 209,
+      "title": "Installers: a beta question, an answers mode with a progress stream, and a graphical installer",
+      "state": "closed",
+      "merged_at": "2026-10-15T17:28:35Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/209"
+    },
+    {
+      "number": 208,
+      "title": "Mobile data: an APN with a user name and a password (AT+CGPCO)",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/208"
+    },
+    {
+      "number": 207,
+      "title": "The project's Telegram channel in the README, wiki, site and release notes",
+      "state": "closed",
+      "merged_at": "2026-10-13T05:09:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/207"
+    },
+    {
+      "number": 206,
+      "title": "mu300-update: the panel's saved locks survive an update",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/206"
+    },
+    {
+      "number": 205,
+      "title": "SMS: a reused reference number no longer mixes long messages or keeps them apart",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:28:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/205"
+    },
+    {
+      "number": 204,
+      "title": "install.ps1: make room by shrinking userdata, as install.sh does (#32)",
+      "state": "closed",
+      "merged_at": "2026-10-13T05:00:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/204"
+    },
+    {
+      "number": 203,
+      "title": "mainline: the U30 Air's charger may be an SGM41513 at 0x1a (issue #102)",
+      "state": "closed",
+      "merged_at": "2026-10-13T06:17:52Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/203"
+    },
+    {
+      "number": 201,
+      "title": "wiki: what v2026.10.23 changes",
+      "state": "closed",
+      "merged_at": "2026-10-12T17:56:53Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/201"
+    },
+    {
+      "number": 200,
+      "title": "VPN page: a refused config shows its reason, and the check calls a command every module has",
+      "state": "closed",
+      "merged_at": "2026-10-12T17:44:52Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/200"
+    },
+    {
+      "number": 199,
+      "title": "Imported Android files unreadable by the vendor daemons: the CP was never loaded (#127, #170)",
+      "state": "closed",
+      "merged_at": "2026-10-12T15:45:51Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/199"
+    },
+    {
+      "number": 198,
+      "title": "LuCI: do not offer the internal SIM where mu300-sim does not support it (#194)",
+      "state": "closed",
+      "merged_at": "2026-10-12T15:21:22Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/198"
+    },
+    {
+      "number": 197,
+      "title": "panel: a webhook body of the user's own for SMS forwarding (#171)",
+      "state": "closed",
+      "merged_at": "2026-10-12T15:10:19Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/197"
+    },
+    {
+      "number": 196,
+      "title": "kernel 5.4: enable CONFIG_NFT_QUEUE (#169)",
+      "state": "closed",
+      "merged_at": "2026-10-12T14:59:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/196"
+    },
+    {
+      "number": 195,
+      "title": "panel: decode a carrier name given as UCS2 hex under another character set (#174)",
+      "state": "closed",
+      "merged_at": "2026-10-12T14:59:38Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/195"
+    },
+    {
+      "number": 193,
+      "title": "SMS: direct delivery (+CMT) with the SIM path as the fallback",
+      "state": "closed",
+      "merged_at": "2026-10-12T13:21:44Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/193"
+    },
+    {
+      "number": 192,
+      "title": "luci-app-mu300: verified lock reset (writes checked, read back, saved locks deleted only then; tombstone)",
+      "state": "closed",
+      "merged_at": "2026-10-12T13:37:54Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/192"
+    },
+    {
+      "number": 191,
+      "title": "installers: boot image read back from the medium, bounded SD-card stages, no re-run in the same boot (FINDINGS 48)",
+      "state": "closed",
+      "merged_at": "2026-10-12T13:10:04Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/191"
+    },
+    {
+      "number": 190,
+      "title": "mainline: the stock virtual thermal zone (mu300_thermal), thermal-guard hands over to the kernel",
+      "state": "closed",
+      "merged_at": "2026-10-12T12:42:53Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/190"
+    },
+    {
+      "number": 189,
+      "title": "panel: show the SIM's own number (CNUM, else the IMS identity) on full rounds only",
+      "state": "closed",
+      "merged_at": "2026-10-12T12:54:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/189"
+    },
+    {
+      "number": 187,
+      "title": "CI: the Magisk workflow parses again, and the lock test's holder stays a mu300-update",
+      "state": "closed",
+      "merged_at": "2026-10-12T12:40:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/187"
+    },
+    {
+      "number": 186,
+      "title": "Telegram: English only",
+      "state": "closed",
+      "merged_at": "2026-10-12T12:41:13Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/186"
+    },
+    {
+      "number": 185,
+      "title": "docs: v2026.10.22",
+      "state": "closed",
+      "merged_at": "2026-10-12T09:29:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/185"
+    },
+    {
+      "number": 184,
+      "title": "mainline: no spurious command interrupt from the F50's empty SD slot (#181)",
+      "state": "closed",
+      "merged_at": "2026-10-12T09:15:23Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/184"
+    },
+    {
+      "number": 183,
+      "title": "sms (Ubuntu): one AT transaction and the SMSC refresh, as on OpenWrt (#176); zip log line true when the images' password is applied",
+      "state": "closed",
+      "merged_at": "2026-10-12T09:05:19Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/183"
+    },
+    {
+      "number": 182,
+      "title": "panels: the VPN section only when the VPN module is installed",
+      "state": "closed",
+      "merged_at": "2026-10-12T09:00:21Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/182"
+    },
+    {
+      "number": 180,
+      "title": "Telegram: a plainer layout for the announcements",
+      "state": "closed",
+      "merged_at": "2026-10-12T08:53:59Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/180"
+    },
+    {
+      "number": 179,
+      "title": "Telegram: releases and Magisk zips announced on the channel",
+      "state": "closed",
+      "merged_at": "2026-10-12T08:34:21Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/179"
+    },
+    {
+      "number": 178,
+      "title": "magisk installer: fixed default passwords - ubuntu/ubuntu, OpenWrt root without one (#167)",
+      "state": "closed",
+      "merged_at": "2026-10-12T08:33:44Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/178"
+    },
+    {
+      "number": 177,
+      "title": "sms: one AT transaction per send, same-value SMSC refresh, panel result survives rpcd's timeout (#176)",
+      "state": "closed",
+      "merged_at": "2026-10-12T07:28:37Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/177"
+    },
+    {
+      "number": 175,
+      "title": "docs: v2026.10.21",
+      "state": "closed",
+      "merged_at": "2026-10-12T06:56:57Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/175"
+    },
+    {
+      "number": 173,
+      "title": "mu300-update: no promise of a reboot that starts Android",
+      "state": "closed",
+      "merged_at": "2026-10-12T07:53:28Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/173"
+    },
+    {
+      "number": 168,
+      "title": "A system added later gets the running system's password; mu300-os refuses one nobody can log in to",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/168"
+    },
+    {
+      "number": 166,
+      "title": "OpenWrt: U30 Air native dual-SIM boot and persistent live switching (#73 rebased, review fixes)",
+      "state": "closed",
+      "merged_at": "2026-10-13T08:49:15Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/166"
+    },
+    {
+      "number": 165,
+      "title": "OpenWrt: opt-in U30 Air SC2355 SAE offload and private-log suppression (#74 rebased)",
+      "state": "closed",
+      "merged_at": "2026-10-15T15:09:12Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/165"
+    },
+    {
+      "number": 164,
+      "title": "mainline: the UMS9620 pin controller, and the U30 Air's i2c6 pads (issue #102)",
+      "state": "closed",
+      "merged_at": "2026-10-12T07:54:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/164"
+    },
+    {
+      "number": 163,
+      "title": "[ImgBot] Optimize images",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/163"
+    },
+    {
+      "number": 162,
+      "title": "docs: v2026.10.20",
+      "state": "closed",
+      "merged_at": "2026-10-11T22:19:57Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/162"
+    },
+    {
+      "number": 161,
+      "title": "mu300-update: one run at a time",
+      "state": "closed",
+      "merged_at": "2026-10-11T22:19:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/161"
+    },
+    {
+      "number": 160,
+      "title": "kernel 5.4: enable_xfrm_fragment sysctl registered per network namespace (fixes #103 netns teardown panic)",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:55:29Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/160"
+    },
+    {
+      "number": 159,
+      "title": "sprd_wlan_combo: tear the driver down on remove (rmmod panicked in __run_timers)",
+      "state": "closed",
+      "merged_at": "2026-10-11T22:24:27Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/159"
+    },
+    {
+      "number": 158,
+      "title": "F50 internal/external SIM selection and slot 1 data routing (PR #72 rebased)",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:57:24Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/158"
+    },
+    {
+      "number": 157,
+      "title": "sprd_wlan_combo: routine per-packet, per-poll and per-peer events are not errors",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:47:09Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/157"
+    },
+    {
+      "number": 155,
+      "title": "build-rootfs: the ttyd check reads the config, not its comments",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:25:40Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/155"
+    },
+    {
+      "number": 154,
+      "title": "CI quick mode: pull requests under busybox sh only, no macOS job",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:10:51Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/154"
+    },
+    {
+      "number": 153,
+      "title": "Mainline kernels: 6.18.56 and 7.2.10",
+      "state": "closed",
+      "merged_at": "2026-10-11T20:48:12Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/153"
+    },
+    {
+      "number": 152,
+      "title": "CI: the unix suite in four shards per OS",
+      "state": "closed",
+      "merged_at": "2026-10-11T20:36:59Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/152"
+    },
+    {
+      "number": 151,
+      "title": "FINDINGS 42: the references to the DFS section follow its new number",
+      "state": "closed",
+      "merged_at": "2026-10-11T20:26:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/151"
+    },
+    {
+      "number": 150,
+      "title": "adb over USB to Linux: static adbd in the gadget, keys always required (mu300-usb adb on|off)",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:05:53Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/150"
+    },
+    {
+      "number": 149,
+      "title": "voice API: call control with JSON, call events (socket, feed, hooks), audio pipes, LAN-only SIP drop-ins",
+      "state": "open",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/149"
+    },
+    {
+      "number": 148,
+      "title": "Panel Power: the last change's reason in the page's language",
+      "state": "closed",
+      "merged_at": "2026-10-11T19:01:38Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/148"
+    },
+    {
+      "number": 147,
+      "title": "docs: VoWiFi (Wi-Fi calling) feasibility study",
+      "state": "closed",
+      "merged_at": "2026-10-11T19:02:38Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/147"
+    },
+    {
+      "number": 145,
+      "title": "audio: port kano's e5-linux call audio (5.4 kernel fixes, E5 call sequence, Bluetooth headset output)",
+      "state": "closed",
+      "merged_at": "2026-10-13T05:39:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/145"
+    },
+    {
+      "number": 143,
+      "title": "Vendor daemons get their own account; no node writable by the login user",
+      "state": "closed",
+      "merged_at": "2026-10-11T17:52:59Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/143"
+    },
+    {
+      "number": 142,
+      "title": "Installers: copy the boot chain of Android's slot to the Linux slot",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:37:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/142"
+    },
+    {
+      "number": 141,
+      "title": "Mainline: BTF and the eBPF hooks dae needs (6.18, 7.2)",
+      "state": "closed",
+      "merged_at": "2026-10-11T17:57:26Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/141"
+    },
+    {
+      "number": 139,
+      "title": "sms delete: only a message index reaches the modem",
+      "state": "closed",
+      "merged_at": "2026-10-11T15:55:03Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/139"
+    },
+    {
+      "number": 138,
+      "title": "Ubuntu: optional web panel (Cockpit + MU300 page), the panel extra",
+      "state": "closed",
+      "merged_at": "2026-10-11T17:09:40Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/138"
+    },
+    {
+      "number": 137,
+      "title": "Panel: one stuck AT command no longer wedges the control panel",
+      "state": "closed",
+      "merged_at": "2026-10-11T16:09:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/137"
+    },
+    {
+      "number": 136,
+      "title": "Panel: System > Terminal (ttyd), LAN-only, LuCI-session tokens",
+      "state": "closed",
+      "merged_at": "2026-10-11T18:25:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/136"
+    },
+    {
+      "number": 133,
+      "title": "U30 Air: 0-100 % charge limit, Type-C Rp input current, host on outside power, Wi-Fi phy address (based on oswaldxdd's charge2)",
+      "state": "closed",
+      "merged_at": "2026-10-11T14:28:11Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/133"
+    },
+    {
+      "number": 132,
+      "title": "test: a zombie counts as killed in the suspend/resume timing test",
+      "state": "closed",
+      "merged_at": "2026-10-11T11:14:41Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/132"
+    },
+    {
+      "number": 131,
+      "title": "VPN engine extras: vpn-xray, vpn-singbox, vpn-dae in mu300-extra and mu300-update",
+      "state": "closed",
+      "merged_at": "2026-10-11T20:48:42Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/131"
+    },
+    {
+      "number": 130,
+      "title": "Review: kanoqwq clean-tf-7.2, every commit classified",
+      "state": "closed",
+      "merged_at": "2026-10-11T16:09:38Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/130"
+    },
+    {
+      "number": 129,
+      "title": "kano review: panel home page readouts (Wi-Fi clients, DNS, connection count)",
+      "state": "closed",
+      "merged_at": "2026-10-11T18:28:58Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/129"
+    },
+    {
+      "number": 128,
+      "title": "kano review: AT request framing, one Wi-Fi reopen per WCN reset",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/128"
+    },
+    {
+      "number": 126,
+      "title": "Toolkit: show the installed release; mu300-update version",
+      "state": "closed",
+      "merged_at": "2026-10-11T11:04:03Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/126"
+    },
+    {
+      "number": 125,
+      "title": "Panel: a VPN section (Overview, Profiles, Subscriptions, Engines, Settings, Logs) over the module's --json CLI",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:02:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/125"
+    },
+    {
+      "number": 124,
+      "title": "Hotspot: never on a DFS channel (the SC2355 driver cannot detect radar)",
+      "state": "closed",
+      "merged_at": "2026-10-11T18:50:13Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/124"
+    },
+    {
+      "number": 123,
+      "title": "Wi-Fi driver fixes from kanoqwq's clean-tf-7.2 fork",
+      "state": "closed",
+      "merged_at": "2026-10-11T17:46:41Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/123"
+    },
+    {
+      "number": 122,
+      "title": "Panel page audit: board.json LAN port usb0, SQM default queue on the uplink",
+      "state": "closed",
+      "merged_at": "2026-10-11T06:58:23Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/122"
+    },
+    {
+      "number": 121,
+      "title": "Update: keep the device's OpenWrt settings, add the image's new config files",
+      "state": "closed",
+      "merged_at": "2026-10-11T06:37:58Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/121"
+    },
+    {
+      "number": 120,
+      "title": "update: install packages added on the device again, set their settings aside (fixes #116)",
+      "state": "closed",
+      "merged_at": "2026-10-11T20:26:42Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/120"
+    },
+    {
+      "number": 119,
+      "title": "README: the Magisk zips of OpenWrt with the control panel",
+      "state": "closed",
+      "merged_at": "2026-10-11T06:07:29Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/119"
+    },
+    {
+      "number": 118,
+      "title": "Website: every page in three languages, and the v2026.10.18 features",
+      "state": "closed",
+      "merged_at": "2026-10-11T06:06:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/118"
+    },
+    {
+      "number": 117,
+      "title": "test: a release has 11 Magisk zips",
+      "state": "closed",
+      "merged_at": "2026-10-11T04:51:15Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/117"
+    },
+    {
+      "number": 115,
+      "title": "[ImgBot] Optimize images",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/115"
+    },
+    {
+      "number": 114,
+      "title": "test: fetch_addr's budget check is not flaky on a fast runner",
+      "state": "closed",
+      "merged_at": "2026-10-10T20:39:43Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/114"
+    },
+    {
+      "number": 113,
+      "title": "Data usage (per day/cycle, cap), live rates every second, operator names, event-driven Wi-Fi LED",
+      "state": "closed",
+      "merged_at": "2026-10-10T22:24:51Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/113"
+    },
+    {
+      "number": 112,
+      "title": "SMS: durable pooling, incomplete long messages, SMS forwarding page",
+      "state": "closed",
+      "merged_at": "2026-10-10T21:29:54Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/112"
+    },
+    {
+      "number": 111,
+      "title": "CPU performance profiles (mu300-cpu + LuCI System > CPU); voltage offsets deferred",
+      "state": "closed",
+      "merged_at": "2026-10-10T20:34:27Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/111"
+    },
+    {
+      "number": 110,
+      "title": "README: what you lose is nothing",
+      "state": "closed",
+      "merged_at": "2026-10-10T19:56:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/110"
+    },
+    {
+      "number": 109,
+      "title": "Ubuntu 26.04 is no longer beta",
+      "state": "closed",
+      "merged_at": "2026-10-10T19:42:09Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/109"
+    },
+    {
+      "number": 108,
+      "title": "Magisk zips for OpenWrt with the control panel",
+      "state": "closed",
+      "merged_at": "2026-10-10T19:22:09Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/108"
+    },
+    {
+      "number": 107,
+      "title": "Website (GitHub Pages) and wiki",
+      "state": "closed",
+      "merged_at": "2026-10-10T19:30:47Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/107"
+    },
+    {
+      "number": 106,
+      "title": "Relay IPv6: withdraw a renumbered /64 from the LAN (#87)",
+      "state": "closed",
+      "merged_at": "2026-10-10T18:50:14Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/106"
+    },
+    {
+      "number": 104,
+      "title": "Ubuntu: Wi-Fi client mode comes back after a WCN reset (#94)",
+      "state": "closed",
+      "merged_at": "2026-10-10T17:21:50Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/104"
+    },
+    {
+      "number": 101,
+      "title": "Panel: an n78 cell is n78, not n77",
+      "state": "closed",
+      "merged_at": "2026-10-10T12:43:52Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/101"
+    },
+    {
+      "number": 100,
+      "title": "Wi-Fi: recover from a stuck WCN instead of a soft lockup and panic (#94)",
+      "state": "closed",
+      "merged_at": "2026-10-10T12:43:49Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/100"
+    },
+    {
+      "number": 99,
+      "title": "Panel: one-click reset of the modem locks, and a warning that they stay in Android (#96)",
+      "state": "closed",
+      "merged_at": "2026-10-10T11:50:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/99"
+    },
+    {
+      "number": 98,
+      "title": "fw4 reload and restart work on the 5.4 kernel with flow offloading (#95)",
+      "state": "closed",
+      "merged_at": "2026-10-10T15:14:42Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/98"
+    },
+    {
+      "number": 97,
+      "title": "mu300cell: IPv6 comes back after a WAN restart",
+      "state": "closed",
+      "merged_at": "2026-10-10T11:15:11Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/97"
+    },
+    {
+      "number": 93,
+      "title": "The VPN toolkit becomes a module: dikeckaan/mu300-linux-vpn",
+      "state": "closed",
+      "merged_at": "2026-10-10T07:37:19Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/93"
+    },
+    {
+      "number": 92,
+      "title": "install.sh: install Linux on slot a when Android runs from slot b (#86)",
+      "state": "closed",
+      "merged_at": "2026-10-10T15:17:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/92"
+    },
+    {
+      "number": 91,
+      "title": "Locked Linux: mu300-next-boot lock keeps Linux for good, Android only by hand",
+      "state": "closed",
+      "merged_at": "2026-10-09T17:44:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/91"
+    },
+    {
+      "number": 90,
+      "title": "kernel 5.4: quiet the vendor drivers' log spam (#68)",
+      "state": "closed",
+      "merged_at": "2026-10-11T06:18:06Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/90"
+    },
+    {
+      "number": 89,
+      "title": "ndp-learn routes every /64 the bearer holds to the LAN after a renumber (#87)",
+      "state": "closed",
+      "merged_at": "2026-10-09T17:45:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/89"
+    },
+    {
+      "number": 88,
+      "title": "mu300-sms: a hook for every received message, for forwarding (#70)",
+      "state": "closed",
+      "merged_at": "2026-10-09T17:44:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/88"
+    },
+    {
+      "number": 85,
+      "title": "mu300-update: rollback-boot brings back the modules of the image it restores",
+      "state": "closed",
+      "merged_at": "2026-10-09T11:04:04Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/85"
+    },
+    {
+      "number": 84,
+      "title": "mu300-sms: sync moves what it pooled off the SIM, so a full SIM never costs the next message",
+      "state": "closed",
+      "merged_at": "2026-10-09T11:03:58Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/84"
+    },
+    {
+      "number": 83,
+      "title": "stock/README, README: the trustos note without the permission sentence",
+      "state": "closed",
+      "merged_at": "2026-10-09T10:51:36Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/83"
+    },
+    {
+      "number": 82,
+      "title": "stock/: the trustos image moves to the Internet Archive; OpenWrt images take the feed's package updates",
+      "state": "closed",
+      "merged_at": "2026-10-09T09:20:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/82"
+    },
+    {
+      "number": 81,
+      "title": "Codex/v50 tf pages",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/81"
+    },
+    {
+      "number": 80,
+      "title": "Users' reports: the region probe never reads past the eMMC, RNDIS joins the bridge first, fw4's LAN rules on 5.4",
+      "state": "closed",
+      "merged_at": "2026-10-09T07:09:57Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/80"
+    },
+    {
+      "number": 79,
+      "title": "CI: a Release workflow publishes a prerelease from main on request",
+      "state": "closed",
+      "merged_at": "2026-10-09T07:10:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/79"
+    },
+    {
+      "number": 78,
+      "title": "Handoff 2026-10-09: what is in flight and what comes next",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/78"
+    },
+    {
+      "number": 77,
+      "title": "mu300-power: the F50 has no battery, whatever its fuel gauge says",
+      "state": "closed",
+      "merged_at": "2026-10-09T06:03:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/77"
+    },
+    {
+      "number": 76,
+      "title": "mu300-vpn: profiles and engine drivers - Xray, sing-box, mihomo, WireGuard, OpenVPN behind one command (VPN toolkit ①)",
+      "state": "closed",
+      "merged_at": "2026-10-09T07:48:06Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/76"
+    },
+    {
+      "number": 74,
+      "title": "OpenWrt: opt-in U30 Air SC2355 SAE offload and private-log suppression",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/74"
+    },
+    {
+      "number": 73,
+      "title": "OpenWrt: U30 Air native dual-SIM boot and persistent live switching",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/73"
+    },
+    {
+      "number": 72,
+      "title": "Add F50 internal/external SIM selection and restore slot 1 data routing",
+      "state": "closed",
+      "merged_at": "2026-10-11T21:57:26Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/72"
+    },
+    {
+      "number": 69,
+      "title": "Users' reports: the region probe never reads past the eMMC, RNDIS joins the bridge first, fw4's LAN rules on 5.4",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/69"
+    },
+    {
+      "number": 66,
+      "title": "luci-app-mu300: the dashboard's SIM identity is validated before it is cached",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/66"
+    },
+    {
+      "number": 63,
+      "title": "sc27xx-fgu: UMP9620 saved capacity in Android's format, 100 % on the charger's Full",
+      "state": "closed",
+      "merged_at": "2026-10-07T03:17:19Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/63"
+    },
+    {
+      "number": 62,
+      "title": "Power profiles: idle radios when nobody is connected, the charging boot, the charge guard",
+      "state": "closed",
+      "merged_at": "2026-10-08T19:11:22Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/62"
+    },
+    {
+      "number": 60,
+      "title": "FINDINGS: contents table with section status, dated notes where later work superseded a claim",
+      "state": "closed",
+      "merged_at": "2026-10-06T22:24:18Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/60"
+    },
+    {
+      "number": 59,
+      "title": "README: refresh every stale claim against the code and FINDINGS",
+      "state": "closed",
+      "merged_at": "2026-10-06T22:24:08Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/59"
+    },
+    {
+      "number": 58,
+      "title": "mu300-ttl: tc backend on mainline (flow offloading stays on); LuCI Cellular > TTL",
+      "state": "closed",
+      "merged_at": "2026-10-06T22:13:31Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/58"
+    },
+    {
+      "number": 57,
+      "title": "Mainline: system suspend - tickless idle, PMIC watchdog, PCIe WAKE#, the Wi-Fi firmware assert",
+      "state": "closed",
+      "merged_at": "2026-10-06T22:18:21Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/57"
+    },
+    {
+      "number": 56,
+      "title": "README: a hobby project, at your own risk",
+      "state": "closed",
+      "merged_at": "2026-10-06T21:59:58Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/56"
+    },
+    {
+      "number": 55,
+      "title": "mainline: bq256xx drives the U30 Air's charger (untested on hardware)",
+      "state": "closed",
+      "merged_at": "2026-10-06T20:17:06Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/55"
+    },
+    {
+      "number": 53,
+      "title": "kernel: the driver trees are remade from the pristine copy when their patches change",
+      "state": "closed",
+      "merged_at": "2026-10-06T16:27:52Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/53"
+    },
+    {
+      "number": 51,
+      "title": "make-release: the lang extra's audit allows its manifest",
+      "state": "closed",
+      "merged_at": "2026-10-06T14:44:47Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/51"
+    },
+    {
+      "number": 50,
+      "title": "mu300-ussd: the answer budget of T seconds is at least T seconds",
+      "state": "closed",
+      "merged_at": "2026-10-06T13:00:45Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/50"
+    },
+    {
+      "number": 49,
+      "title": "mu300-vpn: Tailscale's own traffic through the tunnel",
+      "state": "closed",
+      "merged_at": "2026-10-06T12:33:47Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/49"
+    },
+    {
+      "number": 48,
+      "title": "LuCI languages: a language switch in both OpenWrt systems, 46 languages, the lang extra and its web page",
+      "state": "closed",
+      "merged_at": "2026-10-06T11:23:19Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/48"
+    },
+    {
+      "number": 47,
+      "title": "mainline: KVM (/dev/kvm) and the module set a router needs, shipped in the kernel bundle",
+      "state": "closed",
+      "merged_at": "2026-10-06T10:39:24Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/47"
+    },
+    {
+      "number": 46,
+      "title": "luci-app-mu300: battery tile on the U30 Air under mainline, with watts",
+      "state": "closed",
+      "merged_at": "2026-10-06T09:26:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/46"
+    },
+    {
+      "number": 44,
+      "title": "mu300-atd: a T-second reply budget is at least T seconds (macOS Atd flake)",
+      "state": "closed",
+      "merged_at": "2026-10-06T06:52:39Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/44"
+    },
+    {
+      "number": 42,
+      "title": "make-release.sh: --prerelease option",
+      "state": "closed",
+      "merged_at": "2026-10-06T04:12:37Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/42"
+    },
+    {
+      "number": 41,
+      "title": "Wi-Fi: serialise WCN power transitions; no panic on RX without a context (FINDINGS 31n)",
+      "state": "closed",
+      "merged_at": "2026-10-06T03:04:00Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/41"
+    },
+    {
+      "number": 40,
+      "title": "Magisk installer: an update keeps the accounts and passwords; never a default or empty one",
+      "state": "closed",
+      "merged_at": "2026-10-06T03:03:48Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/40"
+    },
+    {
+      "number": 39,
+      "title": "init: an arm from Android after LK's own fallback boots Linux",
+      "state": "closed",
+      "merged_at": "2026-10-06T03:03:35Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/39"
+    },
+    {
+      "number": 38,
+      "title": "mu300-update keeps the vendor files when it runs from OpenWrt",
+      "state": "closed",
+      "merged_at": "2026-10-06T03:03:23Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/38"
+    },
+    {
+      "number": 37,
+      "title": "OpenWrt with the MU300 control panel as a third system; kanoqwq's fixes for every system",
+      "state": "closed",
+      "merged_at": "2026-10-05T17:58:32Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/37"
+    },
+    {
+      "number": 36,
+      "title": "wifi-client: share the Wi-Fi uplink, WPA3 told apart, password off the command line, disconnect lasts",
+      "state": "closed",
+      "merged_at": "2026-10-06T03:40:02Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/36"
+    },
+    {
+      "number": 35,
+      "title": "Magisk installer on the device: the unmount Android already did, and a password file that keeps both systems",
+      "state": "closed",
+      "merged_at": "2026-10-05T14:34:37Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/35"
+    },
+    {
+      "number": 34,
+      "title": "F50 LEDs like the U30 Air's; update cleanup, quiet IPA threads, the whole boot in the journal, a fixed 5.4 Wi-Fi MAC",
+      "state": "closed",
+      "merged_at": "2026-10-05T13:59:11Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/34"
+    },
+    {
+      "number": 33,
+      "title": "The eMMC stays mmc0, and init finds eMMC and card by type",
+      "state": "closed",
+      "merged_at": "2026-10-05T13:43:30Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/33"
+    },
+    {
+      "number": 31,
+      "title": "mu300-extra: the VPN engines are an optional download; every command on the PATH",
+      "state": "closed",
+      "merged_at": "2026-10-05T10:53:30Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/31"
+    },
+    {
+      "number": 30,
+      "title": "Magisk-flashable installer, built by CI for every system and kernel",
+      "state": "closed",
+      "merged_at": "2026-10-05T09:24:04Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/30"
+    },
+    {
+      "number": 28,
+      "title": "Driver fixes from the overnight device tests and kanoqwq's fork",
+      "state": "closed",
+      "merged_at": "2026-10-05T09:16:23Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/28"
+    },
+    {
+      "number": 27,
+      "title": "The Linux filesystem on the SD card",
+      "state": "closed",
+      "merged_at": "2026-10-05T09:10:01Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/27"
+    },
+    {
+      "number": 26,
+      "title": "Mainline kernels: 6.18.55 and 7.2.9",
+      "state": "closed",
+      "merged_at": "2026-10-05T09:09:57Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/26"
+    },
+    {
+      "number": 23,
+      "title": "Improve TF networking, USB management, and dual-kernel images",
+      "state": "closed",
+      "merged_at": "2026-10-05T06:36:05Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/23"
+    },
+    {
+      "number": 22,
+      "title": "Add standalone LuCI modem app with Bootstrap dark mode and dashboard i18n",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/22"
+    },
+    {
+      "number": 21,
+      "title": "Install OpenWrt to TF with Linux 7.2 from Magisk",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/21"
+    },
+    {
+      "number": 19,
+      "title": "Wi-Fi scan mode lasts one boot and gives the hotspot back; devices note a newer release at login",
+      "state": "closed",
+      "merged_at": "2026-10-05T09:09:03Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/19"
+    },
+    {
+      "number": 18,
+      "title": "F50: the heat alarm no longer reads a battery that is not there",
+      "state": "closed",
+      "merged_at": "2026-09-29T05:45:11Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/18"
+    },
+    {
+      "number": 17,
+      "title": "Drop the daily traffic statistics; the README keeps its badges",
+      "state": "closed",
+      "merged_at": "2026-09-28T21:42:17Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/17"
+    },
+    {
+      "number": 16,
+      "title": "Windows installs push LF scripts; the AP lists its stations; stale trial guards disarmed; mu300-nfc on|off",
+      "state": "closed",
+      "merged_at": "2026-09-28T21:32:04Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/16"
+    },
+    {
+      "number": 15,
+      "title": "OpenWrt build: no apostrophe inside the docker sh -c script; a test for it",
+      "state": "closed",
+      "merged_at": "2026-09-28T17:07:14Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/15"
+    },
+    {
+      "number": 14,
+      "title": "U30 Air: mu300-nfc writes its NFC tag (the hotspot's Wi-Fi, a URL, text)",
+      "state": "closed",
+      "merged_at": "2026-09-28T17:00:25Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/14"
+    },
+    {
+      "number": 13,
+      "title": "U30 Air: every LED under control as in ZTE's firmware; a heat alarm on the battery LED",
+      "state": "closed",
+      "merged_at": "2026-09-28T16:20:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/13"
+    },
+    {
+      "number": 12,
+      "title": "U30 Air USB host; installers ask which adb device",
+      "state": "closed",
+      "merged_at": "2026-09-28T13:54:06Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/12"
+    },
+    {
+      "number": 11,
+      "title": "Tests for every system's scripts; U30 Air buttons and LED timeout",
+      "state": "closed",
+      "merged_at": "2026-09-28T08:05:34Z",
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/11"
+    },
+    {
+      "number": 10,
+      "title": "ZTE U30 Air support",
+      "state": "closed",
+      "merged_at": null,
+      "html_url": "https://github.com/dikeckaan/mu300-linux/pull/10"
+    }
+  ]
+}

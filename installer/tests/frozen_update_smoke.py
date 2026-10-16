@@ -8,6 +8,8 @@ import sys
 def child(package):
     from contextlib import nullcontext, redirect_stdout
     import hashlib
+    import builtins
+    import getpass
     import io
     import struct
     import tempfile
@@ -30,6 +32,11 @@ def child(package):
     struct.pack_into('<I',live,28,zlib.crc32(live[:28]))
     key=hashlib.sha256(b'frozen-only-test-key').hexdigest()
     original_client=paramiko.SSHClient
+    original_input=builtins.input
+    original_getpass=getpass.getpass
+    def no_console(*args,**kwargs):raise AssertionError('GUI attempted console input')
+    builtins.input=no_console
+    getpass.getpass=no_console
     results=[]
     try:
         for mode in ('legacy','sd','part','data-image'):
@@ -39,6 +46,10 @@ def child(package):
                 record=store.create(meta,{'serial':'ssh:'+key,'cid':'a'*32,'ssh_key':key},
                                     {'method':'update','host':'192.168.78.1'}, {'method':'update','openwrt_bytes':capacity})
                 adapter=Adapter(meta,Context(store,record,lambda *_:None));adapter.password='fixture-only'
+                prompt_output=io.StringIO()
+                with redirect_stdout(prompt_output):
+                    assert adapter.legacy.confirm('Userdata will be formatted and Android reset') is True
+                assert prompt_output.getvalue()==''
                 events=[];uploads={};probes=[]
                 channel=SimpleNamespace(recv_exit_status=lambda:0)
                 public_key=SimpleNamespace(asbytes=lambda:b'frozen-only-test-key')
@@ -62,6 +73,7 @@ def child(package):
                 adapter.legacy.payload_rootfs=lambda _:nullcontext(archive)
                 def obsolete(*args,**kwargs):raise AssertionError('Old package update gate executed')
                 adapter.legacy.update=obsolete
+                adapter.legacy.confirm=no_console
                 # The real package boot repacker executes; only transport and
                 # the uploaded rootfs fixture are replaced. No device opens.
                 with redirect_stdout(io.StringIO()):adapter.execute()
@@ -73,10 +85,14 @@ def child(package):
                     assert record['update_layout']['offset']==offset
                 else:assert not probes
                 results.append(mode)
-    finally:paramiko.SSHClient=original_client
+    finally:
+        paramiko.SSHClient=original_client
+        builtins.input=original_input
+        getpass.getpass=original_getpass
     print(json.dumps({'package':package.name,'kernel':meta['kernel'],'frozen_backend':True,
                       'modes':results,'real_package_boot_repacker':True,'old_gate_bypassed':True,
-                      'original_capacity':capacity,'hardware_access':False}))
+                      'original_capacity':capacity,'gui_console_input_blocked':True,
+                      'gui_confirmation_no_output':True,'hardware_access':False}))
 
 
 if __name__=='__main__':

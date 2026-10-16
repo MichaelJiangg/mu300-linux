@@ -51,6 +51,8 @@ def build_patch(destination, artifact=None):
 它修复旧版隐藏额外空间安装被 legacy 检查拒绝的问题。
 无需重新分区、重装或清空 Android。请保留原包全部载荷、子目录和备份。
 Mac 版本未更新。补丁不会连接或操作设备。
+图形界面无需在日志输入 yes，只需确认页面上的最终安装计划。
+更新 OpenWrt 不会格式化 Android userdata；首次安装需要重置时，以确认页面的数据影响为准。
 若提示校验失败，停止并保留完整提示；不要跳过校验或改选首次分区安装。
 
 Close the installer. Extract every ZIP member over the original package, run

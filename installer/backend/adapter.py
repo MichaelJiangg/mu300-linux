@@ -79,6 +79,10 @@ class Adapter:
         self.ctx = context
         self.legacy = load(self.root / 'OpenWrt-Installer.py', '_installer_' + secrets.token_hex(4))
         self.legacy.GUI = self
+        # Older package helpers may still implement a terminal confirmation.
+        # Bind confirmation to the coordinator; never read its NDJSON stdin.
+        self.legacy.confirm = self.confirm_legacy
+        self.legacy.input = self.console_input_unavailable
         if self.kind == 'e5':
             self.legacy.B, self.legacy.F, self.legacy.SCRIPTS = str(self.root), str(self.root/'files'), str(self.root/'scripts')
             # Old compatible package scripts must not retain their exact-hash
@@ -106,6 +110,15 @@ class Adapter:
                     return traced(self.ctx, 'legacy ADB '+shlex.join(map(str,args)),
                                   lambda:original(android, *args, **kwargs), output=False)
                 self.legacy.Android.call = observed
+
+    def confirm_legacy(self, *_args, **_kwargs):
+        if not self.ctx or self.legacy.GUI is not self:
+            raise RecoveryRequired('GUI confirmation context is unavailable / 图形界面确认上下文不可用，已停止')
+        self.ctx.boundary()
+        return True
+
+    def console_input_unavailable(self, *_args, **_kwargs):
+        raise RecoveryRequired('A required GUI option is missing; console input is unavailable / 缺少必要的图形界面参数，已停止；请返回安装计划检查选项')
 
     def stage(self, stage, status='running', **details):
         if self.ctx:
@@ -484,6 +497,7 @@ class Adapter:
     def update_e5(self, args):
         helper = load(self.root/'scripts/tools/e5-update.py', '_update')
         helper.GUI = self
+        helper.input = self.console_input_unavailable
         raw_size, raw_hash = self.legacy.gz_metadata(str(self.root/'files/openwrt.ext4.gz'))
         previous = sys.argv
         try:

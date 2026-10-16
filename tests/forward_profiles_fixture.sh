@@ -92,6 +92,7 @@ expect_error '{"webhook_body":"{broken}"}'
 expect_error '{"webhook_url":"https://{text}.example.com/hook"}'
 expect_error '{"profile":"../../etc"}'
 # A future battery device uses the shared profile even in independent mode.
+BATTERY=$MU300_FORWARD_BATTERY
 mkdir -p "$BATTERY"
 printf '1\n' > "$BATTERY/present"; printf '50\n' > "$BATTERY/capacity"; printf 'Discharging\n' > "$BATTERY/status"
 check_set '{"profile":"shared","mode":"per_sim","enabled":1,"method":"webhook","webhook_url":"https://power.example.com/hook","power_forward_enabled":1}'

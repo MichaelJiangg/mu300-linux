@@ -304,10 +304,12 @@ live_switch() {
     available || { fail 'Persistent dual-SIM brokers unavailable; reboot first'; return 1; }
     [ ! -e /run/mu300-mobile-data.suspend ] || { fail 'Resume the modem before switching'; return 1; }
     [ ! -d /run/unisoc-modem-lock-apply ] || { fail 'Network locks are being applied'; return 1; }
+    # Decide before the same-slot path too: data deliberately off needs no IP.
+    if sim_wan_held_down; then held_down=1; fi
     if [ "$old" = "$target" ]; then
-        wan_wait || { atomic "$R/sim-result" no_data; fail 'Active SIM has no data; use default for next-boot selection'; return 1; }
+        [ "$held_down" = 1 ] || wan_wait || { atomic "$R/sim-result" no_data; fail 'Active SIM has no data; use default for next-boot selection'; return 1; }
         sim_cfg_save_default "$target" || return 1
-        sim_seen_add "$target" || true
+        [ "$held_down" = 1 ] || sim_seen_add "$target" || true
         atomic "$R/sim-result" switched
         rm -f "$FALLBACK"; status; return 0
     fi
@@ -318,7 +320,6 @@ live_switch() {
     refusal=$(preflight "$target") || { fail "$refusal"; return 1; }
     # Did the card in use have data? It decides what a target without data means, below.
     if wan_up; then had_data=1; fi
-    if sim_wan_held_down; then held_down=1; fi
     # Prevent new dial/watch rounds before netifd cancels the old protocol task.
     : > "$R/sim-switching"
     atomic "$R/sim-result" switching
@@ -339,14 +340,14 @@ live_switch() {
     if [ "$rc" = 75 ]; then
         # nothing was sent: the radio lock or the AT channel stayed busy. The previous card is as it was.
         atomic "$R/sim-result" failed
-        rm -f "$R/sim-switching" /run/mu300-mobile-data-down
+        rm -f "$R/sim-switching"
         [ "$held_down" = 1 ] || ifup "$sim_wan" || true
         fail 'The modem is busy; nothing was changed, try again'; return 1
     fi
     if [ "$rc" != 0 ]; then
         if roll_back "$old"; then
             atomic "$R/sim-result" rolled_back
-            rm -f "$R/sim-switching" /run/mu300-mobile-data-down
+            rm -f "$R/sim-switching"
             if [ "$held_down" != 1 ]; then
                 ifup "$sim_wan" || { fail 'Previous SIM restored but WAN could not be started'; return 1; }
             fi
@@ -357,7 +358,7 @@ live_switch() {
     # The target card is up: let netifd dial it, and keep the boot default where it was until the bearer is
     # there. The published slot is this boot's; the saved one is tomorrow's.
     publish "$target"
-    rm -f "$R/sim-switching" /run/mu300-mobile-data-down
+    rm -f "$R/sim-switching"
     atomic "$R/sim-phase" waiting_for_data
     if [ "$held_down" = 1 ]; then
         sim_cfg_save_default "$target" || { atomic "$R/sim-result" failed; fail storage_failed; return 1; }

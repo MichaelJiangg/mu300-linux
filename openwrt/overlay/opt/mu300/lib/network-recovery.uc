@@ -21,18 +21,30 @@ export function can_resume(status, wait_slot, selected, blocked) {
         status.available !== false || wait_slot !== selected)
         return false;
     for (let error in status.errors ?? [])
-        if (error.code != 'REGISTRATION_WAIT')
+        if (error.code != 'REGISTRATION_WAIT' && error.code != 'SIM_MISSING')
             return false;
     return true;
 };
 
-export function recovery(call, state, wait_slot, selected, blocked, previous) {
+export function recovery(call, state, wait_slot, selected, blocked, previous, sim) {
+    let status = call('status', {});
+    let same_sim = type(sim) == 'object' && sim.slot === selected;
+    if (same_sim && sim.state == 'absent') {
+        previous.key = null; previous.attempted = false;
+        // Stop setup/renew attempts without overriding a user's ifdown or
+        // cycling RF. The modem remains able to receive insertion events.
+        if (!blocked && status?.proto == 'mu300cell' && status.autostart === true && status.available !== false)
+            return call('notify_proto', { action: 5, available: false }) != null;
+        return false;
+    }
     let key = registration_key(state, selected);
+    for (let error in status?.errors ?? [])
+        if (error.code == 'SIM_MISSING' && same_sim && sim.state == 'ready')
+            key = sprintf('sim:%d:ready', selected);
     if (key != previous.key) {
         previous.key = key;
         previous.attempted = false;
     }
-    let status = call('status', {});
     if (status?.up === true)
         previous.attempted = false;
     if (key == null || previous.attempted ||

@@ -474,7 +474,7 @@ for os in $OSES; do
         image_own_save "$M/$os.new"
         case $os in
             ubuntu) keep="etc/mu300 etc/ssh etc/hostname etc/localtime etc/timezone etc/fstab home root srv usr/local var/lib/bluetooth" ;;
-openwrt) keep="etc/config etc/mu300 etc/unisoc-modem etc/dropbear etc/rc.local root" ;;
+openwrt) keep="etc/config etc/mu300 etc/unisoc-modem etc/dropbear etc/rc.local etc/crontabs root" ;;
         esac
         kept=
         for k in $keep; do

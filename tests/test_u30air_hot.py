@@ -493,11 +493,20 @@ esac""")
 
 
     def test_deliberately_down_wan_stays_down_after_native_switch(self):
+        flag=self.run/'mu300-mobile-data-down';flag.touch()
         r=self.ctl('switch','1',T_HELD_DOWN='1')
         self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         self.assertEqual((self.etc/'uci-slot').read_text(),'0\n')
         self.assertNotIn('up',(self.tmp/'net').read_text().splitlines())
         self.assertEqual(self.status()['active'],1)
+        self.assertTrue(flag.exists())
+
+    def test_same_card_manual_off_needs_no_address_or_at_command(self):
+        flag=self.run/'mu300-mobile-data-down';flag.touch()
+        r=self.ctl('switch','2',T_HELD_DOWN='1',T_WAN='0')
+        self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+        self.assertEqual(self.calls(),[])
+        self.assertTrue(flag.exists())
 
     def test_teardown_must_acknowledge_before_radio_off(self):
         self.stub('sleep', ':')

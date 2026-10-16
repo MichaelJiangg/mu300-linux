@@ -77,12 +77,24 @@ mkfifo -m 600 "$CMD"
 
 # the one open that everything else borrows
 open_tty() {
-    exec 3<&- 2>/dev/null || true
-    exec 3<>"$DEV" || return 1
+    exec 3<&- || true
+    # command suppresses exec redirection's fatal-special-builtin behavior in
+    # ash/dash. A failed FIRST open is retryable; a successful open is retained.
+    command exec 3<>"$DEV" || return 1
     # on fd 3, not "stty -F $DEV": the -F form opens and closes the tty a second time
     stty raw -echo <&3 2>/dev/null || true
 }
-open_tty || { echo "mu300-atd: cannot open $DEV" >&2; exit 1; }
+if ! open_tty; then
+    echo "mu300-atd: $DEV exists but is not usable; waiting for first open" >&2
+    first_open_end=$(( $(date +%s) + ${MU300_AT_INITIAL_WAIT:-30} ))
+    until open_tty; do
+        [ "$(date +%s)" -lt "$first_open_end" ] || {
+            echo "mu300-atd: $DEV never became usable; check CP firmware and eMMC availability" >&2
+            exit 1
+        }
+        sleep 1
+    done
+fi
 
 # Keep the other AT channels drained, the way Android's RIL does - it holds nr0-nr5 open and reads all six.
 # /dev/stty_nr0 carries the modem's unsolicited output (+SIND, +ECIND, +SPERRLOG, ...), and each stty_nr<n> is
@@ -138,9 +150,19 @@ for n in ${MU300_AT_URC_CHANNELS-0}; do
         : > "$log"
         # A new owner must not inherit a registered cache from a dead CP.
         case "$n" in
-            0|3) rm -f "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/slot$((n / 3)).json" ;;
+            0|3) rm -f "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/slot$((n / 3)).json" \
+                       "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/sim$((n / 3)).json" \
+                       "${MU300_REGISTRATION_DIR:-/run/mu300-registration}/sim-power$((n / 3))" ;;
         esac
-        exec 4< "$other" || exit 1
+        # A late URC channel must also survive ENODEV on its first open. Never
+        # probe with a separate open/close or reopen a successful descriptor.
+        if ! command exec 4< "$other"; then
+            urc_open_end=$(( $(date +%s) + ${MU300_AT_INITIAL_WAIT:-30} ))
+            until command exec 4< "$other"; do
+                [ "$(date +%s)" -lt "$urc_open_end" ] || exit 1
+                sleep 1
+            done
+        fi
         # $$ remains the parent's PID in ash subshells. Read our actual PID
         # without forking so a dead drainer cannot pass the readiness check.
         read -r reader_pid reader_stat < /proc/self/stat
@@ -156,6 +178,9 @@ for n in ${MU300_AT_URC_CHANNELS-0}; do
                         /opt/mu300/bin/led-status sim-status "$((n / 3))" "$urc" >/dev/null 2>&1 ;;
             esac
             case "$n:$urc" in
+                0:+ECIND:*|3:+ECIND:*)
+                    ! command -v mu300_sim_changed >/dev/null 2>&1 ||
+                        mu300_sim_changed "$((n / 3))" "$urc" ;;
                 0:+CEREG:*|3:+CEREG:*)
                     ! command -v mu300_registration_save >/dev/null 2>&1 ||
                         mu300_registration_save "$((n / 3))" "$urc" ;;
@@ -283,6 +308,9 @@ while :; do
     else
         silent=0
     fi
+    # A bare CPIN has no reliable card identity: SPACTCARD can stick on this
+    # channel. Only explicitly addressed transactions enter the SIM cache.
+    ! command -v mu300_sim_reply >/dev/null 2>&1 || mu300_sim_reply "$cmd" "$reply"
     if [ -n "$answer" ]; then
         # write it complete, then move it into place, so the client never reads half an answer
         printf '%s\n' "$reply" > "$answer.part" 2>/dev/null && mv "$answer.part" "$answer" 2>/dev/null

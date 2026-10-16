@@ -700,6 +700,8 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 	if (atomic_read(&priv->hif.block_cmd_after_close) == 1) {
 		if (cmd_id != CMD_CLOSE) {
 			ret = -EBUSY;
+			if (rlen)
+				*rlen = 0;
 			pr_info("%s need block cmd after close : %s\n",
 				__func__, cmdevt_cmd2str(cmd_id));
 			sprd_chip_free_msg(&priv->chip, msg);
@@ -712,6 +714,8 @@ int sc2355_send_cmd_recv_rsp(struct sprd_priv *priv, struct sprd_msg *msg, u8 *r
 	if (atomic_read(&priv->hif.change_iface_block_cmd) == 1) {
 		if (cmd_id != CMD_CLOSE && cmd_id != CMD_OPEN) {
 			ret = -EBUSY;
+			if (rlen)
+				*rlen = 0;
 			pr_info("%s need block cmd while change iface : %s\n",
 				__func__, cmdevt_cmd2str(cmd_id));
 			sprd_chip_free_msg(&priv->chip, msg);
@@ -1947,7 +1951,7 @@ int sc2355_get_station(struct sprd_priv *priv, struct sprd_vif *vif,
 		       struct sprd_sta_info *sta)
 {
 	struct sprd_msg *msg;
-	struct cmd_get_station get_sta;
+	struct cmd_get_station get_sta = {};
 	u8 *r_buf = (u8 *)&get_sta;
 	u16 r_len = sizeof(get_sta);
 	int ret;

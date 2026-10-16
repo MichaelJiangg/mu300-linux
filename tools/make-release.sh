@@ -122,7 +122,7 @@ for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-ubuntu-rootfs mu3
         -e '(^|/)lib/firmware/(wcnmodem|gnssmodem|wifi_board_config|bt_configure)' \
         -e '^opt/mu300/android/.+' -e '__properties__|dev-properties' \
         -e '(^|/)(libmali|libOpenCL|libGLES|libEGL|libvulkan)[^/]*\.so' \
-        -e '^etc/ssh/ssh_host_' -e '^etc/mu300/(hotspot|vpn|toolkit)\.conf$' -e '^etc/dropbear/dropbear_.*_host_key' \
+        -e '^etc/uhttpd\.key$' -e '^etc/ssh/ssh_host_' -e '^etc/mu300/(hotspot|vpn|toolkit)\.conf$' -e '^etc/dropbear/dropbear_.*_host_key' \
         | grep -vE '^opt/mu300/android/system/?$|^opt/mu300/android/system/bin/?$|^opt/mu300/android/system/bin/cltest$' || true)
     if [ -n "$bad" ]; then echo "$a contains files that must not be published:"; echo "$bad" | head -20; fail=1; fi
     mid=$(tar -xzOf "$D/$a.tar.gz" ./etc/machine-id 2>/dev/null || true)

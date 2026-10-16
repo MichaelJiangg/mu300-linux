@@ -34,7 +34,7 @@ if name=='uci':
  elif a[:2]==['-q','commit'] and s.get('fail_commit'):
   s['fail_commit']=False; save(); sys.exit(1)
 elif name=='ubus':
- print(json.dumps({'up':s['up'],'pending':False,'l3_device':'card'+str(s['actual'])}))
+ print(json.dumps({'up':s['up'],'pending':False,'autostart':s.get('autostart',True),'l3_device':'card'+str(s['actual'])}))
 elif name=='ifdown':
  if not s.get('stuck'): s['up']=False; save()
 elif name=='ifup':
@@ -57,6 +57,12 @@ elif name=='jsonfilter':
             self.stub(name,f'exec "{driver}" {name} "$@"')
         self.stub('sleep', ':')
         (self.tmp/'ready').touch()
+        # BusyBox ash can run ifdown/ifup as applets before consulting PATH.
+        # Keep all test network operations inside these explicit fixtures.
+        self.controller=self.tmp/'data-sim'
+        source=SCRIPT.read_text()
+        shims='\n'.join(name+'() { "$STUBLOG/stubs/'+name+'" "$@"; }' for name in ('ifdown','ifup','sleep'))
+        self.controller.write_text(source.replace('#!/bin/sh\n','#!/bin/sh\n'+shims+'\n',1))
         self.extra=dict(MU300_SIM_ENV_LIB=self.envlib,MU300_SIM_MUTEX=self.tmp/'mutex',MU300_DUAL_READY=self.tmp/'ready',MU300_DATA_SIM_ACTUAL=self.tmp/'actual')
 
     def reset(self, **values):
@@ -64,7 +70,7 @@ elif name=='jsonfilter':
         (self.tmp/'commands').write_text('')
 
     def run_switch(self,shell,target):
-        return self.script(shell,SCRIPT,'apply',target,**self.extra)
+        return self.script(shell,self.controller,'apply',target,**self.extra)
 
     def test_same_card_never_disconnects(self):
         for shell in self.each_shell():
@@ -83,6 +89,17 @@ elif name=='jsonfilter':
                 s=json.loads(self.db.read_text())
                 self.assertEqual((s['saved'],s['actual'],s['up']),(int(target),int(target),True))
             self.assertFalse((self.tmp/'mutex').exists())
+
+    def test_manually_disabled_data_stays_off_on_other_card(self):
+        for shell in self.each_shell():
+            self.reset(autostart=False)
+            state=json.loads(self.db.read_text());state['up']=False
+            self.db.write_text(json.dumps(state))
+            r=self.run_switch(shell,'1')
+            self.assertEqual(r.returncode,0,r.stderr)
+            state=json.loads(self.db.read_text())
+            self.assertEqual((state['saved'],state['actual'],state['up']),(1,1,False))
+            self.assertNotIn('ifup',(self.tmp/'commands').read_text())
 
     def test_failed_selection_restores_original(self):
         for shell in self.each_shell():

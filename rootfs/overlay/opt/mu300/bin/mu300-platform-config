@@ -6,6 +6,21 @@ device=$(mu300-device 2>/dev/null)
 case $device in v50|u30air) slots=2 ;; f50) slots=1 ;; *) exit 1 ;; esac
 [ "$(uci -q get unisoc_modem.main)" = core ] || exit 0
 previous=$(uci -q get unisoc_modem.main.platform_defaults)
+# Restore a positively selected internal F50 SIM before the AT owner layout
+# is fixed. Ordinary single-SIM F50 boots get no additional modem commands.
+if [ "$device" = f50 ] && { [ -z "$previous" ] || [ "$previous" = f50 ]; }; then
+    selected=$(uci -q get unisoc_modem.main.data_sim)
+    if [ -z "$previous" ] && [ "$selected" != 0 ] && [ "$selected" != 1 ]; then
+        legacy=$(uci -q get network.wan.sim_slot)
+        if [ "$legacy" = 1 ]; then
+            uci -q set unisoc_modem.main.data_sim=1 || exit 1
+            selected=1
+        fi
+    fi
+    if [ "$selected" = 1 ] && [ "$(uci -q get unisoc_modem.main.sim_slots)" != 2 ]; then
+        uci -q set unisoc_modem.main.sim_slots=2 && uci -q commit unisoc_modem || exit 1
+    fi
+fi
 if [ "$previous" = "$device" ]; then
     # Upgrade existing U30 profiles once; never reset APNs or the selected card.
     [ "$device" = u30air ] && [ "$(uci -q get unisoc_modem.main.u30_native_version)" != 1 ] || exit 0
