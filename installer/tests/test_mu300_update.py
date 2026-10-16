@@ -90,7 +90,7 @@ class LegacyUpdate(unittest.TestCase):
         (self.root/'desktop/files/boot/original-init').write_text('ROOT_OFFSET='+str(offset)+'\n')
         self.assertEqual(self.probe(geometry(offset=offset))['offset'], offset)
 
-    @unittest.skipIf(os.name == 'nt', 'POSIX shell fixture, run in Linux/WSL')
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux target-shell fixture; run in Linux/WSL')
     def test_real_readonly_probe_checks_mounted_container_and_loop_source(self):
         fake = self.root/'runtime'
         files = {'run/mu300/disk-dev':'/dev/loop0', 'sys/class/block/loop0/dev':'7:0',
