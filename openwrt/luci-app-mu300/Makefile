@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-mu300
 PKG_VERSION:=1.2.0
-PKG_RELEASE:=15
+PKG_RELEASE:=16
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=MU300 Linux contributors
 PKGARCH:=all
@@ -24,6 +24,7 @@ define Package/luci-app-mu300/description
 endef
 
 define Package/luci-app-mu300/conffiles
+/etc/mu300/sim-radio
 /etc/config/unisoc_modem
 /etc/config/unisoc_apn
 /etc/config/mu300-charge

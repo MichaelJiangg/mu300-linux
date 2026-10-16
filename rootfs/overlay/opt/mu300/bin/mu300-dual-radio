@@ -12,7 +12,7 @@ query() {
     MU300_AT_DIR=$dir "$client" -t "${3:-3}" "AT+SPACTCARD=$1;${2#AT}" | tr -d '\r'
 }
 ok() { query "$1" "$2" "${3:-4}" | grep -qx OK; }
-cfun() { query "$1" 'AT+CFUN?' | sed -n 's/^+CFUN: *\([01]\)$/\1/p'; }
+cfun() { query "$1" 'AT+CFUN?' | sed -n 's/^+CFUN: *\([014]\)$/\1/p'; }
 fail() { echo "dual-radio: $*" >&2; exit 1; }
 # Do not close or steal the old NR3 owner on a live system. Configuration
 # migration requires a clean reboot. The drainer announces readiness on open.
@@ -37,12 +37,25 @@ for card in 0 1; do
 done
 present() { case $1 in 0) [ "$present0" = 1 ] ;; 1) [ "$present1" = 1 ] ;; *) return 1 ;; esac; }
 cf0=$(cfun 0); cf1=$(cfun 1)
-if { [ "$present0" = 0 ] || [ "$cf0" = 1 ]; } && { [ "$present1" = 0 ] || [ "$cf1" = 1 ]; }; then
+allowed0=1; allowed1=1
+for card in 0 1; do
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$card"; rc=$?
+    case "$rc:$card" in 0:*) ;; 1:0) allowed0=0;; 1:1) allowed1=0;; *) fail 'invalid saved radio policy';; esac
+done
+allowed() { if [ "$1" = 0 ]; then [ "$allowed0" = 1 ]; else [ "$allowed1" = 1 ]; fi; }
+# A warm disabled stack may still be on after a CP/service restart. Enforce
+# only its flight mode; do not reset or reinitialize the other live stack.
+if [ "$allowed0" = 0 ] && [ "$cf0" = 1 ]; then ok 0 'AT+CFUN=4' 30 || fail 'SIM 0 RF disable failed'; cf0=$(cfun 0); fi
+if [ "$allowed1" = 0 ] && [ "$cf1" = 1 ]; then ok 1 'AT+CFUN=4' 30 || fail 'SIM 1 RF disable failed'; cf1=$(cfun 1); fi
+if { [ "$present0" = 0 ] || { [ "$allowed0:$cf0" = 1:1 ] || [ "$allowed0:$cf0" = 0:4 ]; }; } &&
+   { [ "$present1" = 0 ] || { [ "$allowed1:$cf1" = 1:1 ] || [ "$allowed1:$cf1" = 0:4 ]; }; }; then
     actual=$(query 0 'AT+SPSWDATA?' | sed -n 's/^+SPSWDATA: *\([01]\)$/\1/p')
     case "$actual" in 0|1) printf '%s\n' "$actual" > "$root/mu300-data-sim-actual" ;; *) fail 'data SIM readback unavailable' ;; esac
     : > "$root/mu300-dual-radio-ready"; exit 0
 fi
 check0=$cf0; check1=$cf1
+[ "$allowed0:$check0" != 0:4 ] || check0=0
+[ "$allowed1:$check1" != 0:4 ] || check1=0
 [ "$present0" != 0 ] || check0=0
 [ "$present1" != 0 ] || check1=0
 case "$check0:$check1" in
@@ -86,8 +99,13 @@ if present "$target"; then [ "$actual" = "$target" ] || fail 'data SIM readback 
 printf '%s\n' "$actual" > "$root/mu300-data-sim-actual"
 for card in 0 1; do
     present "$card" || continue
-    ok "$card" 'AT+SFUN=4' 20 || fail "SIM $card radio-on rejected"
-    [ "$(cfun "$card")" = 1 ] || fail "SIM $card radio-on readback mismatch"
+    if allowed "$card"; then
+        ok "$card" 'AT+SFUN=4' 20 || fail "SIM $card radio-on rejected"
+        [ "$(cfun "$card")" = 1 ] || fail "SIM $card radio-on readback mismatch"
+    else
+        ok "$card" 'AT+CFUN=4' 30 || fail "SIM $card radio-off rejected"
+        [ "$(cfun "$card")" = 4 ] || fail "SIM $card radio-off readback mismatch"
+    fi
 done
 : > "$root/mu300-dual-radio-ready"
-echo 'dual-radio: both SIM stacks ready' >&2
+echo 'dual-radio: SIM stacks initialized with saved RF permissions' >&2

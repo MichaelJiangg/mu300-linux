@@ -1,0 +1,8 @@
+#!/bin/sh
+# Persistent per-slot RF permission. Missing means both enabled (legacy).
+case ${1:-} in 0|1) ;; *) exit 2;; esac
+policy=${UNISOC_RADIO_POLICY:-/etc/mu300/sim-radio}
+[ -e "$policy" ] || exit 0
+flags=$(cat "$policy") || exit 2
+case "$flags" in '0 0'|'0 1'|'1 0'|'1 1') ;; *) exit 2;; esac
+if [ "$1" = 0 ]; then [ "${flags% *}" = 1 ]; else [ "${flags#* }" = 1 ]; fi

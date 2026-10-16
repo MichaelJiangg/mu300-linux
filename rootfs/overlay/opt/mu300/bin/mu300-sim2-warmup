@@ -36,6 +36,7 @@ SIM_CONFIG_U30=1
 [[ ! -e /run/mu300/charging-boot ]] || exit 0
 SLOT=$(cat /run/mu300/sim-slot 2>/dev/null || echo 1)
 case "$SLOT" in 0|1) ;; *) SLOT=1 ;; esac
+"${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$SLOT" || exit 0
 say() { logger -t mu300-sim "$*" 2>/dev/null || true; }
 # A second run in one boot is the AT service restarted by hand: the owners were closed and opened again, and the
 # cold start cannot be repeated. Nothing is concluded from it and no setting is changed.
@@ -115,6 +116,7 @@ if ! MU300_RADIO_LOCK_WAIT=30 "$MD" radio-locked /bin/bash /opt/mu300/bin/mu300-
     fallback "${reason:-cold-start-failed}"
 fi
 rm -f "$PENDING" /run/mu300/sim-active-unknown /run/unisoc-modem-early-hook-pending
+[ "${1:-}" != --radio-only ] || exit 0
 
 # 3. the second card's first data
 [[ "$SLOT" == 1 ]] || exit 0

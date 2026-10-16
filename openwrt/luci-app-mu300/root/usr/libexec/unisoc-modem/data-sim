@@ -10,6 +10,7 @@ validate_apply() {
     [ "$1" = data ] || { echo invalid_sim >&2; return 1; }
     case "$2" in
         0|1) ;;
+        radio-[01]-[01]) ;;
         u30-hot-[01]|u30-default-[01])
             [ "$(mu300-device 2>/dev/null)" = u30air ] || { echo dual_sim_unavailable >&2; return 1; } ;;
         *) echo invalid_sim >&2; return 1 ;;
@@ -23,6 +24,11 @@ get) [ -x "$adapter" ] && "$adapter" get || printf '{"ok":0,"error":"dual_sim_un
 start) job_start data "${2:-}" ;;
 status) job_status "${2:-}" ;;
 worker) job_worker "$2" "$3" "$4" ;;
-apply) validate_apply "$2" "$3" && exec "$adapter" apply "$3" ;;
+apply)
+    validate_apply "$2" "$3" || exit 1
+    case "$3" in
+        radio-[01]-[01]) value=${3#radio-}; exec /opt/mu300/bin/mu300-sim-radio apply "${value%-*}" "${value#*-}";;
+        *) exec "$adapter" apply "$3";;
+    esac;;
 *) exit 2 ;;
 esac

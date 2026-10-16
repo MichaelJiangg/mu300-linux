@@ -1004,6 +1004,117 @@ var DASH_I18N = {
 	'「': ['“', '“'],
 	'」': ['”', '”']
 };
+Object.assign(DASH_I18N, {
+  "SIM 射频": [
+    "SIM radios",
+    "SIM radyoları"
+  ],
+  "射频": [
+    "Radio",
+    "Radyo"
+  ],
+  "分别控制每张卡的射频并记住设置。关闭后该卡无法通话、收发短信或上网；不会自动切换到另一张卡。": [
+    "Control and remember RF for each SIM separately. When off, that SIM cannot make calls, send or receive SMS, or use data. The other SIM is not selected automatically.",
+    "Her SIM radyosunu ayrı kontrol edin ve kaydedin. Kapalı SIM arama, SMS veya veri kullanamaz. Diğer SIM otomatik seçilmez."
+  ],
+  "设置会在重启后保留。关闭当前上网卡会中断蜂窝网络。": [
+    "Saved across reboots. Turning off the data SIM disconnects cellular data.",
+    "Yeniden başlatmada korunur. Veri SIM radyosunu kapatmak hücresel bağlantıyı keser."
+  ],
+  "开启射频": [
+    "Enable radio",
+    "Radyoyu aç"
+  ],
+  "关闭射频": [
+    "Disable radio",
+    "Radyoyu kapat"
+  ],
+  "已开启": [
+    "Enabled",
+    "Açık"
+  ],
+  "已关闭": [
+    "Disabled",
+    "Kapalı"
+  ],
+  "正在应用射频设置…": [
+    "Applying radio settings…",
+    "Radyo ayarları uygulanıyor…"
+  ],
+  "射频设置已应用并保存": [
+    "Radio settings applied and saved",
+    "Radyo ayarları uygulandı ve kaydedildi"
+  ],
+  "Enable the target SIM radio before switching": [
+    "Enable the target SIM radio before switching",
+    "Geçişten önce hedef SIM radyosunu açın"
+  ],
+  "This SIM radio is disabled by the user": [
+    "This SIM radio is disabled by the user",
+    "Bu SIM radyosu kullanıcı tarafından kapatılmış"
+  ],
+  "Invalid saved SIM radio policy": [
+    "Invalid saved SIM radio policy",
+    "Kaydedilmiş SIM radyo ayarları geçersiz"
+  ],
+  "Radio setting saved; modem command failed:": [
+    "Radio setting saved; modem command failed:",
+    "Radyo ayarı kaydedildi; modem komutu başarısız:"
+  ],
+  "Radio setting saved; RF readback not confirmed": [
+    "Radio setting saved; RF readback not confirmed",
+    "Radyo ayarı kaydedildi; modem durumu doğrulanamadı"
+  ],
+  "Radio setting saved; RF enable failed": [
+    "Radio setting saved; RF enable failed",
+    "Radyo ayarı kaydedildi; radyo açılamadı"
+  ],
+  "Radio setting saved; RF disable failed": [
+    "Radio setting saved; RF disable failed",
+    "Radyo ayarı kaydedildi; radyo kapatılamadı"
+  ],
+  "请先开启目标 SIM 的射频，再切换上网卡": [
+    "Enable the target SIM radio before switching",
+    "Geçişten önce hedef SIM radyosunu açın"
+  ],
+  "该卡射频已被用户禁用": [
+    "This SIM radio is disabled by the user",
+    "Bu SIM radyosu kullanıcı tarafından kapatılmış"
+  ],
+  "已保存的 SIM 射频设置无效": [
+    "Invalid saved SIM radio policy",
+    "Kaydedilmiş SIM radyo ayarları geçersiz"
+  ],
+  "设置已保存，但基带执行失败：": [
+    "Radio setting saved; modem command failed:",
+    "Radyo ayarı kaydedildi; modem komutu başarısız:"
+  ],
+  "设置已保存，但未能确认射频状态": [
+    "Radio setting saved; RF readback not confirmed",
+    "Radyo ayarı kaydedildi; modem durumu doğrulanamadı"
+  ],
+  "设置已保存，目标 SIM 尚未就绪": [
+    "Radio setting saved; target SIM is not ready",
+    "Radyo ayarı kaydedildi; hedef SIM henüz hazır değil"
+  ],
+  "设置已保存，但射频开启失败": [
+    "Radio setting saved; RF enable failed",
+    "Radyo ayarı kaydedildi; radyo açılamadı"
+  ],
+  "设置已保存，但射频关闭失败": [
+    "Radio setting saved; RF disable failed",
+    "Radyo ayarı kaydedildi; radyo kapatılamadı"
+  ],
+  "射频设置失败": [
+    "Radio setting failed",
+    "Radyo ayarı başarısız"
+  ],
+  "射频设置请求无效": [
+    "Invalid radio request",
+    "Radyo isteği geçersiz"
+  ]
+});
+
 var DASH_KEYS = Object.keys(DASH_I18N).sort(function(a, b) { return b.length - a.length; });
 var DASH_PATTERN = new RegExp(DASH_KEYS.map(function(k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g');
 function uiLanguage() {

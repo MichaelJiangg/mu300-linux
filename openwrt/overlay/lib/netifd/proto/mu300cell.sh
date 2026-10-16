@@ -48,6 +48,11 @@ proto_mu300cell_setup() {
 	out=$(MU300_NETIFD=1 MU300_PDP_TYPE="${pdptype:-IP}" MU300_AUTH="${auth:-none}" MU300_USERNAME="$username" MU300_PASSWORD="$password" MU300_ROAMING_PDP_TYPE="${roaming:-${pdptype:-IP}}" MU300_INITIAL_ATTACH="${attach:-0}" /opt/mu300/bin/mobile-data up "$apn" 2>/tmp/mu300cell.err)
 	rc=$?
 	[ "$rc" = 0 ] || printf '{"phase":"failed"}\n' > "/run/unisoc-apn-dial-$slot.json"
+	if [ "$rc" = 7 ]; then
+		proto_notify_error "$config" SIM_RADIO_DISABLED
+		proto_set_available "$config" 0
+		return 1
+	fi
 	if [ "$rc" = 4 ]; then
 		logger -t mu300cell "$(cat /tmp/mu300cell.err)"
 		proto_notify_error "$config" DUAL_RADIO_REBOOT_REQUIRED

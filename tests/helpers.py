@@ -62,6 +62,8 @@ class ShellTest(unittest.TestCase):
         e = dict(os.environ)
         e['PATH'] = f'{self.stubs}{os.pathsep}{e.get("PATH", "")}'
         e['STUBLOG'] = str(self.tmp)
+        e['MU300_RADIO_ALLOWED'] = str(BIN / 'mu300-radio-allowed')
+        e['UNISOC_RADIO_POLICY'] = str(self.tmp / 'sim-radio-policy')
         e['LC_ALL'] = 'C.UTF-8' if os.name != 'nt' else e.get('LC_ALL', '')
         e.update({k: str(v) for k, v in extra.items()})
         return e

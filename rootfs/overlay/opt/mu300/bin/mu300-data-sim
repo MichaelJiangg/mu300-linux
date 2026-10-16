@@ -62,6 +62,7 @@ get)
 apply)
     target=${2:-}
     case "$target" in 0|1) ;; *) echo invalid_sim >&2; exit 1 ;; esac
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || { echo 'Enable the target SIM radio before switching' >&2; exit 1; }
     [ -n "$dev1" ] || { echo dual_sim_unavailable >&2; exit 1; }
     [ -f "$ready" ] || { echo dual_boot_required >&2; exit 1; }
     # A separate switch gate blocks interactive writes, but permits the dial

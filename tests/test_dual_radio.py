@@ -25,6 +25,7 @@ elif cmd.endswith('+SPSWDATA?'):print('+SPSWDATA: '+str(s['data']))
 elif cmd.endswith('+SPSWDATA'):s['data']=slot
 elif cmd.endswith('+SFUN=4'):s['cfun'][slot]=1
 elif cmd.endswith('+SFUN=2'):s['cfun'][slot]=0
+elif cmd.endswith('+CFUN=4'):s['cfun'][slot]=4
 f.write_text(json.dumps(s));print('OK')
 ''')
         client.chmod(0o755)
@@ -64,6 +65,34 @@ f.write_text(json.dumps(s));print('OK')
             self.assertNotEqual(r.returncode,0)
             self.assertEqual((self.tmp/'commands').read_text(),'')
             ready.write_text(str(os.getpid()))
+
+    def test_saved_rf_combinations_survive_cold_and_warm_initialization(self):
+        for shell in self.each_shell():
+            for a in (0,1):
+                for b in (0,1):
+                    (self.tmp/'sim-radio-policy').write_text(f'{a} {b}\n')
+                    self.reset([0,0])
+                    result=self.script(shell,SCRIPT,**self.extra)
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    expected=[1 if a else 4,1 if b else 4]
+                    self.assertEqual(json.loads((self.tmp/'radio.json').read_text())['cfun'],expected)
+                    commands=(self.tmp/'commands').read_text()
+                    for card,enabled in enumerate((a,b)):
+                        self.assertEqual(f'AT+SPACTCARD={card};+SFUN=4' in commands,bool(enabled))
+                    (self.tmp/'commands').write_text('')
+                    result=self.script(shell,SCRIPT,**self.extra)
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    self.assertNotIn('SFUN=',(self.tmp/'commands').read_text())
+
+    def test_warm_restart_enforces_only_the_disabled_slot(self):
+        for shell in self.each_shell():
+            for a,b in ((0,1),(1,0),(0,0)):
+                (self.tmp/'sim-radio-policy').write_text(f'{a} {b}\n')
+                self.reset([1,1])
+                r=self.script(shell,SCRIPT,**self.extra)
+                self.assertEqual(r.returncode,0,r.stderr)
+                writes=[c for c in (self.tmp/'commands').read_text().splitlines() if not c.endswith('?')]
+                self.assertEqual(writes,[f'AT+SPACTCARD={slot};+CFUN=4' for slot,on in enumerate((a,b)) if not on])
 
     def test_empty_slot_does_not_block_the_inserted_card(self):
         for shell in self.each_shell():

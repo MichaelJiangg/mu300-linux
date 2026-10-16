@@ -1,0 +1,89 @@
+#!/bin/sh
+# All RF mutations share mobile-data's radio mutex and the SIM switch gate.
+# No tty opens, data-card selection or SIM power removal.
+set -eu
+export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+policy=${UNISOC_RADIO_POLICY:-/etc/mu300/sim-radio}
+read_policy() {
+    flags='1 1'
+    [ ! -e "$policy" ] || flags=$(cat "$policy")
+    case "$flags" in '0 0'|'0 1'|'1 0'|'1 1') ;; *) echo 'Invalid saved SIM radio policy' >&2; exit 1;; esac
+}
+case ${1:-} in
+get)
+    read_policy
+    printf '{"ok":1,"enabled":[%s,%s]}\n' "${flags% *}" "${flags#* }"
+    exit 0;;
+apply|--locked)
+    case ${2:-}:${3:-} in 0:0|0:1|1:0|1:1) slot=$2; enabled=$3;; *) exit 2;; esac;;
+*) exit 2;;
+esac
+if [ "$1" = apply ]; then
+    mutex=${MU300_SIM_MUTEX:-/run/unisoc-data-sim-switch}
+    mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
+    echo $$ > "$mutex/pid"
+    trap 'rm -f "$mutex/pid"; rmdir "$mutex" 2>/dev/null || true' EXIT
+    trap 'exit 143' INT TERM
+    [ ! -d /run/unisoc-modem-lock-apply ] || { echo modem_busy >&2; exit 1; }
+    rc=0
+    /opt/mu300/bin/mobile-data radio-policy "$slot" "$enabled" || rc=$?
+    if [ "$rc" = 8 ]; then
+        # Release the RF mutex before invoking its existing initialization
+        # path. Retain the switch gate so no other UI operation can interleave.
+        # Never invent a second SFUN/SPSWDATA sequence for cold re-enablement.
+        if [ "$(mu300-device)" = u30air ] && [ -e /run/mu300-radio-freeze ]; then
+            /bin/bash /opt/mu300/bin/mu300-sim2-warmup --radio-only || exit 1
+        else
+            init_rc=0
+            MU300_SIM_CONTROL=1 /opt/mu300/bin/mobile-data radio-on || init_rc=$?
+            case "$init_rc" in 0|7) ;; *) exit "$init_rc";; esac
+        fi
+        /opt/mu300/bin/mobile-data radio-policy "$slot" "$enabled" || {
+            echo 'Radio setting saved; target SIM is not ready' >&2; exit 1;
+        }
+        exit 0
+    fi
+    exit "$rc"
+fi
+read_policy
+if [ "$slot" = 0 ]; then flags="$enabled ${flags#* }"; else flags="${flags% *} $enabled"; fi
+mkdir -p "$(dirname "$policy")"
+umask 022
+printf '%s\n' "$flags" > "$policy.new.$$"
+mv "$policy.new.$$" "$policy"
+sync -f "$policy" 2>/dev/null || true
+. /opt/mu300/bin/mu300-sim-env
+mu300_sim_env
+own=$MU300_SIM_SLOT
+wan=$(uci -q get unisoc_modem.main.data_interface) || wan=wan
+case "$wan" in ''|*[!a-zA-Z0-9_]*) exit 2;; esac
+availability() { ubus -t 3 call "network.interface.$wan" notify_proto "{\"action\":5,\"available\":$1}" >/dev/null; }
+if [ "$slot" = "$own" ] && [ "$enabled" = 0 ]; then availability false; fi
+# U30 has one active RF stack. Allowing an inactive slot does not switch it.
+if [ "$(mu300-device)" = u30air ] && [ "$slot" != "$own" ] && [ "$enabled" = 1 ]; then exit 0; fi
+# Cold boot is RF-off. Do not let this UI preempt nr1's first SMMSWAP
+# command with CFUN. Enabling delegates to the original initializer below;
+# disabling just retains the cold RF-off state and its saved policy.
+if [ ! -e "${MU300_RIL_HANDSHAKE:-/run/mu300-ril-handshake}" ]; then
+    [ "$enabled" != 1 ] || exit 8
+    exit 0
+fi
+mu300_sim_env "$slot"
+at() { MU300_AT_DIR=$MU300_SIM_SHARED mu300-at -t "${2:-30}" "AT+SPACTCARD=$slot;${1#AT}" | tr -d '\r'; }
+ok() { reply=$(at "$1" "${2:-30}") && [ "$(printf '%s\n' "$reply" | tail -n1)" = OK ]; }
+state=$(at 'AT+CFUN?' 5 | sed -n 's/^+CFUN: *\([014]\)$/\1/p')
+if [ "$enabled" = 1 ]; then
+    if [ "$state" = 0 ]; then
+        exit 8  # Ask the outer controller to use the existing cold-start path.
+    fi
+    if [ "$state" != 1 ]; then
+        ok 'AT+CFUN=1' || { echo 'Radio setting saved; RF enable failed' >&2; exit 1; }
+    fi
+    expected=1
+else
+    ok 'AT+CFUN=4' || { echo 'Radio setting saved; RF disable failed' >&2; exit 1; }
+    expected=4
+fi
+state=$(at 'AT+CFUN?' 5 | sed -n 's/^+CFUN: *\([014]\)$/\1/p')
+[ "$state" = "$expected" ] || { echo 'Radio setting saved; RF readback not confirmed' >&2; exit 1; }
+if [ "$slot" = "$own" ] && [ "$enabled" = 1 ]; then availability true; fi

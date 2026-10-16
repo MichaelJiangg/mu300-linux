@@ -243,6 +243,7 @@ do_get() {
 
 # ------------------------------------------------------------------ apply
 sfun_restart() {
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "${MU300_SIM_SLOT:-0}" || { say 'RECONNECT-DEFERRED radio-disabled-by-user'; return 0; }
     local phase=${1:-late} restart_failed=0 active_sim
     active_sim=$(cfg data_sim); active_sim=${active_sim:-0}
     # SFUN 5 -> 4 itself takes 1-2 seconds. The old code waited here for the radio

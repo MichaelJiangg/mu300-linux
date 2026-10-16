@@ -186,6 +186,7 @@ route() {
 # The first command alone may say "not sent" (75): after it the radio has been told something.
 sequence() {
     local target=$1 old=$((1-$1)) got attempt
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || return 1
     cmd "$(main "$old")" "AT+SPACTCARD=$old;+SFUN=5" 20 >/dev/null || return $?
     cmd "$(main "$old")" "AT+SPACTCARD=$old;+SFUN=3" 10 >/dev/null || return 1
     check "$old" 0 || return 1
@@ -297,6 +298,7 @@ wait_wan_down() {
 }
 live_switch() {
     local target=$1 old had_data=0 rc=0 held_down=0
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || { fail 'Enable the target SIM radio before switching'; return 1; }
     old=$(active); case "$old" in 0|1) ;; *) fail 'Unknown active SIM; reboot first'; return 1;; esac
     [ ! -e "$R/sim-switching" ] || { fail 'Interrupted switch; reboot first'; return 1; }
     [ ! -e "$R/sim-active-unknown" ] || { fail 'Unknown radio state; reboot first'; return 1; }

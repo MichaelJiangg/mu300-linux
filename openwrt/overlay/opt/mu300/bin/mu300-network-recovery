@@ -55,6 +55,11 @@ function evaluate() {
     cfg.unload('unisoc_modem');
     let slot = selected_slot();
     if (slot == null) return;
+    let flags=fs.readfile('/etc/mu300/sim-radio');
+    if (flags != null) {
+        flags=trim(flags);
+        if (index(['0 0','0 1','1 0','1 1'],flags)<0 || substr(flags,slot*2,1)!='1') return;
+    }
     let wait = trim(fs.readfile('/run/mu300cell-' + wan + '.registration-wait') || '');
     let wait_slot = wait == '0' ? 0 : wait == '1' ? 1 : null;
     let sim = read_json(root + '/sim' + slot + '.json');

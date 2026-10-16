@@ -431,6 +431,9 @@ do_list() {
 	"data_sim_get": { },
 	"data_sim_set": { "target": "String" },
 	"data_sim_status": { "id": "String" },
+	"sim_radio_get": { },
+	"sim_radio_set": { "slot": "String", "enabled": false, "confirm": false },
+	"sim_radio_status": { "id": "String" },
 	"status": { "slot": "String" },
 	"rates": { },
 	"cells": { "slot": "String" },
@@ -506,6 +509,15 @@ call)
         data_sim_get) "$DASH/data-sim" get ;;
         data_sim_set) "$DASH/data-sim" start "$(inp '@.target')" ;;
         data_sim_status) "$DASH/data-sim" status "$(inp '@.id')" ;;
+        sim_radio_get) /opt/mu300/bin/mu300-sim-radio get ;;
+        sim_radio_set)
+            slot=$(inp '@.slot'); enabled=$(inp '@.enabled'); confirmed=$(inp '@.confirm')
+            case "$slot:$enabled:$confirmed" in
+                [01]:true:true) "$DASH/data-sim" start "radio-$slot-1";;
+                [01]:false:true) "$DASH/data-sim" start "radio-$slot-0";;
+                *) printf '{"ok":0,"error":"Invalid radio request"}\n';;
+            esac;;
+        sim_radio_status) "$DASH/data-sim" status "$(inp '@.id')" ;;
         status)     run_m status     'm_status' ;;
         cells)      m_status cells ;;
         # Avoid the forensic log's fork/tail/rewrite on every speed sample.

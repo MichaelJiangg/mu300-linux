@@ -249,6 +249,9 @@ v6_off() {
 #      实测那一步会把刚起来的 CP 又清一次，白等一整轮 CP 启动（12 s 起）。SFUN=4 之后要等
 #      射频真正上来，而不是问一次就走。
 radio_on_locked() {
+    if [ "$DEVICE" = u30air ]; then
+        "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$MU300_SIM_SLOT" || return 7
+    fi
     if [ "$DEVICE" = u30air ] && [ -e /run/mu300-radio-freeze ]; then
         [ ! -e /run/mu300/sim-switching ] && [ ! -e /run/mu300/sim-active-unknown ] &&
             [ -e /run/mu300/sim-radio-ready ] || return 1
@@ -292,8 +295,12 @@ radio_on_locked() {
     fi
     if [ "$DEVICE" != u30air ] && [ "$(uci -q get unisoc_modem.main.sim_slots 2>/dev/null || true)" = 2 ]; then
         /opt/mu300/bin/mu300-dual-radio
-        return $?
+        local dual_rc=$?
+        [ "$dual_rc" = 0 ] || return "$dual_rc"
+        "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$MU300_SIM_SLOT" || return 7
+        return 0
     fi
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$MU300_SIM_SLOT" || return 7
     out=$(at 'AT+CFUN?' 4 2>&1 || true)
     case "$out" in
         *"+CFUN: 1"*) return 0 ;;
@@ -852,6 +859,7 @@ down() {
 }
 
 sim_reset() {
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$MU300_SIM_SLOT" || { echo 'This SIM radio is disabled by the user' >&2; return 1; }
     [ ! -e /run/mu300/sim-managed ] || { echo "Native dual-SIM RF is managed; use SIM control or reboot" >&2; return 1; }
     tty_setup
     at 'AT+SFUN=5' 20; at 'AT+SFUN=3' 10; sleep 2; at 'AT+SFUN=2' 10; at 'AT+SFUN=4' 30
@@ -1019,6 +1027,10 @@ status() {
 
 
 case "${1:-status}" in
+    radio-policy)
+        case ${2:-}:${3:-} in 0:0|0:1|1:0|1:1) ;; *) exit 2;; esac
+        radio_locked /opt/mu300/bin/mu300-sim-radio --locked "$2" "$3"
+        ;;
     radio-locked)
         [ "$DEVICE" = u30air ] || exit 2
         shift

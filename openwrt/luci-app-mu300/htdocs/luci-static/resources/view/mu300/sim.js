@@ -3,6 +3,7 @@
 'require rpc';
 'require poll';
 'require mu300.common as M';
+'require mu300.sim-radio as SimRadio';
 
 var get=rpc.declare({object:'mu300dash',method:'data_sim_get',nobatch:true,expect:{'':{}}});
 var start=rpc.declare({object:'mu300dash',method:'data_sim_set',params:['target'],nobatch:true,expect:{'':{}}});
@@ -129,8 +130,11 @@ return view.extend({
             return get().then(function(r){if(root.isConnected)paint(r,false);}).catch(function(){}).finally(function(){self.inflight=false;});
         };
         poll.add(this.refresh,2);
+        var radioPanel=el('section',null,'mud-card mud-sim-panel');root.append(radioPanel);
+        this.radios=SimRadio.attach(radioPanel);
+        this.refreshRadios=function(){return self.radios.refresh();};poll.add(this.refreshRadios,2);
         return root;
     },
-    unload:function(){poll.remove(this.refresh); clearTimeout(this.timer); if(this.cancelWait)this.cancelWait();},
+    unload:function(){poll.remove(this.refresh);poll.remove(this.refreshRadios);if(this.radios)this.radios.dispose(); clearTimeout(this.timer); if(this.cancelWait)this.cancelWait();},
     handleSaveApply:null,handleSave:null,handleReset:null
 });
