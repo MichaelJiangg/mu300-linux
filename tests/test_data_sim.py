@@ -43,7 +43,9 @@ elif name=='ifup':
 elif name=='mu300-at':
  cmd=a[-1]
  if cmd.endswith('+SPSWDATA?'): print('+SPSWDATA: '+str(s['actual'])+'\\nOK')
- elif cmd.endswith('+CPIN?'): print('+CPIN: '+('SIM PIN' if s.get('pin') else 'READY')+'\\nOK')
+ elif cmd.endswith('+CPIN?'):
+  if s.get('absent_target') and 'SPACTCARD=1;' in cmd: print('+CME ERROR: 10')
+  else: print('+CPIN: '+('SIM PIN' if s.get('pin') else 'READY')+'\\nOK')
  elif cmd.endswith('+SPSWDATA'):
   target=int(cmd.split('SPACTCARD=')[1][0])
   if not (target==1 and s.get('fail_switch')): s['actual']=target; save()
@@ -138,3 +140,13 @@ elif name=='jsonfilter':
             self.assertIn('modem_busy',r.stderr)
             self.assertNotIn('mu300-at',(self.tmp/'commands').read_text())
             (self.tmp/'mutex').rmdir()
+
+    def test_missing_internal_card_is_reported_without_disconnecting_the_external_card(self):
+        for shell in self.each_shell():
+            self.reset(absent_target=True)
+            r=self.run_switch(shell,'1')
+            self.assertNotEqual(r.returncode,0)
+            self.assertIn('sim_not_ready',r.stderr)
+            self.assertNotIn('ifdown',(self.tmp/'commands').read_text())
+            self.assertEqual(json.loads(self.db.read_text()),
+                             dict(saved=0,actual=0,up=True,absent_target=True))
