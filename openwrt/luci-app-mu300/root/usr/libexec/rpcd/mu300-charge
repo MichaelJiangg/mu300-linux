@@ -1,0 +1,10 @@
+#!/bin/sh
+case "$1:$2" in
+list:)
+    echo '{"get":{},"configure":{"enabled":"","start":"","stop":""},"full_once":{},"pause":{},"resume":{}}'
+    ;;
+call:get|call:configure|call:full_once|call:pause|call:resume)
+    exec /usr/libexec/unisoc-modem/charge "$2"
+    ;;
+*) exit 1 ;;
+esac

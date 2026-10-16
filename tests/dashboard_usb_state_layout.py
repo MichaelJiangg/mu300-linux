@@ -28,7 +28,7 @@ def main():
                         return Promise.resolve({});
                     }};
                     window.M=new Function('rpc','baseclass','L',common)(rpc,base,L);
-                    window.v=new Function('view','M','L',device)(base,M,L);
+                    window.v=new Function('view','M','L','Charge',device)(base,M,L,{mount(){}});
                     document.querySelector('main').appendChild(v.render(state));
                     // Only accelerate test timers, keeping production deadline logic.
                     const later=v.later;v.later=function(fn,ms){return later.call(this,fn,ms>=1500?120:Math.min(ms,30));};

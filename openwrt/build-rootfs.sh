@@ -216,6 +216,8 @@ grep -q "device_no_dfs(config);" $R/usr/share/ucode/wifi/hostapd.uc || { echo "w
 if [ -d /in/luci-plugin ]; then
     cp -a /in/luci-plugin/root/. $R/
     cp -a /in/luci-plugin/htdocs/. $R/www/
+    chmod 0600 $R/etc/config/mu300-charge
+    chmod 0755 $R/etc/init.d/mu300-charge $R/etc/hotplug.d/power_supply/75-mu300-charge $R/usr/libexec/rpcd/mu300-charge
     ucode $R/usr/libexec/unisoc-modem/disable-channel-analysis $R
     chmod 0755 $R/etc/init.d/unisoc-cpu
     chmod 0600 $R/etc/config/unisoc_apn
@@ -286,6 +288,8 @@ if [ -d /in/luci-plugin ]; then
     ln -sf ../init.d/unisoc-traffic $R/etc/rc.d/K01unisoc-traffic
     ln -sf ../init.d/unisoc-cpu $R/etc/rc.d/S99unisoc-cpu
     ln -sf ../init.d/unisoc-cpu $R/etc/rc.d/K89unisoc-cpu
+    ln -sf ../init.d/mu300-charge $R/etc/rc.d/S97mu300-charge
+    ln -sf ../init.d/mu300-charge $R/etc/rc.d/K20mu300-charge
 fi
 # busybox PATH is /usr/sbin:/usr/bin:/sbin:/bin, so the commands go into /usr/bin
 for c in mu300-toolkit mu300-next-boot mu300-os mu300-update mobile-data mu300-at mu300-sms led-status wifi-client mu300-ttl mu300-wifi-band mu300-led mu300-usb mu300-nfc mu300-user-packages; do ln -sf /opt/mu300/bin/$c $R/usr/bin/$c; done

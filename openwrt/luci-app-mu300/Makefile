@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-mu300
 PKG_VERSION:=1.2.0
-PKG_RELEASE:=14
+PKG_RELEASE:=15
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=MU300 Linux contributors
 PKGARCH:=all
@@ -26,6 +26,7 @@ endef
 define Package/luci-app-mu300/conffiles
 /etc/config/unisoc_modem
 /etc/config/unisoc_apn
+/etc/config/mu300-charge
 /etc/unisoc-modem/cpu.json
 /etc/unisoc-modem/cpu-voltage.json
 endef
@@ -38,6 +39,8 @@ define Package/luci-app-mu300/install
 	$(CP) ./htdocs/. $(1)/www/
 	$(CP) ./root/. $(1)/
 	chmod 0600 $(1)/etc/config/unisoc_apn
+	chmod 0600 $(1)/etc/config/mu300-charge
+	chmod 0755 $(1)/etc/init.d/mu300-charge $(1)/etc/hotplug.d/power_supply/75-mu300-charge $(1)/usr/libexec/rpcd/mu300-charge
 	chmod 0755 $(1)/etc/init.d/unisoc-cpu
 	chmod 0755 $(1)/etc/init.d/unisoc-modem-ui $(1)/etc/init.d/unisoc-sms-forward $(1)/etc/init.d/unisoc-traffic $(1)/etc/hotplug.d/net/90-unisoc-usb-host $(1)/etc/hotplug.d/iface/90-unisoc-usb-host $(1)/usr/libexec/rpcd/mu300dash $(1)/usr/libexec/unisoc-modem/*
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
@@ -63,6 +66,8 @@ define Package/luci-app-mu300/postinst
 	/etc/init.d/rpcd restart 2>/dev/null || true
 	/etc/init.d/unisoc-modem-ui enable 2>/dev/null || true
 	/etc/init.d/unisoc-modem-ui start 2>/dev/null || true
+	/etc/init.d/mu300-charge enable 2>/dev/null || true
+	/etc/init.d/mu300-charge start 2>/dev/null || true
 	/etc/init.d/unisoc-sms-forward enable 2>/dev/null || true
 	/etc/init.d/unisoc-sms-forward start 2>/dev/null || true
 	/etc/init.d/unisoc-traffic enable 2>/dev/null || true
