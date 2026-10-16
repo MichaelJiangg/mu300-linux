@@ -1,4 +1,5 @@
 """Embedded BusyBox worker; imported as Python data by frozen backends."""
+from .uninstall_growth import GROWTH
 
 WORKER = r'''#!/bin/busybox sh
 set -eu
@@ -45,7 +46,7 @@ touch /run/stay
 httpd -p 8089 -h /run/openwrt-uninstall || true
 cd /openwrt-uninstall
 sha256sum -c SHA256SUMS
-IFS=: read -r cid disk_node data_node root_node misc_node android_node linux_node total front tail start root_size wipe boot_bytes boot_sha extra < request
+IFS=: read -r cid disk_node data_node root_node misc_node android_node linux_node total front tail start root_size wipe boot_bytes boot_sha action data_start data_size fs_before fs_uuid extra < request
 [ -z "$extra" ] && [ "${#cid}" = 32 ] && [ "${#boot_sha}" = 64 ]
 case "$cid$boot_sha" in *[!0-9a-f]*) exit 2 ;; esac
 case "$disk_node" in mmcblk[0-9]) ;; *) exit 2 ;; esac
@@ -57,6 +58,18 @@ for n in "$total" "$front" "$tail" "$start" "$root_size" "$boot_bytes"; do
     case "$n" in ''|0*|*[!0-9]*) exit 2 ;; esac
 done
 case "$wipe" in 0|1) ;; *) exit 2 ;; esac
+case "$action" in
+    '') [ "$wipe" = 1 ] && action=reset || action=gap ;;
+    reset) [ "$wipe" = 1 ] ;;
+    gap) [ "$wipe" = 0 ] ;;
+    grow-ext4|grow-f2fs)
+        [ "$wipe" = 0 ]
+        for n in "$data_start" "$data_size" "$fs_before"; do case "$n" in ''|0*|*[!0-9]*) exit 2 ;; esac; done
+        [ "${#fs_uuid}" = 32 ]; case "$fs_uuid" in *[!0-9a-f]*) exit 2 ;; esac
+        [ "$data_start" -ge "$front" ] && [ "$((data_start+data_size))" -le "$tail" ]
+        [ "$data_start" -lt "$start" ] && [ "$((data_start+data_size))" -ge "$((start+root_size))" ] ;;
+    *) exit 2 ;;
+esac
 disk=/dev/$disk_node
 misc=/dev/$misc_node
 android=/dev/$android_node
@@ -87,6 +100,22 @@ for half in before after; do
 done
 snapshot_read
 snapshot_known
+case "$action" in grow-*)
+    # Read-only checks and executable compatibility happen before any GPT write.
+    dd if="$misc" of=current-bcb bs=2048 count=1 2>/dev/null
+    cmp -s current-bcb before-bcb
+    [ "$(cat /sys/class/block/$data_node/start)" = "$data_start" ]
+    fs_measure /dev/$data_node
+    if [ "$action" = grow-f2fs ]; then
+        fs_tool /openwrt-uninstall/tools/sbin/fsck.f2fs -V
+        fs_tool /openwrt-uninstall/tools/sbin/resize.f2fs -V
+    else
+        fs_tool /openwrt-uninstall/tools/usr/sbin/e2fsck -V
+        fs_tool /openwrt-uninstall/tools/usr/sbin/resize2fs -V
+    fi
+    fs_check /dev/$data_node
+    fs_measure /dev/$data_node ;;
+esac
 finished=0
 if cmp -s check-first after-first && cmp -s check-last after-last; then finished=1; fi
 if [ "$finished" = 0 ]; then
@@ -99,15 +128,30 @@ if [ "$finished" = 0 ]; then
         dd if=recovery-bcb of="$misc" bs=2048 count=1 conv=notrunc,fsync
         dd if="$misc" of=current-bcb bs=2048 count=1 2>/dev/null
         cmp -s current-bcb recovery-bcb
-    else
+    elif [ "$action" = gap ]; then
         # Only the proven OpenWrt range is invalidated; factory gaps stay gaps.
         dd if=/dev/zero of="$disk" bs=4096 seek="$((start/8))" count=1 conv=notrunc,fsync
     fi
     echo '2/3 restoring the verified partition layout' > /run/openwrt-uninstall/progress.txt
     snapshot_commit
 fi
+case "$action" in grow-*)
+    echo 'Growing and verifying Android userdata without formatting' > /run/openwrt-uninstall/progress.txt
+    # The packaged BusyBox supports BLKRRPART, not losetup --sizelimit.
+    # Require the exact restored partition; never expose the remaining disk.
+    blockdev --rereadpt "$disk"
+    [ "$(cat /sys/class/block/$data_node/start)" = "$data_start" ]
+    [ "$(cat /sys/class/block/$data_node/size)" = "$data_size" ]
+    for node in "$data_node" "$misc_node" "$android_node" "$linux_node"; do
+        kernel_node_matches "$node"
+    done
+    idle_partition "$data_node"
+    grow_device=/dev/$data_node
+    fs_grow ;;
+esac
 echo '3/3 restoring Android boot selection' > /run/openwrt-uninstall/progress.txt
 # The running kernel/ramdisk is in RAM. The current Android boot is never written.
+[ "$(sha256sum "$android" | cut -d' ' -f1)" = "$boot_sha" ]
 dd if="$android" of="$linux" bs=1048576 conv=fsync
 [ "$(sha256sum "$linux" | cut -d' ' -f1)" = "$boot_sha" ]
 dd if=android-bc of="$misc" bs=1 seek=2048 count=32 conv=notrunc,fsync
@@ -119,3 +163,5 @@ trap - EXIT HUP INT TERM
 reboot -f
 while :; do sleep 10; done
 '''
+
+WORKER = WORKER.replace('# BEGIN DEVICE WORKER', GROWTH+'\n# BEGIN DEVICE WORKER',1)

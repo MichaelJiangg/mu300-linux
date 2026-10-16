@@ -6,10 +6,11 @@ import {toast} from 'sonner';
 import {Toaster} from './components/ui/sonner';
 import {ArrowRight, BookOpen, Check, CheckCircle2, ChevronDown, CircleAlert, CircleHelp, Copy, Download, FolderOpen, HardDrive, LoaderCircle, Monitor, Moon, Pause, RefreshCw, RotateCcw, Settings2, ShieldCheck, Smartphone, Sun, Upload, Usb, Wifi, WifiOff} from 'lucide-react';
 import {Button} from './components/ui/button';
+import {Dialog, DialogContent, DialogDescription, DialogTitle} from './components/ui/dialog';
 import {SupportDialog, SupportInfo, type RepositoryId} from './components/support';
 import {helpStrings} from './help-i18n';
 import {strings, type Language} from './i18n';
-import {gib, native, request, stateGroup, subscribe, type AdbConnection, type Device, type Package, type Transaction, type Transfer} from './protocol';
+import {gib, native, request, stateGroup, subscribe, type AdbConnection, type Device, type Package, type ResetPrompt, type Transaction, type Transfer} from './protocol';
 import './style.css';
 
 const HelpCenter = lazy(() => import('./components/help-center').then(module => ({default:module.HelpCenter})));
@@ -49,6 +50,7 @@ function App() {
   const [host, setHost] = useState('192.168.9.1');
   const [password, setPassword] = useState('');
   const [accepted, setAccepted] = useState(false);
+  const [resetPrompt, setResetPrompt] = useState<ResetPrompt>();
   const [busy, setBusy] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [logOpen, setLogOpen] = useState(false);
@@ -204,9 +206,12 @@ function App() {
     if (['install','advanced','boot'].includes(next)) {setMethod(next === 'boot' ? 'boot' : next === 'advanced' ? 'reinstall' : 'part'); await refresh();}
     if (next === 'update') setMethod('update');
   };
-  const plan = async () => {
-    const value = await task(() => request<Transaction>('plan', {serial, choices: {method, size_gib: Number(size), grow, host}, password}));
-    if (value) {setPlanOrigin(view); acceptTransaction(value); setView('plan'); setAccepted(false);}
+  const plan = async (resetToken?: string) => {
+    const value = await task(() => request<Transaction | ResetPrompt>('plan', {serial, choices: {method, size_gib: Number(size), grow, host}, password, reset_token:resetToken}));
+    if (value && 'confirmation_required' in value) {
+      setResetPrompt(value); reportError(value.reason); return;
+    }
+    if (value) {setResetPrompt(undefined); setPlanOrigin(view); acceptTransaction(value); setView('plan'); setAccepted(false);}
   };
   const start = async (command: string, record = tx) => {
     if (!record) return;
@@ -287,7 +292,7 @@ function App() {
     {id:'boot', icon:Usb, title:t.boot, description:t.bootDesc},
     {id:'advanced', icon:Settings2, title:t.advanced, description:t.advancedDesc},
   ] as const;
-  const impact = tx?.choices.method === 'uninstall' ? (tx.plan.wipe ? t.uninstallWipe : t.uninstallKeep) : tx?.plan.wipe ? t.wipe : tx?.choices.method === 'tf' ? t.tfErase : tx?.choices.method === 'reinstall' ? t.reinstallErase : tx?.choices.method === 'image' ? t.imageImpact : tx?.choices.method === 'update' ? t.updateImpact : tx?.choices.method === 'boot' ? t.bootImpact : t.preserve;
+  const impact = tx?.choices.method === 'uninstall' ? (tx.plan.wipe ? t.uninstallWipe : tx.plan.data_action?.startsWith('grow-') ? t.uninstallPreserve : t.uninstallKeep) : tx?.plan.wipe ? t.wipe : tx?.choices.method === 'tf' ? t.tfErase : tx?.choices.method === 'reinstall' ? t.reinstallErase : tx?.choices.method === 'image' ? t.imageImpact : tx?.choices.method === 'update' ? t.updateImpact : tx?.choices.method === 'boot' ? t.bootImpact : t.preserve;
   const impactNotice = tx && <div className={'alert ' + (tx.plan.wipe || tx.plan.experimental || tx.choices.method === 'uninstall' ? 'danger' : '')}><CircleAlert size={20}/><div><strong>{t.impact}</strong><p>{impact}</p>{tx.plan.experimental && <p>{t.experimental}</p>}</div></div>;
   const waitingForOpenwrt = tx?.stage === 'openwrt_boot' && tx.status.startsWith('waiting') && !tx.unsafe;
   const manualRestart = waitingForOpenwrt && tx?.details?.reboot_manually !== false;
@@ -331,7 +336,7 @@ function App() {
           {['part','image'].includes(method) && <label className="size-field">{t.size}<input disabled={busy} type="number" min="2" step="0.25" value={size} onChange={e => setSize(e.target.value)}/></label>}
           {['part','reinstall'].includes(method) && <label className="checkbox-label"><input disabled={busy} type="checkbox" checked={grow} onChange={e => setGrow(e.target.checked)}/><div>{t.grow}<small>{t.growHelp}</small></div></label>}
         </section>}
-        </div><div className="actions"><Button disabled={busy} variant="ghost" onClick={() => navigate('home')}>{t.back}</Button><Button disabled={busy || !pkg || !device?.root} onClick={plan}>{method === 'uninstall' ? t.planUninstall : t.plan}<ArrowRight size={16}/></Button></div>
+        </div><div className="actions"><Button disabled={busy} variant="ghost" onClick={() => navigate('home')}>{t.back}</Button><Button disabled={busy || !pkg || !device?.root} onClick={() => plan()}>{method === 'uninstall' ? t.planUninstall : t.plan}<ArrowRight size={16}/></Button></div>
       </>}
       {view === 'plan' && tx && <><div className="eyebrow">{tx.choices.method === 'uninstall' ? t.reviewUninstall : t.review}</div><h1 tabIndex={-1}>{tx.device.model}</h1><p className="intro">{tx.package.name} · ••••{tx.device.serial.slice(-4)}</p>{tx.choices.method === 'uninstall' && impactNotice}<div className="page-scroll scroll-area"><section><dl className="plan-list"><div><dt>{tx.choices.method === 'uninstall' ? t.operationMethod : t.installMethod}</dt><dd>{tx.choices.method === 'boot' ? t.boot : tx.choices.method === 'update' ? t.update : (t as unknown as Record<string,string>)[tx.choices.method]}</dd></div><div><dt>{tx.choices.method === 'uninstall' ? t.uninstallTarget : t.target}</dt><dd>{tx.plan.target}</dd></div><div><dt>{tx.choices.method === 'uninstall' ? t.androidAllocation : t.android}</dt><dd>{tx.choices.method === 'uninstall' && <>{gib(tx.plan.previous_android_bytes)} → </>}{gib(tx.plan.android_bytes)}</dd></div><div><dt>{tx.choices.method === 'uninstall' ? t.release : t.allocation}</dt><dd>{tx.choices.method === 'boot' ? '—' : gib(tx.plan.openwrt_bytes)}</dd></div>{tx.choices.method === 'uninstall' ? <div><dt>{t.reclaim}</dt><dd>{gib(tx.plan.reclaimed_bytes)}</dd></div> : <div><dt>{t.grow}</dt><dd>{tx.plan.grow ? <Check size={17}/> : '—'}</dd></div>}</dl></section>
         {tx.choices.method !== 'uninstall' && impactNotice}
@@ -368,6 +373,13 @@ function App() {
     </main></div><footer><span><ShieldCheck size={13}/>OpenWrt Installer · v1.0</span><span>USB / SSH · {pkg?.profile || '—'}</span></footer>
     <Suspense fallback={<div className="help-loading" role="status"><LoaderCircle size={17} className="spin"/>{t.running}</div>}>{helpOpen && <HelpCenter language={lang} open={helpOpen} onOpenChange={setHelpOpen} initialTopic={helpTopic} onGuide={showGuide}/>}
     {guideOpen && <GettingStarted language={lang} open={guideOpen} onOpenChange={changeGuide}/>}</Suspense>
+    {resetPrompt && <Dialog open onOpenChange={open => {if (!open && !busy) setResetPrompt(undefined);}}>
+      <DialogContent closeLabel={help.close} className="removal-reset-dialog">
+        <div className="dialog-heading"><DialogTitle>{t.uninstallResetQuestion}</DialogTitle><DialogDescription>{resetPrompt.model} · ••••{resetPrompt.serial_hint}</DialogDescription></div>
+        <div className="reset-choice-body scroll-area"><div className="alert danger"><CircleAlert size={20}/><div><p className="error-message">{resetPrompt.reason}</p><p>{t.uninstallResetExplanation}</p></div></div></div>
+        <div className="dialog-footer"><Button disabled={busy} variant="outline" onClick={() => setResetPrompt(undefined)}>{t.uninstallCancel}</Button><Button disabled={busy} variant="destructive" onClick={() => plan(resetPrompt.reset_token)}>{t.uninstallChooseReset}</Button></div>
+      </DialogContent>
+    </Dialog>}
     {supportOpen && <SupportDialog language={lang} onOpenChange={changeSupport} onRepository={openRepository}/>}
     <Toaster theme={theme} containerAriaLabel={t.notifications} toastOptions={{closeButtonAriaLabel:t.dismiss, classNames:{toast:"app-toast",description:"toast-description"}}}/>
   </div>;

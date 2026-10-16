@@ -3,9 +3,10 @@ import { listen } from '@tauri-apps/api/event';
 export interface Device {serial: string; model?: string; label?: string; state?: string; wireless?: boolean; system?: string; slot?: string; root?: boolean; readiness?: string; encrypted?: boolean; existing?: boolean; tf?: string; profile?: string; free_bytes?: number; userdata_bytes?: number}
 export interface AdbConnection {endpoint: string; state?: string; devices: Device[]}
 export interface Package {path: string; name: string; adapter: string; profile: string; kernel: string}
+export interface ResetPrompt {confirmation_required: 'format_android'; reason: string; reset_token: string; model: string; serial_hint: string}
 export interface Transaction {
   id: string; status: string; stage: string; device: Device; package: Package;
-  choices: {method: string; host?: string}; plan: {wipe: boolean; two_stage: boolean; offline?: boolean; openwrt_bytes: number; android_bytes?: number; previous_android_bytes?: number; reclaimed_bytes?: number; target: string; grow?: boolean; experimental?: boolean; gap_start?: number};
+  choices: {method: string; host?: string}; plan: {wipe: boolean; data_action?: string; preservation_error?: string; two_stage: boolean; offline?: boolean; openwrt_bytes: number; android_bytes?: number; previous_android_bytes?: number; reclaimed_bytes?: number; target: string; grow?: boolean; experimental?: boolean; gap_start?: number};
   uninstall_armed?: boolean; completed: string[]; unsafe: boolean; updated: number; revision?: number;
   stage_started_at?: number; stage_finished_at?: number;
   details?: {host?: string; tool?: string; reboot_manually?: boolean; boot_confirmed?: boolean; verification_error?: string; connection_state?: string}; error?: {message: string; retryable: boolean; code: string};

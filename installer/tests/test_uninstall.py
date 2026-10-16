@@ -80,6 +80,7 @@ def superblock(size, kind='ext4'):
     else:
         data[:4]=bytes.fromhex('1020f5f2');struct.pack_into('<I',data,16,12)
         struct.pack_into('<Q',data,36,size//4096)
+    at=104 if kind=='ext4' else 108;data[at:at+16]=b'U'*16
     return bytes(data)
 
 
@@ -181,7 +182,7 @@ class Journal(unittest.TestCase):
     def tearDown(self):self.temp.cleanup()
 
     def plan(self):
-        plan,metadata,files=prepare(self.adapter,self.store,self.device)
+        plan,metadata,files=prepare(self.adapter,self.store,self.device,authorize_reset=lambda _:True)
         record=self.store.create(self.package,self.device,{'method':'uninstall'},plan)
         context=Context(self.store,record,lambda *_:None);persist(context,metadata,files)
         return context
@@ -405,13 +406,13 @@ class BootRequest(unittest.TestCase):
 @unittest.skipUnless(shutil.which('busybox'),'requires Linux BusyBox')
 class OfflineGpt(unittest.TestCase):
     def test_full_worker_reset_gap_resume_and_both_android_slots_on_regular_files(self):
-        for slot,wipe,finished in (('a',True,False),('b',True,False),('a',False,False),('b',False,False),('a',True,True)):
-            with self.subTest(slot=slot,wipe=wipe,finished=finished),tempfile.TemporaryDirectory() as directory:
+        for slot,wipe,finished,grow in (('a',True,False,''),('b',True,False,''),('a',False,False,''),('b',False,False,''),('a',True,True,''),('a',False,False,'ok'),('b',False,False,'ok'),('a',False,False,'check-failed'),('a',False,False,'reread-failed'),('b',False,False,'stale-node')):
+            with self.subTest(slot=slot,wipe=wipe,finished=finished,grow=grow),tempfile.TemporaryDirectory() as directory:
                 folder=Path(directory)
                 for name in ('run','dev','sys/class/block/mmcblk0/device','proc','work'):
                     (folder/name).mkdir(parents=True)
                 (folder/'proc/mountinfo').write_text('')
-                original,before=layouts(gap=not wipe)
+                original,before=layouts(gap=not wipe and not grow)
                 after,*_=restored_layout(original,before,SECTORS,'e5root')
                 for name,data in zip(('before-first','before-last','after-first','after-last'),(*before,*after)):
                     (folder/'work'/name).write_bytes(data)
@@ -428,6 +429,7 @@ class OfflineGpt(unittest.TestCase):
                     (path/'uevent').write_text('PARTNAME='+name+'\n')
                     (path/'dev').write_text('179:'+node.split('p')[-1])
                     (path/'size').write_text('8')
+                    (path/'start').write_text(str(GIB//512))
                 (folder/'sys/class/block/mmcblk0/device/cid').write_text(IDENTITY)
                 (folder/'sys/class/block/mmcblk0/size').write_text(str(SECTORS))
                 android_node,linux_node=('mmcblk0p1','mmcblk0p2') if slot=='a' else ('mmcblk0p2','mmcblk0p1')
@@ -445,6 +447,9 @@ class OfflineGpt(unittest.TestCase):
                 (folder/'work/android-bc').write_bytes(android_bc(slot))
                 request=[IDENTITY,'mmcblk0','mmcblk0p4','mmcblk0p5','mmcblk0p3',android_node,linux_node,
                          SECTORS,34,SECTORS-33,29*GIB//512,4*GIB//512,int(wipe),4096,boot_sha]
+                if grow:
+                    request+=['grow-ext4',GIB//512,32*GIB//512,28*GIB,'55'*16]
+                    (folder/'dev/mmcblk0p4').write_bytes(bytes(1024)+superblock(28*GIB))
                 (folder/'work/request').write_text(':'.join(map(str,request))+'\n')
                 sums=''.join(hashlib.sha256(path.read_bytes()).hexdigest()+'  '+path.name+'\n'
                              for path in (folder/'work').iterdir())
@@ -456,9 +461,24 @@ class OfflineGpt(unittest.TestCase):
                 # Only reboot/network services are simulated. GPT, readback,
                 # boot copy, BCB writes and hashes use real BusyBox file I/O.
                 prefix='httpd() { :; }\nreboot() { echo reboot > '+str(folder/'rebooted')+'; exit 0; }\n'
+                if grow:
+                    # GPT/BCB writes are real file I/O. Tool routing is mocked
+                    # here; real populated filesystem growth is tested separately.
+                    prefix+='fs_tool() { '+('case "$*" in *" -pf "*) return 4;; esac; ' if grow=='check-failed' else '')+':; }\n'
+                    prefix+='fs_grow() { echo PRESERVING_GROW; }\n'
+                    prefix+='kernel_node_matches() { '+('return 1' if grow=='stale-node' else ':')+'; }\n'
+                    prefix+='blockdev() { '+('return 16' if grow=='reread-failed' else '[ "$1" = --rereadpt ] && echo '+str(32*GIB//512)+' > '+str(folder/'sys/class/block/mmcblk0p4/size'))+'; }\n'
+                    worker=worker.replace('# BEGIN DEVICE WORKER',prefix+'\n# BEGIN DEVICE WORKER',1)
                 result=subprocess.run(['busybox','ash','-c',prefix+worker],capture_output=True,text=True,timeout=10)
                 debug=list((folder/'run').rglob('debug.log'))
                 detail=debug[0].read_text() if debug else result.stderr
+                if grow in ('check-failed','reread-failed','stale-node'):
+                    self.assertNotEqual(result.returncode,0,detail)
+                    self.assertFalse((folder/'rebooted').exists())
+                    with (folder/'dev/mmcblk0').open('rb') as stream:self.assertEqual(stream.read(34*512),before[0] if grow=='check-failed' else after[0])
+                    self.assertEqual((folder/'dev/mmcblk0p3').read_bytes(),bytes(misc))
+                    self.assertNotIn('PRESERVING_GROW',detail)
+                    continue
                 self.assertEqual(result.returncode,0,detail)
                 self.assertTrue((folder/'rebooted').exists(),detail)
                 self.assertEqual((folder/'dev'/linux_node).read_bytes(),android)

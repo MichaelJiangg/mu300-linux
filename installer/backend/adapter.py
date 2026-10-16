@@ -282,7 +282,9 @@ class Adapter:
         for key in ('START', 'SIZE', 'DISK_SIZE', 'FREE'):
             storage[key] = int(storage[key])
         encrypted = properties['ro.crypto.state'] == 'encrypted' or properties['ro.crypto.type'] in ('file', 'block') or storage['SOURCE'].startswith(('/dev/block/dm-', '/dev/mapper/'))
-        device.update(cid=storage['CID'], storage=storage, encrypted=encrypted, existing=bool(storage.get('ROOT')),
+        device.update(cid=storage['CID'], storage=storage, encrypted=encrypted,
+                      encryption_state=properties['ro.crypto.state'], encryption_type=properties['ro.crypto.type'],
+                      existing=bool(storage.get('ROOT')),
                       tf=storage.get('TF'), userdata_bytes=storage['SIZE']*512, free_bytes=storage['FREE']*1024)
         # Other modes need only a read-only availability hint for recommendations.
         # A removable card and its readable capacity are prerequisites only for TF.

@@ -20,6 +20,7 @@ from .package import inspect_package
 from .state import Cancelled, Context, DeviceLock, Pending, RecoveryRequired, Store, compatible
 from .transport import Adb, wireless_serial
 from .uninstall import Uninstaller, prepare as prepare_uninstall, persist as persist_uninstall
+from .uninstall_growth import PreservationUnavailable
 
 METHODS = {'tf', 'part', 'reinstall', 'image', 'boot', 'update', 'uninstall'}
 
@@ -94,6 +95,7 @@ class Service:
         self.active = None
         self.worker = None
         self.package = None
+        self.uninstall_reset_prompt = None
         self.adapters = Adapter
         self.stop = threading.Event()
         self.verification_lock = threading.Lock()
@@ -231,7 +233,17 @@ class Service:
                 if pending or b'openwrt.uninstall=1' in header[44:1580].split(b'\0',1)[0].split():
                     raise RecoveryRequired('Uninstall is already pending. Resume/import its saved record; do not create another operation. / 已有未完成的卸载，请继续或导入卸载记录，不要创建新操作。')
             if choices.get('method') == 'uninstall':
-                plan, uninstall_metadata, uninstall_files = prepare_uninstall(uninstall_adapter, self.store, device)
+                def authorize_reset(fingerprint):
+                    expected = self.uninstall_reset_prompt
+                    return bool(expected and p.get('reset_token') == expected['token'] and fingerprint == expected['fingerprint'])
+                try:
+                    plan, uninstall_metadata, uninstall_files = prepare_uninstall(uninstall_adapter,self.store,device,authorize_reset)
+                except PreservationUnavailable as error:
+                    token = secrets.token_urlsafe(24)
+                    self.uninstall_reset_prompt = {'token':token,'fingerprint':error.fingerprint}
+                    return {'confirmation_required':'format_android','reason':str(error),'reset_token':token,
+                            'model':device['model'],'serial_hint':device['serial'][-4:]}
+                self.uninstall_reset_prompt = None
             else:
                 plan = plan_install(self.package, device, choices)
             record = self.store.create(self.package, device, choices, plan)
@@ -245,6 +257,9 @@ class Service:
             record = self.store.load(p['transaction'])
             if record['status'] == 'completed':
                 return self.public(record)
+            if (record['choices'].get('method') == 'uninstall' and record['status'] == 'ready' and
+                    record.get('uninstall',{}).get('version') == 1 and not record['effects'].get('uninstall-arm')):
+                raise ValueError('Regenerate the old removal plan to check data preservation / 请重新生成旧版卸载计划，先检查能否保留 Android 数据')
             current = inspect_package(p.get('path') or self.package_root)
             compatible(record['package'], current)
             record['package'] = current

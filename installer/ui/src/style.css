@@ -240,6 +240,9 @@ input:not([type=checkbox]):hover,select:hover {border-color:hsl(var(--primary)/.
 .dialog-close:hover {background:hsl(var(--muted));color:hsl(var(--foreground));}
 .dialog-footer {flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px;border-top:1px solid hsl(var(--border));}
 .support-dialog{width:min(660px,calc(100vw - 48px));height:auto;max-height:calc(100dvh - 48px);}
+.removal-reset-dialog{width:min(640px,calc(100vw - 48px));height:auto;max-height:calc(100dvh - 48px);}
+.reset-choice-body{min-height:0;overflow-y:auto;padding:0 24px 20px;}
+.reset-choice-body .alert{margin:0;}
 .support-body{min-height:0;padding:0 24px 18px;}
 .support-star-intro{margin-bottom:10px;}
 .support-star-intro strong{font-size:13px;font-weight:600;}

@@ -60,10 +60,17 @@ def record(name, data, mode, ino):
 
 def overlay(files):
     import lz4.block
-    data = record('openwrt-uninstall', b'', stat.S_IFDIR|0o700, 1)
-    for index, (name, content) in enumerate(files.items(), 2):
-        data += record(name, content, stat.S_IFREG|(0o755 if name == 'init' else 0o600), index)
-    data += record('TRAILER!!!', b'', 0, len(files)+2)
+    directories = {'openwrt-uninstall'}
+    for name in files:
+        parts = name.split('/')
+        directories.update('/'.join(parts[:i]) for i in range(1,len(parts)))
+    data = b''; index = 1
+    for name in sorted(directories,key=lambda name:(name.count('/'),name)):
+        data += record(name,b'',stat.S_IFDIR|0o700,index); index += 1
+    for name, content in files.items():
+        executable = name == 'init' or name.startswith('openwrt-uninstall/tools/')
+        data += record(name, content, stat.S_IFREG|(0o755 if executable else 0o600), index); index += 1
+    data += record('TRAILER!!!', b'', 0, index)
     result = bytearray(MAGIC)
     for at in range(0, len(data), 8 << 20):
         block = lz4.block.compress(data[at:at+(8 << 20)], store_size=False)
