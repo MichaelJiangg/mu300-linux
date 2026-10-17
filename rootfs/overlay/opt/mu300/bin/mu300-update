@@ -341,7 +341,7 @@ upk_pending() {
 # image_own_restore NEW after; upk_record removes what they keep in NEW/.mu300-image.
 image_own_save() {
     rm -rf "$1/.mu300-image"; mkdir -p "$1/.mu300-image" || return 1
-    for _uf in image-version image-packages packages.txt; do
+    for _uf in image-version image-packages packages.txt release.json; do
         [ ! -f "$1/etc/mu300/$_uf" ] || cp "$1/etc/mu300/$_uf" "$1/.mu300-image/$_uf" || return 1
     done
     for _uf in "$1"/etc/config/*; do [ ! -e "$_uf" ] || echo "${_uf##*/}"; done > "$1/.mu300-image/config"
@@ -349,7 +349,7 @@ image_own_save() {
 image_own_restore() {
     [ -d "$1/.mu300-image" ] || return 0
     mkdir -p "$1/etc/mu300" || return 1
-    for _uf in image-version image-packages packages.txt; do
+    for _uf in image-version image-packages packages.txt release.json; do
         if [ -f "$1/.mu300-image/$_uf" ]; then cp "$1/.mu300-image/$_uf" "$1/etc/mu300/$_uf" || return 1
         # a list of the old image would describe the wrong one (the version stays: "unknown" says less)
         elif [ "$_uf" != image-version ]; then rm -f "$1/etc/mu300/$_uf"; fi

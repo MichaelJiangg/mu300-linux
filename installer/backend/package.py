@@ -40,5 +40,10 @@ def inspect_package(directory):
     payloads = {name: sha(safe_file(root, name)) for name in names}
     if not (root/'OpenWrt-Installer.py').is_file():
         raise ValueError('Missing compatible Python entry / 缺少兼容安装入口')
-    return {'protocol': 1, 'adapter': adapter, 'profile': profile, 'layout': layout, 'kernel': kernel,
-            'payloads': payloads, 'path': str(root), 'name': root.name}
+    package = {'protocol': 1, 'adapter': adapter, 'profile': profile, 'layout': layout, 'kernel': kernel,
+               'payloads': payloads, 'path': str(root), 'name': root.name}
+    release_file = root/('desktop/release.json' if adapter == 'mu300' else 'files/RELEASE.json')
+    if release_file.is_file():
+        release_data = json.loads(release_file.read_text(encoding='utf-8'))
+        package['release_version'] = release_data['image_version']
+    return package

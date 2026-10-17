@@ -119,6 +119,7 @@ for o in firmware android-subset android-gpu-subset tools/logdw/logdw tools/bt-i
 done
 # shellcheck disable=SC2046
 docker run --rm --platform linux/arm64 \
+  -v "${MU300_RELEASE_JSON:-$TOP/work}":/in/release.json:ro \
   -v "$TOP/rootfs/overlay/opt/mu300":/in/opt-mu300:ro -v "$TOP/openwrt/overlay":/in/overlay:ro \
   -v "$TOP/openwrt/patches/fw4-sipa-offload.patch":/in/fw4-sipa-offload.patch:ro \
   -v "$TOP/openwrt/patches/wifi-scripts-no-dfs.patch":/in/wifi-scripts-no-dfs.patch:ro \
@@ -260,6 +261,7 @@ if [ -e /in/busybox ]; then
 fi
 mkdir -p $R/etc/mu300
 printf "%s\n" "${MU300_VERSION:-dev}" > $R/etc/mu300/image-version
+[ ! -f /in/release.json ] || cp /in/release.json $R/etc/mu300/release.json
 # Record image packages so upgrades can restore only user additions.
 (MU300_LIB=1; . $R/opt/mu300/bin/mu300-update; upk_manual $R openwrt) > $R/etc/mu300/image-packages
 [ -s $R/etc/mu300/image-packages ] || { echo "missing image-packages" >&2; exit 1; }

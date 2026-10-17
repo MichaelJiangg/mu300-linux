@@ -15,15 +15,11 @@ esac
 UO=${MU300_UPSTREAM_OUT:-$DEFAULT_UO}
 PLUGIN=${MU300_LUCI_PLUGIN_SRC:-$TOP/openwrt/luci-app-mu300}
 [ -s "$PLUGIN/Makefile" ] || { echo "standalone LuCI plugin missing: $PLUGIN (set MU300_LUCI_PLUGIN_SRC)" >&2; exit 1; }
-OUT=${1:-$TOP/mu300-linux-openwrt-tf-$KERNEL.zip}
-case $OUT in /*) ;; *) OUT=$TOP/$OUT ;; esac
+OUT=${1:-}
 ROOTFS=$TOP/openwrt/mu300-openwrt-tf-$KERNEL-rootfs.tar.gz
 BOOT=$TOP/work/boot-linux-tf-$KERNEL.img
 GENERIC=$TOP/work/ramdisk-$KERNEL-tf.lz4
 WRAPPED=$TOP/work/Image-$KERNEL.lk
-VERSION=${MU300_VERSION:-}
-[ -n "$VERSION" ] || VERSION=$(git -c safe.directory="$TOP" -C "$TOP" rev-parse --short HEAD 2>/dev/null || true)
-[ -n "$VERSION" ] || VERSION=clean-tf-$KERNEL
 mkdir -p "$TOP/work"
 
 # Hybrid layout relocates original deployment files behind a thin Magisk entry;
@@ -61,6 +57,17 @@ grep -qx 'CONFIG_LEDS_AW9523B=y' "$UO/kernel.config" || {
 }
 rel=$(strings "$UO/Image" | sed -n 's/^Linux version \([^ ]*\) .*/\1/p' | head -n1)
 case $rel in "$KERNEL".*) ;; *) echo "$UO is kernel '$rel', expected $KERNEL.x" >&2; exit 1 ;; esac
+RELEASE_JSON=$TOP/work/release-$KERNEL.json
+if [ -n "${MU300_VERSION:-}" ]; then
+    VERSION=$(python3 "$TOP/tools/release-identity.py" --profile mu300 --kernel "$rel" --version "$MU300_VERSION" --output "$RELEASE_JSON" --field image_version)
+else
+    VERSION=$(python3 "$TOP/tools/release-identity.py" --profile mu300 --kernel "$rel" --output "$RELEASE_JSON" --field image_version)
+fi
+if [ -z "$OUT" ]; then
+    OUT=$TOP/$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["package_name"])' "$RELEASE_JSON").zip
+fi
+case $OUT in /*) ;; *) OUT=$TOP/$OUT ;; esac
+
 for m in $(cat "$TOP/upstream/module-order.txt"); do
     [ -s "$UO/modules/$m" ] || { echo "missing $KERNEL module $m" >&2; exit 1; }
 done
@@ -91,7 +98,7 @@ done
 
 echo "==> OpenWrt rootfs ($rel modules included)"
 MU300_GPU=0 MU300_INPUTS="$IN" MU300_MAINLINE_OUT="$UO" MU300_LUCI_PLUGIN_SRC="$PLUGIN" \
-  MU300_VERSION="$VERSION-tf-$KERNEL" \
+  MU300_VERSION="$VERSION" MU300_RELEASE_JSON="$RELEASE_JSON" \
   sh "$TOP/openwrt/build-rootfs.sh" "$(basename "$ROOTFS")"
 for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./sbin/block ./lib/libblkid-tiny.so ./etc/init.d/fstab ./etc/mu300/block-mount.build-id \
@@ -170,7 +177,8 @@ cp "$TOP/android/magisk/mu300-openwrt-tf/module.prop" \
    "$TOP/tools/tf-storage.sh" "$TOP/tools/tf-stage.sh" "$TOP/tools/tf-install-worker.sh" "$STAGE/"
 cp "$TOP/android/magisk/mu300-linux-switch/bootchain.sh" "$STAGE/bootchain.sh"
 sed -i "s/Linux 7\.2/Linux $KERNEL/g; s/KERNEL=7\.2/KERNEL=$KERNEL/g" "$STAGE/customize.sh"
-sed -i "s/7\.2/$KERNEL/g" "$STAGE/module.prop"
+VERSION_CODE=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build_epoch"])' "$RELEASE_JSON")
+sed -i "s/7\.2/$KERNEL/g; s/^version=.*/version=$VERSION/; s/^versionCode=.*/versionCode=$VERSION_CODE/" "$STAGE/module.prop"
 cp "$IN/busybox" "$STAGE/busybox"
 cp "$ROOTFS" "$STAGE/mu300-openwrt.tar.gz"
 cp "$BOOT" "$STAGE/boot-linux.img"
@@ -185,6 +193,18 @@ if [ "$DESKTOP" = 1 ]; then
     else
         python3 "$TOP/desktop/package.py" --stage "$STAGE" --tools "$DESKTOP_TOOLS" --kernel "$KERNEL"
     fi
+    cp "$RELEASE_JSON" "$STAGE/desktop/release.json"
+    # Include release metadata in the desktop checksum envelope.
+    python3 - "$STAGE" <<'PY_RELEASE'
+import hashlib, json, sys
+from pathlib import Path
+stage = Path(sys.argv[1])
+path = stage/'desktop/manifest.json'
+manifest = json.loads(path.read_text())
+release = stage/'desktop/release.json'
+manifest['desktop']['desktop/release.json'] = hashlib.sha256(release.read_bytes()).hexdigest()
+path.write_text(json.dumps(manifest, indent=2)+'\n')
+PY_RELEASE
 fi
 rm -f "$OUT"
 python3 - "$TOP" "$STAGE" "$OUT" <<'PY'

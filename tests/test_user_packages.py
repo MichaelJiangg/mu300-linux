@@ -315,6 +315,16 @@ class Record(ShellTest):
             self.record(shell, 'ubuntu')
             self.assertTrue((src / 'ppa-htop.list').exists())
 
+    def test_release_identity_belongs_to_new_image_while_user_settings_survive(self):
+        for shell in self.each_shell():
+            self.fresh()
+            write(self.old, {'etc/mu300/release.json':'old release'})
+            write(self.new, {'etc/mu300/release.json':'new release'})
+            result=self.record(shell)
+            self.assertIn('rc=0', result.stdout, result.stderr)
+            self.assertEqual((self.new/'etc/mu300/release.json').read_text(),'new release')
+            self.assertEqual((self.new/'etc/config/dhcp').read_text(),'old dhcp\n')
+
     def test_android_install_has_the_same_block(self):
         upd = UPD.read_text()
         ai = (TOP / 'tools/android-install.sh').read_text()

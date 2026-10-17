@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 export interface Device {serial: string; model?: string; label?: string; state?: string; wireless?: boolean; system?: string; slot?: string; root?: boolean; readiness?: string; encrypted?: boolean; existing?: boolean; tf?: string; profile?: string; free_bytes?: number; userdata_bytes?: number}
 export interface AdbConnection {endpoint: string; state?: string; devices: Device[]}
-export interface Package {path: string; name: string; adapter: string; profile: string; kernel: string}
+export interface Package {path: string; name: string; adapter: string; profile: string; kernel: string; release_version?: string}
 export interface ResetPrompt {confirmation_required: 'format_android'; reason: string; reset_token: string; model: string; serial_hint: string}
 export interface Transaction {
   id: string; status: string; stage: string; device: Device; package: Package;
