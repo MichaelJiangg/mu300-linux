@@ -13,6 +13,8 @@ if(action=='resolve') {
     let p=json(fs.readfile('/dev/stdin') || '{}');
     let iface=c.get('unisoc_modem','main','data_interface') || 'wan';
     result=apn.resolve(c,p,c.get_all('network',iface) || {});
+} else if(action=='status') {
+    result=apn.status(c,cachedIdentity());
 } else if(action=='needs-identity') {
     let needed=false;c.foreach('unisoc_apn','selection',()=>{needed=true;});
     print(needed?'1\n':'0\n');exit(0);

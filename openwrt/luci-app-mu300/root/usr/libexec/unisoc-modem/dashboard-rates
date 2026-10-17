@@ -5,14 +5,18 @@ import { cursor } from 'uci';
 import { connect } from 'ubus';
 
 const cfg = cursor();
-let device = cfg.get('unisoc_modem', 'main', 'data_device');
-if (!device) {
-	const bus = connect();
-	const iface = cfg.get('unisoc_modem', 'main', 'data_interface') || 'wan';
-	let status;
-	try { status = bus?.call('network.interface.' + iface, 'status', {}); } catch (e) {}
-	device = status?.l3_device || 'sipa_eth0';
+const iface = cfg.get('unisoc_modem', 'main', 'data_interface') || 'wan';
+let status;
+if (match(iface, /^[A-Za-z0-9_]{1,32}$/)) {
+	// Same live interface priority as the full snapshot. Bound an unavailable
+	// netifd without adding AT, retries, or another refresh timer.
+	try {
+		const bus = connect(null, 1);
+		status = bus?.call('network.interface.' + iface, 'status', {});
+	} catch (e) {}
 }
+const device = status?.l3_device || status?.device ||
+	cfg.get('unisoc_modem', 'main', 'data_device') || 'sipa_eth0';
 if (!match(device, /^[A-Za-z0-9_.:-]{1,15}$/)) {
 	print('{"available":false}\n');
 	exit(0);

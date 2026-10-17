@@ -65,7 +65,10 @@ class Refresh(unittest.TestCase):
 
 class StagedCollector(ShellTest):
     def test_engineering_and_neighbors_published_before_identity(self):
+        from test_dashboard_data import JSONFILTER_STUB
         self.stub('uci', 'exit 1')
+        parser=self.stubs/'jsonfilter';parser.write_text(JSONFILTER_STUB);parser.chmod(0o755)
+        self.stub('ubus',"printf '%s\\n' '{\"up\":true,\"l3_device\":\"sipa_eth3\",\"uptime\":42}'")
         self.stub('ucode', "printf 'null\\n'")
         self.stub('fake-at', '''
 printf '%s\\n' "$*" >> "$STUBLOG/commands"
@@ -75,7 +78,7 @@ case "$*" in
   *'AT+CESQ'*) printf '+CESQ: 99,99,255,255,30,80\\nOK\\n' ;;
   *'AT+CSCS?;+COPS?'*) cp "$MU300_DASH_DIR/sig.json" "$STUBLOG/engineering.json" ;;
   *'AT+SPENGMD=0,6,6'*) cp "$MU300_DASH_DIR/cell.json" "$STUBLOG/before-neighbors.json" ;;
-  *'AT+CGEQOSRDP=1'*) cp "$MU300_DASH_DIR/cell.json" "$STUBLOG/before-qos.json" ;;
+  *'AT+CGEQOSRDP=4'*) cp "$MU300_DASH_DIR/cell.json" "$STUBLOG/before-qos.json" ;;
   *'AT+CNUM'*) cp "$MU300_DASH_DIR/cell.json" "$STUBLOG/before-number.json" ;;
   *) printf 'OK\\n' ;;
 esac''')

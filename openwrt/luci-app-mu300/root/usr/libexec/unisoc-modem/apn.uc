@@ -81,6 +81,12 @@ export function get(c,identity) {
     return {ok:1,iface,current:publicCurrent,profiles,data_sim:c.get('unisoc_modem','main','data_sim')=='1'?1:0,
         remembered:!!selected,mode:selected?.mode || 'global',identity_ready:!!valid_identity(identity),source:resolved.source || 'error'};
 };
+export function status(c,identity) {
+    let state=get(c,identity);
+    // Dashboard polling only needs public selection fields, never credentials.
+    return state.ok ? {ok:1,apn:state.current.apn,source:state.source,data_sim:state.data_sim}
+        : {ok:0,error:state.error};
+};
 export function change(c,action,p,reload,identity) {
     let state=get(c,identity);
     if(!state.ok)return state;

@@ -88,7 +88,7 @@ for f in ./opt/mu300/bin/mu300-at ./opt/mu300/bin/mobile-data \
     ./etc/mu300/wifi-sae.build-id \
     ./opt/mu300/bin/mu300-smsd ./opt/mu300/bin/mu300-sms ./etc/init.d/mu300-smsd \
     ./www/luci-static/resources/mu300/refresh.js ./www/luci-static/resources/view/mu300/sms.css \
-    ./usr/libexec/unisoc-modem/dashboard-rates ./usr/libexec/unisoc-modem/operator.uc \
+    ./usr/libexec/unisoc-modem/dashboard-rates ./usr/libexec/unisoc-modem/dashboard-network.sh ./usr/libexec/unisoc-modem/operator.uc \
     ./usr/libexec/unisoc-modem/refresh-config \
     ./usr/libexec/unisoc-modem/lock ./usr/libexec/unisoc-modem/boot-replay ./usr/libexec/unisoc-modem/sim-scope.sh \
     ./usr/libexec/unisoc-modem/lock-apply.sh ./usr/libexec/unisoc-modem/lock-jobs.sh \

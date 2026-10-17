@@ -108,7 +108,7 @@ for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./www/luci-static/resources/view/mu300/home.js \
     ./www/luci-static/resources/mu300/refresh.js \
     ./www/luci-static/resources/view/mu300/sms.css \
-    ./usr/libexec/unisoc-modem/dashboard-rates \
+    ./usr/libexec/unisoc-modem/dashboard-rates ./usr/libexec/unisoc-modem/dashboard-network.sh \
     ./usr/libexec/unisoc-modem/apn ./usr/libexec/unisoc-modem/apn.uc ./usr/libexec/unisoc-modem/apn-identity ./etc/config/unisoc_apn \
     ./www/luci-static/resources/view/mu300/apn.js \
     ./usr/libexec/unisoc-modem/lock ./usr/libexec/unisoc-modem/boot-replay ./usr/libexec/unisoc-modem/sim-scope.sh \
