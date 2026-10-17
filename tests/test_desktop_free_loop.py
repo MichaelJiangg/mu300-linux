@@ -20,12 +20,13 @@ class RealLoop(unittest.TestCase):
         self.assertEqual(p.returncode,0,p.stdout+p.stderr)
         return p.stdout
 
-    def fixture(self,wrong_file=False,changed_gpt=False):
+    def fixture(self,wrong_file=False,changed_gpt=False,grow=True):
         for tool in ('losetup','mkfs.ext4','debugfs','e2fsck','resize2fs','mount','bash'):
             if not shutil.which(tool):self.skipTest('missing fixture tool '+tool)
         with tempfile.TemporaryDirectory(prefix='mu300-free-range-') as tmp:
             base=Path(tmp);disk=base/'disk';stage=base/'stage';stage.mkdir()
             payload=base/'payload';payload.mkdir()
+            (payload/'desktop-settings.env').write_text('GROW_FS='+str(int(grow))+'\n')
             total=6*2097152;first,last=snapshot(total,[('userdata',2048,2*2097152-1)])
             start=2*2097152;need=2*2097152
             newfirst,newlast=m.gpt_add_root(first,last,total,start,need)
@@ -51,6 +52,7 @@ class RealLoop(unittest.TestCase):
             loader=repair/'lib/ld-musl-aarch64.so.1';loader.write_text('#!/bin/sh\nshift 2\nexec "$@"\n');loader.chmod(0o755)
             for tool in ('e2fsck','resize2fs'):(repair/'usr/sbin'/tool).symlink_to(shutil.which(tool))
             shutil.copyfile(TOP/'desktop/android-loop.sh',payload/'android-loop.sh')
+            shutil.copyfile(TOP/'desktop/boot/ext4-geometry.sh',payload/'ext4-geometry.sh')
             sysroot=base/'sys';(sysroot/'device').mkdir(parents=True)
             (sysroot/'device/cid').write_text('a'*32);(sysroot/'size').write_text(str(total))
             script=(TOP/'desktop/android-write-free.sh').read_text()
@@ -77,11 +79,15 @@ class RealLoop(unittest.TestCase):
                     f.seek((start+need)*512);self.assertEqual(f.read(len(after)),after)
                     if changed_gpt:
                         f.seek(start*512);self.assertEqual(f.read(4096),bytes(4096))
+                    elif not wrong_file:
+                        f.seek(start*512+1028);blocks=int.from_bytes(f.read(4),'little')
+                        self.assertEqual(blocks*4096,need*512 if grow else 32<<20)
             finally:
                 self.assertFalse(self.command('losetup','-j',str(disk)).strip(),'fixture loop leaked')
 
     def test_real_ext4_grows_to_selected_size_and_adjacent_ranges_survive(self):self.fixture()
     def test_bad_root_file_never_commits_partition_table(self):self.fixture(wrong_file=True)
     def test_changed_gpt_aborts_before_touching_free_range(self):self.fixture(changed_gpt=True)
+    def test_explicit_no_growth_keeps_original_filesystem_size(self):self.fixture(grow=False)
 
 if __name__=='__main__':unittest.main()

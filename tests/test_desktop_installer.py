@@ -174,6 +174,7 @@ class Desktop(unittest.TestCase):
         old=self.payload_manifest();new=self.payload_manifest(relocated=True)
         new['desktop']['OpenWrt-Installer.exe']='c'*64
         new['desktop']['docs/DESKTOP-INSTALL.md']='d'*64
+        new['desktop']['desktop/files/boot/ext4-geometry.sh']='e'*64
         self.assertEqual(installer.resume_payload_id(old),installer.resume_payload_id(new))
         for field in ('boot-linux.img','mu300-openwrt.tar.gz','rootfs.requirements','busybox'):
             changed=copy.deepcopy(new);changed['magisk']['payload/'+field]='e'*64
@@ -423,9 +424,10 @@ desktop_free_loop
     def test_boot_append_leaves_kernel_original_frame_and_log_tail_intact(self):
         with tempfile.TemporaryDirectory() as t:
             assets=Path(t);(assets/'repair').mkdir()
-            for n in ('storage.sh','install-part.sh','part-prepare.sh','part-progress.sh','mu300-gpt'):
+            for n in ('storage.sh','install-part.sh','part-prepare.sh','part-progress.sh','ext4-geometry.sh','mu300-gpt'):
                 (assets/n).write_bytes((TOP/'desktop/boot'/n).read_bytes())
             for n,source in (('original-init',TOP/'boot/init'),('build-boot-image.py',TOP/'boot/build-boot-image.py')):(assets/n).write_bytes(source.read_bytes())
+            (assets/'internal-ext4.sh').write_bytes((TOP/'boot/internal-ext4.sh').read_bytes())
             (assets/'repair/manifest.json').write_text('{"sha256":{}}')
             ram=frame(b'original ramdisk');kernel=b'K'*4096
             base=bytearray(64<<20);base[:8]=b'ANDROID!';struct.pack_into('<II',base,8,len(kernel),len(ram));struct.pack_into('<I',base,40,4)
@@ -439,6 +441,8 @@ desktop_free_loop
                     rs=struct.unpack_from('<I',out,12)[0]
                     streams=unpack_frames(out[8192:8192+rs]);self.assertEqual(streams[0],b'original ramdisk')
                     contents=cpio_files(streams[-1]);self.assertEqual(contents['etc/mu300-desktop-root-mode'],(mode+'\n').encode())
+                    self.assertEqual(contents['etc/ext4-geometry.sh'],(assets/'ext4-geometry.sh').read_bytes())
+                    self.assertEqual(contents['etc/mu300-internal-ext4.sh'],(assets/'internal-ext4.sh').read_bytes())
                     if mode=='prepare':self.assertEqual(contents['etc/mu300-desktop-prepare'],b'request\n')
                     else:
                         self.assertNotIn('etc/mu300-desktop-prepare',contents)

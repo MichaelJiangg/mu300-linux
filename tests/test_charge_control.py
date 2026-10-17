@@ -139,7 +139,8 @@ class ChargeControl(unittest.TestCase):
 
     def test_real_watch_receives_events_and_checks_soc_without_events(self):
         docker=['docker','exec',self.container]
-        subprocess.run(docker+['/bin/sh','-c','mkdir -p /var/run/ubus; /sbin/ubusd >/tmp/charge-ubus.log 2>&1 &'],check=True)
+        # The base image has not run procd, which normally creates /run.
+        subprocess.run(docker+['/bin/sh','-c','mkdir -p /run /var/run/ubus; /sbin/ubusd >/tmp/charge-ubus.log 2>&1 &'],check=True)
         for attempt in range(30):
             if subprocess.run(docker+['ubus','list'],capture_output=True).returncode==0:break
             time.sleep(.1)
@@ -150,22 +151,26 @@ class ChargeControl(unittest.TestCase):
                  'MU300_CHARGE_SYS=/fixture/power MU300_CHARGE_STATE=/fixture/state.json '
                  'MU300_CHARGE_TYPEC=/fixture/typec MU300_CHARGE_DEVICE=u30air '
                  '/usr/bin/ucode /usr/libexec/unisoc-modem/charge-watch.uc')
-        watcher=subprocess.Popen(docker+['/bin/sh','-c',command],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        watch_log=self.fixture/'watch.log'
+        errors=watch_log.open('wb');self.addCleanup(errors.close)
+        watcher=subprocess.Popen(docker+['/bin/sh','-c',command],stdout=subprocess.PIPE,stderr=errors)
         def wait_for(predicate,seconds):
             deadline=time.monotonic()+seconds
             while time.monotonic()<deadline:
                 if watcher.poll() is not None:
-                    self.fail(watcher.communicate()[1].decode())
+                    self.fail(watch_log.read_text())
                 if predicate():return
                 time.sleep(.1)
-            self.fail('Charge policy did not react in time')
+            self.fail('Charge policy did not react in time: '+watch_log.read_text())
         try:
             wait_for(lambda:(self.fixture/'watch.pid').exists(),3)
-            # Wait only in the fixture for the listener registration.
-            time.sleep(.3)
             self.write(self.battery/'capacity',70)
-            subprocess.run(docker+['ubus','send','mu300.charge','{}'],check=True)
-            wait_for(lambda:(self.charger/'charge_type').read_text()=='Fast',3)
+            # Under ARM emulation startup can exceed a fixed 300 ms sleep.
+            # Retry fixture-only events until the listener is actually ready.
+            def event_received():
+                subprocess.run(docker+['ubus','send','mu300.charge','{}'],check=True)
+                return (self.charger/'charge_type').read_text()=='Fast'
+            wait_for(event_received,3)
             # Real FGU percentages do not generate regular change events.
             self.write(self.battery/'capacity',90)
             wait_for(lambda:(self.charger/'charge_type').read_text()=='N/A',33)

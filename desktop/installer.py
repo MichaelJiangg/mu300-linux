@@ -405,6 +405,7 @@ class Android:
         self.shell('chmod 755 '+self.bb+' '+self.p+'/*.sh')
         if not tf:
             for n in ('android-image.sh','android-write-part.sh','android-write-free.sh','android-loop.sh'):self.push(root/'desktop'/n,n)
+            self.push(root/'desktop/files/boot/ext4-geometry.sh','ext4-geometry.sh')
             for p in (root/'desktop/files/boot/repair').rglob('*'):
                 if p.is_file():self.push(p,p.relative_to(root).as_posix())
             self.shell('chmod -R u+rx '+self.p+'/desktop/files/boot/repair')

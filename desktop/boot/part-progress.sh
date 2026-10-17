@@ -59,12 +59,10 @@ part_fail() {
 }
 part_grow_ext4() {
     # Resize offline: online resize can be unavailable in the installation kernel.
-    local dev=$1 sectors=$2 blocks low high shift actual
+    local dev=$1 sectors=$2 blocks
+    . /etc/ext4-geometry.sh || return 1
     blocks=$((sectors / 8))
     /repair/lib/ld-musl-aarch64.so.1 --library-path /repair/lib:/repair/usr/lib /repair/usr/sbin/resize2fs -f "$dev" "$blocks" > /run/part-growfs.log 2>&1 || return 1
-    low=$(od -An -tu4 -j 1028 -N 4 "$dev" | tr -d ' \n')
-    high=$(od -An -tu4 -j 1360 -N 4 "$dev" | tr -d ' \n')
-    shift=$(od -An -tu4 -j 1048 -N 4 "$dev" | tr -d ' \n')
-    # Our root images use 4 KiB blocks. Do not report success on a 2 GiB FS.
-    [ "$shift" = 2 ] && [ "$high" = 0 ] && [ "$low" = "$blocks" ]
+    /repair/lib/ld-musl-aarch64.so.1 --library-path /repair/lib:/repair/usr/lib /repair/usr/sbin/e2fsck -fn "$dev" >> /run/part-growfs.log 2>&1 || return 1
+    ext4_verify_grown "$dev" "$sectors"
 }

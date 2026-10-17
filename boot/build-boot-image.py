@@ -156,6 +156,7 @@ def main():
         'bin/logdw': (a.logdw.read_bytes(), stat.S_IFREG | 0o755),
         'etc/ueventd-perms.sh': (text(a.ueventd_perms), stat.S_IFREG | 0o755),
         'etc/module-order': (text(a.module_order), stat.S_IFREG | 0o644),
+        'etc/mu300-internal-ext4.sh': (text(HERE / 'internal-ext4.sh'), stat.S_IFREG | 0o644),
     }
     dirs = {'bin', 'sbin', 'etc', 'proc', 'sys', 'dev', 'run', 'tmp', 'root', 'config', 'linux-modules'}
     for name in a.module_order.read_text().split():

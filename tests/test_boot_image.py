@@ -89,6 +89,7 @@ class GenericRamdisk(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
         files = cpio_files(unlz4_legacy(out.read_bytes()))
         self.assertEqual(files['init'][1], (BOOT / 'init').read_bytes())
+        self.assertEqual(files['etc/mu300-internal-ext4.sh'][1],(BOOT/'internal-ext4.sh').read_bytes())
         self.assertTrue(files['init'][0] & 0o111, 'init is not executable')
         self.assertEqual(files['etc/module-order'][1], (BOOT / 'module-order.txt').read_bytes())
         for n in (BOOT / 'module-order.txt').read_text().split():

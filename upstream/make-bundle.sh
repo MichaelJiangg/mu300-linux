@@ -63,5 +63,6 @@ if grep -qx 'CONFIG_LEDS_AW9523B=y' "$UO/kernel.config"; then
     devices="$devices v50"
 fi
 echo "$devices" > "$W/b/devices"
+printf 'sdcard\nlinux-slot\ngpt-root\n' > "$W/b/features"
 tar -C "$W/b" -czf "$OUT" .
 echo "$OUT: kernel $krel, $(ls "$W/b/modules" | wc -l | tr -d ' ') modules, ramdisk segment $(wc -c < "$W/b/ramdisk-generic.lz4" | tr -d ' ') bytes"

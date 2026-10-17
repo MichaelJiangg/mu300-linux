@@ -414,10 +414,36 @@ find_root_offset() {
     done
     return 1
 }
+# An internal GPT root uses the same container filesystem as the free region.
+# Do not scan the card or accept two partitions with the same name.
+find_gpt_root() {
+    local candidate= p name label magic
+    [ "$(cat /sys/block/mmcblk0/device/type 2>/dev/null)" = MMC ] || return 1
+    for p in /sys/block/mmcblk0/mmcblk0p*/uevent; do
+        grep -qx PARTNAME=mu300root "$p" 2>/dev/null || continue
+        [ -z "$candidate" ] || return 1
+        name=${p%/uevent}; name=${name##*/}
+        candidate=/dev/$name
+    done
+    [ -n "$candidate" ] && [ -b "$candidate" ] || return 1
+    dd if="$candidate" of=/run/root-super bs=512 count=8 2>/dev/null || return 1
+    [ "$(wc -c < /run/root-super)" = 4096 ] || return 1
+    magic=$(od -An -tx2 -j1080 -N2 /run/root-super | tr -d ' \n')
+    label=$(dd if=/run/root-super bs=1 skip=1144 count=16 2>/dev/null | tr -d '\000')
+    [ "$magic" = ef53 ] && [ "$label" = mu300root ] && echo "$candidate"
+}
 # A TF-only image must never fall through to the eMMC free-region probe.
 root_target=$(cat /etc/mu300-root-target 2>/dev/null)
+# A desktop boot can retain a TF-only marker from its base segment. Its
+# explicit partition choice must survive a generic init appended by updates.
+case $(cat /etc/mu300-desktop-root-mode 2>/dev/null) in
+    part) root_target=part ;;
+    sd) root_target=sd ;;
+    legacy) root_target=auto ;;
+esac
 # Generic images retain the bounded internal-root fallback.
 sd_root=
+if [ "$root_target" != part ]; then
 for n in $(seq 1 8); do
     seen=
     for d in /dev/mmcblk[1-9]p1 /dev/mmcblk[1-9]; do
@@ -435,6 +461,7 @@ for n in $(seq 1 8); do
     [ -n "$seen" ] && break
     mdev -s; sleep 1
 done
+fi
 log "stage=sd-scan dev=${sd_root:-none} blocks=$(ls /dev/mmcblk[1-9]* 2>/dev/null | tr '\n' ',')"
 # No additional wait or second mount: the root scan has established the TF
 # device, and the root mount lets us read the current (journaled) policy.
@@ -446,18 +473,27 @@ if [ -n "$sd_root" ]; then
     mount -t ext4 -o noatime "$sd_root" /disk 2>>/run/rootmount.err && root_mounted=1
     log "stage=sd-root dev=$sd_root mounted=$root_mounted"
 fi
-[ "$root_mounted" = 1 ] && read_usb_boot_policy
-setup_usb_gadget
 internal_root=
 if [ "$root_mounted" = 0 ] && [ "$root_target" != sd ]; then
-    if found=$(find_root_offset); then
+    if [ "$root_target" != part ] && found=$(find_root_offset); then
         [ "$found" = "$ROOT_OFFSET" ] || log "stage=root-offset found=$found (default $ROOT_OFFSET)"
         ROOT_OFFSET=$found
         internal_root=1
+    elif gp=$(find_gpt_root); then
+        rootloop=$gp
+        . /etc/mu300-internal-ext4.sh
+        if desktop_ext4_check "$gp" && mount -t ext4 -o noatime "$gp" /disk 2>>/run/rootmount.err; then
+            root_mounted=1
+            log "stage=root-part dev=$gp"
+        else
+            log "stage=root-part-failed dev=$gp"
+        fi
     else
         log "stage=root-offset not-found (no internal mount attempted)"
     fi
 fi
+[ "$root_mounted" = 1 ] && read_usb_boot_policy
+[ "${DESKTOP_USB_READY:-}" = 1 ] || setup_usb_gadget
 mkdir -p /newroot
 # busybox mount only sets up a loop for regular files; for a block device the loop options would
 # be handed to ext4 (EINVAL), so attach the loop explicitly and verify its offset
@@ -534,6 +570,11 @@ if [ "$root_mounted" = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
     [ "$linux_slot" = a ] && echo b > /run/mu300/android-slot || echo a > /run/mu300/android-slot
     [ -n "$misc" ] && echo "$misc" > /run/mu300/misc-dev
     echo "$rootloop" > /run/mu300/disk-dev
+    case "$rootloop" in
+        /dev/loop*) [ -z "$internal_root" ] || echo 'mmcblk0@region' > /run/mu300-root-dev ;;
+        /dev/mmcblk0p*) echo 'mmcblk0@mu300root' > /run/mu300-root-dev ;;
+        *) [ -z "$sd_root" ] || echo "$sd_root" > /run/mu300-root-dev ;;
+    esac
     echo "$DEVICE" > /run/mu300/device
     init=/sbin/init
     [ -x /newroot/lib/systemd/systemd ] && init=/lib/systemd/systemd

@@ -4,7 +4,7 @@ from helpers import ShellTest, TOP
 class DesktopFsck(ShellTest):
     def test_clean_error_and_unknown_filesystems(self):
         source=(TOP/'desktop/boot/storage.sh').read_text()
-        function=source[source.index('desktop_ext4_check() {'):source.index('\ndesktop_mount_root()')]
+        function=(TOP/'boot/internal-ext4.sh').read_text()
         loader=self.tmp/'loader'
         loader.write_text('#!/bin/sh\necho "$*" >> "$STUBLOG/fsck"\nexit "${TEST_FSCK_RC:-0}"\n')
         loader.chmod(0o755)

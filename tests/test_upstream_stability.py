@@ -103,6 +103,9 @@ case "$*" in
 esac
 exit 0
 ''')
+        # Some BusyBox builds prefer internal applets over PATH. A shell
+        # function must win so this fixture can never call the host's ip.
+        source='ip() { "$STUBLOG/stubs/ip" "$@"; }\n'+source
         for shell in self.each_shell():
             for address in ('192.168.77.1/24', '192.168.77.1/16', '192.168.88.1/24'):
                 for name in ('bridged', 'ip-calls'):

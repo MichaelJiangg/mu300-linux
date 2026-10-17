@@ -1,0 +1,31 @@
+#!/usr/bin/ucode
+// Apply once to the pinned LuCI view, on clean builds and package installation.
+import { readfile, writefile, rename, unlink } from 'fs';
+
+let path = (ARGV[0] || '') + '/www/luci-static/resources/view/network/wireless.js';
+let text = readfile(path);
+let removing = ARGV[1] == '--remove';
+if (text == null || (index(text, 'mu300CipherSupport') >= 0) != removing) exit(0);
+function once(pattern, transform, label) {
+    let count = 0;
+    text = replace(text, pattern, m => { count++; return transform(m); });
+    if (count != 1) die('Unexpected LuCI source for cipher filtering: ' + label + '\n');
+}
+if (removing) {
+    once(/'require mu300\.wifi-ciphers as mu300CipherSupport';/g, m => '', 'remove import');
+    once(/return network\.getWifiNetwork\(s\.section\)\.then\(async function\(radioNet\)\s*\{\nconst mu300CipherCaps = await mu300CipherSupport\.load\(radioNet\.getWifiDeviceName\(\)\);\n/g,
+        m => replace(replace(m, 'async function(', 'function('), /\nconst mu300CipherCaps[^\n]+\n/, ''), 'remove modal lookup');
+    once(/mu300CipherSupport\.apply\(o, mu300CipherCaps\);\n/g, m => '', 'remove filter');
+} else {
+    once(/'use strict';/g, m => m + "'require mu300.wifi-ciphers as mu300CipherSupport';", 'imports');
+    once(/return network\.getWifiNetwork\(s\.section\)\.then\(function\(radioNet\)\s*\{/g,
+    m => replace(m, 'function(', 'async function(') + '\n' +
+        'const mu300CipherCaps = await mu300CipherSupport.load(radioNet.getWifiDeviceName());\n', 'modal');
+    once(/const crypto_modes\s*=\s*\[\];/g,
+    m => 'mu300CipherSupport.apply(o, mu300CipherCaps);\n' + m, 'cipher controls');
+}
+let tmp = path + '.cipher.tmp';
+if (writefile(tmp, text) != length(text) || !rename(tmp, path)) {
+    unlink(tmp);
+    die('Cannot update LuCI cipher choices\n');
+}

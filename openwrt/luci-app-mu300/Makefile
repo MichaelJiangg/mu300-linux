@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-mu300
 PKG_VERSION:=1.2.0
-PKG_RELEASE:=18
+PKG_RELEASE:=19
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=MU300 Linux contributors
 PKGARCH:=all
@@ -61,6 +61,7 @@ define Package/luci-app-mu300/postinst
 		cp -a "$$old"/. "$$state"/
 	fi
 	ucode /usr/libexec/unisoc-modem/disable-channel-analysis || exit 1
+	ucode /usr/libexec/unisoc-modem/filter-wifi-ciphers || exit 1
 	rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* 2>/dev/null
 	uci -q get luci.languages.tr >/dev/null || uci set luci.languages.tr='Türkçe'
 	uci commit luci
@@ -93,6 +94,16 @@ define Package/luci-app-mu300/postrm
 	fi
 	rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* 2>/dev/null
 	/etc/init.d/rpcd restart 2>/dev/null || true
+}
+exit 0
+endef
+
+define Package/luci-app-mu300/prerm
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+	if [ "$$1" = remove ]; then
+		ucode /usr/libexec/unisoc-modem/filter-wifi-ciphers '' --remove || exit 1
+	fi
 }
 exit 0
 endef

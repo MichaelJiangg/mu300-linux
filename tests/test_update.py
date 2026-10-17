@@ -244,6 +244,7 @@ class Update(ShellTest):
                 self.assertEqual('v50' in boards,expected)
                 self.assertIn('f50',boards)
                 self.assertIn('u30air',boards)
+                self.assertEqual((stage/'b/features').read_text().splitlines(),['sdcard','linux-slot','gpt-root'])
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ set -eu
 set -o pipefail
 P=${MU300_PAYLOAD_DIR:?};T=${MU300_INSTALL_TMP:?}
 . "$P/desktop-settings.env"
+. "$P/ext4-geometry.sh"
 dev=${1:?root device}; expected_cid=${2:?cid}; expected_sectors=${3:?size}; expected_sha=${4:?image checksum}
 node=${dev##*/};disk=${node%p*}
 case "$node" in mmcblk[0-9]p[0-9]*) ;; *) exit 1 ;; esac
@@ -32,8 +33,10 @@ repair=$P/desktop/files/boot/repair
 }
 if [ "${GROW_FS:-1}" = 1 ]; then
 "$repair/lib/ld-musl-aarch64.so.1" --library-path "$repair/lib:$repair/usr/lib" "$repair/usr/sbin/resize2fs" -f "$dev" "$((expected_sectors/8))"
-low=$(od -An -tu4 -j1028 -N4 "$dev" | tr -d ' \n');high=$(od -An -tu4 -j1360 -N4 "$dev" | tr -d ' \n')
-[ "$high" = 0 ] && [ "$low" = "$((expected_sectors/8))" ]
+fi
+"$repair/lib/ld-musl-aarch64.so.1" --library-path "$repair/lib:$repair/usr/lib" "$repair/usr/sbin/e2fsck" -fn "$dev"
+if [ "${GROW_FS:-1}" = 1 ]; then
+    ext4_verify_grown "$dev" "$expected_sectors" || { echo 'root filesystem geometry does not fill target' >&2; exit 1; }
 fi
 mount -t ext4 -o ro,noload "$dev" "$T/image-root"
 trap 'umount "$T/image-root" 2>/dev/null || :' EXIT

@@ -26,7 +26,7 @@ const labels = {
     'LED timeout (seconds)': ['状态灯自动熄灭（秒）', 'LED kapanma süresi (saniye)'],
     'While charging lamps stay on. Otherwise 0 keeps them on; press the power key to show them again.': ['充电时状态灯保持点亮；未充电时 0 表示常亮，熄灭后短按电源键可再次点亮。', 'Şarjda ışıklar açık kalır. Diğer durumlarda 0 sürekli açık tutar; yeniden göstermek için güç tuşuna basın.'],
     'U30 Air: network blue on 4G, white on 5G, red without data. Wi-Fi blue on 2.4 GHz, white on 5 GHz. These lamps support on/off only.': ['U30 Air：网络灯 4G 蓝色、5G 白色、无数据红色；Wi-Fi 灯 2.4 GHz 蓝色、5 GHz 白色。这两组灯仅支持开关。', 'U30 Air: 4G mavi, 5G beyaz, veri yoksa kırmızı. Wi-Fi: 2.4 GHz mavi, 5 GHz beyaz. Bu ışıklar yalnızca açılıp kapatılabilir.'],
-    'Charging: breathing blue; full or normal battery: white; low battery: blinking red.': ['充电时蓝色呼吸；充满或正常电量时白色；低电量时红色闪烁。', 'Şarjda yumuşakça parlayan mavi; dolu veya normal pil beyaz; düşük pil yanıp sönen kırmızı.'],
+    'Below 50%: blue; from 50%: white. Breathing while charging; steady white when full.': ['低于 50% 蓝色，50% 起白色；充电时对应颜色呼吸，充满后白色常亮。', '%50 altında mavi, %50 ve üzerinde beyaz. Şarjda aynı renk yumuşakça parlar; dolunca sabit beyaz yanar.'],
 	'Signal lamp (LTE / 5G / no service)': ['信号灯（4G / 5G / 无信号）', 'Sinyal ışığı (4G / 5G / servis yok)'],
 	'Signal lamp brightness': ['信号灯亮度', 'Sinyal ışığı parlaklığı'],
 	'Wi-Fi hotspot lamp': ['Wi-Fi 热点灯', 'Wi-Fi erişim noktası ışığı'],
@@ -139,7 +139,7 @@ return view.extend({
 		}
 
         if (u30air) {
-            o = s.option(form.Flag, 'battery', label('Battery lamp'), label('Charging: breathing blue; full or normal battery: white; low battery: blinking red.'));
+            o = s.option(form.Flag, 'battery', label('Battery lamp'), label('Below 50%: blue; from 50%: white. Breathing while charging; steady white when full.'));
             o.default = '1'; o.rmempty = false;
             o = s.option(form.Value, 'battery_brightness', label('Battery lamp brightness'));
             o.datatype = 'range(0,255)'; o.default = '255'; o.rmempty = false;

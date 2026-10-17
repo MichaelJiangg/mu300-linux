@@ -172,7 +172,9 @@ battery() {
     # Charger online changes before the fuel-gauge status sometimes does.
     # A stale "Charging"/"Full" must not keep the charging indication alive.
     [ "$KEEP_LIT" != 0 ] || status=Discharging
+    # Stock U30 Air: blue below 50%, white from 50%; Full is steady white.
     color=sc27xx:green
+    [ "$cap" -ge 50 ] || color=sc27xx:blue
     mkdir -p "$STATE"
     previous_power=$(cat "$STATE/.external-power" 2>/dev/null)
     echo "$KEEP_LIT" > "$STATE/.external-power"
@@ -180,14 +182,9 @@ battery() {
         echo $(( $(uptime_s) + TIMEOUT )) > "$STATE/.awake-until"
     fi
     rm -f "$STATE/.battery-blink" "$STATE/.battery-breathe"
-    case $status in
-        Charging) color=sc27xx:blue ;;
-        Full) ;;
-        *) if [ "$cap" -le 15 ]; then color=sc27xx:red; fi ;;
-    esac
+    [ "$status" != Full ] || color=sc27xx:green
     case "$status:$color" in
         Charging:*) echo "$color" > "$STATE/.battery-breathe" ;;
-        *:sc27xx:red) echo "$color" > "$STATE/.battery-blink" ;;
     esac
     for channel in sc27xx:red sc27xx:green sc27xx:blue; do
         value=0; [ "$channel" != "$color" ] || value=1

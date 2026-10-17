@@ -36,10 +36,10 @@ esac""")
         for shell in self.each_shell():
             self.apply(shell,'online-5g');self.apply(shell,'wifi-on')
             self.assertEqual([self.value(n) for n in ['net_blue','zte-ldo0','zte-ldo1','zte-ldo2']],['0','1','1','0'])
-            self.assertEqual(self.value('sc27xx:blue'),'255');self.assertEqual(self.value('sc27xx:green'),'0')
+            self.assertEqual(self.value('sc27xx:green'),'255');self.assertEqual(self.value('sc27xx:blue'),'0')
             self.apply(shell,'online-4g')
             self.assertEqual(self.value('net_blue'),'1');self.assertEqual(self.value('zte-ldo0'),'0')
-            self.assertEqual(self.value('zte-ldo1'),'1');self.assertEqual(self.value('sc27xx:blue'),'255')
+            self.assertEqual(self.value('zte-ldo1'),'1');self.assertEqual(self.value('sc27xx:green'),'255')
             self.apply(shell,'offline');self.assertEqual(self.value('keyboard-backlight'),'1')
             self.apply(shell,'wifi-off');self.assertEqual(self.value('zte-ldo1'),'0')
 
@@ -47,14 +47,15 @@ esac""")
         for shell in self.each_shell():
             self.apply(shell,'online-5g');self.apply(shell,'wifi-on')
             self.apply(shell,'refresh',TEST_SIGNAL='0',TEST_WIFI='0',TEST_BATTERY='0')
-            self.assertTrue(all(self.value(n)=='0' for n in ['zte-ldo0','zte-ldo1','sc27xx:blue']))
+            self.assertTrue(all(self.value(n)=='0' for n in ['zte-ldo0','zte-ldo1','sc27xx:green']))
             self.apply(shell,'refresh',TEST_BRIGHTNESS='40')
-            self.assertEqual(self.value('zte-ldo0'),'1');self.assertEqual(self.value('zte-ldo1'),'1');self.assertEqual(self.value('sc27xx:blue'),'40')
+            self.assertEqual(self.value('zte-ldo0'),'1');self.assertEqual(self.value('zte-ldo1'),'1');self.assertEqual(self.value('sc27xx:green'),'40')
 
     def test_battery_states_and_timeout(self):
         for shell in self.each_shell():
             (self.battery/'status').write_text('Discharging\n');(self.battery/'capacity').write_text('10\n')
-            self.apply(shell,'battery');self.assertEqual(self.value('sc27xx:red'),'255')
+            self.apply(shell,'battery');self.assertEqual(self.value('sc27xx:blue'),'255')
+            self.assertEqual(self.value('sc27xx:red'),'0')
             (self.battery/'status').write_text('Full\n');self.apply(shell,'battery')
             self.assertEqual(self.value('sc27xx:green'),'255');self.assertEqual(self.value('sc27xx:red'),'0')
             (self.battery/'status').write_text('Discharging\n')
@@ -86,16 +87,40 @@ esac""")
 
     def test_charging_uses_hardware_rise_hold_fall_rest(self):
         for shell in self.each_shell():
-            blue=self.lamps/'sc27xx:blue'
-            (blue/'trigger').write_text('[none] timer pattern\n');(blue/'hw_pattern').write_text('');(blue/'repeat').write_text('0\n')
-            self.apply(shell,'battery',TEST_BRIGHTNESS='40')
-            self.assertEqual((blue/'trigger').read_text().strip(),'pattern')
-            self.assertEqual((blue/'hw_pattern').read_text().strip(),'0 625 40 750 0 625 0 250')
-            self.assertEqual((blue/'repeat').read_text().strip(),'-1')
-            self.assertFalse((blue/'delay_on').exists())
+            for channel in ('blue','green'):
+                lamp=self.lamps/('sc27xx:'+channel)
+                (lamp/'trigger').write_text('[none] timer pattern\n');(lamp/'hw_pattern').write_text('');(lamp/'repeat').write_text('0\n')
+            for cap, channel, other in [(49,'blue','green'),(50,'green','blue'),(100,'green','blue')]:
+                (self.battery/'capacity').write_text(str(cap)+'\n')
+                # Real sysfs retains the list of supported triggers after a
+                # write; ordinary fixture files must restore that list.
+                for name in ('blue','green'):
+                    (self.lamps/('sc27xx:'+name)/'trigger').write_text('[none] timer pattern\n')
+                self.apply(shell,'battery',TEST_BRIGHTNESS='40')
+                lamp=self.lamps/('sc27xx:'+channel)
+                self.assertEqual((lamp/'trigger').read_text().strip(),'pattern')
+                self.assertEqual((lamp/'hw_pattern').read_text().strip(),'0 625 40 750 0 625 0 250')
+                self.assertEqual((lamp/'repeat').read_text().strip(),'-1')
+                self.assertEqual(self.value('sc27xx:'+other),'0')
+                self.assertFalse((lamp/'delay_on').exists())
             (self.battery/'status').write_text('Full\n');self.apply(shell,'battery')
-            self.assertEqual((blue/'trigger').read_text().strip(),'none');self.assertEqual(self.value('sc27xx:green'),'255')
+            self.assertEqual((self.lamps/'sc27xx:green/trigger').read_text().strip(),'none')
+            self.assertEqual(self.value('sc27xx:green'),'255');self.assertEqual(self.value('sc27xx:blue'),'0')
             (self.battery/'status').write_text('Charging\n')
+
+    def test_remaining_charge_color_boundary_never_changes_timeout(self):
+        for shell in self.each_shell():
+            (self.battery/'status').write_text('Discharging\n')
+            self.script(shell,BIN/'mu300-led','wake',**dict(self.extra,TEST_TIMEOUT='60'))
+            deadline=self.root/'run/mu300/led/.awake-until'
+            before=deadline.read_text()
+            for cap, channel in [(0,'blue'),(15,'blue'),(49,'blue'),(50,'green'),(51,'green'),(100,'green')]:
+                (self.battery/'capacity').write_text(str(cap)+'\n')
+                self.apply(shell,'battery',TEST_TIMEOUT='60')
+                self.assertEqual(self.value('sc27xx:'+channel),'255')
+                self.assertEqual(self.value('sc27xx:red'),'0')
+                self.assertFalse((self.root/'run/mu300/led/.battery-breathe').exists())
+                self.assertEqual(deadline.read_text(),before)
 
     def test_unplug_ignores_stale_fgu_charging_and_stays_dark_after_events(self):
         for shell in self.each_shell():

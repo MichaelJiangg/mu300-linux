@@ -55,6 +55,7 @@ unset MU300_DEPLOY_ROOT
     for p in (TOP/'desktop/boot').iterdir():
         if p.is_file(): shutil.copyfile(p, assets/p.name)
     shutil.copyfile(TOP/'boot/init', assets/'original-init')
+    shutil.copyfile(TOP/'boot/internal-ext4.sh', assets/'internal-ext4.sh')
     shutil.copyfile(TOP/'boot/build-boot-image.py', assets/'build-boot-image.py')
     shutil.copyfile(TOP/'rootfs/overlay/opt/mu300/bin/mu300-update', dest/'mu300-update-library.sh')
     spec=importlib.util.spec_from_file_location('repair_prepare',TOP/'desktop/prepare-tools.py')

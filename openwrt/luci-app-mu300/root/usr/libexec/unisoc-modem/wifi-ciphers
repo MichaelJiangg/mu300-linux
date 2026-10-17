@@ -1,0 +1,3 @@
+#!/usr/bin/ucode
+import { capabilities } from '/usr/libexec/unisoc-modem/wifi-ciphers.uc';
+print(sprintf('%J\n', capabilities(ARGV[0])));

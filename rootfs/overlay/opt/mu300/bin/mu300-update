@@ -109,6 +109,39 @@ bundle_runs_here() {
     grep -qx './devices' "$2" || return 1
     untar -xzf "$1" -C "$3" ./devices && grep -qw "$_me" "$3/devices"
 }
+# Read the root device, never mount Android userdata to guess an installation.
+# The desktop init records disk-dev; newer generic init also names the layout.
+root_layout() {
+    _sys=${MU300_SYSROOT:-}
+    _ref=$(cat "$_sys/run/mu300-root-dev" 2>/dev/null)
+    case $_ref in *@mu300root) echo part; return ;; *@*) echo region; return ;; esac
+    _rd=$(cat "$_sys/run/mu300/disk-dev" 2>/dev/null); _rn=${_rd##*/}
+    case $_rn in
+        loop[0-9]*)
+            _back=$(cat "$_sys/sys/class/block/$_rn/loop/backing_file" 2>/dev/null)
+            case $_back in /dev/mmcblk[0-9]*) echo region ;; ?*) echo image ;; *) echo unknown ;; esac
+            return ;;
+        mmcblk[0-9]*)
+            if grep -qx PARTNAME=mu300root "$_sys/sys/class/block/$_rn/uevent" 2>/dev/null; then echo part; return; fi
+            _disk=${_rn%p*}
+            if [ "$(cat "$_sys/sys/class/block/$_disk/device/type" 2>/dev/null)" = SD ]; then echo sd; return; fi ;;
+    esac
+    echo unknown
+}
+bundle_finds_root() {  # BUNDLE LIST: must run before modules, root or boot writes
+    _layout=$(root_layout)
+    case $_layout in
+        image)
+            echo 'boot: userdata image needs the desktop installer to preserve its storage policy; nothing installed' >&2
+            return 1 ;;
+        part)
+            if ! grep -qx './features' "$2" || ! tar -xzOf "$1" ./features 2>/dev/null | grep -qx gpt-root; then
+                echo 'boot: this kernel cannot boot the independent mu300root partition (gpt-root missing); nothing installed' >&2
+                return 1
+            fi ;;
+    esac
+    return 0
+}
 # the directory the running system booted from (it stays in use under any name until the reboot)
 is_root() { [ -d "$1" ] && [ / -ef "$1" ]; }
 running_os() { [ -e /etc/openwrt_release ] && echo openwrt || echo ubuntu; }
@@ -625,6 +658,14 @@ write_boot() {  # write_boot DEV PSIZE BODY VBMETA FOOTER
     rm -f "$3.all"
 }
 
+unlock_for_trial() {
+    # After a root update / still refers to the old system. Use the tool in
+    # the installed system, not a chain of probes against deprecated APIs.
+    _next=$DISK/$(running_os)/opt/mu300/bin/mu300-next-boot
+    [ -x "$_next" ] || _next=${MU300_BIN:-/opt/mu300/bin}/mu300-next-boot
+    "$_next" --trial
+}
+
 boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu300-kernel.tar.gz instead)
     tag=$1
     dev=$(part_dev "$BOOT_PART") || { echo "boot: no $BOOT_PART partition found, boot image not updated" >&2; return 1; }
@@ -653,37 +694,12 @@ boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu30
         printf 'boot: the kernel of %s does not support the %s; the boot image is unchanged\n' "$tag" "$(this_device)" >&2
         rm -rf "$tmp"; return 1
     fi
+    bundle_finds_root "$bundle" "$tmp/list" || return 1
     untar -xzf "$bundle" -C "$tmp" ./Image ./ramdisk-generic.lz4 || { echo "boot: unpacking $bundle failed" >&2; return 1; }
     [ -s "$tmp/Image" ] && [ -s "$tmp/ramdisk-generic.lz4" ] || { echo "boot: no kernel in the bundle" >&2; return 1; }
-    # A kernel the systems were not built with (the mainline bundle) brings its modules along: they go into every
-    # installed system before the boot image changes, next to the ones of the other kernel, which stay for a
-    # switch back. Ubuntu keeps them under extra/ and indexes them; OpenWrt keeps them flat and loads by path.
-    if grep -qx './kernel.release' "$tmp/list"; then
-        untar -xzf "$bundle" -C "$tmp" ./kernel.release ./modules || { echo "boot: unpacking the modules failed" >&2; return 1; }
-        for f in modules.builtin modules.builtin.modinfo; do
-            if grep -qx "./$f" "$tmp/list"; then untar -xzf "$bundle" -C "$tmp" "./$f" || true; fi
-        done
-        krel=$(cat "$tmp/kernel.release")
-        case $krel in ''|*/*|.*) echo "boot: bad kernel release '$krel' in the bundle" >&2; return 1 ;; esac
-        for os in $(installed_systems); do
-            case $os in ubuntu) d=$DISK/$os/lib/modules/$krel/extra ;; *) d=$DISK/$os/lib/modules/$krel ;; esac
-            mkdir -p "$d" && cp "$tmp"/modules/*.ko "$d/" || { echo "boot: installing the modules into $os failed" >&2; return 1; }
-            # Built-in -> module transitions (cpufreq voltage profiles) need
-            # fresh indexes on OpenWrt too, not only on Ubuntu.
-            for f in modules.builtin modules.builtin.modinfo; do
-                [ ! -f "$tmp/$f" ] || cp "$tmp/$f" "$DISK/$os/lib/modules/$krel/" || return 1
-            done
-            if [ "$os" = ubuntu ]; then
-                # what the kernel has built in (bundles from v2026.09.29 on): modprobe of a built-in driver then
-                # succeeds, and depmod stops warning
-                for f in modules.builtin modules.builtin.modinfo; do [ ! -f "$tmp/$f" ] || cp "$tmp/$f" "$DISK/$os/lib/modules/$krel/"; done
-                [ -e "$DISK/$os/lib/modules/$krel/modules.order" ] || : > "$DISK/$os/lib/modules/$krel/modules.order"
-                if command -v depmod >/dev/null; then depmod -b "$DISK/$os" "$krel" 2>/dev/null || true; fi
-            fi
-        done
-        printf 'boot: %s modules for %s installed into: %s\n' "$(ls "$tmp/modules" | wc -l | tr -d ' ')" "$krel" "$(installed_systems)"
-    fi
-    id=$(cat "$tmp/Image" "$tmp/ramdisk-generic.lz4" | sha256sum | cut -d' ' -f1)
+    # Modules/features are part of the payload too. Equal Image+init bytes do
+    # not make a different local bundle an already-installed update.
+    id=$(sha256sum < "$bundle" | cut -d' ' -f1)
 
     # the image in boot_b now: stock header page, kernel, ramdisk; AVB footer in the last 64 bytes
     dd if="$dev" of="$tmp/hdr" bs=4096 count=1 2>/dev/null
@@ -727,6 +743,35 @@ boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu30
     cp "$tmp/footer" "$tmp/newfooter"
     { bytes "$nosize" 8 be; bytes "$nosize" 8 be; bytes "$vbs" 8 be; } | poke "$tmp/newfooter" 12
 
+    # A kernel the systems were not built with (the mainline bundle) brings its modules along: they go into every
+    # installed system before the boot image changes, next to the ones of the other kernel, which stay for a
+    # switch back. Ubuntu keeps them under extra/ and indexes them; OpenWrt keeps them flat and loads by path.
+    if grep -qx './kernel.release' "$tmp/list"; then
+        untar -xzf "$bundle" -C "$tmp" ./kernel.release ./modules || { echo "boot: unpacking the modules failed" >&2; return 1; }
+        for f in modules.builtin modules.builtin.modinfo; do
+            if grep -qx "./$f" "$tmp/list"; then untar -xzf "$bundle" -C "$tmp" "./$f" || true; fi
+        done
+        krel=$(cat "$tmp/kernel.release")
+        case $krel in ''|*/*|.*) echo "boot: bad kernel release '$krel' in the bundle" >&2; return 1 ;; esac
+        for os in $(installed_systems); do
+            case $os in ubuntu) d=$DISK/$os/lib/modules/$krel/extra ;; *) d=$DISK/$os/lib/modules/$krel ;; esac
+            mkdir -p "$d" && cp "$tmp"/modules/*.ko "$d/" || { echo "boot: installing the modules into $os failed" >&2; return 1; }
+            # Built-in -> module transitions (cpufreq voltage profiles) need
+            # fresh indexes on OpenWrt too, not only on Ubuntu.
+            for f in modules.builtin modules.builtin.modinfo; do
+                [ ! -f "$tmp/$f" ] || cp "$tmp/$f" "$DISK/$os/lib/modules/$krel/" || return 1
+            done
+            if [ "$os" = ubuntu ]; then
+                # what the kernel has built in (bundles from v2026.09.29 on): modprobe of a built-in driver then
+                # succeeds, and depmod stops warning
+                for f in modules.builtin modules.builtin.modinfo; do [ ! -f "$tmp/$f" ] || cp "$tmp/$f" "$DISK/$os/lib/modules/$krel/"; done
+                [ -e "$DISK/$os/lib/modules/$krel/modules.order" ] || : > "$DISK/$os/lib/modules/$krel/modules.order"
+                if command -v depmod >/dev/null; then depmod -b "$DISK/$os" "$krel" 2>/dev/null || true; fi
+            fi
+        done
+        printf 'boot: %s modules for %s installed into: %s\n' "$(ls "$tmp/modules" | wc -l | tr -d ' ')" "$krel" "$(installed_systems)"
+    fi
+
     # keep the current image for rollback-boot, then write
     cp "$tmp/body" "$BOOTDIR/prev.body"; cp "$tmp/vbmeta" "$BOOTDIR/prev.vbmeta"; cp "$tmp/footer" "$BOOTDIR/prev.footer"
     cat "$BOOTDIR/installed.tag" > "$BOOTDIR/prev.tag" 2>/dev/null || echo installer > "$BOOTDIR/prev.tag"
@@ -743,6 +788,7 @@ boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu30
     echo "$tag" > "$BOOTDIR/installed.tag"
     kernel_choice > "$BOOTDIR/installed.kernel"
     sync
+    unlock_for_trial || echo 'boot: image verified, but the Linux trial could not be armed; select OpenWrt before rebooting' >&2
     rm -rf "$tmp"
     [ -n "${MU300_KERNEL_BUNDLE:-}" ] || rm -f "$bundle"
     printf 'boot: updated to %s (kernel %s bytes, ramdisk %s bytes). If it does not start, the device falls back\n' "$tag" "$nksz" "$nrsz"
@@ -883,6 +929,13 @@ apply() {
         fetch_verified "$tag" "$boot_asset"; r=$?
         # a release without this bundle leaves the boot image alone (boot_update says so); anything else stops here
         [ "$r" = 0 ] || [ "$r" = 2 ] || { offline_hint; die "nothing was changed; run mu300-update apply again to continue the download"; }
+    fi
+    # Refuse an incompatible init before apply_one can rename any system.
+    candidate=${MU300_KERNEL_BUNDLE:-${boot_asset:+$STAGE/$boot_asset}}
+    if [ -n "$candidate" ]; then
+        [ -s "$candidate" ] || die 'missing kernel bundle; nothing installed'
+        tar -tzf "$candidate" > "$STAGE/boot-list" || die 'unreadable kernel bundle; nothing installed'
+        bundle_finds_root "$candidate" "$STAGE/boot-list" || die 'incompatible root layout; use the desktop installer'
     fi
     echo "all files are here and verified; from now on the network is not needed"
 
