@@ -25,7 +25,10 @@ def main():
             const L={env:{lang:'en'},isObject:x=>x&&typeof x==='object'};
             const base={extend(methods){function Widget(...args){this.__init__(...args)}Widget.prototype={setUpdateEvents(){},setChangeEvents(){},...methods};return Widget;}};
             const Select=new Function('UIElement','L','E','dom','_',native+';return UISelect;')(base,L,E,{bindClassInstance(){}},x=>x);
-            const support=new Function('fs','L','_',feature)({exec_direct:()=>Promise.reject(new Error('unavailable'))},L,x=>x);
+            const moduleBase={extend(methods){function Module(){}Object.assign(Module.prototype,methods);return Module;}};
+            const exported=new Function('fs','L','_','baseclass',feature)({exec_direct:()=>Promise.reject(new Error('unavailable'))},L,x=>x,moduleBase);
+            if(typeof exported!=='function')throw new Error('LuCI module must export a constructor');
+            const support=new exported();
             const factory=new Function('ss','form','_','uci','support','caps','let o;'+source+';support.apply(o,caps);return o;');
             function make(suites,saved) {const option={keylist:[],vallist:[],depends(){},value(v,label){this.keylist.push(v);this.vallist.push(label)}};return factory({children:[{option:'encryption',write(){}}],taboption(){return option}},{ListValue:{}},x=>x,{get(){return saved}},support,{suites});}
             const checks=[];

@@ -51,7 +51,12 @@ print(sprintf('%J', {suites:parse(text), unknown:capabilities('radio;reboot'), m
         code=text[start:end]
         module=(FEATURE/'htdocs/luci-static/resources/mu300/wifi-ciphers.js').read_text()
         program='''const assert=require('assert');const [source,module]=JSON.parse(process.argv[1]);
-const support=new Function('fs','L','_',module)({}, {env:{lang:'zh-cn'}},x=>x);
+// LuCI require() accepts constructors and instantiates them. A plain object
+// works in an isolated helper test but breaks the complete wireless view.
+const baseclass={extend(methods){function Module(){}Object.assign(Module.prototype,methods);return Module;}};
+const exported=new Function('fs','L','_','baseclass',module)({}, {env:{lang:'zh-cn'}},x=>x,baseclass);
+assert.strictEqual(typeof exported,'function','LuCI module must export a constructor');
+const support=new exported();
 const factory=new Function('ss','form','_','uci','mu300CipherSupport','mu300CipherCaps','let o;'+source+';return o;');
 function controls(suites,saved='psk2') {const opt={keylist:[],vallist:[],depends(){},value(v,label){this.keylist.push(v);this.vallist.push(label)}};return factory({children:[{option:'encryption',write(){}}],taboption(){return opt}},{ListValue:{}},x=>x,{get(){return saved}},support,{suites});}
 const native=controls(['00-0f-ac:2','00-0f-ac:4']);assert.deepStrictEqual(native.keylist,['auto','ccmp','tkip','tkip+ccmp']);assert.strictEqual(native.validate('id','ccmp'),true);

@@ -1,5 +1,6 @@
 'use strict';
 'require fs';
+'require baseclass';
 
 const suites = {ccmp:['4'],ccmp256:['10'],gcmp:['8'],gcmp256:['9'],tkip:['2'],'tkip+ccmp':['2','4']};
 
@@ -27,7 +28,7 @@ function apply(option, capabilities) {
     };
 }
 
-return {
+return baseclass.extend({
     load: radio => fs.exec_direct('/usr/libexec/unisoc-modem/wifi-ciphers', [radio], 'json').catch(() => ({})),
     apply
-};
+});
