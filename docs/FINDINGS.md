@@ -11866,3 +11866,37 @@ data moved and the board's services came up as before after both reboots. `sipa_
 F50-B (7.2.11, a bundle of this tree through `mu300-update boot`, then `rollback-boot` to its release kernel): **5
 kernel lines a minute** at uptime 402-462 s, from 203 (one `sprd-mpm` wakeup report, one loopcheck heartbeat); the
 journal had no "fail to send" or flow-control line that boot, and br-lan and mobile data came up.
+
+### 192. kanoqwq's storage fixes for #290 (5161859d): what our init and updater lacked
+
+kanoqwq's commit `5161859d` (branch `fix/shared-issues-20261017` of his fork) does in his tree what #295-#298 did in
+ours, plus three things ours lacked:
+
+- **The desktop installer's partition choice.** His installer writes `/etc/mu300-desktop-root-mode` (`part`, `sd`,
+  `legacy`) into the device ramdisk segment, which `mu300-update` keeps when it appends our generic segment. Our init
+  ignored it and took a `mu300sd` card, then a region, before the `mu300root` partition. Now `part` boots the partition
+  first. It is a choice, not a gate: a partition that is missing or does not mount leaves the usual order (card,
+  region, default offset), and is not mounted a second time. `sd` gets no gate either (his init refuses the eMMC
+  then; ours falls back to it, FINDINGS 178's bootability rule). His `/etc/mu300-root-target` (the TF-only marker
+  behind ss12113's `stage=tf-root-unavailable`) is read by no init of ours, so it cannot stop a boot here.
+- **The whole label.** `gpt_root` compared the first 9 bytes of the ext4 label; `mu300rootfs` passed. Now all 16.
+- **His TF installation.** His init leaves no `/run/mu300-root-dev`, only `/run/mu300/disk-dev`. `root_layout` now
+  calls a device of a disk the kernel reports as `SD` the card (`sd`), and `root_on_sd` uses `root_layout`, so the
+  `sdcard` check of the kernel bundle (an older bundle cannot read the card) covers that installation too.
+
+Already covered here: the GPT partition boot (#296), `gpt-root` in the bundles and the layout check before anything
+changes (#295), modules after the image is built with a restore on failure, `mu300-next-boot --trial` and the
+installed system's copy when the running one predates it (#295), the offline e2fsck of a dirty root (FINDINGS 182),
+the eMMC timing fallback (#283). Not taken: the identity of the whole bundle file instead of Image + generic ramdisk
+(the boot image holds only those two, and the modules are installed even when it is up to date, so a different
+bundle file with the same kernel and init would only rewrite an identical image); the duplicate-name refusal (two
+partitions named `mu300root` boot the first with the right filesystem rather than nothing). The desktop installer's
+ext4 growth check, the Wi-Fi cipher filter and the U30 Air battery LED colours are not part of #290.
+
+**Device test (F50-B, 7.2.11, region layout).** A bundle of v2026.10.18.2 with this init in its generic segment,
+installed with this tree's `mu300-update boot`: armed for a trial, booted the region (`mmcblk0@27762098176`), system
+`running`, `boots since the last good one: 0`; the init read back from `boot_b` had this tree's sha256. The same with
+`/etc/mu300-desktop-root-mode` = `part` added to the ramdisk and no such partition on the board: the region again, no
+`root-part` line. Then the release's own `mu300-update boot` with the release bundle put v2026.10.18.2 back (the
+release's init read back from `boot_b`). The partition path itself is not device-tested here: no V50, and no
+`mu300root` partition on F50-B.
