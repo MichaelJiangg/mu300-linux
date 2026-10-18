@@ -1,0 +1,5 @@
+#!/bin/sh
+case "$ACTION" in add|change|remove) ;; *) exit 0 ;; esac
+[ "$(cat /run/mu300/device 2>/dev/null)" = u30air ] || exit 0
+# procd dispatches only kernel power-supply events. The guard rereads sysfs.
+ubus send unisoc.battery '{}' >/dev/null 2>&1

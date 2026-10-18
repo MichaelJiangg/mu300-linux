@@ -1,0 +1,69 @@
+power: supply: UMP9620 deliver battery events while OpenWrt is awake
+
+The FGU already programs a 1-percent coulomb delta and a DT-derived low
+voltage alarm. Only enabling them in suspend leaves normal headless
+operation without power_supply changes. Arm the existing hardware alarms
+after both IRQ handlers are registered and restore them on resume.
+
+Only UMP9620 participates; its probe already requires the stock enabled
+battery policy node. Do not add a polling timer or touch charge/SOC tables.
+
+Battery removal disarms those interrupts; insertion arms them again.
+
+--- a/drivers/power/supply/sc27xx_fuel_gauge.c
++++ b/drivers/power/supply/sc27xx_fuel_gauge.c
+@@ -1114,6 +1114,22 @@
+ 	return IRQ_HANDLED;
+ }
+ 
++/* UMP9620 battery boards need capacity/low-voltage events while awake too.
++ * The mainline suspend-only mask leaves a headless OpenWrt with no Health
++ * monitor. The delta is already configured by hw_init as one percent.
++ * Batteryless boards never probe this FGU (ump9620_has_battery_policy).
++ */
++static int ump9620_fgu_enable_events(struct sc27xx_fgu_data *data)
++{
++	unsigned int mask = SC27XX_FGU_LOW_OVERLOAD_INT | SC27XX_FGU_CLBCNT_DELTA_INT;
++
++	if (data->var != &ump9620_info)
++		return 0;
++
++	return regmap_update_bits(data->regmap, data->base + SC27XX_FGU_INT_EN,
++				 mask, data->bat_present ? mask : 0);
++}
++
+ static irqreturn_t sc27xx_fgu_bat_detection(int irq, void *dev_id)
+ {
+ 	struct sc27xx_fgu_data *data = dev_id;
+@@ -1129,6 +1145,8 @@
+ 	}
+ 
+ 	data->bat_present = !!state;
++	if (ump9620_fgu_enable_events(data))
++		dev_err(data->dev, "failed to update battery event mask\n");
+ 
+ 	mutex_unlock(&data->lock);
+ 
+@@ -1483,6 +1501,12 @@
+ 		return ret;
+ 	}
+ 
++	ret = ump9620_fgu_enable_events(data);
++	if (ret) {
++		dev_err(dev, "failed to enable awake battery events: %d\n", ret);
++		return ret;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -1491,6 +1515,9 @@
+ {
+ 	struct sc27xx_fgu_data *data = dev_get_drvdata(dev);
+ 	int ret;
++
++	if (data->var == &ump9620_info)
++		return ump9620_fgu_enable_events(data);
+ 
+ 	ret = regmap_update_bits(data->regmap, data->base + SC27XX_FGU_INT_EN,
+ 				 SC27XX_FGU_LOW_OVERLOAD_INT |

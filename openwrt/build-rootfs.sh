@@ -176,6 +176,7 @@ printf "127.0.0.1\tlocalhost\n\n::1\tlocalhost ip6-localhost ip6-loopback\nff02:
 printf "mu300\n" > $R/etc/hostname   # the real one comes from uci (etc/uci-defaults/90-mu300)
 cp -a /in/opt-mu300 $R/opt/mu300
 cp -a /in/overlay/. $R/
+chmod 0755 $R/etc/init.d/unisoc-battery $R/etc/hotplug.d/power_supply/80-unisoc-battery
 mkdir -p $R/etc/mu300
 cp /in/block-mount.build-id $R/etc/mu300/block-mount.build-id
 cp /in/wifi-sae/build-id $R/etc/mu300/wifi-sae.build-id
@@ -278,10 +279,11 @@ unset root_hash
 # enable the services (rc.common "enable" needs ubus, which is not running in the build container)
 # accounts still those of the image until an installer or mu300-update puts the device ones in place
 : > $R/etc/.mu300-accounts-from-image
-for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-hw mu300-post mu300-toolkit mu300-atd mu300-network-recovery mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages ttyd; do
+for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-hw mu300-post mu300-toolkit mu300-atd mu300-network-recovery mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages unisoc-battery ttyd; do
     n=$(sed -n "s/^START=//p" $R/etc/init.d/$s)
     ln -sf ../init.d/$s $R/etc/rc.d/S$n$s
 done
+ln -sf ../init.d/unisoc-battery $R/etc/rc.d/K08unisoc-battery
 if [ -d /in/luci-plugin ]; then
     n=$(sed -n "s/^START=//p" $R/etc/init.d/unisoc-modem-ui)
     ln -sf ../init.d/unisoc-modem-ui $R/etc/rc.d/S$n"unisoc-modem-ui"
