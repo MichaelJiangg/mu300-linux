@@ -11900,3 +11900,46 @@ installed with this tree's `mu300-update boot`: armed for a trial, booted the re
 `root-part` line. Then the release's own `mu300-update boot` with the release bundle put v2026.10.18.2 back (the
 release's init read back from `boot_b`). The partition path itself is not device-tested here: no V50, and no
 `mu300root` partition on F50-B.
+
+### 193. Ubuntu's alsactl restore ran before the DSP was up; the image masks it (#331, and the half-rate tap not settled)
+Issue #331 (dynamicfire) reported two things. Both were measured on F50-B (Ubuntu 24.04, v2026.10.18.2, the 41S DSP
+image of 24c, no parameter blobs) on 2026-10-19.
+
+**The card state belongs to mu300-audio-dsp and mu300-voice, not to alsactl.** The Ubuntu image has alsa-utils, and
+with it `90-alsa-restore.rules` and `alsa-restore.service` (pulled in by `sound.target`), both active. The rule runs
+`alsactl restore` the moment `controlC1` appears. That is in `mu300-audio-dsp start`'s `load_all`, before the DSP
+image is written and started. Each DSP-backed control alsactl writes then fails with -5 (`dsp_vbc_dg_set`,
+`dsp_call_mute_set`, `iis_mst_width` and the like; `aud_smsg_send, channel 0 not opened, ... dsp_ready 0`), and each
+codec register it reads waits for the AGDSP power domain, which is down: on 5.4 that wait is the 6 s of 188's
+"power-up wait", on mainline at most 200 ms. Four boots on 5.4 (mu300-audio's drivers), the units active or masked,
+alternating:
+
+| boot | alsactl | power-up timeouts | DSP commands that failed | mu300-audio |
+|---|---|---|---|---|
+| 1 | active | 37 | 124 sends, 1 reply | killed at its 180 s `TimeoutStartSec`, DSP not answering |
+| 2 | masked | 19 | 0 | done, the DSP answers |
+| 3 | active | 29 | 124 sends, 2 replies | killed at 180 s, in the middle of `dsp_alive` |
+| 4 | masked | 19 | 0 | done in 148 s, the DSP answers |
+
+On 7.2.11 the start succeeds either way, but with the units active 125 DSP sends fail before the DSP starts; masked,
+none (mu300-audio done in 22 s). The 21 power-up timeouts and 108 `ASoC error (-5)` reads of `sprd-routing-pcm`
+that remain on 7.2 are the card's own bind, and so are the 19 on 5.4, where they still cost 114 s: the 5.4 drivers of
+mu300-audio do not have 188's shorter wait.
+
+The image now masks `alsa-restore.service`, `alsa-state.service` and `90-alsa-restore.rules` (`rootfs/assemble.sh`).
+mu300-voice puts back what it changes from its own undo log, so nothing relies on the saved state.
+
+**The downlink tap at the vendor's framing: needs a call to settle.** The issue measured `FE_ST_VOICE_C` at the
+`voice_c` framing, 960 / 1920 at 8 kHz mono (and 640 / 1280), at ~7990 frames/s with no seam in a call, where 24d's
+160 / 960 gives ~3990 and a seam every 160 samples; and the same with the tap's MCDT DMA fragment lowered from 160
+words to 80 or 40. Its guess: 160 words of 4 bytes are 320 samples, so a 160-frame period is half of one fragment.
+The driver agrees on the size (`MCDT_VOICE_C_FRAGMENT` 160 at `DMA_SLAVE_BUSWIDTH_4_BYTES`, `src_maxburst` = 640 bytes,
+and with 160 frames each period's block is 320 bytes). The issue's setup differs from ours: 5.4.254 with the W200DS
+DSP image and parameters (`SharkL5_AUDCP_2022Y_VER_4119`), not the 41S image without parameters.
+
+Without a call the measurement cannot tell the framings apart. With the scene up on 7.2.11 (`mu300-voice audio
+start dsp`, no call), `FE_ST_VOICE_C` ran at 7985 frames/s at 160 / 960, 8066 at 960 / 1920 and 8061 at 640 / 1280,
+and every sample was 0. The half rate of 24d and 24e only begins when the modem starts the codec. A tone cannot be
+looped round either: with `VBC_DSP_VOICE_CAPTURE_TYPE` = `VOICE_CAPTURE_UPLINK`, the write to `FE_ST_VOICE_PCM_P`
+fails with EIO without a call (24d). mu300-voice keeps reading the downlink from the dump until a call shows the
+960 / 1920 tap at full rate on this DSP image.
