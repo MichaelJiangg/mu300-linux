@@ -20,9 +20,11 @@ if [ -s "$OUT/build-id" ] && [ "$(cat "$OUT/build-id")" = "$stamp" ] &&
     echo 'Unisoc WPA3: verified APK cache'
     exit 0
 fi
-docker build --platform linux/amd64 -t unisoc-hostapd-build \
+# Share the buildroot's host architecture with ModemManager and BlueZ.
+case "$(uname -m)" in x86_64) PLAT=linux/amd64;; aarch64|arm64) PLAT=linux/arm64;; *) echo 'Unsupported build host architecture' >&2; exit 1;; esac
+docker build --platform "$PLAT" -t unisoc-hostapd-build \
     -f "$TOP/openwrt/hostapd.Dockerfile" "$TOP/openwrt"
-docker run --rm --platform linux/amd64 \
+docker run --rm --platform "$PLAT" \
     -v "${UNISOC_WRT_CACHE:-e5-openwrt-src}:/build" \
     -v "$TOP/openwrt:/src:ro" -v "$OUT:/out" \
     -e "VER=$VER" -e "BUILD_ID=$stamp" -e "JOBS=${UNISOC_JOBS:-4}" \

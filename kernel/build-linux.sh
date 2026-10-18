@@ -25,7 +25,11 @@ open('/work/fragment-rejected.txt','w').write('\n'.join(bad)+'\n'); print('fragm
 P
 cp $OUT/.config /work/linux.config
 start=$(date +%s)
-$M Image modules 2>&1 | grep -E "error|Error|warning: unused|LTO|^make" | tail -40
+# the log is filtered, but make's own status decides: a module that fails to compile must fail the build, not leave
+# the previous build's .ko in place to be collected as if it were new
+$M Image modules > /work/build.log 2>&1 || status=$?
+grep -E "error|Error|warning: unused|LTO|^make" /work/build.log | tail -40 || true
+[ -z "${status:-}" ] || { echo "kernel build failed (make exit $status)"; exit "$status"; }
 echo "BUILD_SECONDS $(( $(date +%s) - start ))"
 ls -la $OUT/arch/arm64/boot/Image
 find $OUT -name "*.ko" | wc -l

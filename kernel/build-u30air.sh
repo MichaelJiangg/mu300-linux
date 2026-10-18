@@ -26,7 +26,9 @@ print('u30air fragment rejected:', len(bad)); [print('  '+b) for b in bad]
 P
 # no module of an earlier build may linger (one the fragment no longer builds would be taken for a U30 Air module)
 find $OUT -name '*.ko' -delete
-$M Image modules 2>&1 | grep -E "error|Error" | tail -20 || true
+$M Image modules > /work/build-u30air.log 2>&1 || status=$?
+grep -E "error|Error" /work/build-u30air.log | tail -20 || true
+[ -z "${status:-}" ] || { echo "U30 Air kernel build failed (make exit $status)"; exit "$status"; }
 # the Image must be the MU300 one: a fragment option that changes built-in code shows up as a different set of
 # symbols vmlinux exports to modules (I2C_SMBUS did: of_i2c_setup_smbus_alert)
 cmp -s <(awk '$3=="vmlinux"' $BASE/Module.symvers | sort) <(awk '$3=="vmlinux"' $OUT/Module.symvers | sort) \
