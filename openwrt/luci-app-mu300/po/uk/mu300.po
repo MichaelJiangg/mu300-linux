@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Виділені ядра увімкнені. Вимкнене ядро залишається вимкненим, також після перезавантаження, доки його знову не увімкнуть. CPU0 завжди залишається увімкненим."
+
+msgid "Low latency: on"
+msgstr "Низька затримка: увімк."
+
+msgid "Low latency: off"
+msgstr "Низька затримка: вимк."
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Режим низької затримки не пускає CPU0 у стани простою, як прошивка ZTE U30 Air: затримки Wi-Fi набагато менші, а пристрій споживає більше енергії. Типово вимкнено."
+
 msgid "Thermal"
 msgstr "Температура"
 
@@ -927,6 +939,9 @@ msgstr "Доставок поки немає"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Тест запущено зі збереженими налаштуваннями; результат з'явиться в журналі доставки."
+
+msgid "Automatic without 2G (152)"
+msgstr "Автоматично без 2G (152)"
 
 msgid "4G only"
 msgstr "Лише 4G"
@@ -3460,6 +3475,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Неприпустиме ядро ЦП"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Невідома операція з напругою CPU"
 
@@ -3710,6 +3731,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Не вдалося перемкнути ядро ЦП"
+
+msgid "Invalid low latency setting"
+msgstr "Неприпустиме налаштування низької затримки"
+
+msgid "The low latency setting could not be applied"
+msgstr "Не вдалося застосувати налаштування низької затримки"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Не вдалося прочитати зсув напруги CPU"
 
@@ -3721,9 +3751,6 @@ msgstr "Не вдалося вимкнути зсув напруги CPU"
 
 msgid "The stress test could not be started"
 msgstr "Не вдалося запустити стрес-тест"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Адаптер ролі USB не є виконуваним"

@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Vurğulanan nüvələr onlayndır. Söndürülmüş nüvə yenidən açılana qədər, yenidən başladıqdan sonra da oflayn qalır. CPU0 həmişə onlayn qalır."
+
+msgid "Low latency: on"
+msgstr "Aşağı gecikmə: açıq"
+
+msgid "Low latency: off"
+msgstr "Aşağı gecikmə: bağlı"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Aşağı gecikmə, ZTE-nin U30 Air proqram təminatında olduğu kimi, CPU0-ı boşda qalma vəziyyətlərindən kənarda saxlayır: Wi-Fi gecikmələri xeyli qısalır, cihaz isə daha çox enerji sərf edir. Standart olaraq bağlıdır."
+
 msgid "Thermal"
 msgstr "İstilik"
 
@@ -927,6 +939,9 @@ msgstr "Hələ çatdırılma yoxdur"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Test saxlanmış ayarlarla başladı; nəticə çatdırılma jurnalında görünəcək."
+
+msgid "Automatic without 2G (152)"
+msgstr "Avtomatik, 2G olmadan (152)"
 
 msgid "4G only"
 msgstr "Yalnız 4G"
@@ -3460,6 +3475,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Yanlış CPU nüvəsi"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Naməlum CPU gərginlik əməliyyatı"
 
@@ -3710,6 +3731,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "CPU nüvəsini dəyişmək mümkün olmadı"
+
+msgid "Invalid low latency setting"
+msgstr "Yanlış aşağı gecikmə ayarı"
+
+msgid "The low latency setting could not be applied"
+msgstr "Aşağı gecikmə ayarını tətbiq etmək mümkün olmadı"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "CPU gərginlik ofseti oxuna bilmədi"
 
@@ -3721,9 +3751,6 @@ msgstr "CPU gərginlik ofseti söndürülə bilmədi"
 
 msgid "The stress test could not be started"
 msgstr "Stress testi başladıla bilmədi"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB rol adapteri icra oluna bilmir"

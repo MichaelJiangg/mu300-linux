@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "A kiemelt magok online állapotban vannak. A kikapcsolt mag offline marad, újraindítás után is, amíg vissza nem kapcsolják. A CPU0 mindig online marad."
+
+msgid "Low latency: on"
+msgstr "Alacsony késleltetés: be"
+
+msgid "Low latency: off"
+msgstr "Alacsony késleltetés: ki"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Az alacsony késleltetés kívül tartja a CPU0-t az üresjárati állapotokon, ahogy a ZTE U30 Air firmware-e is: a Wi-Fi késleltetése jóval kisebb, az eszköz pedig több energiát fogyaszt. Alapértelmezés szerint ki."
+
 msgid "Thermal"
 msgstr "Hőmérséklet"
 
@@ -927,6 +939,9 @@ msgstr "Még nincs kézbesítés"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "A teszt elindult a mentett beállításokkal; az eredmény a kézbesítési naplóban jelenik meg."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automatikus 2G nélkül (152)"
 
 msgid "4G only"
 msgstr "Csak 4G"
@@ -3460,6 +3475,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Érvénytelen CPU-mag"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Ismeretlen CPU-feszültségművelet"
 
@@ -3710,6 +3731,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "A CPU-magot nem sikerült átkapcsolni"
+
+msgid "Invalid low latency setting"
+msgstr "Érvénytelen alacsony késleltetési beállítás"
+
+msgid "The low latency setting could not be applied"
+msgstr "Az alacsony késleltetési beállítást nem sikerült alkalmazni"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "A CPU-feszültségeltolás nem olvasható be"
 
@@ -3721,9 +3751,6 @@ msgstr "A CPU-feszültségeltolás nem kapcsolható ki"
 
 msgid "The stress test could not be started"
 msgstr "A terheléses teszt nem indítható el"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Az USB-szerep adapter nem futtatható"

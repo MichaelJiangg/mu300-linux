@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Các nhân được tô sáng đang trực tuyến. Nhân đã tắt sẽ vẫn ngoại tuyến, kể cả sau khi khởi động lại, cho đến khi được bật lại. CPU0 luôn trực tuyến."
+
+msgid "Low latency: on"
+msgstr "Độ trễ thấp: bật"
+
+msgid "Low latency: off"
+msgstr "Độ trễ thấp: tắt"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Chế độ độ trễ thấp giữ CPU0 không vào các trạng thái nghỉ, giống firmware U30 Air của ZTE: độ trễ Wi-Fi ngắn hơn nhiều và thiết bị tiêu thụ nhiều điện hơn. Mặc định tắt."
+
 msgid "Thermal"
 msgstr "Nhiệt"
 
@@ -927,6 +939,9 @@ msgstr "Chưa có lần gửi nào"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Đã bắt đầu thử với cài đặt đã lưu; kết quả sẽ hiện trong nhật ký gửi."
+
+msgid "Automatic without 2G (152)"
+msgstr "Tự động không có 2G (152)"
 
 msgid "4G only"
 msgstr "Chỉ 4G"
@@ -3460,6 +3475,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Nhân CPU không hợp lệ"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Thao tác điện áp CPU không xác định"
 
@@ -3710,6 +3731,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Không thể chuyển nhân CPU"
+
+msgid "Invalid low latency setting"
+msgstr "Thiết lập độ trễ thấp không hợp lệ"
+
+msgid "The low latency setting could not be applied"
+msgstr "Không thể áp dụng thiết lập độ trễ thấp"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Không thể đọc độ lệch điện áp CPU"
 
@@ -3721,9 +3751,6 @@ msgstr "Không thể tắt độ lệch điện áp CPU"
 
 msgid "The stress test could not be started"
 msgstr "Không thể bắt đầu kiểm tra tải nặng"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Bộ điều hợp vai trò USB không thực thi được"

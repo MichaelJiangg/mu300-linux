@@ -396,7 +396,7 @@
     function locksCard(root) {
         var lc = root.appendChild(card(_('Network, band and cell locks'), 'mu-locks'));
         var lb = lc.appendChild(el('div'));
-        var MODES = [ [ 'auto', _('Automatic') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
+        var MODES = [ [ 'auto', _('Automatic') ], [ 'auto152', _('Automatic without 2G (152)') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
         var RESTART = _('The modem\'s protocol stack restarts: cellular service stops for about half a minute.');
         function set(btn, kind, val, what, quick) {
             act(btn, 'lock.set', { kind: kind, val: val }, {
@@ -1450,6 +1450,26 @@
                 cb.appendChild(row('CPU ' + pol.cpus, pol.governor + ', ' + mhz(pol.cur) + ' (' + mhz(pol.min) + ' - ' + mhz(pol.max) + ')'));
             });
             if (s.throttling) cb.appendChild(note(_('Thermal throttling is active right now.'), 'warn'));
+            // the cores and CPU0's low latency (FINDINGS 200), both saved and applied again at boot
+            if (Array.isArray(s.cores) && s.cores.length) {
+                cb.appendChild(note(_('Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online.')));
+                var cbar = el('div', { 'class': 'mu-actions' });
+                s.cores.forEach(function (c) {
+                    if (typeof c.cpu !== 'number') return;
+                    var on = c.online === 1;
+                    var b = button('CPU' + c.cpu, function () { act(b, 'cpu.core', { cpu: c.cpu, state: on ? 'off' : 'on' }, { done: refresh }); }, on ? 'primary' : '');
+                    if (c.switchable !== 1) b.disabled = true;
+                    cbar.appendChild(b);
+                });
+                cb.appendChild(cbar);
+            }
+            var ll = s.lowlatency || {};
+            if (ll.supported === 1) {
+                var lon = ll.saved === 1;
+                cb.appendChild(note(_('Low latency keeps CPU0 out of its idle states, as ZTE\'s U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default.')));
+                var lb = button(lon ? _('Low latency: on') : _('Low latency: off'), function () { act(lb, 'cpu.lowlatency', { state: lon ? 'off' : 'on' }, { done: refresh }); }, lon ? 'primary' : '');
+                cb.appendChild(el('div', { 'class': 'mu-actions' }, [ lb ]));
+            }
         }
         function paintVolt(v) {
             clear(vb);

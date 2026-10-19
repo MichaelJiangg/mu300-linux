@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Les cœurs en surbrillance sont en ligne. Un cœur mis hors ligne le reste, même après un redémarrage, jusqu'à ce qu'il soit réactivé. CPU0 reste toujours en ligne."
+
+msgid "Low latency: on"
+msgstr "Faible latence : activée"
+
+msgid "Low latency: off"
+msgstr "Faible latence : désactivée"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "La faible latence empêche CPU0 d'entrer dans ses états de repos, comme le firmware U30 Air de ZTE : les délais Wi-Fi sont bien plus courts et l'appareil consomme davantage. Désactivée par défaut."
+
 msgid "Thermal"
 msgstr "Thermique"
 
@@ -927,6 +939,9 @@ msgstr "Aucun envoi pour l'instant"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Test lancé avec les paramètres enregistrés ; le résultat apparaît dans le journal des envois."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automatique sans 2G (152)"
 
 msgid "4G only"
 msgstr "4G uniquement"
@@ -3460,6 +3475,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Cœur CPU invalide"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Opération de tension CPU inconnue"
 
@@ -3710,6 +3731,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Le cœur CPU n'a pas pu être basculé"
+
+msgid "Invalid low latency setting"
+msgstr "Réglage de faible latence invalide"
+
+msgid "The low latency setting could not be applied"
+msgstr "Le réglage de faible latence n'a pas pu être appliqué"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Impossible de lire le décalage de tension CPU"
 
@@ -3721,9 +3751,6 @@ msgstr "Impossible de désactiver le décalage de tension CPU"
 
 msgid "The stress test could not be started"
 msgstr "Impossible de démarrer le test de charge"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "L'adaptateur de rôle USB n'est pas exécutable"

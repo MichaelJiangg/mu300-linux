@@ -320,6 +320,9 @@ msgstr "Ağ, bant ve hücre kilitleri"
 msgid "Automatic"
 msgstr "Otomatik"
 
+msgid "Automatic without 2G (152)"
+msgstr "Otomatik, 2G olmadan (152)"
+
 msgid "4G only"
 msgstr "Yalnızca 4G"
 
@@ -1372,6 +1375,18 @@ msgstr "Profil, CPU yöneticisini ve küme başına frekans sınırlarını dona
 
 msgid "Thermal throttling is active right now."
 msgstr "Şu anda sıcaklık nedeniyle yavaşlatma etkin."
+
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Vurgulu çekirdekler çevrimiçidir. Çevrimdışı bırakılan bir çekirdek, geri açılana kadar yeniden başlatmadan sonra da çevrimdışı kalır. CPU0 her zaman çevrimiçi kalır."
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Düşük gecikme, ZTE'nin U30 Air yazılımında olduğu gibi CPU0'ı boşta durumlarının dışında tutar: Wi-Fi gecikmeleri çok kısalır, cihaz daha fazla güç çeker. Varsayılan olarak kapalı."
+
+msgid "Low latency: on"
+msgstr "Düşük gecikme: açık"
+
+msgid "Low latency: off"
+msgstr "Düşük gecikme: kapalı"
 
 msgid "Experimental: changing the CPU voltage can make the device unstable, corrupt your data and permanently damage your device. Use it entirely at your own risk."
 msgstr "Deneysel: Bu özellik deneyseldir ve cihazınıza kalıcı zarar verebilirsiniz. CPU voltajını değiştirmek cihazı kararsız yapabilir ve verilerinizi bozabilir. Tüm risk size aittir."
