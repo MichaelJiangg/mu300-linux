@@ -190,6 +190,7 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
+| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; one hang into LK's dump mode in a reboot loop, open; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19) |
 
 ## Hardware and firmware facts
 
@@ -12407,3 +12408,71 @@ once there).
 Tests: `tests/test_v50_sim.py` (the board table, the mapping, status, `card`, `default`, `v50-boot` and its once-a-boot
 rule, the live switch's order and its switch back, the identity cache, other boards, the driver drives nothing at probe), `tests/test_sim_selection.py`,
 `tests/test_api.py`, `tests/test_backup.py`, the catalogs.
+### 206. Linux 7.3 as a fourth kernel: what 7.3 changed, and the boards on it
+Mainline Linux 7.3 came out on 2026-10-18. It is a fourth kernel choice from the release after v2026.10.19.2 on:
+`sudo mu300-update kernel 7.3`, choice 4 in the installers, `mu300-kernel-7.3.tar.gz`, Magisk zips `-k7.3` (15 zips
+instead of 11), and the audio extra's `mu300-audio-7.3.tar.gz` (mu300-audio PR #4). 5.4, 6.18.57 and 7.2.11 stay as
+they are.
+
+**The patches.** Every patch of `upstream/patches` applies to 7.3 unchanged, in order (a dry run of each alone fails
+for the ones that build on another: 0011 on 0010, 0012/0015/0016/0019 on 0009, 0018 on 0011). None is upstream in
+7.3, so none was dropped or changed; three apply with fuzz, as they do on 7.2 (0003: 7.x dropped the
+`cma_skip_dt_default_reserved_mem()` line next to it; 0005: `dev_err_probe()` in the error path; 0019: the
+`gpio/consumer.h` include is gone from `bq256xx_charger.c`), each checked to land where it does on 7.2.11.
+`patches/6.18/0007` stays 6.18's. `port/install.py` installs unchanged.
+
+**What 7.3 changed under the port.**
+
+| what | 7.3 | here |
+|---|---|---|
+| `CONFIG_PROC_SYSCTL` | gone: `/proc/sys` is `SYSCTL` itself (`fs/proc/Makefile`: `proc-$(CONFIG_SYSCTL) += proc_sysctl.o`) | `config-ignored.txt` lists it; `build.sh` and `audit-bundle.py` let a listed option be unset only where the kernel has no such symbol at all (not even "is not set"); the fragment also asks `CONFIG_SYSCTL=y`, so `/proc/sys` is checked on every kernel |
+| cfg80211 `remain_on_channel`, `mgmt_tx` | the cookie is chosen by nl80211 (`cfg80211_assign_cookie`) and handed to the driver by value | `sprd_wlan_combo`: the old ops keep choosing it, the 7.3 ones take nl80211's (`*_cookie(..., cookie_given)`) |
+| `dma_capable()` | a fifth argument, the DMA attributes | `sc2355/tx.c` passes 0 (a plain mapping) |
+| the IIO consumer API | in the symbol namespace `IIO_CONSUMER` | the audio extra's headset driver imports it (mu300-audio) |
+| kernel.org's CDN | its `sha256sums.asc` still had 7.2.11's day hours after 7.3 was out: no line for `linux-7.3.tar.xz` | `build.sh` takes the signed list from www.kernel.org (the tarball and its signature from the CDN; the list is signed, so where it comes from changes nothing that is checked) |
+| the release's version picker | a mainline release is `7.3` (kernel release `7.3.0`) until 7.3.1 | `release.yml` takes `X.Y` or `X.Y.Z` of each series (6.18, 7.2, 7.3); `mainline.yml` builds the longterm, the stable, the mainline (never a release candidate) and the newest of each shipped series |
+
+The kernel and all its out-of-tree modules build with no new warning (690 in the module build against 691 for
+7.2.11); `all-modules.py` turns 2457 options into modules (7.2.11: 2442). The bundle: 3054 modules (no audio
+drivers, 194), 135 MiB unpacked, 56.3 MB; the Image as LK loads it 25 860 104 bytes. `make-release.sh`'s audit
+(the sample modules, no driver of the audio stack, the features) passes on it.
+
+**The audio extra on 7.3.** mu300-audio builds the 20 mainline drivers against a 7.3 kit made from this build tree
+(`make-kit-mainline.sh 7.3 7.3 k7.3-preview`; `sipc-core.ko` rebuilt from the kit is byte for byte the bundle's),
+pinned in its `kits.lock` and published as the prerelease `kits-k7.3-preview` until a release of this repository
+ships 7.3 (that release's tree then makes the kit, or is shown to be this one).
+
+**On the boards, 2026-10-19** (v2026.10.19.2 with this branch's `mu300-update`, the 7.3 bundle installed with
+`MU300_KERNEL_BUNDLE`; the previous image kept each time was the release's own):
+
+* **F50-B** (Ubuntu 24.04, no internet, the files served from a computer), against the same checks on 7.2.11 just
+  before: 7.3.0 boots, KVM in VHE mode (571/710 trap handlers), no oops or warning; mobile data context up with an
+  address on `sipa_eth0` (the board has no internet: AT `+CPIN: READY`, `+CSQ: 37,19`, `+COPS: 0,2,"28602",13`,
+  `+CGACT:1,1`); the 5 GHz access point on channel 36/80 MHz; Bluetooth up; the USB gadget `configured`; Cockpit
+  answers (200); the LEDs as on 7.2.11; the on-demand guard refuses the same families and lets root load them, the
+  module sample loads 93 of 99 (the same 6 not built as on 7.2.11), no oops; Docker 29.1.3 runs a container
+  (overlay2, cgroup v2, an address on `docker0`; the container cannot reach the host, which `mu300_filter` drops on
+  purpose). Boot 41.3 s (7.2.11: 52.8 s).
+  - **Call audio.** `mu300-update kernel 7.3` could not fetch the 7.3 extra offline and said so; `mu300-extra
+    install audio --from DIR` with mu300-audio's 7.3 tarball then installed it, the configuration's hash matched the
+    kit's (`2fb71151...`), and after `systemctl restart mu300-audio` - and after a reboot, by itself - `mu300-audio-dsp
+    status`: drivers 19/19 from `extra/audio/modules/7.3.0`, `dsp: running - it answered a command on the first
+    try`. The "dsp: no reply" seen on the first 7.3 boot (with the drivers in the bundle, before 194) was read a
+    minute after boot, before the service's start had finished; with the extra and the wait it answers. The extra's
+    link hook did not start the card when it found its links unchanged (a set for another kernel has the same
+    links); mu300-audio PR #4 starts a card that is down.
+  - **The boot fallback.** With `mu300-next-boot attempts 1` and `mu300-boot-ok` disabled for the test, the next boot
+    of 7.3 came up with slot b at `tries 1` (`1f`), and the one after it went to Android by itself; `su -c
+    mu300-linux` there armed Linux again and 7.3 booted. `mu300-boot-ok` and 5 attempts back: slot b `6f`, as before.
+  - **A hang.** In a reboot loop afterwards the first reboot did not come back: no USB network, no adb; the board
+    enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, and was still there 35 minutes later
+    (31m's hangs ended in Android after about 20 minutes). Not recovered by hand (see the report of PR #342).
+* **U30 Air** (openwrt-luci, the VPN module with its kill switch): 7.3.0 boots with no oops; the SIM ready, data up;
+  the access point on channel 36/80 MHz with its client back; the USB gadget `configured`; the VPN's tunnel (`sbtun`)
+  up behind the kill switch (`mu300_vpn` tables), HTTPS answers through it and the exit is not the carrier's address
+  (the VPN's configuration was not read). The charger came up as on 6.18.57 (`charging on`, 2000 mA input) and the
+  fuel gauge read the same; the battery took no current at 88 % on either kernel. Then `rollback-boot` to 6.18.57:
+  the same checks pass there.
+
+Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
+fragment asks), a reading of the F50's SD card, a reboot soak.

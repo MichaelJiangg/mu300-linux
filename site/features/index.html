@@ -295,7 +295,7 @@ sudo mu300-cpu profile saving            <span class="c"># or balanced (the defa
 <strong>Experimental: it can damage your device for good</strong>
 <p>This feature is experimental and can permanently damage your device. Use it at your own risk.</p>
 </div>
-<p>On the mainline kernels (6.18, 7.2 and 7.3) the CPU voltage can be moved a little, per core cluster (CPUs 0-3, 4-6 and
+<p>On the mainline kernels (6.18, 7.2 and 7.3; on 7.3 not yet tried on a device) the CPU voltage can be moved a little, per core cluster (CPUs 0-3, 4-6 and
 7): from 25 mV lower to 12.5 mV higher, in steps of 3.125 mV. Off (0) by default. A new value applies at the next
 reboot as one trial boot; it is kept once that boot has been up 10 minutes, and dropped (back to 0) by any boot that
 ends in a crash, a watchdog reset or a power cut. It is refused on SoC firmware whose encoding is not known (only the

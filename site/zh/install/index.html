@@ -232,7 +232,7 @@ install.cmd -Check -Lang zh            <span class="c"># Windows (cmd)</span></c
 <li>一张至少 700 MiB 的卡。它会被格式化为 ext4，卷标为 <code>mu300sd</code>。已经装有其他 Linux（ext4）文件系统的卡永远不会被格式化。</li>
 <li>请在设备关机时插卡。Linux 运行时插入的卡，要到下次重启后才能读取。</li>
 <li><code>mu300sd</code> 卡总是优先启动。没有卡时，如果有内部安装，设备就启动它。两者都没有时，它会等几秒钟看有没有卡，然后在大约五分钟后回到 Android。</li>
-<li>四个内核都能读卡。U30 Air 没有卡槽。</li>
+<li>四个内核都带读卡驱动（7.3 尚未在设备上试过）。U30 Air 没有卡槽。</li>
 <li>设备会启动任何卷标为 <code>mu300sd</code> 的卡，所以拿到设备的人也可以从卡上启动他自己的系统。</li>
 </ul>
 </section>

@@ -31,9 +31,10 @@ flowchart TD
 ```
 
 * **Ubuntu 26.04 needs 6.18, 7.2 or 7.3.** Its programs use system calls 5.4 does not have.
-* **The CPU voltage offset (experimental, it can damage the device) is on 6.18, 7.2 and 7.3 only.** See
+* **The CPU voltage offset (experimental, it can damage the device) is on 6.18, 7.2 and 7.3 only** (on 7.3 not yet
+  tried on a device). See
   [CPU Voltage Offset](CPU-Voltage-Offset).
-* **USB host mode on the U30 Air** (`mu300-usb host`) needs a mainline kernel.
+* **USB host mode on the U30 Air** (`mu300-usb host`) needs a mainline kernel (tried on 6.18 and 7.2; not yet on 7.3).
 * **WireGuard:** the VPN module notes that the 5.4 vendor kernel has no WireGuard; mainline does.
 * **KVM** (`/dev/kvm`) is on all four.
 * **The mainline bundles** carry about 360 modules: WireGuard, SQM, tunnels, USB adapters and modems,
