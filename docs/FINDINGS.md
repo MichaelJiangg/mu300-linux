@@ -180,7 +180,7 @@ what replaced it. The table below gives each section's state.
 | 180 | Wi-Fi access point: `get_station` answered any address with the interface's own counters and the station side's signal; now only this AP's stations, with nothing filled in (the firmware has no per-client figures), `-ENOENT` otherwise; `get_channel` link 0 only (kanoqwq f59a296) | current (mainline module and 5.4 patch built; unit tests; U30 Air 6.18.57 with a client, F50-B 7.2.11, 2026-10-17) |
 | 181 | The U30 Air's fuel gauge against the stock module: the user area's writes are `regmap_update_bits()` with a wait after the release (stock `save_last_cap` at 0x4ba4), no migration guess for a valid saved value, the charger's Full is 100 % with the battery current within `fullbatt-current` (kanoqwq f59a296 reviewed: his 4.2 V condition would refuse a real Full) | current (built for 6.18.57 and 7.2.11; unit tests; U30 Air 6.18.57, 2026-10-17: Full at 4.147 V gave 100 %, kept across a reboot) |
 | 188 | Call audio on the mainline kernels: the 5.4 stack (19 modules + the vendor AGDSP DMA) built for 6.18.57 and 7.2.11, the DSP's memory reserved (patch 0022), nothing autoloaded; the xrun restart that panicked 5.4 fixed (descriptors re-armed in `prepare`), the DSP's DDR mapped Normal-NC (7.x memcpy alignment fault), no 6 s spin under a lock waiting for the AGDSP domain, the domain held across the DSP start (warm reboots), the echo played at the tap's 16 kHz mono | current (F50-B 6.18.57 and 7.2.11, F50-C 7.2.11 OpenWrt, offline; a call on F50-C 7.2.11: ringback 425 Hz, melody heard, downlink recorded (his voice, F0 140 Hz); the echo through the fixed path, answered call 22:41: the owner heard his voice and the melody; after a killed call, no player left behind and DSP replies nobody waited for no longer fail the next open: reproduced on F50-B without a call, script fix measured there, driver fix unit-tested) |
-| 196 | The U30 Air's charging boot: the stock modem_control never loads the CP after LK's charger boot (issue #253); a checked copy in RAM loads the CP alone; a charger boot can be a normal one (POWER_ON_CHARGER); unplugged, it powers off; a held power key starts it (from kanoqwq 85d72fa9) | current; offline (loader disassembled, copy checksummed); not run on a device |
+| 196 | The U30 Air's charging boot: the stock modem_control never loads the CP after LK's charger boot (issue #253); a checked copy in RAM loads the CP alone (opt-in until run on a device); a charger boot can be a normal one (POWER_ON_CHARGER); unplugged, it powers off; a held power key starts it (from kanoqwq 85d72fa9) | current; offline (loader disassembled, copy checksummed); not run on a device |
 | 197 | The U30 Air's battery while awake: the fuel gauge's low-voltage and 1 % interrupts armed (patch 0023), and a low-battery poweroff in every state by the stock rules (from kanoqwq 99e1316a) | current; built for 6.18.57 and 7.2.11, unit-tested; not run on a device |
 
 ## Hardware and firmware facts
@@ -12092,8 +12092,10 @@ modem_control`, sha256 `43a3bc8c…819a3`; the F50's copy is the same file):
   task's comm), and android-run runs it only when android-vendor-start names exactly that path.
 - Only when every one of these holds: `mu300-device` says `u30air`; the command line has `androidboot.mode=charger`
   (or `sprdboot.mode=`) and `modem=shutdown`; `/dev/stty_nr1` answers ENODEV or is missing (the CP down; a second
-  start of the vendor service in the same boot finds it up); the device's file has the stock sha256; no
-  `/etc/mu300/no-modem-coldboot`. Anything else, including any failure on the way, gives the stock modem_control as
+  start of the vendor service in the same boot finds it up); the device's file has the stock sha256 (the loader
+  kanoqwq checked); and `/etc/mu300/modem-coldboot` exists. **Off by default**: kanoqwq's notes say the charger-boot
+  start itself was not run on a device, so it is opt-in (`touch /etc/mu300/modem-coldboot`) until a U30 Air has
+  shown it. Anything else, including any failure on the way, gives the stock modem_control as
   before. It cannot stop a boot or the modem: the worst case is today's behaviour. kanoqwq's version stopped the
   vendor service (`exit 5`) when the copy could not be made; ours does not. F50, V50, normal boots: untouched.
 
