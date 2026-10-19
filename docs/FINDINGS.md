@@ -180,6 +180,7 @@ what replaced it. The table below gives each section's state.
 | 180 | Wi-Fi access point: `get_station` answered any address with the interface's own counters and the station side's signal; now only this AP's stations, with nothing filled in (the firmware has no per-client figures), `-ENOENT` otherwise; `get_channel` link 0 only (kanoqwq f59a296) | current (mainline module and 5.4 patch built; unit tests; U30 Air 6.18.57 with a client, F50-B 7.2.11, 2026-10-17) |
 | 181 | The U30 Air's fuel gauge against the stock module: the user area's writes are `regmap_update_bits()` with a wait after the release (stock `save_last_cap` at 0x4ba4), no migration guess for a valid saved value, the charger's Full is 100 % with the battery current within `fullbatt-current` (kanoqwq f59a296 reviewed: his 4.2 V condition would refuse a real Full) | current (built for 6.18.57 and 7.2.11; unit tests; U30 Air 6.18.57, 2026-10-17: Full at 4.147 V gave 100 %, kept across a reboot) |
 | 188 | Call audio on the mainline kernels: the 5.4 stack (19 modules + the vendor AGDSP DMA) built for 6.18.57 and 7.2.11, the DSP's memory reserved (patch 0022), nothing autoloaded; the xrun restart that panicked 5.4 fixed (descriptors re-armed in `prepare`), the DSP's DDR mapped Normal-NC (7.x memcpy alignment fault), no 6 s spin under a lock waiting for the AGDSP domain, the domain held across the DSP start (warm reboots), the echo played at the tap's 16 kHz mono | current (F50-B 6.18.57 and 7.2.11, F50-C 7.2.11 OpenWrt, offline; a call on F50-C 7.2.11: ringback 425 Hz, melody heard, downlink recorded (his voice, F0 140 Hz); the echo through the fixed path, answered call 22:41: the owner heard his voice and the melody; after a killed call, no player left behind and DSP replies nobody waited for no longer fail the next open: reproduced on F50-B without a call, script fix measured there, driver fix unit-tested) |
+| 195 | Wi-Fi PCIe RX (kanoqwq 2d3f7438, cf4dcd61): the RX push interrupt never handed up a completed descriptor (inverted `dscr_ring_empty()`, mainline and 5.4); an RX refill refused by the full EDMA pending ring can resume on the bus completion instead of after 20 ms - 1 s (module parameter `refill_bus_resume`, off by default until measured); the 5.4 driver gets mainline's station-event bounds and channel-less `mgmt_tx` | built (6.18.57, 7.2.11, 5.4 objects), unit tests run the real functions; not yet on a device |
 
 ## Hardware and firmware facts
 
@@ -12062,3 +12063,55 @@ in the core as well.
   versions or symbols. No call was placed.
 * U30 Air (6.18.57): `/proc/config.gz`'s settings hash to the 6.18 kit's; it uses no call audio, so nothing was
   installed there.
+
+### 195. Wi-Fi PCIe RX: the push interrupt skipped what the chip completed, and a full EDMA ring held the RX refill for up to a second
+
+**Status: built, not yet measured on a device** (2026-10-19). From kanoqwq's clean-tf-7.2 2d3f7438 and cf4dcd61,
+reviewed and ported; the 5.4 parts are ours.
+
+**The RX push interrupt (wcn_bsp, mainline and 5.4).** `edma_rx_push_isr()` first asked `dscr_ring_empty()`, which
+read the hardware cursor and returned "empty" when it was `!IS_ERR_OR_NULL` - for every valid cursor. The branch that
+pops the completed descriptors (`edma_pop_link`, `mchn_hw_pop_link`) therefore never ran; the interrupt only refilled
+the ring, and what the chip had completed waited for another path to collect it. kanoqwq compared the function with
+ZTE's own U30 Air `wcn_bsp.ko` (`edma_rx_push_isr` at `.text+0x3f588`): the stock module reads the cursor once,
+returns to the refill on NULL or an error pointer, pops what lies between the ring head and the cursor, and then
+refills. The public 5.4 source (Enceka's ZTE GPL release) and the mainline port both carry the inverted test. Now as
+the stock module, in `upstream/modules/wcn_bsp/pcie/edma_engine.c` and `kernel/patches/wcn-pcie-rx-push-cursor.patch`
+(KPATCHES, after sipa-wcn-logspam-quiet); `dscr_ring_empty()` is gone. kanoqwq ran it on a U30 Air (7.2.8): RX
+worked and nothing regressed, and he saw few RX push interrupts in steady state, so this is a correctness fix, not
+the answer to the idle hotspot's 20-150 ms ping (his four-point timing put that wait before the host's RX MSI, in the
+chip or its firmware; not settled).
+
+**The RX refill after a full pending ring (mainline).** The refill hands the RX buffer addresses to the chip on the
+data channel (`tx_addr_trans`). The channel's pending ring has three usable slots; when it is full the submission is
+refused with `-EAGAIN` (§103). Since the back-off for issue #94, a refill that got nowhere retried from a timer, 20 ms
+doubling to 1 s - right for a chip that stopped taking buffers, too slow for a ring that frees a slot microseconds
+later. Now the bus's completion on that channel (`sc2355_pcie_tx_data_complete`, IRQ context, which already woke the
+TX thread) also calls `sc2355_rx_bus_complete()`: a refill waiting on exactly that refusal is released at once
+(`mod_delayed_work(..., 0)`), and a completion that comes before the timer is armed is remembered
+(`refill_bus_ready`). An allocation failure, a hard error, an SDIO bus, another channel or a timed-out completion
+leave the timer as it was, and nothing polls. `refill_lock` (irqsave) orders the completion against arming the timer
+and against teardown; `hif->rx_mgmt` is published with `smp_store_release` after init and, at deinit, unpublished and
+followed by `synchronize_rcu()` before the free, since the completion callback stays registered across an RX
+deinit/init and looks it up under `rcu_read_lock()`. The 5.4 driver has neither the back-off nor this. kanoqwq ran this one only offline (his changelog: compiled and unit-tested, not deployed), so it is **off by
+default**: `sprd_wlan_combo.refill_bus_resume=1` (or `echo 1 > /sys/module/sprd_wlan_combo/parameters/refill_bus_resume`)
+turns it on; off, the completion returns at once and the refill keeps the timer exactly as before. To be made the
+default after a board measurement.
+
+**The 5.4 driver's event bounds.** The mainline driver has had oswaldxdd's two robustness fixes since PR #282 (§80):
+the station event's IEs bounded by the event's length, and `mgmt_tx` without a channel taking the AP's own one
+instead of an oops. The 5.4 driver lacked both; `kernel/patches/wlan_combo-station-event-bounds.patch` carries them
+(`wdev->chandef` on 5.4).
+
+**Checked.** `tests/test_wifi_rx_path.py` cuts `edma_rx_push_isr()`, `sc2355_mm_fill_buffer()`,
+`sc2355_rx_bus_complete()`, `rx_refill_retry()` and `sc2355_pcie_tx_data_complete()` out of the sources and runs them
+against stub kernel primitives (kanoqwq's harnesses): completed descriptors popped before the refill, wrap-around,
+NULL and error cursors, no free descriptor; the completion before and after the timer is armed, a duplicate storm,
+allocation and hard failures keeping their back-off, wrong channel, timeout, SDIO, teardown racing a submission, and
+the hook removed bringing the old delay back. The modules built warning-free for 6.18.57 and 7.2.11; on 5.4 every
+KPATCHES and wlan_combo patch applies in order, `edma_engine.o` compiles and `sprd_wlan_combo.ko` builds.
+
+**To measure on a board** (any of them; the U30 Air and an F50 on mainline, F50-C on 5.4): Wi-Fi up and a client
+associated, an iperf3 run in both directions at full rate for some minutes (no `WARN edma_pending_q_buffer full` storm,
+no stall, throughput no lower than the release's), a ping from the client to the board idle and under load, and
+`rmmod`/`modprobe` of the Wi-Fi modules or a hotspot restart with traffic running (the teardown path).
