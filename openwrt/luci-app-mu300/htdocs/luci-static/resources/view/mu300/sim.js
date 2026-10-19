@@ -6,10 +6,12 @@
 'require mu300.sim-radio as SimRadio';
 
 var get=rpc.declare({object:'mu300dash',method:'data_sim_get',nobatch:true,expect:{'':{}}});
+var getV50=rpc.declare({object:'mu300dash',method:'v50_sim_get',nobatch:true,expect:{'':{}}});
 var start=rpc.declare({object:'mu300dash',method:'data_sim_set',params:['target'],nobatch:true,expect:{'':{}}});
 var status=rpc.declare({object:'mu300dash',method:'data_sim_status',params:['id'],nobatch:true,expect:{'':{}}});
 var errors={dual_sim_unavailable:'当前配置不支持双卡切换',invalid_sim:'SIM 卡槽无效',modem_busy:'另一项模组操作正在执行',sim_read_failed:'无法核验当前上网卡',sim_not_ready:'目标 SIM 尚未就绪',data_disconnect_failed:'旧数据连接未停止，已取消切换',sim_switch_failed_restored:'切换失败，已恢复原上网卡',sim_rollback_failed:'切换失败且恢复不完整，请检查 SIM 和信号',storage_failed:'设置保存失败'};
 errors.dual_boot_required='双卡尚未共同初始化，请重启后检查状态';
+Object.assign(errors,{v50_board_unknown:'无法识别 V50 硬件版本，未更改选卡',v50_card_unsupported:'此功能仅适用于 V50',v50_card_unavailable:'此硬件版本没有所选 SIM',v50_mux_unavailable:'SIM 选择驱动尚未就绪，请更新内核并重启',v50_card_power_failed:'SIM 电源切换未完成',v50_mux_write_failed:'SIM 硬件选择失败'});
 Object.assign(errors,{"Enable hot switching first": "请先启用双卡热切换", "Persistent dual-SIM brokers unavailable; reboot first": "双卡通道尚未准备完成，请先重启", "Unknown active SIM; reboot first": "当前上网卡状态未知，请重启", "Unexpected radio state; reboot first": "射频状态异常，请先重启", "No card answers in the target SIM position; nothing was changed": "目标卡槽未检测到 SIM，未进行切换", "The target SIM is locked by its PIN; nothing was changed": "目标 SIM 需要 PIN，未进行切换", "Target SIM got no data within the time; previous SIM restored": "目标卡未建立数据连接，已恢复原卡", "Target SIM has no data yet and the previous SIM had none either; staying on the target, boot default unchanged": "两卡均暂无数据连接，保留当前选卡，开机默认卡未更改", "Active SIM has no data; use default for next-boot selection": "当前卡暂无数据连接，可单独保存为下次开机默认卡", "Cannot stop WAN": "无法停止蜂窝连接，已取消切换", "Interrupted switch; reboot first": "上次切卡被中断，请先重启", "Network locks are being applied": "网络锁定正在应用，请稍后再试", "Previous SIM restored but WAN could not be started": "已恢复原卡，但蜂窝连接未能启动", "Resume the modem before switching": "请先恢复基带运行再切卡", "SIM control is busy": "另一项 SIM 设置正在执行", "SIM switched but the boot default could not be saved": "上网卡已切换，但开机默认卡保存失败", "Switch failed; previous SIM restored": "切卡失败，已恢复原卡", "Switch failed; radio state unknown, reboot required": "切卡失败且射频状态未知，需要重启", "Target SIM got no data and the previous one could not be restored; reboot required": "目标卡无数据且原卡恢复失败，需要重启", "Target SIM got no data; previous SIM restored but WAN could not be started": "目标卡无数据，已恢复原卡但蜂窝连接未启动", "The modem is busy; nothing was changed, try again": "基带正忙，未进行切换，请重试", "The target SIM could not be powered; nothing was changed": "目标 SIM 无法上电，未进行切换", "Unknown radio state; reboot first": "射频状态未知，请先重启", "flock is required for SIM control": "缺少 SIM 互斥组件，请更新完整系统"});
 function message(s){return M.translate(errors[s]||s);}
 function el(tag,text,cls) { var n=document.createElement(tag); if(text!=null)n.textContent=text; if(cls)n.className=cls; return n; }
@@ -32,7 +34,7 @@ var CSS = `
 @media(max-width:480px){.mud-sim-page .mud-sim-panel{padding:16px}.mud-sim-page .mud-data-sim{padding:12px}.mud-sim-page .mud-data-sim-controls label{flex-basis:100%}.mud-sim-page .mud-data-sim-controls select{flex:1;min-width:0}.mud-sim-page .mud-data-sim-controls .mud-btn{flex:1}.mud-sim-page .mud-sim-status{flex-direction:column;gap:3px}}
 `;
 return view.extend({
-    load:function() { return Promise.all([M.callSimGet(),get()]); },
+    load:function() { return Promise.all([M.callSimGet(),get(),getV50().catch(function(){return {};})]); },
     render:function(data) {
         M.injectCss(); M.localizeMenu();
         var self=this, root=this.root=el('div',null,'mud mud-sim-page');
@@ -79,6 +81,56 @@ return view.extend({
             if(initial)select.value=r.saved_sim===1?'1':'0';
         }
         paint(data[1],true);
+        var v50=data[2]||{}, physicalSelect=null, physicalButton=null, physicalNote=null;
+        function physicalName(n) {
+            return M.translate(n===3?'外置 SIM':'内置 SIM')+(n===3?'':' '+(n+1));
+        }
+        function paintV50(r,initial) {
+            v50=r;
+            if(!physicalButton)return;
+            physicalButton.disabled=!r.ready||!!self.busy;
+            physicalSelect.disabled=!r.ready||!!self.busy;
+            if(initial) {
+                var current=r.saved_card==null?r.active_card:r.saved_card;
+                if(current!=null)physicalSelect.value=String(current);
+            }
+            physicalNote.textContent='board_id '+r.board_id+' · '+M.translate('当前上网卡')+'：'+
+                (r.active_card==null?M.translate('未连接'):physicalName(r.active_card));
+            if(!r.ready)physicalNote.textContent+=' · '+message('v50_mux_unavailable');
+        }
+        if(v50.supported) {
+            // Physical card IDs must never be sent to SPACTCARD or used as
+            // AT/cache slot indices. eSIM3 shares SIM2; pSIM shares SIM1.
+            controls.hidden=true;
+            var physicalBox=el('div',null,'mud-data-sim');panel.append(physicalBox);
+            physicalBox.append(el('h3',M.translate('V50 物理卡选择')));
+            var physicalRow=el('div',null,'mud-data-sim-controls');physicalBox.append(physicalRow);
+            physicalSelect=el('select');physicalSelect.id='mud-v50-card';
+            (v50.cards||[]).forEach(function(n){var o=el('option',physicalName(n));o.value=String(n);physicalSelect.append(o);});
+            var physicalLabel=el('label',M.translate('默认上网卡'));physicalLabel.htmlFor=physicalSelect.id;
+            physicalButton=el('button',M.translate('切换上网卡'),'mud-btn');physicalButton.type='button';
+            physicalRow.append(physicalLabel,physicalSelect,physicalButton);
+            physicalNote=el('p',null,'mud-note');physicalBox.append(physicalNote);
+            physicalBox.append(el('p',M.translate('内置 SIM 3 与内置 SIM 2 共用逻辑卡槽 SIM2；外置 SIM 与内置 SIM 1 共用 SIM1。射频、锁定及 AT 查看仍按两个逻辑卡槽控制。'),'mud-note'));
+            paintV50(v50,true);
+            physicalButton.onclick=function(){
+                if(self.busy)return;
+                var target=Number(physicalSelect.value);self.busy=true;
+                M.confirmBox('切换上网卡？',physicalName(target),{danger:true}).then(function(yes){
+                    if(!yes||!root.isConnected)return;
+                    physicalButton.disabled=true;physicalSelect.disabled=true;
+                    var toast=M.toast('正在切换上网卡…',{type:'busy',timeout:0});
+                    return start('v50-card-'+target).then(function(r){
+                        if(!r.ok||!r.id)throw new Error(r.error||'网络设置提交失败');return wait(r.id);
+                    }).then(function(){M.selectViewedSlot(target===0||target===3?'0':'1');M.toast('上网卡切换完成',{type:'success'});})
+                      .catch(function(e){if(root.isConnected)M.toast(message(e.message),{type:'error'});})
+                      .finally(function(){toast.close();});
+                }).finally(function(){
+                    self.busy=false;
+                    if(root.isConnected)getV50().then(function(r){if(root.isConnected)paintV50(r,true);}).catch(function(){paintV50(v50,false);});
+                });
+            };
+        } else if(v50.error)panel.append(el('p',message(v50.error),'mud-note'));
         button.disabled=data[0].slots!==2 || !data[1].ok || data[1].ready===false;
         select.disabled=data[0].slots!==2 || !data[1].ok;
         if(button.disabled && !data[1].native)panel.append(el('p',message(data[1].ready===false && data[0].slots===2?'dual_boot_required':'dual_sim_unavailable'),'mud-note'));
@@ -127,7 +179,9 @@ return view.extend({
         this.refresh=function() {
             if(document.hidden||!root.isConnected||self.busy||self.inflight)return Promise.resolve();
             self.inflight=true;
-            return get().then(function(r){if(root.isConnected)paint(r,false);}).catch(function(){}).finally(function(){self.inflight=false;});
+            return Promise.all([get().then(function(r){if(root.isConnected)paint(r,false);}),
+                physicalButton?getV50().then(function(r){if(root.isConnected)paintV50(r,false);}):Promise.resolve()])
+                .catch(function(){}).finally(function(){self.inflight=false;});
         };
         poll.add(this.refresh,2);
         var radioPanel=el('section',null,'mud-card mud-sim-panel');root.append(radioPanel);

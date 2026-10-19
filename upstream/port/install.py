@@ -20,6 +20,13 @@ def append_once(path, marker, text):
     if marker not in s:
         open(p, 'w').write(s.rstrip('\n') + '\n' + text)
 
+append_once('drivers/misc/Makefile', 'zte-v50-sim.o',
+            'obj-$(CONFIG_ZTE_V50_SIM) += zte-v50-sim.o\n')
+append_once('drivers/misc/Kconfig', 'config ZTE_V50_SIM',
+            '\nconfig ZTE_V50_SIM\n\ttristate "ZTE V50 physical SIM multiplexer"\n'
+            '\tdepends on GPIOLIB && OF\n\thelp\n'
+            '\t  V50-only sim_gpio_ctl binding; preserves bootloader routing.\n')
+
 append_once('drivers/clk/sprd/Makefile', 'reset.o', 'clk-sprd-y\t+= reset.o\n')
 append_once('drivers/usb/typec/tcpm/Makefile', 'sc27xx-ump9620.o',
             'obj-$(CONFIG_TYPEC_SC27XX_UMP9620) += sc27xx-ump9620.o\n')

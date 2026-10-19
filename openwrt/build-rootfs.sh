@@ -203,6 +203,7 @@ chmod 0755 $R/opt/mu300/bin/mu300-platform-config
 chmod 0755 $R/opt/mu300/bin/mu300-network-recovery $R/etc/init.d/mu300-network-recovery
 chmod 0755 $R/etc/uci-defaults/92-mu300-uhttpd-key
 chmod 0755 $R/opt/mu300/bin/v50-led-status
+chmod 0755 $R/opt/mu300/bin/mu300-v50-sim
 chmod 0755 $R/opt/mu300/bin/openwrt-board-check
 chmod 0755 $R/opt/mu300/bin/ra-deprecate $R/opt/mu300/bin/wcn-reopen
 chmod 0755 $R/opt/mu300/bin/mu300-user-packages $R/etc/init.d/mu300-user-packages

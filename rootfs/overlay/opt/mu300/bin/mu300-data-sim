@@ -68,9 +68,15 @@ apply)
     # path's pre-radio replay to take the short modem mutex itself. Holding
     # that mutex throughout ifup would deadlock our own replay hook.
     mutex=${MU300_SIM_MUTEX:-/run/unisoc-data-sim-switch}
-    mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
-    echo $$ > "$mutex/pid"
-    trap 'rm -f "$mutex/pid"; rmdir "$mutex" 2>/dev/null' EXIT
+    if [ "${MU300_DATA_SIM_GATE_HELD:-0}" = 1 ]; then
+        # A V50 physical-card transaction already owns this gate. Keep it
+        # held while reusing the normal logical data-card transaction.
+        [ "$(mu300-device)" = v50 ] && [ "$(cat "$mutex/pid" 2>/dev/null)" = "$PPID" ] || { echo modem_busy >&2; exit 1; }
+    else
+        mkdir "$mutex" 2>/dev/null || { echo modem_busy >&2; exit 1; }
+        echo $$ > "$mutex/pid"
+        trap 'rm -f "$mutex/pid"; rmdir "$mutex" 2>/dev/null' EXIT
+    fi
     trap 'exit 1' INT TERM
     [ ! -d /run/unisoc-modem-lock-apply ] || { echo modem_busy >&2; exit 1; }
     current=$(data_card)

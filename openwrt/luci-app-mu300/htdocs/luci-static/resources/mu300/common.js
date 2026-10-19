@@ -113,6 +113,16 @@ var callUsbNetAdd = rpc.declare({ object: 'mu300dash', method: 'usb_net_add', pa
  * standalone package works in any OpenWrt buildroot without po2lmo or extra
  * language packages. Chinese remains the source/fallback language. */
 var DASH_I18N = {
+    'V50 物理卡选择': ['V50 physical SIM selection', 'V50 fiziksel SIM seçimi'],
+    '内置 SIM': ['Built-in SIM', 'Dahili SIM'],
+    '外置 SIM': ['External SIM', 'Harici SIM'],
+    '内置 SIM 3 与内置 SIM 2 共用逻辑卡槽 SIM2；外置 SIM 与内置 SIM 1 共用 SIM1。射频、锁定及 AT 查看仍按两个逻辑卡槽控制。': ['Built-in SIM 3 shares logical SIM2 with built-in SIM 2; the external SIM shares SIM1 with built-in SIM 1. Radio, locks and AT views still use the two logical slots.', 'Dahili SIM 3 ve dahili SIM 2 mantıksal SIM2 yuvasını; harici SIM ve dahili SIM 1 ise SIM1 yuvasını paylaşır. Radyo, kilitler ve AT görünümü iki mantıksal yuvayı kullanır.'],
+    '无法识别 V50 硬件版本，未更改选卡': ['Unknown V50 board version; SIM selection unchanged', 'V50 kart sürümü bilinmiyor; SIM seçimi değiştirilmedi'],
+    '此功能仅适用于 V50': ['This feature is only available on V50', 'Bu özellik yalnızca V50 içindir'],
+    '此硬件版本没有所选 SIM': ['The selected SIM is not fitted on this board', 'Seçilen SIM bu kartta bulunmuyor'],
+    'SIM 选择驱动尚未就绪，请更新内核并重启': ['SIM selector is not ready; update the kernel and reboot', 'SIM seçici hazır değil; çekirdeği güncelleyip yeniden başlatın'],
+    'SIM 电源切换未完成': ['SIM power transition failed', 'SIM güç geçişi başarısız'],
+    'SIM 硬件选择失败': ['Hardware SIM selection failed', 'Donanım SIM seçimi başarısız'],
 	"等待切回受电后恢复充电": ["Charging will resume when the port returns to power-sink mode", "Bağlantı noktası güç alıcı moduna dönünce şarj devam edecek"],
 	"保存并应用": ["Save & apply","Kaydet ve uygula"],
 	"充电管理": ["Charging controls","Şarj denetimi"],

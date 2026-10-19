@@ -105,6 +105,7 @@ for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./opt/mu300/bin/mu300-keys ./opt/mu300/bin/mu300-bt-init ./opt/mu300/bin/mu300-atd ./opt/mu300/bin/mu300-at ./opt/mu300/bin/mobile-data \
     ./opt/mu300/bin/u30air-led-status ./etc/hotplug.d/power_supply/70-mu300-led \
     ./opt/mu300/bin/mu300-data-sim-u30 ./opt/mu300/bin/mu300-sim-u30 ./opt/mu300/bin/mu300-sim2-start ./opt/mu300/bin/mu300-sim2-warmup ./opt/mu300/lib/sim-config.sh \
+    ./opt/mu300/bin/mu300-v50-sim ./opt/mu300/lib/v50-card.sh ./opt/mu300/lib/network-led.sh \
     ./opt/mu300/bin/mu300-user-packages ./etc/init.d/mu300-user-packages ./etc/mu300/image-packages \
     ./opt/mu300/lib/wifi-channels.sh ./usr/share/ucode/wifi/hostapd.uc \
     ./lib/netifd/hostapd-unisoc.sh ./usr/share/ucode/wifi/unisoc-sae.uc \

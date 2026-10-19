@@ -13,6 +13,17 @@ wifi_state() {
 
 network_state() {
     if ubus call network.interface.wan status 2>/dev/null | grep -q '"up": true'; then
+        if [ "$(mu300-device 2>/dev/null)" = u30air ]; then
+            # Native U30 runtime selection can differ from its next-boot
+            # preference. Use the same slot/broker mapping as the dialer.
+            . "${MU300_SIM_ENV_LIB:-/opt/mu300/bin/mu300-sim-env}"
+            . "${MU300_NETWORK_LED_LIB:-/opt/mu300/lib/network-led.sh}"
+            mu300_sim_env "" || return
+            snapshot=$(MU300_AT_DIR=$MU300_SIM_SHARED mu300-at -t 3 "AT+SPACTCARD=$MU300_SIM_SLOT;+CEREG?;+C5GREG?" 2>/dev/null) || true
+            state=$(printf '%s\n' "$snapshot" | mu300_network_led_state) || return
+            led-status "$state"
+            return
+        fi
         case "$(led-status current 2>/dev/null)" in
             online-4g) led-status online-4g; return ;;
             online-5g) led-status online-5g; return ;;

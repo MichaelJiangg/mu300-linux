@@ -80,5 +80,31 @@ const tick=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
         assert.equal(common.selectedSlot(),'1');
         view.unload();
     }
-    console.log('SIM UI: scoped RPC and native U30 boot/live controls pass');
+    for(const [board,cards,target] of [[0,[0,1,2],2],[1,[0,1,2,3],3],[2,[0,1,3],3],[3,[0,1],1]]) {
+        common.selectViewedSlot('0');const requests=[];
+        const physical={ok:1,supported:true,ready:true,board_id:board,cards,active_card:0,saved_card:0};
+        const M={injectCss(){},localizeMenu(){},translate:s=>s,selectViewedSlot:common.selectViewedSlot,
+            confirmBox:()=>Promise.resolve(true),busy(){},toast:()=>({close(){}})};
+        const rpc={declare:o=>arg=>{
+            if(o.method==='v50_sim_get')return Promise.resolve({...physical});
+            if(o.method==='data_sim_set') {
+                requests.push(arg);physical.active_card=physical.saved_card=target;
+                return Promise.resolve({ok:1,id:'abcdefghij'});
+            }
+            if(o.method==='data_sim_status')return Promise.resolve({id:'abcdefghij',state:'done',ok:1});
+            return Promise.resolve({ok:1,ready:true,actual_sim:0,saved_sim:0});
+        }};
+        const view=new Function('view','rpc','poll','M','document','SimRadio',fs.readFileSync(dir+'/view/mu300/sim.js','utf8'))(
+            {extend:o=>o},rpc,{add(){},remove(){}},M,{createElement:element},{attach:()=>({refresh:()=>Promise.resolve(),dispose(){}})});
+        const root=view.render([{slots:2},{ok:1,ready:true,actual_sim:0,saved_sim:0},{...physical}]);
+        function all(n,tag){return (n.tag===tag?[n]:[]).concat(...n.children.map(c=>all(c,tag)));}
+        const select=all(root,'select').find(n=>n.id==='mud-v50-card');
+        assert.deepEqual(select.children.map(n=>Number(n.value)),cards,'board-specific physical choices');
+        const button=all(root,'button')[1];select.value=String(target);button.onclick();await tick();
+        assert.deepEqual(requests,['v50-card-'+target]);
+        assert.equal(common.selectedSlot(),target===0||target===3?'0':'1','physical IDs never become AT slot IDs');
+        physical.ready=false;await view.refresh();assert(button.disabled);
+        view.unload();
+    }
+    console.log('SIM UI: scoped RPC, U30 controls and four V50 hardware variants pass');
 })().catch(e=>{console.error(e);process.exitCode=1;});
