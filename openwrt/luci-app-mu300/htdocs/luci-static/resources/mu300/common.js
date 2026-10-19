@@ -154,6 +154,8 @@ var DASH_I18N = {
 	"已暂停电池充电": ["Battery charging paused","Pil şarjı duraklatıldı"],
 	"恢复自动充电": ["Resume automatic charging","Otomatik şarja dön"],
 	"充电设置已应用，重启后保留": ["Charging settings applied and saved across reboots","Şarj ayarları uygulandı ve yeniden başlatma için kaydedildi"],
+	"上电自启动": ["Start automatically when power is connected","Güç bağlandığında otomatik başlat"],
+	"开启后，插入电源直接启动 OpenWrt；关闭后仅充电，长按电源键启动。设置在下次充电启动时生效。": ["When enabled, connecting power starts OpenWrt. When disabled, charge only; hold the power button to start. Applies on the next charger boot.","Etkinse güç bağlandığında OpenWrt başlar. Kapalıysa yalnızca şarj olur; başlatmak için güç düğmesini basılı tutun. Bir sonraki şarj açılışında uygulanır."],
 	"充电设置已保存，但驱动应用失败，请重试": ["Settings saved, but the charger rejected the change; retry","Ayarlar kaydedildi ancak şarj sürücüsü değişikliği uygulayamadı; yeniden deneyin"],
 	"充电状态保存失败，请重试": ["Unable to save charging state; retry","Şarj durumu kaydedilemedi; yeniden deneyin"],
     '切换': ['Switch', 'Geçiş yap'],

@@ -61,9 +61,16 @@ else
     tr -d '\000' < $src | sed 's/androidboot.slot_suffix=_b/androidboot.slot_suffix=_a/' > /run/mu300-cmdline.android
 fi
 mount --bind /run/mu300-cmdline.android $A/proc/cmdline
+# A charger-started U30 has live PM but can still have NR/CH offline. The stock
+# predicate otherwise skips CP loading. Keep the original loader on all normal
+# boots/models; do not change the command line, NV, AT handshake or RF replay.
+modem_exe=/vendor/bin/modem_control
+if [ -x /opt/mu300/bin/mu300-modem-coldboot ]; then
+    modem_exe=$(/opt/mu300/bin/mu300-modem-coldboot "$A" /run/mu300-cmdline.android) || exit 5
+fi
 # sprd_modem_loader only accepts a task whose comm is exactly "modem_control": exec it directly
 # OpenWrt's procd preloads /lib/libsetlbf.so into services; the bionic linker in the chroot cannot load it
 unset LD_PRELOAD
 export LD_LIBRARY_PATH=/apex/com.android.runtime/lib64/bionic:/system/lib64:/vendor/lib64
 mark vendor-chroot-ready
-exec chroot $A /vendor/bin/modem_control
+exec chroot $A "$modem_exe"

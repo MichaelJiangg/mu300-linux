@@ -1,0 +1,5 @@
+#!/bin/sh /etc/rc.common
+# Sorts before S09mu300-vendor, then S12 hardware and network/AT startup.
+START=09
+boot() { /opt/mu300/bin/mu300-charge-mode; }
+start() { return 0; }

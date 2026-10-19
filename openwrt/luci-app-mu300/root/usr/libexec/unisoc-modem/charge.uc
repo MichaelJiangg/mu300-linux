@@ -20,6 +20,7 @@ function settings() {
     return { enabled: integer(cfg.get(PKG, 'main', 'enabled') || '0', 0, 1),
         start: integer(cfg.get(PKG, 'main', 'start') || '70', 20, 95),
         stop: integer(cfg.get(PKG, 'main', 'stop') || '80', 50, 100),
+        power_on: integer(cfg.get(PKG, 'main', 'power_on') ?? '0', 0, 1),
         paused: integer(cfg.get(PKG, 'main', 'paused') || '0', 0, 1),
         full_once: integer(cfg.get(PKG, 'main', 'full_once') || '0', 0, 1) };
 }
@@ -45,7 +46,7 @@ function snapshot(c) {
     return { ok: true, supported: supported(), available: valid, capacity: cap,
         current_ma: match(current, /^-?[0-9]+$/) ? int(current) / 1000 : null,
         status: valid ? read(CHG + '/status') : '', online: valid && read(CHG + '/online') == '1',
-        enabled: !!c.enabled, start: c.start, stop: c.stop, full_once: !!c.full_once,
+        enabled: !!c.enabled, start: c.start, stop: c.stop, power_on: !!c.power_on, full_once: !!c.full_once,
         paused: !!c.paused, stopped: !!old.stopped, reason: old.reason || '', pending: !!old.pending };
 }
 function remember(state) {
@@ -101,7 +102,9 @@ try {
         if (action == 'configure') {
             let data = json(fs.readfile('/dev/stdin') || '{}');
             let next = {enabled: integer(data?.enabled, 0, 1), start: integer(data?.start, 20, 95),
-                stop: integer(data?.stop, 50, 100), paused: 0, full_once: 0};
+                stop: integer(data?.stop, 50, 100), power_on: c.power_on, paused: 0, full_once: 0};
+            if (data?.power_on != null && data.power_on != '')
+                next.power_on = integer(data.power_on, 0, 1);
             if (next.start >= next.stop) die('charge_threshold_order');
             store(next); c = next;
         } else if (action == 'pause' || action == 'resume') {

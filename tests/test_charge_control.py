@@ -87,6 +87,18 @@ class ChargeControl(unittest.TestCase):
         self.assertEqual((self.charger/'charge_type').read_text(),'Fast')
         self.assertTrue(self.call()['enabled'])
 
+    def test_power_on_persisted_optional_for_older_clients(self):
+        self.assertFalse(self.call()['power_on'])
+        self.assertFalse(self.configure(power_on='0')['power_on'])
+        self.assertFalse(self.call()['power_on'])
+        # Existing callers that only change thresholds preserve the boot choice.
+        self.assertFalse(self.configure()['power_on'])
+        self.assertTrue(self.configure(power_on='1')['power_on'])
+        for board in ('f50', 'v50', 'unknown'):
+            before=(self.config/'mu300-charge').read_bytes()
+            self.assertFalse(self.call('configure',dict(enabled='0',start='70',stop='80',power_on='0'),board=board)['ok'])
+            self.assertEqual((self.config/'mu300-charge').read_bytes(),before)
+
     def test_manual_pause_resume_and_boot_apply(self):
         self.assertTrue(self.call('pause')['paused'])
         (self.fixture/'state.json').unlink()
@@ -121,6 +133,12 @@ class ChargeControl(unittest.TestCase):
             self.assertFalse(self.call('configure',body)['ok'])
             self.assertEqual((self.config/'mu300-charge').read_bytes(),initial)
             self.assertEqual((self.charger/'charge_type').read_text().strip(),'Fast')
+
+    def test_invalid_power_on_leaves_settings_untouched(self):
+        before=(self.config/'mu300-charge').read_bytes()
+        for value in ('2', '-1', '1;reboot', True):
+            self.assertFalse(self.configure(power_on=value)['ok'])
+            self.assertEqual((self.config/'mu300-charge').read_bytes(),before)
 
     def test_otg_source_keeps_pause_until_power_sink_returns(self):
         self.call('pause')

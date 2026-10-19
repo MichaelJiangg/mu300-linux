@@ -46,6 +46,9 @@ done
 file "$IN/tools/keys/mu300-keys" | grep -q 'ELF 64-bit.*ARM aarch64' || {
     echo "mu300-keys must be an AArch64 executable" >&2; exit 1;
 }
+grep -aq 'bq256xx-charger/online' "$IN/tools/keys/mu300-keys" || {
+    echo 'mu300-keys is stale: rebuild tools/keys/mu300-keys.c with charger-event support' >&2; exit 1;
+}
 for f in wcn_bsp.ko sprd_wlan_combo.ko sprdbt_tty.ko mali_kbase.ko; do
     [ -s "$IN/out/modules/$f" ] || { echo "missing $IN/out/modules/$f" >&2; exit 1; }
 done
@@ -106,6 +109,7 @@ for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./opt/mu300/bin/u30air-led-status ./etc/hotplug.d/power_supply/70-mu300-led \
     ./opt/mu300/bin/mu300-data-sim-u30 ./opt/mu300/bin/mu300-sim-u30 ./opt/mu300/bin/mu300-sim2-start ./opt/mu300/bin/mu300-sim2-warmup ./opt/mu300/lib/sim-config.sh \
     ./opt/mu300/bin/mu300-v50-sim ./opt/mu300/lib/v50-card.sh ./opt/mu300/lib/network-led.sh \
+    ./opt/mu300/bin/mu300-charge-mode ./opt/mu300/bin/mu300-modem-coldboot ./etc/rc.d/S09mu300-charge-mode \
     ./opt/mu300/bin/mu300-user-packages ./etc/init.d/mu300-user-packages ./etc/mu300/image-packages \
     ./opt/mu300/lib/wifi-channels.sh ./usr/share/ucode/wifi/hostapd.uc \
     ./lib/netifd/hostapd-unisoc.sh ./usr/share/ucode/wifi/unisoc-sae.uc \

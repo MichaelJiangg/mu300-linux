@@ -23,11 +23,11 @@ with sync_playwright() as p:
                 document.body.style.cssText='font-family:sans-serif;margin:16px';
                 window.saved=[];
                 window.chargeState={ok:true,available:true,supported:true,capacity:76,status:'Charging',online:true,
-                    start:70,stop:80,enabled:true,full_once:false};
+                    start:70,stop:80,enabled:true,power_on:true,full_once:false};
                 const rpc={declare:info=>(...args)=>{
                     if(info.object==='mu300-charge') {
                         if(info.method==='configure'){
-                            saved.push(args);Object.assign(chargeState,{enabled:args[0]==='1',start:+args[1],stop:+args[2]});
+                            saved.push(args);Object.assign(chargeState,{enabled:args[0]==='1',start:+args[1],stop:+args[2],power_on:args[3]==='1'});
                         }
                         if(info.method==='full_once')chargeState.full_once=true;
                         if(info.method==='pause')chargeState.paused=true;
@@ -50,7 +50,7 @@ with sync_playwright() as p:
             page.locator('#mud-charge-start').fill('60')
             save.click()
             page.wait_for_function('saved.length===1')
-            assert page.evaluate('saved') == [['1','60','90']]
+            assert page.evaluate('saved') == [['1','60','90','1']]
             page.locator('[data-charge="once"]').click()
             page.wait_for_function('document.querySelector(\'[data-charge="once"]\').disabled')
             assert page.locator('[data-charge="capacity"]').inner_text() == '76%'

@@ -204,6 +204,7 @@ chmod 0755 $R/opt/mu300/bin/mu300-network-recovery $R/etc/init.d/mu300-network-r
 chmod 0755 $R/etc/uci-defaults/92-mu300-uhttpd-key
 chmod 0755 $R/opt/mu300/bin/v50-led-status
 chmod 0755 $R/opt/mu300/bin/mu300-v50-sim
+chmod 0755 $R/opt/mu300/bin/mu300-charge-mode $R/opt/mu300/bin/mu300-modem-coldboot $R/etc/init.d/mu300-charge-mode
 chmod 0755 $R/opt/mu300/bin/openwrt-board-check
 chmod 0755 $R/opt/mu300/bin/ra-deprecate $R/opt/mu300/bin/wcn-reopen
 chmod 0755 $R/opt/mu300/bin/mu300-user-packages $R/etc/init.d/mu300-user-packages
@@ -287,7 +288,7 @@ unset root_hash
 # enable the services (rc.common "enable" needs ubus, which is not running in the build container)
 # accounts still those of the image until an installer or mu300-update puts the device ones in place
 : > $R/etc/.mu300-accounts-from-image
-for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-hw mu300-post mu300-toolkit mu300-atd mu300-network-recovery mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages unisoc-battery ttyd; do
+for s in mu300-accounts mu300-cpu-driver mu300-vendor mu300-charge-mode mu300-hw mu300-post mu300-toolkit mu300-atd mu300-network-recovery mu300-modem-log mu300-wifi-client mu300-buttons mu300-ndp mu300-smsd mu300-user-packages unisoc-battery ttyd; do
     n=$(sed -n "s/^START=//p" $R/etc/init.d/$s)
     ln -sf ../init.d/$s $R/etc/rc.d/S$n$s
 done

@@ -1,0 +1,47 @@
+#!/bin/sh
+# U30 Air's LK charger boot only. Default to charging; explicit automatic start
+# skips the gate. No wait is added to power-key/normal boots or other models.
+export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
+BIN=${MU300_BIN:-/opt/mu300/bin}
+R=${MU300_SYSROOT:-}
+[ "$("$BIN/mu300-device")" = u30air ] || exit 0
+case $(uci -q get mu300-charge.main.power_on) in
+    0|'') ;;  # Old configurations use the same charge-only default as E5.
+    *) exit 0 ;;
+esac
+[ ! -e "$R/tmp/.failsafe" ] || exit 0
+args=$(cat "$R/proc/cmdline" 2>/dev/null; tr '\000' ' ' < "$R/proc/device-tree/chosen/bootargs" 2>/dev/null)
+printf '%s\n' "$args" | grep -Eq '(^|[[:space:]])(sprdboot|androidboot)\.mode=charger([[:space:]]|$)' || exit 0
+
+# LK already runs PM during charging. Load its IPC/watchdog and the thermal
+# drivers; defer the vendor CP loader, Wi-Fi, netifd and RF AT until power-on.
+"$BIN/extra-modules" > "$R/tmp/mu300-charge-modules.log" 2>&1
+mkdir -p "$R/run/mu300"
+touch "$R/run/mu300/charging-boot"
+"$BIN/mu300-led" battery
+logger -t mu300-charge-mode 'charging only; hold power for 1.5 seconds to start OpenWrt'
+"$BIN/mu300-keys" -c -l 1500
+result=$?
+if [ "$result" != 3 ]; then
+    # An unavailable input or supply must never trap the device in charging.
+    [ "$result" = 0 ] || logger -t mu300-charge-mode 'charger wait unavailable; continuing normal boot'
+    rm -f "$R/run/mu300/charging-boot"
+    exit 0
+fi
+logger -t mu300-charge-mode 'charger removed; powering off'
+"$BIN/mu300-led" sleep
+"$BIN/mu300-next-boot" --rearm || logger -t mu300-charge-mode 'could not rearm boot choice'
+sync
+# rcS waits here, so poweroff via procd cannot complete its rc shutdown. Flush
+# root before the image backing mount, then use the kernel's poweroff path,
+# including FGU shutdown accounting. Never reboot or skip sync with -n.
+mount -o remount,ro / || logger -t mu300-charge-mode 'root remount read-only failed'
+if mountpoint -q /mnt/mu300-disk; then
+    mount -o remount,ro /mnt/mu300-disk || logger -t mu300-charge-mode 'backing mount remount failed'
+fi
+sync
+while :; do
+    poweroff -f
+    logger -t mu300-charge-mode 'poweroff returned; retrying'
+    sleep 1
+done

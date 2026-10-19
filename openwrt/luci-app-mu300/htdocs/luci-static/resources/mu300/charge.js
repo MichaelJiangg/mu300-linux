@@ -4,7 +4,7 @@
 'require mu300.common as M';
 
 var get = rpc.declare({object:'mu300-charge', method:'get', expect:{'':{}}, nobatch:true});
-var configure = rpc.declare({object:'mu300-charge', method:'configure', params:['enabled','start','stop'], expect:{'':{}}, nobatch:true});
+var configure = rpc.declare({object:'mu300-charge', method:'configure', params:['enabled','start','stop','power_on'], expect:{'':{}}, nobatch:true});
 var fullOnce = rpc.declare({object:'mu300-charge', method:'full_once', expect:{'':{}}, nobatch:true});
 
 var pause = rpc.declare({object:'mu300-charge', method:'pause', expect:{'':{}}, nobatch:true});
@@ -47,6 +47,8 @@ return baseclass.extend({
   <div class="mud-device-field"><label for="mud-charge-start">恢复充电于（20–95%）</label><input id="mud-charge-start" data-charge="start" type="number" min="20" max="95" step="1" required disabled></div>
  </div>
  <div class="mud-note">到达上限后暂停充电，降至下限时恢复。关闭上限会恢复正常充电。设置在重启后保留。</div>
+ <label class="mud-device-toggle"><input type="checkbox" data-charge="power_on" disabled>上电自启动</label>
+ <div class="mud-note">开启后，插入电源直接启动 OpenWrt；关闭后仅充电，长按电源键启动。设置在下次充电启动时生效。</div>
  <div class="mud-device-actions"><button type="submit" class="mud-btn" data-charge="save" disabled>保存并应用</button><button type="button" class="mud-btn" data-charge="once" disabled>临时充满一次</button><button type="button" class="mud-btn" data-charge="pause" disabled>暂停电池充电</button></div>
  <div class="mud-note">暂停电池充电时保留 USB 供电，不会关闭 USB 数据或 OTG。</div>
  <div class="mud-note" data-charge="note" role="status" aria-live="polite">临时充满后，自动恢复原来的充电上限。</div>
@@ -56,7 +58,7 @@ return baseclass.extend({
 		var q = function(name) { return card.querySelector('[data-charge="' + name + '"]'); };
 		var state = {}, pending = false;
 		function disable() {
-			['enabled','start','stop','save','once','pause'].forEach(function(name) { q(name).disabled = pending || !state.available; });
+			['enabled','start','stop','power_on','save','once','pause'].forEach(function(name) { q(name).disabled = pending || !state.available; });
 			q('once').disabled = pending || !state.available || !!state.full_once;
 			q('refresh').disabled = pending;
 		}
@@ -69,6 +71,7 @@ return baseclass.extend({
 			q('status').textContent = M.translate(label);
 			q('pause').textContent = M.translate(s.paused ? '恢复自动充电' : '暂停电池充电');
 			q('enabled').checked = !!s.enabled;
+			q('power_on').checked = !!s.power_on;
 			q('start').value = s.start == null ? 70 : s.start;
 			q('stop').value = s.stop == null ? 80 : s.stop;
 			q('once').textContent = M.translate(s.full_once ? '正在临时充满…' : '临时充满一次');
@@ -95,7 +98,7 @@ return baseclass.extend({
 			if (pending || !state.available || !q('form').reportValidity()) return;
 			var start = Number(q('start').value), stop = Number(q('stop').value);
 			if (start >= stop) { q('note').textContent = message('charge_threshold_order'); return; }
-			return perform(function() { return configure(q('enabled').checked ? '1' : '0', String(start), String(stop)); }, true);
+			return perform(function() { return configure(q('enabled').checked ? '1' : '0', String(start), String(stop), q('power_on').checked ? '1' : '0'); }, true);
 		};
 		q('once').onclick = function() { if (state.available && !state.full_once) return perform(fullOnce, true); };
 		q('pause').onclick = function() { if (state.available) return perform(state.paused ? resume : pause, true); };

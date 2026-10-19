@@ -8,7 +8,7 @@ const common = fs.readFileSync(path.join(dir, 'mu300/common.js'), 'utf8');
 const catalog = new Function(common.slice(common.indexOf('var DASH_I18N = {'),
   common.indexOf('var DASH_KEYS = ')) + 'return DASH_I18N;')();
 const state = () => ({ok:true, available:true, supported:true, capacity:76, status:'Charging', online:true,
-  enabled:true, start:70, stop:80, full_once:false});
+  enabled:true, start:70, stop:80, power_on:true, full_once:false});
 function fixture() {
   const elements = {}, calls = [], replies = [state()];
   const card = {style:{}, querySelector(selector) {
@@ -42,13 +42,16 @@ const submit = f => f.elements.form.onsubmit({preventDefault(){}});
   assert.equal(f.elements.capacity.textContent,'76%');
   assert.equal(f.elements.start.value,70);
   assert.equal(f.elements.save.disabled,false);
+  assert.equal(f.elements.power_on.checked,true);
   f.elements.start.value='85'; f.elements.stop.value='80';
   submit(f); assert.equal(f.calls.length,1);
   assert.match(f.elements.note.textContent,/恢复充电阈值/);
   f.elements.start.value='65'; f.elements.stop.value='85';
-  f.replies.push({...state(),start:65,stop:85});
+  f.elements.power_on.checked=false;
+  f.replies.push({...state(),start:65,stop:85,power_on:false});
   await submit(f);
-  assert.deepEqual(f.calls.at(-1),['configure','1','65','85']);
+  assert.deepEqual(f.calls.at(-1),['configure','1','65','85','0']);
+  assert.equal(f.elements.power_on.checked,false);
   f.replies.push({...state(),full_once:true});
   await f.elements.once.onclick();
   assert.equal(f.elements.once.disabled,true);
@@ -69,6 +72,7 @@ const submit = f => f.elements.form.onsubmit({preventDefault(){}});
   await submit(f); assert.match(f.elements.note.textContent,/已保存.*应用失败/);
   const down = fixture(); down.replies[0]={ok:true,available:false};
   await down.module.mount(down.root); assert.equal(down.elements.save.disabled,true);
+  assert.equal(down.elements.power_on.disabled,true);
   assert.equal(down.root.card.hidden,true);
   submit(down); assert.equal(down.calls.length,1);
   const failed = fixture(); failed.replies[0]=new Error('connection');
