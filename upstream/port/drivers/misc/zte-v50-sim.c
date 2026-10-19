@@ -8,7 +8,7 @@
  *   esim2-esim3-switch  SIM2's interface: 0 the second built-in card, 1 the third one
  *   esim1-psim-switch   an INPUT despite its name: the card holder's detect line; never written
  *
- * MU300 (docs/FINDINGS.md 206): nothing is driven at probe. The stock module set both outputs from
+ * MU300 (docs/FINDINGS.md 204): nothing is driven at probe. The stock module set both outputs from
  * androidboot.simswitch/psimswitch, or high/low without them; this one takes the lines as the bootloader left them,
  * so a V50 whose owner never chose a card keeps exactly the routing it had before this driver existed. A level is
  * written only when userspace asks for one (mu300-sim, before the modem's CP starts, at the boot after a choice),

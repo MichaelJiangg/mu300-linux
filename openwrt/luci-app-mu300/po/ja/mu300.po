@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "強調表示されたコアはオンラインです。オフにしたコアは、再起動後も、再びオンにするまでオフラインのままです。CPU0 は常にオンラインです。"
+
+msgid "Low latency: on"
+msgstr "低遅延: オン"
+
+msgid "Low latency: off"
+msgstr "低遅延: オフ"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "低遅延モードは、ZTE の U30 Air ファームウェアと同様に CPU0 をアイドル状態に入れません。Wi-Fi の遅延が大幅に短くなり、消費電力は増えます。既定ではオフです。"
+
 msgid "Thermal"
 msgstr "温度管理"
 
@@ -927,6 +939,9 @@ msgstr "配信はまだありません"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "保存済みの設定でテストを開始しました。結果は配信ログに表示されます。"
+
+msgid "Automatic without 2G (152)"
+msgstr "自動（2G なし）（152）"
 
 msgid "4G only"
 msgstr "4G のみ"
@@ -1800,6 +1815,15 @@ msgstr "0 % ではバッテリーを充電しません（本体は充電器で�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % にすると、常時電源につないだままの機器でバッテリーが長持ちします。"
+
+msgid "When the charger switches the device on"
+msgstr "充電器がデバイスの電源を入れたとき"
+
+msgid "Charge only, until a key starts it"
+msgstr "充電のみ (キーで起動するまで)"
+
+msgid "Start normally"
+msgstr "通常どおり起動"
 
 msgid "Keep as is"
 msgstr "そのまま"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "無効な CPU コア"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "不明な CPU 電圧操作"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "CPU コアを切り替えられませんでした"
+
+msgid "Invalid low latency setting"
+msgstr "無効な低遅延設定"
+
+msgid "The low latency setting could not be applied"
+msgstr "低遅延設定を適用できませんでした"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "CPU 電圧オフセットを読み取れませんでした"
 
@@ -3733,9 +3772,6 @@ msgstr "CPU 電圧オフセットをオフにできませんでした"
 
 msgid "The stress test could not be started"
 msgstr "ストレステストを開始できませんでした"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB ロールアダプタが実行可能ではありません"

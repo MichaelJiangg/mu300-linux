@@ -1,4 +1,4 @@
-# The ZTE V50's SIM cards (docs/FINDINGS.md 206; sourced by mu300-sim). From kanoqwq's v50-card.sh (f0ed60ff), who
+# The ZTE V50's SIM cards (docs/FINDINGS.md 204; sourced by mu300-sim). From kanoqwq's v50-card.sh (f0ed60ff), who
 # read the four board variants and the card IDs from ZTE's B15 firmware (ElfDeviceManager, the telephony framework).
 #
 # A card here is ZTE's physical card ID, not one of the modem's two SIM interfaces (slots):

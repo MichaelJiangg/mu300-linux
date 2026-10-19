@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Выделенные ядра включены. Отключённое ядро остаётся отключённым, в том числе после перезагрузки, пока его снова не включат. CPU0 всегда остаётся включённым."
+
+msgid "Low latency: on"
+msgstr "Низкая задержка: вкл."
+
+msgid "Low latency: off"
+msgstr "Низкая задержка: выкл."
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Режим низкой задержки не пускает CPU0 в состояния простоя, как прошивка ZTE U30 Air: задержки Wi-Fi намного меньше, а устройство потребляет больше энергии. По умолчанию выключен."
+
 msgid "Thermal"
 msgstr "Температура"
 
@@ -927,6 +939,9 @@ msgstr "Доставок пока нет"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Тест запущен с сохранёнными настройками; результат появится в журнале доставки."
+
+msgid "Automatic without 2G (152)"
+msgstr "Автоматически без 2G (152)"
 
 msgid "4G only"
 msgstr "Только 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % никогда не заряжает батарею (устройс�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % берегут батарею устройства, которое постоянно включено в сеть."
+
+msgid "When the charger switches the device on"
+msgstr "Когда зарядное устройство включает устройство"
+
+msgid "Charge only, until a key starts it"
+msgstr "Только зарядка, пока кнопка не запустит его"
+
+msgid "Start normally"
+msgstr "Обычный запуск"
 
 msgid "Keep as is"
 msgstr "Не менять"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Недопустимое ядро ЦП"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Неизвестная операция с напряжением CPU"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Не удалось переключить ядро ЦП"
+
+msgid "Invalid low latency setting"
+msgstr "Недопустимая настройка низкой задержки"
+
+msgid "The low latency setting could not be applied"
+msgstr "Не удалось применить настройку низкой задержки"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Не удалось прочитать смещение напряжения CPU"
 
@@ -3733,9 +3772,6 @@ msgstr "Не удалось отключить смещение напряжен
 
 msgid "The stress test could not be started"
 msgstr "Не удалось запустить стресс-тест"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Адаптер роли USB не является исполняемым"

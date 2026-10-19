@@ -180,7 +180,16 @@ what replaced it. The table below gives each section's state.
 | 180 | Wi-Fi access point: `get_station` answered any address with the interface's own counters and the station side's signal; now only this AP's stations, with nothing filled in (the firmware has no per-client figures), `-ENOENT` otherwise; `get_channel` link 0 only (kanoqwq f59a296) | current (mainline module and 5.4 patch built; unit tests; U30 Air 6.18.57 with a client, F50-B 7.2.11, 2026-10-17) |
 | 181 | The U30 Air's fuel gauge against the stock module: the user area's writes are `regmap_update_bits()` with a wait after the release (stock `save_last_cap` at 0x4ba4), no migration guess for a valid saved value, the charger's Full is 100 % with the battery current within `fullbatt-current` (kanoqwq f59a296 reviewed: his 4.2 V condition would refuse a real Full) | current (built for 6.18.57 and 7.2.11; unit tests; U30 Air 6.18.57, 2026-10-17: Full at 4.147 V gave 100 %, kept across a reboot) |
 | 188 | Call audio on the mainline kernels: the 5.4 stack (19 modules + the vendor AGDSP DMA) built for 6.18.57 and 7.2.11, the DSP's memory reserved (patch 0022), nothing autoloaded; the xrun restart that panicked 5.4 fixed (descriptors re-armed in `prepare`), the DSP's DDR mapped Normal-NC (7.x memcpy alignment fault), no 6 s spin under a lock waiting for the AGDSP domain, the domain held across the DSP start (warm reboots), the echo played at the tap's 16 kHz mono | current (F50-B 6.18.57 and 7.2.11, F50-C 7.2.11 OpenWrt, offline; a call on F50-C 7.2.11: ringback 425 Hz, melody heard, downlink recorded (his voice, F0 140 Hz); the echo through the fixed path, answered call 22:41: the owner heard his voice and the melody; after a killed call, no player left behind and DSP replies nobody waited for no longer fail the next open: reproduced on F50-B without a call, script fix measured there, driver fix unit-tested) |
-| 206 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
+| 195 | Wi-Fi PCIe RX (kanoqwq 2d3f7438, cf4dcd61): the RX push interrupt never handed up a completed descriptor (inverted `dscr_ring_empty()`, mainline and 5.4); an RX refill refused by the full EDMA pending ring can resume on the bus completion instead of after 20 ms - 1 s (module parameter `refill_bus_resume`, off by default until measured); the 5.4 driver gets mainline's station-event bounds and channel-less `mgmt_tx` | built (6.18.57, 7.2.11, 5.4 objects), unit tests run the real functions; not yet on a device |
+| 196 | The U30 Air's charging boot: the stock modem_control never loads the CP after LK's charger boot (issue #253); a checked copy in RAM loads the CP alone (opt-in until run on a device); a charger boot can be a normal one (POWER_ON_CHARGER); unplugged, it powers off; a held power key starts it (from kanoqwq 85d72fa9) | current; offline (loader disassembled, copy checksummed); not run on a device |
+| 197 | The U30 Air's battery while awake: the fuel gauge's low-voltage and 1 % interrupts armed (patch 0023), and a low-battery poweroff in every state by the stock rules (from kanoqwq 99e1316a) | current; built for 6.18.57 and 7.2.11, unit-tested; not run on a device |
+| 198 | Network locks: "Automatic without 2G (152)" next to Automatic (134), from kanoqwq's auto work mode (cf4dcd61, c1293746); a lock like the others, replayed at boot | offline tests; not yet on a device |
+| 199 | Network LED: the V50 lights the lamp of the SIM in use as ZTE's firmware (slot 0 NET2, slot 1 NET1; it was NET1 always); F50/V50 show 5G for a 5G SA registration too (AT+C5GREG?), kanoqwq c1293746/f0ed60ff | unit tests; not yet on a device |
+| 200 | CPU cores online/offline (saved, CPU0 never) and CPU0's low latency (its idle states off, as ZTE's U30 Air; off by default), kanoqwq c1293746/2d3f7438 | unit tests; not yet on a device |
+| 201 | CPU voltage offset: the U30 Air's and the V50's SML builds are known (payload the F50's byte for byte; kanoqwq's U30 Air device test, c1293746, f6b0668d) | unit tests; not yet on our U30 Air |
+| 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
+| 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
+| 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 
 ## Hardware and firmware facts
 
@@ -11639,6 +11648,8 @@ with a card off (one SIM per board here): `tests/test_sim2.py`, `tests/test_sim_
 Tests: `tests/test_device_scripts.py` `SimRadio`, `tests/test_sim2.py`, `tests/test_sim_hot.py`,
 `tests/test_mu300cell.py`, `tests/test_mu300dash_security.py` (`RadioLock`, `SimCard`), `tests/test_api.py` `test_radio`.
 
+**Update (FINDINGS 202):** off is `AT+SFUN=5` now (the vendor RIL's way), not `AT+CFUN=4`.
+
 ### 186. A slot with no card was dialled every 20 s for ever; now the dial waits for the card
 
 From kanoqwq's fork (kanoqwq/mu300-linux f59a296 and ab26e79: the SIM-state events, `registration.sh`, his
@@ -12064,7 +12075,263 @@ in the core as well.
 * U30 Air (6.18.57): `/proc/config.gz`'s settings hash to the 6.18 kit's; it uses no call audio, so nothing was
   installed there.
 
-### 206. The ZTE V50's SIM cards: a third built-in card shares SIM2, the external card SIM1 (#332)
+### 195. Wi-Fi PCIe RX: the push interrupt skipped what the chip completed, and a full EDMA ring held the RX refill for up to a second
+
+**Status: built, not yet measured on a device** (2026-10-19). From kanoqwq's clean-tf-7.2 2d3f7438 and cf4dcd61,
+reviewed and ported; the 5.4 parts are ours.
+
+**The RX push interrupt (wcn_bsp, mainline and 5.4).** `edma_rx_push_isr()` first asked `dscr_ring_empty()`, which
+read the hardware cursor and returned "empty" when it was `!IS_ERR_OR_NULL` - for every valid cursor. The branch that
+pops the completed descriptors (`edma_pop_link`, `mchn_hw_pop_link`) therefore never ran; the interrupt only refilled
+the ring, and what the chip had completed waited for another path to collect it. kanoqwq compared the function with
+ZTE's own U30 Air `wcn_bsp.ko` (`edma_rx_push_isr` at `.text+0x3f588`): the stock module reads the cursor once,
+returns to the refill on NULL or an error pointer, pops what lies between the ring head and the cursor, and then
+refills. The public 5.4 source (Enceka's ZTE GPL release) and the mainline port both carry the inverted test. Now as
+the stock module, in `upstream/modules/wcn_bsp/pcie/edma_engine.c` and `kernel/patches/wcn-pcie-rx-push-cursor.patch`
+(KPATCHES, after sipa-wcn-logspam-quiet); `dscr_ring_empty()` is gone. kanoqwq ran it on a U30 Air (7.2.8): RX
+worked and nothing regressed, and he saw few RX push interrupts in steady state, so this is a correctness fix, not
+the answer to the idle hotspot's 20-150 ms ping (his four-point timing put that wait before the host's RX MSI, in the
+chip or its firmware; not settled).
+
+**The RX refill after a full pending ring (mainline).** The refill hands the RX buffer addresses to the chip on the
+data channel (`tx_addr_trans`). The channel's pending ring has three usable slots; when it is full the submission is
+refused with `-EAGAIN` (§103). Since the back-off for issue #94, a refill that got nowhere retried from a timer, 20 ms
+doubling to 1 s - right for a chip that stopped taking buffers, too slow for a ring that frees a slot microseconds
+later. Now the bus's completion on that channel (`sc2355_pcie_tx_data_complete`, IRQ context, which already woke the
+TX thread) also calls `sc2355_rx_bus_complete()`: a refill waiting on exactly that refusal is released at once
+(`mod_delayed_work(..., 0)`), and a completion that comes before the timer is armed is remembered
+(`refill_bus_ready`). An allocation failure, a hard error, an SDIO bus, another channel or a timed-out completion
+leave the timer as it was, and nothing polls. `refill_lock` (irqsave) orders the completion against arming the timer
+and against teardown; `hif->rx_mgmt` is published with `smp_store_release` after init and, at deinit, unpublished and
+followed by `synchronize_rcu()` before the free, since the completion callback stays registered across an RX
+deinit/init and looks it up under `rcu_read_lock()`. The 5.4 driver has neither the back-off nor this. kanoqwq ran this one only offline (his changelog: compiled and unit-tested, not deployed), so it is **off by
+default**: `sprd_wlan_combo.refill_bus_resume=1` (or `echo 1 > /sys/module/sprd_wlan_combo/parameters/refill_bus_resume`)
+turns it on; off, the completion returns at once and the refill keeps the timer exactly as before. To be made the
+default after a board measurement.
+
+**The 5.4 driver's event bounds.** The mainline driver has had oswaldxdd's two robustness fixes since PR #282 (§80):
+the station event's IEs bounded by the event's length, and `mgmt_tx` without a channel taking the AP's own one
+instead of an oops. The 5.4 driver lacked both; `kernel/patches/wlan_combo-station-event-bounds.patch` carries them
+(`wdev->chandef` on 5.4).
+
+**Checked.** `tests/test_wifi_rx_path.py` cuts `edma_rx_push_isr()`, `sc2355_mm_fill_buffer()`,
+`sc2355_rx_bus_complete()`, `rx_refill_retry()` and `sc2355_pcie_tx_data_complete()` out of the sources and runs them
+against stub kernel primitives (kanoqwq's harnesses): completed descriptors popped before the refill, wrap-around,
+NULL and error cursors, no free descriptor; the completion before and after the timer is armed, a duplicate storm,
+allocation and hard failures keeping their back-off, wrong channel, timeout, SDIO, teardown racing a submission, and
+the hook removed bringing the old delay back. The modules built warning-free for 6.18.57 and 7.2.11; on 5.4 every
+KPATCHES and wlan_combo patch applies in order, `edma_engine.o` compiles and `sprd_wlan_combo.ko` builds.
+
+**To measure on a board** (any of them; the U30 Air and an F50 on mainline, F50-C on 5.4): Wi-Fi up and a client
+associated, an iperf3 run in both directions at full rate for some minutes (no `WARN edma_pending_q_buffer full` storm,
+no stall, throughput no lower than the release's), a ping from the client to the board idle and under load, and
+`rmmod`/`modprobe` of the Wi-Fi modules or a hotspot restart with traffic running (the teardown path).
+
+### 196. The U30 Air's charging boot: no CP after LK's charger boot (#253), power-on on charge, unplug, the power key
+
+kanoqwq's `85d72fa9` (his `docs/U30AIR-CHARGER-BOOT-20261019.zh-CN.md`) found why a U30 Air that a charger switched on
+has no modem, and a way round it. Checked here against the same file (`work-u30air/android-subset/vendor/bin/
+modem_control`, sha256 `43a3bc8c…819a3`; the F50's copy is the same file):
+
+- In a charger boot LK runs the PM co-processor (it charges and keeps its watchdog) but loads no CP, and says so on the
+  command line, `androidboot.mode=charger ... modem=shutdown`. Our init and android-vendor-start pass that line to the
+  vendor daemons as it is (only the slot is swapped).
+- modem_control's start (disassembled at `0xcef8`-`0xcf54`): `w19 = modem_has_been_boot()` (`0xc650`: does
+  `/dev/sctl_pm` open, i.e. is the PM running); then the `modem` parameter is compared with `"shutdown"`; `w8 =
+  (modem != "shutdown") | w19`; only `w8 == 0` calls `load_modem_img(63)` (`0xa290`, every image, the PM's included).
+  In a normal boot LK has loaded everything and `modem` is not `shutdown`; in a charger boot `modem` is `shutdown` but
+  the PM runs, so nothing is loaded either. The CP then never comes: `/dev/stty_nr*` answer ENODEV, mu300-atd waits
+  for ever, the panel shows "No response", and mobile-data / RF restarts cannot help. Our charging boot (§36) keeps
+  the radios off until the Wi-Fi key, and the key then wakes a modem that is not there. Only a reboot (a normal boot)
+  brings it back. That is issue #253's report word for word: a U30 Air after a flat battery (LK starts it on the
+  charger), "No response", only a router restart recovers. (#226 was the F50: a SIPC tty not ready, §138, and the
+  eMMC at HS400ES, §160; not this.)
+- The way round (kanoqwq's, kept): `mu300-modem-coldboot` makes, for that boot only, a copy in RAM
+  (`/run/mu300/coldboot`, bound to the chroot's `/tmp/mu300-coldboot`) of the device's own modem_control with two
+  instructions changed: `0xcf0c mov w19,w0 -> mov w19,wzr` (the PM running no longer counts as "booted") and
+  `0xcf50 mov w0,#63 -> mov w0,#34` (load the CP and CH images only, not the PM's, which is running). The copy's
+  sha256 must then be `9e3490f2…37c2ae`. The program is still named modem_control (sprd_modem_loader checks the
+  task's comm), and android-run runs it only when android-vendor-start names exactly that path.
+- Only when every one of these holds: `mu300-device` says `u30air`; the command line has `androidboot.mode=charger`
+  (or `sprdboot.mode=`) and `modem=shutdown`; `/dev/stty_nr1` answers ENODEV or is missing (the CP down; a second
+  start of the vendor service in the same boot finds it up); the device's file has the stock sha256 (the loader
+  kanoqwq checked); and `/etc/mu300/modem-coldboot` exists. **Off by default**: kanoqwq's notes say the charger-boot
+  start itself was not run on a device, so it is opt-in (`touch /etc/mu300/modem-coldboot`) until a U30 Air has
+  shown it. Anything else, including any failure on the way, gives the stock modem_control as
+  before. It cannot stop a boot or the modem: the worst case is today's behaviour. kanoqwq's version stopped the
+  vendor service (`exit 5`) when the copy could not be made; ours does not. F50, V50, normal boots: untouched.
+
+The rest of `85d72fa9`, adapted to our charging boot (Linux runs, the radios held off by mu300-power, §36) rather
+than his (an early init stage that waits with the services not started):
+
+- **Power-on on charge**: `POWER_ON_CHARGER=1` in `/etc/mu300/power.conf` (`mu300-power set POWER_ON_CHARGER 1`, the
+  LuCI and Cockpit power pages, "When the charger switches the device on"). init then makes no charging-boot marker
+  (it reads the booting system's power.conf; `stage=boot-mode mode=charger ... power-on=1`), and mu300-power starts
+  in `active`. Default 0: the charging boot as before.
+- **Unplugged**: the stock charger mode switches off when the charger goes. The charging boot now does too: unplugged
+  by every account (no charger online, no extcon `USB=1`, the battery not `Charging`) for two loops in a row (10 s
+  apart), a clean poweroff. Before, it stayed up on the battery until 5 %.
+- **The power key**: held 3 s in the charging boot it starts the device (a wake without a key name, as the Wi-Fi key),
+  as the stock charger mode does; held anywhere else it still shuts down.
+- Not taken: his `mu300-keys -c` (a C wait on the power key and power_supply uevents before the services start); our
+  daemon's 10 s loop and mu300-buttons cover it. His `mu300-charge-mode` early stage and its `poweroff -f` after a
+  read-only remount: our poweroff goes through procd / systemd.
+
+Not run on a device yet (needs a flat or switched-off U30 Air on a charger). What to look at:
+`cat /run/mu300/boot-mode` (charger), `dmesg | grep mu300-modem-coldboot` (the copy chosen),
+`ls -l /run/mu300/coldboot/modem_control`, `/dev/stty_nr1` opening, `mu300-at ATI`, then the Wi-Fi key and a dial.
+
+### 197. The U30 Air's battery while awake: the fuel gauge's interrupts, and a low-battery poweroff in every state
+
+kanoqwq's `99e1316a` (his `docs/LOW-BATTERY-STOCK-20261018.zh-CN.md`, from ZTE's `sprd-charger-manager.ko` and
+Android's `BatteryService`) found two gaps that ours had too:
+
+- **Patch 0023** (`upstream/patches/0023-power-sc27xx-fuel-gauge-UMP9620-awake-battery-events.patch`). Mainline's
+  sc27xx fuel gauge arms its low-voltage (`LOW_OVERLOAD`) and coulomb-counter delta interrupts in `suspend` only and
+  disarms them at `resume`. The boards do not suspend, so neither was ever armed: the calibration the low-voltage
+  interrupt runs (`sc27xx_fgu_capacity_calibration(.., true)`: at the alarm voltage a capacity above the alarm
+  capacity is pulled down to it) never ran, and no 1 % change sent a power_supply uevent. Now armed once both IRQs are
+  registered, kept at resume, disarmed with the battery removed and armed again when it is back. Ours limits it to
+  the U30 Air (the UMP9620 on a device tree with `/charger_policy_service`, patch 0016's test); kanoqwq's relied on a
+  battery-policy probe our tree does not have, and the F50 and V50 probe this gauge with made-up readings. Built-in
+  (`CONFIG_FUEL_GAUGE_SC27XX=y`); applies and builds on 6.18.57 and 7.2.11.
+- **The poweroff.** Ours powered off for a low battery only in the charging boot (§36: under 5 % for three loops); an
+  awake U30 Air ran on until the battery cut it. mu300-power now checks in every state, the U30 Air only (no battery
+  on the F50 and V50), unplugged only (as above), with the stock rules instead of a percentage of our own:
+  - the charger manager's undervoltage rule (`cm_uvlo_check_work`): the battery at or under the shutdown voltage +
+    120 mV for 5 samples in a row (stock 800 ms apart, here 1 s, taken within one loop once the first sample is in the
+    window), then off at a capacity of at most 1 % or a voltage at or under the shutdown voltage. That voltage is the
+    device tree's `/charger-manager/cm-shutdown-voltage` (3.10 V on the U30 Air), 3.10 V without it. A sample that
+    cannot be read ends the run without counting.
+  - Android's `BatteryService.shouldShutdownLocked`: `capacity_level` Critical where the driver has it, else 0 %, not
+    charging; here three loops in a row (30 s).
+  The poweroff is the usual clean one (`poweroff` / `systemctl poweroff`, the shutdown marker first so the radios are
+  not woken on the way down). The charge guard's pause does not stop it.
+- Not taken: his ucode service (`unisoc-battery`, hotplug -> ubus -> uloop). Ours polls every 10 s already, the
+  undervoltage window samples quickly, and the uevents of patch 0023 are there for anything else that listens.
+
+Not run on a device. What to look at on a U30 Air with this kernel: `grep -c sc27xx /proc/interrupts` moving as the
+capacity drops 1 %, `udevadm monitor -k -s power_supply` (Ubuntu) or `logread` with a hotplug hook (OpenWrt); a run
+down to the end unplugged: `logread | grep mu300-power` (or `journalctl -u mu300-power`) should name the rule.
+
+### 198. Network locks: an automatic mode without 2G (152), from kanoqwq's fork
+
+kanoqwq's `cf4dcd61` and `c1293746` add an "auto work mode" choice: the automatic network mode is written as
+`AT+SPTESTMODE=134,...` (every RAT, 2G included) or `152,...` (no 2G, his reading of the vendor's table). His users on
+two SIMs saw long delays and stalls with 134 that 152 eased on some basebands; he does not claim more, and neither do
+we: the number is not a band priority and does not promise NR.
+
+**Here** it is one more value of the network mode lock, not a separate setting: `mode auto152` writes `152` with
+`SP5GRAN=1`, is saved and replayed at boot like every lock, and `lock get` reads `152` back as `auto152` (an unknown
+first field still reads as `auto`). `Automatic` stays 134, and so does the reset (the modem's defaults, verified by
+its read-back). LuCI Cellular > Network locks and the dashboard's lock summary, Cockpit's MU300 page
+(`mu300-api lock.set`), the rpcd check. His separate uci option and its ACL fix (`82c01b9e`) are not needed: the value
+travels through the existing lock path. Not taken: his `restart_deferred` (a lock applied with the card's radio off
+already skips the stack restart here, FINDINGS 185).
+
+Tests: `tests/test_mu300dash_security.py` (the value reaches the backend), `tests/test_unisoc_plugin.py`. Not yet
+on a device: whether a board's modem takes `152` and registers.
+
+### 199. Network LED: the V50 lamp of the SIM in use; 5G for a 5G SA registration
+
+**V50.** `mu300-led` lit NET1 for the network on every V50, whatever the card. kanoqwq read ZTE's V50 firmware
+(B15, `services.jar`, `NotificationManagerService.setNetLight()`, `c1293746`, docs/V50-NET-LAMP-MAPPING of his fork):
+the physical cards 0 and 3 (built-in card 1, the external card: logical slot 0, SIM1) light **NET2**, cards 1 and 2
+(built-in cards 2 and 3: slot 1, SIM2) **NET1**, and the other lamp is cleared. A user saw his card on NET2 under
+Android and on NET1 under OpenWrt. Now the lamp follows this boot's slot (`/run/mu300/sim-slot`, as the AT daemons
+read it): slot 0 NET2, slot 1 NET1, the colours as before (blue 4G, white 5G, red without service), the other lamp
+dark; the heat alarm's siren uses the same lamp. The lamp's names in the driver were checked by lighting each one
+(FINDINGS 95) and do not change.
+
+**5G SA.** `led_up` (mobile-data) told 4G from 5G by the AcT of `AT+CEREG?`. A 5G SA registration is in the NR domain
+alone: CEREG then says not registered, and the F50 and the V50 showed blue (4G). Now, when CEREG names no NR access
+technology and is not registered, `AT+C5GREG?` decides: registered (1 or 5) is 5G. From kanoqwq's `network-led.sh`
+(`f0ed60ff`). A failed read keeps the 4G colour, as before. An LTE registration asks nothing more than before (his
+case of an EPS registration still reporting LTE while NR is registered as well is not followed: the watchdog's round
+stays one AT read on LTE).
+
+Not taken: his U30 Air part of `f0ed60ff` (4G/5G from the slot in use). The U30 Air's network light shows the SIM in
+use, not the technology, as ZTE's firmware (FINDINGS 154); mobile-data's `at` already asks the card in use.
+
+Tests: `tests/test_device_scripts.py` (`test_v50` for no slot, slot 0 and slot 1; `test_led_from_cereg`). Not yet on
+a device (no V50 here; F50 with SA).
+
+### 200. CPU cores on and off, and CPU0's low latency (both saved; low latency off by default)
+
+From kanoqwq's `c1293746` (per-core switches, `cpu-cores.uc`) and `2d3f7438` (`mu300-lowlatency`), rewritten into
+`mu300-cpu` (one program for Ubuntu and OpenWrt).
+
+**Cores.** `mu300-cpu core N on|off` takes CPU N offline or brings it back now, and saves it (`CORES_OFF` in
+`/etc/mu300/cpu.conf`); `mu300-cpu apply` (the boot service) takes the saved ones offline again. CPU0 is refused (the
+kernel's timekeeping and the vendor drivers' interrupts start there). A core brought back gets its cluster's profile
+limits again. `mu300-power`'s idle, which takes CPU7 offline and brings it back, leaves a core kept offline alone.
+`CONFIG_HOTPLUG_CPU` is already `=y` in both mainline kernels (the 6.18.57 and 7.2.11 builds' `kernel.config`), so
+his config change is not needed. `status --json` lists each CPU, online and switchable.
+
+**Low latency.** ZTE's U30 Air firmware disables all three idle states of CPU0 after boot (`init.md.rc`, "zte add for
+feimao lowlatency"). kanoqwq measured on a U30 Air (docs/U30AIR-WIFI-IDLE of his fork): with CPU0's deeper states
+allowed, received Wi-Fi events waited 34 ms on average and 100 ms at worst (A), with WFI only 0.6 ms and 2 ms, and 23
+ms and 73 ms back (B); on the stock firmware the reverse (0.6 ms, then 6.7 ms and 81 ms at worst with CPU0's idle
+allowed, then 1.2 ms). Phone pings (the phone's power save off): 12.8 ms and 43.3 ms on average before and after, 7.3
+ms with WFI only. He did not measure the power cost. So it
+is a switch here, **off by default**: `mu300-cpu lowlatency on|off` writes every `cpu0/cpuidle/state*/disable`, saves
+`LOWLATENCY=1`, and the boot service applies an "on" (an "off" leaves the kernel's settings alone). His fork applies it
+to every board unconditionally; that is not taken.
+
+Front ends: LuCI System > CPU (a Cores card: a button per CPU, and the low latency switch), Cockpit's Power and CPU
+page, `mu300-api cpu.core` / `cpu.lowlatency`, rpcd `mu300dash cpu_tune`; EN/TR/ZH and the other catalogs.
+
+Tests: `tests/test_cpu.py` (`CoresAndLatency`), `tests/test_api.py` `test_cpu`, `tests/test_mu300dash_security.py`.
+Not yet on a device: the boards' hotplug of each core, the latency and the power draw with it on.
+
+### 201. CPU voltage offset: the U30 Air's and the V50's SoC firmware are known
+
+FINDINGS 133 kept the U30 Air out of the offset until its SML was read. kanoqwq read it (`c1293746`,
+docs/U30AIR-CPU-VOLTAGE of his fork): `sml_a` and `sml_b` are the same 1 MiB build,
+`f27ac16f44e6cdc87a8ee00a9b53c499c8dde0c3b92c771388e256e84ef12e70`, and differ from the F50's known build only in 508
+bytes inside the 512-byte authentication area at `0x233e8`; the payload `[0x200, 0x23150)` is the F50's byte for byte.
+On his U30 Air (7.2.8) `+3125,+3125,+3125` moved every one of the 31 table entries of the three domains up by exactly
+3125 uV after a reboot, and `0,0,0` put them back byte for byte. Its hash joins the known list in `boot/init` and
+`mu300-cpu` (a test keeps them equal). Nothing else changes: the offset stays 0 until asked for with the confirmation
+word, and a new value still gets its one trial boot. His V50 build (`5b3183f17af9b416...`, from his
+`f6b0668d`: "the same verified executable and DVFS tables as F50; only 512 bytes in the authentication trailer
+differ") joins it as well: the owner takes his findings (2026-10-19). Neither board's offset was tried here. His `related_cpus` fix for the domain labels is in place here already (`mu300-cpu` reads `related_cpus`).
+Not yet tried on our U30 Air.
+
+### 202. A SIM's radio off is the vendor's AT+SFUN=5, not flight mode
+
+FINDINGS 185 switched a card's radio off with `AT+CFUN=4` (flight mode) on its own channel. kanoqwq (`cf4dcd61`,
+docs/SIM-RADIO-SFUN of his fork) found that the vendor RIL switches a card's radio with `AT+SFUN=5` (off) and
+`AT+SFUN=4` (on); the stock RIL's `isRadioOn` reads CFUN 0 and 2 as off, 1 as on. On his V50 (baseband
+`MOCORTM_V2_23A_W25.33.6`) through the panel: SIM2 off read 1/0 with both cards still `READY`, all off and back one card
+at a time, the settings kept across reboots, a data connection taken down by hand left down. The owner takes his
+findings.
+
+**Now** `mobile-data`'s `rf_off_locked` sends `AT+SFUN=5` and accepts CFUN 0 or 2 read back; 0, 2 and an earlier
+release's 4 count as off already. Back on: from 4, `AT+CFUN=1` as before; from 0 or 2 the ordinary bring-up, whose
+`AT+SFUN=4` is the vendor's way back (the RIL handshake and the early lock replay are done once per boot, so they are
+not repeated). `radio_on_locked` treats 2 like 0. The U30 Air's live switch takes a card in use that is off by its
+setting at 0, 2 or 4 (it ends that card with `SFUN=5` itself). Not taken from the same commit: his SIM2-off default
+and his "both off at a cold boot" initialisation. Both belong to his `mu300-dual-radio`, which runs both cards' stacks
+at once; here only the card in use has a stack, the other one's setting only decides whether it may start, and an all-off
+boot keeps the cold 0 after the RIL handshake (FINDINGS 185).
+
+Tests: `tests/test_device_scripts.py` (`SimRadio`), `tests/test_sim_hot.py`
+(`test_the_card_in_use_off_by_sfun5_still_switches`). Not yet on our boards.
+
+### 203. OpenWrt hotspot: U-APSD off
+
+kanoqwq (`2d3f7438`, docs/WIFI-UAPSD-POLICY of his fork) turns U-APSD advertisement off on every access point:
+`openwrt-wifi-config` writes `option uapsd '0'` for a new hotspot, and `uci-defaults/94-mu300-ap-uapsd` (his migration,
+as it is) sets it once on every kept `wifi-iface` in AP mode, stations and the other options untouched. WMM, DTIM, the
+beacon interval and the channel stay. On his U30 Air hostapd's configuration then had `uapsd_advertisement_enabled=0`
+and the WMM element the driver received had the U-APSD bit clear, but a beacon read from another computer still
+carried QoS Info 0x80: the firmware may announce it on its own. So this is the configuration his tree has, nothing
+more is claimed. Ubuntu's hotspot is not changed (his tree changes OpenWrt only).
+
+Tests: `tests/test_wifi.py` (`ApUapsd`). Not yet on our boards.
+
+### 204. The ZTE V50's SIM cards: a third built-in card shares SIM2, the external card SIM1 (#332)
 
 **Status: offline only. Nobody here has a V50**; the test steps are in the PR for the #332 reporter.
 

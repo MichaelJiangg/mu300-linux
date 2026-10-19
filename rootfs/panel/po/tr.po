@@ -320,6 +320,9 @@ msgstr "Ağ, bant ve hücre kilitleri"
 msgid "Automatic"
 msgstr "Otomatik"
 
+msgid "Automatic without 2G (152)"
+msgstr "Otomatik, 2G olmadan (152)"
+
 msgid "4G only"
 msgstr "Yalnızca 4G"
 
@@ -1307,6 +1310,15 @@ msgstr "Şarjı şu seviyede durdur (%)"
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "%0 pili hiç şarj etmez (cihaz şarj cihazıyla çalışır), %100 tam şarj eder; arada şarj o seviyede durur ve 5 puan aşağıda yeniden başlar. %5'in altında pil her zaman şarj olur. Sürekli takılı kalan bir cihazda %80 pili daha sağlıklı tutar."
 
+msgid "Charge only, until a key starts it"
+msgstr "Yalnızca şarj, bir tuş başlatana kadar"
+
+msgid "Start normally"
+msgstr "Normal başlat"
+
+msgid "When the charger switches the device on"
+msgstr "Şarj cihazı cihazı açtığında"
+
 msgid "What each profile does while nobody is connected (no Wi-Fi client, no computer on USB): the Wi-Fi key, a computer on USB or the charger wake the device."
 msgstr "Kimse bağlı değilken (Wi-Fi istemcisi yok, USB'de bilgisayar yok) her profilin yaptığı: Wi-Fi tuşu, USB'deki bir bilgisayar veya şarj cihazı cihazı uyandırır."
 
@@ -1390,6 +1402,18 @@ msgstr "Profil, CPU yöneticisini ve küme başına frekans sınırlarını dona
 
 msgid "Thermal throttling is active right now."
 msgstr "Şu anda sıcaklık nedeniyle yavaşlatma etkin."
+
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Vurgulu çekirdekler çevrimiçidir. Çevrimdışı bırakılan bir çekirdek, geri açılana kadar yeniden başlatmadan sonra da çevrimdışı kalır. CPU0 her zaman çevrimiçi kalır."
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Düşük gecikme, ZTE'nin U30 Air yazılımında olduğu gibi CPU0'ı boşta durumlarının dışında tutar: Wi-Fi gecikmeleri çok kısalır, cihaz daha fazla güç çeker. Varsayılan olarak kapalı."
+
+msgid "Low latency: on"
+msgstr "Düşük gecikme: açık"
+
+msgid "Low latency: off"
+msgstr "Düşük gecikme: kapalı"
 
 msgid "Experimental: changing the CPU voltage can make the device unstable, corrupt your data and permanently damage your device. Use it entirely at your own risk."
 msgstr "Deneysel: Bu özellik deneyseldir ve cihazınıza kalıcı zarar verebilirsiniz. CPU voltajını değiştirmek cihazı kararsız yapabilir ve verilerinizi bozabilir. Tüm risk size aittir."

@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Οι επισημασμένοι πυρήνες είναι ενεργοί. Ένας πυρήνας που απενεργοποιήθηκε μένει ανενεργός, και μετά από επανεκκίνηση, μέχρι να ενεργοποιηθεί ξανά. Ο CPU0 μένει πάντα ενεργός."
+
+msgid "Low latency: on"
+msgstr "Χαμηλή καθυστέρηση: ενεργή"
+
+msgid "Low latency: off"
+msgstr "Χαμηλή καθυστέρηση: ανενεργή"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Η χαμηλή καθυστέρηση κρατά τον CPU0 εκτός των καταστάσεων αδράνειας, όπως το υλικολογισμικό U30 Air της ZTE: οι καθυστερήσεις του Wi-Fi είναι πολύ μικρότερες και η συσκευή καταναλώνει περισσότερη ενέργεια. Ανενεργή από προεπιλογή."
+
 msgid "Thermal"
 msgstr "Θερμικά"
 
@@ -927,6 +939,9 @@ msgstr "Καμία παράδοση ακόμη"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Η δοκιμή ξεκίνησε με τις αποθηκευμένες ρυθμίσεις· το αποτέλεσμα εμφανίζεται στο αρχείο παράδοσης."
+
+msgid "Automatic without 2G (152)"
+msgstr "Αυτόματα χωρίς 2G (152)"
 
 msgid "4G only"
 msgstr "Μόνο 4G"
@@ -1800,6 +1815,15 @@ msgstr "Το 0 % δεν φορτίζει ποτέ την μπαταρία (η σ
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "Το 80 % προστατεύει την μπαταρία μιας συσκευής που μένει στην πρίζα."
+
+msgid "When the charger switches the device on"
+msgstr "Όταν ο φορτιστής ενεργοποιεί τη συσκευή"
+
+msgid "Charge only, until a key starts it"
+msgstr "Μόνο φόρτιση, μέχρι να την εκκινήσει ένα πλήκτρο"
+
+msgid "Start normally"
+msgstr "Κανονική εκκίνηση"
 
 msgid "Keep as is"
 msgstr "Να μείνει ως έχει"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Μη έγκυρος πυρήνας CPU"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Άγνωστη λειτουργία τάσης CPU"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Δεν ήταν δυνατή η εναλλαγή του πυρήνα CPU"
+
+msgid "Invalid low latency setting"
+msgstr "Μη έγκυρη ρύθμιση χαμηλής καθυστέρησης"
+
+msgid "The low latency setting could not be applied"
+msgstr "Δεν ήταν δυνατή η εφαρμογή της ρύθμισης χαμηλής καθυστέρησης"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Δεν ήταν δυνατή η ανάγνωση της μετατόπισης τάσης CPU"
 
@@ -3733,9 +3772,6 @@ msgstr "Δεν ήταν δυνατή η απενεργοποίηση της με
 
 msgid "The stress test could not be started"
 msgstr "Δεν ήταν δυνατή η εκκίνηση της δοκιμής καταπόνησης"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Ο προσαρμογέας ρόλου USB δεν είναι εκτελέσιμος"

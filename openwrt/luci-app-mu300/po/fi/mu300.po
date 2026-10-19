@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Korostetut ytimet ovat käytössä. Pois kytketty ydin pysyy pois käytöstä myös uudelleenkäynnistyksen jälkeen, kunnes se kytketään takaisin. CPU0 on aina käytössä."
+
+msgid "Low latency: on"
+msgstr "Matala viive: päällä"
+
+msgid "Low latency: off"
+msgstr "Matala viive: pois"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Matala viive pitää CPU0:n poissa lepotiloistaan, kuten ZTE:n U30 Air -laiteohjelmisto: Wi-Fi-viiveet lyhenevät huomattavasti ja laite kuluttaa enemmän virtaa. Oletuksena pois."
+
 msgid "Thermal"
 msgstr "Lämpötila"
 
@@ -927,6 +939,9 @@ msgstr "Ei vielä toimituksia"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Testi käynnistettiin tallennetuilla asetuksilla; tulos näkyy toimituslokissa."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automaattinen ilman 2G:tä (152)"
 
 msgid "4G only"
 msgstr "Vain 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % ei koskaan lataa akkua (laite toimii laturin varassa), 100 % lataa s
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % säästää akkua laitteessa, joka pysyy verkossa."
+
+msgid "When the charger switches the device on"
+msgstr "Kun laturi käynnistää laitteen"
+
+msgid "Charge only, until a key starts it"
+msgstr "Vain lataus, kunnes näppäin käynnistää sen"
+
+msgid "Start normally"
+msgstr "Käynnistä normaalisti"
 
 msgid "Keep as is"
 msgstr "Jätä ennalleen"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Virheellinen suoritinydin"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Tuntematon CPU-jännitetoiminto"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Suoritinydintä ei voitu vaihtaa"
+
+msgid "Invalid low latency setting"
+msgstr "Virheellinen matalan viiveen asetus"
+
+msgid "The low latency setting could not be applied"
+msgstr "Matalan viiveen asetusta ei voitu ottaa käyttöön"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "CPU:n jännitesiirtymää ei voitu lukea"
 
@@ -3733,9 +3772,6 @@ msgstr "CPU:n jännitesiirtymää ei voitu poistaa käytöstä"
 
 msgid "The stress test could not be started"
 msgstr "Kuormitustestiä ei voitu käynnistää"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB-roolisovitin ei ole suoritettava"

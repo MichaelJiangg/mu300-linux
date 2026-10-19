@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Hervorgehobene Kerne sind online. Ein abgeschalteter Kern bleibt offline, auch nach einem Neustart, bis er wieder eingeschaltet wird. CPU0 bleibt immer online."
+
+msgid "Low latency: on"
+msgstr "Niedrige Latenz: an"
+
+msgid "Low latency: off"
+msgstr "Niedrige Latenz: aus"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Niedrige Latenz hält CPU0 aus ihren Ruhezuständen heraus, wie es die U30-Air-Firmware von ZTE tut: Die WLAN-Verzögerungen werden viel kürzer, und das Gerät verbraucht mehr Strom. Standardmäßig aus."
+
 msgid "Thermal"
 msgstr "Thermisch"
 
@@ -927,6 +939,9 @@ msgstr "Noch keine Zustellungen"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Test mit den gespeicherten Einstellungen gestartet; das Ergebnis erscheint im Zustellprotokoll."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automatisch ohne 2G (152)"
 
 msgid "4G only"
 msgstr "Nur 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % lädt den Akku nie (das Gerät läuft am Ladegerät), 100 % lädt ih
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % schonen den Akku bei einem Gerät, das dauerhaft am Netz hängt."
+
+msgid "When the charger switches the device on"
+msgstr "Wenn das Ladegerät das Gerät einschaltet"
+
+msgid "Charge only, until a key starts it"
+msgstr "Nur laden, bis eine Taste es startet"
+
+msgid "Start normally"
+msgstr "Normal starten"
 
 msgid "Keep as is"
 msgstr "Unverändert lassen"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Ungültiger CPU-Kern"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Unbekannte CPU-Spannungsoperation"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Der CPU-Kern konnte nicht umgeschaltet werden"
+
+msgid "Invalid low latency setting"
+msgstr "Ungültige Einstellung für niedrige Latenz"
+
+msgid "The low latency setting could not be applied"
+msgstr "Die Einstellung für niedrige Latenz konnte nicht angewendet werden"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Der CPU-Spannungsoffset konnte nicht gelesen werden"
 
@@ -3733,9 +3772,6 @@ msgstr "Der CPU-Spannungsoffset konnte nicht abgeschaltet werden"
 
 msgid "The stress test could not be started"
 msgstr "Der Stresstest konnte nicht gestartet werden"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB-Rollenadapter ist nicht ausführbar"

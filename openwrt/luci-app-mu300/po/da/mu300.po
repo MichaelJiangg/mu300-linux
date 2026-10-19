@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Fremhævede kerner er online. En kerne, der er slået fra, forbliver offline, også efter en genstart, indtil den slås til igen. CPU0 forbliver altid online."
+
+msgid "Low latency: on"
+msgstr "Lav latenstid: til"
+
+msgid "Low latency: off"
+msgstr "Lav latenstid: fra"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Lav latenstid holder CPU0 ude af dens hviletilstande, ligesom ZTE's U30 Air-firmware: Wi-Fi-forsinkelser bliver meget kortere, og enheden bruger mere strøm. Fra som standard."
+
 msgid "Thermal"
 msgstr "Termisk"
 
@@ -927,6 +939,9 @@ msgstr "Ingen leveringer endnu"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Testen er startet med de gemte indstillinger; resultatet vises i leveringsloggen."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automatisk uden 2G (152)"
 
 msgid "4G only"
 msgstr "Kun 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % oplader aldrig batteriet (enheden kører på opladeren), 100 % lader
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % skåner batteriet i en enhed, der bliver siddende i stikket."
+
+msgid "When the charger switches the device on"
+msgstr "Når opladeren tænder enheden"
+
+msgid "Charge only, until a key starts it"
+msgstr "Kun opladning, indtil en tast starter den"
+
+msgid "Start normally"
+msgstr "Start normalt"
 
 msgid "Keep as is"
 msgstr "Lad være som det er"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Ugyldig CPU-kerne"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Ukendt CPU-spændingshandling"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "CPU-kernen kunne ikke skiftes"
+
+msgid "Invalid low latency setting"
+msgstr "Ugyldig indstilling for lav latenstid"
+
+msgid "The low latency setting could not be applied"
+msgstr "Indstillingen for lav latenstid kunne ikke anvendes"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "CPU-spændingsoffsetten kunne ikke læses"
 
@@ -3733,9 +3772,6 @@ msgstr "CPU-spændingsoffsetten kunne ikke slås fra"
 
 msgid "The stress test could not be started"
 msgstr "Stresstesten kunne ikke startes"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB-rolleadapteren er ikke eksekverbar"

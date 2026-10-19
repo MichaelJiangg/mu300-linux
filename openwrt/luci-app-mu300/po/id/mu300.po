@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Inti yang disorot sedang online. Inti yang dimatikan tetap offline, juga setelah mulai ulang, sampai dinyalakan kembali. CPU0 selalu tetap online."
+
+msgid "Low latency: on"
+msgstr "Latensi rendah: aktif"
+
+msgid "Low latency: off"
+msgstr "Latensi rendah: nonaktif"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Latensi rendah menjaga CPU0 tidak masuk ke status diamnya, seperti firmware U30 Air dari ZTE: jeda Wi-Fi jauh lebih singkat, dan perangkat memakai lebih banyak daya. Nonaktif secara bawaan."
+
 msgid "Thermal"
 msgstr "Termal"
 
@@ -927,6 +939,9 @@ msgstr "Belum ada pengiriman"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Uji dimulai dengan pengaturan tersimpan; hasilnya muncul di log pengiriman."
+
+msgid "Automatic without 2G (152)"
+msgstr "Otomatis tanpa 2G (152)"
 
 msgid "4G only"
 msgstr "Hanya 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % tidak pernah mengisi baterai (perangkat berjalan dari pengisi daya),
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % menjaga baterai tetap sehat pada perangkat yang terus tercolok."
+
+msgid "When the charger switches the device on"
+msgstr "Saat pengisi daya menyalakan perangkat"
+
+msgid "Charge only, until a key starts it"
+msgstr "Hanya mengisi daya, sampai tombol menyalakannya"
+
+msgid "Start normally"
+msgstr "Mulai secara normal"
 
 msgid "Keep as is"
 msgstr "Biarkan apa adanya"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Inti CPU tidak valid"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Operasi tegangan CPU tidak dikenal"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Inti CPU tidak dapat dialihkan"
+
+msgid "Invalid low latency setting"
+msgstr "Pengaturan latensi rendah tidak valid"
+
+msgid "The low latency setting could not be applied"
+msgstr "Pengaturan latensi rendah tidak dapat diterapkan"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Offset tegangan CPU tidak dapat dibaca"
 
@@ -3733,9 +3772,6 @@ msgstr "Offset tegangan CPU tidak dapat dimatikan"
 
 msgid "The stress test could not be started"
 msgstr "Uji stres tidak dapat dimulai"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Adaptor peran USB tidak dapat dieksekusi"

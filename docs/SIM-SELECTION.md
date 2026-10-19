@@ -50,7 +50,7 @@ On systemd installations, `mu300-sim select` stores the choice in
 
 ## ZTE V50: built-in and external cards
 
-A V50 carries up to four cards on the modem's two SIM interfaces (docs/FINDINGS.md 206; ZTE's table, read from its
+A V50 carries up to four cards on the modem's two SIM interfaces (docs/FINDINGS.md 204; ZTE's table, read from its
 firmware by kanoqwq). Which ones depends on the board variant (ZTE's `board_id`):
 
 | board_id | cards |

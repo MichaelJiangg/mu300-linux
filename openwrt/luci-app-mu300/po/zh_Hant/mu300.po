@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "高亮的核心處於線上狀態。被關閉的核心會保持離線，重新開機後也是如此，直到重新開啟。CPU0 始終保持線上。"
+
+msgid "Low latency: on"
+msgstr "低延遲：開"
+
+msgid "Low latency: off"
+msgstr "低延遲：關"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "低延遲模式讓 CPU0 不進入閒置狀態，與 ZTE U30 Air 原廠韌體相同：Wi-Fi 延遲大幅縮短，裝置耗電增加。預設關閉。"
+
 msgid "Thermal"
 msgstr "溫控"
 
@@ -927,6 +939,9 @@ msgstr "尚無傳送記錄"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "已使用儲存的設定開始測試；結果會顯示在傳送記錄中。"
+
+msgid "Automatic without 2G (152)"
+msgstr "自動，不含 2G（152）"
 
 msgid "4G only"
 msgstr "僅 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % 表示從不為電池充電（裝置由充電器供電），100 % �
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % 可讓長期插著電源的裝置電池更健康。"
+
+msgid "When the charger switches the device on"
+msgstr "充電器開機時"
+
+msgid "Charge only, until a key starts it"
+msgstr "僅充電，按鍵後啟動"
+
+msgid "Start normally"
+msgstr "正常啟動"
 
 msgid "Keep as is"
 msgstr "維持不變"
@@ -3465,6 +3489,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "無效的 CPU 核心"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "未知的 CPU 電壓操作"
 
@@ -3715,6 +3745,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "無法切換該 CPU 核心"
+
+msgid "Invalid low latency setting"
+msgstr "無效的低延遲設定"
+
+msgid "The low latency setting could not be applied"
+msgstr "無法套用低延遲設定"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "無法讀取 CPU 電壓偏移"
 
@@ -3726,9 +3765,6 @@ msgstr "無法關閉 CPU 電壓偏移"
 
 msgid "The stress test could not be started"
 msgstr "無法啟動壓力測試"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "USB 角色轉接程式不可執行"

@@ -96,7 +96,7 @@ this project has a V50 or has tested one**: install it only if you can get back 
 | What runs | what runs on an F50: the same systems, modules and settings, USB-powered (no battery) |
 | LEDs | NET1 lamp: blue 4G, white 5G, red no service; Wi-Fi lamp: white 5 GHz, blue 2.4 GHz; NET2 dark (`leds-aw9523b`, mainline) |
 | USB network | `192.168.79.1` (neither the F50's nor the U30 Air's subnet) |
-| SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 206); untested on a V50 here |
+| SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 204); untested on a V50 here |
 | Not yet | NFC; the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
 
 The installers say so in one line and stop a V50 that is not exactly that (a model V50 with another device or
@@ -393,7 +393,7 @@ whenever OpenWrt is chosen (`MU300_OPENWRT=plain|luci` answers without asking), 
   adapters in host mode that can join the LAN bridge.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom AT adapter).
 * **System > Languages:** the language of the interface, and the lang extra: download it, or upload the file.
-* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`).
+* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`), and what a boot the charger started does (U30 Air: charge only until the Wi-Fi key or a held power key starts it, off when unplugged; or start normally, `POWER_ON_CHARGER=1`). The U30 Air powers off cleanly on an empty battery by the stock rules (docs/FINDINGS.md 196, 197).
 * **System > Packages after an update:** the packages you had installed yourself and what the update did with them
   (see [Updating](#updating)): what came back, what is pending or failed and why, the settings set aside, and the
   buttons Try again, Repair DNS (after a confirmation) and Dismiss.

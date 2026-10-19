@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Маркираните ядра са включени. Изключено ядро остава изключено, и след рестарт, докато не бъде включено отново. CPU0 винаги остава включено."
+
+msgid "Low latency: on"
+msgstr "Ниско закъснение: вкл."
+
+msgid "Low latency: off"
+msgstr "Ниско закъснение: изкл."
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Ниското закъснение държи CPU0 извън състоянията на покой, както фърмуерът на ZTE U30 Air: закъсненията на Wi-Fi са много по-кратки, а устройството консумира повече енергия. По подразбиране изключено."
+
 msgid "Thermal"
 msgstr "Температура"
 
@@ -927,6 +939,9 @@ msgstr "Все още няма доставки"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Тестът е стартиран със записаните настройки; резултатът се появява в дневника на доставките."
+
+msgid "Automatic without 2G (152)"
+msgstr "Автоматично без 2G (152)"
 
 msgid "4G only"
 msgstr "Само 4G"
@@ -1800,6 +1815,15 @@ msgstr "0 % никога не зарежда батерията (устройс�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % пазят батерията на устройство, което остава на зарядно."
+
+msgid "When the charger switches the device on"
+msgstr "Когато зарядното включи устройството"
+
+msgid "Charge only, until a key starts it"
+msgstr "Само зареждане, докато бутон не го стартира"
+
+msgid "Start normally"
+msgstr "Нормално стартиране"
 
 msgid "Keep as is"
 msgstr "Без промяна"
@@ -3472,6 +3496,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Невалидно ядро на процесора"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Неизвестна операция с напрежението на CPU"
 
@@ -3722,6 +3752,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Ядрото на процесора не можа да бъде превключено"
+
+msgid "Invalid low latency setting"
+msgstr "Невалидна настройка за ниско закъснение"
+
+msgid "The low latency setting could not be applied"
+msgstr "Настройката за ниско закъснение не можа да бъде приложена"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Отместването на напрежението на CPU не можа да бъде прочетено"
 
@@ -3733,9 +3772,6 @@ msgstr "Отместването на напрежението на CPU не м�
 
 msgid "The stress test could not be started"
 msgstr "Стрес тестът не можа да бъде стартиран"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Адаптерът за USB ролята не е изпълним"

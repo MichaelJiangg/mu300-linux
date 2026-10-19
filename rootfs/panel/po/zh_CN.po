@@ -320,6 +320,9 @@ msgstr "网络、频段和小区锁定"
 msgid "Automatic"
 msgstr "自动"
 
+msgid "Automatic without 2G (152)"
+msgstr "自动，不含 2G（152）"
+
 msgid "4G only"
 msgstr "仅 4G"
 
@@ -1307,6 +1310,15 @@ msgstr "充电至此电量停止（%）"
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "0 % 表示从不给电池充电（设备由充电器供电），100 % 表示充满；介于两者之间时，充电在该电量停止，低于 5 个百分点时重新开始。电量低于 5 % 时始终充电。对于一直插电的设备，80 % 能让电池更健康。"
 
+msgid "Charge only, until a key starts it"
+msgstr "仅充电，按键后启动"
+
+msgid "Start normally"
+msgstr "正常启动"
+
+msgid "When the charger switches the device on"
+msgstr "充电器开机时"
+
 msgid "What each profile does while nobody is connected (no Wi-Fi client, no computer on USB): the Wi-Fi key, a computer on USB or the charger wake the device."
 msgstr "无人连接时（无 Wi-Fi 客户端，USB 上无电脑）各配置的行为：Wi-Fi 键、USB 上的电脑或充电器可唤醒设备。"
 
@@ -1390,6 +1402,18 @@ msgstr "配置会在硬件频率表范围内设置 CPU 调速器和每个簇的�
 
 msgid "Thermal throttling is active right now."
 msgstr "当前正在因温度降频。"
+
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "高亮的核心处于在线状态。被关闭的核心会保持离线，重启后也是如此，直到重新开启。CPU0 始终保持在线。"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "低延迟模式让 CPU0 不进入空闲状态，与 ZTE U30 Air 原厂固件相同：Wi-Fi 延迟大幅缩短，设备耗电增加。默认关闭。"
+
+msgid "Low latency: on"
+msgstr "低延迟：开"
+
+msgid "Low latency: off"
+msgstr "低延迟：关"
 
 msgid "Experimental: changing the CPU voltage can make the device unstable, corrupt your data and permanently damage your device. Use it entirely at your own risk."
 msgstr "实验性功能：修改 CPU 电压可能导致设备不稳定、损坏您的数据，并可能对您的设备造成永久性损坏。风险完全由您自行承担。"
