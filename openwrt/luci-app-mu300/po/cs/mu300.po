@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Zvýrazněná jádra jsou online. Vypnuté jádro zůstane offline, i po restartu, dokud nebude znovu zapnuto. CPU0 zůstává vždy online."
+
+msgid "Low latency: on"
+msgstr "Nízká latence: zapnuto"
+
+msgid "Low latency: off"
+msgstr "Nízká latence: vypnuto"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Nízká latence drží CPU0 mimo stavy nečinnosti, stejně jako firmware ZTE U30 Air: zpoždění Wi-Fi jsou mnohem kratší a zařízení odebírá více energie. Ve výchozím stavu vypnuto."
+
 msgid "Thermal"
 msgstr "Teplota"
 
@@ -927,6 +939,9 @@ msgstr "Zatím žádná doručení"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Test spuštěn s uloženým nastavením; výsledek se zobrazí v protokolu doručení."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automaticky bez 2G (152)"
 
 msgid "4G only"
 msgstr "Pouze 4G"
@@ -3451,6 +3466,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Neplatné jádro CPU"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Neznámá operace s napětím CPU"
 
@@ -3701,6 +3722,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Jádro CPU nelze přepnout"
+
+msgid "Invalid low latency setting"
+msgstr "Neplatné nastavení nízké latence"
+
+msgid "The low latency setting could not be applied"
+msgstr "Nastavení nízké latence nelze použít"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Posun napětí CPU nelze přečíst"
 
@@ -3712,9 +3742,6 @@ msgstr "Posun napětí CPU nelze vypnout"
 
 msgid "The stress test could not be started"
 msgstr "Zátěžový test nelze spustit"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Adaptér role USB není spustitelný"

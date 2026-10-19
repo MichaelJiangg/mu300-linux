@@ -466,6 +466,18 @@ msgstr "Hardware max"
 msgid "Frequencies in MHz."
 msgstr "Frequencies in MHz."
 
+msgid "Highlighted cores are online. A core taken offline stays offline, also after a reboot, until it is brought back. CPU0 always stays online."
+msgstr "Nucleele evidențiate sunt online. Un nucleu oprit rămâne offline, și după repornire, până când este pornit din nou. CPU0 rămâne mereu online."
+
+msgid "Low latency: on"
+msgstr "Latență redusă: activată"
+
+msgid "Low latency: off"
+msgstr "Latență redusă: dezactivată"
+
+msgid "Low latency keeps CPU0 out of its idle states, as ZTE's U30 Air firmware does: Wi-Fi delays are much shorter, and the device draws more power. Off by default."
+msgstr "Latența redusă ține CPU0 în afara stărilor de repaus, ca firmware-ul ZTE U30 Air: întârzierile Wi-Fi sunt mult mai mici, iar dispozitivul consumă mai multă energie. Dezactivată implicit."
+
 msgid "Thermal"
 msgstr "Termic"
 
@@ -927,6 +939,9 @@ msgstr "Încă nicio livrare"
 
 msgid "Test started with the saved settings; the result appears in the delivery log."
 msgstr "Testul a pornit cu setările salvate; rezultatul apare în jurnalul de livrare."
+
+msgid "Automatic without 2G (152)"
+msgstr "Automat fără 2G (152)"
 
 msgid "4G only"
 msgstr "Doar 4G"
@@ -3451,6 +3466,12 @@ msgstr "The CPU adapter gave no valid reply"
 msgid "Invalid CPU profile"
 msgstr "Invalid CPU profile"
 
+msgid "Invalid CPU core"
+msgstr "Nucleu CPU invalid"
+
+msgid "Unknown CPU operation"
+msgstr "Unknown CPU operation"
+
 msgid "Unknown CPU voltage operation"
 msgstr "Operație de tensiune CPU necunoscută"
 
@@ -3701,6 +3722,15 @@ msgstr "The CPU profile could not be read"
 msgid "The CPU profile could not be set"
 msgstr "The CPU profile could not be set"
 
+msgid "The CPU core could not be switched"
+msgstr "Nucleul CPU nu a putut fi comutat"
+
+msgid "Invalid low latency setting"
+msgstr "Setare de latență redusă invalidă"
+
+msgid "The low latency setting could not be applied"
+msgstr "Setarea de latență redusă nu a putut fi aplicată"
+
 msgid "The CPU voltage offset could not be read"
 msgstr "Decalajul de tensiune CPU nu a putut fi citit"
 
@@ -3712,9 +3742,6 @@ msgstr "Decalajul de tensiune CPU nu a putut fi dezactivat"
 
 msgid "The stress test could not be started"
 msgstr "Testul de stres nu a putut fi pornit"
-
-msgid "Unknown CPU operation"
-msgstr "Unknown CPU operation"
 
 msgid "USB role adapter is not executable"
 msgstr "Adaptorul de rol USB nu este executabil"
