@@ -160,6 +160,51 @@ print('OK')
             self.assertNotIn('AT+IMSEN',trace)
             self.assertNotIn('AT+CASIMS=',trace)
 
+    def test_non_voice_apply_keeps_both_live_voice_states(self):
+        for shell in self.each_shell():
+            self.reset()
+            result = self.apply(shell, 'endc', 'off')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            current = json.loads((self.run / 'lock.json').read_text())
+            self.assertIs(current['volte']['enabled'], True)
+            self.assertIs(current['vonr']['enabled'], False)
+            self.assertEqual(current['volte']['source'], 'modem')
+            self.assertFalse((self.run / 'voice-volte').exists())
+            self.assertFalse((self.run / 'voice-vonr').exists())
+            trace = (self.tmp / 'commands').read_text()
+            self.assertNotIn('AT+CAVIMS=', trace)
+            self.assertNotIn('AT+SFUN=', trace)
+
+    def test_single_voice_apply_keeps_other_unmodified_voice_state(self):
+        for shell in self.each_shell():
+            self.reset()
+            result = self.apply(shell, 'volte', 'off')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            current = json.loads((self.run / 'lock.json').read_text())
+            self.assertIs(current['volte']['enabled'], False)
+            self.assertIs(current['vonr']['enabled'], False)
+            self.assertFalse((self.run / 'voice-vonr').exists())
+
+    def test_unrelated_reader_does_not_query_voice_during_apply(self):
+        for shell in self.each_shell():
+            self.reset()
+            mutex = self.tmp / 'mutex'
+            mutex.mkdir(exist_ok=True)
+            # A live sibling worker owns the mutex, not the getter's parent.
+            owner = subprocess.Popen(['/bin/sleep', '60'])
+            (mutex / 'pid').write_text(str(owner.pid))
+            try:
+                result = self.script(shell, self.lock, 'get', 'fresh', **self.extra)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                trace = (self.tmp / 'commands').read_text()
+                self.assertNotIn('AT+CAVIMS?', trace)
+                self.assertNotIn('get nr synch_param', trace)
+            finally:
+                owner.terminate()
+                owner.wait()
+                (mutex / 'pid').unlink()
+                mutex.rmdir()
+
     def test_voice_rejection_or_readback_mismatch_never_save(self):
         for shell in self.each_shell():
             for kind, value, fault in [('volte','off','reject'),

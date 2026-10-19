@@ -131,10 +131,15 @@ voice_matches() {
 }
 
 voice_json() {
-    local kind=$1 refresh=${2:-0} got source=unknown enabled=null saved
-    # A getter must not overwrite a write receipt mid-operation. The apply
-    # worker's existing refresh reads the receipt it just verified instead.
-    if [ "$refresh" = 1 ] && [ ! -d "$APPLY_DIR" ]; then
+    local kind=$1 refresh=${2:-0} got source=unknown enabled=null saved query
+    query=$refresh
+    # Post-apply get is a child of the mutex owner. It must read both live
+    # states: an untouched preference has no write receipt. Unrelated getters
+    # still avoid querying halfway through another worker's radio cycle.
+    if [ -d "$APPLY_DIR" ] && [ "$(cat "$APPLY_DIR/pid" 2>/dev/null)" != "$PPID" ]; then
+        query=0
+    fi
+    if [ "$query" = 1 ]; then
         if got=$(voice_read "$kind"); then
             source=modem
             [ "$got" = 1 ] && enabled=true || enabled=false
@@ -142,7 +147,7 @@ voice_json() {
     fi
     # Observations never overwrite a write receipt; only an accepted setter
     # can publish one. This also protects early replay from concurrent getters.
-    if [ "$refresh" != 1 ] || [ -d "$APPLY_DIR" ]; then
+    if [ "$query" != 1 ]; then
         if got=$(voice_receipt "$kind"); then
             source=${got#* }; got=${got%% *}
             [ "$got" = 1 ] && enabled=true || enabled=false
