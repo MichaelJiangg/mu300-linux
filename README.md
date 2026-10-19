@@ -232,7 +232,7 @@ label `mu300sd`); on the eMMC only `boot_b` (or `boot_a`) and 32 bytes of `misc`
 needs no repartitioning. A card that holds another Linux (ext4) filesystem is never formatted. A `mu300sd` card
 always comes first. Without the card the device starts the internal installation if there is one; with none, it
 waits 8 s for the card (30 s while one is still being detected), then returns to Android after about five minutes.
-All four kernels read the card. The U30 Air has no card slot, so it never asks there.
+All four kernels have the card's driver (5.4, 6.18 and 7.2 read it on the boards; 7.3 not tried yet). The U30 Air has no card slot, so it never asks there.
 
 
 * Put the card in while the device is switched off. A card inserted while Linux runs is seen, but it cannot be
@@ -292,7 +292,7 @@ It also asks for the **kernel**:
 
 It can be changed later on the device with `sudo mu300-update kernel 5.4`, `... kernel 6.18`, `... kernel 7.2` or
 `... kernel 7.3`. Ubuntu 26.04 needs 6.18, 7.2 or 7.3 (its programs use system calls 5.4 does not have), and so does USB host mode on the
-U30 Air.
+U30 Air (tried on 6.18 and 7.2; not yet on 7.3).
 
 ![The kernel question, in Turkish](docs/images/installer/installer-2-kernel-tr.png)
 
@@ -485,7 +485,7 @@ the archive once online). `mu300-panel status` says where it is.
 > voltage can make the device unstable, corrupt your data or break the hardware for good, and nobody can repair or
 > replace a device damaged this way. It is off by default; if you are not sure, leave it off.
 
-On the mainline kernels (6.18, 7.2, 7.3; not 5.4) the CPU voltage can be moved per core cluster, domains 0, 1, 2 = CPUs
+On the mainline kernels (6.18, 7.2, 7.3; not 5.4; on 7.3 not yet tried on a device) the CPU voltage can be moved per core cluster, domains 0, 1, 2 = CPUs
 0-3, 4-6, 7: from -25 mV to +12.5 mV in steps of 3.125 mV. The SoC firmware applies it once per boot, so a new value
 takes effect at the next reboot, as **one trial boot**: it is kept once that boot has been up 10 minutes, and it is
 dropped (back to 0, the setting cleared) by any boot with it that ends in a crash, a watchdog reset or a power cut,

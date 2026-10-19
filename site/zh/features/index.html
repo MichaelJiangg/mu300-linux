@@ -239,7 +239,7 @@ sudo mu300-cpu profile saving            <span class="c"># 或 balanced（默认
 <strong>实验性：可能永久损坏设备</strong>
 <p>本功能为实验性功能，可能对您的设备造成永久性损坏。风险由您自行承担。</p>
 </div>
-<p>在主线内核（6.18、7.2 和 7.3）上，可以按核心簇（CPU 0-3、4-6 和 7）小幅调整 CPU 电压：最多降低 25 mV、最多升高 12.5 mV，步进 3.125 mV。默认关闭（0）。新值在下次重启时作为一次试运行开机生效；该次开机运行满 10 分钟后才保留，任何以崩溃、看门狗复位或断电结束的开机都会将其撤销（恢复为 0）。编码未知的 SoC 固件上会被拒绝（目前只有 F50 的已知）。所有设置入口都要求先输入 <code>EXPERIMENTAL</code>：控制面板的“系统 &gt; CPU”、Ubuntu 面板的电源页、<code>mu300-toolkit</code> 和命令行。固件编码由 <a href="https://github.com/kanoqwq">kano</a> 分析得出。</p>
+<p>在主线内核（6.18、7.2 和 7.3；7.3 上尚未在设备上试过）上，可以按核心簇（CPU 0-3、4-6 和 7）小幅调整 CPU 电压：最多降低 25 mV、最多升高 12.5 mV，步进 3.125 mV。默认关闭（0）。新值在下次重启时作为一次试运行开机生效；该次开机运行满 10 分钟后才保留，任何以崩溃、看门狗复位或断电结束的开机都会将其撤销（恢复为 0）。编码未知的 SoC 固件上会被拒绝（目前只有 F50 的已知）。所有设置入口都要求先输入 <code>EXPERIMENTAL</code>：控制面板的“系统 &gt; CPU”、Ubuntu 面板的电源页、<code>mu300-toolkit</code> 和命令行。固件编码由 <a href="https://github.com/kanoqwq">kano</a> 分析得出。</p>
 <pre><code>sudo mu300-cpu voltage status
 sudo mu300-cpu voltage set -6250,-3125,0 --confirm EXPERIMENTAL   <span class="c"># 单位 µV：CPU 0-3、4-6、7</span>
 sudo mu300-cpu voltage stress 10                                  <span class="c"># 试运行开机时做压力测试</span>
