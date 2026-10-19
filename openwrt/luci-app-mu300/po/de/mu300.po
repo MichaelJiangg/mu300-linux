@@ -1801,6 +1801,15 @@ msgstr "0 % lädt den Akku nie (das Gerät läuft am Ladegerät), 100 % lädt ih
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % schonen den Akku bei einem Gerät, das dauerhaft am Netz hängt."
 
+msgid "When the charger switches the device on"
+msgstr "Wenn das Ladegerät das Gerät einschaltet"
+
+msgid "Charge only, until a key starts it"
+msgstr "Nur laden, bis eine Taste es startet"
+
+msgid "Start normally"
+msgstr "Normal starten"
+
 msgid "Keep as is"
 msgstr "Unverändert lassen"
 

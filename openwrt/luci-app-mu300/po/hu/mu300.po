@@ -1801,6 +1801,15 @@ msgstr "A 0 % soha nem tölti az akkumulátort (az eszköz a töltőről működ
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "A 80 % kíméli az akkumulátort egy folyamatosan hálózaton lévő eszközben."
 
+msgid "When the charger switches the device on"
+msgstr "Amikor a töltő bekapcsolja az eszközt"
+
+msgid "Charge only, until a key starts it"
+msgstr "Csak töltés, amíg egy gomb el nem indítja"
+
+msgid "Start normally"
+msgstr "Normál indítás"
+
 msgid "Keep as is"
 msgstr "Változatlanul hagyás"
 

@@ -1801,6 +1801,15 @@ msgstr "0 % laadt de batterij nooit op (het apparaat draait op de lader), 100 % 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % spaart de batterij van een apparaat dat aangesloten blijft."
 
+msgid "When the charger switches the device on"
+msgstr "Wanneer de oplader het apparaat inschakelt"
+
+msgid "Charge only, until a key starts it"
+msgstr "Alleen opladen, totdat een toets het start"
+
+msgid "Start normally"
+msgstr "Normaal starten"
+
 msgid "Keep as is"
 msgstr "Ongewijzigd laten"
 

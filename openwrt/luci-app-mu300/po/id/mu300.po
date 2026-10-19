@@ -1801,6 +1801,15 @@ msgstr "0 % tidak pernah mengisi baterai (perangkat berjalan dari pengisi daya),
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % menjaga baterai tetap sehat pada perangkat yang terus tercolok."
 
+msgid "When the charger switches the device on"
+msgstr "Saat pengisi daya menyalakan perangkat"
+
+msgid "Charge only, until a key starts it"
+msgstr "Hanya mengisi daya, sampai tombol menyalakannya"
+
+msgid "Start normally"
+msgstr "Mulai secara normal"
+
 msgid "Keep as is"
 msgstr "Biarkan apa adanya"
 

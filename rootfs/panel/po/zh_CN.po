@@ -1280,6 +1280,15 @@ msgstr "充电至此电量停止（%）"
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "0 % 表示从不给电池充电（设备由充电器供电），100 % 表示充满；介于两者之间时，充电在该电量停止，低于 5 个百分点时重新开始。电量低于 5 % 时始终充电。对于一直插电的设备，80 % 能让电池更健康。"
 
+msgid "Charge only, until a key starts it"
+msgstr "仅充电，按键后启动"
+
+msgid "Start normally"
+msgstr "正常启动"
+
+msgid "When the charger switches the device on"
+msgstr "充电器开机时"
+
 msgid "What each profile does while nobody is connected (no Wi-Fi client, no computer on USB): the Wi-Fi key, a computer on USB or the charger wake the device."
 msgstr "无人连接时（无 Wi-Fi 客户端，USB 上无电脑）各配置的行为：Wi-Fi 键、USB 上的电脑或充电器可唤醒设备。"
 

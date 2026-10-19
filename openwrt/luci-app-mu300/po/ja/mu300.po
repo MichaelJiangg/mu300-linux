@@ -1801,6 +1801,15 @@ msgstr "0 % ではバッテリーを充電しません（本体は充電器で�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % にすると、常時電源につないだままの機器でバッテリーが長持ちします。"
 
+msgid "When the charger switches the device on"
+msgstr "充電器がデバイスの電源を入れたとき"
+
+msgid "Charge only, until a key starts it"
+msgstr "充電のみ (キーで起動するまで)"
+
+msgid "Start normally"
+msgstr "通常どおり起動"
+
 msgid "Keep as is"
 msgstr "そのまま"
 

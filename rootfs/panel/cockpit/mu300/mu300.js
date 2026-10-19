@@ -1360,6 +1360,10 @@
                             function (ex) { busy(bs, false); toast(errText(ex), 'error'); });
                     });
                     pb.appendChild(actions([ bs ]));
+                    var pon = select('mu-pw-poweron', [ [ '0', _('Charge only, until a key starts it') ], [ '1', _('Start normally') ] ],
+                        conf.POWER_ON_CHARGER === 1 ? '1' : '0');
+                    pon.addEventListener('change', function () { set(null, 'POWER_ON_CHARGER', Number(pon.value)); });
+                    pb.appendChild(field(_('When the charger switches the device on'), pon));
                 }
                 pb.appendChild(note(_('What each profile does while nobody is connected (no Wi-Fi client, no computer on USB): the Wi-Fi key, a computer on USB or the charger wake the device.')));
                 var rows = [ 'plugged', 'battery', 'saver' ].map(function (p) {
