@@ -96,7 +96,7 @@ this project has a V50 or has tested one**: install it only if you can get back 
 | What runs | what runs on an F50: the same systems, modules and settings, USB-powered (no battery) |
 | LEDs | NET1 lamp: blue 4G, white 5G, red no service; Wi-Fi lamp: white 5 GHz, blue 2.4 GHz; NET2 dark (`leds-aw9523b`, mainline) |
 | USB network | `192.168.79.1` (neither the F50's nor the U30 Air's subnet) |
-| SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 194); untested on a V50 here |
+| SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 206); untested on a V50 here |
 | Not yet | NFC; the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
 
 The installers say so in one line and stop a V50 that is not exactly that (a model V50 with another device or

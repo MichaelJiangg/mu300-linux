@@ -180,7 +180,7 @@ what replaced it. The table below gives each section's state.
 | 180 | Wi-Fi access point: `get_station` answered any address with the interface's own counters and the station side's signal; now only this AP's stations, with nothing filled in (the firmware has no per-client figures), `-ENOENT` otherwise; `get_channel` link 0 only (kanoqwq f59a296) | current (mainline module and 5.4 patch built; unit tests; U30 Air 6.18.57 with a client, F50-B 7.2.11, 2026-10-17) |
 | 181 | The U30 Air's fuel gauge against the stock module: the user area's writes are `regmap_update_bits()` with a wait after the release (stock `save_last_cap` at 0x4ba4), no migration guess for a valid saved value, the charger's Full is 100 % with the battery current within `fullbatt-current` (kanoqwq f59a296 reviewed: his 4.2 V condition would refuse a real Full) | current (built for 6.18.57 and 7.2.11; unit tests; U30 Air 6.18.57, 2026-10-17: Full at 4.147 V gave 100 %, kept across a reboot) |
 | 188 | Call audio on the mainline kernels: the 5.4 stack (19 modules + the vendor AGDSP DMA) built for 6.18.57 and 7.2.11, the DSP's memory reserved (patch 0022), nothing autoloaded; the xrun restart that panicked 5.4 fixed (descriptors re-armed in `prepare`), the DSP's DDR mapped Normal-NC (7.x memcpy alignment fault), no 6 s spin under a lock waiting for the AGDSP domain, the domain held across the DSP start (warm reboots), the echo played at the tap's 16 kHz mono | current (F50-B 6.18.57 and 7.2.11, F50-C 7.2.11 OpenWrt, offline; a call on F50-C 7.2.11: ringback 425 Hz, melody heard, downlink recorded (his voice, F0 140 Hz); the echo through the fixed path, answered call 22:41: the owner heard his voice and the melody; after a killed call, no player left behind and DSP replies nobody waited for no longer fail the next open: reproduced on F50-B without a call, script fix measured there, driver fix unit-tested) |
-| 194 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
+| 206 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 
 ## Hardware and firmware facts
 
@@ -12064,7 +12064,7 @@ in the core as well.
 * U30 Air (6.18.57): `/proc/config.gz`'s settings hash to the 6.18 kit's; it uses no call audio, so nothing was
   installed there.
 
-### 194. The ZTE V50's SIM cards: a third built-in card shares SIM2, the external card SIM1 (#332)
+### 206. The ZTE V50's SIM cards: a third built-in card shares SIM2, the external card SIM1 (#332)
 
 **Status: offline only. Nobody here has a V50**; the test steps are in the PR for the #332 reporter.
 

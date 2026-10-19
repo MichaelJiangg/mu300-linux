@@ -753,7 +753,7 @@
                 });
                 sb.appendChild(bar);
             } else sb.appendChild(note(_('This device has one SIM slot in use.')));
-            /* the ZTE V50's cards (sim.card, FINDINGS 194): two of them behind a switch on one SIM interface */
+            /* the ZTE V50's cards (sim.card, FINDINGS 206): two of them behind a switch on one SIM interface */
             var v = s.v50;
             if (v && has('sim.card')) {
                 var names = [ _('Built-in SIM 1'), _('Built-in SIM 2'), _('Built-in SIM 3'), _('External SIM') ];

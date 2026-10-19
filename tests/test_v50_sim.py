@@ -1,4 +1,4 @@
-"""The ZTE V50's cards (FINDINGS 194): ZTE's board variants, the card each SIM interface reaches, the boot-time switch
+"""The ZTE V50's cards (FINDINGS 206): ZTE's board variants, the card each SIM interface reaches, the boot-time switch
 before the CP starts, and nothing of it on another board. No hardware: a fake sysfs and a uci stub."""
 import json
 import re
