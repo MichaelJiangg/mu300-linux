@@ -11943,3 +11943,18 @@ and every sample was 0. The half rate of 24d and 24e only begins when the modem 
 looped round either: with `VBC_DSP_VOICE_CAPTURE_TYPE` = `VOICE_CAPTURE_UPLINK`, the write to `FE_ST_VOICE_PCM_P`
 fails with EIO without a call (24d). mu300-voice keeps reading the downlink from the dump until a call shows the
 960 / 1920 tap at full rate on this DSP image.
+
+**In a call it holds on this image too.** One outgoing call from F50-C (OpenWrt, 5.4.254, the 41S image) on
+2026-10-19, with mu300-voice's echo running from the dump at the same time. `arecord -D hw:1,9 -f S16_LE -r 8000 -c 1
+-s 64000` (8 s of samples) at each framing, timed by the clock:
+
+| framing | wall time | content |
+|---|---|---|
+| 960 / 1920 | 8 s | silence in that window (peak 9) |
+| 160 / 960 | 16 s | speech; mean step at each 160-sample boundary 298, mid-block 87 |
+| 640 / 1280 | 8 s | speech; mean step 120 at the boundary, 119 mid-block |
+
+So the half rate of 24d and 24e is the 160-frame period, half of the 320-sample MCDT fragment, and not the tap: at
+the vendor's framing it runs at the full 8 kHz without a seam. mu300-voice still reads the dump; moving the downlink
+to the tap at 640 / 1280 (or 960 / 1920) would drop the dump and the 48 kHz conversion, and needs its own call test
+on the mainline kernels first.
