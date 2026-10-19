@@ -1801,6 +1801,15 @@ msgstr "0 % nu încarcă niciodată bateria (dispozitivul funcționează de la �
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % protejează mai bine bateria unui dispozitiv care rămâne la priză."
 
+msgid "When the charger switches the device on"
+msgstr "Când încărcătorul pornește dispozitivul"
+
+msgid "Charge only, until a key starts it"
+msgstr "Doar încărcare, până când o tastă îl pornește"
+
+msgid "Start normally"
+msgstr "Pornire normală"
+
 msgid "Keep as is"
 msgstr "Lasă neschimbat"
 

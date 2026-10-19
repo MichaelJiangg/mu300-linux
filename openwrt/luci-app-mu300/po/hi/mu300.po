@@ -1801,6 +1801,15 @@ msgstr "0 % बैटरी को कभी चार्ज नहीं कर
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % हमेशा बिजली से जुड़े रहने वाले डिवाइस में बैटरी को स्वस्थ रखता है।"
 
+msgid "When the charger switches the device on"
+msgstr "जब चार्जर डिवाइस को चालू करे"
+
+msgid "Charge only, until a key starts it"
+msgstr "केवल चार्जिंग, जब तक कोई बटन इसे चालू न करे"
+
+msgid "Start normally"
+msgstr "सामान्य रूप से शुरू करें"
+
 msgid "Keep as is"
 msgstr "जैसा है वैसा रखें"
 

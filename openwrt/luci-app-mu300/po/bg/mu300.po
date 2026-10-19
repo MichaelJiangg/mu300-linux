@@ -1801,6 +1801,15 @@ msgstr "0 % никога не зарежда батерията (устройс�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % пазят батерията на устройство, което остава на зарядно."
 
+msgid "When the charger switches the device on"
+msgstr "Когато зарядното включи устройството"
+
+msgid "Charge only, until a key starts it"
+msgstr "Само зареждане, докато бутон не го стартира"
+
+msgid "Start normally"
+msgstr "Нормално стартиране"
+
 msgid "Keep as is"
 msgstr "Без промяна"
 

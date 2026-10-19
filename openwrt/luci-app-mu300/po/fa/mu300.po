@@ -1801,6 +1801,15 @@ msgstr "0 % هرگز باتری را شارژ نمی‌کند (دستگاه با
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % سلامت باتری را در دستگاهی که همیشه به برق وصل است بهتر حفظ می‌کند."
 
+msgid "When the charger switches the device on"
+msgstr "وقتی شارژر دستگاه را روشن می‌کند"
+
+msgid "Charge only, until a key starts it"
+msgstr "فقط شارژ، تا زمانی که یک کلید آن را راه‌اندازی کند"
+
+msgid "Start normally"
+msgstr "راه‌اندازی عادی"
+
 msgid "Keep as is"
 msgstr "بدون تغییر"
 
