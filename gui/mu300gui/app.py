@@ -706,7 +706,7 @@ class App:
         check(i, 'Ubuntu LTS', 'ubuntu', _('The full distribution with apt; about 500 MiB of RAM in use. Needs {1}.', size(f.need('ubuntu'))),
               enabled=not room or room >= f.need('ubuntu'))
         radio(i, _('24.04 LTS: the longest tested, supported until 2029'), 'ubuntu_version', '24.04', enabled=ch.ubuntu, indent=S5)
-        radio(i, _('26.04 LTS: the newest, supported until 2031; needs kernel 6.18 or 7.2'), 'ubuntu_version', '26.04', enabled=ch.ubuntu, indent=S5)
+        radio(i, _('26.04 LTS: the newest, supported until 2031; needs kernel 6.18, 7.2 or 7.3'), 'ubuntu_version', '26.04', enabled=ch.ubuntu, indent=S5)
         ttk.Frame(i, height=S2, style='Card.TFrame').pack()
         check(i, 'OpenWrt 25.12', 'openwrt', _('A router system with the LuCI web interface; about 140 MiB of RAM in use. Needs {1}.', size(f.need('openwrt'))))
         radio(i, _('The standard LuCI web interface'), 'openwrt_flavor', 'plain', enabled=ch.openwrt, indent=S5)
@@ -720,13 +720,13 @@ class App:
         if room and room < f.need('both'):
             ttk.Label(i, text=_('This place has {1}: both systems together need {2}.', size(room), size(f.need('both'))), style='Card.Small.TLabel').pack(anchor='w', pady=(S2, 0))
 
-        o, i = card(body, _('Kernel'), _('It can be changed later on the device: sudo mu300-update kernel 5.4|6.18|7.2'))
+        o, i = card(body, _('Kernel'), _('It can be changed later on the device: sudo mu300-update kernel 5.4|6.18|7.2|7.3'))
         add(o)
         radio(i, _('5.4  —  the vendor kernel: the longest tested, everything this project supports'), 'kernel', '5.4', enabled=ch.kernel_ok('5.4'),
-              note=None if ch.kernel_ok('5.4') else _('The ZTE V50 runs a mainline kernel only (6.18 or 7.2).') if ch.device == 'v50'
+              note=None if ch.kernel_ok('5.4') else _('The ZTE V50 runs a mainline kernel only (6.18, 7.2 or 7.3).') if ch.device == 'v50'
               else _('Not with Ubuntu 26.04: its programs use system calls that 5.4 does not have.'))
         radio(i, _('6.18  —  mainline Linux, long-term release: newer drivers and security fixes; no USB-C video output yet'), 'kernel', '6.18')
-        radio(i, _('7.2  —  the newest stable mainline Linux; tested less than 6.18'), 'kernel', '7.2')
+        radio(i, _('7.2  —  mainline Linux, stable release; tested less than 6.18'), 'kernel', '7.2')
 
         rel = ctl.releases
         o, i = card(body, _('Release'))
