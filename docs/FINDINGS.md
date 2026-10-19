@@ -190,7 +190,7 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
-| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; one hang into LK's dump mode in a reboot loop, open; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19) |
+| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; one hang into LK's dump mode in a reboot loop (back by itself after 2.5 h), open; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19) |
 
 ## Hardware and firmware facts
 
@@ -12465,8 +12465,10 @@ ships 7.3 (that release's tree then makes the kit, or is shown to be this one).
     of 7.3 came up with slot b at `tries 1` (`1f`), and the one after it went to Android by itself; `su -c
     mu300-linux` there armed Linux again and 7.3 booted. `mu300-boot-ok` and 5 attempts back: slot b `6f`, as before.
   - **A hang.** In a reboot loop afterwards the first reboot did not come back: no USB network, no adb; the board
-    enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, and was still there 35 minutes later
-    (31m's hangs ended in Android after about 20 minutes). Not recovered by hand (see the report of PR #342).
+    enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, for about two and a half hours (31m's hangs
+    ended in Android after about 20 minutes), then booted 7.3 again by itself with one slot try used (`5f`). Nothing
+    was done by hand; `rollback-boot` then put it back on 7.2.11, which runs with the audio extra's DSP answering.
+    One hang in six boots of 7.3: whether 7.3 hangs more often than 6.18 and 7.2 (31m) needs a reboot soak.
 * **U30 Air** (openwrt-luci, the VPN module with its kill switch): 7.3.0 boots with no oops; the SIM ready, data up;
   the access point on channel 36/80 MHz with its client back; the USB gadget `configured`; the VPN's tunnel (`sbtun`)
   up behind the kill switch (`mu300_vpn` tables), HTTPS answers through it and the exit is not the carrier's address
