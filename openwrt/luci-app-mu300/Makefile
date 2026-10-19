@@ -29,6 +29,7 @@ define Package/luci-app-mu300/conffiles
 /etc/config/unisoc_apn
 /etc/config/mu300-charge
 /etc/unisoc-modem/cpu.json
+/etc/unisoc-cpu-cores.json
 /etc/unisoc-modem/cpu-voltage.json
 endef
 
@@ -39,6 +40,7 @@ define Package/luci-app-mu300/install
 	$(INSTALL_DIR) $(1)/www
 	$(CP) ./htdocs/. $(1)/www/
 	$(CP) ./root/. $(1)/
+	chmod 0755 $(1)/etc/init.d/unisoc-cpu-cores $(1)/usr/libexec/rpcd/unisoc-cpu-cores $(1)/usr/libexec/unisoc-modem/cpu-cores
 	chmod 0600 $(1)/etc/config/unisoc_apn
 	chmod 0600 $(1)/etc/config/mu300-charge
 	chmod 0755 $(1)/etc/init.d/mu300-charge $(1)/etc/hotplug.d/power_supply/75-mu300-charge $(1)/usr/libexec/rpcd/mu300-charge
@@ -75,6 +77,7 @@ define Package/luci-app-mu300/postinst
 	/etc/init.d/unisoc-traffic enable 2>/dev/null || true
 	/etc/init.d/unisoc-traffic start 2>/dev/null || true
 	/etc/init.d/unisoc-cpu enable 2>/dev/null || true
+	/etc/init.d/unisoc-cpu-cores enable 2>/dev/null || true
 }
 exit 0
 endef
@@ -90,6 +93,7 @@ define Package/luci-app-mu300/postrm
 		/etc/init.d/unisoc-traffic stop 2>/dev/null || true
 		/etc/init.d/unisoc-traffic disable 2>/dev/null || true
 		/etc/init.d/unisoc-cpu disable 2>/dev/null || true
+		/etc/init.d/unisoc-cpu-cores disable 2>/dev/null || true
 		rm -f /etc/unisoc-modem/usb-boot.conf
 	fi
 	rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* 2>/dev/null

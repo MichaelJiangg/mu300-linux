@@ -1,0 +1,7 @@
+#!/bin/sh /etc/rc.common
+# Explicit opt-in; no background worker or modem startup dependency.
+START=99
+start() {
+    [ -s /etc/unisoc-cpu-cores.json ] || return 0
+    /usr/libexec/unisoc-modem/cpu-cores boot | logger -t unisoc-cpu-cores
+}

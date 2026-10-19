@@ -1,0 +1,9 @@
+#!/bin/sh
+case "$1:$2" in
+    list:) echo '{"get":{},"apply":{"cores":[],"persist":false,"reset":false}}' ;;
+    call:get) /usr/libexec/unisoc-modem/cpu-cores get ;;
+    call:apply) /usr/libexec/unisoc-modem/cpu-cores apply ;;
+    *) echo '{"ok":0,"error":"cpu_cores_invalid"}' ;;
+esac
+# rpcd consumes the JSON error; a backend rejection is not an RPC transport error.
+exit 0

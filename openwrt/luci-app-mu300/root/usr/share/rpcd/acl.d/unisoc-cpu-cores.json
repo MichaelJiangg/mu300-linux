@@ -1,0 +1,7 @@
+{
+  "unisoc-cpu-cores": {
+    "description": "View and explicitly control CPU online state",
+    "read": { "ubus": { "unisoc-cpu-cores": ["get"] } },
+    "write": { "ubus": { "unisoc-cpu-cores": ["apply"] } }
+  }
+}

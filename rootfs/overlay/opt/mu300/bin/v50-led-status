@@ -34,8 +34,15 @@ lamp() {
     done
 }
 network() {
-    local slot=$1 state=$2 key=signal enabled brightness color=none blink=0
-    [ "$slot" = 0 ] || key=signal2
+    local slot=$1 state=$2 bank key enabled brightness color=none blink=0
+    # Stock V50 B15 NotificationManagerService.setNetLight(): physical cards
+    # 0/3 use NET2 (logical SIM1), cards 1/2 use NET1 (logical SIM2).
+    # Settings remain attached to the physical lamp, not the logical SIM.
+    case $slot in
+        0) bank=net2; key=signal2 ;;
+        1) bank=net1; key=signal ;;
+        *) return 1 ;;
+    esac
     enabled=$(cfg "$key")
     brightness=$(level "$(cfg "${key}_brightness")" 255)
     [ "$enabled" != 0 ] || brightness=0
@@ -48,7 +55,7 @@ network() {
         modem) color=blue; blink=500 ;;
         thermal) color=red; blink=200 ;;
     esac
-    lamp net$((slot+1)) "$color" "$brightness" "$blink"
+    lamp "$bank" "$color" "$brightness" "$blink"
 }
 save_network() {
     local slot=$1 state=$2 old

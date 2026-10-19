@@ -13,12 +13,12 @@ function policies() {
     let out=[];
     for(let id in sort(fs.lsdir(ROOT) || [])) {
         if(!match(id,/^policy[0-9]+$/)) continue;
-        let p={id,cpus:read(id,'affected_cpus'),driver:read(id,'scaling_driver'),
+        let p={id,cpus:read(id,'related_cpus') || read(id,'affected_cpus'),driver:read(id,'scaling_driver'),
             governors:words(read(id,'scaling_available_governors')),governor:read(id,'scaling_governor'),
             min:number(id,'scaling_min_freq'),max:number(id,'scaling_max_freq'),
             hardware_min:number(id,'cpuinfo_min_freq'),hardware_max:number(id,'cpuinfo_max_freq'),
             current:number(id,'scaling_cur_freq'),frequencies:map(words(read(id,'scaling_available_frequencies')),v=>int(v))};
-        p.writable=!!length(p.governors) && p.min!=null && p.max!=null && p.hardware_min!=null && p.hardware_max!=null;
+        p.writable=!!length(p.governors) && !!length(words(read(id,'affected_cpus'))) && p.min!=null && p.max!=null && p.hardware_min!=null && p.hardware_max!=null;
         push(out,p);
     }
     return out;
@@ -127,6 +127,10 @@ function apply(input,replay) {
     for(let c in changes) for(let p in desired) if(p.id==c.id) {
         p.governor=c.governor; p.min=c.min; p.max=c.max;
     }
+    // Preserve saved frequency requests for a fully offline cluster; optional
+    // core replay runs after frequency replay at the next normal boot.
+    for(let c in (config.frequency?.changes || []))
+        if(!length(filter(desired,p=>p.id==c.id))) push(desired,c);
     let changed=[], thermal_changed=[], error=null, rollback=true;
     for(let c in changes) {
         let p=byid[c.id]; push(changed,p);

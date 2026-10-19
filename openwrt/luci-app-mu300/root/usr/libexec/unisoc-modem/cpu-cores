@@ -1,0 +1,12 @@
+#!/bin/sh
+action=${1:-get}
+case "$action" in get|apply|boot) ;; *) exit 2 ;; esac
+if [ "$action" != get ]; then
+    exec 9> "${UNISOC_CORES_LOCK:-/run/unisoc-cpu-cores.lock}" || exit 1
+    flock -n 9 || { echo '{"ok":0,"error":"cpu_cores_busy"}'; exit 1; }
+    # Share the existing frequency editor's write lock; hotplug may remove a
+    # policy temporarily when its last core goes offline.
+    exec 8> "${UNISOC_CORES_POLICY_LOCK:-/run/unisoc-modem-cpu.lock}" || exit 1
+    flock -n 8 || { echo '{"ok":0,"error":"cpu_cores_busy"}'; exit 1; }
+fi
+exec ucode "${UNISOC_CORES_LIB:-/usr/libexec/unisoc-modem/cpu-cores.uc}" "$action"

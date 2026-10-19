@@ -129,6 +129,10 @@ for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./usr/libexec/unisoc-modem/hotspot ./usr/libexec/unisoc-modem/hotspot.uc \
     ./www/luci-static/resources/view/mu300/traffic.js ./etc/init.d/unisoc-traffic \
     ./www/luci-static/resources/view/mu300/cpu.js ./etc/init.d/unisoc-cpu \
+    ./www/luci-static/resources/mu300/auto-mode.js \
+    ./www/luci-static/resources/mu300/cpu-cores.js ./etc/init.d/unisoc-cpu-cores \
+    ./usr/libexec/rpcd/unisoc-cpu-cores ./usr/libexec/unisoc-modem/cpu-cores \
+    ./usr/libexec/unisoc-modem/cpu-cores.uc ./etc/rc.d/S99unisoc-cpu-cores \
     ./usr/libexec/unisoc-modem/cpu ./usr/libexec/unisoc-modem/cpu.uc \
     ./usr/libexec/unisoc-modem/cpu-thermal.uc \
     ./usr/libexec/unisoc-modem/cpu-voltage ./usr/libexec/unisoc-modem/cpu-voltage.uc \

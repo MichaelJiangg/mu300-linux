@@ -46,7 +46,7 @@ function current() {
             let pair=match(line,/^([0-9]+) ([0-9]+)$/);
             if(pair) push(table,{khz:int(pair[1]),uv:int(pair[2])});
         }
-        push(domains,{id:int(d),policy:id,cpus:trim(fs.readfile(path+'affected_cpus')||''),offset:int(offset),table});
+        push(domains,{id:int(d),policy:id,cpus:trim(fs.readfile(path+'related_cpus')||fs.readfile(path+'affected_cpus')||''),offset:int(offset),table});
     }
     return domains;
 }

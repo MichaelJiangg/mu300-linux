@@ -234,7 +234,7 @@ if [ -d /in/luci-plugin ]; then
     chmod 0755 $R/etc/init.d/mu300-charge $R/etc/hotplug.d/power_supply/75-mu300-charge $R/usr/libexec/rpcd/mu300-charge
     ucode $R/usr/libexec/unisoc-modem/disable-channel-analysis $R
     ucode $R/usr/libexec/unisoc-modem/filter-wifi-ciphers $R
-    chmod 0755 $R/etc/init.d/unisoc-cpu
+    chmod 0755 $R/etc/init.d/unisoc-cpu $R/etc/init.d/unisoc-cpu-cores $R/usr/libexec/rpcd/unisoc-cpu-cores
     chmod 0600 $R/etc/config/unisoc_apn
     chmod 0755 $R/etc/init.d/unisoc-modem-ui $R/etc/init.d/unisoc-sms-forward $R/etc/init.d/unisoc-traffic $R/etc/hotplug.d/net/90-unisoc-usb-host $R/etc/hotplug.d/iface/90-unisoc-usb-host $R/usr/libexec/rpcd/mu300dash $R/usr/libexec/unisoc-modem/*
     mkdir -p $R/usr/lib/lua/luci/i18n
@@ -304,6 +304,7 @@ if [ -d /in/luci-plugin ]; then
     ln -sf ../init.d/unisoc-traffic $R/etc/rc.d/S$n"unisoc-traffic"
     ln -sf ../init.d/unisoc-traffic $R/etc/rc.d/K01unisoc-traffic
     ln -sf ../init.d/unisoc-cpu $R/etc/rc.d/S99unisoc-cpu
+    ln -sf ../init.d/unisoc-cpu-cores $R/etc/rc.d/S99unisoc-cpu-cores
     ln -sf ../init.d/unisoc-cpu $R/etc/rc.d/K89unisoc-cpu
     ln -sf ../init.d/mu300-charge $R/etc/rc.d/S97mu300-charge
     ln -sf ../init.d/mu300-charge $R/etc/rc.d/K20mu300-charge

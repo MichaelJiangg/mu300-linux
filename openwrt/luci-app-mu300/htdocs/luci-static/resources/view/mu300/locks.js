@@ -2,6 +2,7 @@
 'require view';
 'require mu300.refresh as R';
 'require mu300.common as M';
+'require mu300.auto-mode as AutoMode';
 
 /* 网络锁定 -- 模式 / 频段 / 小区 / EN-DC，全部经 ubus mu300dash lock_set -> 后端
  * mu300-dash-lock（编码按 ufi_tools 权威实现），应用后 SFUN 重启协议栈并落盘，
@@ -45,6 +46,7 @@ return view.extend({
 <div class="mud-sec">
   <h3 class="mud-lock-heading"><span class="mud-heading-label">网络模式 · EN-DC</span><span class="mud-progress mud-lock-progress" id="mud-lock-progress" role="status"></span></h3>
   <div class="mud-ctl" id="mud-lock-modes" style="grid-template-columns:repeat(4,1fr);max-width:520px"></div>
+  <div id="mud-auto-mode" hidden></div>
   <div class="mud-ctl" style="margin-top:7px;grid-template-columns:1fr 1fr;max-width:340px">
     <button class="mud-btn" id="mud-lock-endc">EN-DC</button>
     <button class="mud-btn" id="mud-lock-refresh">刷新锁定状态</button>
@@ -128,6 +130,7 @@ return view.extend({
 		var apply = function(kind, val, what, opts) {
 			opts = opts || {};
 			var slot = M.selectedSlot();
+			opts.slot = slot;
 			M.confirmBox(opts.title || ('应用「' + what + '」？'),
 				opts.message || (opts.noSfun ? '' : '协议栈会重启（SFUN），蜂窝断开约半分钟。'),
 				{ danger: !opts.noSfun, okText: opts.okText || '应用' })
@@ -143,20 +146,32 @@ return view.extend({
 			if (opts.optimistic) opts.optimistic();   /* 按钮立刻切到目标态，回读负责校正 */
 			M.busy(btn, true);   /* 在 optimistic 之后：它可能重置按钮的 className */
 			self.note('正在后台应用 ' + what + ' …' + (opts.noSfun ? '' : '（SFUN 重启 + 重新驻网，约半分钟）'), 'busy');
-			L.resolveDefault(M.callLockSet(kind, val)).then(function(r) {
+			var run = function() {
+				if (opts.prepare && (self._disposed || M.selectedSlot() !== opts.slot))
+					throw new Error(M.translate('查看卡槽已改变，请重新确认操作'));
+				return M.callLockSet(kind, val);
+			};
+			// Save only the compatibility option after confirmation; keep the
+			// existing selected-SIM job and AT/replay ordering unchanged.
+			var operation = opts.prepare ? Promise.resolve().then(opts.prepare).then(run) : run();
+			operation.then(function(r) {
 			if (self._disposed) return;
 				r = r || {};
 				if (!r.ok) {
 					self._applying = false;
-					M.busy(btn, false);
+					M.busy(btn, false); self.paintAutoMode();
 					self.note('失败：' + (r.error || '未知错误'), 'error');
 					self.refresh();
 					return;
 				}
 				self.note('正在确认设置结果…', 'busy');
 				return self.readback(r, btn);
-			}, function() { self._applying = false; M.busy(btn, false); self.note('调用失败', 'error'); });
+			}, function(error) { self._applying = false; M.busy(btn, false); self.paintAutoMode(); self.note(error && error.message || '调用失败', 'error'); });
 		};
+
+		this.autoMode = AutoMode.attach(this.Q('auto-mode'), function(btn, prepare) {
+			apply('mode', 'auto', M.translate('自动模式兼容性'), {btn:btn, prepare:prepare});
+		});
 
 		this.Q('lock-modes').innerHTML = MODES.map(function(m) {
 			return '<button class="mud-btn" data-mode="' + m[0] + '">' + M.esc(M.translate(m[1])) + '</button>';
@@ -202,18 +217,19 @@ return view.extend({
 			};
 		});
 		this.Q('lock-refresh').onclick = function() {
+			if (self.autoMode) self.autoMode.reload();
 			var btn = this;
 			M.busy(btn, true);
 			self.note('正在直读调制解调器（最多几秒）…', 'busy');
 			L.resolveDefault(M.callLockFresh('1')).then(function(l) {
 			if (self._disposed) return;
-				M.busy(btn, false);
+				M.busy(btn, false); self.paintAutoMode();
 				self.lastLock = l || {};
 				self.paint();
 				self.note('已刷新', 'success');
 				var nb = self.Q('neigh');
 				if (nb && self.lastCell) nb.innerHTML = M.neighborRows(self.neighborCell || self.lastCell, self.lastLock.cells || []);
-			}, function() { M.busy(btn, false); self.note('刷新失败', 'error'); });
+			}, function() { M.busy(btn, false); self.paintAutoMode(); self.note('刷新失败', 'error'); });
 			self.loadServing();
 		};
 
@@ -434,7 +450,7 @@ return view.extend({
 			// The operation is finished; a slow display refresh must not keep its
 			// button spinning after the completion toast has already appeared.
 			self._applying = false;
-			M.busy(btn, false);
+			M.busy(btn, false); self.paintAutoMode();
 		}).then(function() {
 			if (self._disposed) return;
 			self.note(operation.kind === 'auto_apply' ? '开机自动应用设置已保存' :
@@ -483,7 +499,12 @@ return view.extend({
 		});
 	},
 
+	paintAutoMode: function() {
+		if (this.autoMode) this.autoMode.update((this.lastLock || {}).mode, !!this._applying);
+	},
+
 	paint: function() {
+		this.paintAutoMode();
 		var l = this.lastLock || {};
 		var self = this;
 		this.paintVoiceSwitches(l);

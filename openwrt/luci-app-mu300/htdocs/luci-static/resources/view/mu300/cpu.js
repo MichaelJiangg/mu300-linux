@@ -3,6 +3,7 @@
 'require rpc';
 'require poll';
 'require mu300.common as M';
+'require mu300.cpu-cores as Cores';
 
 var get = rpc.declare({ object: 'mu300dash', method: 'cpu_get', expect: { '': {} } });
 var apply = rpc.declare({ object: 'mu300dash', method: 'cpu_apply', params: ['payload'], expect: { '': {} } });
@@ -103,7 +104,7 @@ return view.extend({
         root.appendChild(node('style', CSS));
         var title = node('div', null, 'mud-cpu-title');
         title.append(node('h2', M.translate('CPU 设置')), node('p', M.translate('频率、电压、温控分别保存。频率和温控即时生效，电压重启后生效。'), 'mud-note'));
-        root.append(title);
+        root.append(title,Cores.render());
         var frequency = node('section', null, 'mud-card mud-cpu-section');
         frequency.append(heading('频率与调速策略', '即时生效'));
         var grid = node('div', null, 'mud-cpu-grid'); frequency.append(grid); root.append(frequency);

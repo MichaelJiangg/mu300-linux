@@ -39,7 +39,7 @@ def main():
                 const M=new Function('rpc','baseclass','L',common)(rpc,base,L);
                 M.watchSms=()=>{}; M.confirmBox=()=>Promise.resolve(true);
                 window.M=M;
-                window.view=new Function('view','M','L','R',locks)(base,M,L,{poll:()=>()=>{}});
+                window.view=new Function('view','M','L','R','AutoMode',locks)(base,M,L,{poll:()=>()=>{}},{attach:()=>({update(){},reload(){}})});
                 document.querySelector('#app').appendChild(view.render());
             }''', [(RES/'mu300/common.js').read_text(encoding='utf-8'),
                    (RES/'view/mu300/locks.js').read_text(encoding='utf-8'), lang])

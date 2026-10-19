@@ -24,12 +24,14 @@ supported() {
         real=$(readlink -f "$part") || return 1
         [ "$(cat "/sys/class/block/${real##*/}/size")" = 2048 ] || return 1
         hash=$(sha256sum "$part") || return 1
-        # V50 has the same verified executable and DVFS tables as F50; only
-        # 512 bytes in the authentication trailer differ. Keep an exact hash
+        # V50 and U30 Air have the same verified executable and DVFS tables as
+        # F50; only the 512-byte authentication area differs. See
+        # docs/U30AIR-CPU-VOLTAGE-20261019.zh-CN.md. Keep an exact whole-image
         # allowlist, never infer voltage support from the SoC name alone.
         case ${hash%% *} in
             ff4782690fd805ff54fe34853ef8ee5c7e51c3259e20077c55373b50a4b259c2|\
-            5b3183f17af9b416e71dea61e578c61824e4e1df43737a1179032f4b20466b2b) ;;
+            5b3183f17af9b416e71dea61e578c61824e4e1df43737a1179032f4b20466b2b|\
+            f27ac16f44e6cdc87a8ee00a9b53c499c8dde0c3b92c771388e256e84ef12e70) ;;
             *) return 1 ;;
         esac
     done

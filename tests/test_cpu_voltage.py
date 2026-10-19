@@ -51,6 +51,9 @@ class EarlyVoltageDiscovery(ShellTest):
         # Redirect every filesystem read to regular fake devices; no actual
         # partitions, module loading, or hash bypass in production code.
         check=check.replace('/sys/',str(self.tmp)+'/sys/').replace('/dev/',str(self.tmp)+'/dev/').replace('[ -b ', '[ -f ')
+        # BusyBox standalone ash may resolve its hash applet before PATH.
+        # Invoke this fixture's stub explicitly, never a real firmware hash.
+        check=check.replace('sha256sum "$part"', '"$STUBLOG/stubs/sha256sum" "$part"')
         compatible=self.tmp/'sys/firmware/devicetree/base/compatible'
         compatible.parent.mkdir(parents=True)
         compatible.write_bytes(b'zte,f50\0sprd,ums9620\0')
@@ -68,6 +71,11 @@ class EarlyVoltageDiscovery(ShellTest):
         self.stub('sha256sum','printf "%s  %s\\n" 5b3183f17af9b416e71dea61e578c61824e4e1df43737a1179032f4b20466b2b "$1"')
         for shell in self.each_shell():
             self.assertEqual(self.sh(shell,check+'\nsupported').returncode,0)
+        self.stub('sha256sum','printf "%s  %s\\n" f27ac16f44e6cdc87a8ee00a9b53c499c8dde0c3b92c771388e256e84ef12e70 "$1"')
+        compatible.write_bytes(b'zte,u30air\0sprd,ums9620\0')
+        for shell in self.each_shell():
+            self.assertEqual(self.sh(shell,check+'\nsupported').returncode,0)
+        # Matching chip name alone never enables an unverified SML image.
         self.stub('sha256sum','printf "%s  %s\\n" unknown "$1"')
         for shell in self.each_shell():
             self.assertNotEqual(self.sh(shell,check+'\nsupported').returncode,0)

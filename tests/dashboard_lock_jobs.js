@@ -87,8 +87,9 @@ async function main() {
         }, busy:(button,on)=>{button.busy=on;},
         callLockSet:(kind,val)=>{requests.push({kind,val,slot:selected}); return Promise.resolve({...start,kind});},
         waitLockJob:()=>new Promise((resolve,reject)=>{finishJob=resolve;failJob=reject;})};
-    const page = new Function('view','R','M','L',locks)(
-        {extend:x=>x},{poll:()=>()=>{}},fakeM,{resolveDefault:x=>Promise.resolve(x)});
+    const page = new Function('view','R','M','L','AutoMode',locks)(
+        {extend:x=>x},{poll:()=>()=>{}},fakeM,{resolveDefault:x=>Promise.resolve(x)},
+        {attach:()=>({update(){},reload(){}})});
     page.refresh=()=>Promise.resolve();
     page.note=(text,type)=>notes.push({text,type});
     page.wire(pageRoot);

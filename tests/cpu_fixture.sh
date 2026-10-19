@@ -45,4 +45,15 @@ export MU300_CPU_CONFIG=$old
 printf '%s' '{"persist":false,"changes":[{"id":"policy0","cpus":"0 1","governor":"schedutil","min":100,"max":300}]}' | call apply > "$base/out"
 test ! -e "$MU300_CPU_CONFIG"
 call boot > "$base/out"
+# related_cpus stays stable across hotplug; affected_cpus can become empty.
+# Saving an active cluster must retain another offline cluster's request.
+printf '0 1\n' > "$MU300_CPU_SYS/policy0/related_cpus"
+printf '%s' '{"scope":"frequency","persist":true,"changes":[{"id":"policy0","cpus":"0 1","governor":"schedutil","min":100,"max":300},{"id":"policy4","cpus":"0 1","governor":"performance","min":200,"max":300}]}' | call apply > "$base/out"
+printf '\n' > "$MU300_CPU_SYS/policy4/affected_cpus"
+printf '0\n' > "$MU300_CPU_SYS/policy0/affected_cpus"
+call get > "$base/out"
+test "$(jsonfilter -i "$base/out" -e '@.policies[0].cpus')" = '0 1'
+test "$(jsonfilter -i "$base/out" -e '@.policies[1].writable')" = false
+printf '%s' '{"scope":"frequency","persist":true,"changes":[{"id":"policy0","cpus":"0 1","governor":"performance","min":100,"max":300}]}' | call apply > "$base/out"
+test "$(jsonfilter -i "$MU300_CPU_CONFIG" -e '@.frequency.changes[1].min')" = 200
 echo "PASS CPU validation/persistence/restore/rollback/temporary: $base"

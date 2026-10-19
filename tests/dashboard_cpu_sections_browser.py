@@ -7,7 +7,8 @@ js=top/'openwrt/luci-app-mu300/htdocs/luci-static/resources'
 common=(js/'mu300/common.js').read_text(encoding='utf-8')
 cpu=(js/'view/mu300/cpu.js').read_text(encoding='utf-8')
 with sync_playwright() as p:
-    browser=p.chromium.launch(headless=True,executable_path='C:/Users/kano/AppData/Local/ms-playwright/chromium-1024/chrome-win/chrome.exe')
+    chrome=Path('C:/Program Files/Google/Chrome/Application/chrome.exe')
+    browser=p.chromium.launch(headless=True,**({'executable_path':str(chrome)} if chrome.exists() else {}))
     for theme in ('aurora','bootstrap'):
         for dark in (False,True):
             for lang in ('zh-cn','en','tr'):
@@ -24,7 +25,7 @@ with sync_playwright() as p:
                         window.data={ok:1,persist:false,policies:[0,4,7].map((id,i)=>({id:'policy'+id,cpus:['0 1 2 3','4 5 6','7'][i],driver:'sprd-cpufreq-v2',governors:['schedutil','performance'],governor:'schedutil',frequencies:[408000,1000000,1800000],min:408000,max:1800000,hardware_min:408000,hardware_max:1800000,current:1000000,writable:true})),zones:[{name:'soc-thmzone',id:'thermal_zone19',temp:42000,minimum:40000,maximum:100000,step:1000,mode:'enabled',policy:'step_wise',trips:[{id:0,type:'passive',temp:70000,hysteresis:1000,writable:true,throttles_cpu:false},{id:1,type:'passive',temp:85000,hysteresis:1000,writable:true,throttles_cpu:true},{id:2,type:'critical',temp:110000,hysteresis:2000,writable:false}],cooling:[{id:'cdev0',type:'cpufreq-cpu0',state:0,max_state:9}]},{name:'lit0-thmzone',id:'thermal_zone7',temp:40000,trips:[],cooling:[]}],voltage:{supported:false}};
                         const rpc={declare:o=>(payload)=>{if(o.method==='cpu_apply'){requests.push(JSON.parse(payload));}return Promise.resolve(data);}};
                         const M=new Function('rpc','baseclass','L',common)(rpc,{extend:o=>o},L);
-                        window.view=new Function('view','rpc','poll','M',cpu)({extend:o=>o},rpc,{add(){},remove(){}},M);
+                        window.view=new Function('view','rpc','poll','M','Cores',cpu)({extend:o=>o},rpc,{add(){},remove(){}},M,{render:()=>document.createElement('div')});
                         document.body.append(view.render(data));
                     }''',[common,cpu,lang])
                     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),(theme,dark,lang,width,'overflow')
