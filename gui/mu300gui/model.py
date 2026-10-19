@@ -290,11 +290,11 @@ def problems(c, facts):
     if (c.ubuntu or c.openwrt) and c.place_bytes(facts) and c.place_bytes(facts) < c.needs(facts):
         out.append(('systems', _('That choice needs about {1} and the place has {2}.', size(c.needs(facts)), size(c.place_bytes(facts)))))
     if c.kernel == '5.4' and c.device == 'v50' and c.package:
-        out.append(('kernel', _('The ZTE V50 runs a mainline kernel only: take the zip for kernel 6.18 or 7.2 of this release')))
+        out.append(('kernel', _('The ZTE V50 runs a mainline kernel only: take the zip for kernel 6.18, 7.2 or 7.3 of this release')))
     elif c.kernel == '5.4' and c.device == 'v50':
-        out.append(('kernel', _('The ZTE V50 runs a mainline kernel only (6.18 or 7.2).')))
+        out.append(('kernel', _('The ZTE V50 runs a mainline kernel only (6.18, 7.2 or 7.3).')))
     elif not c.kernel_ok():
-        out.append(('kernel', _('Ubuntu 26.04 needs a mainline kernel: choose 6.18 or 7.2.')))
+        out.append(('kernel', _('Ubuntu 26.04 needs a mainline kernel: choose 6.18, 7.2 or 7.3.')))
     if c.kernel not in KERNELS:
         out.append(('kernel', _('Choose a kernel.')))
     if c.default_linux and not 1 <= int(c.boot_attempts or 0) <= 6:
