@@ -304,7 +304,7 @@ radio_on_locked() {
     out=$(at 'AT+CFUN?' 4 2>&1 || true)
     case "$out" in
         *"+CFUN: 1"*) return 0 ;;
-        *"+CFUN: 0"*) ;;
+        *"+CFUN: 0"*|*"+CFUN: 2"*|*"+CFUN: 4"*) ;;
         *)
             radio_say "AT 通道没有回应，停止本轮，不向死通道发送 SFUN：$(echo "${out:-无回答}" | tr -s '\n' ' ')"
             return 1 ;;

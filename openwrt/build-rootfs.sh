@@ -96,7 +96,14 @@ fi
 want=$(curl -fsL "$URL/sha256sums" | sed -n "s/^\([0-9a-f]*\) \*$TARBALL$/\1/p")
 have=$(shasum -a 256 "openwrt/$TARBALL" 2>/dev/null || sha256sum "openwrt/$TARBALL")
 [ "${have%% *}" = "$want" ] || { echo "checksum mismatch for $TARBALL" >&2; exit 1; }
-docker import --platform linux/arm64 "openwrt/$TARBALL" mu300-$FLAVOUR-base:$VER >/dev/null
+# Import each upstream rootfs once. Re-importing identical bytes creates another
+# dangling image on every packaging run, even though the base has not changed.
+base_image=mu300-$FLAVOUR-base:$VER
+base_digest=$(docker image inspect --format '{{ index .Config.Labels "org.openwrt.rootfs.sha256" }}' "$base_image" 2>/dev/null || true)
+if [ "$base_digest" != "$want" ]; then
+    docker import --platform linux/arm64 --change "LABEL org.openwrt.rootfs.sha256=$want" \
+        "openwrt/$TARBALL" "$base_image" >/dev/null
+fi
 # OpenWrt ships an unsigned regulatory.db; this kernel requires the signed database (wens key), so take Debian/Ubuntu's
 REGDB=$(mktemp -d)
 docker run --rm --platform linux/arm64 -v "$REGDB":/o ubuntu:26.04 sh -c \

@@ -25,7 +25,7 @@ class LockWrites(ShellTest):
             shutil.copyfile(LIB / name, self.lock.parent / name)
             (self.lock.parent / name).chmod(0o755)
         self.modem = self.tmp / 'modem.json'
-        self.stub('uci', f'case "$3" in unisoc_modem.main.state_dir) echo "{self.state}";; *.sim_slots) echo "${{TEST_SIM_SLOTS:-1}}";; esac')
+        self.stub('uci', f'case "$3" in unisoc_modem.main.state_dir) echo "{self.state}";; *.sim_slots) echo "${{TEST_SIM_SLOTS:-1}}";; *.auto_work_mode) echo "${{TEST_AUTO_MODE:-default}}";; *.auto_work_mode_default) echo "${{TEST_DEFAULT_MODE:-134}}";; esac')
         self.stub('logger', ':')
         self.stub('ifup', 'echo ifup >> "$STUBLOG/commands"')
         self.stub('sleep', ':')
@@ -86,6 +86,52 @@ print('OK')
 
     def apply(self, shell, kind, val):
         return self.script(shell, self.lock, 'apply', kind, val, **self.extra)
+
+    def test_automatic_mode_override_and_reset_share_codec(self):
+        for shell in self.each_shell():
+            for default,choice,expected in [('134','default','134'),('134','152','152'),('152','default','152'),('152','134','134')]:
+                for kind in ('mode','reset'):
+                    self.reset(tm='131,128,1', gran='0')
+                    result=self.script(shell,self.lock,'apply',kind,'auto',
+                        **dict(self.extra,TEST_AUTO_MODE=choice,TEST_DEFAULT_MODE=default))
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    self.assertEqual(json.loads(self.modem.read_text())['tm'],expected+',128,1')
+
+    def test_auto_mode_boot_replay_uses_selected_code_before_dial(self):
+        for shell in self.each_shell():
+            (self.tmp/'marker').unlink(missing_ok=True)
+            self.reset(tm='134,128,1', gran='1')
+            (self.state/'mode').write_text('auto')
+            (self.state/'auto_apply').write_text('on')
+            result=self.script(shell,self.lock,'replay','early',**dict(self.extra,TEST_AUTO_MODE='152'))
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(json.loads(self.modem.read_text())['tm'],'152,128,1')
+            self.assertNotIn('AT+SFUN=',(self.tmp/'commands').read_text())
+
+    def test_second_slot_override_preserves_first_slot(self):
+        for shell in self.each_shell():
+            for kind in ('mode','reset'):
+                self.reset(tm='128,131,0',gran='0')
+                scoped=self.state/'sim1';scoped.mkdir(exist_ok=True)
+                env=dict(self.extra,TEST_AUTO_MODE='152',MU300_SIM_SLOT='1',
+                         MU300_STATE_DIR=scoped,MU300_DASH_DIR=self.run/'sim1')
+                result=self.script(shell,self.lock,'apply',kind,'auto',**env)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(json.loads(self.modem.read_text())['tm'],'128,152,0')
+
+    def test_disabled_sim2_accepts_settings_without_enabling_rf(self):
+        for shell in self.each_shell():
+            for kind in ('mode','reset'):
+                self.reset(tm='128,131,0',gran='0',cfun='4')
+                (self.tmp/'sim-radio-policy').write_text('1 0\n')
+                scoped=self.state/'sim1';scoped.mkdir(exist_ok=True)
+                env=dict(self.extra,TEST_AUTO_MODE='152',MU300_SIM_SLOT='1',
+                         MU300_STATE_DIR=scoped,MU300_DASH_DIR=self.run/'sim1')
+                result=self.script(shell,self.lock,'apply',kind,'auto',**env)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(json.loads(self.modem.read_text())['tm'],'128,152,0')
+                self.assertEqual(json.loads(self.modem.read_text())['cfun'],'4')
+                self.assertNotIn('AT+SFUN=',(self.tmp/'commands').read_text())
 
     def seed_locks(self, directory=None):
         directory = directory or self.state

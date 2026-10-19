@@ -62,7 +62,6 @@ get)
 apply)
     target=${2:-}
     case "$target" in 0|1) ;; *) echo invalid_sim >&2; exit 1 ;; esac
-    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || { echo 'Enable the target SIM radio before switching' >&2; exit 1; }
     [ -n "$dev1" ] || { echo dual_sim_unavailable >&2; exit 1; }
     [ -f "$ready" ] || { echo dual_boot_required >&2; exit 1; }
     # A separate switch gate blocks interactive writes, but permits the dial
@@ -76,6 +75,21 @@ apply)
     [ ! -d /run/unisoc-modem-lock-apply ] || { echo modem_busy >&2; exit 1; }
     current=$(data_card)
     case "$current" in 0|1) ;; *) echo sim_read_failed >&2; exit 1 ;; esac
+    # Preserve a pre-policy SIM2 choice when later switching back to SIM1.
+    if [ "$current" = 1 ] && [ ! -e "${UNISOC_RADIO_POLICY:-/etc/mu300/sim-radio}" ]; then
+        "${MU300_RADIO_CONTROL:-/opt/mu300/bin/mu300-sim-radio}" --switch-enable 1 1 || exit 1
+    fi
+    # Selecting SIM2 is an explicit opt-in. Do not recursively take this
+    # switch gate; the existing controller still serializes its RF operation.
+    permission=0
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || permission=$?
+    case "$permission:$target" in
+        0:*) ;;
+        1:1)
+            at_slot "$target" 'AT+CPIN?' | grep -q '^+CPIN: READY' || { echo sim_not_ready >&2; exit 1; }
+            "${MU300_RADIO_CONTROL:-/opt/mu300/bin/mu300-sim-radio}" --switch-enable 1 1 || exit 1 ;;
+        *) echo 'Enable the target SIM radio before switching' >&2; exit 1 ;;
+    esac
     if [ "$current" = "$target" ]; then
         # Even an intentionally disconnected WAN must stay disconnected.
         save_card "$target" || { echo storage_failed >&2; exit 1; }

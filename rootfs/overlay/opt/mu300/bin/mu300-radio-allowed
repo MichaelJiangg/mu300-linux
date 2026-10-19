@@ -1,8 +1,14 @@
 #!/bin/sh
-# Persistent per-slot RF permission. Missing means both enabled (legacy).
-case ${1:-} in 0|1) ;; *) exit 2;; esac
+# Persistent per-slot RF permission. SIM2 is opt-in; an existing saved SIM2
+# data-card choice is also explicit intent and must survive an upgrade.
+case ${1:-} in 0|1|--flags) ;; *) exit 2;; esac
 policy=${UNISOC_RADIO_POLICY:-/etc/mu300/sim-radio}
-[ -e "$policy" ] || exit 0
-flags=$(cat "$policy") || exit 2
+if [ -e "$policy" ]; then
+    flags=$(cat "$policy") || exit 2
+else
+    flags='1 0'
+    [ "$(uci -q get unisoc_modem.main.data_sim 2>/dev/null)" != 1 ] || flags='1 1'
+fi
 case "$flags" in '0 0'|'0 1'|'1 0'|'1 1') ;; *) exit 2;; esac
+[ "$1" != --flags ] || { printf '%s\n' "$flags"; exit 0; }
 if [ "$1" = 0 ]; then [ "${flags% *}" = 1 ]; else [ "${flags#* }" = 1 ]; fi

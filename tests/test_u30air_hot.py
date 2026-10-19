@@ -107,8 +107,11 @@ esac""")
             .replace('/opt/mu300/bin/mu300-at','mu300-at').replace('/opt/mu300/bin/mobile-data','mobile-data')
             .replace('/opt/mu300/bin/mu300-device','mu300-device'))
         self.controller.chmod(0o755)
+        (self.tmp/'sim-radio-policy').write_text('1 1\n')
+        self.stub('radio-control','[ "$*" = "--switch-enable 1 1" ] || exit 2; printf "1 1\\n" > "$UNISOC_RADIO_POLICY"; echo enable-sim2 >> "$STUBLOG/radio-opt-in"')
 
     def env(self, **extra):
+        extra.setdefault('MU300_RADIO_CONTROL',self.stubs/'radio-control')
         extra.setdefault('MU300_SIM_CONFIG_LIB', TOP / 'rootfs/overlay/opt/mu300/lib/sim-config.sh')
         extra.setdefault('MU300_SIM_ROOT', self.tmp)   # the library's own files (sim-data-seen, the route mark)
         extra.setdefault('MU300_REBOOT_CMD', self.stubs / 'reboot')
@@ -138,6 +141,7 @@ esac""")
         for public,slot in [('1','0'),('2','1')]:
             r=self.ctl('switch',public)
             self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+
             self.assertEqual((self.etc/'uci-slot').read_text(),slot+'\n')
             self.assertEqual((self.run/'mu300/sim-slot').read_text(),slot+'\n')
             s=self.status()
@@ -154,6 +158,15 @@ esac""")
         self.assertEqual(seen.stat().st_mode & 0o077, 0)
         self.assertFalse((self.run/'mu300/sim-sequence').exists())
 
+    def test_explicit_switch_to_disabled_sim2_enables_permission(self):
+        result=self.ctl('switch','1')
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        (self.tmp/'sim-radio-policy').write_text('1 0\n')
+        result=self.ctl('switch','2')
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
+        self.assertTrue((self.tmp/'radio-opt-in').exists())
+
     def test_switch_from_user_disabled_active_radio(self):
         (self.tmp/'sim-radio-policy').write_text('1 0\n')
         (self.tmp/'radio1').write_text('4\n')
@@ -163,6 +176,18 @@ esac""")
         self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 0\n')
         self.assertEqual((self.tmp/'radio1').read_text().strip(),'0')
         self.assertEqual((self.tmp/'radio0').read_text().strip(),'1')
+
+    def test_switch_from_sfun_disabled_active_radio(self):
+        for off in ('0','2'):
+            (self.tmp/'sim-radio-policy').write_text('1 0\n')
+            (self.tmp/'radio1').write_text(off+'\n')
+            (self.tmp/'radio0').write_text('0\n')
+            (self.run/'mu300/sim-slot').write_text('1\n')
+            (self.tmp/'route').write_text('1\n')
+            result=self.ctl('switch','1')
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            self.assertEqual((self.run/'mu300/sim-slot').read_text(),'0\n')
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 0\n')
 
     def test_the_card_in_use_goes_off_before_the_other_one_comes_on(self):
         # measured on our U30 Air: with the target's radio switched on first, its AT+SFUN=4 never answered and the

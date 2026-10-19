@@ -25,15 +25,16 @@ from pathlib import Path
 r=Path(os.environ["STUBLOG"]);p=r/"state";s=json.loads(p.read_text());cmd=sys.argv[-1]
 with (r/"at").open("a") as f:f.write(cmd+"\\n")
 n=int(re.search(r"SPACTCARD=(\\d)",cmd)[1])
-if "CFUN=" in cmd:
+if "SFUN=" in cmd:
  if os.getenv("FAIL_RF")=="1":print("ERROR");sys.exit(1)
- s[n]=int(cmd[-1]);p.write_text(json.dumps(s))
+ s[n]=1 if cmd.endswith("=4") else int(os.getenv("OFF_STATE","2"));p.write_text(json.dumps(s))
+elif cmd.endswith("+CPIN?"): print("+CPIN: READY" if os.getenv("SIM_POWERED")=="1" else "+CME ERROR: 10")
 else: print("+CFUN: "+str(s[n]))
 print("OK")' "$@"''')
         self.stub('mobile-data', '''printf '%s\n' "$*" >> "$STUBLOG/mobile"
 case $1 in
  radio-policy) exec sh "$CONTROLLER" --locked "$2" "$3";;
- radio-on) printf '[1,4]' > "$STUBLOG/state";;
+ radio-on) printf '[1,2]' > "$STUBLOG/state";;
  *) exit 2;;
 esac''')
         self.controller=self.tmp/'controller'
@@ -50,16 +51,41 @@ esac''')
 
     def test_independent_radios_both_off_and_reenable_without_data_switch(self):
         for shell in self.each_shell():
-            for slot,on,expected in [('1','0',[1,4]),('0','0',[4,4]),('1','1',[4,1]),('0','1',[1,1])]:
+            for slot,on,expected in [('1','0',[1,2]),('0','0',[2,2]),('1','1',[2,1]),('0','1',[1,1])]:
                 result=self.call(shell,'apply',slot,on)
                 self.assertEqual(result.returncode,0,result.stderr)
                 self.assertEqual(json.loads((self.tmp/'state').read_text()),expected)
             self.assertEqual(json.loads(self.call(shell,'get').stdout)['enabled'],[1,1])
             self.assertNotIn('SPSWDATA',(self.tmp/'at').read_text())
-            self.assertNotIn('SFUN',(self.tmp/'at').read_text())
+            self.assertNotIn('CFUN=',(self.tmp/'at').read_text())
             notifications=(self.tmp/'ubus').read_text()
             self.assertIn('"available":false',notifications)
             self.assertIn('"available":true',notifications)
+
+    def test_missing_policy_defaults_sim2_off_and_keeps_saved_sim2_selection(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').unlink(missing_ok=True)
+            self.stub('uci','case "$3" in *.sim_slots) echo 2;; *.data_sim) echo "${SAVED_DATA_SIM:-0}";; *) echo wan;; esac')
+            view=json.loads(self.call(shell,'get').stdout)
+            self.assertEqual(view['enabled'],[1,0])
+            view=json.loads(self.call(shell,'get',SAVED_DATA_SIM='1').stdout)
+            self.assertEqual(view['enabled'],[1,1])
+            self.assertFalse((self.tmp/'at').exists())
+            (self.tmp/'sim-radio-policy').write_text('1 0\n')
+            self.assertEqual(json.loads(self.call(shell,'get',SAVED_DATA_SIM='1').stdout)['enabled'],[1,0])
+
+    def test_explicit_sim2_switch_enables_under_existing_switch_gate(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').write_text('1 0\n')
+            (self.tmp/'state').write_text('[1,2]')
+            gate=self.tmp/'gate';gate.mkdir(exist_ok=True)
+            result=self.call(shell,'--switch-enable','1','1')
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
+            self.assertEqual(json.loads((self.tmp/'state').read_text()),[1,1])
+            self.assertTrue(gate.exists())
+            gate.rmdir()
+            self.assertNotIn('SPSWDATA',(self.tmp/'at').read_text())
 
     def test_standby_toggle_never_changes_wan_intent(self):
         for shell in self.each_shell():
@@ -84,12 +110,12 @@ esac''')
 
     def test_cold_reenable_uses_existing_initializer_and_not_new_sfun_sequence(self):
         for shell in self.each_shell():
-            (self.tmp/'state').write_text('[0,4]')
+            (self.tmp/'state').write_text('[0,2]')
             (self.tmp/'sim-radio-policy').write_text('0 0\n')
             result=self.call(shell,'apply','0','1')
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('radio-on',(self.tmp/'mobile').read_text())
-            self.assertEqual(json.loads((self.tmp/'state').read_text()),[1,4])
+            self.assertEqual(json.loads((self.tmp/'state').read_text()),[1,2])
 
     def test_cold_disable_never_preempts_first_ril_handshake(self):
         for shell in self.each_shell():
@@ -97,6 +123,37 @@ esac''')
             result=self.call(shell,'apply','0','0')
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertFalse((self.tmp/'at').exists())
+
+    def test_sfun_off_zero_and_two_reenable_without_resetting_powered_sim(self):
+        for shell in self.each_shell():
+            for off in ('0','2'):
+                (self.tmp/'state').write_text('[1,1]')
+                self.assertEqual(self.call(shell,'apply','0','0',OFF_STATE=off).returncode,0)
+                self.assertEqual(json.loads((self.tmp/'state').read_text()),[int(off),1])
+                result=self.call(shell,'apply','0','1',SIM_POWERED='1')
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(json.loads((self.tmp/'state').read_text()),[1,1])
+                self.assertNotIn('radio-on',(self.tmp/'mobile').read_text())
+                commands=(self.tmp/'at').read_text()
+                self.assertIn('AT+SPACTCARD=0;+SFUN=5',commands)
+                self.assertIn('AT+SPACTCARD=0;+SFUN=4',commands)
+                self.assertNotIn('CFUN=',commands)
+
+    def test_old_flight_mode_is_not_accepted_as_sfun_off_confirmation(self):
+        for shell in self.each_shell():
+            result=self.call(shell,'apply','1','0',OFF_STATE='4')
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('readback not confirmed',result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 0\n')
+
+    def test_enabling_already_on_sim_only_updates_permission(self):
+        for shell in self.each_shell():
+            (self.tmp/'state').write_text('[1,1]')
+            (self.tmp/'sim-radio-policy').write_text('1 0\n')
+            result=self.call(shell,'apply','1','1')
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
+            self.assertNotIn('SFUN=',(self.tmp/'at').read_text())
 
     def test_u30_inactive_permission_changes_preserve_cold_stack_baseline(self):
         self.stub('mu300-device','echo u30air')

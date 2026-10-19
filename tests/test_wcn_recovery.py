@@ -35,7 +35,11 @@ class DriverRecovery(unittest.TestCase):
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <errno.h>
 #define READ_ONCE(x) (x)
+#define SPRD_HW_SC2355_PCIE 3
+#define spin_lock_irqsave(p,f) do { (void)(p); (f)=0; } while (0)
+#define spin_unlock_irqrestore(p,f) do { (void)(p); (void)(f); } while (0)
 #define SPRD_MAX_ADD_MH_BUF_ONCE 32
 #define SPRD_PCIE_RX_ALLOC_BUF 1
 #define clamp(x,a,b) ((x)<(a)?(a):((x)>(b)?(b):(x)))
@@ -44,17 +48,18 @@ class DriverRecovery(unittest.TestCase):
 #define atomic_add_return(n,p) (*(p)+=(n))
 static unsigned int atomic_xchg(unsigned int *p, unsigned int v) { unsigned int n=*p; *p=v; return n; }
 struct mem_mgmt { unsigned int alloc_num; };
-struct rx_mgmt { struct mem_mgmt mm_entry; void *addr_trans_head; bool stopping; int refill_retry; unsigned int refill_backoff_ms; struct sprd_hif *hif; };
-struct ops { void (*tx_addr_trans)(struct sprd_hif *, void *, int, bool); };
-struct sprd_hif { struct rx_mgmt *rx_mgmt; struct ops *ops; void *priv; };
+struct rx_mgmt { struct mem_mgmt mm_entry; void *addr_trans_head; bool stopping; int refill_retry; unsigned int refill_backoff_ms; struct sprd_hif *hif; int refill_lock; bool refill_bus_waiting,refill_bus_ready; };
+struct ops { int (*tx_addr_trans)(struct sprd_hif *, void *, int, bool); };
+struct sprd_hif { struct rx_mgmt *rx_mgmt; struct ops *ops; void *priv; int hw_type; };
 static unsigned int allocated, immediate, delayed, delay_ms, attempts;
 static bool sent;
 static void *system_wq;
 static int delayed_work_pending(int *p) { return *p; }
-static void queue_delayed_work(void *q, int *p, unsigned int ms) { ++delayed; *p=1; delay_ms=ms; }
+static void mod_delayed_work(void *q, int *p, unsigned int ms) { ++delayed; *p=1; delay_ms=ms; }
+static void cancel_delayed_work(int *p) { *p=0; }
 static void sc2355_queue_rx_buff_work(void *p, int id) { ++immediate; }
 static unsigned int sc2355_mm_buffer_alloc(struct mem_mgmt *m, unsigned int n) { ++attempts; return n-allocated; }
-static void transmit(struct sprd_hif *h, void *data, int len, bool flush) { if (sent) h->rx_mgmt->addr_trans_head=NULL; }
+static int transmit(struct sprd_hif *h, void *data, int len, bool flush) { if (sent) h->rx_mgmt->addr_trans_head=NULL; return 0; }
 ''' + constants + '\n' + body + r'''
 int main(void) {
     struct rx_mgmt rx={ .mm_entry={100} }; struct ops ops={transmit}; struct sprd_hif h={&rx,&ops,NULL}; rx.hif=&h;

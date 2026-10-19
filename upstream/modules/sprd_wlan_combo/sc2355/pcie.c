@@ -14,6 +14,7 @@
 #include <linux/of_device.h>
 #include <linux/atomic.h>
 #include <linux/moduleparam.h>
+#include <linux/rcupdate.h>
 
 #include <misc/marlin_platform.h>
 
@@ -618,13 +619,18 @@ static int pcie_suspend_resume_handle(int chn, int mode)
 
 static int sc2355_pcie_tx_data_complete(int channel, int timeout)
 {
-	struct sprd_hif *hif = sc2355_pcie_get_hif();
+	struct sprd_hif *hif;
 	struct tx_mgmt *tx_mgmt;
 
 	/* The bus calls this after draining its pending queue, with IRQs off. */
+	rcu_read_lock();
+	hif = sc2355_pcie_get_hif();
 	tx_mgmt = hif ? smp_load_acquire(&hif->tx_mgmt) : NULL;
 	if (!timeout && tx_mgmt && atomic_xchg(&tx_mgmt->pcie_tx_waiting, 0))
 		sc2355_tx_up(tx_mgmt);
+	if (!timeout && hif && channel == hif->tx_data_port)
+		sc2355_rx_bus_complete(hif);
+	rcu_read_unlock();
 	return 0;
 }
 

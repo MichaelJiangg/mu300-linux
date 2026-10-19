@@ -66,9 +66,43 @@ elif name=='jsonfilter':
         shims='\n'.join(name+'() { "$STUBLOG/stubs/'+name+'" "$@"; }' for name in ('ifdown','ifup','sleep'))
         self.controller.write_text(source.replace('#!/bin/sh\n','#!/bin/sh\n'+shims+'\n',1))
         self.extra=dict(MU300_SIM_ENV_LIB=self.envlib,MU300_SIM_MUTEX=self.tmp/'mutex',MU300_DUAL_READY=self.tmp/'ready',MU300_DATA_SIM_ACTUAL=self.tmp/'actual')
+        self.stub('radio-control','[ "$*" = "--switch-enable 1 1" ] || exit 2; [ "${FAIL_RADIO_ENABLE:-0}" != 1 ] || exit 1; printf "1 1\\n" > "$UNISOC_RADIO_POLICY"; echo enable-sim2 >> "$STUBLOG/commands"')
+        self.extra['MU300_RADIO_CONTROL']=self.stubs/'radio-control'
+
+    def test_first_switch_to_sim2_remembers_rf_opt_in(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').unlink(missing_ok=True)
+            self.reset()
+            result=self.run_switch(shell,'1')
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
+            self.assertLess((self.tmp/'commands').read_text().index('enable-sim2'),(self.tmp/'commands').read_text().index('ifdown'))
+            result=self.run_switch(shell,'0')
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
+
+    def test_failed_enable_or_absent_sim2_leaves_current_data_untouched(self):
+        for shell in self.each_shell():
+            for absent in (False,True):
+                (self.tmp/'sim-radio-policy').unlink(missing_ok=True)
+                self.reset(absent_target=absent)
+                result=self.script(shell,self.controller,'apply','1',**dict(self.extra,FAIL_RADIO_ENABLE='1'))
+                self.assertNotEqual(result.returncode,0)
+                self.assertNotIn('ifdown',(self.tmp/'commands').read_text())
+                self.assertEqual(json.loads(self.db.read_text())['actual'],0)
+
+    def test_legacy_sim2_opt_in_is_preserved_when_returning_to_sim1(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').unlink(missing_ok=True)
+            self.reset(saved=1,actual=1)
+            result=self.run_switch(shell,'0')
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual((self.tmp/'sim-radio-policy').read_text(),'1 1\n')
 
     def reset(self, **values):
-        self.db.write_text(json.dumps(dict(saved=0,actual=0,up=True,**values)))
+        state=dict(saved=0,actual=0,up=True)
+        state.update(values)
+        self.db.write_text(json.dumps(state))
         (self.tmp/'commands').write_text('')
 
     def run_switch(self,shell,target):

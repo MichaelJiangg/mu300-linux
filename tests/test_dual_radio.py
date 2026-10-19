@@ -25,15 +25,26 @@ elif cmd.endswith('+SPSWDATA?'):print('+SPSWDATA: '+str(s['data']))
 elif cmd.endswith('+SPSWDATA'):s['data']=slot
 elif cmd.endswith('+SFUN=4'):s['cfun'][slot]=1
 elif cmd.endswith('+SFUN=2'):s['cfun'][slot]=0
-elif cmd.endswith('+CFUN=4'):s['cfun'][slot]=4
+elif cmd.endswith('+SFUN=5'):s['cfun'][slot]=int(os.getenv('OFF_STATE','2'))
 f.write_text(json.dumps(s));print('OK')
 ''')
         client.chmod(0o755)
         self.extra=dict(MU300_DUAL_AT_CLIENT=client,MU300_DUAL_RUN=self.run,MU300_SIM_SLOT='1')
+        (self.tmp/'sim-radio-policy').write_text('1 1\n')
+
+    def test_default_boot_keeps_sim2_rf_off(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').unlink(missing_ok=True)
+            self.reset([0,0])
+            result=self.script(shell,SCRIPT,**dict(self.extra,MU300_SIM_SLOT='0'))
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(json.loads((self.tmp/'radio.json').read_text())['cfun'],[1,2])
+            self.assertNotIn('AT+SPACTCARD=1;+SFUN=4',(self.tmp/'commands').read_text())
 
     def reset(self,cfun):
         (self.tmp/'radio.json').write_text(json.dumps(dict(cfun=cfun,data=0)))
         (self.tmp/'commands').write_text('')
+        (self.run/'mu300-dual-radio-ready').unlink(missing_ok=True)
 
     def test_fresh_shared_initialization_preserves_modes_and_order(self):
         for shell in self.each_shell():
@@ -74,7 +85,7 @@ f.write_text(json.dumps(s));print('OK')
                     self.reset([0,0])
                     result=self.script(shell,SCRIPT,**self.extra)
                     self.assertEqual(result.returncode,0,result.stderr)
-                    expected=[1 if a else 4,1 if b else 4]
+                    expected=[1 if a else 2,1 if b else 2]
                     self.assertEqual(json.loads((self.tmp/'radio.json').read_text())['cfun'],expected)
                     commands=(self.tmp/'commands').read_text()
                     for card,enabled in enumerate((a,b)):
@@ -84,6 +95,24 @@ f.write_text(json.dumps(s));print('OK')
                     self.assertEqual(result.returncode,0,result.stderr)
                     self.assertNotIn('SFUN=',(self.tmp/'commands').read_text())
 
+    def test_both_disabled_cold_boot_prepares_modes_without_starting_rf(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').write_text('0 0\n')
+            self.reset([0,0])
+            result=self.script(shell,SCRIPT,**dict(self.extra,OFF_STATE='0'))
+            self.assertEqual(result.returncode,0,result.stderr)
+            commands=(self.tmp/'commands').read_text()
+            for slot in (0,1):
+                self.assertIn(f'AT+SPACTCARD={slot};+SFUN=2',commands)
+                self.assertIn(f'AT+SPACTCARD={slot};+SPTESTMODEM=',commands)
+                self.assertIn(f'AT+SPACTCARD={slot};+SFUN=5',commands)
+                self.assertNotIn(f'AT+SPACTCARD={slot};+SFUN=4',commands)
+            self.assertEqual(json.loads((self.tmp/'radio.json').read_text())['cfun'],[0,0])
+            (self.tmp/'commands').write_text('')
+            result=self.script(shell,SCRIPT,**self.extra)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertNotIn('SFUN=',(self.tmp/'commands').read_text())
+
     def test_warm_restart_enforces_only_the_disabled_slot(self):
         for shell in self.each_shell():
             for a,b in ((0,1),(1,0),(0,0)):
@@ -92,7 +121,22 @@ f.write_text(json.dumps(s));print('OK')
                 r=self.script(shell,SCRIPT,**self.extra)
                 self.assertEqual(r.returncode,0,r.stderr)
                 writes=[c for c in (self.tmp/'commands').read_text().splitlines() if not c.endswith('?')]
-                self.assertEqual(writes,[f'AT+SPACTCARD={slot};+CFUN=4' for slot,on in enumerate((a,b)) if not on])
+                self.assertEqual(writes,[f'AT+SPACTCARD={slot};+SFUN=5' for slot,on in enumerate((a,b)) if not on])
+
+    def test_zero_off_readback_and_flight_mode_migration_do_not_reset_live_peer(self):
+        for shell in self.each_shell():
+            (self.tmp/'sim-radio-policy').write_text('1 0\n')
+            for state in ([1,1],[1,4]):
+                self.reset(state)
+                result=self.script(shell,SCRIPT,**dict(self.extra,OFF_STATE='0'))
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual(json.loads((self.tmp/'radio.json').read_text())['cfun'],[1,0])
+                writes=[c for c in (self.tmp/'commands').read_text().splitlines() if not c.endswith('?')]
+                self.assertEqual(writes,['AT+SPACTCARD=1;+SFUN=5'])
+                (self.tmp/'commands').write_text('')
+                result=self.script(shell,SCRIPT,**self.extra)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertNotIn('SFUN=',(self.tmp/'commands').read_text())
 
     def test_empty_slot_does_not_block_the_inserted_card(self):
         for shell in self.each_shell():

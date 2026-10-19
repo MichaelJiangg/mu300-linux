@@ -204,7 +204,7 @@ verify_reset() {
 
 reset_modem_settings() {
     write_setting 'AT+SP5GRAN=1' &&
-    write_setting "AT+SPTESTMODE=134,$m1,$prim" &&
+    write_setting "AT+SPTESTMODE=$m0,$m1,$prim" &&
     write_setting 'AT+SPENDC=1' &&
     write_band_setting 'AT+SPLBAND=1,0,0,0,0,0' &&
     write_band_setting 'AT+SPLBAND=2,0,0,0,0' &&
@@ -225,7 +225,8 @@ invalidate_reset_cache() {
 }
 
 do_reset_apply() {
-    local tm m0=134 gran=1 m1 prim want_lte= want_nr=
+    local tm m0 gran=1 m1 prim want_lte= want_nr=
+    m0=$(auto_work_mode)
     tm=$(read_field 'AT+SPTESTMODE?' SPTESTMODE)
     printf '%s\n' "$tm" | grep -Eq '^[0-9]+,[0-9]+,[01](,[0-9]+)*$' ||
         { fail_apply '无法读取当前 SIM 模式，未发送设置'; return 1; }
@@ -239,7 +240,7 @@ do_reset_apply() {
     verify_reset ||
         { fail_apply '清除回读不一致，部分设置可能已生效；已保存锁定未删除，请刷新后重试'; return 1; }
     sfun_restart || { fail_apply '协议栈重启被拒绝，请检查模组状态'; return 1; }
-    at 'AT+CFUN?' 4 | grep -q '+CFUN: 1' ||
+    [ "${restart_deferred:-0}" = 1 ] || at 'AT+CFUN?' 4 | grep -q '+CFUN: 1' ||
         { fail_apply '设置已写入，但射频未恢复，请检查模组状态'; return 1; }
     verify_reset || { fail_apply '协议栈重启后设置不一致，未保存'; return 1; }
     # Publish the replay barrier before deleting any file, so an interrupted
@@ -330,7 +331,7 @@ do_apply() {
     verify_apply || { fail_apply '模组回读与请求设置不一致，未保存'; return 1; }
     if [ "$kind" != endc ]; then
         sfun_restart || { fail_apply '协议栈重启被拒绝，请检查模组状态'; return 1; }
-        at 'AT+CFUN?' 4 | grep -q '+CFUN: 1' ||
+        [ "${restart_deferred:-0}" = 1 ] || at 'AT+CFUN?' 4 | grep -q '+CFUN: 1' ||
             { fail_apply '设置已写入，但射频未恢复，请检查模组状态'; return 1; }
         verify_apply || { fail_apply '协议栈重启后设置不一致，未保存'; return 1; }
     fi

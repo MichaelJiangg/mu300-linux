@@ -157,17 +157,24 @@ nr_bands() {  # nr_bands "mA,mB,mS" -> "78,41,..."
 mode_label() {  # mode_label WORKMODE GRAN  (decode per ufi_tools toAppMode, slot 0)
     case $1 in
         3)   echo 4g ;;
-        134) echo auto ;;
+        134|152) echo auto ;;
         128|131) [ "$2" = 1 ] && echo sa || echo nsa ;;
         *)   echo auto ;;
     esac
+}
+auto_work_mode() {
+    local value
+    value=$(cfg auto_work_mode)
+    case "$value" in 134|152) printf '%s\n' "$value"; return;; esac
+    value=$(cfg auto_work_mode_default)
+    case "$value" in 152) echo 152;; *) echo 134;; esac
 }
 mode_pair() {  # mode_pair LABEL -> "workmode gran"  (encode per ufi_tools modeConfigForSlot0)
     case $1 in
         4g)   echo "3 1" ;;
         sa)   echo "128 1" ;;
         nsa)  echo "131 0" ;;
-        *)    echo "134 1" ;;
+        *)    printf '%s 1\n' "$(auto_work_mode)" ;;
     esac
 }
 
@@ -243,7 +250,11 @@ do_get() {
 
 # ------------------------------------------------------------------ apply
 sfun_restart() {
-    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "${MU300_SIM_SLOT:-0}" || { say 'RECONNECT-DEFERRED radio-disabled-by-user'; return 0; }
+    restart_deferred=0
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "${MU300_SIM_SLOT:-0}" || {
+        restart_deferred=1
+        say 'RECONNECT-DEFERRED radio-disabled-by-user'; return 0;
+    }
     local phase=${1:-late} restart_failed=0 active_sim
     active_sim=$(cfg data_sim); active_sim=${active_sim:-0}
     # SFUN 5 -> 4 itself takes 1-2 seconds. The old code waited here for the radio

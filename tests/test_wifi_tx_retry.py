@@ -135,6 +135,8 @@ typedef int atomic_t;
 #define atomic_set(p,v) (*(p)=(v))
 static int atomic_xchg(int *p, int v) { int old=*p; *p=v; return old; }
 #define smp_load_acquire(p) (*(p))
+#define rcu_read_lock() ((void)0)
+#define rcu_read_unlock() ((void)0)
 struct tx_mgmt { atomic_t pcie_tx_waiting; int wakeups; };
 struct sprd_hif { void *tx_mgmt; int tx_data_port; };
 struct mbuf_t { int owner; };
@@ -142,6 +144,7 @@ static struct sprd_hif *current_hif;
 static int result, complete_during_push, submits;
 static struct sprd_hif *sc2355_pcie_get_hif(void) { return current_hif; }
 static void sc2355_tx_up(struct tx_mgmt *tx) { ++tx->wakeups; }
+static void sc2355_rx_bus_complete(struct sprd_hif *hif) {}
 static int sc2355_pcie_tx_data_pop_list(int c, struct mbuf_t *h, struct mbuf_t *t, int n) { return 0; }
 ''' + callback + r'''
 static int sc2355_pcie_push_link(struct sprd_hif *hif, int ch,

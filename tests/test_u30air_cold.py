@@ -83,6 +83,21 @@ echo OK
         # init.d/mu300-atd restart, when the warm-up starts the AT service over for SIM1: recorded
         self.stub('atd-init', 'echo "$*" >> "$STUBLOG/atd-init"')
         self.start = self.copy_script('mu300-sim2-start')
+        # These cold-start scenarios explicitly opt into SIM2.
+        (self.tmp/'sim-radio-policy').write_text('1 1\n')
+
+    def test_default_sim2_rf_off_skips_cold_start_without_at(self):
+        (self.tmp/'sim-radio-policy').unlink()
+        (self.etc/'uci-slot').write_text('0\n')
+        result=self.boot()
+        self.assertEqual(result.returncode,7)
+        self.assertEqual(self.calls(),[])
+
+    def test_existing_sim2_data_preference_is_not_disabled_on_upgrade(self):
+        (self.tmp/'sim-radio-policy').unlink()
+        (self.etc/'uci-slot').write_text('1\n')
+        result=self.boot()
+        self.assertEqual(result.returncode,0,result.stderr)
 
     def env(self, **extra):
         extra.setdefault('MU300_SIM_ROOT', self.tmp)

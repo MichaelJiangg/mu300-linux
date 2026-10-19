@@ -45,7 +45,7 @@ function attach(root) {
     var disposed=false, pending=false, flags=null, supported=[true,true], readRevision=0;
     root.innerHTML='<h3></h3><p class="mud-note"></p><div data-radios></div><p role="status" aria-live="polite"></p>';
     root.querySelector('h3').textContent=M.translate('SIM 射频');
-    root.querySelector('.mud-note').textContent=M.translate('分别控制每张卡的射频并记住设置。关闭后该卡无法通话、收发短信或上网；不会自动切换到另一张卡。');
+    root.querySelector('.mud-note').textContent=M.translate('分别控制每张卡的射频并记住设置。关闭后该卡无法通话、收发短信或上网；不会自动切换到另一张卡。') + ' ' + M.translate('SIM2 默认关闭射频；手动开启或主动切换到 SIM2 会开启并记住选择。已有明确的射频设置和 SIM2 上网选择会保留。');
     var buttons=[], result=root.querySelector('[role=status]'), rows=root.querySelector('[data-radios]');
     rows.style.cssText='display:grid;gap:12px;margin:16px 0';
     [0,1].forEach(function(slot) {

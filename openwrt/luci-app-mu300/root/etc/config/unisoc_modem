@@ -16,6 +16,8 @@ config core 'main'
 	option wifi_device 'wlan0'
 	option usb_device 'usb0'
 	option replay_timeout '90'
+	option auto_work_mode 'default'
+	option auto_work_mode_default '134'
 	option home_refresh_interval '2'
 	option state_dir '/etc/unisoc-modem/lock-state.d'
 

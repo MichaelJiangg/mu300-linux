@@ -298,7 +298,6 @@ wait_wan_down() {
 }
 live_switch() {
     local target=$1 old had_data=0 rc=0 held_down=0
-    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || { fail 'Enable the target SIM radio before switching'; return 1; }
     old=$(active); case "$old" in 0|1) ;; *) fail 'Unknown active SIM; reboot first'; return 1;; esac
     [ ! -e "$R/sim-switching" ] || { fail 'Interrupted switch; reboot first'; return 1; }
     [ ! -e "$R/sim-active-unknown" ] || { fail 'Unknown radio state; reboot first'; return 1; }
@@ -306,6 +305,16 @@ live_switch() {
     available || { fail 'Persistent dual-SIM brokers unavailable; reboot first'; return 1; }
     [ ! -e /run/mu300-mobile-data.suspend ] || { fail 'Resume the modem before switching'; return 1; }
     [ ! -d /run/unisoc-modem-lock-apply ] || { fail 'Network locks are being applied'; return 1; }
+    if [ "$old" = 1 ] && [ ! -e "${UNISOC_RADIO_POLICY:-/etc/mu300/sim-radio}" ]; then
+        "${MU300_RADIO_CONTROL:-/opt/mu300/bin/mu300-sim-radio}" --switch-enable 1 1 || return 1
+    fi
+    local permission=0
+    "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$target" || permission=$?
+    case "$permission:$target" in
+        0:*) ;;
+        1:1) "${MU300_RADIO_CONTROL:-/opt/mu300/bin/mu300-sim-radio}" --switch-enable 1 1 || return 1 ;;
+        *) fail 'Enable the target SIM radio before switching'; return 1 ;;
+    esac
     # Decide before the same-slot path too: data deliberately off needs no IP.
     if sim_wan_held_down; then held_down=1; fi
     if [ "$old" = "$target" ]; then
@@ -318,10 +327,10 @@ live_switch() {
     # A card whose SIM power is off answers CME ERROR 10 whatever is in its position: the starting RF state is
     # validated here, the card itself only once its power is on (preflight).
     if ! check "$old" 1; then
-        # Explicit flight mode is a known state, not a failed native switch.
+        # Explicit RF off is a known state, not a failed native switch.
         # Keep the original off/old-SIM-power-off/new-SIM-power-on sequence.
         ! "${MU300_RADIO_ALLOWED:-/opt/mu300/bin/mu300-radio-allowed}" "$old" &&
-            check "$old" 4 || { fail 'Unexpected radio state; reboot first'; return 1; }
+            { check "$old" 0 || check "$old" 2 || check "$old" 4; } || { fail 'Unexpected radio state; reboot first'; return 1; }
     fi
     check "$target" 0 || { fail 'Unexpected radio state; reboot first'; return 1; }
     local refusal

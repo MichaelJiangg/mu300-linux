@@ -6,6 +6,7 @@
 'require mu300.common as M';
 
 return view.extend({
+	load: function() { return uci.load('unisoc_modem'); },
 	render: function() {
 		M.localizeMenu();
 		var t = M.translate;
@@ -64,6 +65,19 @@ return view.extend({
 		o.description = t('留空时匹配 Wi-Fi 网卡；只有一个 AP 时自动选择。多个 AP 无法唯一匹配时必须指定无线配置节名称。');
 		o = s.option(form.Value, 'usb_device', t('USB 网卡'));
 		o.placeholder = 'usb0';
+
+		var defaultMode = uci.get('unisoc_modem', 'main', 'auto_work_mode_default') === '152' ? '152' : '134';
+		o = s.option(form.ListValue, 'auto_work_mode', t("自动网络模式编号"));
+		o.value('default', t('默认') + ' (' + defaultMode + ')');
+		o.value('134', '134');
+		o.value('152', '152');
+		o.default = 'default';
+		o.rmempty = false;
+		o.cfgvalue = function(section) {
+			var value = uci.get('unisoc_modem', section, 'auto_work_mode');
+			return value === '134' || value === '152' ? value : 'default';
+		};
+		o.description = t("控制各 SIM 自动模式的基带制式组合。双卡时若网络延迟很高或明显卡顿，可尝试切换 134／152；效果取决于本机基带。") + ' ' + t("保存后需在网络锁定重新应用自动模式；已开启开机自动应用的卡也会在下次启动时采用此值。显式 4G／SA／NSA 模式不变。");
 
 		o = s.option(form.Value, 'replay_timeout', t('等待 AT 就绪上限（秒）'));
 		o.datatype = 'uinteger';
