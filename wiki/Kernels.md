@@ -16,7 +16,7 @@ the one the factory built and the most proven; 6.18, 7.2 and 7.3 are the regular
 | 3 | **7.2** | 7.2 (stable): the stable 7.2 series of mainline Linux, newer drivers, the same functions as 6.18; tested less than 6.18 |
 | 4 | **7.3** | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 7.2 |
 
-7.3 comes from the next release after v2026.10.19.1 on; older releases offer the first three.
+7.3 comes from the next release after v2026.10.19.2 on; older releases offer the first three.
 
 ## Which one should I take?
 
@@ -54,7 +54,7 @@ flowchart TD
 | 6.18 | 6.18.56 | longterm; BTF, BPF JIT, FunctionFS (for adb); rebuilt in v2026.10.25: the U30 Air's charger is also looked for at 0x1a (an SGM41513, #102); v2026.10.23 added the `mu300_thermal` module (the board's temperature as a thermal zone); since v2026.10.22 the F50's SD slot has real card detect (the EIC controller's six banks mapped), so an empty slot is no longer polled and no `mmc1` register dumps fill the log (#181); since v2026.10.21 the Wi-Fi driver can be unloaded (#146) and is quieter (#140) |
 | 7.2 | 7.2.10 | stable; the same additions, the same card-detect fix, the same modules |
 
-7.3 is not in v2026.10.25; it comes from the next release after v2026.10.19.1 on, with the same additions and modules.
+7.3 is not in v2026.10.25; it comes from the next release after v2026.10.19.2 on, with the same additions and modules.
 
 The point releases bring, among others, a DWC3 USB fix for an IRQ storm that could panic the board, netfilter
 flowtable and fq_codel fixes, Bluetooth and USB-serial use-after-free fixes. The BTF data costs about 4 MB of the

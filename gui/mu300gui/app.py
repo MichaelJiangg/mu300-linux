@@ -727,6 +727,7 @@ class App:
               else _('Not with Ubuntu 26.04: its programs use system calls that 5.4 does not have.'))
         radio(i, _('6.18  —  mainline Linux, long-term release: newer drivers and security fixes; no USB-C video output yet'), 'kernel', '6.18')
         radio(i, _('7.2  —  mainline Linux, stable release; tested less than 6.18'), 'kernel', '7.2')
+        radio(i, _('7.3  —  the newest mainline Linux; tested less than 7.2'), 'kernel', '7.3')
 
         rel = ctl.releases
         o, i = card(body, _('Release'))
@@ -1318,10 +1319,10 @@ class App:
                 line = ttk.Frame(i, style='Card.TFrame')
                 line.pack(anchor='w', pady=(S3, 0))
                 ttk.Label(line, text=_('Kernel:'), style='Card.TLabel').pack(side='left')
-                kbox = ttk.Combobox(line, values=['5.4', '6.18', '7.2'], width=6, state='readonly')
+                kbox = ttk.Combobox(line, values=['5.4', '6.18', '7.2', '7.3'], width=6, state='readonly')
                 # the kernel it runs, not a fixed 6.18 (seen on F50-B running 7.2.10: the box said 6.18)
                 running = info.get('kernel', '')
-                kbox.set(next((k for k in ('5.4', '6.18', '7.2') if running == k or running.startswith(k + '.')), '6.18'))
+                kbox.set(next((k for k in ('5.4', '6.18', '7.2', '7.3') if running == k or running.startswith(k + '.')), '6.18'))
                 kbox.pack(side='left', padx=S2)
                 action(line, _('Switch to it'), lambda: self._command('kernel-' + kbox.get(), _('Install kernel {1} on the device? It restarts into it afterwards only when you restart it.', kbox.get()))).pack(side='left')
             else:

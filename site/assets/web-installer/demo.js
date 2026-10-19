@@ -15,7 +15,7 @@ export function demoReleases() {
     const assets = new Map();
     const sizes = { openwrt: 45e6, "openwrt-luci": 47e6, "ubuntu-24.04": 120e6, "ubuntu-26.04": 130e6 };
     for (const [s, size] of Object.entries(sizes)) {
-      for (const k of ["5.4", "6.18", "7.2"]) {
+      for (const k of ["5.4", "6.18", "7.2", "7.3"]) {
         if (s === "ubuntu-26.04" && k === "5.4") continue;
         const name = `mu300-magisk-${tag}-${s}-k${k}.zip`;
         assets.set(name, asset("dikeckaan/mu300-linux", tag, name, size));

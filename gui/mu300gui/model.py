@@ -13,7 +13,7 @@ GIB = 1 << 30
 SECTOR = 512
 # what the installers say each choice needs (their `need.*` facts say it for a device; these are for before a check)
 NEED = {'openwrt': 800 * MIB, 'ubuntu': 1600 * MIB, 'both': 2400 * MIB}
-KERNELS = ('5.4', '6.18', '7.2')
+KERNELS = ('5.4', '6.18', '7.2', '7.3')
 UBUNTUS = ('24.04', '26.04')
 MIN_PASSWORD = 6
 

@@ -151,7 +151,8 @@ ALLOWED = MAGISK | COMPUTER
 # a signed release's zips carry its signature too
 SIGNATURE = 'mu300/SHA256SUMS.sig'
 PWCHECK = 'mu300/mu300-pwcheck'       # the password checker, in the zips of releases whose kernel bundle has it
-ASSETS = ('mu300-kernel.tar.gz', 'mu300-kernel-6.18.tar.gz', 'mu300-kernel-7.2.tar.gz', 'mu300-openwrt-rootfs.tar.gz',
+ASSETS = ('mu300-kernel.tar.gz', 'mu300-kernel-6.18.tar.gz', 'mu300-kernel-7.2.tar.gz', 'mu300-kernel-7.3.tar.gz',
+          'mu300-openwrt-rootfs.tar.gz',
           'mu300-openwrt-luci-rootfs.tar.gz', 'mu300-ubuntu-rootfs.tar.gz', 'mu300-ubuntu-26.04-rootfs.tar.gz')
 
 
@@ -198,14 +199,16 @@ class Builder(unittest.TestCase):
         r = self.build()
         self.assertEqual(r.returncode, 0, r.stderr)
         names = sorted(p.name for p in (self.tmp / 'out').glob('*.zip'))
-        self.assertEqual(len(names), 11)
+        # four systems on four kernels, less Ubuntu 26.04 on 5.4
+        self.assertEqual(len(names), 15)
         self.assertNotIn('mu300-magisk-v2026.10.06-ubuntu-26.04-k5.4.zip', names)
         self.assertIn('mu300-magisk-v2026.10.06-openwrt-k6.18.zip', names)
         # OpenWrt with the control panel, on every kernel
-        for k in ('5.4', '6.18', '7.2'):
+        for k in ('5.4', '6.18', '7.2', '7.3'):
             self.assertIn(f'mu300-magisk-v2026.10.06-openwrt-luci-k{k}.zip', names)
+        self.assertIn('mu300-magisk-v2026.10.06-ubuntu-26.04-k7.3.zip', names)
         sums = (self.tmp / 'out/SHA256SUMS-magisk').read_text().split('\n')
-        self.assertEqual(len([s for s in sums if s]), 11)
+        self.assertEqual(len([s for s in sums if s]), 15)
         for line in sums:
             if line:
                 h, n = line.split('  ')
@@ -251,7 +254,7 @@ class Builder(unittest.TestCase):
         r = self.build(rel=rel)
         self.assertEqual(r.returncode, 0, r.stderr)
         zips = sorted((self.tmp / 'out').glob('*.zip'))
-        self.assertEqual(len(zips), 11)
+        self.assertEqual(len(zips), 15)
         for zp in zips:
             self.assertEqual(zipfile.ZipFile(zp).read(PWCHECK), b'\x7fELF pwcheck\n', zp.name)
 
@@ -260,7 +263,7 @@ class Builder(unittest.TestCase):
         r = self.build()
         self.assertEqual(r.returncode, 0, r.stderr)
         zips = sorted((self.tmp / 'out').glob('*.zip'))
-        self.assertEqual(len(zips), 11)
+        self.assertEqual(len(zips), 15)
         for zp in zips:
             z = zipfile.ZipFile(zp)
             self.assertEqual(z.read(SIGNATURE), (self.rel / 'SHA256SUMS.sig').read_bytes(), zp.name)
@@ -537,7 +540,7 @@ class ReleaseZips(ShellTest):
 
     def zips(self):
         zs = sorted(Path(os.environ['MU300_MAGISK_ZIPS']).glob('*.zip'))
-        self.assertEqual(len(zs), 11, zs)          # 3 OpenWrt, 3 OpenWrt with the panel, 3 + 2 Ubuntu
+        self.assertEqual(len(zs), 15, zs)          # 4 OpenWrt, 4 OpenWrt with the panel, 4 + 3 Ubuntu
         return zs
 
     def test_allow_list_and_manifest(self):

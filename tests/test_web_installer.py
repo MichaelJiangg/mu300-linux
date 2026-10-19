@@ -152,7 +152,7 @@ class Strings(unittest.TestCase):
         fam['err.adb.access.'] = {'windows', 'linux', 'mac', 'android', 'other'}
         fam['lock.'] = fam['explain.lock.'] = {'unlocked', 'locked', 'unknown'}
         fam['sys.about.'] = {'ubuntu-24.04', 'ubuntu-26.04', 'openwrt', 'openwrt-luci'}
-        fam['kernel.'] = {'5.4', '6.18', '7.2'}
+        fam['kernel.'] = {'5.4', '6.18', '7.2', '7.3'}
         fam['job.kind.'] = {'plan', 'install', 'uninstall'}
         fam['review.pw.'] = {'given', 'kept', 'image'}
         fam['wizard.step.'] = set(re.search(r'WSTEPS = \[(.*?)\]', app).group(1).replace('"', '').split(', '))
