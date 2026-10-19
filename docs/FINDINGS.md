@@ -11958,3 +11958,107 @@ So the half rate of 24d and 24e is the 160-frame period, half of the 320-sample 
 the vendor's framing it runs at the full 8 kHz without a seam. mu300-voice still reads the dump; moving the downlink
 to the tap at 640 / 1280 (or 960 / 1920) would drop the dump and the 48 kHz conversion, and needs its own call test
 on the mainline kernels first.
+
+### 194. Call audio leaves the images: the audio extra (github.com/dikeckaan/mu300-audio) for all three kernels
+The owner decided that the call-audio patches leave mu300-linux and become a module of their own, installed like the
+VPN module: `sudo mu300-extra install audio`. Since this entry the releases carry nothing of the stack: not the 5.4
+patches and `kernel/build-audio.sh`, not `upstream/modules/sprd_audio` (20 modules in every mainline bundle until
+v2026.10.19.1, #316's audit), not `mu300-audio-dsp`, `mu300-voice`, the `mu300-audio` service, its `modprobe.d` file
+or the OpenWrt init script, and not the `pcmhost`, `ctlset` and `mu300-hfp` sources. `tools/make-release.sh`'s
+audit now refuses a kernel bundle that carries one of the 23 drivers of 5.4 or the 20 of mainline (mainline's
+`sprd-dma.ko` is the stack's AGCP DMA driver; 5.4's own `sprd-dma.ko` is the vendor kernel's and stays), and an
+image whose manifest has one of the stack's programs or services.
+
+**What stays in the kernel, and why.** Only what a module cannot do:
+
+| what | where | why it cannot be a module |
+|---|---|---|
+| the DSP's memory, reserved at boot (`CONFIG_OF_RESERVED_MEM_ADD="0xaf600000,3M;0xaf900000,7M"`) | 5.4: `kernel/patches/of-reserved-mem-add.patch` and the fragment; mainline: `upstream/patches/0022` and `mu300-mainline.config` | memory has to be taken out of memblock before the page allocator owns it; by the time any module loads, those pages are someone else's |
+| the ALSA/ASoC core: `SND_SOC` (snd-soc-core, an in-tree module), `SND_SOC_SPRD` (for `SND_SOC_COMPRESS`, which has no prompt), `SND_DYNAMIC_MINORS`, `SND_CTL_INPUT_VALIDATION` | `mu300-mainline.config` (5.4's vendor configuration has them) | the extra's drivers link against the core's exports, and the bools change the sound core itself (minor allocation, the check of every control write); they are the kernel's configuration, and the extra's drivers are built against exactly that configuration |
+| `DMADEVICES` | `mu300-mainline.config` | the dmaengine core the extra's AGCP DMA driver registers with |
+| the masks of alsa-utils' restore (`alsa-restore.service`, `alsa-state.service`, `90-alsa-restore.rules`, 193) | `rootfs/assemble.sh` | not kernel: an Ubuntu base setting, harmless without the extra and needed with it (alsa-utils is in the image) |
+
+`/opt/mu300/lib/run-dir.sh`, which `mu300-voice` uses for `/run/mu300-voice`, stays too: `mu300-atd` uses it.
+
+**The extra.** One tarball per kernel, `mu300-audio-5.4.tar.gz`, `-6.18`, `-7.2`, with `SHA256SUMS`, as releases of
+mu300-audio (its `tools/make-extra.sh`, a release workflow modeled on mu300-linux-vpn's). Each is a module in the VPN
+module's format - `./VERSION`, `./requires` (mu300-linux v2026.10.19.1), `./manifest`, `./hooks/link` and
+`./hooks/unlink` - with `./kernel`, the kernel choice its drivers (`./modules/<release>/`) are for. `mu300-extra
+install audio` takes the one of `kernel_choice` from mu300-audio's latest release (`MU300_AUDIO_URL`), checked against
+its `SHA256SUMS` in the VPN module's private copy (`module_get`); `--from DIR` offline, a file alone only with
+`MU300_AUDIO_UNVERIFIED=1`; a tarball whose `./kernel` is not the device's is refused. The hooks link it into every
+installed system (`/opt/mu300/bin/{mu300-audio-dsp,mu300-voice,pcmhost,ctlset,mu300-hfp}`, the services,
+`/etc/modprobe.d/mu300-audio.conf`) and move what a system had there itself (the stack of v2026.10.19.1, or what
+mu300-audio's old 5.4 installer put there) to `NAME.builtin`, which `remove` puts back. `mu300-audio` is enabled on a
+system's first link; `mu300-voice` only where the system had no call follower of its own (one it had keeps its
+enabled state: something else may follow the calls there), and later links leave both as they are.
+
+**The firmware** is fetched at install time from mu300-audio-firmware's `v1.0/agdsp.bin` (`AUDIO_FW_URL`) and kept
+only if its sha256 is `378ceea7...b937` (`AUDIO_FW_SHA256`, the 41S image of 24c), into `extra/.audio-firmware`;
+`hooks/link` copies it into a system that has none and marks it (`/etc/mu300/agdsp.extra`), and `unlink` takes out
+only that copy. A firmware a system has is never touched. `MU300_AUDIO_FIRMWARE=none` fetches none, `=FILE` takes the
+user's own image (1 to 6 MiB, an `AUDCP` header); `--from DIR` takes `DIR/agdsp.bin` only with the pinned hash.
+Neither repository nor any release carries it.
+
+**Kernel switches.** The drivers are per kernel, so the extra follows the kernel: `mu300-update kernel X` and
+`rollback-boot` call `audio_follow` once the boot image is written, which installs `mu300-audio-X.tar.gz` (or the one
+staged in `/mnt/mu300-disk/.mu300-update/audio/`, or `MU300_AUDIO_MODULE`) and links it again. It is never fatal: a
+switch whose audio extra cannot be had still happens and says that call audio waits for `mu300-extra install audio`;
+`mu300-extra list` and `mu300-update check` say so too.
+
+**Built against each kernel's exact build.** mu300-audio builds its drivers out of tree against a *build kit* of each
+kernel of a mu300-linux release, made from that release's own build trees (`kernel/kits/make-kit-*.sh` there:
+headers, scripts, `.config`, `Module.symvers`; on mainline `vmlinux` without its DWARF for the modules' BTF, the modem
+stack's headers and `Module.symvers` - `agdsp_access` calls `sipc-core` - and the kernel's `virt-dma`). Made for
+v2026.10.19.1 from the trees of its release build (rel-20261018's upper over rel-20261017's sources, an APFS clone so
+the original stays as it was):
+
+* 5.4: the configuration extracted from the release's `Image` (IKCONFIG) is the build tree's; all 10889 symbol CRCs
+  that the release's own 5.4 modules carry match the kit's `Module.symvers` (modversions: what decides whether the
+  kernel takes a module).
+* 6.18 and 7.2: the configurations are the bundles' `kernel.config`; `sipc-core.ko` rebuilt from the kit's tree is
+  byte for byte the release's, and the 40 audio drivers mu300-audio's CI built from the kits are byte for byte the
+  ones v2026.10.19.1 shipped (40 of 40, build-id included).
+
+Mainline has no modversions, and vermagic says nothing about the configuration: a driver built against another
+configuration of 6.18.57 would load and read the kernel's structures at the wrong offsets. So each set carries the
+sha256 of its kit's configuration settings (`grep -E '^(CONFIG_|# CONFIG_)' .config | LC_ALL=C sort`), and
+`mu300-audio-dsp` loads it only when `/proc/config.gz` gives the same (`MU300_AUDIO_ANY_BUILD=1` overrides); else it
+says why and falls back to where the releases up to v2026.10.19.1 kept their drivers. A mu300-linux release that
+changes a kernel's configuration therefore needs a new mu300-audio release built against its kits; one that does not
+(this one: nothing here changes a kernel) keeps working with the kits of v2026.10.19.1.
+
+**From v2026.10.19.1.** The update's own updater (`apply` hands over to the new release's) sees whether the device
+uses call audio - the extra is installed, a system has `/lib/firmware/agdsp.bin`, or the old 5.4 installer's drivers
+are in `/lib/modules/*/audio` - and then installs the audio extra of its kernel before the systems are switched
+(`audio_fetch`, `audio_install`; the new systems are linked with the VPN module's `modules_link`). The firmware is
+carried over with the user's files. When the extra cannot be had (offline, nothing staged), the update goes on - the
+device works without it - and ends with a loud notice that says how to stage it or `sudo mu300-extra install audio`;
+`mu300-update check` keeps saying so. A v2026.10.19.1 system's own `mu300-extra` does not know `audio` by name, but
+installs it as an extra of the user's own (`mu300-audio/install.sh` does that from a computer).
+
+**The 5.4 drivers got the mainline port's bounds checks** (mu300-audio `kernel/5.4/patches/audio-ctl-bounds.patch`):
+the enum puts of `vbc-dai.c` and the UMP9620 codec checked `integer.value[0]` - a long, `item[0]` and `item[1]`
+together - and indexed with `enumerated.item[0]`, so a write with `item[1]`'s top bit set passed and indexed past the
+text and setting arrays (a `sprintf` of a wild string into a 128-byte stack buffer among them); and the profile blobs
+were stored without checks (a heap overflow into the buffer of an earlier, smaller profile, a read past it on
+read-back, a mode index unchecked against `num_mode`). Mainline had these fixes since 188, and checks control writes
+in the core as well.
+
+**Measured, 2026-10-19,** with mu300-audio's prerelease v1.0.0 (CI-built):
+
+* F50-B (Ubuntu 24.04, v2026.10.19.1 with this branch's `mu300-update` and `mu300-extra`, no internet, the files served
+  from a computer): `mu300-extra install audio` on 7.2.11 with the firmware moved aside fetched the 7.2 tarball and the
+  firmware (pinned hash), moved the image's stack aside, put the firmware in, and the DSP answered without a reboot
+  (`mu300-audio-dsp status`: drivers 19/19 from `extra/audio/modules/7.2.11`, `dsp: running - it answered`). After a
+  reboot the same, from the extra. `remove` put the image's files back and took the firmware out; `install --from DIR`
+  (offline) put it back. `mu300-update kernel 6.18` installed the 6.18 extra after the boot image; after the reboot
+  6.18.57's configuration matched the set's and the DSP answered; `kernel 7.2` back, the same. The board was then set
+  back to its own release files.
+* F50-C (OpenWrt, 5.4, v2026.10.19.1, the old 5.4 installer's stack): `mu300-audio/install.sh --from DIR
+  --no-firmware` from a computer installed the extra as an extra of the user's own; the old installer's files moved
+  aside, its disabled call follower stayed disabled. After a reboot the 23 drivers were the extra's (the loaded
+  `snd_soc_sprd_vbc_v4`'s build-id is the extra's, with the bounds patch), the DSP answered, nothing in the log about
+  versions or symbols. No call was placed.
+* U30 Air (6.18.57): `/proc/config.gz`'s settings hash to the 6.18 kit's; it uses no call audio, so nothing was
+  installed there.

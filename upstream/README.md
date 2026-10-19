@@ -73,7 +73,7 @@ boot/flash-trial.sh boot-mainline.img      # slot b only, falls back to Android
 
 ## Newer kernels (7.x)
 
-The whole port - kernel and all 31 out-of-tree modules - also builds against **7.2.11**, the newest stable release
+The whole port - kernel and all its out-of-tree modules - also builds against **7.2.11**, the newest stable release
 (2026-10-15), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
 Wi-Fi access point, mobile data (18.7 MB/s), Bluetooth, the Mali GPU, cpufreq and the modem's AT channel working,
 and no warning or oops in the log. (7.2 is a stable, not a longterm release: 6.18 stays the base, 7.x is how the
@@ -102,8 +102,10 @@ installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.11` for `build.sh` a
   Ubuntu boot that died early before the crash capture existed (31d) is unexplained, and has not recurred in the
   reboot loops since (Ubuntu 6/6, OpenWrt 4/4).
 - Power-off works through the PMIC (FINDINGS 31h); on a powered USB port the battery-less F50 starts again.
-- Audio: call audio is ported (`modules/sprd_audio`, FINDINGS 188): the Unisoc AGDSP stack of 5.4 for 6.18 and 7.2.
-  The AGDSP image is the user's to supply (`mu300-audio-dsp install FILE`); this repository has none.
+- Audio: call audio is ported (FINDINGS 188): the Unisoc AGDSP stack of 5.4 for 6.18 and 7.2. Since FINDINGS 194 it
+  is the audio extra's ([mu300-audio](https://github.com/dikeckaan/mu300-audio), `mu300-extra install audio`): its
+  drivers are built there against each kernel's build kit; what stays here is the DSP's memory reservation
+  (`patches/0022`) and the ASoC/ALSA core options of `mu300-mainline.config`.
 
 ## Earlier status notes
 Clocks, pinctrl, power domains, USB 3.1 gadget, eMMC, PCIe, thermal, cpufreq, watchdog, LEDs and Wi-Fi/BT are
