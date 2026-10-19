@@ -272,7 +272,7 @@ install.cmd -Lang zh                   <span class="c"># Windows (cmd)</span></c
 <div class="qa"><span class="ask">将 Android 的热点名称和密码复制到 Linux 吗？(是/否)</span><p>你的手机已经认识 Android 的热点，这样它们无需重新设置就能连上 Linux 的热点。</p><p class="pick">按 <kbd>Enter</kbd> 选择“是”。</p></div>
 <div class="qa"><span class="ask">包含 Mali GPU（OpenCL）用户空间组件吗（约 90 MiB）？(是/否)</span><p>图形芯片，用于 OpenCL 计算。无论选哪个都没有屏幕。</p><p class="pick">按 <kbd>Enter</kbd> 选择“是”；想省空间就选“否”。</p></div>
 <div class="qa"><span class="ask">安装 VPN 模块吗（约多下载 40 MB，在设备上占用 120 MB）？(是/否)</span><p><a href="https://github.com/dikeckaan/mu300-linux-vpn">mu300-linux-vpn</a> 提供的可选 VPN。之后也可以在设备上用 <code>sudo mu300-extra install vpn</code> 添加。</p><p class="pick">不确定？选“否”（首次安装时的默认值）。</p></div>
-<div class="qa"><span class="ask">选择哪个内核？1) 5.4 2) 6.18 3) 7.2 4) 7.3</span><p>内核是 Linux 中负责和硬件打交道的核心。5.4 是紫光展锐的厂商内核，测试时间最长。6.18 是主线 Linux 的长期支持版本，驱动更新，功能相同。7.2 是稳定的 7.2 系列，测试比 6.18 少。7.3 是最新的主线版本，驱动最新，功能相同，测试比 7.2 少（从 v2026.10.19.1 之后的下一个版本起提供）。</p><p class="pick">不确定？选 1，5.4（默认）。Ubuntu 26.04 需要 6.18、7.2 或 7.3。之后可以用 <code>sudo mu300-update kernel 6.18</code> 修改。</p></div>
+<div class="qa"><span class="ask">选择哪个内核？1) 5.4 2) 6.18 3) 7.2 4) 7.3</span><p>内核是 Linux 中负责和硬件打交道的核心。5.4 是紫光展锐的厂商内核，测试时间最长。6.18 是主线 Linux 的长期支持版本，驱动更新，功能相同。7.2 是稳定的 7.2 系列，测试比 6.18 少。7.3 是最新的主线版本，驱动最新，功能相同，测试比 7.2 少（从 v2026.10.19.2 之后的下一个版本起提供）。</p><p class="pick">不确定？选 1，5.4（默认）。Ubuntu 26.04 需要 6.18、7.2 或 7.3。之后可以用 <code>sudo mu300-update kernel 6.18</code> 修改。</p></div>
 <div class="qa"><span class="ask">update（更新）或 wipe（清除）</span><p>只有已经装过 Linux 时才会问。<code>update</code> 重新安装系统，并保留你的设置、用户、主目录、SSH 主机密钥和 OpenWrt 的设置。<code>wipe</code> 清除 Linux 文件系统，从头安装。</p><p class="pick">按 <kbd>Enter</kbd> 选择 update（也可以输入 <code>更新</code> 或 <code>清除</code>）。</p></div>
 <div class="qa"><span class="ask">保留当前密码吗？（yes/no）</span><p>更新时，如果被替换的系统有自己的登录密码，就会问。<code>yes</code> 会为每个这样的系统问一次当前密码，并在设备上与该系统的密码核对（没有密码时直接按 <kbd>Enter</kbd>；OpenWrt 出厂时的 <code>root</code> 没有密码）；输错三次后安装程序停止，什么都不改。<code>no</code> 会要求输入新密码，输入两次。</p><p class="pick">按 <kbd>Enter</kbd> 选 yes，然后输入你现在登录用的密码。</p></div>
 <div class="qa"><span class="ask">"ubuntu" 用户（Ubuntu）和 "root"（OpenWrt）的密码</span><p>以后登录用的密码，至少 6 个字符，输入两次。输入时屏幕上不会显示任何东西。</p><p class="pick">选一个你记得住的：第 3 步要用。</p></div>
@@ -345,7 +345,7 @@ sudo mu300-update check        <span class="c"># 有没有更新的版本？</sp
 <tr><th scope="row"><code>mu300-magisk-&lt;tag&gt;-ubuntu-26.04-k7.3.zip</code></th><td>Ubuntu 26.04</td><td>7.3</td></tr>
 </tbody></table></div>
 <ol>
-<li><strong>选一个 zip</strong>：从<a href="https://github.com/dikeckaan/mu300-linux/releases/latest">最新版本</a>下载，并用 <code>SHA256SUMS-magisk</code> 校验。每个版本共有 15 个（v2026.10.19.1 及更早、还没有 7.3 时为 11 个），带控制面板的 OpenWrt 也在其中。</li>
+<li><strong>选一个 zip</strong>：从<a href="https://github.com/dikeckaan/mu300-linux/releases/latest">最新版本</a>下载，并用 <code>SHA256SUMS-magisk</code> 校验。每个版本共有 15 个（v2026.10.19.2 及更早、还没有 7.3 时为 11 个），带控制面板的 OpenWrt 也在其中。</li>
 <li><strong>安装</strong>：在 Magisk 应用中（模块，从本地安装），或者在 <code>adb shell</code> 中：
 <pre><code>su -c 'magisk --install-module /sdcard/Download/&lt;zip&gt;'</code></pre>
 不要在 recovery 中安装。</li>

@@ -24,7 +24,7 @@
 #   KEEP_PW_OSES="..."  with UPDATE=1: the systems whose accounts and passwords stay exactly as they are (PWHASH and
 #                      PW_SET do not touch them); install.sh: those whose current password the user confirmed
 #   IMPORT_HOTSPOT=0|1 copy Android's hotspot SSID/passphrase into each system
-#   KERNEL=5.4|6.18|7.2  the kernel in the new boot image; mu300-update keeps installing that one (boot/kernel)
+#   KERNEL=5.4|6.18|7.2|7.3  the kernel in the new boot image; mu300-update keeps installing that one (boot/kernel)
 #   ADB=0|1 ADB_KEY    adb over USB to each system: 1 lets in only the adb public key ADB_KEY ("BASE64 name",
 #                      etc/mu300/adb_keys; "keys" in etc/mu300/adb_auth); 0 writes nothing, and a system that was
 #                      never told otherwise has adb on for every computer (mu300-adbd)
@@ -1020,7 +1020,7 @@ echo "$BOOT_OS" > $M/.mu300/boot-os
 # --- install-os end
 case ${BOOT_ATTEMPTS:-} in [1-6]) echo "$BOOT_ATTEMPTS" > $M/.mu300/boot-attempts ;; esac
 case ${KERNEL:-5.4} in
-    5.4|6.18|7.2) mkdir -p $M/boot; echo "${KERNEL:-5.4}" > $M/boot/kernel; echo "${KERNEL:-5.4}" > $M/boot/installed.kernel ;;
+    5.4|6.18|7.2|7.3) mkdir -p $M/boot; echo "${KERNEL:-5.4}" > $M/boot/kernel; echo "${KERNEL:-5.4}" > $M/boot/installed.kernel ;;
 esac
 # the boot image is the installer's now: a release tag left by an earlier mu300-update would describe another one
 rm -f $M/boot/installed.tag

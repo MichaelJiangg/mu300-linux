@@ -309,7 +309,7 @@ manifest_load() {  # the zip's manifest, read like the conf file: only these key
         *) _ok= ;;
     esac
     case $KERNEL:$KERNEL_ASSET in
-        5.4:mu300-kernel.tar.gz|6.18:mu300-kernel-6.18.tar.gz|7.2:mu300-kernel-7.2.tar.gz) ;;
+        5.4:mu300-kernel.tar.gz|6.18:mu300-kernel-6.18.tar.gz|7.2:mu300-kernel-7.2.tar.gz|7.3:mu300-kernel-7.3.tar.gz) ;;
         *) _ok= ;;
     esac
     for _h in "$SHA256_KERNEL" "$SHA256_ROOTFS"; do

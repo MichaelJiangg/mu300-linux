@@ -109,7 +109,7 @@ LAN setting pins the address).
 * **A real Linux system**, not an app or a container: Ubuntu 24.04 or 26.04 LTS with systemd and `apt`, OpenWrt
   with its LuCI web interface, or OpenWrt with the MU300 control panel (below).
 * **Four kernels to choose from:** Unisoc's vendor 5.4, mainline 6.18 LTS, mainline 7.2 (stable) and mainline 7.3,
-  the newest (from the next release after v2026.10.19.1 on); 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the eBPF
+  the newest (from the next release after v2026.10.19.2 on); 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the eBPF
   hooks that [dae](https://github.com/daeuniverse/dae) needs. KVM (`/dev/kvm`) on all of them.
 * **Internet over 5G/LTE**, shared with everything connected to the device.
 * **A Wi-Fi hotspot** (5 GHz or 2.4 GHz) and **USB networking**: plug it into a computer and it shows up as a network adapter.
@@ -288,7 +288,7 @@ It also asks for the **kernel**:
 | 1 | 5.4 | Unisoc's vendor kernel (Android 12 base): the longest tested, everything this project supports |
 | 2 | 6.18 | mainline Linux, the current long-term (LTS) release: newer drivers and security fixes, the same functions (hotspot, mobile data, SMS, Bluetooth, VPN, GPU); no USB-C video output yet |
 | 3 | 7.2 (stable) | the stable 7.2 series of mainline Linux: newer drivers, the same functions as 6.18; tested less than 6.18 |
-| 4 | 7.3 | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 7.2 (from the next release after v2026.10.19.1 on) |
+| 4 | 7.3 | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 7.2 (from the next release after v2026.10.19.2 on) |
 
 It can be changed later on the device with `sudo mu300-update kernel 5.4`, `... kernel 6.18`, `... kernel 7.2` or
 `... kernel 7.3`. Ubuntu 26.04 needs 6.18, 7.2 or 7.3 (its programs use system calls 5.4 does not have), and so does USB host mode on the
@@ -569,7 +569,7 @@ without a computer: from the Magisk app (reached through scrcpy, a web panel or 
 by itself when a release is published, so the zips follow the other assets after a few minutes. Building them yourself:
 `tools/make-magisk-zips.sh RELEASE_DIR OUT_DIR`.
 
-**1. Take one zip.** One per system and kernel, 15 in all (11 up to v2026.10.19.1, before 7.3). The same zip works on the F50 and on the U30 Air, and
+**1. Take one zip.** One per system and kernel, 15 in all (11 up to v2026.10.19.2, before 7.3). The same zip works on the F50 and on the U30 Air, and
 installs to the internal storage or to an SD card: the installer recognises the device and finds the place.
 
 | zip | system | kernel | size |
@@ -590,7 +590,7 @@ installs to the internal storage or to an SD card: the installer recognises the 
 | `mu300-magisk-<tag>-ubuntu-26.04-k7.2.zip` | Ubuntu 26.04 | 7.2 | 125.9 MB |
 | `mu300-magisk-<tag>-ubuntu-26.04-k7.3.zip` | Ubuntu 26.04 | 7.3 | ~125.9 MB |
 
-The sizes are those of the v2026.10.18 build; the k7.3 zips come from the next release after v2026.10.19.1 on, and their sizes (~) are estimated from the k7.2 ones. The VPN is not in the zips: add its module on the device with
+The sizes are those of the v2026.10.18 build; the k7.3 zips come from the next release after v2026.10.19.2 on, and their sizes (~) are estimated from the k7.2 ones. The VPN is not in the zips: add its module on the device with
 `sudo mu300-extra install vpn` (see [VPN](#vpn)). There is no Ubuntu 26.04 zip with kernel 5.4: its programs need system
 calls that kernel does not have, the same rule as for `install.sh`. Check a download with `SHA256SUMS-magisk`.
 
@@ -1080,7 +1080,7 @@ Like the installer, it offers to reboot the device from Linux into Android first
 |---|---|
 | Ubuntu 24.04 LTS, OpenWrt 25.12, OpenWrt with the control panel | ✅ |
 | Ubuntu 26.04 LTS | ✅ kernel 6.18, 7.2 or 7.3 (its programs need system calls 5.4 does not have) |
-| Kernels | ✅ vendor 5.4, mainline 6.18 LTS, 7.2 and 7.3 (7.3 from the next release after v2026.10.19.1 on; 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the BPF JIT, so dae runs), with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
+| Kernels | ✅ vendor 5.4, mainline 6.18 LTS, 7.2 and 7.3 (7.3 from the next release after v2026.10.19.2 on; 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the BPF JIT, so dae runs), with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
 | KVM | ✅ `/dev/kvm` on all four kernels |
 | Mobile data (5G NSA / LTE) | ✅ shared with Wi-Fi and USB clients; reconnects by itself after modem resets |
 | SMS, USSD | ✅ `sms`, `mu300-ussd`; on `openwrt-luci` also in the panel |

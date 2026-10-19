@@ -347,7 +347,7 @@ unpacked on a computer, where it is the computer's installer with the zip's syst
 ([below](#a-magisk-zip-on-a-computer)).
 
 If the device runs a rooted Android with **Magisk 26 or newer**, Linux can be installed from the device itself. Each
-release has one zip per system and kernel, 15 in all (11 up to v2026.10.19.1, before 7.3), e.g. `mu300-magisk-<tag>-ubuntu-24.04-k5.4.zip` or
+release has one zip per system and kernel, 15 in all (11 up to v2026.10.19.2, before 7.3), e.g. `mu300-magisk-<tag>-ubuntu-24.04-k5.4.zip` or
 `mu300-magisk-<tag>-openwrt-luci-k7.2.zip` (OpenWrt with the control panel); the same zip works on the F50 and the
 U30 Air and finds the place by itself. There is no Ubuntu 26.04 zip with kernel 5.4.
 
