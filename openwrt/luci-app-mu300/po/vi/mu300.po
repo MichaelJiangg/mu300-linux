@@ -1816,6 +1816,15 @@ msgstr "0 % không bao giờ sạc pin (thiết bị chạy bằng bộ sạc), 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % giúp pin bền hơn trên thiết bị luôn cắm sạc."
 
+msgid "When the charger switches the device on"
+msgstr "Khi bộ sạc bật thiết bị"
+
+msgid "Charge only, until a key starts it"
+msgstr "Chỉ sạc, cho đến khi một phím khởi động nó"
+
+msgid "Start normally"
+msgstr "Khởi động bình thường"
+
 msgid "Keep as is"
 msgstr "Giữ nguyên"
 

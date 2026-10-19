@@ -1816,6 +1816,15 @@ msgstr "0 % батареяны ешқашан зарядтамайды (құры
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % үнемі желіде тұратын құрылғыда батареяны сақтайды."
 
+msgid "When the charger switches the device on"
+msgstr "Зарядтағыш құрылғыны қосқанда"
+
+msgid "Charge only, until a key starts it"
+msgstr "Тек зарядтау, түйме іске қосқанша"
+
+msgid "Start normally"
+msgstr "Қалыпты іске қосу"
+
 msgid "Keep as is"
 msgstr "Өзгеріссіз қалдыру"
 

@@ -1816,6 +1816,15 @@ msgstr "0 % לעולם לא טוען את הסוללה (המכשיר פועל מ
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % שומרים על הסוללה במכשיר שנשאר מחובר לחשמל."
 
+msgid "When the charger switches the device on"
+msgstr "כאשר המטען מדליק את המכשיר"
+
+msgid "Charge only, until a key starts it"
+msgstr "טעינה בלבד, עד שמקש יפעיל אותו"
+
+msgid "Start normally"
+msgstr "הפעלה רגילה"
+
 msgid "Keep as is"
 msgstr "ללא שינוי"
 

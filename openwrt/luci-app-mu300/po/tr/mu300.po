@@ -1816,6 +1816,15 @@ msgstr "0 % pili hiç şarj etmez (cihaz şarj aletinden çalışır), 100 % tam
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % sınırı, sürekli fişte duran bir cihazda pili daha sağlıklı tutar."
 
+msgid "When the charger switches the device on"
+msgstr "Şarj cihazı cihazı açtığında"
+
+msgid "Charge only, until a key starts it"
+msgstr "Yalnızca şarj, bir tuş başlatana kadar"
+
+msgid "Start normally"
+msgstr "Normal başlat"
+
 msgid "Keep as is"
 msgstr "Olduğu gibi bırak"
 

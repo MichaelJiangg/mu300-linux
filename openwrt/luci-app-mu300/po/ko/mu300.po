@@ -1816,6 +1816,15 @@ msgstr "0 %는 배터리를 충전하지 않고(기기는 충전기 전원으로
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 %는 계속 전원에 연결해 두는 장치에서 배터리를 더 건강하게 유지합니다."
 
+msgid "When the charger switches the device on"
+msgstr "충전기가 기기를 켤 때"
+
+msgid "Charge only, until a key starts it"
+msgstr "충전만 (키로 시작할 때까지)"
+
+msgid "Start normally"
+msgstr "정상적으로 시작"
+
 msgid "Keep as is"
 msgstr "그대로 유지"
 

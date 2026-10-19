@@ -1816,6 +1816,15 @@ msgstr "0 % laddar aldrig batteriet (enheten drivs av laddaren), 100 % laddar de
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % skonar batteriet i en enhet som sitter inkopplad."
 
+msgid "When the charger switches the device on"
+msgstr "När laddaren slår på enheten"
+
+msgid "Charge only, until a key starts it"
+msgstr "Endast laddning, tills en knapp startar den"
+
+msgid "Start normally"
+msgstr "Starta normalt"
+
 msgid "Keep as is"
 msgstr "Lämna som det är"
 

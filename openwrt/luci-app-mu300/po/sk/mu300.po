@@ -1816,6 +1816,15 @@ msgstr "0 % batériu nikdy nenabíja (zariadenie beží z nabíjačky), 100 % ju
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % šetrí batériu zariadenia, ktoré zostáva pripojené k sieti."
 
+msgid "When the charger switches the device on"
+msgstr "Keď nabíjačka zapne zariadenie"
+
+msgid "Charge only, until a key starts it"
+msgstr "Len nabíjať, kým ho nespustí tlačidlo"
+
+msgid "Start normally"
+msgstr "Spustiť normálne"
+
 msgid "Keep as is"
 msgstr "Ponechať bez zmeny"
 

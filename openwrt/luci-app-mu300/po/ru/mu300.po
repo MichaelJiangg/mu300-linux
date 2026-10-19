@@ -1816,6 +1816,15 @@ msgstr "0 % никогда не заряжает батарею (устройс�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % берегут батарею устройства, которое постоянно включено в сеть."
 
+msgid "When the charger switches the device on"
+msgstr "Когда зарядное устройство включает устройство"
+
+msgid "Charge only, until a key starts it"
+msgstr "Только зарядка, пока кнопка не запустит его"
+
+msgid "Start normally"
+msgstr "Обычный запуск"
+
 msgid "Keep as is"
 msgstr "Не менять"
 

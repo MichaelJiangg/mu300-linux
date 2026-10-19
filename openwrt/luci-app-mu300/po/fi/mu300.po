@@ -1816,6 +1816,15 @@ msgstr "0 % ei koskaan lataa akkua (laite toimii laturin varassa), 100 % lataa s
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % säästää akkua laitteessa, joka pysyy verkossa."
 
+msgid "When the charger switches the device on"
+msgstr "Kun laturi käynnistää laitteen"
+
+msgid "Charge only, until a key starts it"
+msgstr "Vain lataus, kunnes näppäin käynnistää sen"
+
+msgid "Start normally"
+msgstr "Käynnistä normaalisti"
+
 msgid "Keep as is"
 msgstr "Jätä ennalleen"
 

@@ -1816,6 +1816,15 @@ msgstr "0 % non carica mai la batteria (il dispositivo funziona con il caricator
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "L'80 % protegge meglio la batteria di un dispositivo che resta collegato."
 
+msgid "When the charger switches the device on"
+msgstr "Quando il caricatore accende il dispositivo"
+
+msgid "Charge only, until a key starts it"
+msgstr "Solo ricarica, finché un tasto non lo avvia"
+
+msgid "Start normally"
+msgstr "Avvia normalmente"
+
 msgid "Keep as is"
 msgstr "Lascia invariato"
 

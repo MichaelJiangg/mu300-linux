@@ -1816,6 +1816,15 @@ msgstr "0 % batareyanı heç vaxt doldurmur (cihaz şarj cihazından işləyir),
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % daim şəbəkədə qalan cihazda batareyanı daha sağlam saxlayır."
 
+msgid "When the charger switches the device on"
+msgstr "Şarj cihazı cihazı işə saldıqda"
+
+msgid "Charge only, until a key starts it"
+msgstr "Yalnız şarj, düymə işə salana qədər"
+
+msgid "Start normally"
+msgstr "Normal başlat"
+
 msgid "Keep as is"
 msgstr "Olduğu kimi saxla"
 

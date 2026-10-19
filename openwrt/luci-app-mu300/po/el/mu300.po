@@ -1816,6 +1816,15 @@ msgstr "Το 0 % δεν φορτίζει ποτέ την μπαταρία (η σ
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "Το 80 % προστατεύει την μπαταρία μιας συσκευής που μένει στην πρίζα."
 
+msgid "When the charger switches the device on"
+msgstr "Όταν ο φορτιστής ενεργοποιεί τη συσκευή"
+
+msgid "Charge only, until a key starts it"
+msgstr "Μόνο φόρτιση, μέχρι να την εκκινήσει ένα πλήκτρο"
+
+msgid "Start normally"
+msgstr "Κανονική εκκίνηση"
+
 msgid "Keep as is"
 msgstr "Να μείνει ως έχει"
 
