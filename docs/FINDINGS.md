@@ -12101,9 +12101,11 @@ dark; the heat alarm's siren uses the same lamp. The lamp's names in the driver 
 (FINDINGS 95) and do not change.
 
 **5G SA.** `led_up` (mobile-data) told 4G from 5G by the AcT of `AT+CEREG?`. A 5G SA registration is in the NR domain
-alone: CEREG then says not registered (or keeps an LTE AcT), and the F50 and the V50 showed blue (4G). Now, when CEREG
-names no NR access technology, `AT+C5GREG?` decides: registered (1 or 5) is 5G. From kanoqwq's `network-led.sh`
-(`f0ed60ff`). A failed read keeps the 4G colour, as before. One more short local AT read per watchdog round on LTE.
+alone: CEREG then says not registered, and the F50 and the V50 showed blue (4G). Now, when CEREG names no NR access
+technology and is not registered, `AT+C5GREG?` decides: registered (1 or 5) is 5G. From kanoqwq's `network-led.sh`
+(`f0ed60ff`). A failed read keeps the 4G colour, as before. An LTE registration asks nothing more than before (his
+case of an EPS registration still reporting LTE while NR is registered as well is not followed: the watchdog's round
+stays one AT read on LTE).
 
 Not taken: his U30 Air part of `f0ed60ff` (4G/5G from the slot in use). The U30 Air's network light shows the SIM in
 use, not the technology, as ZTE's firmware (FINDINGS 154); mobile-data's `at` already asks the card in use.

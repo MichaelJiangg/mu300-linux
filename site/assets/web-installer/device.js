@@ -509,7 +509,7 @@ export const API_METHODS = new Set(("hello overview wifi.get wifi.set wifi.power
   "sms.forward sms.forward_set sms.forward_test sms.forward_log_clear lan.get lan.set usb.role usb.net adb.auth system.get system.hostname system.timezone system.password system.ssh " +
   "system.reboot system.boot system.bootos update.check update.apply kernel.set extra.list extra.install extra.remove logs " +
   "backup.export backup.import at.send at.history ussd.send ussd.cancel modem.restart ttl.get ttl.set traffic.get traffic.set power.get " +
-  "power.set led.get led.set zram.get zram.set cpu.get cpu.profile cpu.voltage update.status update.source packages.get " +
+  "power.set led.get led.set zram.get zram.set cpu.get cpu.profile cpu.core cpu.lowlatency cpu.voltage update.status update.source packages.get " +
   "packages.act docker.status job.status job.cancel job.clear").split(" "));
 // the last line of what mu300-api printed, as an object (it prints exactly one)
 export function parseApiAnswer(stdout) {
