@@ -73,11 +73,11 @@ class JavaScript(unittest.TestCase):
                       'for (const f of process.argv.slice(2)) console.log(JSON.stringify(await inspectMagiskZip(new Blob([readFileSync(f)]))));\n')
             (tmp / 'inspect.mjs').write_text(script)
             zips = sorted((tmp / 'out').glob('*.zip'))
-            self.assertEqual(len(zips), 11)
+            self.assertEqual(len(zips), 15)
             r = subprocess.run([NODE, str(tmp / 'inspect.mjs')] + [str(z) for z in zips], capture_output=True, text=True, timeout=120)
             self.assertEqual(r.returncode, 0, r.stderr)
             seen = [json.loads(l) for l in r.stdout.splitlines()]
-            self.assertEqual(len(seen), 11)
+            self.assertEqual(len(seen), 15)
             for z, info in zip(zips, seen):
                 self.assertEqual(f"mu300-magisk-{info['tag']}-{info['system']}-k{info['kernel']}.zip", z.name)
                 self.assertTrue(info['web'], z.name)
