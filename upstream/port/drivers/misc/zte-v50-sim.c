@@ -16,6 +16,12 @@ struct v50_sim {
 	struct mutex lock;
 };
 
+/* A live deployment must not switch a powered SIM as a side effect of probe.
+ * Cold production boots keep the stock bootarg/default initialization. */
+static bool preserve_state;
+module_param(preserve_state, bool, 0444);
+MODULE_PARM_DESC(preserve_state, "Keep current selector levels when binding on a running system");
+
 static ssize_t v50_read(struct device *dev, struct gpio_desc *gpio, char *buf)
 {
 	int value = gpiod_get_value_cansleep(gpio);
@@ -124,6 +130,7 @@ static int v50_sim_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct device_node *v50;
 	struct v50_sim *sim;
+	int chip, psim, ret;
 
 	/* Some generic vendor trees carry unused SIM nodes on other products. */
 	v50 = of_find_compatible_node(NULL, NULL, "awinic,aw9523b");
@@ -139,13 +146,28 @@ static int v50_sim_probe(struct platform_device *pdev)
 	if (IS_ERR(sim->detect))
 		return dev_err_probe(dev, PTR_ERR(sim->detect), "card detect GPIO\n");
 	sim->chip = devm_gpiod_get(dev, "esim2-esim3-switch",
+				 preserve_state ? GPIOD_ASIS :
 				 v50_initial("androidboot.simswitch=", true));
 	if (IS_ERR(sim->chip))
 		return dev_err_probe(dev, PTR_ERR(sim->chip), "eSIM selector GPIO\n");
 	sim->psim = devm_gpiod_get(dev, "soft-psim-switch",
+				 preserve_state ? GPIOD_ASIS :
 				 v50_initial("androidboot.psimswitch=", false));
 	if (IS_ERR(sim->psim))
 		return dev_err_probe(dev, PTR_ERR(sim->psim), "physical SIM selector GPIO\n");
+	if (preserve_state) {
+		/* LK may have left an unused selector as an input with a pull-down.
+		 * Retain its actual level, but take output ownership for later writes. */
+		chip = gpiod_get_value_cansleep(sim->chip);
+		psim = gpiod_get_value_cansleep(sim->psim);
+		if (chip < 0 || psim < 0)
+			return dev_err_probe(dev, chip < 0 ? chip : psim, "read selectors\n");
+		ret = gpiod_direction_output(sim->chip, chip);
+		if (!ret)
+			ret = gpiod_direction_output(sim->psim, psim);
+		if (ret)
+			return dev_err_probe(dev, ret, "preserve selector outputs\n");
+	}
 	platform_set_drvdata(pdev, sim);
 	return 0;
 }
