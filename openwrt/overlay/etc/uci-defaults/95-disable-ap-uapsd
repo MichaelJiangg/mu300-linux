@@ -1,0 +1,26 @@
+#!/bin/sh
+# One-time migration of preserved hotspot settings; leave station interfaces
+# and all other wireless options intact. New BSSes also use the generator policy.
+. /lib/functions.sh
+changed=0
+failed=0
+disable_ap_uapsd() {
+	local section="$1" mode value
+	config_get mode "$section" mode
+	[ "$mode" = ap ] || return 0
+	config_get value "$section" uapsd
+	[ "$value" = 0 ] && return 0
+	if uci -q set "wireless.$section.uapsd=0"; then
+		changed=1
+	else
+		failed=1
+	fi
+}
+[ -f /etc/config/wireless ] || exit 0
+config_load wireless || exit 1
+config_foreach disable_ap_uapsd wifi-iface
+[ "$failed" = 0 ] || exit 1
+if [ "$changed" = 1 ]; then
+	uci commit wireless || exit 1
+fi
+exit 0

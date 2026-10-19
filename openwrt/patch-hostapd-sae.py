@@ -61,6 +61,10 @@ def patch_source(root):
 def patch_wifi(root):
     root = Path(root)
     path = root / 'lib/netifd/hostapd.sh'
+    # Shared hotspot policy: disable U-APSD advertisement, retaining WMM and
+    # the existing beacon/DTIM settings. Also covers restored old UCI values.
+    replace(path, '\tset_default uapsd 1\n',
+            '\tuapsd=0 # U-APSD is disabled by the shared hotspot policy.\n')
     replace(path, 'hostapd_set_bss_options() {',
             '. /lib/netifd/hostapd-unisoc.sh\n\nhostapd_set_bss_options() {')
     replace(path, '\t[ -n "$spp_amsdu" ] && append bss_conf "spp_amsdu=$spp_amsdu" "$N"\n',
@@ -72,6 +76,9 @@ def patch_wifi(root):
     # remains available to builds that deliberately select legacy scripts.
     ucode = root.parent / 'files-ucode/usr/share/ucode/wifi'
     path = ucode / 'ap.uc'
+    replace(path, '\tconfig.wmm_enabled = 1;\n',
+            '\tconfig.wmm_enabled = 1;\n'
+            '\tconfig.uapsd_advertisement_enabled = 0; // Shared hotspot policy.\n')
     replace(path, "import * as iface from 'wifi.iface';\n",
             "import * as iface from 'wifi.iface';\n"
             "import { configure as unisoc_sae_config } from 'wifi.unisoc-sae';\n")

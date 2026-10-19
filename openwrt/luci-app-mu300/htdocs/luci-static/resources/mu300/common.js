@@ -114,6 +114,10 @@ var callUsbNetAdd = rpc.declare({ object: 'mu300dash', method: 'usb_net_add', pa
  * language packages. Chinese remains the source/fallback language. */
 var DASH_I18N = {
     'V50 物理卡选择': ['V50 physical SIM selection', 'V50 fiziksel SIM seçimi'],
+    '2内置卡': ['2 built-in SIMs', '2 dahili SIM'],
+    '2内置卡 + 1插拔卡': ['2 built-in SIMs + 1 removable SIM', '2 dahili SIM + 1 çıkarılabilir SIM'],
+    '3内置卡': ['3 built-in SIMs', '3 dahili SIM'],
+    '3内置卡 + 1插拔卡': ['3 built-in SIMs + 1 removable SIM', '3 dahili SIM + 1 çıkarılabilir SIM'],
     '内置 SIM': ['Built-in SIM', 'Dahili SIM'],
     '外置 SIM': ['External SIM', 'Harici SIM'],
     '内置 SIM 3 与内置 SIM 2 共用逻辑卡槽 SIM2；外置 SIM 与内置 SIM 1 共用 SIM1。射频、锁定及 AT 查看仍按两个逻辑卡槽控制。': ['Built-in SIM 3 shares logical SIM2 with built-in SIM 2; the external SIM shares SIM1 with built-in SIM 1. Radio, locks and AT views still use the two logical slots.', 'Dahili SIM 3 ve dahili SIM 2 mantıksal SIM2 yuvasını; harici SIM ve dahili SIM 1 ise SIM1 yuvasını paylaşır. Radyo, kilitler ve AT görünümü iki mantıksal yuvayı kullanır.'],

@@ -183,6 +183,7 @@ printf "127.0.0.1\tlocalhost\n\n::1\tlocalhost ip6-localhost ip6-loopback\nff02:
 printf "mu300\n" > $R/etc/hostname   # the real one comes from uci (etc/uci-defaults/90-mu300)
 cp -a /in/opt-mu300 $R/opt/mu300
 cp -a /in/overlay/. $R/
+chmod 0755 $R/etc/uci-defaults/95-disable-ap-uapsd
 chmod 0755 $R/etc/init.d/unisoc-battery $R/etc/hotplug.d/power_supply/80-unisoc-battery
 mkdir -p $R/etc/mu300
 cp /in/block-mount.build-id $R/etc/mu300/block-mount.build-id
@@ -192,6 +193,7 @@ for f in sbin/block lib/libblkid-tiny.so etc/init.d/fstab; do
     [ -s "$R/$f" ] || { echo "patched block-mount required file missing: $f" >&2; exit 1; }
 done
 chmod 0755 $R/opt/mu300/bin/cpu-voltage-platform $R/etc/init.d/mu300-cpu-driver
+chmod 0755 $R/opt/mu300/bin/mu300-lowlatency
 for helper in mu300-data-sim-u30 mu300-sim-u30 mu300-sim2-start mu300-sim2-warmup u30air-led-status; do
     [ -s "$R/opt/mu300/bin/$helper" ] || { echo "missing U30 helper: $helper" >&2; exit 1; }
     chmod 0755 "$R/opt/mu300/bin/$helper"

@@ -94,7 +94,8 @@ return view.extend({
                 var current=r.saved_card==null?r.active_card:r.saved_card;
                 if(current!=null)physicalSelect.value=String(current);
             }
-            physicalNote.textContent='board_id '+r.board_id+' · '+M.translate('当前上网卡')+'：'+
+            var layouts={0:'3内置卡',1:'3内置卡 + 1插拔卡',2:'2内置卡 + 1插拔卡',3:'2内置卡'};
+            physicalNote.textContent=M.translate(layouts[r.board_id]||'SIM')+' · '+M.translate('当前上网卡')+'：'+
                 (r.active_card==null?M.translate('未连接'):physicalName(r.active_card));
             if(!r.ready)physicalNote.textContent+=' · '+message('v50_mux_unavailable');
         }

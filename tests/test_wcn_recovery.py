@@ -27,6 +27,69 @@ class DriverRecovery(unittest.TestCase):
             self.assertEqual(p.returncode, 0, p.stderr)
             subprocess.run([str(exe)], check=True, timeout=5)
 
+    def test_rx_push_drains_completed_ring_before_refill(self):
+        body = function((MOD / 'wcn_bsp/pcie/edma_engine.c').read_text(),
+                        'edma_rx_push_isr')
+        self.run_c(r'''
+#include <assert.h>
+#include <stdint.h>
+#include <stddef.h>
+#define IS_ERR_OR_NULL(p) (!(p) || (uintptr_t)(p) >= (uintptr_t)-4095)
+struct desc { int index; };
+struct ring { struct desc *head; int free; };
+struct channel { int inout; struct ring dscr_ring; };
+struct edma_info { struct channel chn_sw[16]; };
+static struct edma_info state;
+static struct desc ring[4] = {{0},{1},{2},{3}};
+static struct desc *hw;
+static int reads, maps, pops, delivered, refills, step, pop_step, refill_step;
+static struct edma_info *edma_info(void) { return &state; }
+static void edma_hw_next_dscr(int ch, int dir, struct desc **end) {
+    assert(ch==11 && dir==0); ++reads; *end=hw;
+}
+static struct desc *mpool_phy_to_vir(struct desc *p) {
+    assert(!IS_ERR_OR_NULL(p)); ++maps; return p;
+}
+static void edma_pop_link(int ch, struct desc *start, struct desc *end,
+                          void **head, void **tail, int *n) {
+    ++pops; pop_step=++step;
+    *n=(end->index-start->index+4)%4;
+    assert(*n>0); *head=start; *tail=end;
+    state.chn_sw[ch].dscr_ring.head=end;
+    state.chn_sw[ch].dscr_ring.free+=*n;
+}
+static void edma_rx_list_pop_dp(int ch, void *h, void *t, int n) {
+    assert(ch==11 && h && t && n>0);
+}
+static void mchn_hw_pop_link(int ch, void *h, void *t, int n) {
+    assert(ch==11 && h && t); delivered+=n; ++step;
+}
+static void mchn_hw_req_push_link(int ch, int n) {
+    assert(ch==11 && n==state.chn_sw[ch].dscr_ring.free);
+    ++refills; refill_step=++step;
+}
+''' + body + r'''
+int main(void) {
+    state.chn_sw[11].dscr_ring.head=&ring[0]; hw=&ring[2];
+    edma_rx_push_isr(11);
+    assert(reads==1 && maps==1 && pops==1 && delivered==2 && refills==1);
+    assert(pop_step<refill_step);
+    /* An empty push interrupt still replenishes available descriptors. */
+    edma_rx_push_isr(11);
+    assert(reads==2 && pops==1 && delivered==2 && refills==2);
+    /* Wrapped completion belongs to the same ring and is delivered once. */
+    state.chn_sw[11].dscr_ring.head=&ring[3]; hw=&ring[1];
+    edma_rx_push_isr(11);
+    assert(reads==3 && pops==2 && delivered==4 && refills==3);
+    hw=NULL; edma_rx_push_isr(11);
+    hw=(void *)(intptr_t)-5; edma_rx_push_isr(11);
+    assert(reads==5 && maps==3 && pops==2 && delivered==4 && refills==5);
+    state.chn_sw[11].dscr_ring.free=0;
+    edma_rx_push_isr(11);
+    assert(refills==5);
+}
+''')
+
     def test_refill_no_progress_backs_off_and_progress_resumes_immediately(self):
         text = (WLAN / 'sc2355/rx.c').read_text()
         body = function(text, 'sc2355_mm_fill_buffer')

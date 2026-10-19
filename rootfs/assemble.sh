@@ -30,6 +30,7 @@ done
 rm -rf $R && mkdir -p $R
 tar -xf /w/base.tar -C $R
 cp -a /w/overlay/. $R/
+chmod 0755 $R/opt/mu300/bin/mu300-lowlatency
 # /lib is a symlink to usr/lib on Ubuntu; always write through usr/lib
 mkdir -p $R/usr/lib/modules/$KREL/extra
 cp /kmods/*.ko $R/usr/lib/modules/$KREL/extra/

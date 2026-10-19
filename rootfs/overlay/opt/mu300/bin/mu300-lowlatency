@@ -1,0 +1,15 @@
+#!/bin/sh
+# Stock U30 Air init.md.rc: "zte add for feimao lowlatency" disables
+# CPU0 idle after boot. Apply the requested policy to every MU300 profile.
+# CPU0 only; no polling, frequency changes or radio/PCIe power commands.
+R=${MU300_SYSROOT:-}
+status=0
+for node in "$R"/sys/devices/system/cpu/cpu0/cpuidle/state*/disable; do
+    [ -f "$node" ] || continue
+    [ "$(cat "$node" 2>/dev/null)" = 1 ] && continue
+    if ! printf '1\n' > "$node"; then
+        echo "mu300-lowlatency: cannot disable CPU0 idle: $node" >&2
+        status=1
+    fi
+done
+exit "$status"
