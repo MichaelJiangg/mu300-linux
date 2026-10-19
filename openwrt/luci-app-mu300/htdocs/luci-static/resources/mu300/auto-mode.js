@@ -74,7 +74,10 @@ return baseclass.extend({
             // The selection is a draft until the lock page confirms the job.
             request(button,()=>set('unisoc_modem','main',{auto_work_mode:value})
                 .then(()=>commit('unisoc_modem'))
-                .catch(()=>{throw new Error(M.translate('保存兼容性设置失败，未执行网络模式应用'));}));
+                .catch(error=>{
+                    const detail=error && error.message ? ': '+error.message : '';
+                    throw new Error(M.translate('保存兼容性设置失败，未执行网络模式应用')+detail);
+                }));
         };
         reload();
         return {update,reload};

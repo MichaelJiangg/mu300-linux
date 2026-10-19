@@ -16,6 +16,7 @@
   },
   "write": {
    "ubus": {
+    "uci": [ "commit" ],
     "mu300dash": [ "*" ],
     "mu300-charge": [ "configure", "full_once", "pause", "resume" ]
    },
