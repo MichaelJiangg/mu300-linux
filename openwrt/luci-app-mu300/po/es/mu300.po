@@ -2000,6 +2000,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "SIM integrada 1"
+
+msgid "Built-in SIM 2"
+msgstr "SIM integrada 2"
+
+msgid "Built-in SIM 3"
+msgstr "SIM integrada 3"
+
+msgid "External SIM"
+msgstr "SIM externa"
+
+msgid "SIM card"
+msgstr "Tarjeta SIM"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "La SIM integrada 3 comparte SIM2 y la SIM externa comparte SIM1. La tarjeta elegida aquí se conmuta antes de que arranque el módem, en el próximo inicio; sin elección, las tarjetas quedan como las deja el cargador de arranque."
+
+msgid "As the bootloader sets them"
+msgstr "Como las deja el cargador de arranque"
+
 msgid "Applying the radio setting…"
 msgstr "Aplicando el ajuste de radio…"
 
@@ -3507,12 +3528,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "El módem no aceptó el ajuste; no se guardó nada"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "Solicitud demasiado grande"

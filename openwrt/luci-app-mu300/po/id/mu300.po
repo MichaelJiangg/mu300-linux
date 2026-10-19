@@ -2000,6 +2000,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "SIM bawaan 1"
+
+msgid "Built-in SIM 2"
+msgstr "SIM bawaan 2"
+
+msgid "Built-in SIM 3"
+msgstr "SIM bawaan 3"
+
+msgid "External SIM"
+msgstr "SIM eksternal"
+
+msgid "SIM card"
+msgstr "Kartu SIM"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "SIM bawaan 3 berbagi SIM2, SIM eksternal berbagi SIM1. Kartu yang dipilih di sini dialihkan sebelum modem menyala, pada boot berikutnya; tanpa pilihan, kartu tetap seperti yang diatur bootloader."
+
+msgid "As the bootloader sets them"
+msgstr "Seperti yang diatur bootloader"
+
 msgid "Applying the radio setting…"
 msgstr "Menerapkan pengaturan radio…"
 
@@ -3507,12 +3528,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "Modem tidak menerima pengaturan; tidak ada yang disimpan"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "Permintaan terlalu besar"

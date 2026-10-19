@@ -114,6 +114,7 @@ module installed, `vpn_extra` mu300-extra there, `wifi_client`, `sms` (`cli`, `p
 | `data.set` | `apn` `pdp` (`IP`/`IPV6`/`IPV4V6`) `auth` (`none`/`pap`/`chap`/`both`) `user` `password` `clear_credentials` `roaming` (bool: `mobile-data roaming on` or `off`; alone it restarts nothing) | `restart` |
 | `data.power` | `state` | - |
 | `sim.get`, `sim.select` | -, `slot` 1/2 | `sim` (mu300-sim's JSON) |
+| `sim.card` | `card` 0-3 or `"none"` (ZTE V50 only: built-in SIM 1/2/3, external; at the next boot) | `sim` (mu300-sim's JSON, its `v50` member), `text` (FINDINGS 194) |
 | `sim.state` | `fresh` (bool: ask the card, AT+CPIN?) | `state` (`ready`/`locked`/`absent`, or null) `slot` (mu300-sim-state, FINDINGS 186) |
 | `voice.get`, `voice.set` | -, `slot` 1/2 `kind` volte/vonr `state` on/off | `voice` (`mobile-data voice --json --read`: the saved choice per card, `live` what the card in use says), `text` (FINDINGS 184) |
 | `radio.get`, `radio.set` | -, `slot` 1/2/"all" `state` on/off | `radio` (`mu300-sim-radio status --json`: `enabled` per card, `all_off`, `active`, `busy`, `result`), `text`; `busy` while another change runs (FINDINGS 185) |

@@ -2000,6 +2000,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "내장 SIM 1"
+
+msgid "Built-in SIM 2"
+msgstr "내장 SIM 2"
+
+msgid "Built-in SIM 3"
+msgstr "내장 SIM 3"
+
+msgid "External SIM"
+msgstr "외부 SIM"
+
+msgid "SIM card"
+msgstr "SIM 카드"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "내장 SIM 3은 SIM2를, 외부 SIM은 SIM1을 공유합니다. 여기서 선택한 카드는 다음 부팅 때 모뎀이 시작되기 전에 전환됩니다. 선택하지 않으면 카드는 부트로더가 설정한 그대로 유지됩니다."
+
+msgid "As the bootloader sets them"
+msgstr "부트로더가 설정한 그대로"
+
 msgid "Applying the radio setting…"
 msgstr "무선 설정 적용 중…"
 
@@ -3507,12 +3528,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "모뎀이 설정을 받아들이지 않았습니다. 아무것도 저장되지 않았습니다"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "요청이 너무 큽니다"

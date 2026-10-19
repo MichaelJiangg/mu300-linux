@@ -2000,6 +2000,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "Кірістірілген SIM 1"
+
+msgid "Built-in SIM 2"
+msgstr "Кірістірілген SIM 2"
+
+msgid "Built-in SIM 3"
+msgstr "Кірістірілген SIM 3"
+
+msgid "External SIM"
+msgstr "Сыртқы SIM"
+
+msgid "SIM card"
+msgstr "SIM карта"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "Кірістірілген SIM 3 SIM2-мен, сыртқы SIM SIM1-мен ортақ. Мұнда таңдалған карта келесі жүктелуде модем іске қосылмай тұрып қосылады; таңдау болмаса, карталар жүктеуші орнатқандай қалады."
+
+msgid "As the bootloader sets them"
+msgstr "Жүктеуші орнатқандай"
+
 msgid "Applying the radio setting…"
 msgstr "Радио баптауы қолданылуда…"
 
@@ -3507,12 +3528,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "Модем баптауды қабылдамады; ештеңе сақталмады"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "Сұрау тым үлкен"

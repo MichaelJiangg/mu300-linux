@@ -1995,6 +1995,27 @@ msgstr "切換到卡%d"
 msgid "Use SIM%d at next boot"
 msgstr "下次啟動使用卡%d"
 
+msgid "Built-in SIM 1"
+msgstr "內建 SIM 1"
+
+msgid "Built-in SIM 2"
+msgstr "內建 SIM 2"
+
+msgid "Built-in SIM 3"
+msgstr "內建 SIM 3"
+
+msgid "External SIM"
+msgstr "外接 SIM"
+
+msgid "SIM card"
+msgstr "SIM 卡"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "內建 SIM 3 與 SIM2 共用，外接 SIM 與 SIM1 共用。此處選擇的卡會在下次開機、基頻啟動前切換到位；未選擇時，各卡保持開機載入程式設定的狀態。"
+
+msgid "As the bootloader sets them"
+msgstr "保持開機載入程式的設定"
+
 msgid "Applying the radio setting…"
 msgstr "正在套用射頻設定…"
 
@@ -3500,12 +3521,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "模組未接受該設定，未儲存任何內容"
 
 # Dual SIM controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "請啟用熱切換；通道尚未準備好時請重新啟動，操作進行中請等待。"
-
-# Dual SIM controls.
 msgid "SIM control failed"
 msgstr "SIM 控制失敗"
+
+# Dual SIM controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "請啟用熱切換；通道尚未準備好時請重新啟動，操作進行中請等待。"
 
 msgid "Request too large"
 msgstr "請求過大"

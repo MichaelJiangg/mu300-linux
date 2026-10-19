@@ -1,4 +1,4 @@
-# F50 internal and external SIM selection
+# F50 internal and external SIM selection (and the V50's cards)
 
 The default remains the external card (slot 0). Some F50 units also have an internal
 SIM exposed as slot 1. Selecting slot 1 does not provision an eSIM or write any SIM
@@ -47,6 +47,36 @@ The existing OpenWrt automatic WAN setup uses the selected card after reboot.
 On systemd installations, `mu300-sim select` stores the choice in
 `/etc/mu300/sim-slot`; configure the selected carrier in the existing
 `/etc/mu300/mobile-data.conf`. The two-profile LuCI editor is OpenWrt-specific.
+
+## ZTE V50: built-in and external cards
+
+A V50 carries up to four cards on the modem's two SIM interfaces (docs/FINDINGS.md 194; ZTE's table, read from its
+firmware by kanoqwq). Which ones depends on the board variant (ZTE's `board_id`):
+
+| board_id | cards |
+| --- | --- |
+| 0 | built-in SIM 1, 2, 3 |
+| 1 | built-in SIM 1, 2, 3 and the external SIM |
+| 2 | built-in SIM 1, 2 and the external SIM |
+| 3 | built-in SIM 1, 2 |
+
+Built-in SIM 1 and the external SIM share SIM1 (slot 0); built-in SIM 2 and 3 share SIM2 (slot 1). A board switch
+picks the card on each interface. Choose the card, then reboot:
+
+```sh
+mu300-sim status            # card in use / next boot card
+mu300-sim card 3            # 0, 1, 2: built-in SIM 1, 2, 3; 3: the external SIM
+mu300-sim card none         # no choice: the switches stay as the bootloader sets them
+```
+
+`card` saves the card and its interface (the same `sim_slot` as `select`), so the WAN page's profile for that
+interface is used (SIM1: APN/PDP type, SIM2: the internal profile). At the next boot the switch is set before the
+modem starts; nothing is switched while the modem runs. LuCI: Cellular > SIM; Cockpit: the SIM card; the API:
+`sim.card`. Without a choice nothing changes from before: the switches stay as the bootloader leaves them.
+
+`mu300-sim card N --now` (experimental, kanoqwq's sequence from ZTE's firmware) switches a card on the SIM in use
+without a reboot: mobile data goes down, the card is powered off, switched, powered on after 5 s, and the data comes
+back; a failure switches the previous card back. A card on the other SIM needs the reboot.
 
 ## Devices without a supported slot-1 backend
 
