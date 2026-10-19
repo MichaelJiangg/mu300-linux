@@ -396,7 +396,7 @@
     function locksCard(root) {
         var lc = root.appendChild(card(_('Network, band and cell locks'), 'mu-locks'));
         var lb = lc.appendChild(el('div'));
-        var MODES = [ [ 'auto', _('Automatic') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
+        var MODES = [ [ 'auto', _('Automatic') ], [ 'auto152', _('Automatic without 2G (152)') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
         var RESTART = _('The modem\'s protocol stack restarts: cellular service stops for about half a minute.');
         function set(btn, kind, val, what, quick) {
             act(btn, 'lock.set', { kind: kind, val: val }, {
