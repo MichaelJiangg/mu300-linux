@@ -2024,6 +2024,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "अंतर्निहित SIM 1"
+
+msgid "Built-in SIM 2"
+msgstr "अंतर्निहित SIM 2"
+
+msgid "Built-in SIM 3"
+msgstr "अंतर्निहित SIM 3"
+
+msgid "External SIM"
+msgstr "बाहरी SIM"
+
+msgid "SIM card"
+msgstr "SIM कार्ड"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "अंतर्निहित SIM 3, SIM2 साझा करता है और बाहरी SIM, SIM1 साझा करता है। यहाँ चुना गया कार्ड अगले बूट पर मॉडेम शुरू होने से पहले जोड़ा जाता है; कोई चुनाव न होने पर कार्ड वैसे ही रहते हैं जैसे बूटलोडर उन्हें सेट करता है।"
+
+msgid "As the bootloader sets them"
+msgstr "जैसे बूटलोडर उन्हें सेट करता है"
+
 msgid "Applying the radio setting…"
 msgstr "रेडियो सेटिंग लागू हो रही है…"
 
@@ -3537,12 +3558,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "मॉडेम ने सेटिंग स्वीकार नहीं की; कुछ भी सहेजा नहीं गया"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "अनुरोध बहुत बड़ा है"

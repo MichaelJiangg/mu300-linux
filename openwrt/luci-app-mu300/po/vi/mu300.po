@@ -2024,6 +2024,27 @@ msgstr "Switch to SIM%d"
 msgid "Use SIM%d at next boot"
 msgstr "Use SIM%d at next boot"
 
+msgid "Built-in SIM 1"
+msgstr "SIM tích hợp 1"
+
+msgid "Built-in SIM 2"
+msgstr "SIM tích hợp 2"
+
+msgid "Built-in SIM 3"
+msgstr "SIM tích hợp 3"
+
+msgid "External SIM"
+msgstr "SIM ngoài"
+
+msgid "SIM card"
+msgstr "Thẻ SIM"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "SIM tích hợp 3 dùng chung SIM2, SIM ngoài dùng chung SIM1. Thẻ được chọn ở đây sẽ được chuyển vào trước khi modem khởi động, ở lần khởi động tiếp theo; nếu không chọn, các thẻ giữ nguyên như bootloader thiết lập."
+
+msgid "As the bootloader sets them"
+msgstr "Như bootloader thiết lập"
+
 msgid "Applying the radio setting…"
 msgstr "Đang áp dụng cài đặt radio…"
 
@@ -3537,12 +3558,12 @@ msgid "The modem did not take the setting; nothing was saved"
 msgstr "Modem không nhận cài đặt; chưa lưu gì"
 
 # Source-language fallback for untranslated new controls.
-msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
-msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
-
-# Source-language fallback for untranslated new controls.
 msgid "SIM control failed"
 msgstr "SIM control failed"
+
+# Source-language fallback for untranslated new controls.
+msgid "Enable hot switching; reboot if channels are unavailable or wait until idle"
+msgstr "Enable hot switching; reboot if channels are unavailable or wait until idle"
 
 msgid "Request too large"
 msgstr "Yêu cầu quá lớn"

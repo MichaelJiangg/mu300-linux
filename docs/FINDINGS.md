@@ -189,6 +189,7 @@ what replaced it. The table below gives each section's state.
 | 201 | CPU voltage offset: the U30 Air's and the V50's SML builds are known (payload the F50's byte for byte; kanoqwq's U30 Air device test, c1293746, f6b0668d) | unit tests; not yet on our U30 Air |
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
+| 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 
 ## Hardware and firmware facts
 
@@ -12329,3 +12330,80 @@ carried QoS Info 0x80: the firmware may announce it on its own. So this is the c
 more is claimed. Ubuntu's hotspot is not changed (his tree changes OpenWrt only).
 
 Tests: `tests/test_wifi.py` (`ApUapsd`). Not yet on our boards.
+
+### 204. The ZTE V50's SIM cards: a third built-in card shares SIM2, the external card SIM1 (#332)
+
+**Status: offline only. Nobody here has a V50**; the test steps are in the PR for the #332 reporter.
+
+**What was asked.** #332: a V50 has three positions on its SIM selector (two carriers' built-in cards and the tray),
+and under Linux only the first built-in card worked. The reporter found the switch in an Android capture: no AT
+command, a SoC GPIO (`soft-psim-switch`; gpiochip4 line 108 on the mainline numbering, 172 on Android's) that
+Android's telephony framework drives; `gpioset ... 108=1` before the modem came up gave him the external card.
+
+**What kanoqwq read in ZTE's firmware** (his `f0ed60ff` and `b4c051c8`, `docs/V50-CARD-TOPOLOGY-U30-LED-20261019.zh-CN.md`
+in his fork; B15 firmware, `ElfDeviceManager` and the telephony framework, `sim_gpio_ctl.ko` disassembled). A V50 has
+one of four board variants, told by ZTE's `board_id` (`/proc/driver/board_id` on Android; the bootloader's
+`androidboot.zte_boardid` in the device tree's `chosen/bootargs` under the mainline kernel):
+
+| board_id | cards | card IDs |
+|---|---|---|
+| 0 | three built-in | 0 1 2 |
+| 1 | three built-in and the tray | 0 1 2 3 |
+| 2 | two built-in and the tray | 0 1 3 |
+| 3 | two built-in | 0 1 |
+
+The modem still has two SIM interfaces. Card 0 (built-in SIM 1) and card 3 (the tray) share SIM1 behind
+`soft-psim-switch` (0/1); card 1 (built-in SIM 2) and card 2 (built-in SIM 3) share SIM2 behind `esim2-esim3-switch`
+(0/1). `esim1-psim-switch` is, despite its name, an input (the card holder's detect line). The reporter's GPIO and
+polarity agree with this table. ZTE's own switch powers the SIM down first (`SFUN=5`, `SFUN=3`), sets the GPIO, waits
+5 s and powers it up (`SFUN=2`, then `SFUN=4`).
+
+**What this tree does with it.** kano switches live, with both protocol stacks running; this tree runs one card per
+boot (the F50's selection, docs/SIM-SELECTION.md), so the card is chosen for the next boot and switched in before the
+modem's CP starts. No AT command and no power sequence are needed, nothing waits 5 s, and a SIM is never switched
+while powered.
+
+* `zte-v50-sim.c` (kano's driver, built in; `CONFIG_ZTE_V50_SIM=y`): binds the stock `zte,sim_gpio_ctrl` node only
+  where the V50's AW9523B is, and exposes `chip_select`, `psim_select` (read/write) and `psim_present` (read). **It
+  drives nothing at probe** (`GPIOD_ASIS`): ZTE's module set both outputs from `androidboot.simswitch` /
+  `psimswitch` or a default, kano's does the same on a cold boot. Here a V50 whose owner never chose a card keeps
+  exactly the routing it had before this driver, and a write that matches the line's level leaves the line alone.
+* `mu300-sim card 0|1|2|3|none` (V50 only): checks the card against the board, saves it (OpenWrt
+  `network.wan.v50_card`, else `/etc/mu300/v50-card`) and the SIM interface it is on (`sim_slot`, as `select`),
+  refuses without the driver; `none` forgets it. `mu300-sim default 1|2` keeps a card on that interface and forgets
+  one on the other. `status --json` has a `v50` member (board, cards, the card in use from the switches' levels, the
+  saved one, the levels); no AT command.
+* `mu300-sim v50-boot`, from `android-vendor-start` right before `modem_control` (OpenWrt S09, Ubuntu alike): once a
+  boot, on a V50 with a saved card the board has and whose interface is the boot's, sets that one switch when its
+  level differs, and then drops the dashboard's identity cache of that interface (`sim.json` / `sim-slot1.json`: the
+  previous card's operator and numbers). Anything else (another board, no card, an unknown board_id, a card on the
+  other interface than the WAN page's choice, no driver) leaves the switches as they are, logs why and starts the
+  modem as before. It never stops the boot.
+* The V50 now boots SIM2 as the F50 does (`slot1_supported`): the same modem and channel set (nr3/nr4/nr5,
+  `sipa_eth8`, `AT+SPSWDATA`); this is what makes built-in SIM 2 and 3 usable. Each interface keeps its own APN
+  profile on the WAN page, whose labels say which cards are behind it on a V50.
+* Front ends: LuCI Cellular > SIM (a card list for this board, the card in use and at the next boot; `sim_set
+  card`), Cockpit's SIM card (`mu300-api sim.card`), the backup (`sim.card` in the `sim` section on a V50). EN/TR/ZH
+  and the other catalogs.
+
+* **kano's live switch, opt-in**: `mu300-sim card N --now` (the CLI only) switches a card on the SIM in use without a
+  reboot, in ZTE's order as his `mu300-v50-sim` does: the data down, then under mobile-data's radio lock `SFUN=5`,
+  `SFUN=3`, the switch, 5 s, `SFUN=2`, the card's `+CPIN:` (8 s at most), `SFUN=4` when that SIM's radio is allowed;
+  a failure switches the previous card back the same way. A card on the other SIM still needs the reboot (one stack
+  runs here). kano's notes say the physical switching was not tried on any board variant (his V50 is board 3, two
+  built-in cards, and he deployed and read the driver there, without switching), so the reboot path stays the
+  default.
+
+**Not taken from kano.** His dual-stack data-card transaction around the switch (`mu300-data-sim`, the identity
+generation markers; his tree runs both stacks); the cold-boot levels from `androidboot.*` (a default nobody verified
+on four variants; here a V50 without a choice keeps the bootloader's routing); the `preserve_state` module parameter
+(here it is the only behaviour). His U30 Air network LED and V50 NET-lamp changes are in the misc port.
+
+**Risks.** A wrong table entry for some board would switch in a card position with nothing in it: SIM1 or SIM2 then
+has no card, and `mu300-sim card none` plus a reboot (or choosing another card) gives the bootloader's routing back.
+The driver does nothing without the V50's AW9523B, so the F50 and the U30 Air are untouched (`v50-boot` returns at
+once there).
+
+Tests: `tests/test_v50_sim.py` (the board table, the mapping, status, `card`, `default`, `v50-boot` and its once-a-boot
+rule, the live switch's order and its switch back, the identity cache, other boards, the driver drives nothing at probe), `tests/test_sim_selection.py`,
+`tests/test_api.py`, `tests/test_backup.py`, the catalogs.

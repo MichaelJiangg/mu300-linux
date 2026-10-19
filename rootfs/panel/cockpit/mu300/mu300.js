@@ -753,6 +753,30 @@
                 });
                 sb.appendChild(bar);
             } else sb.appendChild(note(_('This device has one SIM slot in use.')));
+            /* the ZTE V50's cards (sim.card, FINDINGS 204): two of them behind a switch on one SIM interface */
+            var v = s.v50;
+            if (v && has('sim.card')) {
+                var names = [ _('Built-in SIM 1'), _('Built-in SIM 2'), _('Built-in SIM 3'), _('External SIM') ];
+                var nm = function (n) { return (n === null || n === undefined) ? null : names[n] || null; };
+                var none = v.saved_card === null || v.saved_card === undefined;
+                sb.appendChild(row(_('Card in use'), nm(v.card)));
+                sb.appendChild(row(_('Card at the next boot'), none ? _('As the bootloader sets them') : nm(v.saved_card)));
+                sb.appendChild(note(_('Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them.')));
+                if (v.cards && v.switches) {
+                    var cb = actions([]);
+                    v.cards.forEach(function (n) {
+                        var b = button(nm(n), function () {
+                            act(b, 'sim.card', { card: n }, { done: refresh, confirm: _('Use this card from the next boot on?') });
+                        }, n === v.saved_card ? 'primary' : '');
+                        cb.appendChild(b);
+                    });
+                    var nb = button(_('As the bootloader sets them'), function () {
+                        act(nb, 'sim.card', { card: 'none' }, { done: refresh });
+                    }, none ? 'primary' : '');
+                    cb.appendChild(nb);
+                    sb.appendChild(cb);
+                }
+            }
         }
         refresh();
 

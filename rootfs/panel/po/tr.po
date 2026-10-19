@@ -734,6 +734,33 @@ msgstr "SIM değiştirilsin mi? Mobil veri bundan sonra diğer kartı kullanır 
 msgid "This device has one SIM slot in use."
 msgstr "Bu cihazda kullanılan tek bir SIM yuvası var."
 
+msgid "Built-in SIM 1"
+msgstr "Dahili SIM 1"
+
+msgid "Built-in SIM 2"
+msgstr "Dahili SIM 2"
+
+msgid "Built-in SIM 3"
+msgstr "Dahili SIM 3"
+
+msgid "External SIM"
+msgstr "Harici SIM"
+
+msgid "Card in use"
+msgstr "Kullanılan kart"
+
+msgid "Card at the next boot"
+msgstr "Sonraki açılıştaki kart"
+
+msgid "As the bootloader sets them"
+msgstr "Önyükleyicinin ayarladığı gibi"
+
+msgid "Built-in SIM 3 shares SIM2, the external SIM shares SIM1. The card chosen here is switched in before the modem starts, at the next boot; without a choice the cards stay as the bootloader sets them."
+msgstr "Dahili SIM 3, SIM2'yi; harici SIM, SIM1'i paylaşır. Burada seçilen kart bir sonraki açılışta modem başlamadan önce devreye alınır; seçim yoksa kartlar önyükleyicinin ayarladığı gibi kalır."
+
+msgid "Use this card from the next boot on?"
+msgstr "Bu kart sonraki açılıştan itibaren kullanılsın mı?"
+
 msgid "Radio per SIM"
 msgstr "SIM başına radyo"
 
