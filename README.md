@@ -1216,6 +1216,13 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 The kernel source used here is mirrored at
 [`dikeckaan/zte-ums9620-kernel-5.4.254`](https://github.com/dikeckaan/zte-ums9620-kernel-5.4.254).
 
+## Support the project
+
+mu300-linux is a hobby project, made by one person in Turkey in spare time. If it saved you a device or some money
+and you want to give something back, you can sponsor it on [GitHub Sponsors](https://github.com/sponsors/dikeckaan).
+One-off and monthly amounts both work, from anywhere GitHub takes cards. It is entirely optional: everything here
+stays free.
+
 ## Credits and licenses
 
 * Kernel source: ZTE's GPL release for the U30 Air (mirrored by Enceka) and the Unisoc drivers in it — GPL-2.0.
