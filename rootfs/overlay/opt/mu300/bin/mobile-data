@@ -879,7 +879,10 @@ sim_reset() {
     tty_setup
     at 'AT+SFUN=5' 20; at 'AT+SFUN=3' 10; sleep 2; at 'AT+SFUN=2' 10; at 'AT+SFUN=4' 30
     for _ in $(seq 1 30); do at 'AT+CPIN?' | grep -q READY && break; sleep 2; done
-    at 'AT+CPIN?'
+    at 'AT+CPIN?' || return $?
+    # SFUN=2 resets volatile preferences too. Reuse the detached platform
+    # worker now, including when data is off and no redial will follow.
+    queue_data_priority || true
 }
 
 # The modem firmware occasionally resets itself (modem_control reloads it); it comes back with the radio off and

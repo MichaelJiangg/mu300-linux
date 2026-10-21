@@ -62,7 +62,7 @@ test('preserve reserved bytes and Android health metadata', () => {
     const result = Buffer.from(api.buildBlock(repaired(raw), 'a'), 'hex');
     assert.equal(result[12], 0xbe); assert.equal(result[11], 0x5a); assert.equal(result[20], 0xa7);
 });
-test('bad CRC, malformed hex, wrong version, verity, unsuccessful Android and pending priority are rejected', () => {
+test('bad CRC, malformed hex, wrong version, verity and unsuccessful Android are rejected', () => {
     assert.throws(() => api.buildBlock(BEFORE.a.slice(0, 62) + '00', 'a'), /CRC/);
     for (const bad of ['z'.repeat(64), BEFORE.a.slice(2), BEFORE.a + '00']) assert.throws(() => api.buildBlock(bad, 'a'));
     for (const [at, value] of [[4, 0], [8, 2], [9, 1], [12, 0x1f], [13, 1], [15, 1]]) {
@@ -70,7 +70,7 @@ test('bad CRC, malformed hex, wrong version, verity, unsuccessful Android and pe
         assert.throws(() => api.buildBlock(repaired(raw), 'a'));
     }
     const raw = Buffer.from(BEFORE.a, 'hex'); raw[12] = 0x9e; raw[14] = 0x2f;
-    assert.throws(() => api.buildBlock(repaired(raw), 'a'), /待执行/);
+    assert.equal(api.buildBlock(repaired(raw), 'a'), WANTED.a); // Already armed OpenWrt is safe to re-arm.
 });
 test('recognition accepts current boot families and refuses stock, corrupt and pending images', () => {
     for (const family of ['e5', 'mu300']) {
@@ -92,6 +92,21 @@ test('probe every supported family in either Android slot using actual getprop s
         }
     }
 });
+test('already armed OpenWrt does not override the running Android slot', async () => {
+    for (const slot of ['a', 'b']) {
+        const info = fixture('mu300', slot), raw = Buffer.from(info.live, 'hex');
+        raw[slot === 'a' ? 12 : 14] = 0x9e;
+        raw[slot === 'a' ? 14 : 12] = 0x6f;
+        // A previous boot selection may already name the opposite slot.
+        raw[1] = slot === 'a' ? 98 : 97;
+        const tr = transport(info, {model: 'U30AIR', device: 'U30Air', live: repaired(raw)});
+        const result = await load(tr.fn).probe();
+        assert.equal(result.slot, slot);
+        assert.equal(result.other, slot === 'a' ? 'b' : 'a');
+        assert.equal(api.buildBlock(result.live, result.slot), WANTED[slot]);
+    }
+});
+
 test('installed E5-family images do not require an orange verified-boot property', async () => {
     for (const slot of ['a', 'b']) for (const unlocked of ['green', 'yellow', 'unknown']) {
         const info = fixture('e5', slot), tr = transport(info, {unlocked, model: 'angelcare K1'});

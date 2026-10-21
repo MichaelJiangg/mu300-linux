@@ -185,6 +185,52 @@ esac
         for path in ('tools/build-openwrt-tf-magisk.sh', 'tools/make-release.sh'):
             self.assertIn('./opt/mu300/bin/mobile-data ', (TOP / path).read_text())
 
+    def test_manual_reset_reapplies_without_redial_and_preserves_failures(self):
+        code = self.source[self.source.index('sim_reset() {'):
+                           self.source.index('\n# The modem firmware occasionally resets')]
+        code = code.replace('/run/mu300/sim-managed', str(self.tmp / 'managed'))
+        self.stub('allowed', 'exit "${DENY_RADIO:-0}"')
+        self.stub('sleep', ':')
+        fixture = self.tmp / 'reset-fixture'
+        fixture.write_text('#!/bin/bash\nset -euo pipefail\n' + code + r'''
+tty_setup() { :; }
+at() {
+    echo "$1" >> "$STUBLOG/reset-commands"
+    [ "${AT_FAIL:-}" != "$1" ] || return 9
+    case "$1" in *CPIN*) printf '+CPIN: READY\nOK\n';; *) echo OK;; esac
+}
+queue_data_priority() {
+    echo PRIORITY >> "$STUBLOG/reset-commands"
+    return "${QUEUE_RC:-0}"
+}
+sim_reset
+''')
+        expected = ['AT+SFUN=5', 'AT+SFUN=3', 'AT+SFUN=2', 'AT+SFUN=4',
+                    'AT+CPIN?', 'AT+CPIN?', 'PRIORITY']
+        for slot in ('0', '1'):
+            for shell in (['bash'],):  # mobile-data requires bash/pipefail
+                log = self.tmp / 'reset-commands'
+                log.write_text('')
+                env = dict(MU300_SIM_SLOT=slot, MU300_RADIO_ALLOWED=self.stubs / 'allowed')
+                # Every reset schedules again; there is no permanent done flag.
+                for _ in range(2):
+                    r = self.script(shell, fixture, **env, QUEUE_RC=1)
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertEqual(log.read_text().splitlines(), expected * 2)
+                log.write_text('')
+                r = self.script(shell, fixture, **env, AT_FAIL='AT+SFUN=2')
+                self.assertEqual(r.returncode, 9, r.stderr)
+                self.assertNotIn('PRIORITY', log.read_text())
+                log.write_text('')
+                r = self.script(shell, fixture, **env, DENY_RADIO=1)
+                self.assertEqual(r.returncode, 1, r.stderr)
+                self.assertEqual(log.read_text(), '')
+                (self.tmp / 'managed').touch()
+                r = self.script(shell, fixture, **env)
+                self.assertEqual(r.returncode, 1, r.stderr)
+                self.assertEqual(log.read_text(), '')
+                (self.tmp / 'managed').unlink()
+
 
 class AtomicModemLocks(ShellTest):
     def test_concurrent_stale_owner_recovery_never_enters_twice(self):

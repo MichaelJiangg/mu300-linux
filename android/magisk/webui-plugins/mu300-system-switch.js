@@ -1,6 +1,6 @@
 //<script>
 /*
- * OpenWrt system switch v5 — Minikano
+ * OpenWrt system switch v6 — Minikano
  * Android web-panel plugin; all supported E5-family and MU300-family models.
  * Select the installed OpenWrt for the next boot, preserving default policy.
  * Write only misc[2048:2080]. No root mount, boot flash or boot-chain sync.
@@ -34,7 +34,9 @@
         if (!(bytes[current] & 0x80) || !(bytes[current] & 15) || (bytes[13] & 1) || (bytes[15] & 1)) {
             throw new Error('Android 启动槽尚未就绪或存在校验错误，请先完成 Android 初始化及更新');
         }
-        if ((bytes[other] & 15) > (bytes[current] & 15)) throw new Error('另一槽已有待执行的启动，请先完成或取消该操作');
+        // misc describes the NEXT boot, not the running Android slot. A
+        // previously armed OpenWrt is valid here; probe/writeScript separately
+        // verify its image and exclude pending install/uninstall boots.
         return bytes;
     };
     const buildBlock = (text, slot) => {
