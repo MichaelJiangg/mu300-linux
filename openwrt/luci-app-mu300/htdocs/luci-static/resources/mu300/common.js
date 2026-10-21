@@ -159,6 +159,8 @@ var DASH_I18N = {
 	"保存并应用": ["Save & apply","Kaydet ve uygula"],
 	"充电管理": ["Charging controls","Şarj denetimi"],
 	"当前电量": ["Battery level","Pil seviyesi"],
+	"电池电流": ["Battery current", "Pil akımı"],
+	"正数充电，负数放电；显示电池净电流，不是 USB 输入电流。": ["Positive: charging; negative: discharging. Net battery current, not USB input current.", "Pozitif: şarj; negatif: deşarj. USB giriş akımı değil, net pil akımıdır."],
 	"充电状态": ["Charging status","Şarj durumu"],
 	"正在读取…": ["Reading…","Okunuyor…"],
 	"启用充电上限": ["Enable charge limit","Şarj sınırını etkinleştir"],
@@ -1048,6 +1050,7 @@ var DASH_I18N = {
 	'短信适配器': ['SMS adapter', 'SMS bağdaştırıcısı'],
 	'实现 list、show、send、delete、sync 子命令；留空时自动查找 mu300-sms。': ['Implement the list, show, send, delete and sync subcommands; leave blank to find mu300-sms automatically.', 'list, show, send, delete ve sync alt komutlarını uygulayın; mu300-sms otomatik bulunsun diye boş bırakın.'],
 	'短信池目录': ['SMS pool directory', 'SMS havuzu dizini'],
+	'原生收件、面板和转发共用；更改后重启生效，已有短信不自动搬移。': ['Shared by native reception, the dashboard and forwarding. Restart after changing it; existing messages are not moved automatically.', 'Yerel alım, gösterge paneli ve yönlendirme aynı dizini kullanır. Değişiklikten sonra yeniden başlatın; mevcut iletiler otomatik taşınmaz.'],
 	'蜂窝逻辑接口': ['Cellular logical interface', 'Hücresel mantıksal arabirim'],
 	'蜂窝 IPv6 接口': ['Cellular IPv6 interface', 'Hücresel IPv6 arabirimi'],
 	'蜂窝网卡': ['Cellular network device', 'Hücresel ağ aygıtı'],
@@ -1327,6 +1330,11 @@ function esc(s) {
 	return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
 		return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
 	});
+}
+function fmtBatteryCurrent(ua) {
+	if (typeof ua !== 'number' || !Number.isFinite(ua)) return '--';
+	var ma = Math.round(ua / 1000);
+	return (ma > 0 ? '+' : '') + ma + 'mA';
 }
 function fmtBytes(b) {
 	if (b == null || isNaN(b)) return '--';
@@ -1872,7 +1880,7 @@ return baseclass.extend({
 	callUsbGet: callUsbGet, callUsbSet: callUsbSet,
 	callUsbNetList: callUsbNetList, callUsbNetAdd: callUsbNetAdd,
 	carrierName: carrierName, qLabel: qLabel, qCol: qCol, qScore: qScore,
-	esc: esc, fmtBytes: fmtBytes, fmtTrafficBytes: fmtTrafficBytes, fmtRate: fmtRate, fmtUptime: fmtUptime, PLMN_CN: PLMN_CN,
+	esc: esc, fmtBatteryCurrent: fmtBatteryCurrent, fmtBytes: fmtBytes, fmtTrafficBytes: fmtTrafficBytes, fmtRate: fmtRate, fmtUptime: fmtUptime, PLMN_CN: PLMN_CN,
 	uiLanguage: uiLanguage, translate: translate, localize: localize, localizeMenu: localizeMenu,
 	injectCss: injectCss, v: v, set: set, spark: spark, neighborRows: neighborRows,
 	toast: toast, busy: busy, confirmBox: confirmBox, alertBox: alertBox, choiceBox: choiceBox,

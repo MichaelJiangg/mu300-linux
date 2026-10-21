@@ -47,7 +47,8 @@ return view.extend({
 		o.description = t('实现 list、show、send、delete、sync 子命令；留空时自动查找 mu300-sms。');
 
 		o = s.option(form.Value, 'sms_pool', t('短信池目录'));
-		o.placeholder = '/etc/unisoc-modem/sms';
+		o.placeholder = '/etc/mu300/sms';
+		o.description = t('原生收件、面板和转发共用；更改后重启生效，已有短信不自动搬移。');
 
 		o = s.option(form.Value, 'data_interface', t('蜂窝逻辑接口'));
 		o.placeholder = 'wan';

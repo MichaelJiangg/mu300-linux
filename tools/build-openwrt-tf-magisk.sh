@@ -119,7 +119,7 @@ for f in ./lib/netifd/proto/mu300cell.sh ./lib/netifd/proto/mu300cell-v6.sh \
     ./lib/netifd/hostapd-unisoc.sh ./usr/share/ucode/wifi/unisoc-sae.uc \
     ./etc/mu300/wifi-sae.build-id \
     ./opt/mu300/bin/mu300-usb ./opt/mu300/bin/v50-led-status ./opt/mu300/bin/mu300-platform-config ./opt/mu300/bin/openwrt-board-check ./opt/mu300/bin/mu300-sim-env ./opt/mu300/bin/mu300-data-sim ./opt/mu300/bin/mu300-dual-radio ./etc/init.d/mu300-post ./etc/init.d/mu300-atd \
-    ./etc/init.d/mu300-smsd ./opt/mu300/bin/mu300-smsd ./opt/mu300/bin/mu300-sms ./etc/sysctl.d/99-mu300-console.conf \
+    ./etc/init.d/mu300-smsd ./opt/mu300/lib/sms-pool.sh ./opt/mu300/bin/mu300-smsd ./opt/mu300/bin/mu300-sms ./etc/sysctl.d/99-mu300-console.conf \
     ./usr/share/luci/menu.d/luci-app-mu300.json \
     ./www/luci-static/resources/view/mu300/home.js \
     ./www/luci-static/resources/mu300/refresh.js \

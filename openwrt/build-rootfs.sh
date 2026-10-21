@@ -206,6 +206,7 @@ for helper in mu300-data-sim-u30 mu300-sim-u30 mu300-sim2-start mu300-sim2-warmu
 done
 chroot "$R" /bin/sh -c "command -v flock >/dev/null" || { echo "missing native SIM flock dependency" >&2; exit 1; }
 [ -s "$R/opt/mu300/lib/sim-config.sh" ] || { echo "missing U30 SIM configuration library" >&2; exit 1; }
+[ -s "$R/opt/mu300/lib/sms-pool.sh" ] || { echo "missing shared SMS pool library" >&2; exit 1; }
 chmod 0755 $R/etc/hotplug.d/power_supply/70-mu300-led
 chmod 0755 $R/opt/mu300/bin/mu300-platform-config
 chmod 0755 $R/opt/mu300/bin/mu300-network-recovery $R/etc/init.d/mu300-network-recovery

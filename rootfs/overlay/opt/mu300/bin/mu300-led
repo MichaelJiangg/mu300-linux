@@ -125,7 +125,13 @@ write() {  # write NAME 0|1: the LED itself
         # 2.25 s cycle: quicker ramps and a longer full-brightness hold.
         # Keep the requested peak (up to 255); do not overdrive the PMIC.
         pattern="0 625 $value 750 0 625 0 250"
-        if ! grep -q '\[pattern\]' "$LEDS/$1/trigger"; then echo pattern > "$LEDS/$1/trigger"; fi
+        if ! grep -q '\[pattern\]' "$LEDS/$1/trigger"; then
+            # SC27xx pattern_set enables RUN without clearing steady TYPE.
+            # Stop the old steady output before handing it to the pattern
+            # trigger; equal cached curves do not describe the hardware mode.
+            echo 0 > "$LEDS/$1/brightness"
+            echo pattern > "$LEDS/$1/trigger"
+        fi
         if [ -w "$LEDS/$1/hw_pattern" ]; then
             [ "$(cat "$LEDS/$1/repeat" 2>/dev/null)" = -1 ] || echo -1 > "$LEDS/$1/repeat"
             [ "$(cat "$LEDS/$1/hw_pattern" 2>/dev/null)" = "$pattern" ] || echo "$pattern" > "$LEDS/$1/hw_pattern"

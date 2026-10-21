@@ -19,6 +19,7 @@
 START=19
 USE_PROCD=1
 export PATH="$PATH:/opt/mu300/busybox-bin"
+. "${MU300_SMS_POOL_LIB:-/opt/mu300/lib/sms-pool.sh}" || exit 1
 
 # wait for a SIPC tty inside the procd command: the nodes appear when the CP is alive, and an init
 # script that returns without opening an instance never gets a second chance. Bounded (240 s) so a
@@ -34,6 +35,7 @@ wait_and_exec() {
 }
 
 start_legacy() {
+    local sms_pool=$(mu300_sms_pool)
     if [ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ]; then
         mkdir -p /run/mu300
         : > /run/mu300/u30-native
@@ -48,7 +50,7 @@ start_legacy() {
 	[ ! -x /usr/libexec/unisoc-modem/lock ] || : > /run/unisoc-modem-early-hook-pending
 	[ -x /opt/mu300/bin/bootmark ] && /opt/mu300/bin/bootmark S19-atd-init
 	procd_open_instance atd
-	procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)"
+	procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)" MU300_SMS_POOL="$sms_pool"
 	procd_set_param command /bin/sh -c "$(wait_and_exec /dev/stty_nr1 /opt/mu300/bin/mu300-atd)"
 	[ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] || procd_set_param respawn 3600 10 0
 	procd_set_param stdout 1
@@ -58,7 +60,7 @@ start_legacy() {
 	# second instance on nr2 (mobile-data's dedicated channel)
 	procd_open_instance atd2
 	procd_set_param command /bin/sh -c "$(wait_and_exec /dev/stty_nr2 /opt/mu300/bin/mu300-atd)"
-	procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)" MU300_AT_DEV=/dev/stty_nr2 MU300_AT_DIR=/run/mu300-at2 MU300_AT_URC_CHANNELS= MU300_AT_ALIVE_LOG=/run/mu300-at/urc/stty_nr0.log
+	procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)" MU300_SMS_POOL="$sms_pool" MU300_AT_DEV=/dev/stty_nr2 MU300_AT_DIR=/run/mu300-at2 MU300_AT_URC_CHANNELS= MU300_AT_ALIVE_LOG=/run/mu300-at/urc/stty_nr0.log
 	[ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] || procd_set_param respawn 3600 10 0
 	procd_set_param stdout 1
 	procd_set_param stderr 1
@@ -74,16 +76,16 @@ start_legacy() {
 		[ "$n" != 3 ] || [ "$(uci -q get unisoc_modem.main.sim_slots)" != 2 ] || continue
 		procd_open_instance atd$n
 		procd_set_param command /bin/sh -c "$(wait_and_exec /dev/stty_nr$n /opt/mu300/bin/mu300-atd)"
-		urc= pool=/etc/mu300/sms alive_log=/run/mu300-at/urc/stty_nr0.log
+		urc= pool=$sms_pool alive_log=/run/mu300-at/urc/stty_nr0.log
 		case "$n" in 3|4|5)
-			pool=/etc/mu300/sms/sim1
+			pool=$sms_pool/sim1
 			if [ "$n" = 4 ] && [ "$(uci -q get unisoc_modem.main.sim_slots)" = 2 ]; then
 				urc=3 alive_log=/run/mu300-at4/urc/stty_nr3.log
 			fi ;;
 		esac
 		# Set the env table ONCE. Adding another table with the same JSON key
 		# can leave procd with only MU300_AT_DEV and the wrong owner directory.
-		procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)" MU300_AT_DEV=/dev/stty_nr$n MU300_AT_DIR=/run/mu300-at$n MU300_AT_URC_CHANNELS=$urc MU300_SMS_POOL=$pool MU300_AT_ALIVE_LOG=$alive_log
+		procd_set_param env MU300_AT_DISABLE_REOPEN="$([ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] && echo 1 || echo 0)" MU300_AT_DEV=/dev/stty_nr$n MU300_AT_DIR=/run/mu300-at$n MU300_AT_URC_CHANNELS=$urc "MU300_SMS_POOL=$pool" MU300_AT_ALIVE_LOG=$alive_log
 		[ "$(/opt/mu300/bin/mu300-device 2>/dev/null)" = u30air ] || procd_set_param respawn 3600 10 0
 		procd_set_param stdout 1
 		procd_set_param stderr 1
@@ -107,8 +109,8 @@ start_legacy() {
 # The wait is inside the instance, never in start_service: an init script that waits returns without instances
 # when the wait fails, and a boot without AT brokers is a boot without WAN.
 broker() {
-    local name=$1 channel=$2 directory=$3 urc=$4 live=$5 wait=${6:-} condition= pool=/etc/mu300/sms
-    [ "$channel" -lt 3 ] || pool=/etc/mu300/sms/sim1
+    local name=$1 channel=$2 directory=$3 urc=$4 live=$5 wait=${6:-} condition= pool=$(mu300_sms_pool)
+    [ "$channel" -lt 3 ] || pool=$pool/sim1
     # A literal brace inside ${...:+...} closes the expansion early in ash. Build it separately.
     [ -z "$wait" ] || condition=" && { $wait; }"
     procd_open_instance "$name"

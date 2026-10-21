@@ -185,7 +185,7 @@ printf 'sent (42)\n'
                 env = dict(os.environ, PATH=str(bindir) + ':' + os.environ['PATH'],
                            MU300_DASH_DIR=str(directory), MU300_SMS_BIN=str(sms),
                            MU300_SMS_POOL=str(pool), MU300_SIM_SLOT=slot,
-                           MU300_DASH_BIN=str(bindir), TEST_SENDS=str(root / 'sends'))
+                           MU300_DASH_BIN=str(bindir), MU300_SMS_POOL_LIB=str(SMS.parent.parent/'lib/sms-pool.sh'), TEST_SENDS=str(root / 'sends'))
                 def call(method, data=None):
                     result = subprocess.run([str(RPC), 'call', method],
                                             input=json.dumps(data or {}), env=env,

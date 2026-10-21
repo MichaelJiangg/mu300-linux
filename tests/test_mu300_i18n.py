@@ -69,6 +69,18 @@ const M = new Function('rpc', 'baseclass', 'L', 'document', 'navigator', 'getCom
         result = subprocess.run(['node', '-', str(COMMON)], input=harness, capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_battery_current_preserves_real_sign_zero_and_unavailable_values(self):
+        self.run_js("""
+for (const [raw, expected] of [[260000,'+260mA'],[-570000,'-570mA'],[0,'0mA'],
+    [-1,'0mA'],[null,'--'],[undefined,'--'],['260000','--'],[NaN,'--'],[Infinity,'--']])
+    if (M.fmtBatteryCurrent(raw) !== expected) throw Error(String(raw) + ': ' + M.fmtBatteryCurrent(raw));
+for (const locale of ['en','tr']) {
+    lang=locale;
+    for (const text of ['电池电流','正数充电，负数放电；显示电池净电流，不是 USB 输入电流。'])
+        if (M.translate(text)===text) throw Error('Missing translation: '+locale+text);
+}
+""")
+
     def test_staged_cell_merge_does_not_erase_pending_fields(self):
         self.run_js("""
 const old = {ts:1, ident:{msisdn:'123'}, qos:{qci:9}, neigh:[{pci:2}], lte:{band:3}};

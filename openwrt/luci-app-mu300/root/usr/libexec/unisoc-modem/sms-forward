@@ -6,9 +6,8 @@ export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 . /usr/share/libubox/jshn.sh
 
 BASE=${MU300_FORWARD_DIR:-/etc/unisoc-modem/forward}
-POOL=${MU300_SMS_POOL:-$(uci -q get unisoc_modem.main.sms_pool 2>/dev/null)}
-[ -d "${POOL:-/etc/unisoc-modem/sms}/msg" ] || [ ! -d /etc/mu300/sms/msg ] || POOL=/etc/mu300/sms
-POOL=${POOL:-/etc/unisoc-modem/sms}
+. "${MU300_SMS_POOL_LIB:-/opt/mu300/lib/sms-pool.sh}" || exit 1
+POOL=$(mu300_sms_pool adapter)
 ROOT_POOL=$POOL
 CONFIG=$BASE/config.json
 STATE=$BASE/state

@@ -3,7 +3,12 @@
 # daemon supplies header and PDU on stdin; SMS data never appears in argv.
 set -eu
 umask 077
-POOL=${MU300_SMS_POOL:-/etc/mu300/sms}
+POOL=${MU300_SMS_POOL:-}
+if [ -z "$POOL" ]; then
+    . "${MU300_SMS_POOL_LIB:-${0%/*}/../lib/sms-pool.sh}" || exit 1
+    POOL=$(mu300_sms_pool) || exit 1
+fi
+export MU300_SMS_POOL=$POOL
 SPOOL=$POOL/incoming
 IFS= read -r header || exit 1
 IFS= read -r pdu || exit 1

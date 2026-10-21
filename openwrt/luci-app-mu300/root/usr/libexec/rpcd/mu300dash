@@ -43,10 +43,8 @@ call:status|call:cells|call:signal|call:at|call:at_history|call:lock_get|call:lo
     fi
     ;;
 esac
-# Keep the former MU300 path as an automatic upgrade fallback.
-SMS_POOL=$(uci -q get unisoc_modem.main.sms_pool 2>/dev/null)
-[ -d "${SMS_POOL:-/etc/unisoc-modem/sms}" ] || [ ! -d /etc/mu300/sms ] || SMS_POOL=/etc/mu300/sms
-export MU300_SMS_POOL=${MU300_SMS_POOL:-${SMS_POOL:-/etc/unisoc-modem/sms}}
+. "${MU300_SMS_POOL_LIB:-/opt/mu300/lib/sms-pool.sh}" || exit 1
+export MU300_SMS_POOL=$(mu300_sms_pool adapter)
 if [ "${MU300_SIM_SLOT:-0}" = 1 ] && [ "${1:-}" != sms-job ]; then
     export MU300_SMS_POOL=$MU300_SMS_POOL/sim1
     export MU300_SMS_OP_LOCK=/tmp/mu300-sms-op-sim1.lock
@@ -272,6 +270,20 @@ m_sms_list() {
     # first line "pool: N message(s), U unread - page P/T (10 per page)",
     # then fixed-width rows (see mu300-sms cmd_list); parse by column position
     printf '%s\n' "$out" | awk -v sms_used="$sms_used" -v sms_total="$sms_total" -v sms_seen="$sms_seen" '
+        BEGIN {
+            for (b = 1; b < 32; b++) control[sprintf("%c", b)] = sprintf("\\u%04x", b)
+        }
+        function q(s, out, i, c) {
+            out = "\""
+            for (i = 1; i <= length(s); i++) {
+                c = substr(s, i, 1)
+                if (c == "\\") out = out "\\\\"
+                else if (c == "\"") out = out "\\\""
+                else if (c in control) out = out control[c]
+                else out = out c
+            }
+            return out "\""
+        }
         NR == 1 {
             total = $0; sub(/^pool: /, "", total); sub(/ message.*/, "", total)
             unread = $0; sub(/^pool: [0-9]+ message\(s\), /, "", unread); sub(/ unread.*/, "", unread)
@@ -287,14 +299,19 @@ m_sms_list() {
         }
         {
             id = substr($0, 1, 7); st = substr($0, 9, 7); dir = substr($0, 17, 3)
-            peer = substr($0, 21, 18); tm = substr($0, 40, 21); prev = substr($0, 62)
+            peer = substr($0, 21, 18); width = 21
+            # Native direct delivery keeps the full ISO timestamp and offset.
+            # Legacy/custom adapters may still use the 21-character column.
+            stamp = substr($0, 40, 25)
+            if (stamp ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][ T][0-9][0-9]:[0-9][0-9]:[0-9][0-9][-+][0-9][0-9]:[0-9][0-9]$/)
+                width = 25
+            tm = substr($0, 40, width); prev = substr($0, 41 + width)
             gsub(/^[ \t]+|[ \t]+$/, "", id); gsub(/^[ \t]+|[ \t]+$/, "", st)
             gsub(/^[ \t]+|[ \t]+$/, "", dir); gsub(/^[ \t]+|[ \t]+$/, "", peer)
             gsub(/^[ \t]+|[ \t]+$/, "", tm); gsub(/^[ \t]+|[ \t]+$/, "", prev)
-            gsub(/\\/,"\\\\",prev); gsub(/"/,"\\\"",prev)
             if (id ~ /^[0-9]+$/)
-                printf "%s{\"id\":\"%s\",\"status\":\"%s\",\"dir\":\"%s\",\"peer\":\"%s\",\"time\":\"%s\",\"preview\":\"%s\"}",
-                    (n++ ? "," : ""), id, st, dir, peer, tm, prev
+                printf "%s{\"id\":%s,\"status\":%s,\"dir\":%s,\"peer\":%s,\"time\":%s,\"preview\":%s}",
+                    (n++ ? "," : ""), q(id), q(st), q(dir), q(peer), q(tm), q(prev)
         }
         END { print "]}" }'
 }

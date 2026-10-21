@@ -16,7 +16,11 @@ export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 # A dead/busy AT client must not hold the receiver behind the 90 s CLI default.
 export MU300_AT_LOCK_WAIT=${MU300_AT_LOCK_WAIT:-8}
 
-POOL=${MU300_SMS_POOL:-/etc/mu300/sms}
+POOL=${MU300_SMS_POOL:-}
+if [ -z "$POOL" ]; then
+    . "${MU300_SMS_POOL_LIB:-${0%/*}/../lib/sms-pool.sh}" || exit 1
+    POOL=$(mu300_sms_pool) || exit 1
+fi
 export MU300_SMS_POOL=$POOL
 ATDIR=${MU300_AT_DIR:-/run/mu300-at}
 URCDIR=$ATDIR/urc

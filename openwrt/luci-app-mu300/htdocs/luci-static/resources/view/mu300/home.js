@@ -191,7 +191,7 @@ return view.extend({
     <div class="mud-kpi"><b id="mud-cpu">--</b><span>CPU 占用</span><div class="mud-meter"><i id="mud-cpu-bar" style="background:var(--brand,var(--primary,#3b82f6))"></i></div></div>
     <div class="mud-kpi"><b id="mud-ram">--</b><span>内存 · <span class="mud-sub" id="mud-ram-sub">--</span></span><div class="mud-meter"><i id="mud-ram-bar" style="background:var(--info,#0ea5e9)"></i></div></div>
     <div class="mud-kpi"><b id="mud-disk">--</b><span>存储</span><div class="mud-meter"><i id="mud-disk-bar" style="background:var(--warning,#f59e0b)"></i></div></div>
-    <div class="mud-kpi"><b id="mud-batt">--</b><span id="mud-batt-l">电源</span></div>
+    <div class="mud-kpi"><b id="mud-batt">--</b><span id="mud-batt-l" title="正数充电，负数放电；显示电池净电流，不是 USB 输入电流。">电源</span><div class="mud-meter" id="mud-batt-meter" hidden aria-hidden="true"><i id="mud-batt-bar" style="width:0%;background:var(--success,#16a34a)"></i></div></div>
   </div>
   <div id="mud-freqs" class="mud-freqs"></div>
   <div class="mud-cols">
@@ -616,9 +616,13 @@ return view.extend({
 			M.set('disk', pct2 + '%'); M.v('disk-bar').style.width = pct2 + '%';
 		}
 		var p = i.power || {};
+		var batteryPct = p.present && typeof p.capacity === 'number' && Number.isFinite(p.capacity)
+			? Math.max(0, Math.min(100, p.capacity)) : null;
+		M.v('batt-meter').hidden = batteryPct == null;
+		M.v('batt-bar').style.width = (batteryPct == null ? 0 : batteryPct) + '%';
 		if (p.present && p.capacity != null) {
 			M.set('batt', p.capacity + '%');
-			M.set('batt-l', '电源 · ' + (p.status || '') + (p.volt != null ? ' · ' + p.volt + ' V' : '') + (p.usb ? ' · USB' : ''));
+			M.set('batt-l', (p.status || '--') + (p.volt != null ? ' · ' + p.volt + ' V' : '') + ' · ' + M.fmtBatteryCurrent(p.ua) + (p.usb ? ' · USB' : ''));
 		} else {
 			M.set('batt', p.usb ? 'USB' : '--');
 			M.set('batt-l', '电源' + (p.volt != null ? ' · ' + p.volt + ' V' : ''));

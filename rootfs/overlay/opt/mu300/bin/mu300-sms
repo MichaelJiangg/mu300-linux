@@ -13,7 +13,12 @@ set -u
 umask 077
 export PATH="$PATH:/opt/mu300/bin:/opt/mu300/busybox-bin:/usr/sbin:/sbin"
 
-POOL=${MU300_SMS_POOL:-/etc/mu300/sms}
+POOL=${MU300_SMS_POOL:-}
+if [ -z "$POOL" ]; then
+    . "${MU300_SMS_POOL_LIB:-${0%/*}/../lib/sms-pool.sh}" || exit 1
+    POOL=$(mu300_sms_pool) || exit 1
+fi
+export MU300_SMS_POOL=$POOL
 MSGDIR=$POOL/msg
 ATDIR=${MU300_AT_DIR:-/run/mu300-at}
 PAGE=${MU300_SMS_PAGE:-10}
@@ -775,7 +780,7 @@ cmd_list() {
                 }
                 print s
             }')
-        printf '%-7s %-7s %-3s %-18s %-21s %s\n' \
+        printf '%-7s %-7s %-3s %-18.18s %-21s %s\n' \
             "$id" "$status" "$dir" "${peer:-?}" "${scts:-?}" "$text"
     done
 }

@@ -42,7 +42,7 @@ procd_set_param() {
 procd_close_instance() { :; }
 start_service
 '''
-        self.stub('uci', 'echo 2')
+        self.stub('uci', 'case "$*" in *sim_slots*) echo 2 ;; *) exit 1 ;; esac')
         for shell in self.each_shell():
             r = self.sh(shell, code)
             self.assertEqual(r.returncode, 0, r.stderr)

@@ -161,3 +161,23 @@ esac""")
                 finally:
                     if proc.poll() is None:proc.kill();proc.communicate()
             self.assertTrue(all(self.value(n)=='0' for n in ['sc27xx:red','sc27xx:green','sc27xx:blue']))
+
+    def test_steady_to_breathing_stops_output_but_refresh_does_not_restart_curve(self):
+        for shell in self.each_shell():
+            lamp=self.lamps/'sc27xx:green'
+            (lamp/'trigger').write_text('[none] timer pattern\n')
+            (lamp/'brightness').write_text('255\n')
+            (lamp/'hw_pattern').write_text('')
+            (lamp/'repeat').write_text('0\n')
+            self.apply(shell,'battery')
+            # sysfs pattern_set supplies the new peak; the plain-file fixture
+            # captures the required stop of the previous steady output.
+            self.assertEqual((lamp/'brightness').read_text().strip(),'0')
+            self.assertEqual((lamp/'hw_pattern').read_text().strip(),'0 625 255 750 0 625 0 250')
+            # Reconcile a running hardware curve without restarting its phase.
+            (lamp/'trigger').write_text('none timer [pattern]\n')
+            (lamp/'brightness').write_text('255\n')
+            before=(lamp/'hw_pattern').stat().st_mtime_ns
+            self.apply(shell,'battery')
+            self.assertEqual((lamp/'brightness').read_text().strip(),'255')
+            self.assertEqual((lamp/'hw_pattern').stat().st_mtime_ns,before)

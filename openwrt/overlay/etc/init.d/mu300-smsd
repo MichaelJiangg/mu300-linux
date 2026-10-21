@@ -3,13 +3,15 @@
 START=95
 USE_PROCD=1
 export PATH="$PATH:/opt/mu300/busybox-bin"
+. "${MU300_SMS_POOL_LIB:-/opt/mu300/lib/sms-pool.sh}" || exit 1
 
 start_service() {
 	[ -c /dev/stty_nr1 ] || return 0
+	local sms_pool=$(mu300_sms_pool)
 	procd_open_instance smsd
 	procd_set_param command /opt/mu300/bin/mu300-smsd
 	# /var is tmpfs on OpenWrt; the pool is small and worth keeping across reboots
-	procd_set_param env MU300_SMS_POOL=/etc/mu300/sms MU300_SIM_SLOT=0
+	procd_set_param env MU300_SMS_POOL="$sms_pool" MU300_SIM_SLOT=0
 	procd_set_param respawn 3600 10 0
 	procd_set_param stdout 1
 	procd_set_param stderr 1
@@ -17,7 +19,7 @@ start_service() {
 	if [ "$(uci -q get unisoc_modem.main.sim_slots)" = 2 ]; then
 		procd_open_instance smsd-sim1
 		procd_set_param command /opt/mu300/bin/mu300-smsd
-		procd_set_param env MU300_SMS_POOL=/etc/mu300/sms/sim1 MU300_AT_DIR=/run/mu300-at4 MU300_SIM_SLOT=1 MU300_SMS_LOCK=/run/mu300-smsd-sim1.lock MU300_SMS_OP_LOCK=/tmp/mu300-sms-op-sim1.lock MU300_SMS_DIRECT_FLAG=/run/mu300-sms-direct-sim1
+		procd_set_param env MU300_SMS_POOL="$sms_pool/sim1" MU300_AT_DIR=/run/mu300-at4 MU300_SIM_SLOT=1 MU300_SMS_LOCK=/run/mu300-smsd-sim1.lock MU300_SMS_OP_LOCK=/tmp/mu300-sms-op-sim1.lock MU300_SMS_DIRECT_FLAG=/run/mu300-sms-direct-sim1
 		procd_set_param respawn 3600 10 0
 		procd_set_param stdout 1
 		procd_set_param stderr 1
