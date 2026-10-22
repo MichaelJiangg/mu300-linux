@@ -12560,6 +12560,72 @@ tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the pr
 Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
 fragment asks), a reading of the F50's SD card, a reboot soak.
 
+### 207. The U30 Air's charger: the battery's CV and the stock safety-timer policy (and 3 A, off unless asked for)
+
+**Status: patch 0024 checked by kanoqwq on a U30 Air (7.2.8); here 0024-0026 apply to 6.18.57, 7.2.11 and 7.3, the
+Image builds on 6.18.57 and 7.2.11 and both files compile on 7.3, with no warning; not run on a device here. Patch 0025
+is off by default.**
+
+kanoqwq's `c031a58a` (his `docs/U30AIR-CHARGING-EARLY-FULL-20261022.zh-CN.md`): users saw "Full" at about 84 % with a
+90 % limit, and a stop near 91 % that only a replug ended. He compared our driver with ZTE's `sqc_bq2560x.ko` (read
+from his U30 Air's `vendor_dlkm_a`, SHA-256 `ce42c87c...`) and its source:
+
+- **The CV.** Patch 0009 capped the vendor node at 4.208 V, a value read once from Android's registers. ZTE's driver
+  takes the battery node's CV (4.3 V on the U30 Air SSV; every JEITA step of SDP/CDP/DCP says 4.3 V too). A low CV
+  enters the constant-voltage phase early and can terminate at a low percentage. **Patch 0024**
+  (`upstream/patches/0024-power-bq256xx-U30-Air-battery-CV-and-stock-safety-timer.patch`): the vendor node
+  (`ti,bq2560x_chg`, already kept off the F50 and V50 by patch 0016) takes the battery node's CV bounded by the chip
+  (4.3 V is 4.272 V in the chip's 32 mV steps); without a valid node, the chip default. Other bq256xx boards as before.
+- **The safety timer.** ZTE's probe clears REG05 bit 3 (`EN_TIMER`, at probe+0xdd8), as its source's
+  `bq2560x_charger_set_safety_timer(.., DISABLE)` does; ours left the chip's timer on, which can end a long slow
+  charge until a replug. 0024 clears it and keeps `EN_TERM`; TS/NTC, overvoltage and thermal protection are other
+  bits and stay.
+
+kanoqwq's check on his U30 Air: REG04 `0x68` (4.272 V), REG05 `0x87` (termination on, timer off), the 1.98 A ICHG,
+the computer port's 500 mA and the user charge limit unchanged; he did not run a full cycle or catch the original
+early "Full" again. His regression for the second point is ours already: mu300-power's charge limit
+(FINDINGS 33l, 36) works from the capacity, never from a "Full" status. Not taken: ZTE's 16-hour plugged-in policy
+(`charger_policy_service`, `expired-mode-enable`); kanoqwq has not ported it either.
+
+**3 A, patch 0025, off by default.** His `627cacea` (`docs/U30AIR-3A-20261022.zh-CN.md`) lets the U30 Air charge at
+the battery node's current (3 A, bounded by the chip; 1.98 A without a valid node), sets that as the initial ICHG, and
+takes a Type-C source's 3 A Rp as 3 A of input instead of 2 A. BC1.2 SDP/CDP/DCP (0.5/1.5/2 A), the CV, termination
+and thermal bits are unchanged. He read the registers back (ICHG 3 A, REG02 `0xb2`) on a computer's port and says
+himself that this is not a test of 3 A into the battery or from a 3 A charger. So here every part of it is behind
+`bq256xx_charger.u30air_3a` (0444, default N): without it the driver is exactly 0024's. The driver is built in, so the
+switch is a kernel command-line option (`MU300_CMDLINE_EXTRA=bq256xx_charger.u30air_3a=1` for a test build; mainline
+forces its own command line, FINDINGS 160).
+
+`tests/test_u30air_charger_ncm.py` reads both patches. His `tests/bq256xx_stock_cv.py` and
+`tests/bq256xx_typec_current.py` compile the driver's functions out of a prepared kernel tree; they are not here
+(no kernel tree in the test run). **Device check before merge (U30 Air):** `i2cget` of REG04/REG05 (0x68/0x87 as
+his), a charge from about 80 % on a wall charger with the 90 % limit (no early Full, no stop before it), and with
+`u30air_3a=1` a test build, `constant_charge_current` 3000000 and the current measured from a charger that offers 3 A.
+
+### 208. NCM: a timer flush that finds the USB requests busy (off unless asked for)
+
+**Status: offline only (kanoqwq's fixture and ours); off by default.**
+
+kanoqwq's `e4ad30a0` (`docs/NCM-TX-TIMER-20261022.zh-CN.md`), a backport of Cosmin Tanislav's linux-usb patch of
+2026-08-17 (lore `20260817192638.437798-1-cosmin-gabriel.tanislav.xa@renesas.com`; not in 6.18, 7.2 or 7.3):
+`ncm_tx_timeout()` flushes a half-filled NTB with `ndo_start_xmit(NULL, ..)` and ignores the result. When every USB
+TX request is in flight, `u_ether`'s `eth_start_xmit()` returns `NETDEV_TX_BUSY`, nothing is wrapped, and the timer
+returns `HRTIMER_NORESTART`: no qdisc requeues a NULL skb, so the NTB waits for the next frame. Users reported
+host-side stalls after long USB use; nobody has captured one, and the fix is not shown to cure them.
+
+**Patch 0026** (`upstream/patches/0026-usb-gadget-ncm-retry-a-busy-timer-flush-off-unless-asked-for.patch`): with
+`usb_f_ncm.tx_busy_retry` set, a BUSY flush moves the timer 300 us on (`hrtimer_forward_now`, so an expired timer
+does not spin) and returns `HRTIMER_RESTART`; a successful flush, a gone netdev or the usual `hrtimer_cancel` at
+disable end it. Off by default because kanoqwq tested it on a C fixture built from the real `u_ether.c`/`f_ncm.c`
+(10000 BUSY rounds, ASan/UBSan), not on a device; the parameter is 0644, so a device test switches it at run time:
+`echo 1 > /sys/module/usb_f_ncm/parameters/tx_busy_retry`. Patch 0008's small-frame flush is unchanged. Applies to
+6.18.57, 7.2.11 and 7.3 and builds on all three. His `tests/usb_ncm_timer.py` and `ncm-tx-fixture.h` (and
+`04294c7b`, a fix to that test's dry run) need a prepared kernel tree and are not here.
+
+**Device check before merge (any board, USB tethered):** with the parameter on, a long USB ping and an iperf3 run both
+ways at once for an hour; no stall, and latency and throughput as with it off (patch 0008's header has reference
+numbers).
+
 ### 209. kanoqwq's shared installation fixes (b8d4f222): backup restore, the boot-control pair, cpio parents
 
 **Status: offline only.** From kanoqwq's `b8d4f222` ("OTA diff tools and shared installation fixes"); the OTA diff
