@@ -190,7 +190,7 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
-| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; one hang into LK's dump mode in a reboot loop (back by itself after 2.5 h), open; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19) |
+| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's) |
 
 ## Hardware and firmware facts
 
@@ -12426,21 +12426,28 @@ for the ones that build on another: 0011 on 0010, 0012/0015/0016/0019 on 0009, 0
 | what | 7.3 | here |
 |---|---|---|
 | `CONFIG_PROC_SYSCTL` | gone: `/proc/sys` is `SYSCTL` itself (`fs/proc/Makefile`: `proc-$(CONFIG_SYSCTL) += proc_sysctl.o`) | `config-ignored.txt` lists it; `build.sh` and `audit-bundle.py` let a listed option be unset only where the kernel has no such symbol at all (not even "is not set"); the fragment also asks `CONFIG_SYSCTL=y`, so `/proc/sys` is checked on every kernel |
-| cfg80211 `remain_on_channel`, `mgmt_tx` | the cookie is chosen by nl80211 (`cfg80211_assign_cookie`) and handed to the driver by value | `sprd_wlan_combo`: the old ops keep choosing it, the 7.3 ones take nl80211's (`*_cookie(..., cookie_given)`) |
-| `dma_capable()` | a fifth argument, the DMA attributes | `sc2355/tx.c` passes 0 (a plain mapping) |
+| cfg80211 `remain_on_channel`, `mgmt_tx` | the cookie is chosen by nl80211 (`cfg80211_assign_cookie`) and handed to the driver by value | `sprd_wlan_combo`: the old ops keep choosing it, the 7.3 ones take nl80211's (`MU300_COOKIE`, the by-value ops in `common/cfg80211.h`) |
+| `dma_capable()` | a fifth argument, the DMA attributes | `sc2355/tx.h` passes 0 (a plain mapping) on 7.3; `tx.c` is unchanged |
 | the IIO consumer API | in the symbol namespace `IIO_CONSUMER` | the audio extra's headset driver imports it (mu300-audio) |
 | kernel.org's CDN | its `sha256sums.asc` still had 7.2.11's day hours after 7.3 was out: no line for `linux-7.3.tar.xz` | `build.sh` takes the signed list from www.kernel.org (the tarball and its signature from the CDN; the list is signed, so where it comes from changes nothing that is checked) |
 | the release's version picker | a mainline release is `7.3` (kernel release `7.3.0`) until 7.3.1 | `release.yml` takes `X.Y` or `X.Y.Z` of each series (6.18, 7.2, 7.3); `mainline.yml` builds the longterm, the stable, the mainline (never a release candidate) and the newest of each shipped series |
+
+The 7.3 code of `sprd_wlan_combo` sits in its headers (`cfg80211.h`, `tx.h`) and in macros of the same width
+as the text they replace, so the module built for 6.18.57 and 7.2.11 from this source is byte for byte the one
+v2026.10.19.3 shipped (rebuilt against that release's trees, stripped as `build-modules.sh` does: same sha256;
+a first form with the 7.3 code in `cfg80211.c` changed the 7.2.11 module's build ID through its debug information's
+columns). 6.18 and 7.2 therefore did not change with 7.3.
 
 The kernel and all its out-of-tree modules build with no new warning (690 in the module build against 691 for
 7.2.11); `all-modules.py` turns 2457 options into modules (7.2.11: 2442). The bundle: 3054 modules (no audio
 drivers, 194), 135 MiB unpacked, 56.3 MB; the Image as LK loads it 25 860 104 bytes. `make-release.sh`'s audit
 (the sample modules, no driver of the audio stack, the features) passes on it.
 
-**The audio extra on 7.3.** mu300-audio builds the 20 mainline drivers against a 7.3 kit made from this build tree
-(`make-kit-mainline.sh 7.3 7.3 k7.3-preview`; `sipc-core.ko` rebuilt from the kit is byte for byte the bundle's),
-pinned in its `kits.lock` and published as the prerelease `kits-k7.3-preview` until a release of this repository
-ships 7.3 (that release's tree then makes the kit, or is shown to be this one).
+**The audio extra on 7.3.** mu300-audio builds the 20 mainline drivers against a 7.3 kit made from the build tree
+(`make-kit-mainline.sh 7.3 7.3 TAG`; `sipc-core.ko` rebuilt from the kit is byte for byte the bundle's). The first
+kit, the prerelease `kits-k7.3-preview`, came from a tree without the V50 SIM driver (FINDINGS 204), so its
+configuration is not the release's; the kit of the first release that ships 7.3 is made from that release's own
+tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the preview's place.
 
 **On the boards, 2026-10-19** (v2026.10.19.2 with this branch's `mu300-update`, the 7.3 bundle installed with
 `MU300_KERNEL_BUNDLE`; the previous image kept each time was the release's own):
@@ -12464,11 +12471,11 @@ ships 7.3 (that release's tree then makes the kit, or is shown to be this one).
   - **The boot fallback.** With `mu300-next-boot attempts 1` and `mu300-boot-ok` disabled for the test, the next boot
     of 7.3 came up with slot b at `tries 1` (`1f`), and the one after it went to Android by itself; `su -c
     mu300-linux` there armed Linux again and 7.3 booted. `mu300-boot-ok` and 5 attempts back: slot b `6f`, as before.
-  - **A hang.** In a reboot loop afterwards the first reboot did not come back: no USB network, no adb; the board
-    enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, for about two and a half hours (31m's hangs
-    ended in Android after about 20 minutes), then booted 7.3 again by itself with one slot try used (`5f`). Nothing
-    was done by hand; `rollback-boot` then put it back on 7.2.11, which runs with the audio extra's DSP answering.
-    One hang in six boots of 7.3: whether 7.3 hangs more often than 6.18 and 7.2 (31m) needs a reboot soak.
+  - **A hang that was not 7.3.** In a reboot loop afterwards the first reboot did not come back: no USB network,
+    no adb; the board enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, for about two and a half
+    hours, then booted 7.3 again by itself with one slot try used (`5f`); `rollback-boot` then put it back on 7.2.11.
+    The owner found the cause: he had pulled F50-B's plug by accident during that reboot. It is not counted against
+    7.3.
 * **U30 Air** (openwrt-luci, the VPN module with its kill switch): 7.3.0 boots with no oops; the SIM ready, data up;
   the access point on channel 36/80 MHz with its client back; the USB gadget `configured`; the VPN's tunnel (`sbtun`)
   up behind the kill switch (`mu300_vpn` tables), HTTPS answers through it and the exit is not the carrier's address

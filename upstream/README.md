@@ -95,7 +95,7 @@ installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.11` for `build.sh` a
 
 **7.3** (mainline, 2026-10-18) is the fourth kernel, from the release after v2026.10.19.2 on: `mu300-kernel-7.3.tar.gz`,
 `sudo mu300-update kernel 7.3`, choice 4 in the installer; `OUTDIR=out-7.3 KV=7.3` (its kernel release is `7.3.0`).
-Every patch applies unchanged; what 7.3 changed is in FINDINGS 195: `PROC_SYSCTL` folded into `SYSCTL`
+Every patch applies unchanged; what 7.3 changed is in FINDINGS 206: `PROC_SYSCTL` folded into `SYSCTL`
 (`config-ignored.txt`), the cfg80211 cookie of remain-on-channel and management frames handed to the driver by
 value, `dma_capable()` taking DMA attributes, and the IIO consumer API in a symbol namespace (the audio extra's
 headset driver).
