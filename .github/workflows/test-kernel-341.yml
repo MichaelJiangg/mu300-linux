@@ -53,6 +53,7 @@ jobs:
         env:
           KV: ${{ inputs.kv }}
         run: |
+          sudo chown -R "$(id -u):$(id -g)" upstream/out-7.2
           MU300_UPSTREAM_OUT=upstream/out-7.2 \
             sh upstream/make-bundle.sh "/tmp/mu300-kernel-${KV}-341.tar.gz" /tmp/ref/mu300-kernel.tar.gz
           ls -lh /tmp/mu300-kernel-*.tar.gz
