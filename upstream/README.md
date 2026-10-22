@@ -5,7 +5,7 @@ MU300 (Unisoc UMS9620): all 8 CPUs (4×A55, 4×A76), eMMC, USB NCM + ACM, the 5 
 with mobile data (downlink and uplink), SMS, the VPN, the Mali GPU, thermal/cpufreq, the PMIC watchdog and
 reboot. `docs/FINDINGS.md` 31-31f has what it took and what is still open.
 
-On a device: `sudo mu300-update kernel 6.18` (or `7.2`, the newest stable release), and `sudo mu300-update kernel
+On a device: `sudo mu300-update kernel 6.18` (or `7.2`, the stable release, or `7.3`, the newest mainline release), and `sudo mu300-update kernel
 5.4` back; the installer offers all three. Every kernel's modules stay installed.
 
 Reference: Unisoc's UMS9620 DT series (LKML, 2023-12-15, "arm64: dts: sprd: Add support for Unisoc's UMS9620", not
@@ -85,12 +85,20 @@ next jump is kept small.) One source serves both:
   `strncpy`, alarmtimer, `linux/hex.h`) and `linux/of_gpio.h`, a shim kbuild only finds when the kernel has no
   such header. API changes that need more than a shim are under `LINUX_VERSION_CODE` (the cfg80211 ops taking a
   `wireless_dev`, `dma_fence_signal()` returning nothing).
-* `.github/workflows/mainline.yml` builds the port every week against the current longterm and the newest stable
-  release, so the next break shows up as a red run rather than at the next jump.
+* `.github/workflows/mainline.yml` builds the port every week against the current longterm, the newest stable and
+  the newest mainline release (and the newest of each series the releases ship), so the next break shows up as a red
+  run rather than at the next jump.
 
 Releases carry it as `mu300-kernel-7.2.tar.gz`: `sudo mu300-update kernel 7.2` on the device, or choice 3 in the
 installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.11` for `build.sh` and `build-modules.sh`, and
-`MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs both.
+`MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs them all.
+
+**7.3** (mainline, 2026-10-18) is the fourth kernel, from the release after v2026.10.19.2 on: `mu300-kernel-7.3.tar.gz`,
+`sudo mu300-update kernel 7.3`, choice 4 in the installer; `OUTDIR=out-7.3 KV=7.3` (its kernel release is `7.3.0`).
+Every patch applies unchanged; what 7.3 changed is in FINDINGS 206: `PROC_SYSCTL` folded into `SYSCTL`
+(`config-ignored.txt`), the cfg80211 cookie of remain-on-channel and management frames handed to the driver by
+value, `dma_capable()` taking DMA attributes, and the IIO consumer API in a symbol namespace (the audio extra's
+headset driver).
 
 ## Remaining mainline work (as of 2026-09-26)
 

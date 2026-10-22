@@ -1748,8 +1748,8 @@
             load(kb, 'system.get', {}, function (o) {
                 kb.appendChild(row(_('Kernel running'), o.kernel));
                 kb.appendChild(row(_('Kernel chosen'), o.kernel_choice));
-                kb.appendChild(note(_('5.4 is the vendor kernel (Android\'s drivers); 6.18 is the mainline long-term kernel; 7.2 the newest mainline one. A change downloads the kernel and takes effect at the next reboot.')));
-                var k = select('mu-kernel', [ [ '7.2', '7.2' ], [ '6.18', '6.18 LTS' ], [ '5.4', '5.4 (vendor)' ] ], o.kernel_choice || '7.2');
+                kb.appendChild(note(_('5.4 is the vendor kernel (Android\'s drivers); 6.18 is the mainline long-term kernel; 7.2 the stable mainline one; 7.3 the newest mainline one. A change downloads the kernel and takes effect at the next reboot.')));
+                var k = select('mu-kernel', [ [ '7.3', '7.3' ], [ '7.2', '7.2' ], [ '6.18', '6.18 LTS' ], [ '5.4', '5.4 (vendor)' ] ], o.kernel_choice || '7.2');
                 var kbtn = button(_('Change the kernel'), function () {
                     act(kbtn, 'kernel.set', { version: k.value }, { confirm: cockpit.format(_('Install kernel $0? It runs after the next reboot.'), k.value), done: refresh });
                 });

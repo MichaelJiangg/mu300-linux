@@ -18,7 +18,7 @@ sudo mu300-update apply           # system, kernel and boot image: download, unp
 sudo mu300-update report          # what the last updates set aside or put back
 sudo mu300-update rollback        # back to the previous system
 sudo mu300-update rollback-boot   # back to the previous kernel and boot image
-sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS) or 7.2; no argument shows the current one
+sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS), 7.2 (stable) or 7.3; no argument shows the current one
 sudo mu300-update clean           # delete the kept previous version
 ```
 
@@ -52,7 +52,7 @@ release after v2026.10.25 on). It runs the same `mu300-update`, so everything on
   release page first. One whose signature is wrong is never installed.
 * **Previous version:** *Back to the previous version*, *Back to the previous boot image* and *Remove the previous
   version* are `rollback`, `rollback-boot` and `clean`. Each takes a tick and a confirmation.
-* **Kernel:** switch between 5.4, 6.18 and 7.2 (`mu300-update kernel`), and *Start Android at the next restart*.
+* **Kernel:** switch between 5.4, 6.18, 7.2 and 7.3 (`mu300-update kernel`), and *Start Android at the next restart*.
 
 Only one update runs at a time. If one was started in a terminal, the page shows it and waits.
 
@@ -267,7 +267,7 @@ background (from the extra when it carries them, else from Ubuntu's archive once
 sudo MU300_UBUNTU=26.04 mu300-update apply   # or 24.04
 ```
 
-Settings and data are kept. Ubuntu 26.04 needs kernel 6.18 or 7.2.
+Settings and data are kept. Ubuntu 26.04 needs kernel 6.18, 7.2 or 7.3.
 
 ## Release names
 
