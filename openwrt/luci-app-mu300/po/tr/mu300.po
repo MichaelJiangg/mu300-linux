@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi erişim noktası"
 msgid "Restart modem"
 msgstr "Modemi yeniden başlat"
 
-msgid "Restart device"
-msgstr "Cihazı yeniden başlat"
+msgid "Power off or restart"
+msgstr "Kapat veya yeniden başlat"
 
 msgid "Switch to Android"
 msgstr "Android’e geç"
@@ -1165,11 +1165,14 @@ msgstr "Mobil veri dolaşım ağlarında da kullanılır; bu ek ücrete yol aça
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Hücresel bağlantı 1–2 dakika kesilebilir."
 
-msgid "Restart the entire device"
-msgstr "Tüm cihazı yeniden başlat"
-
 msgid "All connections will be interrupted."
 msgstr "Tüm bağlantılar kesilecek."
+
+msgid "Power off"
+msgstr "Kapat"
+
+msgid "Restart"
+msgstr "Yeniden başlat"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Sonraki açılış Android’e geçecek ve cihaz şimdi yeniden başlayacak. Yönetim sayfası ve hücresel paylaşım kesilecek."
@@ -1495,6 +1498,21 @@ msgstr "Geçerli hizmet hücresini kilitle"
 msgid "Unlock cell"
 msgstr "Hücre kilidini kaldır"
 
+msgid "Enter a cell"
+msgstr "Hücreyi elle gir"
+
+msgid "Type"
+msgstr "Tür"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanal numarası (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Bu hücreyi kilitle"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. MHz cinsinden frekans değil, kanal numarası; hücrenin komşu listesinde olması gerekmez."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Uygulama radyo yığınını (SFUN) yeniden başlatır ve hücresel bağlantıyı kısa süre keser. Ayarlar kaydedilir ve Başlangıçta uygula etkinse AT hazır olduğunda eklenti tarafından yeniden uygulanır. Platformun radyo öncesi kancasıyla yeniden başlatmadan uygulanabilir. Otomatik moda dönmek için hiçbir bant seçmeden uygulayın."
 
@@ -1581,6 +1599,9 @@ msgstr "%s arka planda kilitleniyor…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s arka planda kilitlendi (SFUN yeniden başlatması, yaklaşık 30 saniye); durum geri okunuyor…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Aşağıdaki aralıklarda bir kanal numarası ve PCI girin"
 
 msgid "No serving-network data"
 msgstr "Bağlı olunan ağ verisi yok"
@@ -2394,9 +2415,6 @@ msgstr "Cihaz şimdi yeniden başlıyor. Varsayılan açılış Android olduğu 
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Cihaz şimdi yeniden başlıyor ve yaklaşık bir dakika erişilemez olacak. Yeni sistem açılmazsa cihaz, başarısız denemelerden sonra kendiliğinden Android'e döner."
 
-msgid "Restart"
-msgstr "Yeniden başlat"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Yeniden başlatılıyor… bu sayfayı yaklaşık bir dakika sonra yeniden açın."
 
@@ -3050,9 +3068,6 @@ msgstr "Otomatik algıla"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL bir belirteç içerebilir: cihaza ayrı olarak gider, asla bir komut satırına veya günlüğe yazılmaz."
-
-msgid "Type"
-msgstr "Tür"
 
 msgid "Share link"
 msgstr "Paylaşım bağlantısı"

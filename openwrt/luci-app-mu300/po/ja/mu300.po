@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi ホットスポット"
 msgid "Restart modem"
 msgstr "モデムを再起動"
 
-msgid "Restart device"
-msgstr "デバイスを再起動"
+msgid "Power off or restart"
+msgstr "電源オフまたは再起動"
 
 msgid "Switch to Android"
 msgstr "Android に切り替え"
@@ -1165,11 +1165,14 @@ msgstr "ローミングネットワークでもモバイルデータが使われ
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "セルラー接続が 1～2 分間停止する場合があります。"
 
-msgid "Restart the entire device"
-msgstr "デバイス全体を再起動"
-
 msgid "All connections will be interrupted."
 msgstr "すべての接続が中断されます。"
+
+msgid "Power off"
+msgstr "電源オフ"
+
+msgid "Restart"
+msgstr "再起動"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "次回の起動で Android に入るよう設定し、今すぐ再起動します。この管理ページとセルラー共有は切断されます。"
@@ -1495,6 +1498,21 @@ msgstr "現在のサービングセルをロック"
 msgid "Unlock cell"
 msgstr "セルロックを解除"
 
+msgid "Enter a cell"
+msgstr "セルを入力"
+
+msgid "Type"
+msgstr "種類"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "チャネル番号（EARFCN / NR-ARFCN）"
+
+msgid "Lock this cell"
+msgstr "このセルをロック"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. MHz 単位の周波数ではなくチャネル番号です。セルが隣接セル一覧にある必要はありません。"
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "適用すると無線スタックが再起動し (SFUN)、セルラーサービスが一時的に中断されます。設定は保存され、「起動時に適用」が有効な場合は AT の準備完了後にプラグインが再適用します。プラットフォームの無線起動前フックがあれば再起動なしで再適用できます。バンドを何も選択せずに適用すると自動モードに戻ります。"
 
@@ -1581,6 +1599,9 @@ msgstr "バックグラウンドで %s をロックしています…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "バックグラウンドで %s をロックしました (SFUN 再起動、約 30 秒)。ステータスを読み戻しています…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "下記の範囲内でチャネル番号と PCI を入力してください"
 
 msgid "No serving-network data"
 msgstr "サービングネットワークのデータなし"
@@ -2399,9 +2420,6 @@ msgstr "デバイスを再起動します。既定の起動先は Android なの
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "デバイスを再起動します。約 1 分間は接続できません。新しいシステムが起動しない場合は、何度か失敗したあと自動的に Android に戻ります。"
 
-msgid "Restart"
-msgstr "再起動"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "再起動中… 約 1 分後にこのページを開き直してください。"
 
@@ -3055,9 +3073,6 @@ msgstr "検出"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL にはトークンが含まれる場合があります。デバイスには単独で送られ、コマンドラインやログには決して書かれません。"
-
-msgid "Type"
-msgstr "種類"
 
 msgid "Share link"
 msgstr "共有リンク"

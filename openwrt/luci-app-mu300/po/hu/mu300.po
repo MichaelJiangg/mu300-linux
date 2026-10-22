@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi hotspot"
 msgid "Restart modem"
 msgstr "Modem újraindítása"
 
-msgid "Restart device"
-msgstr "Eszköz újraindítása"
+msgid "Power off or restart"
+msgstr "Kikapcsolás vagy újraindítás"
 
 msgid "Switch to Android"
 msgstr "Váltás Androidra"
@@ -1165,11 +1165,14 @@ msgstr "A mobiladat roaminghálózatokon is használatban van, ami többletkölt
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "A mobilkapcsolat 1–2 percre leállhat."
 
-msgid "Restart the entire device"
-msgstr "A teljes eszköz újraindítása"
-
 msgid "All connections will be interrupted."
 msgstr "Minden kapcsolat megszakad."
+
+msgid "Power off"
+msgstr "Kikapcsolás"
+
+msgid "Restart"
+msgstr "Újraindítás"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "A következő indítás Androidba történik, és az eszköz most újraindul. Ez a felügyeleti oldal és a mobilhálózat-megosztás megszakad."
@@ -1495,6 +1498,21 @@ msgstr "Jelenlegi kiszolgáló cella zárolása"
 msgid "Unlock cell"
 msgstr "Cellazárolás feloldása"
 
+msgid "Enter a cell"
+msgstr "Cella megadása"
+
+msgid "Type"
+msgstr "Típus"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Csatornaszám (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Ennek a cellának a zárolása"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Csatornaszám, nem MHz-ben megadott frekvencia; a cellának nem kell szerepelnie a szomszédos cellák listájában."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Az alkalmazás újraindítja a rádióvermet (SFUN), és rövid időre megszakítja a mobilszolgáltatást. A beállítások mentésre kerülnek, és ha az Alkalmazás indításkor engedélyezve van, a bővítmény újraalkalmazza őket, amint az AT készen áll. Egy rádió előtti platformhook újraindítás nélkül is újraalkalmazhatja őket. Az automatikus mód visszaállításához alkalmazza kiválasztott sávok nélkül."
 
@@ -1581,6 +1599,9 @@ msgstr "%s zárolása a háttérben…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s zárolva a háttérben (SFUN-újraindítás, kb. 30 másodperc); az állapot visszaolvasása…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Adjon meg egy csatornaszámot és egy PCI-t az alábbi tartományokon belül"
 
 msgid "No serving-network data"
 msgstr "Nincsenek kiszolgálóhálózat-adatok"
@@ -2399,9 +2420,6 @@ msgstr "Az eszköz most újraindul. Az alapértelmezett indítás az Android, ez
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Az eszköz most újraindul, és körülbelül egy percig nem érhető el. Ha az új rendszer nem indul el, az eszköz a sikertelen kísérletek után magától visszatér az Androidra."
 
-msgid "Restart"
-msgstr "Újraindítás"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Újraindítás… nyissa meg újra ezt az oldalt körülbelül egy perc múlva."
 
@@ -3055,9 +3073,6 @@ msgstr "Felismerés"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "Az URL tokent tartalmazhat: külön jut el az eszközhöz, soha nem kerül parancssorba vagy naplóba."
-
-msgid "Type"
-msgstr "Típus"
 
 msgid "Share link"
 msgstr "Megosztási hivatkozás"

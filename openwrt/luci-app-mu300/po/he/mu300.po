@@ -1105,8 +1105,8 @@ msgstr "נקודה חמה Wi-Fi"
 msgid "Restart modem"
 msgstr "הפעלה מחדש של המודם"
 
-msgid "Restart device"
-msgstr "הפעלה מחדש של ההתקן"
+msgid "Power off or restart"
+msgstr "כיבוי או הפעלה מחדש"
 
 msgid "Switch to Android"
 msgstr "מעבר ל-Android"
@@ -1165,11 +1165,14 @@ msgstr "נתונים סלולריים משמשים גם ברשתות נדידה,
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "הקישוריות הסלולרית עלולה להיפסק ל-1–2 דקות."
 
-msgid "Restart the entire device"
-msgstr "הפעלה מחדש של ההתקן כולו"
-
 msgid "All connections will be interrupted."
 msgstr "כל החיבורים ינותקו."
+
+msgid "Power off"
+msgstr "כיבוי"
+
+msgid "Restart"
+msgstr "הפעלה מחדש"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "האתחול הבא ייכנס ל-Android וההתקן יאותחל כעת. דף ניהול זה ושיתוף החיבור הסלולרי ינותקו."
@@ -1495,6 +1498,21 @@ msgstr "נעילת התא המשרת הנוכחי"
 msgid "Unlock cell"
 msgstr "ביטול נעילת תא"
 
+msgid "Enter a cell"
+msgstr "הזנת תא"
+
+msgid "Type"
+msgstr "סוג"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "מספר ערוץ (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "נעילת תא זה"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. מספר ערוץ, לא תדר ב-MHz; התא אינו חייב להופיע ברשימת התאים השכנים."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "ההחלה מפעילה מחדש את מחסנית הרדיו (SFUN) וקוטעת לזמן קצר את השירות הסלולרי. ההגדרות נשמרות, והתוסף מחיל אותן מחדש לאחר ש-AT מוכן כאשר “החלה בעת האתחול” מופעלת. Hook של הפלטפורמה שרץ לפני הרדיו יכול להחיל אותן ללא הפעלה מחדש. החלה ללא בחירת פסים משחזרת את המצב האוטומטי."
 
@@ -1581,6 +1599,9 @@ msgstr "נועל את %s ברקע…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s ננעל ברקע (הפעלה מחדש של SFUN, כ-30 שניות); קורא את המצב בחזרה…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "הזינו מספר ערוץ ו-PCI בטווחים שלהלן"
 
 msgid "No serving-network data"
 msgstr "אין נתוני רשת משרתת"
@@ -2399,9 +2420,6 @@ msgstr "ההתקן מופעל מחדש עכשיו. ברירת המחדל לאת�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "ההתקן מופעל מחדש עכשיו ולא יהיה זמין כדקה. אם המערכת החדשה לא תעלה, ההתקן יחזור ל-Android מעצמו אחרי הניסיונות הכושלים."
 
-msgid "Restart"
-msgstr "הפעלה מחדש"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "מופעל מחדש… פתחו את הדף הזה שוב בעוד כדקה."
 
@@ -3055,9 +3073,6 @@ msgstr "זיהוי"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "ה-URL עשוי להכיל אסימון: הוא נשלח להתקן בנפרד, ואף פעם לא לשורת פקודה או ליומן."
-
-msgid "Type"
-msgstr "סוג"
 
 msgid "Share link"
 msgstr "קישור שיתוף"
