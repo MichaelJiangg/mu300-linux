@@ -725,7 +725,7 @@ function stepChoices() {
 
   box.append(h("h3", {}, t("choice.kernel")));
   const ks = h("div", { class: "wi-opts" });
-  for (const k of ["5.4", "6.18", "7.2"]) {
+  for (const k of ["5.4", "6.18", "7.2", "7.3"]) {
     const ok = c.systems.every((s) => (avail[s] || []).includes(k)) && !(S.status.device === "v50" && k === "5.4");   // the V50: mainline only
     ks.append(radio("kernel", k, c.kernel, t("kernel." + k), () => { c.kernel = k; w.files = {}; render(); }, { disabled: !ok }));
   }
@@ -1364,7 +1364,7 @@ function linuxView() {
       btn(t("linux.apply"), act(t("linux.apply"), (on) => d.applyUpdate(on), { confirm: t("linux.apply.confirm"), long: true, refresh: true }), "primary", { disabled: off })),
     h("p", { class: "small muted" }, t("linux.apply.note")));
   out.append(h("h3", {}, t("choice.kernel")),
-    h("div", { class: "actions" }, ["5.4", "6.18", "7.2"].map((k) => btn(k + (i.kernelChoice === k ? " ✓" : ""), act(t("linux.kernel.set", k), (on) => d.setKernel(k, on), { confirm: t("linux.kernel.confirm", k), long: true, refresh: true }), "", { disabled: off || i.kernelChoice === k }))),
+    h("div", { class: "actions" }, ["5.4", "6.18", "7.2", "7.3"].map((k) => btn(k + (i.kernelChoice === k ? " ✓" : ""), act(t("linux.kernel.set", k), (on) => d.setKernel(k, on), { confirm: t("linux.kernel.confirm", k), long: true, refresh: true }), "", { disabled: off || i.kernelChoice === k }))),
     h("p", { class: "small muted" }, t("linux.kernel.note")));
   if (i.systems.length > 1) {
     out.append(h("h3", {}, t("choice.boot-os")),

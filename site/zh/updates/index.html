@@ -109,7 +109,7 @@ sudo reboot</code></pre>
 <li><strong>你在系统里添加和改动的一切都会带过去</strong>：任何目录里的文件（<code>/etc/wireguard</code>、你自己写的服务、crontab、<code>/var/lib/docker</code>、<code>/opt</code>、主目录）、你改过的设置、账户和密码、按你开关状态的服务、从你设备上取来的 Wi-Fi 和基带文件，以及已装的扩展。每个版本都带着自己文件的清单，更新就靠它把版本自带的文件和你的文件区分开。VPN 模块（核心和引擎作为一组）会更新到它的最新版本。</li>
 <li>内核和启动镜像也一起更新。新内核的头几次启动照常按失败次数计算，所以起不来的内核会让设备自己回到 Android。</li>
 </ol>
-<p>换内核也是同样的方式：<code>sudo mu300-update kernel 6.18</code>（或 <code>5.4</code>、<code>7.2</code>），然后重启。见<a href="../choose/#kernels">选择内核</a>。</p>
+<p>换内核也是同样的方式：<code>sudo mu300-update kernel 6.18</code>（或 <code>5.4</code>、<code>7.2</code>、<code>7.3</code>），然后重启。见<a href="../choose/#kernels">选择内核</a>。</p>
 <p><strong>版本名称</strong>是版本构建的日期加上当天的序号：<code>v2026.10.16.1</code>、<code>v2026.10.16.2</code>。它们比所有旧的三段式名称（如 <code>v2026.10.27</code>，其“日期”只是一个计数器）都新。v2026.10.27 或更旧的设备照常用 <code>sudo mu300-update apply</code> 更新到这些版本，但在出现日期为 2026 年 10 月 27 日或更晚的版本之前，登录时不会显示更新提示（<a href="https://github.com/dikeckaan/mu300-linux/wiki/Updating#release-names">详情</a>）。</p>
 
 <div class="callout">
