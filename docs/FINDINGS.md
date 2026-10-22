@@ -12560,6 +12560,40 @@ tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the pr
 Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
 fragment asks), a reading of the F50's SD card, a reboot soak.
 
+### 210. A SIM ready report with trailing numbers, and the U30 Air's charging light after a steady one
+
+**Status: the LED part checked by kanoqwq on a U30 Air; the SIM part seen by him on an E5-family board. Offline here.**
+
+- **`+ECIND: 3,0,0,1` is a SIM event too** (kanoqwq's `b8d4f222`, `docs/SIM-EVENTS-EXTENDED-20261020.zh-CN.md` in his
+  fork). A card coming up reports `+ECIND: 3,100` (CPIN still busy) and then `+ECIND: 3,0,0,1`. The stock RIL's
+  `onSimStatusChanged` takes type, value and cause and ignores numbers after them; mu300-sim-state's filter
+  (FINDINGS 186) dropped any report with a fourth field, so the second report started no check, and a card that was
+  busy at the first one was found only by the watchdog's five-minute look. Now trailing fields pass when every field
+  is a decimal number of at most 10 digits and 32 bits; an empty field, a sign, a trailing comma or other characters
+  still drop the line, and value and cause are filtered as before. Seen on his angelcare K1 (E5 family), the same
+  modem firmware's report; not seen on an MU300-family board yet.
+- **The U30 Air's battery light stayed steady instead of breathing** (his `edcdeb27`,
+  `docs/U30AIR-LED-DOCK-CURRENT-20261022.zh-CN.md`). Charging, the trigger was `pattern` with the right curve, but the
+  PMIC's LED control register read `0x300`: RUN and the steady TYPE bit both set, so the light stayed on. The
+  SC27xx driver's `pattern_set` sets RUN without clearing the steady bit, and the pattern trigger does not always call
+  `pattern_clear` when it takes over; going from a steady colour (Full, or not charging on the charger) to breathing
+  reproduced it. mu300-led's `breathe` now writes brightness 0 first when the channel is not on the pattern trigger
+  yet, and leaves a channel that is alone. He read `0x100` after the same steps and ran the colour sequence
+  Full -> Charging -> 49 % -> 50 % -> Full -> Charging on his device.
+
+Not taken from the same commits: his SMS pool resolver and 25-character list column (ours has one pool,
+`/etc/mu300/sms-pool`, and `mu300-sms list` cuts the time column to 21 characters), the dashboard's signed battery
+current (our battery tile shows the charge or discharge power in watts), his per-SIM VoLTE/VoNR receipt fix
+(`500e5ea4`: our `mobile-data voice --json --read` reads both live values every time, there is no receipt to go
+stale), his V50 radio resume (`c031a58a`: it is in his dual-stack `mu300-dual-radio`; one stack runs here), his
+`sim-reset` data-priority call (`cb1f761d`: this tree sends no `CEUS`/`CEMODE`).
+
+`tests/test_device_scripts.py`: `SimState.test_event_filter`, and in `Led` the breathing after a steady light.
+**Device check before merge:** U30 Air: full on the charger (steady white), then discharge below full and plug in
+again: the light breathes (on OpenWrt `cat /sys/class/leds/sc27xx:green/trigger` shows `[pattern]`). Any board with
+a SIM tray: take the card out and put it back; `logread | grep sim-state` or `journalctl -t mu300-sim-state` shows
+a check within seconds of the second report.
+
 ### 207. The U30 Air's charger: the battery's CV and the stock safety-timer policy (and 3 A, off unless asked for)
 
 **Status: patch 0024 checked by kanoqwq on a U30 Air (7.2.8); here 0024-0026 apply to 6.18.57, 7.2.11 and 7.3, the
