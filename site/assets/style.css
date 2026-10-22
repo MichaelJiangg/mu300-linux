@@ -9,6 +9,7 @@
   --muted: #526276;
   --line: #d6dfea;
   --blue: #2259d6;
+  --sponsor: #bf3989;
   --blue-soft: #e3ebfb;
   --amber: #b97700;
   --amber-fill: #f2b23a;
@@ -43,6 +44,7 @@
     --muted: #9cabbe;
     --line: #26364c;
     --blue: #7ea6ff;
+  --sponsor: #e86fb6;
     --blue-soft: #1a2a48;
     --amber: #f2b740;
     --amber-fill: #f2b23a;
@@ -65,6 +67,7 @@
   --muted: #9cabbe;
   --line: #26364c;
   --blue: #7ea6ff;
+  --sponsor: #e86fb6;
   --blue-soft: #1a2a48;
   --amber: #f2b740;
   --amber-fill: #f2b23a;
@@ -256,6 +259,12 @@ section { scroll-margin-top: 5rem; }
 }
 .btn.primary { background: var(--blue); color: var(--on-blue); }
 .btn:hover { text-decoration: none; filter: brightness(1.06); }
+.btn.sponsor { border-color: var(--sponsor); color: var(--sponsor); }
+.btn.sponsor svg { flex: none; }
+.btn.sponsor:hover { background: var(--sponsor); color: #fff; filter: none; }
+.btn.small { padding: .35rem .85rem; font-size: .92rem; }
+.sponsor-note { margin-top: .9rem; color: var(--muted); font-size: .95rem; max-width: 52ch; }
+.sponsor-line { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; color: var(--muted); }
 
 /* ------------------------------------------------------------------ blocks */
 
