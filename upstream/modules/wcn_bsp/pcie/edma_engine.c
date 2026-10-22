@@ -1007,7 +1007,7 @@ static int edma_pending_q_buffer(int chn, void *head, void *tail, int num)
 	return OK;
 }
 
-static int edma_pending_q_flush(int chn);
+static int edma_pending_q_num(int chn);
 
 int edma_push_link_async(int chn, void *head, void *tail, int num)
 {
@@ -1030,14 +1030,18 @@ int edma_push_link_async(int chn, void *head, void *tail, int num)
 	spin_unlock_irqrestore(q->lock.irq_spinlock_p, q->lock.flag);
 	ret = edma_push_link(chn, head, tail, num);
 	/*
-	 * MU300 (#339): status was set before this push, and only a TX completion flushes the pending ring and
-	 * clears it. A push that went nowhere brings no completion, so the channel would refuse every later
-	 * submission with -EAGAIN for good. Do the completion's work here: what was queued in the meantime goes
-	 * out (a submission that fails too is dropped, as in the completion's flush), and an empty ring clears status.
+	 * MU300 (#339): status was set before this push, and only a TX completion's flush clears it. A push that
+	 * went nowhere brings no completion, so with nothing queued behind it the channel would refuse every later
+	 * submission with -EAGAIN for good: clear status then. Submissions queued in the meantime are left where
+	 * they are (their callers were told OK and own nothing any more; popping one whose push fails would leak
+	 * it), so that rarer case still waits for a completion.
 	 */
-	if (ret)
-		while (edma_pending_q_flush(chn) != OK)
-			;
+	if (ret) {
+		spin_lock_irqsave(q->lock.irq_spinlock_p, q->lock.flag);
+		if (edma_pending_q_num(chn) <= 0)
+			q->status = 0;
+		spin_unlock_irqrestore(q->lock.irq_spinlock_p, q->lock.flag);
+	}
 
 	return ret;
 }

@@ -9508,8 +9508,10 @@ caller of -EAGAIN keeps its frames and retries. `pr_*_ratelimited` is per call s
 to 20 lines in 5 s whatever the level. Now `sc2355_pcie_push_link` logs only other errors, and the full ring says
 `full, backpressure` at info level at most once a minute. His second point, also fixed: `edma_push_link_async` sets the
 channel's `status` before the direct push and only a TX completion's flush clears it; a direct push that failed
-brought no completion and left the channel refusing every later submission. It now runs the flush itself (queued
-submissions go out, an empty ring clears `status`). Not done: a timeout for a completion that never comes.
+brought no completion and left the channel refusing every later submission. With nothing queued behind it,
+`status` is now cleared at once. Submissions queued meanwhile are not popped there: their callers were told OK, and
+one whose push failed would be lost with its buffers (the completion's own flush already drops one that way, vendor
+code). Not done: that case, and a timeout for a completion that never comes.
 `tests/test_wifi_tx_path.py` reads both. **Device test before merge:** an hour on the hotspot under load as above;
 `dmesg | grep -c 'push link fail: -11'` 0, `grep -c 'full, backpressure'` at most one a minute, throughput and
 `wlan0` errors as before.

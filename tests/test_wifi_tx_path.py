@@ -86,15 +86,17 @@ class WifiTxPath(unittest.TestCase):
 
     def test_a_failed_direct_push_does_not_leave_the_channel_refusing(self):
         # #339: status is set before the direct push and only a completion's flush clears it; a push that went
-        # nowhere brings no completion, so the flush runs at once (an empty ring clears status)
+        # nowhere brings no completion, so with an empty ring status is cleared at once. Nothing queued is popped
+        # here: a queued submission's caller was told OK, and dropping one whose push fails would leak it.
         src = (WCN / 'pcie' / 'edma_engine.c').read_text()
         a = body(src, 'int edma_push_link_async(')
         self.assertLess(a.index('pending_q.status = 1;'), a.index('ret = edma_push_link(chn, head, tail, num);\n\t/*'))
-        self.assertIn('if (ret)\n\t\twhile (edma_pending_q_flush(chn) != OK)\n\t\t\t;', a)
-        self.assertLess(src.index('static int edma_pending_q_flush(int chn);'), src.index('int edma_push_link_async('))
-        f = body(src, 'static int edma_pending_q_flush(int chn)\n{')
-        self.assertIn('if (edma_pending_q_num(chn) <= 0) {\n\t\tedma->chn_sw[chn].pending_q.status = 0;', f)
-
+        self.assertIn('\tif (ret) {\n\t\tspin_lock_irqsave(q->lock.irq_spinlock_p, q->lock.flag);\n'
+                      '\t\tif (edma_pending_q_num(chn) <= 0)\n\t\t\tq->status = 0;\n'
+                      '\t\tspin_unlock_irqrestore(q->lock.irq_spinlock_p, q->lock.flag);\n\t}', a)
+        self.assertNotIn('edma_pending_q_flush(', a)
+        self.assertNotIn('while (', a)
+        self.assertLess(src.index('static int edma_pending_q_num(int chn);'), src.index('int edma_push_link_async('))
 
 class WifiCommandNotSent(unittest.TestCase):
     """FINDINGS 106 (after kanoqwq's clean-tf-7.2 0e19fe32): a command the driver does not send is an error, with
