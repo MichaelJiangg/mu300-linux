@@ -190,6 +190,7 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
+| 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
 | 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's) |
 
 ## Hardware and firmware facts
@@ -12408,6 +12409,79 @@ once there).
 Tests: `tests/test_v50_sim.py` (the board table, the mapping, status, `card`, `default`, `v50-boot` and its once-a-boot
 rule, the live switch's order and its switch back, the identity cache, other boards, the driver drives nothing at probe), `tests/test_sim_selection.py`,
 `tests/test_api.py`, `tests/test_backup.py`, the catalogs.
+
+### 205. The U30 Air's USB 3 link in device mode follows the plug orientation (#54)
+
+**Status: measured on a U30 Air running 7.2.11; nothing is changed here. #341, the fix under test, made the flipped
+orientation worse on this unit (below).**
+
+**What was asked.** #54 reports OpenWrt limited to USB 2.0 (480 Mbps) on the MU300 while Android gives USB 3 host
+speeds. From the host side (koocyton's four-orientation table) SuperSpeed worked in one plug orientation only. #341
+says why: the PHY's TCA and the PTN38003A redriver are written once at power-on and never again, so the orientation
+that SuperSpeed uses is whatever was latched at boot. This entry adds the **device** side: a U30 Air plugged into a
+computer.
+
+**Setup.** U30 Air (UMS9620), OpenWrt 25.12.5 / mainline 7.2.11, USB-C to an Apple Silicon Mac. That Mac's port
+controller exposes both lanes (`usb-drd0-port-hs` and `usb-drd0-port-ss`), so the attachment point itself says which
+speed the link trained at. Cable and host are not variables: the same cable on a Cudy TR3600's USB-A port with a
+Fanxiang S500Pro SSD enumerates `usb 2-1: new SuperSpeed ... 5000` (`uas`), and the U30 Air's UDC reports
+`maximum_speed = super-speed-plus` throughout.
+
+**Measured** — `cat /sys/class/udc/25100000.dwc3/current_speed`, and macOS `Device Speed` on the same link:
+
+| # | state | `current_speed` | macOS |
+|---|---|---|---|
+| 1 | OpenWrt default, via the Cudy router's USB-A | `high-speed` | — (`usb 1-1: new high-speed`) |
+| 2 | OpenWrt default, Mac through an LG display hub | `high-speed` | 2, under `AppleUSB20HubPort` |
+| 3 | OpenWrt default, Mac's own USB-C port | `high-speed` | 2, under `usb-drd0-port-hs`; `port-ss` empty |
+| 4 | Android 13 (vendor, 5.4.254) | `super-speed-plus` | 4 |
+| 5 | Android → Linux, warm switch, PD **off** | `super-speed-plus` | 4 |
+| 6 | OpenWrt + `mu300-usb pd on`, orientation A | `super-speed-plus` | 4 |
+| 7 | PD **off**, orientation A | `super-speed-plus` | 4 |
+| 8 | plug flipped 180°, orientation B | `high-speed` | 2 |
+| 9 | orientation B + `mu300-usb pd on` | `high-speed` | 2 |
+| 10 | flipped back to A | `high-speed` | 2, no recovery |
+
+**What it shows.**
+
+- Device mode behaves like the host side: SuperSpeed is available only in the orientation the PHY/redriver latched at
+  power-on. A replug does not bring it back; only a power cycle does, which is the redriver's once-per-power-on auto
+  detection (#341).
+- `mu300-usb pd on` (0020) is **not** a workaround for the flipped orientation: `/sys/class/typec/port0` appears and
+  `mu300-usb` reports `role: device`, `data role: device`, `power role: sink`, but `current_speed` stays `high-speed`.
+  The TCPM driver manages CC and the roles; it does not move the SS lanes.
+- Rows 4–5 are why a flipped unit can look fixed: Android has the Type-C driver, configures the port, and a warm
+  switch into Linux leaves that state in place. The link then comes up `super-speed-plus` without any PD.
+
+**`dmesg` at the failing attach** (no driver for the Type-C block, so no `redriver` lines — as expected without #341):
+
+```
+sprd-ssphy 25310000.ssphy: VBUS from /extcon-gpio (no driver for the Type-C block)
+sprd-ssphy 25310000.ssphy: vbus off
+sprd-ssphy 25310000.ssphy: ssphy set vbus invalid!
+sprd-ssphy 25310000.ssphy: vbus on
+sprd-ssphy 25310000.ssphy: ssphy set vbus valid!
+```
+
+**#341 on the same unit** (2026-10-22, 7.2.11 built from `usb-typec-orientation-54`, `orientation` = `auto`, device
+mode to the same Mac): orientation A `super-speed-plus` (10 Gb/s), orientation B **not enumerated at all**, back to A
+`super-speed-plus`. Before #341, B fell back to `high-speed` and worked. The attach in B logged
+
+```
+USB 3 lanes flipped (from USB_SW; USB_SW 1, Type-C CC1, TCA flip status 1)
+redriver: -5
+```
+
+and `i2cget -y N 0x30 0x04` fails with EIO on buses 6, 4, 2 and 1, while bus 6 itself works (the charger at 0x6b is
+held by its driver). The device tree has the `sprd,ptn38003a redriver` node at 6-0030 (no supply, no enable GPIO).
+Two readings, not yet told apart: the redriver is not fitted (or not powered) on this unit, so only the TCA routes the
+SuperSpeed pairs; or `auto`'s source, the AON `USB_SW` bit, is wrong for this attach (here it disagrees with the
+PMIC's CC1). The next measurement: the same flip with `orientation` = `cc`, then `off`. #355 is a draft guard (no TCA
+flip when the redriver did not answer), which would bring back the USB 2 fallback but not SuperSpeed in B.
+
+**For reference**, the link is not the transfer bottleneck at current cellular speeds: 325.9 Mbps down (NJU mirror)
+over the SS link, and 244 Mbps over the 480 Mbps fallback on the same mirror.
+
 ### 206. Linux 7.3 as a fourth kernel: what 7.3 changed, and the boards on it
 Mainline Linux 7.3 came out on 2026-10-18. It is a fourth kernel choice from the release after v2026.10.19.2 on:
 `sudo mu300-update kernel 7.3`, choice 4 in the installers, `mu300-kernel-7.3.tar.gz`, Magisk zips `-k7.3` (15 zips
