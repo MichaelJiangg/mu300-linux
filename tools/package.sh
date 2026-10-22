@@ -43,7 +43,7 @@ package_load() {
         *) _pok= ;;
     esac
     case $PKG_KERNEL:$PKG_KERNEL_ASSET in
-        5.4:mu300-kernel.tar.gz|6.18:mu300-kernel-6.18.tar.gz|7.2:mu300-kernel-7.2.tar.gz) ;;
+        5.4:mu300-kernel.tar.gz|6.18:mu300-kernel-6.18.tar.gz|7.2:mu300-kernel-7.2.tar.gz|7.3:mu300-kernel-7.3.tar.gz) ;;
         *) _pok= ;;
     esac
     # (Ubuntu 26.04's programs need system calls 5.4 does not have: no release has that zip)

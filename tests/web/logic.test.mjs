@@ -173,6 +173,11 @@ test("releases: a zip is found by system and kernel, with the checksum GitHub co
   assert.equal(findZip(stable, "ubuntu-26.04", "5.4"), null);
   assert.equal(findZip(stable, "arch", "5.4"), null);
   assert.deepEqual(combos(stable), { "ubuntu-24.04": ["5.4", "6.18", "7.2"], "ubuntu-26.04": ["6.18", "7.2"], openwrt: ["5.4", "6.18", "7.2"], "openwrt-luci": ["5.4", "6.18", "7.2"] });
+  // a release with the k7.3 zips (7.3, the fourth kernel) offers 7.3 too; one without them (v2026.10.19.2 and older) does not
+  const { stable: with73 } = await loadReleases(fetchOf([rel("v2026.11.01", { assets: rel("v2026.11.01").assets
+    .concat(["openwrt", "ubuntu-26.04"].map((s) => asset(zipName("v2026.11.01", s, "7.3")))) })]));
+  assert.deepEqual(combos(with73).openwrt, ["5.4", "6.18", "7.2", "7.3"]);
+  assert.deepEqual(combos(with73)["ubuntu-26.04"], ["6.18", "7.2", "7.3"]);
   assert.equal(releaseSupportsWeb(stable), true);
   assert.equal(releaseSupportsWeb({ tag: LAST_RELEASE_WITHOUT_WEB }), false);
   assert.equal(releaseSupportsWeb({ tag: "v2026.10.19" }), false);
