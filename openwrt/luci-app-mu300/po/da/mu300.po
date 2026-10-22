@@ -3388,6 +3388,12 @@ msgstr "Ukendt låsetype"
 msgid "Invalid value for this lock kind"
 msgstr "Ugyldig værdi for denne låsetype"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Lås af bånd, tilstand og celle understøttes endnu ikke for SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Lås af bånd, tilstand og celle understøttes ikke, mens dobbelt-SIM-skift styrer radioen"
+
 msgid "Invalid page"
 msgstr "Ugyldig side"
 
@@ -3929,6 +3935,9 @@ msgstr "Sprogpakken kunne ikke fjernes"
 msgid "Lock cache unavailable"
 msgstr "Låsecache utilgængelig"
 
+msgid "The modem refused a write"
+msgstr "Modemmet afviste en skrivning"
+
 msgid "The saved locks could not be cleared"
 msgstr "De gemte låse kunne ikke ryddes"
 
@@ -3937,9 +3946,6 @@ msgstr "Ingen betjenende celle at låse til"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modemmet svarede ikke på tilstandsforespørgslen; intet blev sendt"
-
-msgid "The modem refused a write"
-msgstr "Modemmet afviste en skrivning"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Tilbagelæsningen stemmer ikke med de automatiske værdier"

@@ -3388,6 +3388,12 @@ msgstr "Tip de blocare necunoscut"
 msgid "Invalid value for this lock kind"
 msgstr "Valoare invalidă pentru acest tip de blocare"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Blocările de bandă, mod și celulă nu sunt încă acceptate pentru SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Blocările de bandă, mod și celulă nu sunt acceptate cât timp comutarea dual-SIM gestionează radioul"
+
 msgid "Invalid page"
 msgstr "Pagină invalidă"
 
@@ -3929,6 +3935,9 @@ msgstr "Pachetul de limbi nu a putut fi eliminat"
 msgid "Lock cache unavailable"
 msgstr "Cache-ul blocărilor nu este disponibil"
 
+msgid "The modem refused a write"
+msgstr "Modemul a refuzat o scriere"
+
 msgid "The saved locks could not be cleared"
 msgstr "Blocările salvate nu au putut fi șterse"
 
@@ -3937,9 +3946,6 @@ msgstr "Nicio celulă de servire pe care să se blocheze"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modemul nu a răspuns la interogarea modului; nu s-a trimis nimic"
-
-msgid "The modem refused a write"
-msgstr "Modemul a refuzat o scriere"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Recitirea nu corespunde valorilor automate"

@@ -160,7 +160,8 @@ class Mu300Dash(ShellTest):
         stdin = raw if raw is not None else json.dumps(params or {}, ensure_ascii=False)
         env = self.env(STUB_CALLS=calls, STUB_OUT=self.out, MU300_DASH_BIN=self.adapters,
                        MU300_DASH_DIR=run / 'dash', MU300_AT=self.adapters / 'at', MU300_SMS_BIN=self.adapters / 'sms',
-                       MU300_SMS_POOL=run / 'pool', MU300_DASH_SIM=self.adapters / 'sim')
+                       MU300_SMS_POOL=run / 'pool', MU300_DASH_SIM=self.adapters / 'sim',
+                       MU300_SIM_RUN=self.tmp / 'sim-run')
         env.update({k: str(v) for k, v in extra.items()})
         env = {k: v for k, v in env.items() if v != ''}
         r = subprocess.run(shell + [str(DASH), 'call', method], input=stdin.encode(), capture_output=True,
@@ -569,6 +570,42 @@ class SimCard(Mu300Dash):
             r, recs, _ = self.call(shell, 'simcard_set', {'kind': 'volte', 'slot': '0', 'state': 'off'}, MU300_MOBILE_DATA=md)
             self.assertEqual(self.reply(r)['error'], 'The modem did not take the setting; nothing was saved')
             (self.out / 'mobile-data.rc').unlink()
+
+
+class LockSetSim(Mu300Dash):
+    """#356: the lock helper refuses band, mode and cell writes for SIM2 and under the dual-SIM manager, but it runs
+    detached, so the page got ok and nothing changed. lock_set says so in the request and starts nothing."""
+
+    def test_refused_in_the_request(self):
+        sim = self.tmp / 'sim-run'
+        sim.mkdir()
+        for marker, error in (('sim-managed', 'while dual-SIM switching manages the radio'), ('sim-slot', 'for SIM2 yet')):
+            for p in sim.iterdir():
+                p.unlink()
+            (sim / marker).write_text('1\n')
+            for shell in self.each_shell():
+                for kind, val in (('nr', '41'), ('lte', '1,3'), ('mode', 'sa'), ('cell', 'auto'), ('endc', 'on')):
+                    with self.subTest(marker=marker, kind=kind, shell=shell):
+                        r, calls, _ = self.call(shell, 'lock_set', {'kind': kind, 'val': val})
+                        obj = self.reply(r)
+                        self.assertEqual(obj.get('ok'), 0, obj)
+                        self.assertIn(error, obj.get('error', ''))
+                        self.assertEqual(calls, [])
+                # the replay switch and the reset are not radio writes of a card: they still start
+                for kind, val, want in (('auto_apply', 'off', ['setsid', 'lock', 'apply', 'auto_apply', 'off']),
+                                        ('reset', 'auto', ['setsid', 'lock', 'reset'])):
+                    r, calls, _ = self.call(shell, 'lock_set', {'kind': kind, 'val': val})
+                    self.assertEqual(self.reply(r).get('ok'), 1)
+                    self.assertEqual(calls, [want])
+
+    def test_sim1_on_the_u30_air_starts_the_apply(self):
+        sim = self.tmp / 'sim-run'
+        sim.mkdir()
+        (sim / 'sim-slot').write_text('0\n')
+        for shell in self.each_shell():
+            r, calls, _ = self.call(shell, 'lock_set', {'kind': 'nr', 'val': '41'})
+            self.assertEqual(self.reply(r).get('ok'), 1)
+            self.assertEqual(calls, [['setsid', 'lock', 'apply', 'nr', '41']])
 
 
 class Passthrough(Mu300Dash):

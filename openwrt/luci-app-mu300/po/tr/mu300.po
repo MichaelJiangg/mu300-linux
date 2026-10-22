@@ -3381,6 +3381,12 @@ msgstr "Bilinmeyen kilit türü"
 msgid "Invalid value for this lock kind"
 msgstr "Bu kilit türü için geçersiz değer"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Bant, mod ve hücre kilitleri SIM2 için henüz desteklenmiyor"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Çift SIM geçişi radyoyu yönetirken bant, mod ve hücre kilitleri desteklenmiyor"
+
 msgid "Invalid page"
 msgstr "Geçersiz sayfa"
 
@@ -3922,6 +3928,9 @@ msgstr "Dil paketi kaldırılamadı"
 msgid "Lock cache unavailable"
 msgstr "Kilit önbelleği kullanılamıyor"
 
+msgid "The modem refused a write"
+msgstr "Modem bir yazmayı reddetti"
+
 msgid "The saved locks could not be cleared"
 msgstr "Kaydedilen kilitler temizlenemedi"
 
@@ -3930,9 +3939,6 @@ msgstr "Kilitlenecek hizmet hücresi yok"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem mod sorgusunu yanıtlamadı; hiçbir şey gönderilmedi"
-
-msgid "The modem refused a write"
-msgstr "Modem bir yazmayı reddetti"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Geri okuma otomatik değerlerle eşleşmiyor"

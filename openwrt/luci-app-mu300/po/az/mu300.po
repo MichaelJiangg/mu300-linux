@@ -3388,6 +3388,12 @@ msgstr "Naməlum kilid növü"
 msgid "Invalid value for this lock kind"
 msgstr "Bu kilid növü üçün yanlış dəyər"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Diapazon, rejim və hüceyrə kilidləri SIM2 üçün hələ dəstəklənmir"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "İkili SIM keçidi radionu idarə edərkən diapazon, rejim və hüceyrə kilidləri dəstəklənmir"
+
 msgid "Invalid page"
 msgstr "Yanlış səhifə"
 
@@ -3929,6 +3935,9 @@ msgstr "Dil paketini silmək mümkün olmadı"
 msgid "Lock cache unavailable"
 msgstr "Kilid keşi əlçatan deyil"
 
+msgid "The modem refused a write"
+msgstr "Modem yazmağı rədd etdi"
+
 msgid "The saved locks could not be cleared"
 msgstr "Saxlanmış kilidlər silinə bilmədi"
 
@@ -3937,9 +3946,6 @@ msgstr "Kilidlənəcək xidmət edən hüceyrə yoxdur"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem rejim sorğusuna cavab vermədi; heç nə göndərilmədi"
-
-msgid "The modem refused a write"
-msgstr "Modem yazmağı rədd etdi"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Geri oxunma avtomatik dəyərlərlə uyğun gəlmir"

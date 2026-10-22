@@ -3388,6 +3388,12 @@ msgstr "Type de verrouillage inconnu"
 msgid "Invalid value for this lock kind"
 msgstr "Valeur invalide pour ce type de verrouillage"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Les verrous de bande, de mode et de cellule ne sont pas encore pris en charge pour la SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Les verrous de bande, de mode et de cellule ne sont pas pris en charge tant que la bascule double SIM gère la radio"
+
 msgid "Invalid page"
 msgstr "Page invalide"
 
@@ -3929,6 +3935,9 @@ msgstr "Impossible de supprimer le pack de langues"
 msgid "Lock cache unavailable"
 msgstr "Cache des verrouillages indisponible"
 
+msgid "The modem refused a write"
+msgstr "Le modem a refusé une écriture"
+
 msgid "The saved locks could not be cleared"
 msgstr "Les verrouillages enregistrés n'ont pas pu être effacés"
 
@@ -3937,9 +3946,6 @@ msgstr "Aucune cellule de service à verrouiller"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Le modem n'a pas répondu à la requête de mode ; rien n'a été envoyé"
-
-msgid "The modem refused a write"
-msgstr "Le modem a refusé une écriture"
 
 msgid "The read-back does not match the automatic values"
 msgstr "La relecture ne correspond pas aux valeurs automatiques"

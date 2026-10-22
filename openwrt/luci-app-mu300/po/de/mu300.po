@@ -3388,6 +3388,12 @@ msgstr "Unbekannte Sperrart"
 msgid "Invalid value for this lock kind"
 msgstr "Ungültiger Wert für diese Sperrart"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Band-, Modus- und Zellsperren werden für SIM2 noch nicht unterstützt"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Band-, Modus- und Zellsperren werden nicht unterstützt, solange der Dual-SIM-Wechsel das Funkmodul verwaltet"
+
 msgid "Invalid page"
 msgstr "Ungültige Seite"
 
@@ -3929,6 +3935,9 @@ msgstr "Das Sprachpaket konnte nicht entfernt werden"
 msgid "Lock cache unavailable"
 msgstr "Sperr-Cache nicht verfügbar"
 
+msgid "The modem refused a write"
+msgstr "Das Modem hat einen Schreibbefehl abgelehnt"
+
 msgid "The saved locks could not be cleared"
 msgstr "Die gespeicherten Sperren konnten nicht gelöscht werden"
 
@@ -3937,9 +3946,6 @@ msgstr "Keine versorgende Zelle zum Sperren"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Das Modem hat die Modusabfrage nicht beantwortet; nichts wurde gesendet"
-
-msgid "The modem refused a write"
-msgstr "Das Modem hat einen Schreibbefehl abgelehnt"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Das Zurücklesen stimmt nicht mit den automatischen Werten überein"

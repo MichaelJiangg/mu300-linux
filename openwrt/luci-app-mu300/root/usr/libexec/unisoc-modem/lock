@@ -55,6 +55,8 @@ STATE_DIR=$(safe_state_dir "$(uci_get state_dir)" /etc/unisoc-modem/lock-state.d
 DATA_IFACE=$(safe_iface "$(uci_get data_interface)" wan)
 RUNDIR=${MU300_DASH_DIR:-$RUN_DIR}
 APPLY_DIR=${UNISOC_APPLY_DIR:-/run/unisoc-modem-lock-apply}
+# the SIM manager's runtime state (sim-slot, sim-managed); the tests point it elsewhere
+SIM_RUN=${MU300_SIM_RUN:-/run/mu300}
 REPLAY_MARKER=${UNISOC_REPLAY_MARKER:-/run/unisoc-modem-lock-replay-done}
 LOG=$RUNDIR/lock.log
 # The lock state only changes when somebody applies one - a real read costs seven
@@ -377,6 +379,20 @@ emit_state() {
     sed 's/^{//' "$LOCKCACHE"
 }
 
+# band_write CMD: one band mask write. An explicit ERROR answer is a refusal: logged with the answer, nothing saved,
+# no stack restart (#356: the answer used to be thrown away, and a refused write was saved and replayed as applied).
+# No answer at all is not taken as a refusal: some vendor setters apply the value and omit the final OK.
+band_write() {
+    local r
+    r=$(at "$1" 6)
+    case $r in
+        *ERROR*)
+            say "the modem refused $1: $(printf '%s\n' "$r" | sed -n '/ERROR/{p;q;}')"
+            printf '{"ok":0,"error":"The modem refused a write","detail":"%s"}\n' "$1"
+            exit 1 ;;
+    esac
+}
+
 do_apply() {  # do_apply KIND VALUE
     _t0=$(date +%s)
     valid_value "$1" "$2" || { echo "invalid lock setting" >&2; exit 2; }
@@ -388,11 +404,18 @@ do_apply() {  # do_apply KIND VALUE
         say "boot auto-apply -> $2"
         return 0
     fi
-    [ "${MU300_SIM_SLOT:-$(cat /run/mu300/sim-slot 2>/dev/null || echo 0)}" != 1 ] || {
+    # #356: these refusals ran detached and said nothing anywhere; the rpcd backend now refuses the same two cases
+    # before it starts us (the page shows why), and the log says it for every other caller
+    [ "${MU300_SIM_SLOT:-$(cat "$SIM_RUN/sim-slot" 2>/dev/null || echo 0)}" != 1 ] || {
+        say "apply $1 refused: SIM2 lock writes and live radio restart are not supported yet"
         echo "SIM2 lock writes and live radio restart are not supported yet" >&2
         return 1
     }
-    [ ! -e /run/mu300/sim-managed ] || { echo "Managed dual-SIM network lock restart is not supported" >&2; return 1; }
+    [ ! -e "$SIM_RUN/sim-managed" ] || {
+        say "apply $1 refused: the dual-SIM manager runs the radio (managed dual-SIM network lock restart is not supported)"
+        echo "Managed dual-SIM network lock restart is not supported" >&2
+        return 1
+    }
     apply_lock
     trap 'rm -rf "$APPLY_DIR" 2>/dev/null' EXIT INT TERM
     # a reset that committed and was interrupted before its saved settings were all gone: finish it first, or the
@@ -431,18 +454,18 @@ do_apply() {  # do_apply KIND VALUE
         lte)
             val=$(filter_bands "$val" "$LTE_SUP")
             if [ -n "$val" ]; then
-                at "AT+SPLBAND=1,$(lte_masks "$val")" 6 >/dev/null
+                band_write "AT+SPLBAND=1,$(lte_masks "$val")"
             else
-                at 'AT+SPLBAND=1,0,0,0,0,0' 6 >/dev/null
+                band_write 'AT+SPLBAND=1,0,0,0,0,0'
             fi
             say "LTE bands -> ${val:-automatic}"
             ;;
         nr)
             val=$(filter_bands "$val" "$(nr_sup)")
             if [ -n "$val" ]; then
-                at "AT+SPLBAND=2,$(nr_masks "$val" | awk -F, '{print $1",0,"$2","$3}')" 6 >/dev/null
+                band_write "AT+SPLBAND=2,$(nr_masks "$val" | awk -F, '{print $1",0,"$2","$3}')"
             else
-                at 'AT+SPLBAND=2,0,0,0,0' 6 >/dev/null
+                band_write 'AT+SPLBAND=2,0,0,0,0'
             fi
             say "NR bands -> ${val:-automatic}"
             ;;
@@ -745,9 +768,9 @@ verify_replay() {
     return 0
 }
 do_replay() {
-    [ ! -e /run/mu300/sim-managed ] || return 0
+    [ ! -e "$SIM_RUN/sim-managed" ] || { say "replay skipped: the dual-SIM manager runs the radio"; return 0; }
     # SIM2 has a different cold-start sequence. Its band/cell replay and restart are not validated.
-    [ "${MU300_SIM_SLOT:-$(cat /run/mu300/sim-slot 2>/dev/null || echo 0)}" != 1 ] || return 0
+    [ "${MU300_SIM_SLOT:-$(cat "$SIM_RUN/sim-slot" 2>/dev/null || echo 0)}" != 1 ] || { say "replay skipped: SIM2 is in use"; return 0; }
     local phase=${1:-late} marker=$REPLAY_MARKER
     [ -e "$marker" ] && return 0
     if ! auto_apply_enabled; then

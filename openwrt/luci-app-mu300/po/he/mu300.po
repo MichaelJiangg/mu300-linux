@@ -3388,6 +3388,12 @@ msgstr "סוג נעילה לא ידוע"
 msgid "Invalid value for this lock kind"
 msgstr "ערך לא חוקי לסוג נעילה זה"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "נעילות פס, מצב ותא עדיין אינן נתמכות עבור SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "נעילות פס, מצב ותא אינן נתמכות בזמן שהחלפת שני כרטיסי SIM מנהלת את הרדיו"
+
 msgid "Invalid page"
 msgstr "דף לא חוקי"
 
@@ -3929,6 +3935,9 @@ msgstr "לא ניתן היה להסיר את חבילת השפות"
 msgid "Lock cache unavailable"
 msgstr "מטמון הנעילות אינו זמין"
 
+msgid "The modem refused a write"
+msgstr "המודם דחה כתיבה"
+
 msgid "The saved locks could not be cleared"
 msgstr "לא ניתן היה לנקות את הנעילות השמורות"
 
@@ -3937,9 +3946,6 @@ msgstr "אין תא משרת לנעילה"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "המודם לא ענה לשאילתת המצב; לא נשלח דבר"
-
-msgid "The modem refused a write"
-msgstr "המודם דחה כתיבה"
 
 msgid "The read-back does not match the automatic values"
 msgstr "הקריאה החוזרת אינה תואמת לערכים האוטומטיים"

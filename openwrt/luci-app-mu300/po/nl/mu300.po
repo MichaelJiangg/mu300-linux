@@ -3388,6 +3388,12 @@ msgstr "Onbekend type vergrendeling"
 msgid "Invalid value for this lock kind"
 msgstr "Ongeldige waarde voor dit type vergrendeling"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Band-, modus- en celvergrendeling wordt nog niet ondersteund voor SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Band-, modus- en celvergrendeling wordt niet ondersteund zolang dubbele-SIM-wisseling de radio beheert"
+
 msgid "Invalid page"
 msgstr "Ongeldige pagina"
 
@@ -3929,6 +3935,9 @@ msgstr "Het taalpakket kon niet worden verwijderd"
 msgid "Lock cache unavailable"
 msgstr "Vergrendelingscache niet beschikbaar"
 
+msgid "The modem refused a write"
+msgstr "De modem weigerde een schrijfopdracht"
+
 msgid "The saved locks could not be cleared"
 msgstr "De opgeslagen vergrendelingen konden niet worden gewist"
 
@@ -3937,9 +3946,6 @@ msgstr "Geen serving cell om op te vergrendelen"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "De modem antwoordde niet op de modusopvraag; er is niets verzonden"
-
-msgid "The modem refused a write"
-msgstr "De modem weigerde een schrijfopdracht"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Het teruglezen komt niet overeen met de automatische waarden"
