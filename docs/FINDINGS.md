@@ -5955,7 +5955,7 @@ tool edits it. `tests/test_resize_last_partition.py` checks that the edit change
 CRCs and no other byte, and what is refused; `tests/installer.Tests.ps1` runs `OfferRepartition` under Windows
 PowerShell 5.1 and PowerShell 7 against three stubs for the device and checks every answer that must change
 nothing, the order of the writes, and the refusals. **Not run: `install.ps1` on a Windows machine against a
-device, and either installer on a unit with this table.** The shrink itself has been done on one 32 GB unit (#9b,
+device, and either installer on a unit with this table.** (2026-10-22, #357: liuwang97 ran prepare, reset and resume with `install.ps1` on a 32 GB U30 Air under Windows 11; the resume stopped at once because it called `ResumeFacts` and the GPT helpers above their definitions, fixed by moving them and guarded by `test_static.Ps1FunctionOrder`. Their report, not repeated here.) The shrink itself has been done on one 32 GB unit (#9b,
 issue #2); whether Android formats a 64 GB `userdata` that was shrunk this way after a vendor flash is not known.
 `uninstall.ps1` does not offer to grow `userdata` back; `uninstall.sh` does.
 
