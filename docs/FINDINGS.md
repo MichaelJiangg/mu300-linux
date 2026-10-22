@@ -12407,3 +12407,37 @@ once there).
 Tests: `tests/test_v50_sim.py` (the board table, the mapping, status, `card`, `default`, `v50-boot` and its once-a-boot
 rule, the live switch's order and its switch back, the identity cache, other boards, the driver drives nothing at probe), `tests/test_sim_selection.py`,
 `tests/test_api.py`, `tests/test_backup.py`, the catalogs.
+
+### 208. kanoqwq's shared installation fixes (b8d4f222): backup restore, the boot-control pair, cpio parents
+
+**Status: offline only.** From kanoqwq's `b8d4f222` ("OTA diff tools and shared installation fixes"); the OTA diff
+tools themselves are not taken (they are his desktop installer's and his LuCI OTA page's; this tree updates with
+the signed releases of `mu300-update`).
+
+- **OpenWrt's sysupgrade wrapper let a backup be made but not restored.** `/sbin/sysupgrade` here refuses firmware
+  images (an armsr image would overwrite the eMMC) and passed only `-b`/`-l`; LuCI's System > Backup "Upload archive"
+  runs `sysupgrade --restore-backup /tmp/backup.tar.gz`, which it refused. Now, as his: one of `-b`/`--create-backup
+  FILE`, `-r`/`--restore-backup FILE` or `-l`/`--list-backup`, with only the options that shape a backup (`-k -u -c
+  -o -p -v -q`); an image file, `-n`, `-F`, `-T`, two operations or a missing file name is refused. Not taken: his
+  `disable-stock-upgrade` (it rewrites LuCI's minified `flash.js` at build time and stops the build on any other
+  layout); the wrapper already refuses the flash, and the panel has its own Update page.
+- **mu300-next-boot checks the pair of boot-control blocks.** The block's first bytes are the slot suffix LK reads
+  (`_a`/`_b`). Without `/run/mu300/linux-slot` (or a garbled one), the initramfs' Linux block now names the slot,
+  before the command line and the old default b. And a pair where Linux's block names another slot than Linux's, or
+  Android's names Linux's, is never written: every command but `status` stops with "do not match", misc unchanged.
+  The initramfs never publishes such a pair (`publish_slot` copies both from the image, for the slot it found); this
+  guards against anything else that did. His other half of this change (`boot/init` refusing to start without a
+  known slot) is not taken: our initramfs falls back to the slot the image was built for (`etc/mu300-linux-slot`)
+  before b, and a boot that stops in a rescue shell would trade a working default for a gate (no boot gates here).
+- **The initramfs builder writes every parent directory.** `cpio_archive()` put out only the directories it was
+  given; the kernel's unpacker does not create missing parents, so a file under an unnamed directory would be dropped.
+  Every image so far named its directories; now the parents are added (an appended segment that names only
+  `etc/mu300-trial-guard` gets `etc` again, which the unpacker accepts).
+
+His SIM-event change in the same commit (a ready report with trailing numbers) is in the next entry.
+
+`tests/test_device_scripts.py` (`SysupgradeWrapper`, two `NextBoot` cases), `tests/test_boot_image.py`
+(`CpioParents`). **Device check before merge:** OpenWrt, any board: LuCI System > Backup, generate an archive and
+upload it again (the settings come back, the box reboots as LuCI says); `sysupgrade some.img` still refuses. Any
+board, either system: `mu300-next-boot status` and a reboot with the default boot linux (`--rearm` at boot-ok works
+as before).
