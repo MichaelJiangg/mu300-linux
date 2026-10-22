@@ -57,6 +57,7 @@ struct sprd_ssphy {
 	atomic_t		force;		/* the next run sets lanes and redriver even when nothing changed */
 	struct i2c_client	*redriver;	/* the PTN38003A on i2c6, NULL until its bus is there */
 	bool			no_redriver;	/* the device tree has none */
+	bool			no_redriver_warned;	/* said once why a flip is skipped */
 	int			lookups;
 	u32			typec_base;	/* the PMIC's Type-C block (typec@380), 0 when there is none */
 	u32			applied;	/* SSPHY_KEY() of what was last set, 0 = nothing attached since */
@@ -495,7 +496,7 @@ static bool sprd_ssphy_typec_status(struct sprd_ssphy *phy, u32 *status)
  * Set the TCA's lanes for the plug and return the key of what was set. At PHY init always (as before); later
  * only when the orientation is not the one the TCA has, so that a running link is not disturbed for nothing.
  */
-static u32 sprd_ssphy_lanes(struct sprd_ssphy *phy, int mode, bool always)
+static u32 sprd_ssphy_lanes(struct sprd_ssphy *phy, int mode, bool always, bool flip)
 {
 	u32 boot = 0, st, tcpc;
 	const char *from;
@@ -505,7 +506,7 @@ static u32 sprd_ssphy_lanes(struct sprd_ssphy *phy, int mode, bool always)
 	typec = sprd_ssphy_typec_status(phy, &st);
 	normal = sprd_ssphy_lanes_normal(mode, boot, typec, st, &from);
 	tcpc = readl_relaxed(phy->base + TCA_TCPC);
-	if (always || !!(tcpc & TCA_TCPC_ORIENTATION_NORMAL) != normal)
+	if (flip && (always || !!(tcpc & TCA_TCPC_ORIENTATION_NORMAL) != normal))
 		sprd_ssphy_tca_set(phy, normal);
 	if (mode != ORIENT_OFF)
 		dev_info(phy->dev, "USB 3 lanes %s (from %s; USB_SW %d, Type-C %s, TCA flip status %d)\n",
@@ -599,16 +600,29 @@ static void sprd_ssphy_orient_work(struct work_struct *work)
 		phy->applied = 0;
 	} else if (force || phy->applied != key) {
 		/* forced, attached after a detach, or attached again the other way round without a detach seen */
-		key = sprd_ssphy_lanes(phy, mode, false);
+		/*
+		 * Arm the redriver before the TCA is touched: the two have to agree on the lane pair. Where the
+		 * PTN38003A is missing, or does not answer at all (a U30 Air whose i2c 0x30 returns -EIO on every
+		 * bus), flipping the TCA alone leaves no pair working - the host does not enumerate the device at
+		 * all - while the single write PHY init made still falls back to USB 2. Keep that write then.
+		 */
 		ret = sprd_ssphy_redriver_arm(phy, mode, key == SSPHY_KEY(true));
 		if (ret == -EPROBE_DEFER && phy->lookups++ < 30) {
 			atomic_set(&phy->force, 1);
 			next = 1000;
-		} else if (ret && ret != -ENODEV) {
-			dev_warn(phy->dev, "redriver: %d\n", ret);
-		} else if (!ret) {
+			key = sprd_ssphy_lanes(phy, mode, false, true);
+		} else if (ret) {
+			if (ret != -ENODEV && !phy->no_redriver_warned) {
+				phy->no_redriver_warned = true;
+				dev_warn(phy->dev,
+					 "redriver: %d, nothing to follow a flip; the lanes stay as PHY init left them\n",
+					 ret);
+			}
+			key = sprd_ssphy_lanes(phy, mode, false, false);
+		} else {
 			phy->check = true;
 			next = 1500;
+			key = sprd_ssphy_lanes(phy, mode, false, true);
 		}
 		phy->applied = attached ? key : 0;
 	} else if (phy->check && phy->redriver) {
@@ -797,7 +811,7 @@ static int sprd_ssphy_init(struct usb_phy *x)
 
 	/* usb3 switch port: the lanes for the plug's orientation */
 	mutex_lock(&phy->orient_lock);
-	sprd_ssphy_lanes(phy, READ_ONCE(orientation), true);
+	sprd_ssphy_lanes(phy, READ_ONCE(orientation), true, true);
 	mutex_unlock(&phy->orient_lock);
 
 	if (!phy->pmic) {

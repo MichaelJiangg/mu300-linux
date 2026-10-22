@@ -62,7 +62,10 @@ class Static(unittest.TestCase):
 
     def test_triggers(self):
         init = function(self.drv, 'sprd_ssphy_init')
-        self.assertIn('sprd_ssphy_lanes(phy, READ_ONCE(orientation), true);', init)
+        # init always writes the TCA, whatever the guard says; the guard only governs the attach-time flip
+        self.assertIn('sprd_ssphy_lanes(phy, READ_ONCE(orientation), true, true);', init)
+        work = function(self.drv, 'sprd_ssphy_orient_work')
+        self.assertIn('key = sprd_ssphy_lanes(phy, mode, false, false);', work)
         self.assertLess(init.index('atomic_set(&phy->inited, 1);'), init.index('sprd_ssphy_kick(phy, 0, true);'))
         self.assertIn('sprd_ssphy_kick(phy, event ? 300 : 0, event);', function(self.drv, 'sprd_ssphy_vbus_notify'))
         self.assertIn('sprd_ssphy_kick(phy, 100, true);', function(self.drv, 'sprd_ssphy_otg_set_vbus'))
@@ -301,12 +304,13 @@ int main(void)
 	run();
 	assert(phy.redriver == &redriver && phy.check);
 
-	/* an I2C error is reported and nothing is checked */
+	/* an I2C error is reported and nothing is checked; the TCA keeps the write PHY init made */
 	phy.check = false;
 	redriver.fail = 1;
+	t = tca_writes;
 	kick();
 	run();
-	assert(strstr(warned, "redriver: -5") && !phy.check);
+	assert(strstr(warned, "redriver: -5") && !phy.check && tca_writes == t);
 	redriver.fail = 0;
 
 	/* no Type-C block in the device tree: every trigger sets the lanes, no polling as a host */
