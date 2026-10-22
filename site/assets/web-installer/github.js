@@ -12,7 +12,7 @@ export const VPN_ASSET = "mu300-linux-vpn.tar.gz";
 export const LAST_RELEASE_WITHOUT_WEB = "v2026.10.23";
 
 export const SYSTEMS = ["ubuntu-24.04", "ubuntu-26.04", "openwrt", "openwrt-luci"];
-export const KERNELS = ["5.4", "6.18", "7.2"];
+export const KERNELS = ["5.4", "6.18", "7.2", "7.3"];
 
 export class GithubError extends Error {
   constructor(code, message, extra) { super(message || code); this.name = "GithubError"; this.code = code; Object.assign(this, extra || {}); }
@@ -95,7 +95,7 @@ export function findZip(release, system, kernel) {
   return a && a.sha256 ? a : null;
 }
 
-// { "ubuntu-24.04": ["5.4","6.18","7.2"], ... }: what the release has zips for
+// { "ubuntu-24.04": ["5.4","6.18","7.2","7.3"], ... }: what the release has zips for
 export function combos(release) {
   const out = {};
   for (const s of SYSTEMS) {
