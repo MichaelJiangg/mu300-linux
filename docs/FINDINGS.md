@@ -191,7 +191,7 @@ what replaced it. The table below gives each section's state.
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 | 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
-| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's) |
+| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's; released in v2026.10.22.1, F50-B 10/10 boots on 7.3 in a reboot soak) |
 
 ## Hardware and firmware facts
 
@@ -12557,8 +12557,17 @@ tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the pr
   fuel gauge read the same; the battery took no current at 88 % on either kernel. Then `rollback-boot` to 6.18.57:
   the same checks pass there.
 
+**The release, v2026.10.22.1 (2026-10-23).** 5.4.254, 6.18.57 and 7.2.11 are v2026.10.19.3's builds: every file of
+their bundles is the same (the outputs reused, the Wi-Fi module shown identical above); 7.3.0 was built fresh, and its
+kit for the audio extra came from that build tree (`kits-v2026.10.22.1`, CONFIG `202bdee65f2a...`, the Image's own;
+mu300-audio v1.0.3). On F50-B (Ubuntu 24.04, offline), updated from v2026.10.19.2 with the release's `mu300-update`,
+then `mu300-update kernel 7.3`: 7.3.0 boots, the audio extra's 7.3 set loads (19/19) and the DSP answers, mobile data,
+the access point and Cockpit are up; a reboot soak of 10 boots on 7.3 came back 10 times (about 42 s each), every boot
+with the same checks passing, no oops, no failed unit. F50-B stays on 7.3. (During the update's download, still on
+v2026.10.19.2's 7.2.11, F50-B reset once by itself, with nothing in the journal or pstore; the second try went through.)
+
 Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
-fragment asks), a reading of the F50's SD card, a reboot soak.
+fragment asks), a reading of the F50's SD card, a call.
 
 ### 207. The U30 Air's charger: the battery's CV and the stock safety-timer policy (and 3 A, off unless asked for)
 
