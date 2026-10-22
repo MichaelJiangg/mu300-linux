@@ -208,7 +208,7 @@ class FromAnUnpackedZip(Device):
             self.device(pull=False, model='V50', device='MU3351', platform='ums9620')
             r, ev, asked = self.install(shell, pkg, self.ANSWERS)
             self.assertEqual(ev[-1]['event'], 'error')
-            self.assertIn('take the zip for kernel 6.18 or 7.2 of this release', ev[-1]['message'])
+            self.assertIn('take the zip for kernel 6.18, 7.2 or 7.3 of this release', ev[-1]['message'])
             self.assertEqual(self.calls('pull'), [])
             self.assert_nothing_written()
 
@@ -297,7 +297,7 @@ class Window(unittest.TestCase):
         c2.apply_package(package.load(str(self.tmp), {'MU300_PACKAGE': str(self.tmp / 'p54')}))
         c2.password = c2.password2 = 'secret123'
         c2.device = 'v50'
-        self.assertIn('take the zip for kernel 6.18 or 7.2', ' '.join(m for _f, m in model.problems(c2, facts)))
+        self.assertIn('take the zip for kernel 6.18, 7.2 or 7.3', ' '.join(m for _f, m in model.problems(c2, facts)))
 
 
 if __name__ == '__main__':
