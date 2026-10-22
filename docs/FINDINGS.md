@@ -190,7 +190,7 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
-| 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here, #341 is the fix under test |
+| 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
 
 ## Hardware and firmware facts
 
@@ -12411,7 +12411,8 @@ rule, the live switch's order and its switch back, the identity cache, other boa
 
 ### 205. The U30 Air's USB 3 link in device mode follows the plug orientation (#54)
 
-**Status: measured on a U30 Air running 7.2.11; nothing is changed here. The fix under test is #341.**
+**Status: measured on a U30 Air running 7.2.11; nothing is changed here. #341, the fix under test, made the flipped
+orientation worse on this unit (below).**
 
 **What was asked.** #54 reports OpenWrt limited to USB 2.0 (480 Mbps) on the MU300 while Android gives USB 3 host
 speeds. From the host side (koocyton's four-orientation table) SuperSpeed worked in one plug orientation only. #341
@@ -12461,8 +12462,21 @@ sprd-ssphy 25310000.ssphy: vbus on
 sprd-ssphy 25310000.ssphy: ssphy set vbus valid!
 ```
 
-**Still missing**: the four `ssphy`/`redriver` lines per orientation that #341 asks for. Those need its kernel
-(`usb-typec-orientation-54`), not this one.
+**#341 on the same unit** (2026-10-22, 7.2.11 built from `usb-typec-orientation-54`, `orientation` = `auto`, device
+mode to the same Mac): orientation A `super-speed-plus` (10 Gb/s), orientation B **not enumerated at all**, back to A
+`super-speed-plus`. Before #341, B fell back to `high-speed` and worked. The attach in B logged
+
+```
+USB 3 lanes flipped (from USB_SW; USB_SW 1, Type-C CC1, TCA flip status 1)
+redriver: -5
+```
+
+and `i2cget -y N 0x30 0x04` fails with EIO on buses 6, 4, 2 and 1, while bus 6 itself works (the charger at 0x6b is
+held by its driver). The device tree has the `sprd,ptn38003a redriver` node at 6-0030 (no supply, no enable GPIO).
+Two readings, not yet told apart: the redriver is not fitted (or not powered) on this unit, so only the TCA routes the
+SuperSpeed pairs; or `auto`'s source, the AON `USB_SW` bit, is wrong for this attach (here it disagrees with the
+PMIC's CC1). The next measurement: the same flip with `orientation` = `cc`, then `off`. #355 is a draft guard (no TCA
+flip when the redriver did not answer), which would bring back the USB 2 fallback but not SuperSpeed in B.
 
 **For reference**, the link is not the transfer bottleneck at current cellular speeds: 325.9 Mbps down (NJU mirror)
 over the SS link, and 244 Mbps over the 480 Mbps fallback on the same mirror.
