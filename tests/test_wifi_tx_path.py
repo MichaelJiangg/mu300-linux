@@ -72,6 +72,29 @@ class WifiTxPath(unittest.TestCase):
         self.assertIn('atomic_set(&tx_mgmt->pcie_tx_waiting, 0);', body(tx, 'int sc2355_tx_init('))
         self.assertIn('\tatomic_t pcie_tx_waiting;\n', (WLAN / 'tx.h').read_text())
 
+    def test_backpressure_is_not_logged_as_an_error(self):
+        # #339: the pair "edma_pending_q_buffer(10) full" / "push link fail: -11" was a third of the kernel log
+        src = (WCN / 'pcie' / 'edma_engine.c').read_text()
+        edma = body(src, 'static int edma_pending_q_buffer(')
+        self.assertNotIn('pr_warn_ratelimited(', edma)
+        self.assertIn('static DEFINE_RATELIMIT_STATE(full_rs, 60 * HZ, 1);', edma)
+        self.assertLess(edma.index('if (__ratelimit(&full_rs))'), edma.index('return -EAGAIN;'))
+        self.assertIn('#include <linux/ratelimit.h>', src)
+        link = body((WLAN / 'pcie.c').read_text(), 'int sc2355_pcie_push_link(')
+        self.assertIn('if (ret && ret != -EAGAIN) {', link)
+        self.assertIn('pr_err_ratelimited("%s: push link fail: %d, chn: %d!\\n"', link)
+
+    def test_a_failed_direct_push_does_not_leave_the_channel_refusing(self):
+        # #339: status is set before the direct push and only a completion's flush clears it; a push that went
+        # nowhere brings no completion, so the flush runs at once (an empty ring clears status)
+        src = (WCN / 'pcie' / 'edma_engine.c').read_text()
+        a = body(src, 'int edma_push_link_async(')
+        self.assertLess(a.index('pending_q.status = 1;'), a.index('ret = edma_push_link(chn, head, tail, num);\n\t/*'))
+        self.assertIn('if (ret)\n\t\twhile (edma_pending_q_flush(chn) != OK)\n\t\t\t;', a)
+        self.assertLess(src.index('static int edma_pending_q_flush(int chn);'), src.index('int edma_push_link_async('))
+        f = body(src, 'static int edma_pending_q_flush(int chn)\n{')
+        self.assertIn('if (edma_pending_q_num(chn) <= 0) {\n\t\tedma->chn_sw[chn].pending_q.status = 0;', f)
+
 
 class WifiCommandNotSent(unittest.TestCase):
     """FINDINGS 106 (after kanoqwq's clean-tf-7.2 0e19fe32): a command the driver does not send is an error, with
