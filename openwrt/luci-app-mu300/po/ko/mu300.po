@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi 핫스팟"
 msgid "Restart modem"
 msgstr "모뎀 재시작"
 
-msgid "Restart device"
-msgstr "장치 재시작"
+msgid "Power off or restart"
+msgstr "전원 끄기 또는 다시 시작"
 
 msgid "Switch to Android"
 msgstr "Android로 전환"
@@ -1165,11 +1165,14 @@ msgstr "로밍 네트워크에서도 모바일 데이터가 사용되며 추가 
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "셀룰러 연결이 1–2분 동안 중단될 수 있습니다."
 
-msgid "Restart the entire device"
-msgstr "장치 전체 재시작"
-
 msgid "All connections will be interrupted."
 msgstr "모든 연결이 중단됩니다."
+
+msgid "Power off"
+msgstr "전원 끄기"
+
+msgid "Restart"
+msgstr "다시 시작"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "다음 부팅 시 Android로 진입하도록 설정하고 지금 재부팅합니다. 이 관리 페이지와 셀룰러 공유가 끊어집니다."
@@ -1495,6 +1498,21 @@ msgstr "현재 서빙 셀 잠금"
 msgid "Unlock cell"
 msgstr "셀 잠금 해제"
 
+msgid "Enter a cell"
+msgstr "셀 입력"
+
+msgid "Type"
+msgstr "유형"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "채널 번호(EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "이 셀 잠금"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. MHz 단위 주파수가 아니라 채널 번호입니다. 셀이 인접 셀 목록에 없어도 됩니다."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "적용하면 무선 스택이 재시작되어 (SFUN) 셀룰러 서비스가 잠시 중단됩니다. 설정은 저장되며, '시작 시 적용'이 켜져 있으면 AT가 준비된 후 플러그인이 다시 적용합니다. 플랫폼의 무선 시작 전 훅이 있으면 재시작 없이 다시 적용할 수 있습니다. 밴드를 하나도 선택하지 않고 적용하면 자동 모드로 돌아갑니다."
 
@@ -1581,6 +1599,9 @@ msgstr "백그라운드에서 %s 잠금 중…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "백그라운드에서 %s 잠금 완료 (SFUN 재시작, 약 30초). 상태를 다시 읽는 중…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "아래 범위 안에서 채널 번호와 PCI를 입력하세요"
 
 msgid "No serving-network data"
 msgstr "서빙 네트워크 데이터 없음"
@@ -2399,9 +2420,6 @@ msgstr "장치가 지금 재시작됩니다. 기본 부팅이 Android이므로 A
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "장치가 지금 재시작되며 약 1분 동안 연결되지 않습니다. 새 시스템이 시작되지 않으면 몇 번의 실패 후 장치가 자동으로 Android로 돌아갑니다."
 
-msgid "Restart"
-msgstr "다시 시작"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "재시작 중… 약 1분 후에 이 페이지를 다시 여세요."
 
@@ -3055,9 +3073,6 @@ msgstr "감지"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL에 토큰이 포함될 수 있습니다. 토큰은 기기로 별도 전달되며 명령줄이나 로그에는 절대 남지 않습니다."
-
-msgid "Type"
-msgstr "유형"
 
 msgid "Share link"
 msgstr "공유 링크"

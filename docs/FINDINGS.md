@@ -12625,3 +12625,96 @@ disable end it. Off by default because kanoqwq tested it on a C fixture built fr
 **Device check before merge (any board, USB tethered):** with the parameter on, a long USB ping and an iperf3 run both
 ways at once for an hour; no stall, and latency and throughput as with it off (patch 0008's header has reference
 numbers).
+
+### 209. kanoqwq's shared installation fixes (b8d4f222): backup restore, the boot-control pair, cpio parents
+
+**Status: offline only.** From kanoqwq's `b8d4f222` ("OTA diff tools and shared installation fixes"); the OTA diff
+tools themselves are not taken (they are his desktop installer's and his LuCI OTA page's; this tree updates with
+the signed releases of `mu300-update`).
+
+- **OpenWrt's sysupgrade wrapper let a backup be made but not restored.** `/sbin/sysupgrade` here refuses firmware
+  images (an armsr image would overwrite the eMMC) and passed only `-b`/`-l`; LuCI's System > Backup "Upload archive"
+  runs `sysupgrade --restore-backup /tmp/backup.tar.gz`, which it refused. Now, as his: one of `-b`/`--create-backup
+  FILE`, `-r`/`--restore-backup FILE` or `-l`/`--list-backup`, with only the options that shape a backup (`-k -u -c
+  -o -p -v -q`); an image file, `-n`, `-F`, `-T`, two operations or a missing file name is refused. Not taken: his
+  `disable-stock-upgrade` (it rewrites LuCI's minified `flash.js` at build time and stops the build on any other
+  layout); the wrapper already refuses the flash, and the panel has its own Update page.
+- **mu300-next-boot checks the pair of boot-control blocks.** The block's first bytes are the slot suffix LK reads
+  (`_a`/`_b`). Without `/run/mu300/linux-slot` (or a garbled one), the initramfs' Linux block now names the slot,
+  before the command line and the old default b. And a pair where Linux's block names another slot than Linux's, or
+  Android's names Linux's, is never written: every command but `status` stops with "do not match", misc unchanged.
+  The initramfs never publishes such a pair (`publish_slot` copies both from the image, for the slot it found); this
+  guards against anything else that did. His other half of this change (`boot/init` refusing to start without a
+  known slot) is not taken: our initramfs falls back to the slot the image was built for (`etc/mu300-linux-slot`)
+  before b, and a boot that stops in a rescue shell would trade a working default for a gate (no boot gates here).
+- **The initramfs builder writes every parent directory.** `cpio_archive()` put out only the directories it was
+  given; the kernel's unpacker does not create missing parents, so a file under an unnamed directory would be dropped.
+  Every image so far named its directories; now the parents are added (an appended segment that names only
+  `etc/mu300-trial-guard` gets `etc` again, which the unpacker accepts).
+
+His SIM-event change in the same commit (a ready report with trailing numbers) is in the next entry.
+
+`tests/test_device_scripts.py` (`SysupgradeWrapper`, two `NextBoot` cases), `tests/test_boot_image.py`
+(`CpioParents`). **Device check before merge:** OpenWrt, any board: LuCI System > Backup, generate an archive and
+upload it again (the settings come back, the box reboots as LuCI says); `sysupgrade some.img` still refuses. Any
+board, either system: `mu300-next-boot status` and a reboot with the default boot linux (`--rearm` at boot-ok works
+as before).
+
+### 210. A SIM ready report with trailing numbers, and the U30 Air's charging light after a steady one
+
+**Status: the LED part checked by kanoqwq on a U30 Air; the SIM part seen by him on an E5-family board. Offline here.**
+
+- **`+ECIND: 3,0,0,1` is a SIM event too** (kanoqwq's `b8d4f222`, `docs/SIM-EVENTS-EXTENDED-20261020.zh-CN.md` in his
+  fork). A card coming up reports `+ECIND: 3,100` (CPIN still busy) and then `+ECIND: 3,0,0,1`. The stock RIL's
+  `onSimStatusChanged` takes type, value and cause and ignores numbers after them; mu300-sim-state's filter
+  (FINDINGS 186) dropped any report with a fourth field, so the second report started no check, and a card that was
+  busy at the first one was found only by the watchdog's five-minute look. Now trailing fields pass when every field
+  is a decimal number of at most 10 digits and 32 bits; an empty field, a sign, a trailing comma or other characters
+  still drop the line, and value and cause are filtered as before. Seen on his angelcare K1 (E5 family), the same
+  modem firmware's report; not seen on an MU300-family board yet.
+- **The U30 Air's battery light stayed steady instead of breathing** (his `edcdeb27`,
+  `docs/U30AIR-LED-DOCK-CURRENT-20261022.zh-CN.md`). Charging, the trigger was `pattern` with the right curve, but the
+  PMIC's LED control register read `0x300`: RUN and the steady TYPE bit both set, so the light stayed on. The
+  SC27xx driver's `pattern_set` sets RUN without clearing the steady bit, and the pattern trigger does not always call
+  `pattern_clear` when it takes over; going from a steady colour (Full, or not charging on the charger) to breathing
+  reproduced it. mu300-led's `breathe` now writes brightness 0 first when the channel is not on the pattern trigger
+  yet, and leaves a channel that is alone. He read `0x100` after the same steps and ran the colour sequence
+  Full -> Charging -> 49 % -> 50 % -> Full -> Charging on his device.
+
+Not taken from the same commits: his SMS pool resolver and 25-character list column (ours has one pool,
+`/etc/mu300/sms-pool`, and `mu300-sms list` cuts the time column to 21 characters), the dashboard's signed battery
+current (our battery tile shows the charge or discharge power in watts), his per-SIM VoLTE/VoNR receipt fix
+(`500e5ea4`: our `mobile-data voice --json --read` reads both live values every time, there is no receipt to go
+stale), his V50 radio resume (`c031a58a`: it is in his dual-stack `mu300-dual-radio`; one stack runs here), his
+`sim-reset` data-priority call (`cb1f761d`: this tree sends no `CEUS`/`CEMODE`).
+
+`tests/test_device_scripts.py`: `SimState.test_event_filter`, and in `Led` the breathing after a steady light.
+**Device check before merge:** U30 Air: full on the charger (steady white), then discharge below full and plug in
+again: the light breathes (on OpenWrt `cat /sys/class/leds/sc27xx:green/trigger` shows `[pattern]`). Any board with
+a SIM tray: take the card out and put it back; `logread | grep sim-state` or `journalctl -t mu300-sim-state` shows
+a check within seconds of the second report.
+
+### 211. The panel: power off, a cell entered by hand, the battery as a bar
+
+**Status: offline only.** The dashboard parts of kanoqwq's `b8d4f222` and `edcdeb27`, in this tree's LuCI app.
+
+- **Power off or restart.** The dashboard's restart button asks which: Cancel, Power off, Restart. Both go through
+  `mu300-dash-act` (`reboot` or `poweroff` after the 3 s grace for the reply, the usual orderly way: procd stops the
+  services and unmounts; never forced). mu300dash's `act` takes `poweroff` with no argument, as `reboot`. On a board
+  without a battery the USB supply may start it again; that is the bootloader's choice, as with a long power-key press.
+- **A cell entered by hand** (Cellular > Network locks, under the neighbor table): the type (LTE or NR), the channel
+  number (EARFCN 0-262143, NR-ARFCN 1-3279165; a channel number, not MHz) and the PCI (0-503, 0-1007). The page checks
+  the ranges and locks it as a neighbor row's button does (`lock apply cell lte:EARFCN,PCI`, the same confirmation);
+  the cell does not have to be in the neighbor list. The backend's own check (`valid_cell`: digits, at most 7 and 4)
+  is unchanged. kanoqwq's backend change in the same commit (LTE EARFCN 0 allowed) was his tree's; ours already
+  allowed it.
+- **The battery tile has a capacity bar** like CPU, memory and storage, hidden without a battery or a percentage.
+
+Not taken: his signed battery current in the tile (ours shows the charge or discharge power in watts). Cockpit's MU300
+page has no manual cell entry yet. New messages in all 31 catalogs.
+
+`tests/test_mu300dash_security.py` (`poweroff` among the act fields and pass-throughs), `tests/test_luci_i18n.py`.
+**Device check before merge (OpenWrt, any board):** the dashboard's button: Cancel does nothing, Restart restarts,
+Power off powers off (U30 Air: off until the power key). Network locks: an LTE cell from the neighbor table entered
+by hand locks as the row's button would (the page's lock summary shows it), out-of-range values are refused on the
+page; then Unlock. The U30 Air's battery tile shows the bar.

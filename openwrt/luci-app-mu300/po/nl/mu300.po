@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi-hotspot"
 msgid "Restart modem"
 msgstr "Modem herstarten"
 
-msgid "Restart device"
-msgstr "Apparaat herstarten"
+msgid "Power off or restart"
+msgstr "Uitschakelen of herstarten"
 
 msgid "Switch to Android"
 msgstr "Overschakelen naar Android"
@@ -1165,11 +1165,14 @@ msgstr "Mobiele data wordt ook op roamingnetwerken gebruikt, wat extra kan koste
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "De mobiele verbinding kan 1–2 minuten wegvallen."
 
-msgid "Restart the entire device"
-msgstr "Het hele apparaat herstarten"
-
 msgid "All connections will be interrupted."
 msgstr "Alle verbindingen worden onderbroken."
+
+msgid "Power off"
+msgstr "Uitschakelen"
+
+msgid "Restart"
+msgstr "Herstarten"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "De volgende start gaat naar Android en er wordt nu herstart. Deze beheerpagina en het delen van de mobiele verbinding worden verbroken."
@@ -1495,6 +1498,21 @@ msgstr "Huidige serving cell vergrendelen"
 msgid "Unlock cell"
 msgstr "Cel ontgrendelen"
 
+msgid "Enter a cell"
+msgstr "Een cel invoeren"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanaalnummer (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Deze cel vergrendelen"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Een kanaalnummer, geen frequentie in MHz; de cel hoeft niet in de lijst met buurcellen te staan."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Toepassen herstart de radiostack (SFUN) en onderbreekt de mobiele dienst kort. Instellingen worden opgeslagen en door de plugin opnieuw toegepast zodra AT gereed is, als „Toepassen bij opstarten” is ingeschakeld. Een pre-radio-hook van het platform kan ze zonder herstart toepassen. Pas toe zonder geselecteerde banden om de automatische modus te herstellen."
 
@@ -1581,6 +1599,9 @@ msgstr "%s wordt op de achtergrond vergrendeld…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s op de achtergrond vergrendeld (SFUN-herstart, ongeveer 30 seconden); status wordt teruggelezen…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Voer een kanaalnummer en een PCI in binnen de bereiken hieronder"
 
 msgid "No serving-network data"
 msgstr "Geen gegevens over het serving netwerk"
@@ -2399,9 +2420,6 @@ msgstr "Het apparaat herstart nu. De standaardstart is Android, dus Android star
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Het apparaat herstart nu en is ongeveer een minuut weg. Als het nieuwe systeem niet start, gaat het apparaat na de mislukte pogingen vanzelf terug naar Android."
 
-msgid "Restart"
-msgstr "Herstarten"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Herstarten… open deze pagina over ongeveer een minuut opnieuw."
 
@@ -3055,9 +3073,6 @@ msgstr "Detecteren"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "De URL kan een token bevatten: die gaat apart naar het apparaat, nooit in een opdrachtregel of een log."
-
-msgid "Type"
-msgstr "Type"
 
 msgid "Share link"
 msgstr "Deellink"

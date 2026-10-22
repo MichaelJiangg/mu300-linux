@@ -1105,8 +1105,8 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Mulai ulang modem"
 
-msgid "Restart device"
-msgstr "Mulai ulang perangkat"
+msgid "Power off or restart"
+msgstr "Matikan atau mulai ulang"
 
 msgid "Switch to Android"
 msgstr "Beralih ke Android"
@@ -1165,11 +1165,14 @@ msgstr "Data seluler juga digunakan di jaringan roaming, yang bisa menambah biay
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Konektivitas seluler mungkin berhenti selama 1–2 menit."
 
-msgid "Restart the entire device"
-msgstr "Mulai ulang seluruh perangkat"
-
 msgid "All connections will be interrupted."
 msgstr "Semua koneksi akan terputus."
+
+msgid "Power off"
+msgstr "Matikan"
+
+msgid "Restart"
+msgstr "Mulai ulang"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Boot berikutnya akan masuk ke Android dan perangkat dimulai ulang sekarang. Halaman manajemen ini dan berbagi seluler akan terputus."
@@ -1495,6 +1498,21 @@ msgstr "Kunci sel layanan saat ini"
 msgid "Unlock cell"
 msgstr "Buka kunci sel"
 
+msgid "Enter a cell"
+msgstr "Masukkan sel"
+
+msgid "Type"
+msgstr "Jenis"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Nomor kanal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Kunci sel ini"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Nomor kanal, bukan frekuensi dalam MHz; sel tidak harus ada di daftar sel tetangga."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Menerapkan akan memulai ulang stack radio (SFUN) dan memutus layanan seluler sebentar. Pengaturan disimpan dan diterapkan ulang oleh plugin setelah AT siap jika Terapkan saat startup diaktifkan. Hook pra-radio platform dapat menerapkan ulang tanpa memulai ulang. Terapkan tanpa band terpilih untuk mengembalikan mode otomatis."
 
@@ -1581,6 +1599,9 @@ msgstr "Mengunci %s di latar belakang…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s dikunci di latar belakang (mulai ulang SFUN, sekitar 30 detik); membaca kembali status…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Masukkan nomor kanal dan PCI dalam rentang di bawah"
 
 msgid "No serving-network data"
 msgstr "Tidak ada data jaringan layanan"
@@ -2399,9 +2420,6 @@ msgstr "Perangkat dimulai ulang sekarang. Boot bawaan adalah Android, jadi Andro
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Perangkat dimulai ulang sekarang dan tidak dapat diakses selama sekitar satu menit. Jika sistem baru tidak mau menyala, perangkat kembali ke Android dengan sendirinya setelah beberapa percobaan gagal."
 
-msgid "Restart"
-msgstr "Mulai ulang"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Memulai ulang… buka lagi halaman ini sekitar satu menit lagi."
 
@@ -3055,9 +3073,6 @@ msgstr "Deteksi"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL dapat memuat token: dikirim ke perangkat tersendiri, tidak pernah masuk ke baris perintah atau log."
-
-msgid "Type"
-msgstr "Jenis"
 
 msgid "Share link"
 msgstr "Tautan bagikan"
