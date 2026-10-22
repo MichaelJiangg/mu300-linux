@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi 熱點"
 msgid "Restart modem"
 msgstr "重新啟動數據機"
 
-msgid "Restart device"
-msgstr "重新啟動裝置"
+msgid "Power off or restart"
+msgstr "關機或重新啟動"
 
 msgid "Switch to Android"
 msgstr "切換到 Android"
@@ -1165,11 +1165,14 @@ msgstr "行動數據也會在漫遊網路上使用，可能產生額外費用。
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "行動網路連線可能會中斷 1–2 分鐘。"
 
-msgid "Restart the entire device"
-msgstr "重新啟動整台裝置"
-
 msgid "All connections will be interrupted."
 msgstr "所有連線都將中斷。"
+
+msgid "Power off"
+msgstr "關機"
+
+msgid "Restart"
+msgstr "重新啟動"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "下次開機將進入 Android，並立即重新開機。此管理頁面與行動網路分享都會中斷。"
@@ -1495,6 +1498,21 @@ msgstr "鎖定目前服務基地台"
 msgid "Unlock cell"
 msgstr "解除基地台鎖定"
 
+msgid "Enter a cell"
+msgstr "手動輸入基地台"
+
+msgid "Type"
+msgstr "類型"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "頻點（EARFCN / NR-ARFCN）"
+
+msgid "Lock this cell"
+msgstr "鎖定指定基地台"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. 請輸入頻點編號，不是 MHz 頻率；基地台無需出現在鄰近基地台列表中。"
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "套用後射頻協定堆疊會重新啟動（SFUN），行動網路服務會短暫中斷。設定會永久儲存，並在啟用「開機時套用」時由外掛程式於 AT 就緒後重新套用。若平台提供射頻啟動前掛鉤，則可不經重新啟動即重新套用。不選任何頻段再按套用，即可恢復自動模式。"
 
@@ -1581,6 +1599,9 @@ msgstr "正在背景鎖定 %s…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "已在背景鎖定 %s（SFUN 重新啟動，約 30 秒）；正在回讀狀態…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "請輸入下列範圍內的頻點和 PCI"
 
 msgid "No serving-network data"
 msgstr "尚無註冊網路資料"
@@ -2394,9 +2415,6 @@ msgstr "裝置現在重新啟動。預設開機的是 Android，因此會進入 
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "裝置現在重新啟動，大約一分鐘內無法連線。如果新系統無法啟動，裝置會在幾次失敗後自動回到 Android。"
 
-msgid "Restart"
-msgstr "重新啟動"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "正在重新啟動… 請在大約一分鐘後重新開啟此頁面。"
 
@@ -3050,9 +3068,6 @@ msgstr "自動偵測"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL 可能包含權杖：它會單獨傳送到裝置，絕不會出現在命令列或記錄中。"
-
-msgid "Type"
-msgstr "類型"
 
 msgid "Share link"
 msgstr "分享連結"

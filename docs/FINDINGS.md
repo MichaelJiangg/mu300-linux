@@ -12560,6 +12560,31 @@ tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the pr
 Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
 fragment asks), a reading of the F50's SD card, a reboot soak.
 
+### 211. The panel: power off, a cell entered by hand, the battery as a bar
+
+**Status: offline only.** The dashboard parts of kanoqwq's `b8d4f222` and `edcdeb27`, in this tree's LuCI app.
+
+- **Power off or restart.** The dashboard's restart button asks which: Cancel, Power off, Restart. Both go through
+  `mu300-dash-act` (`reboot` or `poweroff` after the 3 s grace for the reply, the usual orderly way: procd stops the
+  services and unmounts; never forced). mu300dash's `act` takes `poweroff` with no argument, as `reboot`. On a board
+  without a battery the USB supply may start it again; that is the bootloader's choice, as with a long power-key press.
+- **A cell entered by hand** (Cellular > Network locks, under the neighbor table): the type (LTE or NR), the channel
+  number (EARFCN 0-262143, NR-ARFCN 1-3279165; a channel number, not MHz) and the PCI (0-503, 0-1007). The page checks
+  the ranges and locks it as a neighbor row's button does (`lock apply cell lte:EARFCN,PCI`, the same confirmation);
+  the cell does not have to be in the neighbor list. The backend's own check (`valid_cell`: digits, at most 7 and 4)
+  is unchanged. kanoqwq's backend change in the same commit (LTE EARFCN 0 allowed) was his tree's; ours already
+  allowed it.
+- **The battery tile has a capacity bar** like CPU, memory and storage, hidden without a battery or a percentage.
+
+Not taken: his signed battery current in the tile (ours shows the charge or discharge power in watts). Cockpit's MU300
+page has no manual cell entry yet. New messages in all 31 catalogs.
+
+`tests/test_mu300dash_security.py` (`poweroff` among the act fields and pass-throughs), `tests/test_luci_i18n.py`.
+**Device check before merge (OpenWrt, any board):** the dashboard's button: Cancel does nothing, Restart restarts,
+Power off powers off (U30 Air: off until the power key). Network locks: an LTE cell from the neighbor table entered
+by hand locks as the row's button would (the page's lock summary shows it), out-of-range values are refused on the
+page; then Unlock. The U30 Air's battery tile shows the bar.
+
 ### 210. A SIM ready report with trailing numbers, and the U30 Air's charging light after a steady one
 
 **Status: the LED part checked by kanoqwq on a U30 Air; the SIM part seen by him on an E5-family board. Offline here.**

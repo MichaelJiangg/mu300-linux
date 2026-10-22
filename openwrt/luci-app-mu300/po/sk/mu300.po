@@ -1105,8 +1105,8 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Reštartovať modem"
 
-msgid "Restart device"
-msgstr "Reštartovať zariadenie"
+msgid "Power off or restart"
+msgstr "Vypnúť alebo reštartovať"
 
 msgid "Switch to Android"
 msgstr "Prepnúť na Android"
@@ -1165,11 +1165,14 @@ msgstr "Mobilné dáta sa používajú aj v roamingových sieťach, čo môže s
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobilné pripojenie sa môže na 1–2 minúty zastaviť."
 
-msgid "Restart the entire device"
-msgstr "Reštartovať celé zariadenie"
-
 msgid "All connections will be interrupted."
 msgstr "Všetky spojenia budú prerušené."
+
+msgid "Power off"
+msgstr "Vypnúť"
+
+msgid "Restart"
+msgstr "Reštartovať"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Nasledujúci štart prejde do Android a zariadenie sa teraz reštartuje. Táto stránka správy a zdieľanie mobilného pripojenia sa odpoja."
@@ -1495,6 +1498,21 @@ msgstr "Uzamknúť aktuálnu obsluhujúcu bunku"
 msgid "Unlock cell"
 msgstr "Odomknúť bunku"
 
+msgid "Enter a cell"
+msgstr "Zadať bunku"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Číslo kanála (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Uzamknúť túto bunku"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Číslo kanála, nie frekvencia v MHz; bunka nemusí byť v zozname susedných."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Použitie reštartuje rádiový stack (SFUN) a nakrátko preruší mobilnú službu. Nastavenia sa uložia a plugin ich znova použije, keď je AT pripravené, ak je povolené Použiť pri štarte. Háčik platformy spúšťaný pred rádiom ich môže použiť bez reštartu. Použite bez vybraných pásiem na obnovenie automatického režimu."
 
@@ -1581,6 +1599,9 @@ msgstr "Zamykanie %s na pozadí…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s uzamknuté na pozadí (reštart SFUN, asi 30 sekúnd); spätné čítanie stavu…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Zadajte číslo kanála a PCI v rozsahoch nižšie"
 
 msgid "No serving-network data"
 msgstr "Žiadne údaje o obsluhujúcej sieti"
@@ -2399,9 +2420,6 @@ msgstr "Zariadenie sa teraz reštartuje. Predvolené spúšťanie je Android, ta
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Zariadenie sa teraz reštartuje a asi minútu bude nedostupné. Ak sa nový systém nespustí, zariadenie sa po neúspešných pokusoch samo vráti do Androidu."
 
-msgid "Restart"
-msgstr "Reštartovať"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Reštartuje sa… otvorte túto stránku znova asi o minútu."
 
@@ -3055,9 +3073,6 @@ msgstr "Rozpoznať"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL môže obsahovať token: do zariadenia sa posiela samostatne, nikdy nie do príkazového riadka ani záznamu."
-
-msgid "Type"
-msgstr "Typ"
 
 msgid "Share link"
 msgstr "Zdieľaný odkaz"
