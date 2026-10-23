@@ -572,15 +572,20 @@ if [ "$MODE" = full ]; then
         i_fw=$(at 'AT+CGMR' 2 | grep -v '^OK' | head -n1)
         i_imei=$(ident_token "$(at 'AT+CGSN' 2)" '[0-9]{15,17}' | cut -c1-15)
         # Some U30 Air firmware answers AT+CGSN with fifteen zeros -- on both SIM slots, and through the vendor's
-        # own miscserver path -- while the NV holds the IMEI and the diag port reads it (FINDINGS 213). Only then
-        # is the diag read asked for; a modem that answers AT is untouched.
+        # own miscserver path -- while the NV holds both IMEIs and the diag port reads them (FINDINGS 213). The
+        # panel shows the module's two IMEIs, so read both; the active slot's one still has AT+CGSN as fallback.
+        i_imei1=; i_imei2=
+        if [ -x "$IMEI_DIAG" ]; then
+            i_imei1=$("$IMEI_DIAG" 0 2>/dev/null)
+            i_imei2=$("$IMEI_DIAG" 1 2>/dev/null)
+        fi
         case $i_imei in ''|000000000000000)
-            [ -x "$IMEI_DIAG" ] && i_imei=$("$IMEI_DIAG" "$SIM_SLOT" 2>/dev/null) ;;
+            if [ "$SIM_SLOT" = 0 ]; then i_imei=$i_imei1; else i_imei=$i_imei2; fi ;;
         esac
         i_imsi=$(ident_token "$(at 'AT+CIMI' 2)" '[0-9]{6,15}')
         i_iccid=$(iccid_value "$(ident_token "$(at 'AT+CCID' 2)" '[0-9A-Fa-f]{18,22}')")
-        IDENT_JSON=$(printf '{"ts":%d,"mfg":%s,"model":%s,"fw":%s,"imei":%s,"imsi":%s,"iccid":%s}' \
-            "$(now)" "$(qs "$i_mfg")" "$(qs "$i_model")" "$(qs "$i_fw")" "$(qs "$i_imei")" "$(qs "$i_imsi")" "$(qs "$i_iccid")")
+        IDENT_JSON=$(printf '{"ts":%d,"slot":%d,"mfg":%s,"model":%s,"fw":%s,"imei":%s,"imei1":%s,"imei2":%s,"imsi":%s,"iccid":%s}' \
+            "$(now)" "$SIM_SLOT" "$(qs "$i_mfg")" "$(qs "$i_model")" "$(qs "$i_fw")" "$(qs "$i_imei")" "$(qs "$i_imei1")" "$(qs "$i_imei2")" "$(qs "$i_imsi")" "$(qs "$i_iccid")")
         if [ -n "$i_imei" ] && [ -n "$i_imsi" ] && [ -n "$i_iccid" ]; then
             printf '%s\n' "$IDENT_JSON" > "$IDENT.part" 2>/dev/null && mv "$IDENT.part" "$IDENT"
             rm -f "$IDENT_PART"

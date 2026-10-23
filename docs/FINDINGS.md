@@ -12781,3 +12781,16 @@ and `mu300dash status` then carry the value. `tests/test_imei_diag.py`.
 
 **Device check before merge (U30 Air, OpenWrt):** the dashboard's IMEI row shows the active card's IMEI after a
 round (not `0000****000`), and follows the card when the slot is switched.
+
+### 214. The panel shows both IMEIs, marks the card in use and copies them on a click
+
+**Status: implemented in the panel; device check below.** Follows 213.
+
+`cell` reads the module's two IMEIs over diag on every identity round (`imei1`/`imei2`, plus `slot`), not only the
+active card's, so a unit with no card in the other slot still shows that slot's IMEI. The dashboard shows two rows
+(`IMEI1 (SIM1)` / `IMEI2 (SIM2)`); the active card's row carries a green tag with the existing `in use` message (no
+new catalog entries), and a click copies the full value -- the page may be masking it -- through the HTTP fallback
+(`execCommand`), as the panel is not a secure context.
+
+Verified on the U30 Air (OpenWrt): `sim-slot1.json` carries `"slot":1,"imei1":...,"imei2":...`; the active slot's
+row carries the tag and the other does not; a click copies the unmasked value.

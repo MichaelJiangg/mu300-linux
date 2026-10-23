@@ -100,6 +100,9 @@ esac""")
         for shell in self.each_shell():
             ident, cache = self.collect(shell, 'zero')
             self.assertEqual(ident['imei'], self.IMEI_DIAG)
+            # the panel shows both module IMEIs; the fixture answers the same one for both slots
+            self.assertEqual((ident['imei1'], ident['imei2']), (self.IMEI_DIAG, self.IMEI_DIAG))
+            self.assertEqual(ident['slot'], 0)
             # a zero IMEI is no complete identity: the real one goes to the 6 h cache
             self.assertEqual(json.loads((cache / 'sim.json').read_text())['imei'], self.IMEI_DIAG)
 
@@ -107,3 +110,4 @@ esac""")
         for shell in self.each_shell():
             ident, _ = self.collect(shell, 'at')
             self.assertEqual(ident['imei'], self.IMEI_AT)
+            self.assertEqual((ident['imei1'], ident['imei2']), (self.IMEI_DIAG, self.IMEI_DIAG))
