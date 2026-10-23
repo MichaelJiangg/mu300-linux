@@ -2040,7 +2040,9 @@ foreach ($os in $OSES) {
     $argv = @("$Top\tools\vendor-overlay.py", '--os', $os, '--firmware', "$Work\firmware",
         '--android-subset', "$Work\android-subset", '--out', "$Work\mu300-vendor-$os.tar.gz")
     if ($gpu -eq 'yes' -and (Test-Path "$Work\android-gpu-subset")) { $argv += @('--gpu-subset', "$Work\android-gpu-subset") }
-    if ($KMAIN) { $argv += @('--kernel-bundle', $KMAIN) }
+    # the tarball, not $KMAIN: modules whose names differ only in case (xt_HL.ko, xt_hl.ko) collapse into one file
+    # in a tree on NTFS (FINDINGS 212)
+    if ($KMAIN) { $argv += @('--kernel-bundle', "$ASSETS\mu300-kernel-$KERNEL.tar.gz") }
     Python @argv
     if ($LASTEXITCODE -ne 0) { Die (T '{1} failed' 'vendor-overlay.py') }
 }

@@ -12727,3 +12727,38 @@ page has no manual cell entry yet. New messages in all 31 catalogs.
 Power off powers off (U30 Air: off until the power key). Network locks: an LTE cell from the neighbor table entered
 by hand locks as the row's button would (the page's lock summary shows it), out-of-range values are refused on the
 page; then Unlock. The U30 Air's battery tile shows the bar.
+
+### 212. Kernel modules whose names differ only in case: one of each pair was lost on the build host
+
+**Status: fixed in the release scripts and the installers; v2026.10.23.1 is the first release whose mainline bundles
+are complete.** Found while building v2026.10.23.1.
+
+A mainline kernel builds four pairs of netfilter modules whose names differ only in case: `xt_HL.ko` (the TTL/hop
+limit target) and `xt_hl.ko` (its match), `xt_TCPMSS.ko` and `xt_tcpmss.ko`, `xt_DSCP.ko` and `xt_dscp.ko`,
+`xt_RATEEST.ko` and `xt_rateest.ko`. The release was built on a Mac, whose default APFS ignores case: the build's
+`upstream/out*/modules` (a docker bind mount) and the staging directories kept one file of each pair, under the name
+the first copy made and with the contents of the second (v2026.10.22.1's 6.18 bundle: `xt_hl.ko` holds `name=xt_HL`;
+its 7.3 bundle `xt_HL.ko` holds `name=xt_hl`). So every mainline bundle (6.18, 7.2, 7.3) of every release before
+v2026.10.23.1 lacks four of the eight modules, and one of the four it has is under the wrong name. The 5.4 bundle has
+no such pair. Nothing failed: `audit-bundle.py` asked `is_file()`, which a case-ignoring file system answers yes for
+the missing name. v2026.10.23.1 ships all eight in each mainline bundle (built on a case-sensitive volume).
+
+- `upstream/case-sensitive.sh` (`case_sensitive DIR`): makes two files that differ only in case in DIR itself and
+  refuses it, with the way to a case-sensitive volume (`hdiutil create -type SPARSE -fs 'Case-sensitive APFS'`), when
+  only one is there. `upstream/make-bundle.sh` asks it of the build's `modules` and its staging directory,
+  `upstream/build-modules.sh` of its output (in the container, on the bind mount), `tools/make-release.sh` of
+  `release/TAG` and of `TMPDIR`. The release scripts' `mktemp` now honour `TMPDIR`
+  (`mktemp -d "${TMPDIR:-/tmp}/mu300-...XXXXXX"`), so a case-sensitive `TMPDIR` is enough for the staging.
+- `upstream/audit-bundle.py` checks `modules.in-tree` against the names the directory lists; `make-release.sh`'s
+  audit wants every name of a mainline bundle's `modules.in-tree` in its `modules/`, and the TTL and MSS pairs in any
+  case.
+- The installers: `install.sh` and `install.ps1` unpack a mainline bundle on the host (`work/release/TAG/kernel-X`)
+  for its `Image`, ramdisk segment and lists, and `tools/vendor-overlay.py` took the modules for the installed system
+  from that tree, so an installation from macOS (default APFS) or Windows (NTFS) lost one of each pair even with a
+  complete bundle. `vendor-overlay.py --kernel-bundle` now reads the tarball itself (a tree still works), and both
+  installers pass it the tarball. The Magisk zips, the web installer and `mu300-update` unpack on the device
+  (`/data/adb`, ext4/f2fs; the root filesystem), which keeps case.
+
+A system installed with an earlier mainline bundle, or from macOS or Windows before this fix, gets the four modules
+with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23.1 on, which unpacks on the device).
+`tests/test_case_sensitive.py`.

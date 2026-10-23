@@ -44,7 +44,7 @@ case $code in
     1*) code=${code#1}; code=${code%00} ;;
     *) code=$(printf '%s' "$TAG" | tr -cd 0-9 | cut -c1-9); [ -n "$code" ] || code=1 ;;
 esac
-W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
+W=$(mktemp -d "${TMPDIR:-/tmp}/mu300-magisk.XXXXXX"); trap 'rm -rf "$W"' EXIT
 tar -xzOf "$R/mu300-kernel.tar.gz" ./busybox > "$W/busybox"
 [ -s "$W/busybox" ] || { echo "mu300-kernel.tar.gz has no busybox" >&2; exit 1; }
 # the installer's password checker (tools/pwcheck, FINDINGS 126), in the bundles of the releases that have it: without
