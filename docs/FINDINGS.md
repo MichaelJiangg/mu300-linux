@@ -12763,7 +12763,7 @@ A system installed with an earlier mainline bundle, or from macOS or Windows bef
 with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23.1 on, which unpacks on the device).
 `tests/test_case_sensitive.py`.
 
-### 207. Boot time on the U30 Air (OpenWrt, 6.18): mobile data at 14.5 s instead of 34 s
+### 214. Boot time on the U30 Air (OpenWrt, 6.18): mobile data at 14.5 s instead of 34 s
 
 Our U30 Air, OpenWrt 25.12.5 on 6.18.57, data on SIM2 over 5G SA, hotspot on 5 GHz channel 149. Seconds after the
 kernel started, from `/run/mu300/boot-timeline` (`dial-addr-ok`), dmesg and logread:
@@ -12782,7 +12782,7 @@ the firmware before it take about 7 s from power-on. That is the vendor's and wa
 What took the time, and what was done:
 * **Kernel, 1.85 s.** The PCIe root port of the Marlin3 waited for a link twice at probe (the 6.18 DWC core's
   `dw_pcie_wait_for_link`, then pcie-sprd's own check), 10 x 90 ms each, with the init thread waiting; the chip is off
-  until wcn_bsp powers it and brings the link up through `sprd_pcie_configure_device()`. `patches/6.18/0024` lets a host
+  until wcn_bsp powers it and brings the link up through `sprd_pcie_configure_device()`. `patches/6.18/0028` lets a host
   driver skip the core's wait (`skip_link_wait`, with `DW_PCIE_HAS_SKIP_LINK_WAIT` so the shared driver still builds on
   7.x without it); pcie-sprd sets it and takes a 50 ms look instead of its own 0.9 s wait.
 * **The UART, ~2.9 s.** `boot/init` set the console level to 7, so every KERN_INFO line went to the 115200 baud UART
