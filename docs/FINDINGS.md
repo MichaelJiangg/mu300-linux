@@ -12778,7 +12778,8 @@ docking the U30 Air to a router over USB and turning its own hotspot off to cut 
 
 `hotspot_set` now writes the same uci flag the page does (0 on, 1 off) before `wifi up`/`wifi down`, and a Wi-Fi
 hold decides its direction (and writes the user's `hotspot-off` marker) before the wake starts, so one hold wakes
-and toggles. A short press still toggles the band, and on a sleeping device still only wakes.
+and toggles. A short press still toggles the band, and on a sleeping device still only wakes; the charging boot is
+unchanged (no services to toggle, so a hold there still only wakes).
 
 **Device check (U30 Air, OpenWrt):** with the hotspot off from the page, one 3 s hold brings the SSID back; with
 the device idle (LEDs dark), one 3 s hold wakes it and toggles once, not twice; a short press still switches

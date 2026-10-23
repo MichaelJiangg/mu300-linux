@@ -97,10 +97,11 @@ mu300-keys -l 3000 -t 5 | { while read -r code kind; do
     was_idle=0; s=$(cat "$PST/state" 2>/dev/null); [ -z "$s" ] || [ "$s" = active ] || was_idle=1
     [ ! -e "$LEDIDLE" ] || was_idle=1   # dark on purpose (idle, or someone's mu300-led idle on): this press only wakes
     key=power; [ "$code" = "$KEY_WIFI" ] && key=wifi
-    # a Wi-Fi hold decides which way and writes the user's marker even on a sleeping device: one press wakes and
-    # toggles; the direction and the marker are set before the wake starts, so the wake cannot undo them
+    # a Wi-Fi hold decides which way and writes the user's marker even on a sleeping device (idle, or the LEDs held
+    # dark): one press wakes and toggles, and the direction and the marker are set before the wake starts, so the
+    # wake cannot undo them. The charging boot has no services to toggle, so a hold there still only wakes.
     dir=
-    if [ "$code $kind" = "$KEY_WIFI long" ]; then
+    if [ "$code $kind" = "$KEY_WIFI long" ] && [ "$s" != charging-boot ]; then
         mkdir -p "$PST" 2>/dev/null
         if hotspot_is_up; then dir=off; cut -d. -f1 "${MU300_SYSROOT:-}/proc/uptime" > "$PST/hotspot-off" 2>/dev/null
         else dir=on; rm -f "$PST/hotspot-off"; fi
