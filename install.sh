@@ -1078,10 +1078,12 @@ if [ "$KERNEL" != 5.4 ]; then
 fi
 step vendor 60
 say "$(t 'Adding the vendor files from your device to the images')"
+# a mainline kernel's modules come from its tarball, not from $KMAIN: names that differ only in case (xt_HL.ko and
+# xt_hl.ko) collapse into one file in a tree on macOS's default file system (FINDINGS 212)
 for os in $OSES; do
     python3 "$TOP/tools/vendor-overlay.py" --os $os --firmware "$WORK/firmware" --android-subset "$WORK/android-subset" \
       $([ -d "$WORK/android-gpu-subset" ] && [ "$gpu" = yes ] && echo --gpu-subset "$WORK/android-gpu-subset") \
-      $([ -n "$KMAIN" ] && echo --kernel-bundle "$KMAIN") \
+      $([ -n "$KMAIN" ] && echo --kernel-bundle "$ASSETS/mu300-kernel-$KERNEL.tar.gz") \
       --out "$WORK/mu300-vendor-$os.tar.gz"
 done
 PWHASH=; [ -z "$pw1" ] || PWHASH=$(printf '%s\n' "$pw1" | python3 "$TOP/tools/sha512crypt.py")
