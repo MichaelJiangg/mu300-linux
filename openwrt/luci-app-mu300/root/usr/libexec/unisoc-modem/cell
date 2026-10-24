@@ -150,9 +150,10 @@ iccid_value() {
 }
 # ident_complete FILE: the identity cache holds IMEI, IMSI and ICCID
 ident_complete() {
-    # a leading 0 is not an IMEI: fifteen zeros (a modem that answers AT+CGSN with nothing) is no identity, and
-    # keeping it in the 6 h cache would hide the diag read below for hours (FINDINGS 213)
-    grep -q '"imei":"[1-9]' "$1" && grep -q '"imsi":"[0-9]' "$1" && grep -q '"iccid":"[0-9A-F]' "$1"
+    # fifteen zeros (a modem that answers AT+CGSN with nothing) is no identity, and keeping it in the 6 h cache would
+    # hide the diag read below for hours (FINDINGS 216). A real IMEI may start with 0 (reporting bodies 00-01).
+    grep -q '"imei":"[0-9]' "$1" && ! grep -q '"imei":"000000000000000"' "$1" &&
+        grep -q '"imsi":"[0-9]' "$1" && grep -q '"iccid":"[0-9A-F]' "$1"
 }
 file_age() { echo $(( $(now) - $(date -r "$1" +%s 2>/dev/null || echo 0) )); }
 
