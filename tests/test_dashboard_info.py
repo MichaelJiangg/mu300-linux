@@ -715,4 +715,3 @@ esac""")
                 (info.tmp / 'wan.json').write_text(WAN)
         finally:
             info.tearDown()
-
