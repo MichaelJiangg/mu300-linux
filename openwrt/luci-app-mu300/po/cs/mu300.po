@@ -3403,6 +3403,15 @@ msgstr "Neznámý druh zámku"
 msgid "Invalid value for this lock kind"
 msgstr "Neplatná hodnota pro tento druh zámku"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Tento modem nepodporuje žádné z těchto pásem"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Zámky pásem, režimu a buňky zatím nejsou pro SIM2 podporovány"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Zámky pásem, režimu a buňky nejsou podporovány, dokud rádio řídí přepínání dvou SIM"
+
 msgid "Invalid page"
 msgstr "Neplatná stránka"
 
@@ -3944,6 +3953,9 @@ msgstr "Jazykový balíček se nepodařilo odebrat"
 msgid "Lock cache unavailable"
 msgstr "Mezipaměť zámků není dostupná"
 
+msgid "The modem refused a write"
+msgstr "Modem odmítl zápis"
+
 msgid "The saved locks could not be cleared"
 msgstr "Uložené zámky se nepodařilo vymazat"
 
@@ -3952,9 +3964,6 @@ msgstr "Žádná obsluhující buňka k uzamčení"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem neodpověděl na dotaz na režim; nic nebylo odesláno"
-
-msgid "The modem refused a write"
-msgstr "Modem odmítl zápis"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Zpětné čtení neodpovídá automatickým hodnotám"

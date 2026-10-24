@@ -3396,6 +3396,15 @@ msgstr "未知的鎖定類型"
 msgid "Invalid value for this lock kind"
 msgstr "此鎖定類型的值無效"
 
+msgid "None of these bands is supported by this modem"
+msgstr "此數據機不支援其中任何頻段"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "SIM2 暫不支援頻段、模式和基地台鎖定"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "雙卡切換管理射頻時，不支援頻段、模式和基地台鎖定"
+
 msgid "Invalid page"
 msgstr "頁碼無效"
 
@@ -3937,6 +3946,9 @@ msgstr "無法移除語言套件"
 msgid "Lock cache unavailable"
 msgstr "鎖定快取無法使用"
 
+msgid "The modem refused a write"
+msgstr "模組拒絕了一次寫入"
+
 msgid "The saved locks could not be cleared"
 msgstr "無法清除已儲存的鎖定"
 
@@ -3945,9 +3957,6 @@ msgstr "沒有可鎖定的服務基地台"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "模組未回應模式查詢；未傳送任何設定"
-
-msgid "The modem refused a write"
-msgstr "模組拒絕了一次寫入"
 
 msgid "The read-back does not match the automatic values"
 msgstr "回讀結果與自動值不一致"
