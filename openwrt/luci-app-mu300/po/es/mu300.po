@@ -3403,6 +3403,9 @@ msgstr "Tipo de bloqueo desconocido"
 msgid "Invalid value for this lock kind"
 msgstr "Valor no válido para este tipo de bloqueo"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Este módem no admite ninguna de estas bandas"
+
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Los bloqueos de banda, modo y celda aún no son compatibles con la SIM2"
 

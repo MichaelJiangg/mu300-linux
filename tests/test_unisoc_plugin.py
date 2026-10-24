@@ -373,6 +373,28 @@ printf 'OK\n'
             self.assertEqual((state / 'nr').read_text(), '78')
             self.assertIn('the modem refused AT+SPLBAND=2,0,0,16,0: ERROR', (run / 'lock.log').read_text())
 
+    def test_bands_the_modem_does_not_support_are_refused_not_written_as_automatic(self):
+        """None of the bands supported: the filter left nothing, which was written as automatic (AT+SPLBAND=2,0,0,0,0)
+        and saved. Now refused with nothing sent; a partly supported list locks the supported ones and logs the rest."""
+        lock, state, run, at = self.reset_setup()
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '999')
+            self.assertEqual(r.returncode, 1, r.stderr)
+            self.assertEqual(json.loads(r.stdout), {'ok': 0, 'error': 'None of these bands is supported by this modem',
+                                                    'detail': '999'})
+            self.assertEqual(self.writes(sent), [])
+            self.assertEqual([c for c in sent if c.startswith('AT+SFUN')], [])
+            self.assertEqual((state / 'nr').read_text(), '78')
+            self.assertIn('apply nr refused: the modem supports none of the bands 999', (run / 'lock.log').read_text())
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'lte', '7')
+            self.assertEqual(r.returncode, 1, r.stderr)
+            self.assertEqual(self.writes(sent), [])
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '41,999')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('AT+SPLBAND=2,0,0,16,0', sent)
+            self.assertEqual((state / 'nr').read_text(), '41')
+            self.assertIn('left out of 41,999 (locking 41)', (run / 'lock.log').read_text())
+
     def test_an_accepted_band_write_is_saved_and_restarts_the_stack(self):
         lock, state, run, at = self.reset_setup()
         for shell in self.each_shell():

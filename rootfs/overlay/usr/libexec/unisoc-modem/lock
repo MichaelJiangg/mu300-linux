@@ -393,6 +393,19 @@ band_write() {
     esac
 }
 
+# bands_kept KIND REQUESTED KEPT: a band lock whose bands the modem supports none of is refused (the filter left
+# nothing, which used to be written as "automatic": a lock on n999 cleared the NR lock and was reported done); bands
+# left out of a partly supported list are logged
+bands_kept() {
+    [ -n "$2" ] || return 0
+    if [ -z "$3" ]; then
+        say "apply $1 refused: the modem supports none of the bands $2"
+        printf '{"ok":0,"error":"None of these bands is supported by this modem","detail":"%s"}\n' "$2"
+        exit 1
+    fi
+    [ "$2" = "$3" ] || say "apply $1: bands the modem does not support left out of $2 (locking $3)"
+}
+
 do_apply() {  # do_apply KIND VALUE
     _t0=$(date +%s)
     valid_value "$1" "$2" || { echo "invalid lock setting" >&2; exit 2; }
@@ -453,6 +466,7 @@ do_apply() {  # do_apply KIND VALUE
             ;;
         lte)
             val=$(filter_bands "$val" "$LTE_SUP")
+            bands_kept lte "$2" "$val"
             if [ -n "$val" ]; then
                 band_write "AT+SPLBAND=1,$(lte_masks "$val")"
             else
@@ -462,6 +476,7 @@ do_apply() {  # do_apply KIND VALUE
             ;;
         nr)
             val=$(filter_bands "$val" "$(nr_sup)")
+            bands_kept nr "$2" "$val"
             if [ -n "$val" ]; then
                 band_write "AT+SPLBAND=2,$(nr_masks "$val" | awk -F, '{print $1",0,"$2","$3}')"
             else

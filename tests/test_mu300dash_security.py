@@ -154,7 +154,7 @@ class Mu300Dash(ShellTest):
         calls = run / 'calls'
         calls.mkdir(parents=True)
         (run / 'dash').mkdir()
-        for cache in ('cell.json', 'sig.json'):   # the collector's caches, as the stubs' output
+        for cache in ('cell.json', 'sig.json', 'lock.json'):   # the collectors' caches, as the stubs' output
             if (self.out / cache).exists():
                 (run / 'dash' / cache).write_bytes((self.out / cache).read_bytes())
         stdin = raw if raw is not None else json.dumps(params or {}, ensure_ascii=False)
@@ -607,6 +607,29 @@ class LockSetSim(Mu300Dash):
             r, calls, _ = self.call(shell, 'lock_set', {'kind': 'nr', 'val': '41'})
             self.assertEqual(self.reply(r).get('ok'), 1)
             self.assertEqual(calls, [['setsid', 'lock', 'apply', 'nr', '41']])
+
+    def test_bands_the_modem_does_not_support(self):
+        """A band list the modem supports none of was written as "automatic" (a lock on n999 cleared the NR lock and
+        the page said done): refused in the request when the last reading has the modem's bands."""
+        self.output('lock.json', '{"ts":1,"caps":{"nr":"1,28,41,78","lte":"1,3,5,8,34,38,39,40,41"}}\n')
+        for shell in self.each_shell():
+            for kind, val in (('nr', '999'), ('nr', '79,257'), ('lte', '7')):
+                with self.subTest(kind=kind, val=val, shell=shell):
+                    r, calls, _ = self.call(shell, 'lock_set', {'kind': kind, 'val': val})
+                    obj = self.reply(r)
+                    self.assertEqual(obj.get('ok'), 0, obj)
+                    self.assertEqual(obj.get('error'), 'None of these bands is supported by this modem')
+                    self.assertEqual(calls, [])
+            # one supported band is enough (the helper leaves the others out and logs them); empty is automatic
+            for kind, val in (('nr', '41,999'), ('nr', ''), ('lte', '3')):
+                r, calls, _ = self.call(shell, 'lock_set', {'kind': kind, 'val': val})
+                self.assertEqual(self.reply(r).get('ok'), 1)
+                self.assertEqual(calls, [['setsid', 'lock', 'apply', kind, val]])
+        # no reading yet: not refused here
+        (self.out / 'lock.json').unlink()
+        for shell in self.each_shell():
+            r, calls, _ = self.call(shell, 'lock_set', {'kind': 'nr', 'val': '999'})
+            self.assertEqual(self.reply(r).get('ok'), 1)
 
 
 class Passthrough(Mu300Dash):

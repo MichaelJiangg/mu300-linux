@@ -3382,6 +3382,9 @@ msgstr "未知的锁定类型"
 msgid "Invalid value for this lock kind"
 msgstr "此锁定类型的值无效"
 
+msgid "None of these bands is supported by this modem"
+msgstr "此调制解调器不支持其中任何频段"
+
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "SIM2 暂不支持频段、模式和小区锁定"
 

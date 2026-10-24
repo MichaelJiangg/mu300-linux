@@ -3403,6 +3403,9 @@ msgstr "不明なロック種別"
 msgid "Invalid value for this lock kind"
 msgstr "このロック種別に対して無効な値です"
 
+msgid "None of these bands is supported by this modem"
+msgstr "このモデムはこれらのバンドのいずれにも対応していません"
+
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "バンド・モード・セルのロックは SIM2 ではまだサポートされていません"
 
