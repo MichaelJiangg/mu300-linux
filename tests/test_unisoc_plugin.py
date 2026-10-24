@@ -297,7 +297,8 @@ case "$cmd" in
   'AT+SP5GRAN?') if [ -f "$M/gran" ]; then printf '+SP5GRAN: 1\n'; else printf '+SP5GRAN: 0\n'; fi ;;
   'AT+SPENDC?') if [ -f "$M/endc" ]; then printf '+ENDC: 1\n'; else printf '+ENDC: 2\n'; fi ;;
   'AT+SPLBAND=0')
-      if [ -f "$M/lte" ] && ! { [ -f "$M/revert-after-sfun" ] && [ -f "$M/sfun" ]; }; then printf '+SPLBAND: 0,482,0,149,0\n'
+      if [ -f "$M/lte" ] && [ -f "$M/u30air" ]; then printf '+SPLBAND: 0,2018,2057,2271,2\n'
+      elif [ -f "$M/lte" ] && ! { [ -f "$M/revert-after-sfun" ] && [ -f "$M/sfun" ]; }; then printf '+SPLBAND: 0,482,0,149,0\n'
       else printf '+SPLBAND: 0,0,0,4,0\n'; fi ;;
   'AT+SPLBAND=3') if [ -f "$M/nr" ]; then printf '+SPLBAND: 553,0,272\n'; else printf '+SPLBAND: 0,0,256\n'; fi ;;
   'AT+SPFORCEFRQ=12,3') if [ -f "$M/cell12" ]; then printf '+SPFORCEFRQ: 12,3\n'; else printf '+SPFORCEFRQ: 12,3,1650,211\n'; fi ;;
@@ -464,6 +465,17 @@ printf 'OK\n'
             self.assertEqual(json.loads(r.stdout)['state'], 'ok')
             got = self.script(shell, lock, 'get', 'cached', MU300_DASH_DIR=run)
             self.assertEqual(json.loads(got.stdout)['reset']['state'], 'ok')
+
+    def test_reset_on_the_u30_air_takes_its_modems_full_lte_table_as_automatic(self):
+        """The U30 Air's modem reads a cleared LTE mask back as its own table (0,2018,2057,2271,2: bands 1,2,3,4,5,
+        7,8,12,17,20,28,34,38-43,66), more than the F50's table here: an exact match failed every reset there
+        ("lte read back as '0,2018,2057,2271,2'", seen on the U30 Air on 6.18.58)."""
+        lock, state, run, at = self.reset_setup(': > "$STUBLOG/modem/u30air"')
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout + (run / 'lock.log').read_text())
+            self.assertEqual(self.reset_result(run)['state'], 'ok')
+            self.assertEqual(sorted(p.name for p in state.iterdir()), ['auto_apply'])
 
     def test_a_refused_write_keeps_the_saved_locks_and_restarts_nothing(self):
         lock, state, run, at = self.reset_setup('printf "AT+SPLBAND=2," > "$STUBLOG/modem/refuse"')
