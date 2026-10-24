@@ -190,6 +190,8 @@ what replaced it. The table below gives each section's state.
 | 202 | A SIM's radio switched off in its settings: `AT+SFUN=5` (the vendor RIL's stack off, CFUN reads 0 or 2) instead of `AT+CFUN=4`, back on through the ordinary `AT+SFUN=4`; an earlier release's flight mode still recognised (kanoqwq cf4dcd61) | unit tests; kanoqwq's V50 device test; not yet on our boards |
 | 203 | OpenWrt hotspot: U-APSD off on every access point, new and kept configurations (kanoqwq 2d3f7438); his U30 Air's beacon still announced it, so a configuration policy only | unit tests; not yet on our boards |
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
+| 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
+| 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's; released in v2026.10.22.1, F50-B 10/10 boots on 7.3 in a reboot soak) |
 
 ## Hardware and firmware facts
 
@@ -5955,7 +5957,7 @@ tool edits it. `tests/test_resize_last_partition.py` checks that the edit change
 CRCs and no other byte, and what is refused; `tests/installer.Tests.ps1` runs `OfferRepartition` under Windows
 PowerShell 5.1 and PowerShell 7 against three stubs for the device and checks every answer that must change
 nothing, the order of the writes, and the refusals. **Not run: `install.ps1` on a Windows machine against a
-device, and either installer on a unit with this table.** The shrink itself has been done on one 32 GB unit (#9b,
+device, and either installer on a unit with this table.** (2026-10-22, #357: liuwang97 ran prepare, reset and resume with `install.ps1` on a 32 GB U30 Air under Windows 11; the resume stopped at once because it called `ResumeFacts` and the GPT helpers above their definitions, fixed by moving them and guarded by `test_static.Ps1FunctionOrder`. Their report, not repeated here.) The shrink itself has been done on one 32 GB unit (#9b,
 issue #2); whether Android formats a 64 GB `userdata` that was shrunk this way after a vendor flash is not known.
 `uninstall.ps1` does not offer to grow `userdata` back; `uninstall.sh` does.
 
@@ -12423,3 +12425,356 @@ once there).
 Tests: `tests/test_v50_sim.py` (the board table, the mapping, status, `card`, `default`, `v50-boot` and its once-a-boot
 rule, the live switch's order and its switch back, the identity cache, other boards, the driver drives nothing at probe), `tests/test_sim_selection.py`,
 `tests/test_api.py`, `tests/test_backup.py`, the catalogs.
+
+### 205. The U30 Air's USB 3 link in device mode follows the plug orientation (#54)
+
+**Status: measured on a U30 Air running 7.2.11; nothing is changed here. #341, the fix under test, made the flipped
+orientation worse on this unit (below).**
+
+**What was asked.** #54 reports OpenWrt limited to USB 2.0 (480 Mbps) on the MU300 while Android gives USB 3 host
+speeds. From the host side (koocyton's four-orientation table) SuperSpeed worked in one plug orientation only. #341
+says why: the PHY's TCA and the PTN38003A redriver are written once at power-on and never again, so the orientation
+that SuperSpeed uses is whatever was latched at boot. This entry adds the **device** side: a U30 Air plugged into a
+computer.
+
+**Setup.** U30 Air (UMS9620), OpenWrt 25.12.5 / mainline 7.2.11, USB-C to an Apple Silicon Mac. That Mac's port
+controller exposes both lanes (`usb-drd0-port-hs` and `usb-drd0-port-ss`), so the attachment point itself says which
+speed the link trained at. Cable and host are not variables: the same cable on a Cudy TR3600's USB-A port with a
+Fanxiang S500Pro SSD enumerates `usb 2-1: new SuperSpeed ... 5000` (`uas`), and the U30 Air's UDC reports
+`maximum_speed = super-speed-plus` throughout.
+
+**Measured** — `cat /sys/class/udc/25100000.dwc3/current_speed`, and macOS `Device Speed` on the same link:
+
+| # | state | `current_speed` | macOS |
+|---|---|---|---|
+| 1 | OpenWrt default, via the Cudy router's USB-A | `high-speed` | — (`usb 1-1: new high-speed`) |
+| 2 | OpenWrt default, Mac through an LG display hub | `high-speed` | 2, under `AppleUSB20HubPort` |
+| 3 | OpenWrt default, Mac's own USB-C port | `high-speed` | 2, under `usb-drd0-port-hs`; `port-ss` empty |
+| 4 | Android 13 (vendor, 5.4.254) | `super-speed-plus` | 4 |
+| 5 | Android → Linux, warm switch, PD **off** | `super-speed-plus` | 4 |
+| 6 | OpenWrt + `mu300-usb pd on`, orientation A | `super-speed-plus` | 4 |
+| 7 | PD **off**, orientation A | `super-speed-plus` | 4 |
+| 8 | plug flipped 180°, orientation B | `high-speed` | 2 |
+| 9 | orientation B + `mu300-usb pd on` | `high-speed` | 2 |
+| 10 | flipped back to A | `high-speed` | 2, no recovery |
+
+**What it shows.**
+
+- Device mode behaves like the host side: SuperSpeed is available only in the orientation the PHY/redriver latched at
+  power-on. A replug does not bring it back; only a power cycle does, which is the redriver's once-per-power-on auto
+  detection (#341).
+- `mu300-usb pd on` (0020) is **not** a workaround for the flipped orientation: `/sys/class/typec/port0` appears and
+  `mu300-usb` reports `role: device`, `data role: device`, `power role: sink`, but `current_speed` stays `high-speed`.
+  The TCPM driver manages CC and the roles; it does not move the SS lanes.
+- Rows 4–5 are why a flipped unit can look fixed: Android has the Type-C driver, configures the port, and a warm
+  switch into Linux leaves that state in place. The link then comes up `super-speed-plus` without any PD.
+
+**`dmesg` at the failing attach** (no driver for the Type-C block, so no `redriver` lines — as expected without #341):
+
+```
+sprd-ssphy 25310000.ssphy: VBUS from /extcon-gpio (no driver for the Type-C block)
+sprd-ssphy 25310000.ssphy: vbus off
+sprd-ssphy 25310000.ssphy: ssphy set vbus invalid!
+sprd-ssphy 25310000.ssphy: vbus on
+sprd-ssphy 25310000.ssphy: ssphy set vbus valid!
+```
+
+**#341 on the same unit** (2026-10-22, 7.2.11 built from `usb-typec-orientation-54`, `orientation` = `auto`, device
+mode to the same Mac): orientation A `super-speed-plus` (10 Gb/s), orientation B **not enumerated at all**, back to A
+`super-speed-plus`. Before #341, B fell back to `high-speed` and worked. The attach in B logged
+
+```
+USB 3 lanes flipped (from USB_SW; USB_SW 1, Type-C CC1, TCA flip status 1)
+redriver: -5
+```
+
+and `i2cget -y N 0x30 0x04` fails with EIO on buses 6, 4, 2 and 1, while bus 6 itself works (the charger at 0x6b is
+held by its driver). The device tree has the `sprd,ptn38003a redriver` node at 6-0030 (no supply, no enable GPIO).
+Two readings, not yet told apart: the redriver is not fitted (or not powered) on this unit, so only the TCA routes the
+SuperSpeed pairs; or `auto`'s source, the AON `USB_SW` bit, is wrong for this attach (here it disagrees with the
+PMIC's CC1). The next measurement: the same flip with `orientation` = `cc`, then `off`. #355 is a draft guard (no TCA
+flip when the redriver did not answer), which would bring back the USB 2 fallback but not SuperSpeed in B.
+
+**For reference**, the link is not the transfer bottleneck at current cellular speeds: 325.9 Mbps down (NJU mirror)
+over the SS link, and 244 Mbps over the 480 Mbps fallback on the same mirror.
+
+### 206. Linux 7.3 as a fourth kernel: what 7.3 changed, and the boards on it
+Mainline Linux 7.3 came out on 2026-10-18. It is a fourth kernel choice from the release after v2026.10.19.2 on:
+`sudo mu300-update kernel 7.3`, choice 4 in the installers, `mu300-kernel-7.3.tar.gz`, Magisk zips `-k7.3` (15 zips
+instead of 11), and the audio extra's `mu300-audio-7.3.tar.gz` (mu300-audio PR #4). 5.4, 6.18.57 and 7.2.11 stay as
+they are.
+
+**The patches.** Every patch of `upstream/patches` applies to 7.3 unchanged, in order (a dry run of each alone fails
+for the ones that build on another: 0011 on 0010, 0012/0015/0016/0019 on 0009, 0018 on 0011). None is upstream in
+7.3, so none was dropped or changed; three apply with fuzz, as they do on 7.2 (0003: 7.x dropped the
+`cma_skip_dt_default_reserved_mem()` line next to it; 0005: `dev_err_probe()` in the error path; 0019: the
+`gpio/consumer.h` include is gone from `bq256xx_charger.c`), each checked to land where it does on 7.2.11.
+`patches/6.18/0007` stays 6.18's. `port/install.py` installs unchanged.
+
+**What 7.3 changed under the port.**
+
+| what | 7.3 | here |
+|---|---|---|
+| `CONFIG_PROC_SYSCTL` | gone: `/proc/sys` is `SYSCTL` itself (`fs/proc/Makefile`: `proc-$(CONFIG_SYSCTL) += proc_sysctl.o`) | `config-ignored.txt` lists it; `build.sh` and `audit-bundle.py` let a listed option be unset only where the kernel has no such symbol at all (not even "is not set"); the fragment also asks `CONFIG_SYSCTL=y`, so `/proc/sys` is checked on every kernel |
+| cfg80211 `remain_on_channel`, `mgmt_tx` | the cookie is chosen by nl80211 (`cfg80211_assign_cookie`) and handed to the driver by value | `sprd_wlan_combo`: the old ops keep choosing it, the 7.3 ones take nl80211's (`MU300_COOKIE`, the by-value ops in `common/cfg80211.h`) |
+| `dma_capable()` | a fifth argument, the DMA attributes | `sc2355/tx.h` passes 0 (a plain mapping) on 7.3; `tx.c` is unchanged |
+| the IIO consumer API | in the symbol namespace `IIO_CONSUMER` | the audio extra's headset driver imports it (mu300-audio) |
+| kernel.org's CDN | its `sha256sums.asc` still had 7.2.11's day hours after 7.3 was out: no line for `linux-7.3.tar.xz` | `build.sh` takes the signed list from www.kernel.org (the tarball and its signature from the CDN; the list is signed, so where it comes from changes nothing that is checked) |
+| the release's version picker | a mainline release is `7.3` (kernel release `7.3.0`) until 7.3.1 | `release.yml` takes `X.Y` or `X.Y.Z` of each series (6.18, 7.2, 7.3); `mainline.yml` builds the longterm, the stable, the mainline (never a release candidate) and the newest of each shipped series |
+
+The 7.3 code of `sprd_wlan_combo` sits in its headers (`cfg80211.h`, `tx.h`) and in macros of the same width
+as the text they replace, so the module built for 6.18.57 and 7.2.11 from this source is byte for byte the one
+v2026.10.19.3 shipped (rebuilt against that release's trees, stripped as `build-modules.sh` does: same sha256;
+a first form with the 7.3 code in `cfg80211.c` changed the 7.2.11 module's build ID through its debug information's
+columns). 6.18 and 7.2 therefore did not change with 7.3.
+
+The kernel and all its out-of-tree modules build with no new warning (690 in the module build against 691 for
+7.2.11); `all-modules.py` turns 2457 options into modules (7.2.11: 2442). The bundle: 3054 modules (no audio
+drivers, 194), 135 MiB unpacked, 56.3 MB; the Image as LK loads it 25 860 104 bytes. `make-release.sh`'s audit
+(the sample modules, no driver of the audio stack, the features) passes on it.
+
+**The audio extra on 7.3.** mu300-audio builds the 20 mainline drivers against a 7.3 kit made from the build tree
+(`make-kit-mainline.sh 7.3 7.3 TAG`; `sipc-core.ko` rebuilt from the kit is byte for byte the bundle's). The first
+kit, the prerelease `kits-k7.3-preview`, came from a tree without the V50 SIM driver (FINDINGS 204), so its
+configuration is not the release's; the kit of the first release that ships 7.3 is made from that release's own
+tree, published in its `kits-TAG` prerelease and pinned in `kits.lock` in the preview's place.
+
+**On the boards, 2026-10-19** (v2026.10.19.2 with this branch's `mu300-update`, the 7.3 bundle installed with
+`MU300_KERNEL_BUNDLE`; the previous image kept each time was the release's own):
+
+* **F50-B** (Ubuntu 24.04, no internet, the files served from a computer), against the same checks on 7.2.11 just
+  before: 7.3.0 boots, KVM in VHE mode (571/710 trap handlers), no oops or warning; mobile data context up with an
+  address on `sipa_eth0` (the board has no internet: AT `+CPIN: READY`, `+CSQ: 37,19`, `+COPS: 0,2,"28602",13`,
+  `+CGACT:1,1`); the 5 GHz access point on channel 36/80 MHz; Bluetooth up; the USB gadget `configured`; Cockpit
+  answers (200); the LEDs as on 7.2.11; the on-demand guard refuses the same families and lets root load them, the
+  module sample loads 93 of 99 (the same 6 not built as on 7.2.11), no oops; Docker 29.1.3 runs a container
+  (overlay2, cgroup v2, an address on `docker0`; the container cannot reach the host, which `mu300_filter` drops on
+  purpose). Boot 41.3 s (7.2.11: 52.8 s).
+  - **Call audio.** `mu300-update kernel 7.3` could not fetch the 7.3 extra offline and said so; `mu300-extra
+    install audio --from DIR` with mu300-audio's 7.3 tarball then installed it, the configuration's hash matched the
+    kit's (`2fb71151...`), and after `systemctl restart mu300-audio` - and after a reboot, by itself - `mu300-audio-dsp
+    status`: drivers 19/19 from `extra/audio/modules/7.3.0`, `dsp: running - it answered a command on the first
+    try`. The "dsp: no reply" seen on the first 7.3 boot (with the drivers in the bundle, before 194) was read a
+    minute after boot, before the service's start had finished; with the extra and the wait it answers. The extra's
+    link hook did not start the card when it found its links unchanged (a set for another kernel has the same
+    links); mu300-audio PR #4 starts a card that is down.
+  - **The boot fallback.** With `mu300-next-boot attempts 1` and `mu300-boot-ok` disabled for the test, the next boot
+    of 7.3 came up with slot b at `tries 1` (`1f`), and the one after it went to Android by itself; `su -c
+    mu300-linux` there armed Linux again and 7.3 booted. `mu300-boot-ok` and 5 attempts back: slot b `6f`, as before.
+  - **A hang that was not 7.3.** In a reboot loop afterwards the first reboot did not come back: no USB network,
+    no adb; the board enumerated as `iWHALE2` (Spreadtrum 0x1782:0x4d00), LK's dump mode, for about two and a half
+    hours, then booted 7.3 again by itself with one slot try used (`5f`); `rollback-boot` then put it back on 7.2.11.
+    The owner found the cause: he had pulled F50-B's plug by accident during that reboot. It is not counted against
+    7.3.
+* **U30 Air** (openwrt-luci, the VPN module with its kill switch): 7.3.0 boots with no oops; the SIM ready, data up;
+  the access point on channel 36/80 MHz with its client back; the USB gadget `configured`; the VPN's tunnel (`sbtun`)
+  up behind the kill switch (`mu300_vpn` tables), HTTPS answers through it and the exit is not the carrier's address
+  (the VPN's configuration was not read). The charger came up as on 6.18.57 (`charging on`, 2000 mA input) and the
+  fuel gauge read the same; the battery took no current at 88 % on either kernel. Then `rollback-boot` to 6.18.57:
+  the same checks pass there.
+
+**The release, v2026.10.22.1 (2026-10-23).** 5.4.254, 6.18.57 and 7.2.11 are v2026.10.19.3's builds: every file of
+their bundles is the same (the outputs reused, the Wi-Fi module shown identical above); 7.3.0 was built fresh, and its
+kit for the audio extra came from that build tree (`kits-v2026.10.22.1`, CONFIG `202bdee65f2a...`, the Image's own;
+mu300-audio v1.0.3). On F50-B (Ubuntu 24.04, offline), updated from v2026.10.19.2 with the release's `mu300-update`,
+then `mu300-update kernel 7.3`: 7.3.0 boots, the audio extra's 7.3 set loads (19/19) and the DSP answers, mobile data,
+the access point and Cockpit are up; a reboot soak of 10 boots on 7.3 came back 10 times (about 42 s each), every boot
+with the same checks passing, no oops, no failed unit. F50-B stays on 7.3. (During the update's download, still on
+v2026.10.19.2's 7.2.11, F50-B reset once by itself, with nothing in the journal or pstore; the second try went through.)
+
+Not tried on 7.3 yet: the CPU voltage offset, the U30 Air's USB host mode, dae (7.3 has BTF and the BPF JIT, as the
+fragment asks), a reading of the F50's SD card, a call.
+
+### 207. The U30 Air's charger: the battery's CV and the stock safety-timer policy (and 3 A, off unless asked for)
+
+**Status: patch 0024 checked by kanoqwq on a U30 Air (7.2.8); here 0024-0026 apply to 6.18.57, 7.2.11 and 7.3, the
+Image builds on 6.18.57 and 7.2.11 and both files compile on 7.3, with no warning; not run on a device here. Patch 0025
+is off by default.**
+
+kanoqwq's `c031a58a` (his `docs/U30AIR-CHARGING-EARLY-FULL-20261022.zh-CN.md`): users saw "Full" at about 84 % with a
+90 % limit, and a stop near 91 % that only a replug ended. He compared our driver with ZTE's `sqc_bq2560x.ko` (read
+from his U30 Air's `vendor_dlkm_a`, SHA-256 `ce42c87c...`) and its source:
+
+- **The CV.** Patch 0009 capped the vendor node at 4.208 V, a value read once from Android's registers. ZTE's driver
+  takes the battery node's CV (4.3 V on the U30 Air SSV; every JEITA step of SDP/CDP/DCP says 4.3 V too). A low CV
+  enters the constant-voltage phase early and can terminate at a low percentage. **Patch 0024**
+  (`upstream/patches/0024-power-bq256xx-U30-Air-battery-CV-and-stock-safety-timer.patch`): the vendor node
+  (`ti,bq2560x_chg`, already kept off the F50 and V50 by patch 0016) takes the battery node's CV bounded by the chip
+  (4.3 V is 4.272 V in the chip's 32 mV steps); without a valid node, the chip default. Other bq256xx boards as before.
+- **The safety timer.** ZTE's probe clears REG05 bit 3 (`EN_TIMER`, at probe+0xdd8), as its source's
+  `bq2560x_charger_set_safety_timer(.., DISABLE)` does; ours left the chip's timer on, which can end a long slow
+  charge until a replug. 0024 clears it and keeps `EN_TERM`; TS/NTC, overvoltage and thermal protection are other
+  bits and stay.
+
+kanoqwq's check on his U30 Air: REG04 `0x68` (4.272 V), REG05 `0x87` (termination on, timer off), the 1.98 A ICHG,
+the computer port's 500 mA and the user charge limit unchanged; he did not run a full cycle or catch the original
+early "Full" again. His regression for the second point is ours already: mu300-power's charge limit
+(FINDINGS 33l, 36) works from the capacity, never from a "Full" status. Not taken: ZTE's 16-hour plugged-in policy
+(`charger_policy_service`, `expired-mode-enable`); kanoqwq has not ported it either.
+
+**3 A, patch 0025, off by default.** His `627cacea` (`docs/U30AIR-3A-20261022.zh-CN.md`) lets the U30 Air charge at
+the battery node's current (3 A, bounded by the chip; 1.98 A without a valid node), sets that as the initial ICHG, and
+takes a Type-C source's 3 A Rp as 3 A of input instead of 2 A. BC1.2 SDP/CDP/DCP (0.5/1.5/2 A), the CV, termination
+and thermal bits are unchanged. He read the registers back (ICHG 3 A, REG02 `0xb2`) on a computer's port and says
+himself that this is not a test of 3 A into the battery or from a 3 A charger. So here every part of it is behind
+`bq256xx_charger.u30air_3a` (0444, default N): without it the driver is exactly 0024's. The driver is built in, so the
+switch is a kernel command-line option (`MU300_CMDLINE_EXTRA=bq256xx_charger.u30air_3a=1` for a test build; mainline
+forces its own command line, FINDINGS 160).
+
+`tests/test_u30air_charger_ncm.py` reads both patches. His `tests/bq256xx_stock_cv.py` and
+`tests/bq256xx_typec_current.py` compile the driver's functions out of a prepared kernel tree; they are not here
+(no kernel tree in the test run). **Device check before merge (U30 Air):** `i2cget` of REG04/REG05 (0x68/0x87 as
+his), a charge from about 80 % on a wall charger with the 90 % limit (no early Full, no stop before it), and with
+`u30air_3a=1` a test build, `constant_charge_current` 3000000 and the current measured from a charger that offers 3 A.
+
+### 208. NCM: a timer flush that finds the USB requests busy (off unless asked for)
+
+**Status: offline only (kanoqwq's fixture and ours); off by default.**
+
+kanoqwq's `e4ad30a0` (`docs/NCM-TX-TIMER-20261022.zh-CN.md`), a backport of Cosmin Tanislav's linux-usb patch of
+2026-08-17 (lore `20260817192638.437798-1-cosmin-gabriel.tanislav.xa@renesas.com`; not in 6.18, 7.2 or 7.3):
+`ncm_tx_timeout()` flushes a half-filled NTB with `ndo_start_xmit(NULL, ..)` and ignores the result. When every USB
+TX request is in flight, `u_ether`'s `eth_start_xmit()` returns `NETDEV_TX_BUSY`, nothing is wrapped, and the timer
+returns `HRTIMER_NORESTART`: no qdisc requeues a NULL skb, so the NTB waits for the next frame. Users reported
+host-side stalls after long USB use; nobody has captured one, and the fix is not shown to cure them.
+
+**Patch 0026** (`upstream/patches/0026-usb-gadget-ncm-retry-a-busy-timer-flush-off-unless-asked-for.patch`): with
+`usb_f_ncm.tx_busy_retry` set, a BUSY flush moves the timer 300 us on (`hrtimer_forward_now`, so an expired timer
+does not spin) and returns `HRTIMER_RESTART`; a successful flush, a gone netdev or the usual `hrtimer_cancel` at
+disable end it. Off by default because kanoqwq tested it on a C fixture built from the real `u_ether.c`/`f_ncm.c`
+(10000 BUSY rounds, ASan/UBSan), not on a device; the parameter is 0644, so a device test switches it at run time:
+`echo 1 > /sys/module/usb_f_ncm/parameters/tx_busy_retry`. Patch 0008's small-frame flush is unchanged. Applies to
+6.18.57, 7.2.11 and 7.3 and builds on all three. His `tests/usb_ncm_timer.py` and `ncm-tx-fixture.h` (and
+`04294c7b`, a fix to that test's dry run) need a prepared kernel tree and are not here.
+
+**Device check before merge (any board, USB tethered):** with the parameter on, a long USB ping and an iperf3 run both
+ways at once for an hour; no stall, and latency and throughput as with it off (patch 0008's header has reference
+numbers).
+
+### 209. kanoqwq's shared installation fixes (b8d4f222): backup restore, the boot-control pair, cpio parents
+
+**Status: offline only.** From kanoqwq's `b8d4f222` ("OTA diff tools and shared installation fixes"); the OTA diff
+tools themselves are not taken (they are his desktop installer's and his LuCI OTA page's; this tree updates with
+the signed releases of `mu300-update`).
+
+- **OpenWrt's sysupgrade wrapper let a backup be made but not restored.** `/sbin/sysupgrade` here refuses firmware
+  images (an armsr image would overwrite the eMMC) and passed only `-b`/`-l`; LuCI's System > Backup "Upload archive"
+  runs `sysupgrade --restore-backup /tmp/backup.tar.gz`, which it refused. Now, as his: one of `-b`/`--create-backup
+  FILE`, `-r`/`--restore-backup FILE` or `-l`/`--list-backup`, with only the options that shape a backup (`-k -u -c
+  -o -p -v -q`); an image file, `-n`, `-F`, `-T`, two operations or a missing file name is refused. Not taken: his
+  `disable-stock-upgrade` (it rewrites LuCI's minified `flash.js` at build time and stops the build on any other
+  layout); the wrapper already refuses the flash, and the panel has its own Update page.
+- **mu300-next-boot checks the pair of boot-control blocks.** The block's first bytes are the slot suffix LK reads
+  (`_a`/`_b`). Without `/run/mu300/linux-slot` (or a garbled one), the initramfs' Linux block now names the slot,
+  before the command line and the old default b. And a pair where Linux's block names another slot than Linux's, or
+  Android's names Linux's, is never written: every command but `status` stops with "do not match", misc unchanged.
+  The initramfs never publishes such a pair (`publish_slot` copies both from the image, for the slot it found); this
+  guards against anything else that did. His other half of this change (`boot/init` refusing to start without a
+  known slot) is not taken: our initramfs falls back to the slot the image was built for (`etc/mu300-linux-slot`)
+  before b, and a boot that stops in a rescue shell would trade a working default for a gate (no boot gates here).
+- **The initramfs builder writes every parent directory.** `cpio_archive()` put out only the directories it was
+  given; the kernel's unpacker does not create missing parents, so a file under an unnamed directory would be dropped.
+  Every image so far named its directories; now the parents are added (an appended segment that names only
+  `etc/mu300-trial-guard` gets `etc` again, which the unpacker accepts).
+
+His SIM-event change in the same commit (a ready report with trailing numbers) is in the next entry.
+
+`tests/test_device_scripts.py` (`SysupgradeWrapper`, two `NextBoot` cases), `tests/test_boot_image.py`
+(`CpioParents`). **Device check before merge:** OpenWrt, any board: LuCI System > Backup, generate an archive and
+upload it again (the settings come back, the box reboots as LuCI says); `sysupgrade some.img` still refuses. Any
+board, either system: `mu300-next-boot status` and a reboot with the default boot linux (`--rearm` at boot-ok works
+as before).
+
+### 210. A SIM ready report with trailing numbers, and the U30 Air's charging light after a steady one
+
+**Status: the LED part checked by kanoqwq on a U30 Air; the SIM part seen by him on an E5-family board. Offline here.**
+
+- **`+ECIND: 3,0,0,1` is a SIM event too** (kanoqwq's `b8d4f222`, `docs/SIM-EVENTS-EXTENDED-20261020.zh-CN.md` in his
+  fork). A card coming up reports `+ECIND: 3,100` (CPIN still busy) and then `+ECIND: 3,0,0,1`. The stock RIL's
+  `onSimStatusChanged` takes type, value and cause and ignores numbers after them; mu300-sim-state's filter
+  (FINDINGS 186) dropped any report with a fourth field, so the second report started no check, and a card that was
+  busy at the first one was found only by the watchdog's five-minute look. Now trailing fields pass when every field
+  is a decimal number of at most 10 digits and 32 bits; an empty field, a sign, a trailing comma or other characters
+  still drop the line, and value and cause are filtered as before. Seen on his angelcare K1 (E5 family), the same
+  modem firmware's report; not seen on an MU300-family board yet.
+- **The U30 Air's battery light stayed steady instead of breathing** (his `edcdeb27`,
+  `docs/U30AIR-LED-DOCK-CURRENT-20261022.zh-CN.md`). Charging, the trigger was `pattern` with the right curve, but the
+  PMIC's LED control register read `0x300`: RUN and the steady TYPE bit both set, so the light stayed on. The
+  SC27xx driver's `pattern_set` sets RUN without clearing the steady bit, and the pattern trigger does not always call
+  `pattern_clear` when it takes over; going from a steady colour (Full, or not charging on the charger) to breathing
+  reproduced it. mu300-led's `breathe` now writes brightness 0 first when the channel is not on the pattern trigger
+  yet, and leaves a channel that is alone. He read `0x100` after the same steps and ran the colour sequence
+  Full -> Charging -> 49 % -> 50 % -> Full -> Charging on his device.
+
+Not taken from the same commits: his SMS pool resolver and 25-character list column (ours has one pool,
+`/etc/mu300/sms-pool`, and `mu300-sms list` cuts the time column to 21 characters), the dashboard's signed battery
+current (our battery tile shows the charge or discharge power in watts), his per-SIM VoLTE/VoNR receipt fix
+(`500e5ea4`: our `mobile-data voice --json --read` reads both live values every time, there is no receipt to go
+stale), his V50 radio resume (`c031a58a`: it is in his dual-stack `mu300-dual-radio`; one stack runs here), his
+`sim-reset` data-priority call (`cb1f761d`: this tree sends no `CEUS`/`CEMODE`).
+
+`tests/test_device_scripts.py`: `SimState.test_event_filter`, and in `Led` the breathing after a steady light.
+**Device check before merge:** U30 Air: full on the charger (steady white), then discharge below full and plug in
+again: the light breathes (on OpenWrt `cat /sys/class/leds/sc27xx:green/trigger` shows `[pattern]`). Any board with
+a SIM tray: take the card out and put it back; `logread | grep sim-state` or `journalctl -t mu300-sim-state` shows
+a check within seconds of the second report.
+
+### 211. The panel: power off, a cell entered by hand, the battery as a bar
+
+**Status: offline only.** The dashboard parts of kanoqwq's `b8d4f222` and `edcdeb27`, in this tree's LuCI app.
+
+- **Power off or restart.** The dashboard's restart button asks which: Cancel, Power off, Restart. Both go through
+  `mu300-dash-act` (`reboot` or `poweroff` after the 3 s grace for the reply, the usual orderly way: procd stops the
+  services and unmounts; never forced). mu300dash's `act` takes `poweroff` with no argument, as `reboot`. On a board
+  without a battery the USB supply may start it again; that is the bootloader's choice, as with a long power-key press.
+- **A cell entered by hand** (Cellular > Network locks, under the neighbor table): the type (LTE or NR), the channel
+  number (EARFCN 0-262143, NR-ARFCN 1-3279165; a channel number, not MHz) and the PCI (0-503, 0-1007). The page checks
+  the ranges and locks it as a neighbor row's button does (`lock apply cell lte:EARFCN,PCI`, the same confirmation);
+  the cell does not have to be in the neighbor list. The backend's own check (`valid_cell`: digits, at most 7 and 4)
+  is unchanged. kanoqwq's backend change in the same commit (LTE EARFCN 0 allowed) was his tree's; ours already
+  allowed it.
+- **The battery tile has a capacity bar** like CPU, memory and storage, hidden without a battery or a percentage.
+
+Not taken: his signed battery current in the tile (ours shows the charge or discharge power in watts). Cockpit's MU300
+page has no manual cell entry yet. New messages in all 31 catalogs.
+
+`tests/test_mu300dash_security.py` (`poweroff` among the act fields and pass-throughs), `tests/test_luci_i18n.py`.
+**Device check before merge (OpenWrt, any board):** the dashboard's button: Cancel does nothing, Restart restarts,
+Power off powers off (U30 Air: off until the power key). Network locks: an LTE cell from the neighbor table entered
+by hand locks as the row's button would (the page's lock summary shows it), out-of-range values are refused on the
+page; then Unlock. The U30 Air's battery tile shows the bar.
+
+### 212. Kernel modules whose names differ only in case: one of each pair was lost on the build host
+
+**Status: fixed in the release scripts and the installers; v2026.10.23.1 is the first release whose mainline bundles
+are complete.** Found while building v2026.10.23.1.
+
+A mainline kernel builds four pairs of netfilter modules whose names differ only in case: `xt_HL.ko` (the TTL/hop
+limit target) and `xt_hl.ko` (its match), `xt_TCPMSS.ko` and `xt_tcpmss.ko`, `xt_DSCP.ko` and `xt_dscp.ko`,
+`xt_RATEEST.ko` and `xt_rateest.ko`. The release was built on a Mac, whose default APFS ignores case: the build's
+`upstream/out*/modules` (a docker bind mount) and the staging directories kept one file of each pair, under the name
+the first copy made and with the contents of the second (v2026.10.22.1's 6.18 bundle: `xt_hl.ko` holds `name=xt_HL`;
+its 7.3 bundle `xt_HL.ko` holds `name=xt_hl`). So every mainline bundle (6.18, 7.2, 7.3) of every release before
+v2026.10.23.1 lacks four of the eight modules, and one of the four it has is under the wrong name. The 5.4 bundle has
+no such pair. Nothing failed: `audit-bundle.py` asked `is_file()`, which a case-ignoring file system answers yes for
+the missing name. v2026.10.23.1 ships all eight in each mainline bundle (built on a case-sensitive volume).
+
+- `upstream/case-sensitive.sh` (`case_sensitive DIR`): makes two files that differ only in case in DIR itself and
+  refuses it, with the way to a case-sensitive volume (`hdiutil create -type SPARSE -fs 'Case-sensitive APFS'`), when
+  only one is there. `upstream/make-bundle.sh` asks it of the build's `modules` and its staging directory,
+  `upstream/build-modules.sh` of its output (in the container, on the bind mount), `tools/make-release.sh` of
+  `release/TAG` and of `TMPDIR`. The release scripts' `mktemp` now honour `TMPDIR`
+  (`mktemp -d "${TMPDIR:-/tmp}/mu300-...XXXXXX"`), so a case-sensitive `TMPDIR` is enough for the staging.
+- `upstream/audit-bundle.py` checks `modules.in-tree` against the names the directory lists; `make-release.sh`'s
+  audit wants every name of a mainline bundle's `modules.in-tree` in its `modules/`, and the TTL and MSS pairs in any
+  case.
+- The installers: `install.sh` and `install.ps1` unpack a mainline bundle on the host (`work/release/TAG/kernel-X`)
+  for its `Image`, ramdisk segment and lists, and `tools/vendor-overlay.py` took the modules for the installed system
+  from that tree, so an installation from macOS (default APFS) or Windows (NTFS) lost one of each pair even with a
+  complete bundle. `vendor-overlay.py --kernel-bundle` now reads the tarball itself (a tree still works), and both
+  installers pass it the tarball. The Magisk zips, the web installer and `mu300-update` unpack on the device
+  (`/data/adb`, ext4/f2fs; the root filesystem), which keeps case.
+
+A system installed with an earlier mainline bundle, or from macOS or Windows before this fix, gets the four modules
+with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23.1 on, which unpacks on the device).
+`tests/test_case_sensitive.py`.

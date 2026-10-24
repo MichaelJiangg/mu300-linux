@@ -1105,8 +1105,8 @@ msgstr "Σημείο πρόσβασης Wi-Fi"
 msgid "Restart modem"
 msgstr "Επανεκκίνηση μόντεμ"
 
-msgid "Restart device"
-msgstr "Επανεκκίνηση συσκευής"
+msgid "Power off or restart"
+msgstr "Απενεργοποίηση ή επανεκκίνηση"
 
 msgid "Switch to Android"
 msgstr "Μετάβαση σε Android"
@@ -1165,11 +1165,14 @@ msgstr "Τα δεδομένα κινητής χρησιμοποιούνται κ
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Η συνδεσιμότητα κινητού δικτύου μπορεί να διακοπεί για 1–2 λεπτά."
 
-msgid "Restart the entire device"
-msgstr "Επανεκκίνηση ολόκληρης της συσκευής"
-
 msgid "All connections will be interrupted."
 msgstr "Όλες οι συνδέσεις θα διακοπούν."
+
+msgid "Power off"
+msgstr "Απενεργοποίηση"
+
+msgid "Restart"
+msgstr "Επανεκκίνηση"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Η επόμενη εκκίνηση θα γίνει σε Android και η συσκευή επανεκκινείται τώρα. Αυτή η σελίδα διαχείρισης και η κοινή χρήση κινητού δικτύου θα αποσυνδεθούν."
@@ -1495,6 +1498,21 @@ msgstr "Κλείδωμα τρέχουσας κυψέλης εξυπηρέτησ�
 msgid "Unlock cell"
 msgstr "Ξεκλείδωμα κυψέλης"
 
+msgid "Enter a cell"
+msgstr "Εισαγωγή κυψέλης"
+
+msgid "Type"
+msgstr "Τύπος"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Αριθμός καναλιού (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Κλείδωμα αυτής της κυψέλης"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Αριθμός καναλιού, όχι συχνότητα σε MHz· η κυψέλη δεν χρειάζεται να είναι στη λίστα γειτονικών."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Η εφαρμογή επανεκκινεί τη στοίβα ραδιοφώνου (SFUN) και διακόπτει για λίγο την υπηρεσία κινητού δικτύου. Οι ρυθμίσεις αποθηκεύονται και εφαρμόζονται ξανά από το πρόσθετο όταν το AT είναι έτοιμο, εφόσον είναι ενεργή η Εφαρμογή κατά την εκκίνηση. Ένα hook πλατφόρμας πριν από το ραδιόφωνο μπορεί να τις εφαρμόσει χωρίς επανεκκίνηση. Εφαρμόστε χωρίς επιλεγμένες ζώνες για επαναφορά της αυτόματης λειτουργίας."
 
@@ -1581,6 +1599,9 @@ msgstr "Κλείδωμα %s στο παρασκήνιο…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "Το %s κλειδώθηκε στο παρασκήνιο (επανεκκίνηση SFUN, περίπου 30 δευτερόλεπτα)· ανάγνωση της κατάστασης…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Εισαγάγετε αριθμό καναλιού και PCI εντός των παρακάτω περιοχών"
 
 msgid "No serving-network data"
 msgstr "Δεν υπάρχουν δεδομένα δικτύου εξυπηρέτησης"
@@ -2399,9 +2420,6 @@ msgstr "Η συσκευή επανεκκινείται τώρα. Η προεπι
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Η συσκευή επανεκκινείται τώρα και θα λείπει για περίπου ένα λεπτό. Αν το νέο σύστημα δεν ξεκινήσει, η συσκευή επιστρέφει μόνη της στο Android μετά τις αποτυχημένες προσπάθειες."
 
-msgid "Restart"
-msgstr "Επανεκκίνηση"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Επανεκκίνηση… ανοίξτε ξανά αυτή τη σελίδα σε περίπου ένα λεπτό."
 
@@ -3055,9 +3073,6 @@ msgstr "Εντοπισμός"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "Το URL μπορεί να περιέχει διακριτικό: πηγαίνει στη συσκευή χωριστά, ποτέ σε γραμμή εντολών ή αρχείο καταγραφής."
-
-msgid "Type"
-msgstr "Τύπος"
 
 msgid "Share link"
 msgstr "Σύνδεσμος κοινοποίησης"

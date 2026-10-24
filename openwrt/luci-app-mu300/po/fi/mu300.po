@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi-tukiasema"
 msgid "Restart modem"
 msgstr "Käynnistä modeemi uudelleen"
 
-msgid "Restart device"
-msgstr "Käynnistä laite uudelleen"
+msgid "Power off or restart"
+msgstr "Sammuta tai käynnistä uudelleen"
 
 msgid "Switch to Android"
 msgstr "Vaihda Androidiin"
@@ -1165,11 +1165,14 @@ msgstr "Mobiilidataa käytetään myös verkkovierailuverkoissa, mikä voi maksa
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Matkapuhelinyhteys voi katketa 1–2 minuutiksi."
 
-msgid "Restart the entire device"
-msgstr "Käynnistä koko laite uudelleen"
-
 msgid "All connections will be interrupted."
 msgstr "Kaikki yhteydet katkeavat."
+
+msgid "Power off"
+msgstr "Sammuta"
+
+msgid "Restart"
+msgstr "Käynnistä uudelleen"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Seuraava käynnistys siirtyy Androidiin, ja laite käynnistyy uudelleen nyt. Tämä hallintasivu ja matkapuhelinyhteyden jakaminen katkeavat."
@@ -1495,6 +1498,21 @@ msgstr "Lukitse nykyinen palveleva solu"
 msgid "Unlock cell"
 msgstr "Poista solulukitus"
 
+msgid "Enter a cell"
+msgstr "Syötä solu"
+
+msgid "Type"
+msgstr "Tyyppi"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanavanumero (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Lukitse tämä solu"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Kanavanumero, ei taajuus megahertseinä; solun ei tarvitse olla naapurisolujen luettelossa."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Käyttöönotto käynnistää radiopinon uudelleen (SFUN) ja katkaisee matkapuhelinpalvelun hetkeksi. Asetukset tallennetaan, ja laajennus ottaa ne uudelleen käyttöön AT:n ollessa valmis, kun Käytä käynnistyksessä on käytössä. Alustan radiota edeltävä koukku voi ottaa ne käyttöön ilman uudelleenkäynnistystä. Palauta automaattinen tila käyttämällä ilman valittuja kaistoja."
 
@@ -1581,6 +1599,9 @@ msgstr "Lukitaan %s taustalla…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s lukittu taustalla (SFUN-uudelleenkäynnistys, noin 30 sekuntia); luetaan tila takaisin…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Syötä kanavanumero ja PCI alla olevien rajojen sisällä"
 
 msgid "No serving-network data"
 msgstr "Ei palvelevan verkon tietoja"
@@ -2399,9 +2420,6 @@ msgstr "Laite käynnistyy nyt uudelleen. Oletuskäynnistys on Android, joten lai
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Laite käynnistyy nyt uudelleen ja on poissa noin minuutin. Jos uusi järjestelmä ei käynnisty, laite palaa itsestään Androidiin epäonnistuneiden yritysten jälkeen."
 
-msgid "Restart"
-msgstr "Käynnistä uudelleen"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Käynnistetään uudelleen… avaa tämä sivu uudelleen noin minuutin kuluttua."
 
@@ -3055,9 +3073,6 @@ msgstr "Tunnista"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL voi sisältää tunnuksen: se menee laitteelle erikseen, ei koskaan komentoriville tai lokiin."
-
-msgid "Type"
-msgstr "Tyyppi"
 
 msgid "Share link"
 msgstr "Jakolinkki"

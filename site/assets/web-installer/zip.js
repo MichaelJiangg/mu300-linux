@@ -78,7 +78,7 @@ export async function openZip(blob) {
 }
 
 const SYSTEMS = { "openwrt": ["openwrt", ""], "openwrt-luci": ["openwrt-luci", ""], "ubuntu-24.04": ["ubuntu", "24.04"], "ubuntu-26.04": ["ubuntu", "26.04"] };
-const KERNELS = ["5.4", "6.18", "7.2"];
+const KERNELS = ["5.4", "6.18", "7.2", "7.3"];
 
 // The manifest of a Magisk zip as its installer reads it (manifest_load): only these keys, and every value exactly
 // one a release can have.

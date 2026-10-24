@@ -1105,8 +1105,8 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Repornire modem"
 
-msgid "Restart device"
-msgstr "Repornire dispozitiv"
+msgid "Power off or restart"
+msgstr "Oprire sau repornire"
 
 msgid "Switch to Android"
 msgstr "Comutare la Android"
@@ -1165,11 +1165,14 @@ msgstr "Datele mobile sunt folosite și în rețelele de roaming, ceea ce poate 
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Conectivitatea celulară se poate opri timp de 1–2 minute."
 
-msgid "Restart the entire device"
-msgstr "Repornirea întregului dispozitiv"
-
 msgid "All connections will be interrupted."
 msgstr "Toate conexiunile vor fi întrerupte."
+
+msgid "Power off"
+msgstr "Oprire"
+
+msgid "Restart"
+msgstr "Repornește"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Următoarea pornire va intra în Android, iar dispozitivul repornește acum. Această pagină de administrare și partajarea celulară se vor deconecta."
@@ -1495,6 +1498,21 @@ msgstr "Blocare celulă de servire curentă"
 msgid "Unlock cell"
 msgstr "Deblocare celulă"
 
+msgid "Enter a cell"
+msgstr "Introduceți o celulă"
+
+msgid "Type"
+msgstr "Tip"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Număr de canal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Blochează această celulă"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Un număr de canal, nu o frecvență în MHz; celula nu trebuie să fie în lista celulelor vecine."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Aplicarea repornește stiva radio (SFUN) și întrerupe scurt serviciul celular. Setările sunt salvate și reaplicate de plugin după ce AT este pregătit, dacă Aplicare la pornire este activat. Un hook pre-radio al platformei poate reaplica fără repornire. Aplicați fără benzi selectate pentru a reveni la modul automat."
 
@@ -1581,6 +1599,9 @@ msgstr "Se blochează %s în fundal…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s blocat în fundal (repornire SFUN, aproximativ 30 de secunde); se citește starea…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Introduceți un număr de canal și un PCI în intervalele de mai jos"
 
 msgid "No serving-network data"
 msgstr "Nu există date despre rețeaua de servire"
@@ -2399,9 +2420,6 @@ msgstr "Dispozitivul repornește acum. Pornirea implicită este Android, deci po
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Dispozitivul repornește acum și lipsește aproximativ un minut. Dacă noul sistem nu pornește, dispozitivul revine singur la Android după încercările eșuate."
 
-msgid "Restart"
-msgstr "Repornește"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Se repornește… deschideți din nou această pagină peste aproximativ un minut."
 
@@ -3055,9 +3073,6 @@ msgstr "Detectează"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL-ul poate conține un token: ajunge separat la dispozitiv, niciodată într-o linie de comandă sau într-un jurnal."
-
-msgid "Type"
-msgstr "Tip"
 
 msgid "Share link"
 msgstr "Link de partajare"

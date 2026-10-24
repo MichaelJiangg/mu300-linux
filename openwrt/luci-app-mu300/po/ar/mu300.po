@@ -1105,8 +1105,8 @@ msgstr "نقطة اتصال Wi-Fi"
 msgid "Restart modem"
 msgstr "إعادة تشغيل المودم"
 
-msgid "Restart device"
-msgstr "إعادة تشغيل الجهاز"
+msgid "Power off or restart"
+msgstr "إيقاف التشغيل أو إعادة التشغيل"
 
 msgid "Switch to Android"
 msgstr "التبديل إلى Android"
@@ -1165,11 +1165,14 @@ msgstr "تُستخدم بيانات الجوال على شبكات التجوا�
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "قد يتوقف الاتصال الخلوي لمدة 1–2 دقيقة."
 
-msgid "Restart the entire device"
-msgstr "إعادة تشغيل الجهاز بالكامل"
-
 msgid "All connections will be interrupted."
 msgstr "ستنقطع جميع الاتصالات."
+
+msgid "Power off"
+msgstr "إيقاف التشغيل"
+
+msgid "Restart"
+msgstr "إعادة التشغيل"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "سيدخل الإقلاع التالي إلى Android وستتم إعادة التشغيل الآن. ستنقطع صفحة الإدارة هذه ومشاركة الاتصال الخلوي."
@@ -1495,6 +1498,21 @@ msgstr "قفل الخلية الخادمة الحالية"
 msgid "Unlock cell"
 msgstr "إلغاء قفل الخلية"
 
+msgid "Enter a cell"
+msgstr "إدخال خلية"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "رقم القناة (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "قفل هذه الخلية"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. رقم قناة وليس ترددًا بالميغاهرتز؛ لا يلزم أن تظهر الخلية في قائمة الخلايا المجاورة."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "يؤدي التطبيق إلى إعادة تشغيل حزمة الراديو (SFUN) ويقطع الخدمة الخلوية لفترة وجيزة. تُحفظ الإعدادات ويعيد الملحق تطبيقها بعد جاهزية AT عند تفعيل «التطبيق عند بدء التشغيل». يمكن لخطّاف ما قبل تشغيل الراديو في المنصة إعادة تطبيقها دون إعادة تشغيل. طبّق دون تحديد أي نطاق لاستعادة الوضع التلقائي."
 
@@ -1581,6 +1599,9 @@ msgstr "جارٍ قفل %s في الخلفية…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "تم قفل %s في الخلفية (إعادة تشغيل SFUN، حوالي 30 ثانية)؛ جارٍ قراءة الحالة…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "أدخل رقم قناة وPCI ضمن النطاقات أدناه"
 
 msgid "No serving-network data"
 msgstr "لا توجد بيانات عن الشبكة الخادمة"
@@ -2399,9 +2420,6 @@ msgstr "سيُعاد تشغيل الجهاز الآن. الإقلاع الافت
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "سيُعاد تشغيل الجهاز الآن ويغيب نحو دقيقة. إذا لم يبدأ النظام الجديد، يعود الجهاز إلى Android تلقائيًا بعد المحاولات الفاشلة."
 
-msgid "Restart"
-msgstr "إعادة التشغيل"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "جارٍ إعادة التشغيل… افتح هذه الصفحة مجددًا بعد نحو دقيقة."
 
@@ -3055,9 +3073,6 @@ msgstr "اكتشاف"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "قد يحتوي URL على رمز: يُرسل إلى الجهاز منفردًا، ولا يدخل أبدًا في سطر أوامر أو سجل."
-
-msgid "Type"
-msgstr "النوع"
 
 msgid "Share link"
 msgstr "رابط مشاركة"
