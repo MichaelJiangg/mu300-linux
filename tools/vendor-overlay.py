@@ -50,23 +50,45 @@ def add_dir(tar, arc, seen, keep):
         tar.addfile(info)
 
 
+def bundle_files(bundle: Path):
+    """the files of a kernel bundle, name -> bytes: from the mu300-kernel-6.18.tar.gz itself, or from a tree it was
+    unpacked into. Take the tarball: a mainline bundle holds modules whose names differ only in case (xt_HL.ko and
+    xt_hl.ko, xt_TCPMSS.ko and xt_tcpmss.ko, ...), and a tree on a host whose file system ignores case (macOS, Windows)
+    keeps one file of each pair - under one name with the other's contents (FINDINGS 212)"""
+    if bundle.is_file():
+        files = {}
+        with tarfile.open(bundle) as t:
+            for m in t:
+                name = m.name[2:] if m.name.startswith('./') else m.name
+                if m.isfile() and (name.startswith('modules/') or name in BUNDLE_FILES):
+                    files[name] = t.extractfile(m).read()
+        return files
+    files = {f: (bundle / f).read_bytes() for f in BUNDLE_FILES if (bundle / f).is_file()}
+    files.update({f'modules/{ko.name}': ko.read_bytes() for ko in (bundle / 'modules').glob('*.ko')})
+    return files
+
+
+BUNDLE_FILES = ('kernel.release', 'modules.builtin', 'modules.builtin.modinfo')
+
+
 def add_kernel_bundle(tar, bundle: Path, os_name, seen):
-    """the modules of another kernel (an unpacked mu300-kernel-6.18.tar.gz), laid out as mu300-update installs
-    them: Ubuntu under lib/modules/<release>/extra (depmod on the device indexes them), OpenWrt flat (it loads
-    them by path)"""
-    krel = (bundle / 'kernel.release').read_text().strip()
-    kos = sorted((bundle / 'modules').glob('*.ko'))
+    """the modules of another kernel (mu300-kernel-6.18.tar.gz, or a tree it was unpacked into: bundle_files), laid
+    out as mu300-update installs them: Ubuntu under lib/modules/<release>/extra (depmod on the device indexes them),
+    OpenWrt flat (it loads them by path)"""
+    files = bundle_files(bundle)
+    krel = files['kernel.release'].decode().strip()
+    kos = sorted(n for n in files if n.startswith('modules/') and n.endswith('.ko') and n.count('/') == 1)
     # the real path: in Ubuntu lib is a link to usr/lib, in OpenWrt a directory
     parent = 'usr/lib/modules' if os_name == 'ubuntu' else 'lib/modules'
     base = f'{parent}/{krel}'
     sub = f'{base}/extra' if os_name == 'ubuntu' else base
     add_dir(tar, sub, seen, keep=len(parent.split('/')))
     for ko in kos:
-        add_bytes(tar, f'{sub}/{ko.name}', ko.read_bytes(), seen)
+        add_bytes(tar, f'{sub}/{ko[len("modules/"):]}', files[ko], seen)
     if os_name == 'ubuntu':
         for f in ('modules.builtin', 'modules.builtin.modinfo'):
-            if (bundle / f).is_file():
-                add_bytes(tar, f'{base}/{f}', (bundle / f).read_bytes(), seen)
+            if f in files:
+                add_bytes(tar, f'{base}/{f}', files[f], seen)
         # the index (modules.dep): wifi-start runs depmod early in every boot
         add_bytes(tar, f'{base}/modules.order', b'', seen)
     return krel, len(kos)
@@ -152,7 +174,7 @@ def main():
     ap.add_argument('--android-subset', type=Path, required=True)
     ap.add_argument('--gpu-subset', type=Path)
     ap.add_argument('--kernel-bundle', type=Path,
-                    help='unpacked mu300-kernel-6.18.tar.gz: its modules go into the system too')
+                    help='mu300-kernel-6.18.tar.gz (or a tree it was unpacked into): its modules go into the system too')
     ap.add_argument('--out', type=Path, required=True)
     a = ap.parse_args()
 

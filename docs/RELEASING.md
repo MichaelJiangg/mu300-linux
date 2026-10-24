@@ -102,7 +102,7 @@ the run (exit 2): no value of the file reaches a shell unchecked.
 | `update` | `online` (default), `mirror`, `from` or `magisk` |
 | `mirror_url` | `mirror`: `http(s)://host[:port]/path` or `file:///path`; the tag is added |
 | `from_path` | `from`: an absolute directory on the device |
-| `magisk_zip` | `magisk`: the zip's system and kernel, e.g. `openwrt-luci-k6.18`, `ubuntu-24.04-k7.2`; it must install the system the board runs |
+| `magisk_zip` | `magisk`: the zip's system and kernel, e.g. `openwrt-luci-k6.18`, `ubuntu-24.04-k7.2`, `openwrt-k7.3`; it must install the system the board runs |
 | `apply_args` | a list of `--unsigned`, `--downgrade`, `--no-rollback`, `--no-reinstall`, `ubuntu`, `openwrt`, `openwrt-luci` |
 | `expect_kernel` | optional: a prefix of `uname -r` after the update, e.g. `6.18` or `7.2.10` |
 

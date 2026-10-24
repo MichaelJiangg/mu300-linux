@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi giriş nöqtəsi"
 msgid "Restart modem"
 msgstr "Modemi yenidən başlat"
 
-msgid "Restart device"
-msgstr "Cihazı yenidən başlat"
+msgid "Power off or restart"
+msgstr "Söndür və ya yenidən başlat"
 
 msgid "Switch to Android"
 msgstr "Android-ə keç"
@@ -1165,11 +1165,14 @@ msgstr "Mobil məlumat rouminq şəbəkələrində də istifadə olunur, bu əla
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobil bağlantı 1–2 dəqiqəlik dayana bilər."
 
-msgid "Restart the entire device"
-msgstr "Bütün cihazı yenidən başlat"
-
 msgid "All connections will be interrupted."
 msgstr "Bütün bağlantılar kəsiləcək."
+
+msgid "Power off"
+msgstr "Söndür"
+
+msgid "Restart"
+msgstr "Yenidən başlat"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Növbəti açılış Android-ə keçəcək və cihaz indi yenidən başlayacaq. Bu idarəetmə səhifəsi və mobil şəbəkə paylaşımı kəsiləcək."
@@ -1495,6 +1498,21 @@ msgstr "Cari xidmət edən hüceyrəni kilidlə"
 msgid "Unlock cell"
 msgstr "Hüceyrə kilidini aç"
 
+msgid "Enter a cell"
+msgstr "Hüceyrəni daxil et"
+
+msgid "Type"
+msgstr "Növ"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanal nömrəsi (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Bu hüceyrəni kilidlə"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. MHz ilə tezlik deyil, kanal nömrəsi; hüceyrənin qonşu siyahısında olması lazım deyil."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Tətbiq etmək radio stekini (SFUN) yenidən başladır və mobil xidməti qısa müddətə kəsir. Parametrlər saxlanılır və “Açılışda tətbiq et” aktiv olduqda AT hazır olandan sonra plagin tərəfindən təkrar tətbiq edilir. Platformanın radiodan əvvəlki hook-u yenidən başlatmadan tətbiq edə bilər. Avtomatik rejimə qayıtmaq üçün heç bir diapazon seçmədən tətbiq edin."
 
@@ -1581,6 +1599,9 @@ msgstr "%s arxa planda kilidlənir…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s arxa planda kilidləndi (SFUN yenidən başlatması, təxminən 30 saniyə); status geri oxunur…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Aşağıdakı aralıqlarda kanal nömrəsi və PCI daxil edin"
 
 msgid "No serving-network data"
 msgstr "Xidmət edən şəbəkə məlumatı yoxdur"
@@ -2399,9 +2420,6 @@ msgstr "Cihaz indi yenidən başlayır. Standart açılış Android-dir, ona gö
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Cihaz indi yenidən başlayır və təxminən bir dəqiqə əlçatmaz olacaq. Yeni sistem başlamasa, uğursuz cəhdlərdən sonra cihaz özü Android-ə qayıdır."
 
-msgid "Restart"
-msgstr "Yenidən başlat"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Yenidən başlayır… təxminən bir dəqiqədən sonra bu səhifəni yenidən aç."
 
@@ -3055,9 +3073,6 @@ msgstr "Aşkar et"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL token ehtiva edə bilər: cihaza ayrıca göndərilir, heç vaxt əmr sətrinə və ya jurnala düşmür."
-
-msgid "Type"
-msgstr "Növ"
 
 msgid "Share link"
 msgstr "Paylaşım keçidi"

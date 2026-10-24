@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi кіру нүктесі"
 msgid "Restart modem"
 msgstr "Модемді қайта іске қосу"
 
-msgid "Restart device"
-msgstr "Құрылғыны қайта жүктеу"
+msgid "Power off or restart"
+msgstr "Өшіру немесе қайта іске қосу"
 
 msgid "Switch to Android"
 msgstr "Android-ге ауысу"
@@ -1165,11 +1165,14 @@ msgstr "Мобильді деректер роуминг желілерінде 
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Ұялы байланыс 1–2 минутқа тоқтауы мүмкін."
 
-msgid "Restart the entire device"
-msgstr "Бүкіл құрылғыны қайта жүктеу"
-
 msgid "All connections will be interrupted."
 msgstr "Барлық қосылымдар үзіледі."
+
+msgid "Power off"
+msgstr "Өшіру"
+
+msgid "Restart"
+msgstr "Қайта іске қосу"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Келесі жүктелу Android-ге кіреді, құрылғы қазір қайта жүктеледі. Бұл басқару беті мен ұялы байланысты тарату ажыратылады."
@@ -1495,6 +1498,21 @@ msgstr "Ағымдағы қызмет көрсететін ұяшықты бек
 msgid "Unlock cell"
 msgstr "Ұяшық бекітуін алу"
 
+msgid "Enter a cell"
+msgstr "Ұяшықты енгізу"
+
+msgid "Type"
+msgstr "Түрі"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Арна нөмірі (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Осы ұяшықты құлыптау"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. МГц-тегі жиілік емес, арна нөмірі; ұяшықтың көршілер тізімінде болуы міндетті емес."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Қолдану радиостекті (SFUN) қайта іске қосып, ұялы байланысты қысқа уақытқа үзеді. Параметрлер сақталады және «Іске қосылғанда қолдану» қосулы болса, AT дайын болғаннан кейін плагин оларды қайта қолданады. Платформаның радио алдындағы ілгегі оларды қайта іске қосусыз қолдана алады. Автоматты режимге оралу үшін ешбір жолақ таңдамай қолданыңыз."
 
@@ -1581,6 +1599,9 @@ msgstr "%s фонда бекітілуде…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s фонда бекітілді (SFUN қайта іске қосылуы, шамамен 30 секунд); күй қайта оқылуда…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Төмендегі ауқымдарда арна нөмірі мен PCI енгізіңіз"
 
 msgid "No serving-network data"
 msgstr "Қызмет көрсететін желі туралы дерек жоқ"
@@ -2399,9 +2420,6 @@ msgstr "Құрылғы қазір қайта жүктеледі. Әдепкі ж
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Құрылғы қазір қайта жүктеледі және бір минуттай қолжетімсіз болады. Жаңа жүйе іске қосылмаса, сәтсіз әрекеттерден кейін құрылғы Android жүйесіне өздігінен қайтады."
 
-msgid "Restart"
-msgstr "Қайта іске қосу"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Қайта жүктелуде… бір минуттан кейін осы бетті қайта ашыңыз."
 
@@ -3055,9 +3073,6 @@ msgstr "Анықтау"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL токенді қамтуы мүмкін: ол құрылғыға бөлек жіберіледі, командалық жолға немесе журналға ешқашан түспейді."
-
-msgid "Type"
-msgstr "Түрі"
 
 msgid "Share link"
 msgstr "Бөлісу сілтемесі"

@@ -1105,8 +1105,8 @@ msgstr "Точка доступа Wi-Fi"
 msgid "Restart modem"
 msgstr "Перезапустить модем"
 
-msgid "Restart device"
-msgstr "Перезагрузить устройство"
+msgid "Power off or restart"
+msgstr "Выключить или перезагрузить"
 
 msgid "Switch to Android"
 msgstr "Переключиться на Android"
@@ -1165,11 +1165,14 @@ msgstr "Мобильные данные используются и в роум�
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Сотовая связь может прерваться на 1–2 минуты."
 
-msgid "Restart the entire device"
-msgstr "Перезагрузить всё устройство"
-
 msgid "All connections will be interrupted."
 msgstr "Все соединения будут прерваны."
+
+msgid "Power off"
+msgstr "Выключить"
+
+msgid "Restart"
+msgstr "Перезапустить"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Следующая загрузка будет в Android, перезагрузка произойдёт сейчас. Эта страница управления и раздача сотовой связи отключатся."
@@ -1495,6 +1498,21 @@ msgstr "Зафиксировать текущую обслуживающую с�
 msgid "Unlock cell"
 msgstr "Снять фиксацию соты"
 
+msgid "Enter a cell"
+msgstr "Ввести соту"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Номер канала (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Заблокировать эту соту"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Номер канала, а не частота в МГц; сота не обязана быть в списке соседних."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Применение перезапускает радиостек (SFUN) и ненадолго прерывает сотовую связь. Настройки сохраняются и, если включено «Применять при запуске», повторно применяются плагином после готовности AT. Предрадиохук платформы может применить их без перезапуска. Чтобы вернуть автоматический режим, примените без выбранных диапазонов."
 
@@ -1581,6 +1599,9 @@ msgstr "Фиксация %s в фоне…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s зафиксировано в фоне (перезапуск SFUN, около 30 секунд); считывание состояния…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Введите номер канала и PCI в диапазонах ниже"
 
 msgid "No serving-network data"
 msgstr "Нет данных об обслуживающей сети"
@@ -2399,9 +2420,6 @@ msgstr "Устройство сейчас перезагрузится. По у�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Устройство сейчас перезагрузится и будет недоступно около минуты. Если новая система не запустится, после неудачных попыток устройство само вернётся в Android."
 
-msgid "Restart"
-msgstr "Перезапустить"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Перезагрузка… откройте эту страницу снова примерно через минуту."
 
@@ -3055,9 +3073,6 @@ msgstr "Определить"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL может содержать токен: он передаётся на устройство отдельно и никогда не попадает в командную строку или журнал."
-
-msgid "Type"
-msgstr "Тип"
 
 msgid "Share link"
 msgstr "Ссылка для обмена"

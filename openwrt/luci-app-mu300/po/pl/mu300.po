@@ -1105,8 +1105,8 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Uruchom ponownie modem"
 
-msgid "Restart device"
-msgstr "Uruchom ponownie urządzenie"
+msgid "Power off or restart"
+msgstr "Wyłącz lub uruchom ponownie"
 
 msgid "Switch to Android"
 msgstr "Przełącz na Android"
@@ -1165,11 +1165,14 @@ msgstr "Dane komórkowe są używane także w sieciach roamingowych, co może ko
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Łączność komórkowa może zostać przerwana na 1–2 minuty."
 
-msgid "Restart the entire device"
-msgstr "Uruchom ponownie całe urządzenie"
-
 msgid "All connections will be interrupted."
 msgstr "Wszystkie połączenia zostaną przerwane."
+
+msgid "Power off"
+msgstr "Wyłącz"
+
+msgid "Restart"
+msgstr "Uruchom ponownie"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Następne uruchomienie przejdzie do Android, a urządzenie zostanie teraz ponownie uruchomione. Ta strona zarządzania i udostępnianie sieci komórkowej zostaną rozłączone."
@@ -1495,6 +1498,21 @@ msgstr "Zablokuj bieżącą komórkę obsługującą"
 msgid "Unlock cell"
 msgstr "Odblokuj komórkę"
 
+msgid "Enter a cell"
+msgstr "Wprowadź komórkę"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Numer kanału (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Zablokuj tę komórkę"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Numer kanału, nie częstotliwość w MHz; komórka nie musi być na liście sąsiednich."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Zastosowanie restartuje stos radiowy (SFUN) i na chwilę przerywa usługę komórkową. Ustawienia są zapisywane i ponownie stosowane przez wtyczkę, gdy AT jest gotowe, jeśli włączono Zastosuj przy starcie. Hak platformy uruchamiany przed radiem może je zastosować bez restartu. Zastosuj bez wybranych pasm, aby przywrócić tryb automatyczny."
 
@@ -1581,6 +1599,9 @@ msgstr "Blokowanie %s w tle…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "Zablokowano %s w tle (restart SFUN, około 30 sekund); odczytywanie stanu…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Wprowadź numer kanału i PCI z zakresów poniżej"
 
 msgid "No serving-network data"
 msgstr "Brak danych o sieci obsługującej"
@@ -2399,9 +2420,6 @@ msgstr "Urządzenie uruchomi się teraz ponownie. Domyślnie uruchamia się Andr
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Urządzenie uruchomi się teraz ponownie i będzie niedostępne przez około minutę. Jeśli nowy system się nie uruchomi, urządzenie po nieudanych próbach samo wróci do Androida."
 
-msgid "Restart"
-msgstr "Uruchom ponownie"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Ponowne uruchamianie… otwórz tę stronę ponownie za około minutę."
 
@@ -3055,9 +3073,6 @@ msgstr "Wykryj"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL może zawierać token: trafia na urządzenie osobno, nigdy do wiersza poleceń ani dziennika."
-
-msgid "Type"
-msgstr "Typ"
 
 msgid "Share link"
 msgstr "Link udostępniania"

@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi-surfzon"
 msgid "Restart modem"
 msgstr "Starta om modemet"
 
-msgid "Restart device"
-msgstr "Starta om enheten"
+msgid "Power off or restart"
+msgstr "Stäng av eller starta om"
 
 msgid "Switch to Android"
 msgstr "Byt till Android"
@@ -1165,11 +1165,14 @@ msgstr "Mobildata används även i roamingnät, vilket kan kosta extra. Vissa SI
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobilanslutningen kan avbrytas i 1–2 minuter."
 
-msgid "Restart the entire device"
-msgstr "Starta om hela enheten"
-
 msgid "All connections will be interrupted."
 msgstr "Alla anslutningar kommer att avbrytas."
+
+msgid "Power off"
+msgstr "Stäng av"
+
+msgid "Restart"
+msgstr "Starta om"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Nästa uppstart går till Android och enheten startas om nu. Denna hanteringssida och delningen av mobilanslutningen kopplas bort."
@@ -1495,6 +1498,21 @@ msgstr "Lås aktuell betjänande cell"
 msgid "Unlock cell"
 msgstr "Lås upp cell"
 
+msgid "Enter a cell"
+msgstr "Ange en cell"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanalnummer (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Lås den här cellen"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Ett kanalnummer, inte en frekvens i MHz; cellen behöver inte finnas i listan över grannceller."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Att verkställa startar om radiostacken (SFUN) och avbryter mobiltjänsten kort. Inställningarna sparas och återställs av pluginet när AT är redo, om ”Verkställ vid uppstart” är aktiverat. En pre-radio-hook i plattformen kan återställa dem utan omstart. Verkställ utan valda band för att återgå till automatiskt läge."
 
@@ -1581,6 +1599,9 @@ msgstr "Låser %s i bakgrunden…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s låst i bakgrunden (SFUN-omstart, cirka 30 sekunder); läser tillbaka statusen…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Ange ett kanalnummer och ett PCI inom intervallen nedan"
 
 msgid "No serving-network data"
 msgstr "Inga data om betjänande nät"
@@ -2399,9 +2420,6 @@ msgstr "Enheten startar om nu. Standardstarten är Android, så Android startar:
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Enheten startar om nu och är borta i ungefär en minut. Om det nya systemet inte startar går enheten själv tillbaka till Android efter de misslyckade försöken."
 
-msgid "Restart"
-msgstr "Starta om"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Startar om… öppna den här sidan igen om ungefär en minut."
 
@@ -3055,9 +3073,6 @@ msgstr "Identifiera"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL:en kan innehålla en token: den går till enheten för sig, aldrig in i en kommandorad eller en logg."
-
-msgid "Type"
-msgstr "Typ"
 
 msgid "Share link"
 msgstr "Delningslänk"

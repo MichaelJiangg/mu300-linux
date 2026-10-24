@@ -1105,8 +1105,8 @@ msgstr "Điểm phát Wi-Fi"
 msgid "Restart modem"
 msgstr "Khởi động lại modem"
 
-msgid "Restart device"
-msgstr "Khởi động lại thiết bị"
+msgid "Power off or restart"
+msgstr "Tắt nguồn hoặc khởi động lại"
 
 msgid "Switch to Android"
 msgstr "Chuyển sang Android"
@@ -1165,11 +1165,14 @@ msgstr "Dữ liệu di động cũng được dùng trên mạng chuyển vùng,
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Kết nối di động có thể dừng trong 1–2 phút."
 
-msgid "Restart the entire device"
-msgstr "Khởi động lại toàn bộ thiết bị"
-
 msgid "All connections will be interrupted."
 msgstr "Mọi kết nối sẽ bị gián đoạn."
+
+msgid "Power off"
+msgstr "Tắt nguồn"
+
+msgid "Restart"
+msgstr "Khởi động lại"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Lần khởi động tới sẽ vào Android và thiết bị khởi động lại ngay. Trang quản lý này và chia sẻ mạng di động sẽ bị ngắt."
@@ -1495,6 +1498,21 @@ msgstr "Khóa cell phục vụ hiện tại"
 msgid "Unlock cell"
 msgstr "Mở khóa cell"
 
+msgid "Enter a cell"
+msgstr "Nhập ô"
+
+msgid "Type"
+msgstr "Loại"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Số kênh (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Khóa ô này"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Số kênh, không phải tần số tính bằng MHz; ô không cần có trong danh sách ô lân cận."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Áp dụng sẽ khởi động lại ngăn xếp radio (SFUN) và làm gián đoạn dịch vụ di động trong giây lát. Cài đặt được lưu và plugin sẽ áp dụng lại sau khi AT sẵn sàng nếu bật “Áp dụng khi khởi động”. Hook trước radio của nền tảng có thể áp dụng lại mà không cần khởi động lại. Áp dụng khi không chọn băng tần nào để trở về chế độ tự động."
 
@@ -1581,6 +1599,9 @@ msgstr "Đang khóa %s trong nền…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "Đã khóa %s trong nền (khởi động lại SFUN, khoảng 30 giây); đang đọc lại trạng thái…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Nhập số kênh và PCI trong các khoảng dưới đây"
 
 msgid "No serving-network data"
 msgstr "Không có dữ liệu mạng phục vụ"
@@ -2399,9 +2420,6 @@ msgstr "Thiết bị sẽ khởi động lại ngay. Khởi động mặc địn
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Thiết bị sẽ khởi động lại ngay và không truy cập được trong khoảng một phút. Nếu hệ thống mới không khởi động được, thiết bị tự quay về Android sau các lần thử thất bại."
 
-msgid "Restart"
-msgstr "Khởi động lại"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Đang khởi động lại… hãy mở lại trang này sau khoảng một phút."
 
@@ -3055,9 +3073,6 @@ msgstr "Tự phát hiện"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL có thể chứa token: nó được gửi riêng tới thiết bị, không bao giờ nằm trong dòng lệnh hay nhật ký."
-
-msgid "Type"
-msgstr "Loại"
 
 msgid "Share link"
 msgstr "Liên kết chia sẻ"

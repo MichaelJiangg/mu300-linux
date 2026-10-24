@@ -1105,8 +1105,8 @@ msgstr "Point d'accès Wi-Fi"
 msgid "Restart modem"
 msgstr "Redémarrer le modem"
 
-msgid "Restart device"
-msgstr "Redémarrer l'appareil"
+msgid "Power off or restart"
+msgstr "Éteindre ou redémarrer"
 
 msgid "Switch to Android"
 msgstr "Basculer vers Android"
@@ -1165,11 +1165,14 @@ msgstr "Les données mobiles sont aussi utilisées sur les réseaux en itinéran
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "La connectivité cellulaire peut s'interrompre pendant 1 à 2 minutes."
 
-msgid "Restart the entire device"
-msgstr "Redémarrer l'appareil entier"
-
 msgid "All connections will be interrupted."
 msgstr "Toutes les connexions seront interrompues."
+
+msgid "Power off"
+msgstr "Éteindre"
+
+msgid "Restart"
+msgstr "Redémarrer"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Le prochain démarrage se fera sous Android et l'appareil redémarre maintenant. Cette page de gestion et le partage cellulaire seront déconnectés."
@@ -1495,6 +1498,21 @@ msgstr "Verrouiller la cellule de service actuelle"
 msgid "Unlock cell"
 msgstr "Déverrouiller la cellule"
 
+msgid "Enter a cell"
+msgstr "Saisir une cellule"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Numéro de canal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Verrouiller cette cellule"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Un numéro de canal, pas une fréquence en MHz ; la cellule n’a pas besoin de figurer dans la liste des voisines."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "L'application redémarre la pile radio (SFUN) et interrompt brièvement le service cellulaire. Les réglages sont enregistrés et réappliqués par le plugin une fois AT prêt lorsque « Appliquer au démarrage » est activé. Un hook de plateforme exécuté avant la radio peut les réappliquer sans redémarrage. Appliquer sans aucune bande sélectionnée rétablit le mode automatique."
 
@@ -1581,6 +1599,9 @@ msgstr "Verrouillage de %s en arrière-plan…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s verrouillée en arrière-plan (redémarrage SFUN, environ 30 secondes) ; relecture de l'état…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Saisissez un numéro de canal et un PCI dans les plages ci-dessous"
 
 msgid "No serving-network data"
 msgstr "Aucune donnée de réseau de service"
@@ -2399,9 +2420,6 @@ msgstr "L'appareil redémarre maintenant. Le démarrage par défaut est Android,
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "L'appareil redémarre maintenant et s'absente environ une minute. Si le nouveau système ne démarre pas, l'appareil revient de lui-même à Android après les tentatives échouées."
 
-msgid "Restart"
-msgstr "Redémarrer"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Redémarrage… rouvrez cette page dans environ une minute."
 
@@ -3055,9 +3073,6 @@ msgstr "Détecter"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "L'URL peut contenir un jeton : elle va à l'appareil séparément, jamais dans une ligne de commande ni dans un journal."
-
-msgid "Type"
-msgstr "Type"
 
 msgid "Share link"
 msgstr "Lien de partage"

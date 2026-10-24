@@ -1105,8 +1105,8 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Riavvia modem"
 
-msgid "Restart device"
-msgstr "Riavvia dispositivo"
+msgid "Power off or restart"
+msgstr "Spegni o riavvia"
 
 msgid "Switch to Android"
 msgstr "Passa ad Android"
@@ -1165,11 +1165,14 @@ msgstr "I dati mobili vengono usati anche sulle reti in roaming, il che può cos
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "La connettività cellulare potrebbe interrompersi per 1–2 minuti."
 
-msgid "Restart the entire device"
-msgstr "Riavvia l'intero dispositivo"
-
 msgid "All connections will be interrupted."
 msgstr "Tutte le connessioni verranno interrotte."
+
+msgid "Power off"
+msgstr "Spegni"
+
+msgid "Restart"
+msgstr "Riavvia"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Il prossimo avvio entrerà in Android e il dispositivo si riavvia ora. Questa pagina di gestione e la condivisione della rete cellulare verranno disconnesse."
@@ -1495,6 +1498,21 @@ msgstr "Blocca la cella di servizio attuale"
 msgid "Unlock cell"
 msgstr "Sblocca cella"
 
+msgid "Enter a cell"
+msgstr "Inserisci una cella"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Numero di canale (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Blocca questa cella"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Un numero di canale, non una frequenza in MHz; la cella non deve per forza essere nell’elenco delle vicine."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "L'applicazione riavvia lo stack radio (SFUN) e interrompe brevemente il servizio cellulare. Le impostazioni vengono salvate e riapplicate dal plugin quando AT è pronto, se «Applica all'avvio» è abilitato. Un hook della piattaforma eseguito prima della radio può riapplicarle senza riavvio. Applicare senza bande selezionate per ripristinare la modalità automatica."
 
@@ -1581,6 +1599,9 @@ msgstr "Blocco di %s in background…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s bloccata in background (riavvio SFUN, circa 30 secondi); rilettura dello stato…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Inserisci un numero di canale e un PCI negli intervalli indicati sotto"
 
 msgid "No serving-network data"
 msgstr "Nessun dato sulla rete di servizio"
@@ -2399,9 +2420,6 @@ msgstr "Il dispositivo si riavvia ora. L'avvio predefinito è Android, quindi pa
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Il dispositivo si riavvia ora e resta assente per circa un minuto. Se il nuovo sistema non parte, il dispositivo torna da solo ad Android dopo i tentativi falliti."
 
-msgid "Restart"
-msgstr "Riavvia"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Riavvio… riaprire questa pagina tra circa un minuto."
 
@@ -3055,9 +3073,6 @@ msgstr "Rileva"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "L'URL può contenere un token: arriva al dispositivo separatamente, mai in una riga di comando o in un log."
-
-msgid "Type"
-msgstr "Tipo"
 
 msgid "Share link"
 msgstr "Link di condivisione"

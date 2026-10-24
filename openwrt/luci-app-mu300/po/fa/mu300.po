@@ -1105,8 +1105,8 @@ msgstr "هات‌اسپات Wi-Fi"
 msgid "Restart modem"
 msgstr "راه‌اندازی مجدد مودم"
 
-msgid "Restart device"
-msgstr "راه‌اندازی مجدد دستگاه"
+msgid "Power off or restart"
+msgstr "خاموش کردن یا راه‌اندازی مجدد"
 
 msgid "Switch to Android"
 msgstr "رفتن به Android"
@@ -1165,11 +1165,14 @@ msgstr "داده همراه در شبکه‌های رومینگ نیز استف�
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "ممکن است اتصال سلولی 1–2 دقیقه متوقف شود."
 
-msgid "Restart the entire device"
-msgstr "راه‌اندازی مجدد کل دستگاه"
-
 msgid "All connections will be interrupted."
 msgstr "همهٔ اتصال‌ها قطع خواهند شد."
+
+msgid "Power off"
+msgstr "خاموش کردن"
+
+msgid "Restart"
+msgstr "راه‌اندازی مجدد"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "راه‌اندازی بعدی وارد Android می‌شود و دستگاه اکنون راه‌اندازی مجدد می‌شود. این صفحهٔ مدیریت و اشتراک‌گذاری اینترنت سلولی قطع می‌شوند."
@@ -1495,6 +1498,21 @@ msgstr "قفل سلول سرویس‌دهندهٔ فعلی"
 msgid "Unlock cell"
 msgstr "باز کردن قفل سلول"
 
+msgid "Enter a cell"
+msgstr "وارد کردن سلول"
+
+msgid "Type"
+msgstr "نوع"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "شماره کانال (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "قفل کردن این سلول"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. شماره کانال، نه فرکانس بر حسب مگاهرتز؛ لازم نیست سلول در فهرست سلول‌های همسایه باشد."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "اعمال، پشتهٔ رادیو را دوباره راه‌اندازی می‌کند (SFUN) و سرویس سلولی را برای مدت کوتاهی قطع می‌کند. وقتی «اعمال هنگام راه‌اندازی» فعال باشد، تنظیمات ذخیره می‌شوند و افزونه پس از آماده شدن AT آن‌ها را دوباره اعمال می‌کند. یک هوک پیش از رادیوی پلتفرم می‌تواند بدون راه‌اندازی مجدد آن‌ها را اعمال کند. برای بازگشت به حالت خودکار، بدون انتخاب هیچ باندی اعمال کنید."
 
@@ -1581,6 +1599,9 @@ msgstr "در حال قفل کردن %s در پس‌زمینه…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s در پس‌زمینه قفل شد (راه‌اندازی مجدد SFUN، حدود 30 ثانیه)؛ در حال خواندن دوبارهٔ وضعیت…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "شماره کانال و PCI را در محدوده‌های زیر وارد کنید"
 
 msgid "No serving-network data"
 msgstr "داده‌ای از شبکهٔ سرویس‌دهنده نیست"
@@ -2399,9 +2420,6 @@ msgstr "دستگاه اکنون دوباره راه‌اندازی می‌شود
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "دستگاه اکنون دوباره راه‌اندازی می‌شود و حدود یک دقیقه در دسترس نیست. اگر سیستم جدید بالا نیاید، دستگاه پس از تلاش‌های ناموفق خودش به Android برمی‌گردد."
 
-msgid "Restart"
-msgstr "راه‌اندازی مجدد"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "در حال راه‌اندازی مجدد… حدود یک دقیقهٔ دیگر این صفحه را دوباره باز کنید."
 
@@ -3055,9 +3073,6 @@ msgstr "تشخیص"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL ممکن است توکن داشته باشد: جداگانه به دستگاه می‌رسد و هرگز در خط فرمان یا گزارش نمی‌آید."
-
-msgid "Type"
-msgstr "نوع"
 
 msgid "Share link"
 msgstr "پیوند اشتراک‌گذاری"

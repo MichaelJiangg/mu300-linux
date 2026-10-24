@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi हॉटस्पॉट"
 msgid "Restart modem"
 msgstr "मॉडेम पुनः आरंभ करें"
 
-msgid "Restart device"
-msgstr "डिवाइस पुनः आरंभ करें"
+msgid "Power off or restart"
+msgstr "बंद करें या पुनः आरंभ करें"
 
 msgid "Switch to Android"
 msgstr "Android पर जाएँ"
@@ -1165,11 +1165,14 @@ msgstr "मोबाइल डेटा रोमिंग नेटवर्क
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "सेल्युलर कनेक्टिविटी 1–2 मिनट के लिए रुक सकती है।"
 
-msgid "Restart the entire device"
-msgstr "पूरा डिवाइस पुनः आरंभ करें"
-
 msgid "All connections will be interrupted."
 msgstr "सभी कनेक्शन बाधित होंगे।"
+
+msgid "Power off"
+msgstr "बंद करें"
+
+msgid "Restart"
+msgstr "रीस्टार्ट करें"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "अगला बूट Android में होगा और डिवाइस अभी रीबूट होगा। यह प्रबंधन पेज और सेल्युलर शेयरिंग डिस्कनेक्ट हो जाएँगे।"
@@ -1495,6 +1498,21 @@ msgstr "वर्तमान सर्विंग सेल लॉक कर�
 msgid "Unlock cell"
 msgstr "सेल अनलॉक करें"
 
+msgid "Enter a cell"
+msgstr "सेल दर्ज करें"
+
+msgid "Type"
+msgstr "प्रकार"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "चैनल संख्या (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "इस सेल को लॉक करें"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. चैनल संख्या, MHz में आवृत्ति नहीं; सेल का पड़ोसी सूची में होना ज़रूरी नहीं है।"
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "लागू करने से रेडियो स्टैक (SFUN) पुनः आरंभ होता है और सेल्युलर सेवा कुछ देर बाधित होती है। सेटिंग्स सहेजी जाती हैं और “स्टार्टअप पर लागू करें” सक्षम होने पर AT तैयार होने के बाद प्लगइन उन्हें दोबारा लागू करता है। प्लेटफ़ॉर्म का प्री-रेडियो हुक बिना पुनः आरंभ के उन्हें लागू कर सकता है। स्वचालित मोड पर लौटने के लिए बिना कोई बैंड चुने लागू करें।"
 
@@ -1581,6 +1599,9 @@ msgstr "%s को पृष्ठभूमि में लॉक किया �
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s पृष्ठभूमि में लॉक किया गया (SFUN पुनः आरंभ, लगभग 30 सेकंड); स्थिति वापस पढ़ी जा रही है…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "नीचे दी गई सीमाओं में चैनल संख्या और PCI दर्ज करें"
 
 msgid "No serving-network data"
 msgstr "सर्विंग नेटवर्क का कोई डेटा नहीं"
@@ -2399,9 +2420,6 @@ msgstr "डिवाइस अभी रीस्टार्ट होगा।
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "डिवाइस अभी रीस्टार्ट होगा और लगभग एक मिनट तक उपलब्ध नहीं रहेगा। अगर नया सिस्टम शुरू नहीं होता, तो विफल प्रयासों के बाद डिवाइस अपने आप Android पर लौट जाता है।"
 
-msgid "Restart"
-msgstr "रीस्टार्ट करें"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "रीस्टार्ट हो रहा है… लगभग एक मिनट बाद यह पेज फिर से खोलें।"
 
@@ -3055,9 +3073,6 @@ msgstr "पहचानें"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL में टोकन हो सकता है: वह डिवाइस को अलग से भेजा जाता है, कभी कमांड लाइन या लॉग में नहीं जाता।"
-
-msgid "Type"
-msgstr "प्रकार"
 
 msgid "Share link"
 msgstr "शेयर लिंक"

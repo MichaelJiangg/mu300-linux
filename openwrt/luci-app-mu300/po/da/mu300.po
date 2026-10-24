@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi-hotspot"
 msgid "Restart modem"
 msgstr "Genstart modem"
 
-msgid "Restart device"
-msgstr "Genstart enhed"
+msgid "Power off or restart"
+msgstr "Sluk eller genstart"
 
 msgid "Switch to Android"
 msgstr "Skift til Android"
@@ -1165,11 +1165,14 @@ msgstr "Mobildata bruges også på roamingnetværk, hvilket kan koste ekstra. No
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobilforbindelsen kan stoppe i 1–2 minutter."
 
-msgid "Restart the entire device"
-msgstr "Genstart hele enheden"
-
 msgid "All connections will be interrupted."
 msgstr "Alle forbindelser vil blive afbrudt."
+
+msgid "Power off"
+msgstr "Sluk"
+
+msgid "Restart"
+msgstr "Genstart"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Næste opstart går til Android, og enheden genstarter nu. Denne administrationsside og mobildelingen afbrydes."
@@ -1495,6 +1498,21 @@ msgstr "Lås aktuel betjenende celle"
 msgid "Unlock cell"
 msgstr "Lås celle op"
 
+msgid "Enter a cell"
+msgstr "Angiv en celle"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanalnummer (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Lås denne celle"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Et kanalnummer, ikke en frekvens i MHz; cellen behøver ikke at være på listen over naboceller."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Anvendelse genstarter radiostakken (SFUN) og afbryder mobiltjenesten kortvarigt. Indstillingerne gemmes og genanvendes af pluginet, når AT er klar, hvis Anvend ved opstart er aktiveret. En platform-hook før radioen kan genanvende uden genstart. Anvend uden valgte bånd for at gendanne automatisk tilstand."
 
@@ -1581,6 +1599,9 @@ msgstr "Låser %s i baggrunden…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s låst i baggrunden (SFUN-genstart, ca. 30 sekunder); læser status tilbage…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Angiv et kanalnummer og en PCI inden for intervallerne nedenfor"
 
 msgid "No serving-network data"
 msgstr "Ingen data om betjenende netværk"
@@ -2399,9 +2420,6 @@ msgstr "Enheden genstarter nu. Standardopstarten er Android, så den starter And
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Enheden genstarter nu og er væk i cirka et minut. Hvis det nye system ikke starter, går enheden selv tilbage til Android efter de mislykkede forsøg."
 
-msgid "Restart"
-msgstr "Genstart"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Genstarter… åbn denne side igen om cirka et minut."
 
@@ -3055,9 +3073,6 @@ msgstr "Registrer"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL'en kan indeholde et token: det sendes til enheden for sig selv, aldrig ind i en kommandolinje eller en log."
-
-msgid "Type"
-msgstr "Type"
 
 msgid "Share link"
 msgstr "Delingslink"

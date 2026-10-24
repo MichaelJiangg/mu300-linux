@@ -1105,8 +1105,8 @@ msgstr "Wi-Fi точка за достъп"
 msgid "Restart modem"
 msgstr "Рестартиране на модема"
 
-msgid "Restart device"
-msgstr "Рестартиране на устройството"
+msgid "Power off or restart"
+msgstr "Изключване или рестартиране"
 
 msgid "Switch to Android"
 msgstr "Превключване към Android"
@@ -1165,11 +1165,14 @@ msgstr "Мобилните данни се използват и в роумин
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Мобилната свързаност може да спре за 1–2 минути."
 
-msgid "Restart the entire device"
-msgstr "Рестартиране на цялото устройство"
-
 msgid "All connections will be interrupted."
 msgstr "Всички връзки ще бъдат прекъснати."
+
+msgid "Power off"
+msgstr "Изключване"
+
+msgid "Restart"
+msgstr "Рестартирай"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Следващото стартиране ще бъде в Android и устройството се рестартира сега. Тази страница за управление и споделянето на мобилната мрежа ще прекъснат."
@@ -1495,6 +1498,21 @@ msgstr "Заключване на текущата обслужваща клет
 msgid "Unlock cell"
 msgstr "Отключване на клетка"
 
+msgid "Enter a cell"
+msgstr "Въвеждане на клетка"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Номер на канал (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Заключване на тази клетка"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Номер на канал, а не честота в MHz; клетката не е нужно да е в списъка на съседните."
+
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Прилагането рестартира радио стека (SFUN) и за кратко прекъсва мобилната услуга. Настройките се запазват и се прилагат отново от добавката, след като AT е готов, ако Прилагане при стартиране е включено. Платформен hook преди радиото може да ги приложи без рестартиране. Приложете без избрани ленти, за да възстановите автоматичния режим."
 
@@ -1581,6 +1599,9 @@ msgstr "Заключване на %s във фонов режим…"
 
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s е заключена във фонов режим (рестартиране на SFUN, около 30 секунди); прочитане на състоянието…"
+
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Въведете номер на канал и PCI в диапазоните по-долу"
 
 msgid "No serving-network data"
 msgstr "Няма данни за обслужващата мрежа"
@@ -2399,9 +2420,6 @@ msgstr "Устройството се рестартира сега. Старт�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Устройството се рестартира сега и няма да е достъпно около минута. Ако новата система не стартира, устройството само се връща към Android след неуспешните опити."
 
-msgid "Restart"
-msgstr "Рестартирай"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Рестартиране… отворете тази страница отново след около минута."
 
@@ -3055,9 +3073,6 @@ msgstr "Разпознай"
 
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL адресът може да съдържа токен: отива към устройството сам, никога в команден ред или дневник."
-
-msgid "Type"
-msgstr "Тип"
 
 msgid "Share link"
 msgstr "Връзка за споделяне"
