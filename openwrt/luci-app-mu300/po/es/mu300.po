@@ -3403,6 +3403,15 @@ msgstr "Tipo de bloqueo desconocido"
 msgid "Invalid value for this lock kind"
 msgstr "Valor no válido para este tipo de bloqueo"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Este módem no admite ninguna de estas bandas"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Los bloqueos de banda, modo y celda aún no son compatibles con la SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Los bloqueos de banda, modo y celda no son compatibles mientras el cambio de doble SIM gestiona la radio"
+
 msgid "Invalid page"
 msgstr "Página no válida"
 
@@ -3944,6 +3953,9 @@ msgstr "No se pudo eliminar el paquete de idiomas"
 msgid "Lock cache unavailable"
 msgstr "Caché de bloqueos no disponible"
 
+msgid "The modem refused a write"
+msgstr "El módem rechazó una escritura"
+
 msgid "The saved locks could not be cleared"
 msgstr "No se pudieron borrar los bloqueos guardados"
 
@@ -3952,9 +3964,6 @@ msgstr "No hay celda de servicio que bloquear"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "El módem no respondió a la consulta de modo; no se envió nada"
-
-msgid "The modem refused a write"
-msgstr "El módem rechazó una escritura"
 
 msgid "The read-back does not match the automatic values"
 msgstr "La relectura no coincide con los valores automáticos"

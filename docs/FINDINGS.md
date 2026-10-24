@@ -9503,6 +9503,22 @@ the v2026.10.27 kernels on the same devices.
 * Not covered: two Wi-Fi clients (mDNS between them, a second client's DHCPv6), an SDIO board, and the skb
   short-headroom path, which no log line shows; nothing here proves the use-after-free case was reached.
 
+**2026-10-23, the log pair (#339, cyjx007):** on the v2026.10.19.3 kernel (7.2.11, U30 Air, 1 h 45 m) the pair
+`edma_pending_q_buffer(10) full` / `push link fail: -11, chn: 10` was 2874 of 7835 lines in the kernel log, with
+`wlan0` at 0 errors and 0 drops. Both lines are the same backpressure: channel 10 (`PCIE_TX_ADDR_DATA_PORT`, the TX
+data and the RX address-list refill) has a pending ring of 4 (`pcie.c`'s `INIT_INTF_SC2355`, three usable), and every
+caller of -EAGAIN keeps its frames and retries. `pr_*_ratelimited` is per call site at 10 per 5 s, so two sites gave up
+to 20 lines in 5 s whatever the level. Now `sc2355_pcie_push_link` logs only other errors, and the full ring says
+`full, backpressure` at info level at most once a minute. His second point, also fixed: `edma_push_link_async` sets the
+channel's `status` before the direct push and only a TX completion's flush clears it; a direct push that failed
+brought no completion and left the channel refusing every later submission. With nothing queued behind it,
+`status` is now cleared at once. Submissions queued meanwhile are not popped there: their callers were told OK, and
+one whose push failed would be lost with its buffers (the completion's own flush already drops one that way, vendor
+code). Not done: that case, and a timeout for a completion that never comes.
+`tests/test_wifi_tx_path.py` reads both. **Device test before merge:** an hour on the hotspot under load as above;
+`dmesg | grep -c 'push link fail: -11'` 0, `grep -c 'full, backpressure'` at most one a minute, throughput and
+`wlan0` errors as before.
+
 ### 125. Release names: the day of the release and its number (vYYYY.MM.DD.N)
 
 **Status: current** (unit tests in sh, Python, JavaScript and PowerShell against one table; the old clients' behaviour

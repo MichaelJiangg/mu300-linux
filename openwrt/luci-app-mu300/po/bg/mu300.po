@@ -3403,6 +3403,15 @@ msgstr "Неизвестен вид заключване"
 msgid "Invalid value for this lock kind"
 msgstr "Невалидна стойност за този вид заключване"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Този модем не поддържа нито една от тези ленти"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Заключването на обхват, режим и клетка все още не се поддържа за SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Заключването на обхват, режим и клетка не се поддържа, докато превключването на двойна SIM управлява радиото"
+
 msgid "Invalid page"
 msgstr "Невалидна страница"
 
@@ -3944,6 +3953,9 @@ msgstr "Езиковият пакет не можа да бъде премахн
 msgid "Lock cache unavailable"
 msgstr "Кешът на заключванията е недостъпен"
 
+msgid "The modem refused a write"
+msgstr "Модемът отказа запис"
+
 msgid "The saved locks could not be cleared"
 msgstr "Запазените заключвания не можаха да бъдат изчистени"
 
@@ -3952,9 +3964,6 @@ msgstr "Няма обслужваща клетка за заключване"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модемът не отговори на заявката за режим; нищо не беше изпратено"
-
-msgid "The modem refused a write"
-msgstr "Модемът отказа запис"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Обратното четене не съвпада с автоматичните стойности"
