@@ -303,8 +303,8 @@ return view.extend({
         <div class="mud-r"><span class="mud-k">${_('Modem')}</span><span class="mud-v" id="mud-modem">--</span></div>
         <div class="mud-r"><span class="mud-k">${_('Carrier')}</span><span class="mud-v" id="mud-carr">--</span></div>
         <div class="mud-r"><span class="mud-k">PLMN</span><span class="mud-v" id="mud-plmn">--</span></div>
-        <div class="mud-r"><span class="mud-k" id="mud-imei1-k">IMEI1 (SIM1)</span><span class="mud-v mud-copy" id="mud-imei1" data-copy="imei1">--</span></div>
-        <div class="mud-r"><span class="mud-k" id="mud-imei2-k">IMEI2 (SIM2)</span><span class="mud-v mud-copy" id="mud-imei2" data-copy="imei2">--</span></div>
+        <div class="mud-r" id="mud-imei1-r"><span class="mud-k" id="mud-imei1-k">IMEI1 (SIM1)</span><span class="mud-v mud-copy" id="mud-imei1">--</span></div>
+        <div class="mud-r" id="mud-imei2-r" style="display:none"><span class="mud-k" id="mud-imei2-k">IMEI2 (SIM2)</span><span class="mud-v mud-copy" id="mud-imei2">--</span></div>
         <div class="mud-r"><span class="mud-k">IMSI</span><span class="mud-v" id="mud-imsi">--</span></div>
         <div class="mud-r"><span class="mud-k">ICCID</span><span class="mud-v" id="mud-iccid">--</span></div>
         <div class="mud-r" id="mud-msisdn-r" style="display:none"><span class="mud-k">${_('Own number')}</span><span class="mud-v" id="mud-msisdn">--</span></div>
@@ -451,6 +451,29 @@ return view.extend({
 			M.v('reveal').textContent = self.identShown ? _('Hide SIM identifiers') : _('Show SIM identifiers');
 			self.paintIdent(self.lastCell);
 		};
+		/* a click on an IMEI copies the whole value; the panel is plain HTTP (no secure context), so execCommand is
+		 * the fallback of the clipboard API */
+		[ 0, 1 ].forEach(function(n) {
+			var el = q('imei' + (n + 1));
+			if (!el) return;
+			el.onclick = function() {
+				var v = self.imeiFull && self.imeiFull[n];
+				if (!v) return;
+				var copy = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(v)
+					: new Promise(function(res, rej) {
+						var ta = document.createElement('textarea');
+						ta.value = v; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
+						document.body.appendChild(ta); ta.select();
+						try { document.execCommand('copy') ? res() : rej(new Error('copy')); } catch (e) { rej(e); }
+						document.body.removeChild(ta);
+					});
+				copy.then(function() {
+					el.classList.add('ok');
+					setTimeout(function() { el.classList.remove('ok'); }, 900);
+					M.toast('IMEI' + (n + 1) + ' \u2713', { type: 'success' });
+				}, function() { M.toast('\u2717', { type: 'error' }); });
+			};
+		});
 
 		/* Lock from a neighbor row (event delegation) */
 		q('neigh').addEventListener('click', function(ev) {
@@ -551,46 +574,20 @@ return view.extend({
 			if (!s) return '--';
 			return this.identShown ? s : s.substring(0, 4) + '****' + s.substring(s.length - 3);
 		}.bind(this);
-		/* The module has two IMEIs, one per card. Both are shown, the active one with a green check, and a click
-		 * copies the full value (the page may be masking it). A unit with no card in the other slot still shows
-		 * that slot's IMEI (FINDINGS 213/214). */
-		var slot = id && typeof id.slot === 'number' ? id.slot : null;
-		var badge = ' <span class="mud-imei-active">✓ ' + _('in use') + '</span>';
-		M.v('imei1-k').innerHTML = 'IMEI1 (SIM1)' + (slot === 0 ? badge : '');
-		M.v('imei2-k').innerHTML = 'IMEI2 (SIM2)' + (slot === 1 ? badge : '');
-		this.imeiFull = { imei1: id && id.imei1, imei2: id && id.imei2 };
-		M.set('imei1', mask(id && id.imei1));
-		M.set('imei2', mask(id && id.imei2));
-		if (!this._copyWired) {
-			this._copyWired = true;
-			var self = this;
-			var st = document.createElement('style');
-			st.textContent = '.mud-copy{cursor:pointer;border-bottom:1px dotted rgba(0,0,0,.25)}' +
-				'.mud-copy:hover{color:#1e7e34}' +
-				'.mud-copy.ok{color:#1e7e34}' +
-				'.mud-imei-active{display:inline-block;margin-left:6px;padding:0 6px;border-radius:9px;' +
-					'background:#e6f4ea;color:#1e7e34;font-size:11px;line-height:18px;font-weight:600}';
-			document.head.appendChild(st);
-			document.addEventListener('click', function(ev) {
-				var el = ev.target && ev.target.closest ? ev.target.closest('.mud-copy') : null;
-				if (!el) return;
-				var v = self.imeiFull && self.imeiFull[el.getAttribute('data-copy')];
-				if (!v) return;
-				var copy = navigator.clipboard && window.isSecureContext
-					? navigator.clipboard.writeText(v)
-					: new Promise(function(res, rej) {
-						var ta = document.createElement('textarea');
-						ta.value = v; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
-						document.body.appendChild(ta); ta.select();
-						try { document.execCommand('copy') ? res() : rej(new Error('copy')); } catch (e) { rej(e); }
-						document.body.removeChild(ta);
-					});
-				copy.then(function() {
-					el.classList.add('ok');
-					setTimeout(function() { el.classList.remove('ok'); }, 900);
-					M.toast(el.getAttribute('data-copy') === 'imei1' ? 'IMEI1 ✓' : 'IMEI2 ✓', { type: 'success' });
-				}, function() { M.toast('✗', { type: 'error' }); });
-			});
+		/* The module has two IMEIs, one per card (cell's imei1/imei2, read over diag, FINDINGS 217). Both are shown,
+		 * the active one tagged, and a click copies the full value (the page may be masking it). Where diag gave
+		 * nothing (another modem, the 5.4 kernel), the AT+CGSN IMEI stands in for the active card's, and a row with
+		 * no value at all is hidden. */
+		var slot = id && typeof id.slot === 'number' ? id.slot : 0;
+		var imei = [ id && id.imei1, id && id.imei2 ];
+		if (!imei[slot] && id && id.imei) imei[slot] = id.imei;
+		this.imeiFull = imei;
+		for (var n = 0; n < 2; n++) {
+			var k = M.v('imei' + (n + 1) + '-k'), r = M.v('imei' + (n + 1) + '-r');
+			if (k) k.innerHTML = 'IMEI' + (n + 1) + ' (SIM' + (n + 1) + ')' +
+				(slot === n && imei[n] ? ' <span class="mud-imei-active">\u2713 ' + _('in use') + '</span>' : '');
+			if (r) r.style.display = imei[n] || n === slot ? '' : 'none';
+			M.set('imei' + (n + 1), mask(imei[n]));
 		}
 		M.set('imsi', mask(id && id.imsi));
 		M.set('iccid', mask(id && id.iccid));
