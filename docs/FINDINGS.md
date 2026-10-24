@@ -12778,3 +12778,42 @@ the missing name. v2026.10.23.1 ships all eight in each mainline bundle (built o
 A system installed with an earlier mainline bundle, or from macOS or Windows before this fix, gets the four modules
 with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23.1 on, which unpacks on the device).
 `tests/test_case_sensitive.py`.
+
+### 219. Call audio on 5.4: the card took two minutes to bind, and every unbind WARNed in `_regulator_put`
+
+**Status: fixed in mu300-audio v1.0.5 (dikeckaan/mu300-audio#7).** Measured on F50-B with 5.4.254 (Ubuntu 24.04)
+on 2026-10-24.
+
+With the 5.4 kernel the DSP answered only 4 to 5 minutes after boot. Every boot also logged `WARNING: ... at
+drivers/regulator/core.c:2173 _regulator_put` from `mu300-audio-dsp` while the sound card was binding. Both had the
+same trigger: binding the card before the DSP runs an image.
+
+- **The slow bind.** `mu300-audio-dsp start` binds the card first and writes the DSP firmware after it. Before the
+  firmware is written, the AGDSP power domain cannot come up. During the bind the codec reads its digital registers
+  one at a time. Each read calls `agdsp_access_enable()`, which on 5.4 polled the PMU up to 1000000 times under its
+  spinlock, about 6 s. The bind made 19 such reads: the first timeout came at 44 s and the card registered at 148 s.
+  This is the loop that made 6.18 panic in 188. The mainline port had bounded it there, but the 5.4 drivers still
+  had the old one.
+- **The rebind.** The last `insmod` starts the card's probe on the deferred-probe worker and returns. `bind_card`
+  then finds the card unregistered, writes `unbind` (which waits for that probe to finish) and binds it again. That
+  costs another two minutes.
+- **The WARN.** The unbind removes the codec component, and `sprd_headset_power_deinit()` put CLK_DCL_32K and
+  DIG_CLK_INTC while they were still enabled (`sprd_headset_regulator_init()` keeps them on). That gives two WARNs, a
+  leaked enable, and `en` left true, so the next probe never enabled the new handles. The trace is
+  `regulator_put` < `sprd_headset_power_deinit` < `sprd_headset_remove` < `sprd_codec_soc_remove` <
+  `snd_soc_unregister_card` < `unbind_store`.
+
+mu300-audio v1.0.5 gives 5.4 the mainline bounded wait (`kernel/5.4/patches/agdsp-access-bounded-wait.patch`). The
+lock is dropped during the wait, which lasts at most 200 ms when the caller may sleep and 2 ms when it may not. The
+headset now disables a regulator before putting it (`headset-power-deinit-disable.patch`, and the same change in the
+mainline sources). Measured on F50-B (5.4):
+
+| | v1.0.4 | v1.0.5 |
+|---|---|---|
+| card registered | 148 s | 42 s |
+| "the DSP is running" | 199 s | 76-80 s |
+| an unbind of the card | 2 WARNs | none |
+
+When a manual `unbind`/`bind` of `sound@0` makes `mu300-audio-dsp status` say "no reply", the cause is the routes.
+A rebound card comes up with every route off, so the status's PCM never opens. Running `mu300-audio-dsp routes`
+brings it back (both versions behave this way).
