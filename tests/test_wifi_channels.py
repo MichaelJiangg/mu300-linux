@@ -506,8 +506,21 @@ class HotspotVerify(ShellTest):
             self.assertEqual(sleeps, 40)
             self.assertEqual(sc, '')
 
+    REFUSED = '[{:12.6f}] sprd-wlan: sc2355_rx_rsp_process ctx_id 0 recv rsp[CMD_START_AP] status[SPRD_CMD_STATUS_NOT_SUPPORT]\n'
+
+    @staticmethod
+    def uptime():
+        """The host's /proc/uptime (hotspot-verify reads only the dmesg lines from its own start on); None without it."""
+        try:
+            return float(Path('/proc/uptime').read_text().split()[0])
+        except (OSError, ValueError, IndexError):
+            return None
+
     def test_a_refused_start_goes_to_2g(self):
-        line = '[   27.5] sprd-wlan: sc2355_rx_rsp_process ctx_id 0 recv rsp[CMD_START_AP] status[SPRD_CMD_STATUS_NOT_SUPPORT]\n'
+        # printed after hotspot-verify began (a fixed early time, 27.5 s, was before it on any Linux host up longer than
+        # that: the line was skipped; without /proc/uptime, as on macOS, the script keeps every line)
+        now = self.uptime()
+        line = self.REFUSED.format(27.5 if now is None else now + 5)
         for shell in self.each_shell():
             # the refusal is printed before the access point shows up, or in the same moment
             for up in (0, 1000):
@@ -515,6 +528,17 @@ class HotspotVerify(ShellTest):
                 self.assertIn('restart mu300-hotspot.service', sc)
                 self.assertIn('falling back to 2.4 GHz', err)
                 self.assertEqual(sleeps, 1)
+
+    def test_a_refusal_from_before_this_start_is_not_this_one(self):
+        now = self.uptime()
+        if now is None or now < 3:
+            self.skipTest('needs /proc/uptime, and a host up for more than 3 s')
+        line = self.REFUSED.format(now - 2)
+        for shell in self.each_shell():
+            sleeps, sc, err = self.run_verify(shell, dmesg=line, FAKE_UP=3)
+            self.assertEqual(sc, '')
+            self.assertNotIn('falling back', err)
+            self.assertEqual(sleeps, 4)
 
     @unittest.skipUnless(Path('/proc/self/comm').exists(), 'needs /proc')
     def test_an_ssid_before_hostapd_runs_is_not_this_start(self):
