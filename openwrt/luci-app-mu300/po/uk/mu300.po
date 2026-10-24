@@ -3403,6 +3403,15 @@ msgstr "Невідомий тип фіксації"
 msgid "Invalid value for this lock kind"
 msgstr "Неприпустиме значення для цього типу фіксації"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Цей модем не підтримує жодного з цих діапазонів"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Блокування діапазонів, режиму й соти ще не підтримується для SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Блокування діапазонів, режиму й соти не підтримується, поки перемикання двох SIM керує радіомодулем"
+
 msgid "Invalid page"
 msgstr "Неприпустима сторінка"
 
@@ -3944,6 +3953,9 @@ msgstr "Не вдалося видалити мовний пакет"
 msgid "Lock cache unavailable"
 msgstr "Кеш фіксації недоступний"
 
+msgid "The modem refused a write"
+msgstr "Модем відхилив запис"
+
 msgid "The saved locks could not be cleared"
 msgstr "Не вдалося видалити збережені блокування"
 
@@ -3952,9 +3964,6 @@ msgstr "Немає обслуговуючої соти для фіксації"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модем не відповів на запит режиму; нічого не надіслано"
-
-msgid "The modem refused a write"
-msgstr "Модем відхилив запис"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Зворотне читання не збігається з автоматичними значеннями"

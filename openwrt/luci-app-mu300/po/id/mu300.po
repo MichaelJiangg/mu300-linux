@@ -3403,6 +3403,15 @@ msgstr "Jenis kunci tidak diketahui"
 msgid "Invalid value for this lock kind"
 msgstr "Nilai tidak valid untuk jenis kunci ini"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Modem ini tidak mendukung satu pun dari band ini"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Kunci band, mode, dan sel belum didukung untuk SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Kunci band, mode, dan sel tidak didukung selama peralihan dual-SIM mengelola radio"
+
 msgid "Invalid page"
 msgstr "Halaman tidak valid"
 
@@ -3944,6 +3953,9 @@ msgstr "Paket bahasa tidak dapat dihapus"
 msgid "Lock cache unavailable"
 msgstr "Cache kunci tidak tersedia"
 
+msgid "The modem refused a write"
+msgstr "Modem menolak sebuah penulisan"
+
 msgid "The saved locks could not be cleared"
 msgstr "Kunci yang tersimpan tidak dapat dihapus"
 
@@ -3952,9 +3964,6 @@ msgstr "Tidak ada sel layanan untuk dikunci"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem tidak menjawab kueri mode; tidak ada yang dikirim"
-
-msgid "The modem refused a write"
-msgstr "Modem menolak sebuah penulisan"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Pembacaan ulang tidak cocok dengan nilai otomatis"
