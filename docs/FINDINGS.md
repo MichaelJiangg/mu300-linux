@@ -192,6 +192,7 @@ what replaced it. The table below gives each section's state.
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 | 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
 | 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's; released in v2026.10.22.1, F50-B 10/10 boots on 7.3 in a reboot soak) |
+| 213 | A kernel oops on a restart of mu300-adbd: f_ncm and f_rndis free `os_desc_table` at unbind and keep the pointer, and a bind without MS OS descriptors (adbd's `without_adb` wrote `os_desc/use` 0) leaves it for the next unbind to free again - a kmalloc-16 double free that came back as `kstrdup()` oopsing in the UDC store; patch 0027 clears the pointer (6.18.57, 7.2.11 and 7.3 all have the bug), mu300-adbd keeps the descriptors on for every kernel | current (F50 Ubuntu, 2026-10-24: unpatched 7.3 with the release's mu300-adbd went down within 11 restarts of it once, and oopsed at restart 118 a second time - "Unable to handle kernel paging request" at an address made of string bytes; 6.18.58 with 0027 and the same mu300-adbd 200 restarts clean; unpatched 7.3 with the new mu300-adbd 150 restarts clean. A U30 Air on OpenWrt 6.18.58 dropped off the air during the same loop) |
 
 ## Hardware and firmware facts
 
@@ -12779,6 +12780,54 @@ A system installed with an earlier mainline bundle, or from macOS or Windows bef
 with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23.1 on, which unpacks on the device).
 `tests/test_case_sensitive.py`.
 
+### 213. A kernel oops on a restart of mu300-adbd: f_ncm and f_rndis free their MS OS descriptor table twice
+
+**Status: fixed in the kernel (patch 0027, every mainline kernel) and avoided in mu300-adbd (every kernel, 5.4 too); both checked on an F50.**
+
+On 2026-10-22 our U30 Air (OpenWrt, 6.18.57) oopsed while mu300-adbd restarted, in `kstrdup()` called from
+`gadget_dev_desc_UDC_store()`, the write of the UDC name that binds the gadget again. The string it was copying was
+`-lan` - the tail of the kernfs link name `upper_br-lan`, written into a 16-byte object that the slab still had on its
+free list. Something had freed a kmalloc-16 object twice, and this kernel has no `SLAB_FREELIST_HARDENED` to stop it,
+so the free list handed the same memory out to two owners and the next allocation read the other one's data.
+
+The object is the USB function's `os_desc_table` (one `struct usb_os_desc_table`, 16 bytes on arm64):
+
+- `ncm_bind()` and `rndis_bind()` allocate a new table only when the gadget uses OS descriptors
+  (`cdev->use_os_string`, from configfs `os_desc/use`), and assign `f->os_desc_table` only then.
+- `ncm_unbind()` and `rndis_unbind()` `kfree(f->os_desc_table)` and keep the pointer.
+- So: bind with `use=1` (a table), unbind (freed, pointer kept), bind with `use=0` (no new table: the stale pointer
+  stays), unbind - the same table freed a second time.
+
+mu300-adbd made exactly that sequence on every restart: `without_adb` (adb out of the gadget, while adbd is down)
+wrote `os_desc/use` 0 and removed `os_desc/c.1`, `with_adb` turned them on again. Each restart was a double free;
+most of them went unnoticed until the slab handed the memory to someone who cared.
+
+The same two lines are in 6.18.57, 7.2.11 and 7.3 (checked against kernel.org's trees).
+
+- **Patch 0027** (`upstream/patches/0027-usb-gadget-ncm-rndis-os-desc-table-double-free.patch`): `f->os_desc_table =
+  NULL` after the `kfree()` in both unbinds. `kfree(NULL)` is a no-op, so an unbind without a table is harmless.
+  It applies after patches 0008 and 0026 (which change f_ncm elsewhere) on all three kernels. It is a mainline bug
+  as well, worth sending to linux-usb.
+- **mu300-adbd**: `without_adb` leaves the MS OS descriptors on once `with_adb` has turned them on, so the gadget is
+  never bound without them after it was bound with them: the 5.4 kernel and a mainline kernel without 0027 are kept off
+  that path too. What the computer sees without adb: bcdDevice 0x0301 as before (0x0302 with RNDIS); NCM's
+  `compatible_id` is empty, so Windows binds no other driver to it.
+
+Checked on an F50 (Ubuntu 24.04, 2026-10-24), `systemctl restart mu300-adbd` every ~3.5 s:
+
+| kernel | mu300-adbd | result |
+|---|---|---|
+| 7.3 (release, no 0027) | the release's (`os_desc/use` 0 without adb) | down within 11 restarts (panic_on_oops on, no log kept); a second run oopsed at restart 118: `Unable to handle kernel paging request at virtual address 0065702e73646990`, an address made of string bytes |
+| 6.18.58 with 0027 | the release's | 200 restarts, nothing in the kernel log |
+| 7.3 (release, no 0027) | this one (descriptors left on) | 150 restarts, nothing in the kernel log |
+
+A U30 Air on OpenWrt (6.18.58, no 0027) running the same loop dropped off the air within minutes and did not come
+back on its own (on battery, no USB attached): `kernel.panic_on_oops` is off on these kernels, so an oops there can leave
+a device hung instead of rebooting.
+
+Tests: `tests/test_adb.py` (`GadgetOsDescTable`: both unbinds clear the pointer after the free, one patch with the
+number 0027, mu300-adbd never turns the descriptors off; `Gadget`: after adb leaves, `os_desc/use` is still 1 and
+`os_desc/c.1` still a link).
 ### 219. Call audio on 5.4: the card took two minutes to bind, and every unbind WARNed in `_regulator_put`
 
 **Status: fixed in mu300-audio v1.0.5 (dikeckaan/mu300-audio#7).** Measured on F50-B with 5.4.254 (Ubuntu 24.04)
