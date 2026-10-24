@@ -3403,6 +3403,15 @@ msgstr "Неизвестный тип фиксации"
 msgid "Invalid value for this lock kind"
 msgstr "Недопустимое значение для этого типа фиксации"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Этот модем не поддерживает ни один из этих диапазонов"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Блокировка диапазонов, режима и соты пока не поддерживается для SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Блокировка диапазонов, режима и соты не поддерживается, пока переключение двух SIM управляет радиомодулем"
+
 msgid "Invalid page"
 msgstr "Недопустимая страница"
 
@@ -3944,6 +3953,9 @@ msgstr "Не удалось удалить языковой пакет"
 msgid "Lock cache unavailable"
 msgstr "Кэш фиксации недоступен"
 
+msgid "The modem refused a write"
+msgstr "Модем отклонил запись"
+
 msgid "The saved locks could not be cleared"
 msgstr "Не удалось удалить сохранённые блокировки"
 
@@ -3952,9 +3964,6 @@ msgstr "Нет обслуживающей соты для фиксации"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модем не ответил на запрос режима; ничего не отправлено"
-
-msgid "The modem refused a write"
-msgstr "Модем отклонил запись"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Обратное чтение не совпадает с автоматическими значениями"

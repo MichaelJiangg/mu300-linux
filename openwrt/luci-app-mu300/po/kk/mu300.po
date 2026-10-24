@@ -3403,6 +3403,15 @@ msgstr "Белгісіз бекіту түрі"
 msgid "Invalid value for this lock kind"
 msgstr "Бұл бекіту түрі үшін жарамсыз мән"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Жолақ, режим және ұяшық құлыптары SIM2 үшін әлі қолдау көрсетілмейді"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Қос SIM ауыстыру радионы басқарып тұрғанда жолақ, режим және ұяшық құлыптарына қолдау көрсетілмейді"
+
 msgid "Invalid page"
 msgstr "Жарамсыз бет"
 
@@ -3944,6 +3953,9 @@ msgstr "Тіл бумасын жою мүмкін болмады"
 msgid "Lock cache unavailable"
 msgstr "Бекіту кэші қолжетімсіз"
 
+msgid "The modem refused a write"
+msgstr "Модем жазуды қабылдамады"
+
 msgid "The saved locks could not be cleared"
 msgstr "Сақталған құлыптарды өшіру мүмкін болмады"
 
@@ -3952,9 +3964,6 @@ msgstr "Бекітетін қызмет көрсететін ұяшық жоқ"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модем режим сұрауына жауап бермеді; ештеңе жіберілмеді"
-
-msgid "The modem refused a write"
-msgstr "Модем жазуды қабылдамады"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Кері оқу автоматты мәндерге сәйкес келмейді"
