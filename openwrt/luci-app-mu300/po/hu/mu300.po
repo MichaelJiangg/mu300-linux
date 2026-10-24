@@ -3403,6 +3403,15 @@ msgstr "Ismeretlen zárolástípus"
 msgid "Invalid value for this lock kind"
 msgstr "Érvénytelen érték ehhez a zárolástípushoz"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "A sáv-, mód- és cellazár a SIM2-nél még nem támogatott"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "A sáv-, mód- és cellazár nem támogatott, amíg a kettős SIM váltás kezeli a rádiót"
+
 msgid "Invalid page"
 msgstr "Érvénytelen oldal"
 
@@ -3944,6 +3953,9 @@ msgstr "A nyelvi csomagot nem sikerült eltávolítani"
 msgid "Lock cache unavailable"
 msgstr "A zárolási gyorsítótár nem érhető el"
 
+msgid "The modem refused a write"
+msgstr "A modem elutasított egy írást"
+
 msgid "The saved locks could not be cleared"
 msgstr "A mentett zárolásokat nem sikerült törölni"
 
@@ -3952,9 +3964,6 @@ msgstr "Nincs kiszolgáló cella a zároláshoz"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "A modem nem válaszolt a mód lekérdezésére; semmi nem lett elküldve"
-
-msgid "The modem refused a write"
-msgstr "A modem elutasított egy írást"
 
 msgid "The read-back does not match the automatic values"
 msgstr "A visszaolvasás nem egyezik az automatikus értékekkel"
