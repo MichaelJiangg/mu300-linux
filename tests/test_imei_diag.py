@@ -75,7 +75,8 @@ case "$*" in
   *AT+CEREG?*)    printf '+CEREG: 2,1,"1A2B","01234567",7\nOK\n' ;;
   *AT+C5GREG*)    printf '+C5GREG: 2,1,"1A2B","01234567",7\nOK\n' ;;
   *AT+CESQ*)      printf '+CESQ: 99,99,255,255,20,50\nOK\n' ;;
-  *AT+CGSN*)      [ -e "$STUBLOG/cgsn-zeros" ] || { printf '867530012345678\nOK\n'; exit 0; }
+  *AT+CGSN*)      [ -e "$STUBLOG/cgsn-lead0" ] && { printf '012345678901237\nOK\n'; exit 0; }
+                  [ -e "$STUBLOG/cgsn-zeros" ] || { printf '867530012345678\nOK\n'; exit 0; }
                   printf '000000000000000\nOK\n' ;;
   *AT+CIMI*)      printf '286016012345678\nOK\n' ;;
   *AT+CCID*)      printf '+CCID: 8990011234567890123\nOK\n' ;;
@@ -107,3 +108,20 @@ esac""")
         for shell in self.each_shell():
             ident, _ = self.collect(shell, 'at')
             self.assertEqual(ident['imei'], self.IMEI_AT)
+
+    def test_an_imei_with_a_leading_zero_is_a_complete_identity(self):
+        """Reporting bodies 00-01 give real IMEIs a leading 0: only fifteen zeros are no identity, so such an IMEI
+        is cached for the 6 h like any other and AT+CGSN is not asked again on the next round."""
+        (self.tmp / 'cgsn-lead0').write_text('')
+        for shell in self.each_shell():
+            run, ident = self.tmp / 'run-l0', self.tmp / 'ident-l0'
+            for d in (run, ident):
+                shutil.rmtree(d, ignore_errors=True)
+            (self.tmp / 'at').unlink(missing_ok=True)
+            env = dict(MU300_AT=self.stubs / 'fake-at', MU300_IMEI_DIAG=DIAG, MU300_DIAG_DEV=self.diag,
+                       MU300_DASH_DIR=run, MU300_DASH_IDENT_DIR=ident, MU300_DASH_POOL_DIR=self.tmp / 'pool-l0')
+            for _ in range(2):
+                r = self.script(shell, CELL, 'full', **env)
+                self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads((run / 'cell.json').read_text())['ident']['imei'], '012345678901237')
+            self.assertEqual(1, (self.tmp / 'at').read_text().count('AT+CGSN'))
