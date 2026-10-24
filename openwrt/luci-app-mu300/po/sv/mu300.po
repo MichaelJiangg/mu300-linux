@@ -3403,6 +3403,15 @@ msgstr "Okänd låstyp"
 msgid "Invalid value for this lock kind"
 msgstr "Ogiltigt värde för denna låstyp"
 
+msgid "None of these bands is supported by this modem"
+msgstr "Det här modemet stöder inget av dessa band"
+
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Lås av band, läge och cell stöds ännu inte för SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Lås av band, läge och cell stöds inte medan växling mellan två SIM styr radion"
+
 msgid "Invalid page"
 msgstr "Ogiltig sida"
 
@@ -3944,6 +3953,9 @@ msgstr "Språkpaketet kunde inte tas bort"
 msgid "Lock cache unavailable"
 msgstr "Låscache inte tillgänglig"
 
+msgid "The modem refused a write"
+msgstr "Modemet avvisade en skrivning"
+
 msgid "The saved locks could not be cleared"
 msgstr "De sparade låsen kunde inte rensas"
 
@@ -3952,9 +3964,6 @@ msgstr "Ingen betjänande cell att låsa till"
 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modemet svarade inte på lägesförfrågan; ingenting skickades"
-
-msgid "The modem refused a write"
-msgstr "Modemet avvisade en skrivning"
 
 msgid "The read-back does not match the automatic values"
 msgstr "Återläsningen stämmer inte med de automatiska värdena"
