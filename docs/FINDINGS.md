@@ -192,6 +192,7 @@ what replaced it. The table below gives each section's state.
 | 204 | The ZTE V50's SIM cards (#332): ZTE's four board variants, a third built-in card behind SIM2 and the external card behind SIM1, switched by board GPIOs; chosen per boot, the switch set before the modem's CP starts (kanoqwq's f0ed60ff, b4c051c8) | offline only (no V50 here): unit tests, the driver built for 6.18.57 and 7.2.11; on a V50 by the #332 reporter |
 | 205 | The U30 Air's USB 3 link in **device** mode follows the plug orientation (#54): SuperSpeed only in the orientation the PHY/redriver latched at power-on; `mu300-usb pd on` (0020) gives CC and the roles but does not flip the lanes, and a replug does not bring SuperSpeed back (7.2.11) | measured on a U30 Air, 7.2.11; no fix here. #341 on the same unit: orientation A at 10 Gbps, B not seen at all (worse than the USB 2 fallback); the PTN38003A does not answer at i2c 0x30 there |
 | 206 | Linux 7.3 as a fourth kernel: every patch applies unchanged (none upstream, none dropped); `PROC_SYSCTL` folded into `SYSCTL` (`config-ignored.txt`, checked only where the kernel lacks the symbol), the cfg80211 cookie handed in by value, `dma_capable()` with DMA attributes, `IIO_CONSUMER` for the audio extra; the checksum list from www.kernel.org (the CDN lagged) | current (F50-B Ubuntu: all checks, call audio with the 7.3 extra, the boot fallback; the one hang in a reboot loop was the board's plug pulled by accident, not 7.3; the U30 Air openwrt-luci with the VPN and its kill switch, 2026-10-19; `sprd_wlan_combo` for 6.18.57 and 7.2.11 byte for byte v2026.10.19.3's; released in v2026.10.22.1, F50-B 10/10 boots on 7.3 in a reboot soak) |
+| 218 | CPU0's cluster power-down: USB, IPA and the Wi-Fi's PCIe were not wake sources of LP_AP_INTC (TF-A's IRQ_EN table); `ums9620_lpintc` adds every SPI the kernel enabled | current (U30 Air OpenWrt 6.18.57: USB pings 9.5 ms avg / 42 ms max instead of 15.7 / 69; F50 Ubuntu 6.18.58: 1.2 / 1.5 ms instead of 30.6 / 150; builds for 7.2.12; suspend path not run) |
 
 ## Hardware and firmware facts
 
@@ -12781,8 +12782,10 @@ with its next kernel update (`mu300-update kernel 6.18|7.2|7.3` from v2026.10.23
 
 ### 218. CPU0's cluster power-down: USB, IPA and the Wi-Fi's PCIe were not wake sources (ums9620_lpintc)
 
-**Status: built for 6.18.57 and measured on a U30 Air (OpenWrt 25.12.5, 6.18.57); not yet built for 7.2 and 7.3, its
-suspend path not yet run on a device, the power with it not measured.**
+**Status: built for 6.18.57 and measured on a U30 Air (OpenWrt 25.12.5, 6.18.57); built for 6.18.58 and checked on an
+F50 (Ubuntu 24.04, 2026-10-24: pings over USB from a Mac 1.2 ms on average and 1.5 ms at most with it, 30.6 ms and 150 ms
+without, 60 each), and builds against 7.2.12; its suspend path not yet run on a device, the power with it not
+measured.**
 
 With every cpuidle state allowed, pings over USB from a computer waited up to 120 ms. The waits went away with CPU0
 kept out of its deepest state, `cluster-pd` (PSCI; the A55 cluster and its DSU powered off), and that was the
