@@ -14,6 +14,10 @@
 set -u
 
 DEV=${MU300_DIAG_DEV:-/dev/sdiag_nr}
+# OpenWrt's own busybox has neither od nor timeout; the image's full static one (/opt/mu300/bin/busybox) has both,
+# and is taken where it is. Elsewhere (a test host) the system's od and timeout.
+BB=${MU300_BUSYBOX:-/opt/mu300/bin/busybox}
+bb() { if [ -x "$BB" ]; then "$BB" "$@"; else "$@"; fi; }
 case ${1:-} in
     0) req='\176\000\000\000\000\012\000\136\201\000\000\176' ;;
     1) req='\176\000\000\000\000\012\000\136\202\000\000\176' ;;
@@ -26,9 +30,9 @@ if [ -c "$DEV" ]; then
     # is one second at most: the answer arrives in milliseconds and the tty holds it until cat opens it.
     stty -F "$DEV" -icanon -echo 2>/dev/null
     printf "$req" > "$DEV" 2>/dev/null || exit 0
-    hex=$( { timeout 1 cat "$DEV"; } 2>/dev/null | od -An -tx1 -v | tr -d ' \n')
+    hex=$( { bb timeout 1 cat "$DEV"; } 2>/dev/null | bb od -An -tx1 -v | tr -d ' \n')
 elif [ -f "$DEV" ]; then
-    hex=$(od -An -tx1 -v "$DEV" 2>/dev/null | tr -d ' \n')
+    hex=$(bb od -An -tx1 -v "$DEV" 2>/dev/null | tr -d ' \n')
 else
     exit 0
 fi
