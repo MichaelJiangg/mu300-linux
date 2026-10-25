@@ -16,7 +16,7 @@ The full, authoritative instructions are in
 | `mu300-kernel.tar.gz` | Linux 5.4.254 `Image` and modules (with the U30 Air's own), static busybox and logdw, the generic boot ramdisk segment |
 | `mu300-kernel-6.18.tar.gz`, `mu300-kernel-7.2.tar.gz`, `mu300-kernel-7.3.tar.gz` | the mainline kernels and their modules (7.3 from the next release after v2026.10.19.2 on) |
 | `mu300-ubuntu-rootfs.tar.gz`, `mu300-ubuntu-26.04-rootfs.tar.gz` | Ubuntu 24.04 and 26.04 |
-| `mu300-openwrt-rootfs.tar.gz`, `mu300-openwrt-luci-rootfs.tar.gz` | OpenWrt 25.12.5, plain and with the control panel |
+| `mu300-openwrt-rootfs.tar.gz`, `mu300-openwrt-luci-rootfs.tar.gz` | OpenWrt 25.12.6, plain and with the control panel |
 | `mu300-extra-lang.tar.gz` | more web interface languages |
 | `mu300-update` | the on-device updater |
 | `mu300-magisk-*.zip` | Magisk installers, one per system and kernel |
@@ -65,9 +65,7 @@ applied (about 10 minutes on Apple silicon). Then:
 * Wi-Fi, Bluetooth and GPU drivers: realme C51/C53 AndroidT kernel release (GPL-2.0).
 * Mainline 6.18, 7.2 and 7.3: kernel.org Linux plus the port in
   [`upstream/`](https://github.com/dikeckaan/mu300-linux/tree/main/upstream).
-* Call audio is not built here: its drivers, scripts and tools are the audio extra,
-  [mu300-audio](https://github.com/dikeckaan/mu300-audio), built there against each kernel's build kit (made from this
-  repository's build trees of a release). The kernels keep the DSP's memory reservation and the ALSA/ASoC core.
+* Call audio is not built here: it is the audio extra, [mu300-audio](https://github.com/dikeckaan/mu300-audio).
 * Each release's notes list the exact source commits.
 
 ## Other distributions

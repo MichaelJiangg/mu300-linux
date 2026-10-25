@@ -1669,7 +1669,7 @@ if ($PKG) {
     }
 } else {
 Write-Host ('  ' + (T '1) Ubuntu LTS: 24.04 or 26.04, asked next (full distribution, apt, ~500 MiB RAM in use)'))
-Write-Host ('  ' + (T '2) OpenWrt {1} (router, LuCI web UI, ~140 MiB RAM in use)' '25.12.5'))
+Write-Host ('  ' + (T '2) OpenWrt {1} (router, LuCI web UI, ~140 MiB RAM in use)' '25.12.6'))
 Write-Host ('  ' + (T '3) both (switch later with: mu300-os ubuntu|openwrt)'))
 if ($SIZE -lt $NEED_BOTH) {
     $fits = if ($SIZE -ge $NEED_UBUNTU) { T 'one system fits, not both' } else { T 'only OpenWrt fits' }
@@ -1694,8 +1694,8 @@ if ($OSES -contains 'openwrt') {
     $owAnswer = ''
     if (-not $owPreset) {
         Say (T 'Which OpenWrt?')
-        Write-Host ('  ' + (T '1) OpenWrt {1}: the standard LuCI web interface' '25.12.5'))
-        Write-Host ('  ' + (T '2) OpenWrt {1} with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)' '25.12.5'))
+        Write-Host ('  ' + (T '1) OpenWrt {1}: the standard LuCI web interface' '25.12.6'))
+        Write-Host ('  ' + (T '2) OpenWrt {1} with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)' '25.12.6'))
         $owAnswer = Ask (T 'Choice') '1' 'MU300_OPENWRT'
     }
     try { $OSES = @(ChooseOpenWrt $OSES $owPreset $owAnswer) } catch { Die (T 'invalid choice') }

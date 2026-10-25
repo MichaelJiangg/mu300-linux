@@ -124,6 +124,29 @@ class AdbImages(unittest.TestCase):
         self.assertIn('/adbd:ro', r)
 
 
+class GadgetOsDescTable(unittest.TestCase):
+    """The oops of 2026-10-22 on an adbd restart (FINDINGS 213): f_ncm and f_rndis freed os_desc_table at unbind and
+    kept the pointer, so a bind without OS descriptors left it for the next unbind to free again. Patch 0027 forgets
+    it in both; mu300-adbd keeps the descriptors on, for kernels without the patch."""
+
+    KPATCH = TOP / 'upstream/patches/0027-usb-gadget-ncm-rndis-os-desc-table-double-free.patch'
+
+    def test_both_unbinds_forget_the_table_they_freed(self):
+        p = self.KPATCH.read_text()
+        for f in ('f_ncm.c', 'f_rndis.c'):
+            hunk = p.split(f'+++ b/drivers/usb/gadget/function/{f}\n', 1)[1].split('\n--- ', 1)[0]
+            self.assertIn('\n \tkfree(f->os_desc_table);\n+\tf->os_desc_table = NULL;\n \tf->os_desc_n = 0;\n', hunk)
+
+    def test_one_patch_with_its_number(self):
+        names = [q.name for q in (TOP / 'upstream/patches').rglob('0027-*.patch')]
+        self.assertEqual([self.KPATCH.name], names)
+
+    def test_adbd_never_turns_the_descriptors_off(self):
+        s = (BIN / 'mu300-adbd').read_text()
+        self.assertNotIn('echo 0 > "$G/os_desc/use"', s)
+        self.assertNotIn('rm -f "$G/os_desc/c.1"', s)
+
+
 class Gadget(ShellTest):
     """mu300-adbd run/stop on a fake gadget: NCM (or RNDIS) + ACM in configs/c.1, bound to 25100000.dwc3."""
 
@@ -269,8 +292,9 @@ class Gadget(ShellTest):
             self.assertFalse(self.linked())
             self.assertEqual(self.UDC, self.read('UDC'))
             self.assertEqual('0x0301', self.read('bcdDevice'))
-            self.assertEqual('0', self.read('os_desc/use'))
-            self.assertFalse(os.path.lexists(self.g / 'os_desc/c.1'))
+            # left on: a bind without them would leave f_ncm's freed os_desc_table for the next unbind to free again
+            self.assertEqual('1', self.read('os_desc/use'))
+            self.assertTrue(os.path.islink(self.g / 'os_desc/c.1'))
             self.assertFalse((self.g / 'functions/ffs.adb').exists())
             self.assertIn(f'umount {self.ffs}', self.calls())
             # nothing was ever set on this device: on, and open to every computer
