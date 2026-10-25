@@ -53,6 +53,20 @@ class ImeiDiag(ShellTest):
             r = self.script(shell, DIAG, 0, MU300_DIAG_DEV=self.tmp / 'does-not-exist')
             self.assertEqual((r.returncode, r.stdout.strip()), (0, ''), r.stderr)
 
+    def test_the_images_busybox_reads_where_there_is_one(self):
+        # OpenWrt's busybox has no od and no timeout: imei-diag takes them from the image's full busybox
+        bb = self.tmp / 'busybox'
+        log = self.tmp / 'applets'
+        bb.write_text('#!/bin/sh\necho "$1" >> %s\nexec "$@"\n' % log)
+        bb.chmod(0o755)
+        for shell in self.each_shell():
+            log.write_text('')
+            path = self.tmp / 'f'
+            path.write_bytes(answer(self.IMEI1))
+            r = self.script(shell, DIAG, 0, MU300_DIAG_DEV=path, MU300_BUSYBOX=bb)
+            self.assertEqual((r.returncode, r.stdout.strip()), (0, self.IMEI1), r.stderr)
+            self.assertEqual(log.read_text().split(), ['od'])
+
     def test_usage(self):
         for shell in self.each_shell():
             r = self.script(shell, DIAG, 7, MU300_DIAG_DEV=self.tmp / 'x')
