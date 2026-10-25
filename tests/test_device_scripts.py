@@ -2733,31 +2733,33 @@ class SipaDele(ShellTest):
                 self.assertNotIn('sipa-dele', calls.replace('sipa-dele-start', ''))
             ko.unlink()
 
-    def test_extra_modules_loads_the_stock_thermal_zone_module_when_the_kernel_has_one(self):
-        """mu300_thermal (the stock virtual thermal zone, mainline only): loaded once, by name where depmod indexed it
-        and by path where not (Ubuntu's extra/ before depmod ran); the vendor 5.4 kernel has no such module."""
-        for shell in self.each_shell():
-            r, calls = self.run_script(shell, 'extra-modules')                       # 5.4: no module, nothing tried
-            self.assertEqual(r.returncode, 0, r.stderr)
-            self.assertNotIn('mu300_thermal', calls)
-            for sub in ('', 'extra'):
-                ko = self.mods / sub / 'mu300_thermal.ko'
-                ko.parent.mkdir(exist_ok=True)
-                ko.write_text('')
-                r, calls = self.run_script(shell, 'extra-modules')
+    def test_extra_modules_loads_the_mainline_only_modules_when_the_kernel_has_them(self):
+        """mu300_thermal (the stock virtual thermal zone) and ums9620_lpintc (the cluster power-down's wake sources,
+        FINDINGS 218), mainline only: each loaded once, by name where depmod indexed it and by path where not
+        (Ubuntu's extra/ before depmod ran); the vendor 5.4 kernel has no such modules."""
+        for m in ('mu300_thermal', 'ums9620_lpintc'):
+            for shell in self.each_shell():
+                r, calls = self.run_script(shell, 'extra-modules')                   # 5.4: no module, nothing tried
                 self.assertEqual(r.returncode, 0, r.stderr)
-                self.assertIn('modprobe mu300_thermal', calls)
-                self.assertNotIn(f'insmod {ko}', calls)
-                self.assertIn('loaded mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1)   # no index yet: by path
-                self.assertIn(f'insmod {ko}', calls)
-                self.assertIn('loaded mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1, INSMOD_RC=1)
-                self.assertEqual(r.returncode, 0, r.stderr)                          # a failure is logged, not fatal
-                self.assertIn('FAILED mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', 'mu300_thermal 12288 0 - Live 0x0 (O)\n')
-                self.assertNotIn('mu300_thermal', calls)                             # loaded already
-                ko.unlink()
+                self.assertNotIn(m, calls)
+                for sub in ('', 'extra'):
+                    ko = self.mods / sub / f'{m}.ko'
+                    ko.parent.mkdir(exist_ok=True)
+                    ko.write_text('')
+                    r, calls = self.run_script(shell, 'extra-modules')
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                    self.assertIn(f'modprobe {m}', calls)
+                    self.assertNotIn(f'insmod {ko}', calls)
+                    self.assertIn(f'loaded {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1)   # no index yet: by path
+                    self.assertIn(f'insmod {ko}', calls)
+                    self.assertIn(f'loaded {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1, INSMOD_RC=1)
+                    self.assertEqual(r.returncode, 0, r.stderr)                      # a failure is logged, not fatal
+                    self.assertIn(f'FAILED {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', f'{m} 12288 0 - Live 0x0 (O)\n')
+                    self.assertNotIn(m, calls)                                       # loaded already
+                    ko.unlink()
 
     def test_refuses_after_the_wait(self):
         """K46: the packet domain never comes up: exit 1 after MU300_DELE_WAIT s, the module is not inserted."""
@@ -5155,18 +5157,25 @@ class VpnUplink(ShellTest):
 
     def test_a_vpn_started_before_the_bearer_is_restarted(self):
         import time
-        now = int(time.time())
+        # the seconds in the message are counted from the script's own clock reading (state/uplink-up), which can be a
+        # second or more after the test's: the expected text is taken from it, not from the test's clock
+        def up():
+            return int((self.tmp / 'state' / 'uplink-up').read_text())
         for shell in self.each_shell():
-            r, calls = self.run_uplink(shell, now - 2)
+            since = int(time.time()) - 2
+            r, calls = self.run_uplink(shell, since)
             self.assertIn('vpn restart', calls, (shell, r.stderr))
-            self.assertIn('the VPN started before sipa_eth0 was up (2 s): restarting it', calls)
+            self.assertGreaterEqual(up() - since, 2)
+            self.assertIn(f'the VPN started before sipa_eth0 was up ({up() - since} s): restarting it', calls)
             # the same second counts as before
             r, calls = self.run_uplink(shell, int(time.time()))
             self.assertIn('vpn restart', calls, (shell, r.stderr))
             # a run that began before the bearer (its engine file) and reached its engine after it: restarted too
-            r, calls = self.run_uplink(shell, int(time.time()) + 20, began=int(time.time()) - 3)
+            began = int(time.time()) - 3
+            r, calls = self.run_uplink(shell, began + 23, began=began)
             self.assertIn('vpn restart', calls, (shell, r.stderr))
-            self.assertIn('(3 s)', calls)
+            self.assertGreaterEqual(up() - began, 3)
+            self.assertIn(f'({up() - began} s)', calls)
             self.assertTrue((self.tmp / 'state' / 'uplink-up').exists())
             self.assertFalse((self.tmp / 'state' / 'vpn-uplink.lock').exists())
 

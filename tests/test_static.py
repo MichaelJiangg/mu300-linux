@@ -446,9 +446,8 @@ class Rules(unittest.TestCase):
         self.assertIn('[ -e /etc/mu300/docker-zone ] && exit 0', zone)
 
     def test_release_audit_refuses_the_audio_stack(self):
-        # make-release.sh: call audio is the audio extra's (FINDINGS 194): no kernel bundle carries a driver of the
-        # call-audio stack (mainline's sprd-dma.ko is the stack's own; 5.4's is the vendor kernel's DMA driver and
-        # stays), and no image its programs or services. The audit's own lines, run against bundles made here.
+        # make-release.sh: no kernel bundle carries a driver of the audio extra, and no image its programs or
+        # services. The audit's own lines, run against bundles made here.
         rel = (TOP / 'tools' / 'make-release.sh').read_text()
         audit = rel[rel.index('AUDIO_KO="'):rel.index('[ $fail = 0 ] || { echo "audit failed')]
         self.assertEqual(23, len(re.search(r'AUDIO_KO="([^"]*)"', audit).group(1).split()))

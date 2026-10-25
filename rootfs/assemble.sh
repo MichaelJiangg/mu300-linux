@@ -90,11 +90,8 @@ done
 for c in $(cat $R/opt/mu300/lib/path-commands); do ln -sfn /opt/mu300/bin/$c $R/usr/local/bin/$c; done
 # no graphical/serial login noise on a headless dongle; keep ttyS1 console for debugging
 ln -sfn /dev/null $R/etc/systemd/system/getty@tty1.service
-# The sound card's state is mu300-audio-dsp's and mu300-voice's (an undo log; both are the audio extra's,
-# https://github.com/dikeckaan/mu300-audio, not the image's), not alsactl's. alsa-utils restores
-# every control the moment the card appears, which on this board is before mu300-audio-dsp has started the DSP: each
-# DSP control fails with -5 and each codec read waits for a power domain that is down (6 s apiece on 5.4). On 5.4
-# that held mu300-audio past its 180 s and it was killed in the middle of its start (docs/FINDINGS.md 193).
+# The sound card's state is the audio extra's (https://github.com/dikeckaan/mu300-audio), not alsactl's: alsa-utils'
+# restore at boot runs too early for it and stalls its start.
 ln -sfn /dev/null $R/etc/systemd/system/alsa-restore.service
 ln -sfn /dev/null $R/etc/systemd/system/alsa-state.service
 mkdir -p $R/etc/udev/rules.d
