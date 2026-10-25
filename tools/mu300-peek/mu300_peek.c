@@ -1,16 +1,12 @@
 // Dump or poke physical memory / MMIO from dmesg. This kernel has no CONFIG_DEVMEM, so there is no /dev/mem
-// and no other way to look at the AGDSP's reserved region or at the syscon registers the audio drivers use.
+// and no other way to look at reserved memory or at syscon registers.
 //   insmod mu300_peek.ko addr=0xafa00000 len=64            DDR
 //   insmod mu300_peek.ko addr=0x64910b80 len=48 mmio=1     registers
 //   insmod mu300_peek.ko addr=0x64900000 mmio=1 set=0x1000 poke a bit (reads back after)
 // init returns an error on purpose: the work is done by then, and failing to load means the next insmod does
 // not have to rmmod first.
 //
-// WARNING, measured the hard way: touching an address inside the AGDSP/AGCP domain - the VBC block at
-// 0x56510000, MCDT, or the AGCP AHB syscon - while that domain is powered down hangs the bus, and the
-// watchdog takes the board with it. On this device that also costs slot B its boot trial, so LK rolls back to
-// Android and it has to be re-armed. Hold a PCM open first, which is what powers the domain, and only then
-// read or poke those addresses. DDR and the always-on syscons are safe at any time.
+// WARNING: some MMIO ranges hang the bus while their power domain is down; DDR and the always-on syscons are safe.
 #include <linux/module.h>
 #include <linux/io.h>
 

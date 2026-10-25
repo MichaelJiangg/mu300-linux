@@ -104,8 +104,6 @@ shift. Sending picks GSM 7-bit when every character fits, UCS-2 otherwise. Detai
 
 ## Voice calls
 
-The board has no speaker or microphone. A call's audio can go through the modem's audio DSP, to the device's own taps
-on the call (play into it, record from it) or a Bluetooth headset, with the audio extra: `sudo mu300-extra install
-audio` ([mu300-audio](https://github.com/dikeckaan/mu300-audio): the drivers of every kernel, the call scripts, and the
-DSP image fetched with its pinned sha256).
+The board has no speaker or microphone. Call audio is the optional audio extra: `sudo mu300-extra install audio`
+([mu300-audio](https://github.com/dikeckaan/mu300-audio)).
 See [Hardware Notes](Hardware-Notes#no-sound-no-screen).

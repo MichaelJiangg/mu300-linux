@@ -74,12 +74,8 @@ watchdog in the power co-processor was never told to stand down, because that me
 
 ## No sound, no screen
 
-* **Sound (§24-24e, §188):** the board has no speaker path and no microphone; nothing answers at the amplifier's
-  address. Call audio runs through the modem's audio DSP with a DSP image (the ZTE Voyage 41S image is the one
-  measured): the other side hears what is played into the call, and the downlink can be recorded. The drivers and the
-  call scripts are the audio extra, [mu300-audio](https://github.com/dikeckaan/mu300-audio), for all three kernels:
-  `sudo mu300-extra install audio` (§194). The kernels keep only what no module can bring: the DSP's memory reserved
-  at boot and the ALSA/ASoC core.
+* **Sound:** the board has no speaker and no microphone. Call audio is the optional audio extra,
+  [mu300-audio](https://github.com/dikeckaan/mu300-audio): `sudo mu300-extra install audio`.
 * **Screen:** HDMI over USB-C does not work, because the USB-C power-delivery chip never answers. The device is headless.
 
 ## A rare boot hang on 6.18 (§31m, open)

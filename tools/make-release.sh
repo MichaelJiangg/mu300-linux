@@ -299,10 +299,8 @@ for a in mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     done
     rm -f "$D/modules.check"
 done
-# Call audio is the audio extra's (https://github.com/dikeckaan/mu300-audio, mu300-extra install audio; FINDINGS 194):
-# no kernel bundle carries a driver of the Unisoc call-audio stack, and no image its programs or services. The 23 of
-# 5.4 and the 20 of mainline - mainline's sprd-dma.ko is the stack's AGCP DMA driver; 5.4's is the vendor kernel's
-# own DMA driver, which stays.
+# Call audio is the audio extra's (https://github.com/dikeckaan/mu300-audio): no kernel bundle carries its drivers
+# (mainline's sprd-dma.ko is one of them; 5.4's is the vendor kernel's own and stays), and no image its programs.
 AUDIO_KO="audio_mem agdsp_access audio_sipc sprd_audcp_boot sprd_audcp_dvfs audio-dsp-dump audio-pipe sprd_apipe
 mcdt_hw_r2p0 saudio sprd-dmaengine-pcm sprd-platform-pcm-routing sprd-compr-2stage-dma snd-soc-sprd-dai snd-soc-sprd-vaudio
 snd-soc-sprd-vbc-v4 snd-soc-sprd-vbc-fe snd-soc-sprd-codec-ump9620-power snd-soc-sprd-codec-ump9620-power-dev

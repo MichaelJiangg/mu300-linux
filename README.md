@@ -132,9 +132,7 @@ trying it costs you the server.
 * **The hardware stays what it is**, under either system:
   * no screen output: HDMI over USB-C does not work (the power-delivery chip never answers), so it is a headless
     machine you use over SSH or the web interface;
-  * no speaker or microphone: a call's audio can only go through the modem's audio DSP, to the device's own taps on
-    the call or a Bluetooth headset, with the audio extra (`sudo mu300-extra install audio`; see
-    [What works](#what-works-and-what-does-not));
+  * no speaker or microphone; call audio is the optional audio extra (`sudo mu300-extra install audio`);
   * about 1.4 GB of RAM, because the modem firmware reserves most of the rest. Compressed swap in RAM (zram, half the
     RAM, lz4) is on by default and stretches it; `sudo mu300-zram off` turns it off.
 
@@ -883,25 +881,15 @@ to the mobile network, add a forwarding `wan -> docker`. Docker works on all fou
 
 ### Call audio (the audio extra)
 
-The board has no speaker or microphone; a call's audio goes through the modem's audio DSP, to the device's own taps
-on the call or a Bluetooth headset. Its drivers, `mu300-audio-dsp`, `mu300-voice` and the services are not in the
-images: they are the audio extra, released by [mu300-audio](https://github.com/dikeckaan/mu300-audio) for each kernel
-(FINDINGS 194).
+Call audio is an optional extra, [mu300-audio](https://github.com/dikeckaan/mu300-audio), for every kernel:
 
 ```sh
-sudo mu300-extra install audio                       # the kernel this device uses; fetches the DSP image (pinned sha256)
-sudo mu300-extra install audio --from /mnt/usb/      # offline: mu300-audio-KERNEL.tar.gz, SHA256SUMS and agdsp.bin
-sudo MU300_AUDIO_FIRMWARE=none mu300-extra install audio   # no firmware (MU300_AUDIO_FIRMWARE=FILE: your own image)
-mu300-audio-dsp status                               # dsp: running - it answered
-sudo mu300-extra remove audio                        # out of every system again (reboot: the drivers stay loaded)
+sudo mu300-extra install audio                       # the kernel this device uses
+sudo mu300-extra install audio --from /mnt/usb/      # offline: the release's files in one directory
+sudo mu300-extra remove audio
 ```
 
-`mu300-update kernel X` takes the audio extra of kernel X along (offline: `mu300-audio-X.tar.gz` and `SHA256SUMS` in
-`/mnt/mu300-disk/.mu300-update/audio/` first; without it the switch still happens and call audio waits). **Coming from
-v2026.10.19.1 or older**, where the images carried the stack: the update sees that the device uses call audio (a DSP
-firmware is installed) and installs the audio extra by itself before it switches the systems; when it cannot have it
-(offline, nothing staged), the update goes on, ends with a loud notice, and `mu300-update check` says so until
-`sudo mu300-extra install audio` ran. The firmware is kept either way.
+`mu300-update` keeps it in step with the kernel.
 
 ### Languages
 
@@ -1099,7 +1087,7 @@ Like the installer, it offers to reboot the device from Linux into Android first
 | Web panels | ✅ OpenWrt: LuCI, and the MU300 control panel on `openwrt-luci` (with a terminal in the browser); Ubuntu: Cockpit with an MU300 page as the panel extra; adb to Linux over USB on both (off by default) |
 | Back to Android, automatic rollback | ✅ |
 | Screen output (HDMI over USB-C) | ✗ the USB-C power chip never answers, so no display |
-| Call audio | ⚠️ the board has no speaker and no microphone, but a call's audio runs through the modem's audio DSP with the audio extra: `sudo mu300-extra install audio` installs the drivers of the kernel the device uses, `mu300-audio-dsp` and `mu300-voice` from [mu300-audio](https://github.com/dikeckaan/mu300-audio), and fetches the measured DSP image (a ZTE Voyage 41S image, published in [mu300-audio-firmware](https://github.com/dikeckaan/mu300-audio-firmware)) only if its sha256 is the pinned one (`MU300_AUDIO_FIRMWARE=FILE` takes your own); it follows `mu300-update kernel`. The images carry none of it since [FINDINGS 194](docs/FINDINGS.md); an update from v2026.10.19.1 installs the extra by itself on a device that used call audio. Measured: the other side hears what is played into the call (`mu300-voice tone`), the downlink is recorded, and `mu300-voice echo` plays the caller back to themselves ([FINDINGS 24d, 24e](docs/FINDINGS.md)). A Bluetooth headset as the output (after kano's [e5-linux](https://github.com/kanoqwq/e5-linux); `mu300-voice audio start bt`, `tools/hfp`) is built, but a whole call on one is not measured yet. The kernels have USB audio drivers, not tried here |
+| Call audio | ⚠️ the board has no speaker and no microphone; call audio is the optional audio extra: `sudo mu300-extra install audio` ([mu300-audio](https://github.com/dikeckaan/mu300-audio)). The kernels have USB audio drivers, not tried here |
 
 ## How it works, in short
 
