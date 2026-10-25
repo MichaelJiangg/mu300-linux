@@ -1,34 +1,7 @@
 #!/usr/bin/env python3
-"""Build the VBC DSP profile blobs the kernel asks for, from the vendor's parameter XML.
+"""Build the DSP profile blobs the kernel loads from /lib/firmware, from the vendor's parameter XML.
 
     tools/vbc-profile/vbc-profile.py dsp_vbc.xml audio_structure.xml cvs.xml -o out/
-
-On Android these are produced by the proprietary audio HAL, which parses the XML under
-/odm/etc/audio_params/sprd and hands the result to the driver.  Nothing of the sort exists on a Linux
-userspace - but nothing of the sort is needed, because the kernel fetches the profiles itself:
-
-    vbc_profile_loading()  ->  request_firmware(&fw, "dsp_vbc", ...)
-
-so a blob at /lib/firmware/dsp_vbc is loaded by writing 1 to the "DSP VBC Profile Update" mixer control.
-The four names the driver knows are audio_structure, dsp_vbc, cvs and dsp_smartamp, and the file format is
-(vbc-phy-v4.h):
-
-    struct vbc_fw_header { char magic[16]; u32 num_mode; u32 len_mode; };   /* "audio_profile" */
-    /* followed by num_mode * len_mode bytes, mode 0 first */
-
-The XML says what those two numbers are, in the root element's num_mode and struct_size, and then gives every
-field of every mode.  A field is addressed by three attributes and carries a fourth:
-
-    id      byte offset of the containing word, counted from the start of the whole mode array rather than
-            from the start of its own mode - mode 1's first field is at struct_size, mode 2's at twice that
-    t       that word's width, as a bit count with a letter in front: u16, u32, t960, u768
-    offset  bit position of this field inside the word, counting from the bottom
-    bits    its width in bits
-    val     its value
-
-Fields with no id/t of their own are bitfields inside a container that has them, and a container with no
-attributes at all is just grouping.  Everything not mentioned stays zero, which is what the reserve fields
-spell out anyway.
 
 The XML is vendor parameter data and does not live in this repo; point this at a copy you already have.
 """

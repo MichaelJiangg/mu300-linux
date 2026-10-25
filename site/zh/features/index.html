@@ -308,7 +308,7 @@ docker compose up -d</code></pre>
 <h2>不能用的东西</h2>
 <ul class="dots">
 <li class="r"><strong>屏幕输出</strong>USB-C 转 HDMI：USB-C 电源芯片从不应答。</li>
-<li class="r"><strong>声音</strong>主板上没有扬声器和麦克风。安装 DSP 镜像后，通话音频经由基带的音频 DSP（<code>mu300-audio-dsp</code>）；驱动随 6.18、7.2 和 7.3 一起提供，5.4 上需从 mu300-audio 安装。</li>
+<li class="r"><strong>声音</strong>主板上没有扬声器和麦克风；通话音频是可选的音频扩展（<code>mu300-extra install audio</code>）。</li>
 <li class="r"><strong>只有 WPA3 的 Wi-Fi</strong>Wi-Fi 驱动没有 SAE；WPA2/WPA3 混合模式可以。</li>
 <li class="r"><strong>热点和客户端同时开</strong>Wi-Fi 同一时间只能做一件事。</li>
 <li class="r"><strong>监听模式</strong>Wi-Fi 芯片只支持客户端和热点模式。</li>

@@ -1,7 +1,5 @@
-"""Call audio and the kernels (FINDINGS 188, 194): the Unisoc call-audio stack is the audio extra's
-(github.com/dikeckaan/mu300-audio, mu300-extra install audio), built there out of tree against each kernel's build. What
-stays here is what no module can bring: the DSP's memory reserved at boot, and the ALSA/ASoC/dmaengine core options the
-extra's drivers link against. Nothing of the stack is built or shipped here any more."""
+"""Call audio and the kernels: call audio is the audio extra's (github.com/dikeckaan/mu300-audio). What stays here is
+the memory reserved at boot and the sound core options its drivers build against."""
 import re
 import subprocess
 import tempfile
@@ -30,12 +28,11 @@ class StaysInTheKernel(unittest.TestCase):
         patch = (UP / 'patches' / '0022-of-reserved-mem-add.patch').read_text()
         self.assertIn('+config OF_RESERVED_MEM_ADD', patch)
         self.assertIn('+	reserved_mem_add_regions();', patch)
-        # pages kept (memblock_reserve, not no-map): audio_mem maps them with vmap() like the modem's smem
+        # pages kept (memblock_reserve, not no-map)
         self.assertIn('memblock_reserve(base, size)', patch)
         self.assertTrue((TOP / 'kernel' / 'patches' / 'of-reserved-mem-add.patch').is_file())
 
     def test_the_kernel_checks_every_control_write(self):
-        # the vendor ASoC code indexes tables with control values, not always checked (FINDINGS 188)
         self.assertIn('CONFIG_SND_CTL_INPUT_VALIDATION=y\n', (UP / 'mu300-mainline.config').read_text())
 
     def test_the_guard_never_blocks_what_the_stack_needs(self):
@@ -69,10 +66,8 @@ class NotHereAnyMore(unittest.TestCase):
         self.assertNotIn('mu300-voice', (OVERLAY / 'etc/tmpfiles.d/mu300-run.conf').read_text().split('\n', 3)[-1])
 
     def test_ubuntu_leaves_the_card_state_alone(self):
-        # alsa-utils restored every control when the card appeared, before the DSP was started: each DSP control
-        # failed with -5, each codec read waited for the power domain, and on 5.4 mu300-audio ran past its timeout
-        # and was killed in its start (FINDINGS 193). The image masks the service and the udev rule (harmless without
-        # the audio extra, needed with it); run its lines.
+        # the image masks alsa-utils' restore service and udev rule (harmless without the audio extra, needed with
+        # it); run its lines.
         src = (TOP / 'rootfs' / 'assemble.sh').read_text()
         lines = [l for l in src.splitlines()
                  if ('alsa' in l or l == 'mkdir -p $R/etc/udev/rules.d') and not l.lstrip().startswith('#')]

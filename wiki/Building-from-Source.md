@@ -65,9 +65,7 @@ applied (about 10 minutes on Apple silicon). Then:
 * Wi-Fi, Bluetooth and GPU drivers: realme C51/C53 AndroidT kernel release (GPL-2.0).
 * Mainline 6.18, 7.2 and 7.3: kernel.org Linux plus the port in
   [`upstream/`](https://github.com/dikeckaan/mu300-linux/tree/main/upstream).
-* Call audio is not built here: its drivers, scripts and tools are the audio extra,
-  [mu300-audio](https://github.com/dikeckaan/mu300-audio), built there against each kernel's build kit (made from this
-  repository's build trees of a release). The kernels keep the DSP's memory reservation and the ALSA/ASoC core.
+* Call audio is not built here: it is the audio extra, [mu300-audio](https://github.com/dikeckaan/mu300-audio).
 * Each release's notes list the exact source commits.
 
 ## Other distributions
