@@ -97,8 +97,8 @@ installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.12` for `build.sh` a
 `sudo mu300-update kernel 7.3`, choice 4 in the installer; `OUTDIR=out-7.3 KV=7.3` (its kernel release is `7.3.0`).
 Every patch applies unchanged; what 7.3 changed is in FINDINGS 206: `PROC_SYSCTL` folded into `SYSCTL`
 (`config-ignored.txt`), the cfg80211 cookie of remain-on-channel and management frames handed to the driver by
-value, `dma_capable()` taking DMA attributes, and the IIO consumer API in a symbol namespace (the audio extra's
-headset driver).
+value, `dma_capable()` taking DMA attributes, and the IIO consumer API in a symbol namespace (used by the audio
+extra).
 
 ## Remaining mainline work (as of 2026-09-26)
 
@@ -110,10 +110,8 @@ headset driver).
   Ubuntu boot that died early before the crash capture existed (31d) is unexplained, and has not recurred in the
   reboot loops since (Ubuntu 6/6, OpenWrt 4/4).
 - Power-off works through the PMIC (FINDINGS 31h); on a powered USB port the battery-less F50 starts again.
-- Audio: call audio is ported (FINDINGS 188): the Unisoc AGDSP stack of 5.4 for 6.18 and 7.2. Since FINDINGS 194 it
-  is the audio extra's ([mu300-audio](https://github.com/dikeckaan/mu300-audio), `mu300-extra install audio`): its
-  drivers are built there against each kernel's build kit; what stays here is the DSP's memory reservation
-  (`patches/0022`) and the ASoC/ALSA core options of `mu300-mainline.config`.
+- Audio: call audio is the audio extra ([mu300-audio](https://github.com/dikeckaan/mu300-audio),
+  `mu300-extra install audio`).
 
 ## Earlier status notes
 Clocks, pinctrl, power domains, USB 3.1 gadget, eMMC, PCIe, thermal, cpufreq, watchdog, LEDs and Wi-Fi/BT are
@@ -124,7 +122,7 @@ working (see the status below). What is still missing:
 - **PM co-processor**: without Android's `modem_control` the board powers off after ~290 s, so the vendor chroot is
   still required.
 - ~~**GPU**~~: works since 2026-09-19 (DDK r40p0 ported to 6.18, OpenCL verified on the device).
-- **Audio**: ported 2026-10-17 (FINDINGS 188).
+- **Audio**: the audio extra (mu300-audio).
 - **Bluetooth**: built as an out-of-tree module, untested on 6.18.
 
 ## Modem on 6.18: working (2026-09-19)
@@ -204,7 +202,7 @@ Still open: audio is untouched.
 
 ## Status (2026-09-17): OpenWrt runs on 6.18.52
 
-The installed OpenWrt 25.12.5 boots on the mainline kernel through the normal `boot/init`
+The installed OpenWrt 25.12.6 boots on the mainline kernel through the normal `boot/init`
 (multi-OS switch_root): SSH, LuCI, `br-lan` over the USB 3.1 gadget, fw4/nftables, zram.
 
 Fixes needed on top of the port:
@@ -224,7 +222,9 @@ Fixes needed on top of the port:
 - Thermal: vendor `sprd_thermal_r5p0` (19 on-die zones) with calibration from the UMS9620 eFuse; the eFuse
   provider is built read-only.
 - cpufreq: vendor `sprd_sip_svc` + `sprd-cpufreq-v2`; ATF does the DVFS, the kernel asks through SIP SMC calls
-  (3 policies: 4 little / 3 mid / 1 big, schedutil). PSCI cpuidle (WFI, core sleep, cluster power-down).
+  (3 policies: 4 little / 3 mid / 1 big, schedutil). PSCI cpuidle (WFI, core sleep, cluster power-down);
+  `modules/ums9620_lpintc` makes the interrupts the kernel enabled wake sources of the cluster power-down, which TF-A
+  left at its own list without USB, IPA and PCIe (docs/FINDINGS.md 218).
   Idle temperature dropped from ~54 C to ~48 C.
 - The stock DT has trip points only on the vendor virtual zone (`soc-thmzone`: passive 70/85 C, critical 110 C,
   cooling maps to the three clusters), whose sensor driver mainline lacks: `modules/mu300_thermal` brings it back
