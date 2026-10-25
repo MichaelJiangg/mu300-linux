@@ -202,7 +202,7 @@ Still open: audio is untouched.
 
 ## Status (2026-09-17): OpenWrt runs on 6.18.52
 
-The installed OpenWrt 25.12.5 boots on the mainline kernel through the normal `boot/init`
+The installed OpenWrt 25.12.6 boots on the mainline kernel through the normal `boot/init`
 (multi-OS switch_root): SSH, LuCI, `br-lan` over the USB 3.1 gadget, fw4/nftables, zram.
 
 Fixes needed on top of the port:

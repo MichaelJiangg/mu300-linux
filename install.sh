@@ -79,7 +79,7 @@ set -eu
 TOP=$(cd "$(dirname "$0")" && pwd)
 KOUT=${MU300_KERNEL_OUT:-$TOP/out}
 WORK=${MU300_WORK:-$TOP/work}
-OWRT_VER=25.12.5
+OWRT_VER=25.12.6
 # empty: the newest published release, looked up when it is needed. It used to be a fixed tag that nobody
 # remembered to move, so new installs kept getting an old release long after fixes were published.
 T=/data/local/tmp

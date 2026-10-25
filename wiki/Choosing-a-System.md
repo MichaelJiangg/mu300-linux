@@ -29,12 +29,12 @@ optional [VPN](VPN) module.
 ```
 ==> What should be installed?
   1) Ubuntu LTS: 24.04 or 26.04, asked next (full distribution, apt, ~500 MiB RAM in use)
-  2) OpenWrt 25.12.5 (router, LuCI web UI, ~140 MiB RAM in use)
+  2) OpenWrt 25.12.6 (router, LuCI web UI, ~140 MiB RAM in use)
   3) both (switch later with: mu300-os ubuntu|openwrt)
 
 ==> Which OpenWrt?
-  1) OpenWrt 25.12.5: the standard LuCI web interface
-  2) OpenWrt 25.12.5 with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)
+  1) OpenWrt 25.12.6: the standard LuCI web interface
+  2) OpenWrt 25.12.6 with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)
 
 ==> Which Ubuntu?
   1) 24.04 LTS  the longest tested, supported until 2029
