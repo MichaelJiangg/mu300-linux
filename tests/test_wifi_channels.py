@@ -7,7 +7,7 @@ start_dfs_cac() fails and the AP stays down).
 * `openwrt-wifi-config` and `mu300-wifi-band` on OpenWrt (a stub `uci`): the channel, htmode, the channel list for
   auto, and a DFS channel set in LuCI rewritten at boot;
 * `openwrt/patches/wifi-scripts-no-dfs.patch`: how the build applies it, and - with MU300_WRT_IMAGE naming an
-  OpenWrt 25.12 docker image (e.g. mu300-openwrt-base:25.12.5, as openwrt/build-rootfs.sh imports it) - the hostapd
+  OpenWrt 25.12 docker image (e.g. mu300-openwrt-base:25.12.6, as openwrt/build-rootfs.sh imports it) - the hostapd
   configuration the patched wifi-scripts generate for a fake wiphy with and without radar detection.
 """
 import json

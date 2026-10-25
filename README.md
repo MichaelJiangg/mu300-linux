@@ -911,7 +911,7 @@ panel. The web interface starts in **English**; switch it under System -> System
 `openwrt-luci` under System -> Languages. An update keeps the language you picked.
 
 Every other language is the **lang extra** (about 2 MB, OpenWrt only - Ubuntu has no web interface): LuCI in the 40
-further languages OpenWrt 25.12.5 translates it to, and the control panel in 29 of them (ar, az, bg, cs, da, de, el,
+further languages OpenWrt 25.12.6 translates it to, and the control panel in 29 of them (ar, az, bg, cs, da, de, el,
 es, fa, fi, fr, he, hi, hu, id, it, ja, kk, ko, nl, pl, pt-BR, ro, ru, sk, sv, uk, vi, zh-TW; az, kk and id have no
 LuCI translation, only the panel's). Install it from the panel (System -> Languages: download it, or upload
 `mu300-extra-lang.tar.gz` from the release page when the device has no internet) or on the device:
