@@ -506,8 +506,8 @@ check() {
     _xs=; for x in $(extra_installed); do extra_known "$x" && _xs="$_xs $x ($(extra_release "$x"))"; done
     printf 'extras           %s\n' "${_xs:- none (mu300-extra list)}"
     printf 'kernel            %s (boot image: %s; kernel choice %s)\n' "$(uname -r)" "$(cat "$BOOTDIR/installed.tag" 2>/dev/null || echo "from the installer")" "$(kernel_choice)"
-    # call audio in use (a DSP firmware is installed) without the audio extra: the releases since FINDINGS 194 do not
-    # carry the stack, and the update could not install it
+    # call audio in use (a DSP firmware is installed) without the audio extra: the releases since v2026.10.19.1 do not
+    # carry it, and the update could not install it
     if [ ! -d "$EXTRA/audio/bin" ] && audio_in_use ""; then
         printf 'call audio        the DSP firmware is installed, the audio extra is not: sudo mu300-extra install audio\n'
     elif [ -d "$EXTRA/audio/bin" ] && [ "$(cat "$EXTRA/audio/kernel" 2>/dev/null)" != "$(kernel_choice)" ]; then
@@ -2090,8 +2090,7 @@ apply_one() {  # apply_one OS TAG
 #                at all. mu300-linux-vpn.tar.gz is vpn as module v1 was, the core with xray and sing-box in it (the
 #                bundle, which mu300-extra and mu300-update from before the engine extras download): taken when the
 #                core is not to be had (a pinned v1 release, a copy brought by hand), and as the fallback of a set.
-#   audio        call audio (FINDINGS 194): the Unisoc call-audio stack - its drivers, mu300-audio-dsp, mu300-voice,
-#                pcmhost, ctlset, mu300-hfp, the services - released on its own by github.com/dikeckaan/mu300-audio as
+#   audio        call audio: its drivers, programs and services, released on its own by github.com/dikeckaan/mu300-audio as
 #                one tarball per kernel, mu300-audio-KERNEL.tar.gz (5.4, 6.18, 7.2, 7.3) with SHA256SUMS: a module like the
 #                VPN's (./VERSION, ./requires, ./hooks/link and ./hooks/unlink, ./manifest), and ./kernel, the kernel
 #                choice its drivers (./modules/<release>/) were built for. The one of the kernel this device uses
@@ -2114,8 +2113,7 @@ VPN_STAGED=$DISK/.mu300-update/vpn
 AUDIO_REPO=dikeckaan/mu300-audio
 AUDIO_URL=${MU300_AUDIO_URL:-https://github.com/$AUDIO_REPO/releases/latest/download}
 AUDIO_STAGED=$DISK/.mu300-update/audio
-# the DSP firmware the audio extra fetches: the one image measured on an F50 (a ZTE Voyage 41S AGDSP image, FINDINGS
-# 24), published by the owner on its own; nothing with another sha256 is ever installed from there
+# the DSP firmware the audio extra fetches; nothing with another sha256 is ever installed from there
 AUDIO_FW_URL=${MU300_AUDIO_FW_URL:-https://github.com/dikeckaan/mu300-audio-firmware/releases/download/v1.0/agdsp.bin}
 AUDIO_FW_SHA256=378ceea78dbf013e10625e71efd6fab487d727e371884ae8daf078da2828b937
 AUDIO_FW_CACHE=$EXTRA/.audio-firmware/agdsp.bin
@@ -2850,7 +2848,7 @@ audio_in_use() {
     return 1
 }
 audio_hint() {
-    printf '\nCall audio is the audio extra now (FINDINGS 194). Copy SHA256SUMS and %s from\n' "$(module_asset audio)" >&2
+    printf '\nCall audio is the audio extra now. Copy SHA256SUMS and %s from\n' "$(module_asset audio)" >&2
     printf 'https://github.com/%s/releases/latest into %s/ on this device (or:\n' "$AUDIO_REPO" "$AUDIO_STAGED" >&2
     printf 'MU300_AUDIO_MODULE=/path/to/that/directory), or get the device online, then: mu300-extra install audio\n' >&2
 }

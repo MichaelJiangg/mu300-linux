@@ -13,7 +13,7 @@ result: OK: free and empty, same layout as the tested device (~32 GiB after user
 
 ==> What should be installed?
   1) Ubuntu LTS: 24.04 or 26.04, asked next (full distribution, apt, ~500 MiB RAM in use)
-  2) OpenWrt 25.12.5 (router, LuCI web UI, ~140 MiB RAM in use)
+  2) OpenWrt 25.12.6 (router, LuCI web UI, ~140 MiB RAM in use)
   3) both (switch later with: mu300-os ubuntu|openwrt)
 Choice [3]: 3
 Which one should boot (ubuntu/openwrt) [ubuntu]: ubuntu

@@ -299,10 +299,8 @@ for a in mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     done
     rm -f "$D/modules.check"
 done
-# Call audio is the audio extra's (https://github.com/dikeckaan/mu300-audio, mu300-extra install audio; FINDINGS 194):
-# no kernel bundle carries a driver of the Unisoc call-audio stack, and no image its programs or services. The 23 of
-# 5.4 and the 20 of mainline - mainline's sprd-dma.ko is the stack's AGCP DMA driver; 5.4's is the vendor kernel's
-# own DMA driver, which stays.
+# Call audio is the audio extra's (https://github.com/dikeckaan/mu300-audio): no kernel bundle carries its drivers
+# (mainline's sprd-dma.ko is one of them; 5.4's is the vendor kernel's own and stays), and no image its programs.
 AUDIO_KO="audio_mem agdsp_access audio_sipc sprd_audcp_boot sprd_audcp_dvfs audio-dsp-dump audio-pipe sprd_apipe
 mcdt_hw_r2p0 saudio sprd-dmaengine-pcm sprd-platform-pcm-routing sprd-compr-2stage-dma snd-soc-sprd-dai snd-soc-sprd-vaudio
 snd-soc-sprd-vbc-v4 snd-soc-sprd-vbc-fe snd-soc-sprd-codec-ump9620-power snd-soc-sprd-codec-ump9620-power-dev
@@ -365,9 +363,9 @@ first with \`./install.sh --check\`.
 | mu300-kernel-7.3.tar.gz | mainline Linux 7.3 (the newest mainline release) for \`mu300-update kernel 7.3\`: the same parts |
 | mu300-ubuntu-rootfs.tar.gz | Ubuntu 24.04 LTS root filesystem |
 | mu300-ubuntu-26.04-rootfs.tar.gz | Ubuntu 26.04 LTS root filesystem |
-| mu300-openwrt-rootfs.tar.gz | OpenWrt 25.12.5 root filesystem |
-| mu300-openwrt-luci-rootfs.tar.gz | OpenWrt 25.12.5 with the MU300 control panel (luci-app-mu300 by kanoqwq, Aurora theme by eamonxg) |
-| mu300-extra-lang.tar.gz | LuCI and the MU300 panel in more languages (OpenWrt only; English, Turkish and Chinese are in the images): \`mu300-extra install lang\` on the device, or System > Languages in the panel; LuCI's catalogs from the OpenWrt 25.12.5 feed, the panel's AI-translated |
+| mu300-openwrt-rootfs.tar.gz | OpenWrt 25.12.6 root filesystem |
+| mu300-openwrt-luci-rootfs.tar.gz | OpenWrt 25.12.6 with the MU300 control panel (luci-app-mu300 by kanoqwq, Aurora theme by eamonxg) |
+| mu300-extra-lang.tar.gz | LuCI and the MU300 panel in more languages (OpenWrt only; English, Turkish and Chinese are in the images): \`mu300-extra install lang\` on the device, or System > Languages in the panel; LuCI's catalogs from the OpenWrt 25.12.6 feed, the panel's AI-translated |
 | mu300-extra-panel.tar.gz | the web panel for Ubuntu: Cockpit (Ubuntu's web console: terminal, logs, services, networking, storage) and the MU300 page (signal, mobile data, data usage, SMS, VPN, power and CPU, Wi-Fi, updates), on the LAN only: \`sudo mu300-extra install panel\` on the device (Cockpit from Ubuntu's archive), or the installer's question |
 | mu300-extra-panel-offline.tar.gz | the same with Cockpit's packages for Ubuntu 24.04 and 26.04, for a device that is not online: \`sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz\` |
 | mu300-update | the on-device updater of this release (\`mu300-update apply\` switches to it before it changes anything) |
