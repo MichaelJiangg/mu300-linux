@@ -43,8 +43,7 @@
 #               (https://LAN-ADDRESS:9090, the Ubuntu account's password). Its command, mu300-panel, installs Cockpit's
 #               packages into the system (from the extra when it carries them, else from Ubuntu's archive) and, after
 #               an update replaced the system, again in the background at its first boot (mu300-extra link).
-#   audio       call audio (FINDINGS 194): the Unisoc audio DSP's drivers for one kernel, mu300-audio-dsp, mu300-voice
-#               and their services, the module of github.com/dikeckaan/mu300-audio. It follows the kernel: mu300-update
+#   audio       call audio: the drivers for one kernel, the programs and their services, the module of github.com/dikeckaan/mu300-audio. It follows the kernel: mu300-update
 #               kernel X installs the one of X. Removing it takes it out of every system again (and the firmware it
 #               had put there).
 #

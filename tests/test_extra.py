@@ -1168,7 +1168,7 @@ class LangExtra(ExtrasBase):
             self.assertEqual(r.stdout.split(), [], shell)
 
 
-# ---- the audio extra (FINDINGS 194) ------------------------------------------------------------------------------
+# ---- the audio extra -------------------------------------------------------------------------------------------
 AUDIO_URL = 'http://10.0.0.2:8000/audio-module'
 AUDIO_HOOK_LINK = ('echo "audio-link [$1]" >> "$STUBLOG/hooks"\n'
                    '[ -z "$1" ] || { mkdir -p "$1/opt/mu300/bin" && ln -sfn "$MU300_EXTRA_DIR/bin/mu300-audio-dsp" "$1/opt/mu300/bin/mu300-audio-dsp"; }\n'

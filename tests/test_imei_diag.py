@@ -1,4 +1,4 @@
-"""imei-diag and the collector's fallback to it (FINDINGS 213).
+"""imei-diag and the collector's fallback to it (FINDINGS 220).
 
 Some U30 Air firmware answers AT+CGSN with fifteen zeros -- on both SIM slots, and through the vendor's own
 miscserver path -- while the modem's NV still holds both IMEIs. The vendor's backend reads them over the diag port;
