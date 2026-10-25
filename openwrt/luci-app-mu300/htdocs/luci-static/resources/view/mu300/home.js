@@ -574,7 +574,7 @@ return view.extend({
 			if (!s) return '--';
 			return this.identShown ? s : s.substring(0, 4) + '****' + s.substring(s.length - 3);
 		}.bind(this);
-		/* The module has two IMEIs, one per card (cell's imei1/imei2, read over diag, FINDINGS 217). Both are shown,
+		/* The module has two IMEIs, one per card (cell's imei1/imei2, read over diag, FINDINGS 221). Both are shown,
 		 * the active one tagged, and a click copies the full value (the page may be masking it). Where diag gave
 		 * nothing (another modem, the 5.4 kernel), the AT+CGSN IMEI stands in for the active card's, and a row with
 		 * no value at all is hidden. */

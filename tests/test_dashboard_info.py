@@ -667,7 +667,7 @@ esac""")
 @unittest.skipUnless(shutil.which('node'), 'Node.js is needed for the LuCI JS tests')
 class ImeiRows(unittest.TestCase):
     """home.js's paintIdent: the module's two IMEIs (cell's imei1/imei2, over diag), the active card's tagged, and the
-    AT+CGSN IMEI standing in for the active card's where diag gave nothing (FINDINGS 217)."""
+    AT+CGSN IMEI standing in for the active card's where diag gave nothing (FINDINGS 221)."""
 
     def paint(self, ident):
         src = HOME.read_text(encoding='utf-8')

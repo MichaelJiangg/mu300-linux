@@ -31,7 +31,7 @@ adb shell /opt/mu300/bin/mu300-device --json
 One line of JSON on stdout, exit status 0, nothing on stderr:
 
 ```json
-{"mu300":1,"device":"f50","system":"openwrt-luci","version_id":"25.12.5","release":"v2026.10.23","kernel":"7.2.10","root":true,"adb":"open"}
+{"mu300":1,"device":"f50","system":"openwrt-luci","version_id":"25.12.6","release":"v2026.10.23","kernel":"7.2.10","root":true,"adb":"open"}
 ```
 
 | Field | Type | Values |

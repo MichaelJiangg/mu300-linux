@@ -79,10 +79,8 @@ sudo mu300-usb adb off          # no adb at all
 A device where you turned adb off, or set it up with a key, before this release stays as it was.
 
 ### Can I make calls or play sound?
-Calls yes, sound on the device no: the board has no speaker or microphone. A call's audio runs through the modem's
-audio DSP, to the device's own taps on the call or a Bluetooth headset (the headset route is not measured yet), with
-the audio extra: `sudo mu300-extra install audio` installs it from [mu300-audio](https://github.com/dikeckaan/mu300-audio) for
-the kernel the device uses, with the DSP image (checked against its pinned sha256).
+The board has no speaker or microphone. Call audio is the optional audio extra: `sudo mu300-extra install audio`
+([mu300-audio](https://github.com/dikeckaan/mu300-audio)).
 
 ### Can I plug in a screen?
 No. HDMI over USB-C does not work (the USB-C power-delivery chip never answers). It is a headless machine.

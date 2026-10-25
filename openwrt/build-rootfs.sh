@@ -19,7 +19,7 @@
 set -eu
 FLAVOUR=${MU300_FLAVOUR:-openwrt}
 case $FLAVOUR in
-    openwrt)     VER=${MU300_WRT_VER:-25.12.5}; BASEURL=https://downloads.openwrt.org/releases ;;
+    openwrt)     VER=${MU300_WRT_VER:-25.12.6}; BASEURL=https://downloads.openwrt.org/releases ;;
     # ImmortalWrt is an OpenWrt fork: same package manager, same layout, more drivers and LuCI apps
     immortalwrt) VER=${MU300_WRT_VER:-25.12.2}; BASEURL=https://downloads.immortalwrt.org/releases ;;
     *) echo "unknown flavour '$FLAVOUR' (openwrt or immortalwrt)" >&2; exit 1 ;;

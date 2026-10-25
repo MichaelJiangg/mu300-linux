@@ -151,7 +151,7 @@ iccid_value() {
 # ident_complete FILE: the identity cache holds IMEI, IMSI and ICCID
 ident_complete() {
     # fifteen zeros (a modem that answers AT+CGSN with nothing) is no identity, and keeping it in the 6 h cache would
-    # hide the diag read below for hours (FINDINGS 216). A real IMEI may start with 0 (reporting bodies 00-01).
+    # hide the diag read below for hours (FINDINGS 220). A real IMEI may start with 0 (reporting bodies 00-01).
     grep -q '"imei":"[0-9]' "$1" && ! grep -q '"imei":"000000000000000"' "$1" &&
         grep -q '"imsi":"[0-9]' "$1" && grep -q '"iccid":"[0-9A-F]' "$1"
 }
@@ -573,7 +573,7 @@ if [ "$MODE" = full ]; then
         i_fw=$(at 'AT+CGMR' 2 | grep -v '^OK' | head -n1)
         i_imei=$(ident_token "$(at 'AT+CGSN' 2)" '[0-9]{15,17}' | cut -c1-15)
         # Some U30 Air firmware answers AT+CGSN with fifteen zeros -- on both SIM slots, and through the vendor's
-        # own miscserver path -- while the NV holds both IMEIs and the diag port reads them (FINDINGS 213). The
+        # own miscserver path -- while the NV holds both IMEIs and the diag port reads them (FINDINGS 220). The
         # panel shows the module's two IMEIs, so read both; the active slot's one still has AT+CGSN as fallback.
         i_imei1=; i_imei2=
         if [ -x "$IMEI_DIAG" ]; then

@@ -3,7 +3,7 @@
 #
 # Some U30 Air firmware (MOCORTM_V2_23A_W25.03.2_Debug) answers AT+CGSN -- and AT+SPIMEI? -- with fifteen zeros:
 # on both SIM slots, and through the vendor's own miscserver path.  The NV still holds both IMEIs and the vendor's
-# backend reads them from the diag port with the request below (FINDINGS 213).  This is that read: no write, no
+# backend reads them from the diag port with the request below (FINDINGS 220).  This is that read: no write, no
 # state change.
 #
 #   imei-diag 0   the external card's IMEI (IMEI1, diag 0x5E81)
