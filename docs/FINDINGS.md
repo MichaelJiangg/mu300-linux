@@ -11932,3 +11932,20 @@ OpenWrt's own busybox (25.12.6) has neither `od` nor `timeout`, so on a stock im
 U30 Air (OpenWrt 25.12.6, 6.18.58, firmware `MOCORTM_V2_23A_W25.30.2_Debug`, whose `AT+CGSN` answers a real IMEI):
 both slots read 15 digits, slot 0's is the one `AT+CGSN` gives, and the collector is unchanged where AT works.
 
+### 221. The panel shows both IMEIs, marks the card in use and copies them on a click
+
+**Status: implemented in the panel; device check below.** Follows 220.
+
+`cell` reads the module's two IMEIs over diag on every identity round (`imei1`/`imei2`, plus `slot`), not only the
+active card's, so a unit with no card in the other slot still shows that slot's IMEI. The dashboard shows two rows
+(`IMEI1 (SIM1)` / `IMEI2 (SIM2)`); the active card's row carries a green tag with the existing `in use` message (no
+new catalog entries), and a click copies the full value -- the page may be masking it -- through the HTTP fallback
+(`execCommand`), as the panel is not a secure context.
+
+Verified on the U30 Air (OpenWrt): `sim-slot1.json` carries `"slot":1,"imei1":...,"imei2":...`; the active slot's
+row carries the tag and the other does not; a click copies the unmasked value.
+
+Checked again before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58, card in slot 0): the cache carries
+`"slot":0` and two different 15-digit IMEIs, the one of slot 0 equal to `AT+CGSN`'s; the dashboard shows both rows,
+masked, with the tag on IMEI1 only; a click hands the full 15 digits to the copy; no errors in the browser console.
+
