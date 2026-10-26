@@ -11908,3 +11908,27 @@ its cluster-pd.
 
 ### 219. (removed)
 
+### 220. The U30 Air's AT+CGSN answers fifteen zeros: the IMEI is read over diag
+
+**Status: fixed in the panel's collector; the diag read is a fallback, used only when AT+CGSN gives nothing
+usable.** Seen on a U30 Air (OpenWrt 25.12.5, v2026.10.23.1, 7.2.11, `MOCORTM_V2_23A_W25.03.2_Debug`).
+
+`AT+CGSN` and `AT+SPIMEI?` answer `000000000000000` on both SIM slots, and through the vendor's own miscserver path
+on the stock Android, while the modem's NV holds both IMEIs. The vendor's backend reads them over `/dev/sdiag_nr`
+(the request `7E 00 00 00 00 0A 00 5E 81/82 00 00 7E`; the value follows the `74 00 5E 01` marker, one 8-byte block,
+nibbles least significant first, an `a` filler before the first digit). The collector cached the zeros as a
+complete identity, so the page showed `0000****000` for 6 h.
+
+`imei-diag` (shell, read-only: no AT and no NV write) makes that read; `cell` asks it only when `AT+CGSN` returned
+nothing or fifteen zeros, and a zero IMEI no longer counts as a complete identity, so an existing zero cache is
+re-read within the minute. Verified on the unit: slot 0 reads IMEI1 and slot 1 IMEI2, over repeated runs; the cache
+and `mu300dash status` then carry the value. `tests/test_imei_diag.py`.
+
+**Device check before merge (U30 Air, OpenWrt):** the dashboard's IMEI row shows the active card's IMEI after a
+round (not `0000****000`), and follows the card when the slot is switched.
+
+OpenWrt's own busybox (25.12.6) has neither `od` nor `timeout`, so on a stock image the read printed nothing:
+`imei-diag` takes both from the image's full busybox (`/opt/mu300/bin/busybox`). Checked before merge on a second
+U30 Air (OpenWrt 25.12.6, 6.18.58, firmware `MOCORTM_V2_23A_W25.30.2_Debug`, whose `AT+CGSN` answers a real IMEI):
+both slots read 15 digits, slot 0's is the one `AT+CGSN` gives, and the collector is unchanged where AT works.
+
