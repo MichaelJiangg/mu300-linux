@@ -24,6 +24,16 @@ case $FLAVOUR in
     immortalwrt) VER=${MU300_WRT_VER:-25.12.2}; BASEURL=https://downloads.immortalwrt.org/releases ;;
     *) echo "unknown flavour '$FLAVOUR' (openwrt or immortalwrt)" >&2; exit 1 ;;
 esac
+# The hash comes from the release's sha256sums, and that file counts only with a valid usign signature by the
+# release's key, pinned in openwrt/keys/usign/ (OpenWrt's keyring, git.openwrt.org/keyring.git usign/<number>): the
+# 25.12 releases are signed by b5043e70f9a75cde (OpenWrt) and 467a35c14d7fbc5c (ImmortalWrt). Another release
+# series is signed by another key, which has to be pinned here first. Without the check, whoever could change the
+# download (a mirror, a proxy) could change sha256sums with it, and the tarball would match.
+case $FLAVOUR:$VER in
+    openwrt:25.12.*)     USIGN_KEY=b5043e70f9a75cde ;;
+    immortalwrt:25.12.*) USIGN_KEY=467a35c14d7fbc5c ;;
+    *) echo "no pinned usign key for $FLAVOUR $VER (openwrt/keys/usign, openwrt/build-rootfs.sh)" >&2; exit 1 ;;
+esac
 SYSTEM=${MU300_SYSTEM:-openwrt}
 case $SYSTEM in
     openwrt) ;;
@@ -114,7 +124,15 @@ cd "$TOP"
 if [ ! -f "openwrt/$TARBALL" ]; then
     curl -fL -o "openwrt/$TARBALL" "$URL/$TARBALL"
 fi
-want=$(curl -fsL "$URL/sha256sums" | sed -n "s/^\([0-9a-f]*\) \*$TARBALL$/\1/p")
+# sha256sums (below) counts only with a valid usign signature by the release's key
+SUMS=$(mktemp -d)
+curl -fsL -o "$SUMS/sha256sums" "$URL/sha256sums" && curl -fsL -o "$SUMS/sha256sums.sig" "$URL/sha256sums.sig" ||
+    { echo "cannot download $URL/sha256sums and its signature" >&2; rm -rf "$SUMS"; exit 1; }
+python3 "$TOP/tools/usign-verify.py" "$TOP/openwrt/keys/usign/$USIGN_KEY" "$SUMS/sha256sums.sig" "$SUMS/sha256sums" >/dev/null ||
+    { echo "$URL/sha256sums: no valid signature by $FLAVOUR's key $USIGN_KEY" >&2; rm -rf "$SUMS"; exit 1; }
+want=$(sed -n "s/^\([0-9a-f]\{64\}\) \*$TARBALL$/\1/p" "$SUMS/sha256sums")
+rm -rf "$SUMS"
+[ -n "$want" ] || { echo "$TARBALL is not in the signed sha256sums" >&2; exit 1; }
 have=$(shasum -a 256 "openwrt/$TARBALL" 2>/dev/null || sha256sum "openwrt/$TARBALL")
 [ "${have%% *}" = "$want" ] || { echo "checksum mismatch for $TARBALL" >&2; exit 1; }
 docker import --platform linux/arm64 "openwrt/$TARBALL" mu300-$FLAVOUR-base:$VER >/dev/null
