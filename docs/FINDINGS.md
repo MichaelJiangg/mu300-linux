@@ -11949,3 +11949,31 @@ Checked again before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58, card i
 `"slot":0` and two different 15-digit IMEIs, the one of slot 0 equal to `AT+CGSN`'s; the dashboard shows both rows,
 masked, with the tag on IMEI1 only; a click hands the full 15 digits to the copy; no errors in the browser console.
 
+### 222. The Wi-Fi key toggles the hotspot in one press, awake or asleep
+
+**Status: on the U30 Air (OpenWrt); follows 152.**
+
+The Wi-Fi key already had the hotspot toggle on a 3 s hold, but two things made it useless for the case it is for:
+docking the U30 Air to a router over USB and turning its own hotspot off to cut heat.
+
+* the hold only counted on an awake device; on a sleeping one (LEDs dark) the first hold only woke it, so the
+  hotspot needed two holds;
+* `hotspot_set on` ran `wifi up` only. The panel's Wi-Fi switch writes `wireless.radio0.disabled=1` (persistent),
+  so after turning the hotspot off from the page the key could not bring it back -- `wifi up` does not clear the
+  flag -- and the only way back was USB.
+
+`hotspot_set` now writes the same uci flag the page does (0 on, 1 off) before `wifi up`/`wifi down`, and a Wi-Fi
+hold decides its direction (and writes the user's `hotspot-off` marker) before the wake starts, so one hold wakes
+and toggles. A short press still toggles the band, and on a sleeping device still only wakes; the charging boot is
+unchanged (no services to toggle, so a hold there still only wakes).
+
+**Device check (U30 Air, OpenWrt):** with the hotspot off from the page, one 3 s hold brings the SSID back; with
+the device idle (LEDs dark), one 3 s hold wakes it and toggles once, not twice; a short press still switches
+2.4/5 GHz.
+
+
+Checked before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58), with the installed `mu300-buttons` fed two
+Wi-Fi holds 45 s apart (no hand on the key: a stand-in for `mu300-keys` printing `138 long`): awake, the first hold
+took the access point down with `wireless.@wifi-device[0].disabled=1` and the `hotspot-off` marker, the second
+brought it back up (`ENABLED`, flag 0, no marker); the same with the LEDs held dark (`mu300-led idle on`), one hold
+each way. The short press and the charging boot were not exercised.
