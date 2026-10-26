@@ -11977,3 +11977,41 @@ Wi-Fi holds 45 s apart (no hand on the key: a stand-in for `mu300-keys` printing
 took the access point down with `wireless.@wifi-device[0].disabled=1` and the `hotspot-off` marker, the second
 brought it back up (`ENABLED`, flag 0, no marker); the same with the LEDs held dark (`mu300-led idle on`), one hold
 each way. The short press and the charging boot were not exercised.
+
+### 223. LTE band locks use each board's own LTE table (the U30 Air locks B7, B20, B28 and the rest)
+
+**Status: implemented in `unisoc-modem/lock`; checked on a U30 Air (OpenWrt) and an F50 (Ubuntu).** Follows #361,
+#387.
+
+LTE has no capability query, so the lock helper had one fixed table, the F50's (1,3,5,8,34,38,39,40,41), on every
+board. A cleared mask (`AT+SPLBAND=1,0,0,0,0,0`) reads back as the modem's own full table:
+
+| Board | Modem firmware | Cleared read-back | Bands |
+|---|---|---|---|
+| F50 | W25.39.4 | `0,482,0,149,0` | 1,3,5,8,34,38,39,40,41 |
+| U30 Air | W25.30.2 | `0,2018,2057,2271,2` | 1,2,3,4,5,7,8,12,17,20,28,34,38,39,40,41,42,43,66 |
+
+So the U30 Air could not lock B2, B4, B7, B12, B17, B20, B28, B42, B43 or B66, and `get` listed all 19 bands of an
+automatic modem as `locked` (the page still said "Automatic" by counting candidates).
+
+The table is now picked per board (`mu300-device`: `u30air`, anything else the F50's), and becomes the panel's LTE
+candidates (`caps.lte`), the apply filter, the boot replay's filter, and the "automatic" test of the reset and replay
+read-backs (every band of the table present, or an empty mask). `get` reports the read-back as it is, except that
+one holding the whole table is reported as nothing locked.
+
+**Why fixed and not learned from a read-back** (#387 learned it whenever no lock was saved): a read-back taken
+while a lock sits in the modem's NV -- left by Android, by the stock UI, by a hand-sent AT command, or by a wiped
+state directory -- would become "the table", and that lock would then read as automatic and pass every reset and
+replay check (`0,450,0,149,0`, a lock on the F50's list less B38, is exactly that on the U30 Air). Learning only
+after an explicit clear and radio restart avoids that, but the learned file lives in the state directory on the
+SD card or eMMC, which can move to the other board, and needs a reset before the U30's bands show at all. A fixed
+table per board writes nothing to flash and cannot mistake a lock for the table.
+
+**Device check, U30 Air (OpenWrt 25.12.6, 6.18.58, v2026.10.26.1 with this helper):** automatic reads
+`locked: ""`, `raw 0,2018,2057,2271,2`, 19 candidates; `ubus call mu300dash lock_set` with `20,7` sent
+`0,0,8,64,0`, read back `locked 20,7`, and the modem registered; a reboot replayed it (`replay done (early)`, the
+read-back check passed); `lte ""` saved automatic, and the reboot's early check accepted the 19-band read-back;
+a lock sent by hand (`AT+SPLBAND=1,0,450,0,149,0`) read back as `34,39,40,41,1,3,5,8`, not automatic; the reset
+from a lock and from that hand lock verified `ok` and left no saved setting. **F50 (Ubuntu, 7.3.0):** the table and
+the cleared read-back unchanged; `20,7` refused (none supported), `3,7` locked B3 (B7 left out), reset back to
+automatic with nothing saved.
