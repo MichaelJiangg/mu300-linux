@@ -11945,3 +11945,7 @@ new catalog entries), and a click copies the full value -- the page may be maski
 Verified on the U30 Air (OpenWrt): `sim-slot1.json` carries `"slot":1,"imei1":...,"imei2":...`; the active slot's
 row carries the tag and the other does not; a click copies the unmasked value.
 
+Checked again before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58, card in slot 0): the cache carries
+`"slot":0` and two different 15-digit IMEIs, the one of slot 0 equal to `AT+CGSN`'s; the dashboard shows both rows,
+masked, with the tag on IMEI1 only; a click hands the full 15 digits to the copy; no errors in the browser console.
+
