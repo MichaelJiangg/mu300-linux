@@ -11865,3 +11865,9 @@ unchanged (no services to toggle, so a hold there still only wakes).
 the device idle (LEDs dark), one 3 s hold wakes it and toggles once, not twice; a short press still switches
 2.4/5 GHz.
 
+
+Checked before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58), with the installed `mu300-buttons` fed two
+Wi-Fi holds 45 s apart (no hand on the key: a stand-in for `mu300-keys` printing `138 long`): awake, the first hold
+took the access point down with `wireless.@wifi-device[0].disabled=1` and the `hotspot-off` marker, the second
+brought it back up (`ENABLED`, flag 0, no marker); the same with the LEDs held dark (`mu300-led idle on`), one hold
+each way. The short press and the charging boot were not exercised.
