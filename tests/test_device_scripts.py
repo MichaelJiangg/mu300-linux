@@ -738,6 +738,7 @@ class Atd(ShellTest):
     def test_a_cmt_frame_while_idle_is_spooled_before_the_next_command(self):
         for shell in self.each_shell():
             m, _nr0 = self.start_spooling(shell, nr0=False)
+            time.sleep(1.3)                                          # past the daemon's startup drain (a quiet second)
             os.write(m, f'\r\n+CMT: "ADANA BLD",27\r\n{self.PDU}\r\n'.encode())
             time.sleep(0.3)
             self.assertEqual(self.spooled(timeout=0.1), [])        # nobody reads an idle command channel
@@ -4683,7 +4684,8 @@ class UsbReset(ShellTest):
         self.role = self.tmp / 'role'
         self.role.write_text('device\n')
         self.hook = self.tmp / 'hook'
-        self.hook.write_text('#!/bin/sh\necho "hook $ACTION $INTERFACE" >> "$STUBLOG/calls"\n')
+        self.hook.write_text('#!/bin/sh\necho "hook $ACTION $INTERFACE" >> "$STUBLOG/calls"\n'
+                             '[ "$MU300_USB_SKIP_REBIND" = 1 ] || echo queued-rebind >> "$STUBLOG/calls"\n')
         self.hook.chmod(0o755)
         self.run_dir = self.tmp / 'run'
         self.run_dir.mkdir()
@@ -4721,6 +4723,7 @@ class UsbReset(ShellTest):
             self.assertIn('usleep 100000\n', calls)
             self.assertNotIn('sleep 2', calls.replace('usleep', ''))
             self.assertIn('hook ifup lan\n', calls)
+            self.assertNotIn('queued-rebind', calls, 'USB reset recovery queued another rebind')
             self.assertIn('mu300-usb', calls)       # logger tag
             self.assertTrue(float((self.run_dir / 'mu300-usb-rebind-done').read_text().split()[0]) >= 0)
 

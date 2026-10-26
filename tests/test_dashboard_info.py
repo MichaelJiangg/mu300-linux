@@ -7,6 +7,9 @@
 - Connections: the kernel's nf_conntrack_count (mainline has no /proc/net/nf_conntrack), the table as fallback,
   null when neither can be read.
 
+- USB link: the speed the USB-C cable negotiated (the gadget's UDC in device mode, the attached device in host mode,
+  a root hub never standing in for it), and nothing at all with the port empty.
+
 The SIM's own number (cell, the collector; home.js, the row; FINDINGS 49, after kanoqwq@0d93695): AT+CNUM on full
 rounds only, the IMS public identity (AT+SPPAURI?) when the SIM has none, nothing when neither has one; never in
 the fast tier, never on flash, never in a log."""
@@ -116,7 +119,8 @@ class Info(ShellTest):
     def info(self, shell, **env):
         base = dict(MU300_DHCP_LEASES=self.leases, MU300_POWER_SUPPLY_DIR=self.tmp / 'psy',
                     MU300_CONNTRACK_COUNT=self.tmp / 'nf_conntrack_count',
-                    MU300_CONNTRACK_TABLE=self.tmp / 'nf_conntrack')
+                    MU300_CONNTRACK_TABLE=self.tmp / 'nf_conntrack',
+                    MU300_UDC_DIR=self.tmp / 'udc', MU300_USB_DEVICES_DIR=self.tmp / 'usb')
         base.update(env)
         r = self.script(shell, INFO, **base)
         self.assertEqual(r.returncode, 0, r.stderr)
@@ -185,6 +189,55 @@ class Info(ShellTest):
             self.assertEqual(self.info(shell)['conns'], 42)
             count.write_text('x\n')
             self.assertEqual(self.info(shell)['conns'], 3)
+
+    def usb_udc(self, current, maximum):
+        u = self.tmp / 'udc' / '25100000.dwc3'
+        u.mkdir(parents=True, exist_ok=True)
+        (u / 'current_speed').write_text(current + '\n')
+        (u / 'maximum_speed').write_text(maximum + '\n')
+
+    def usb_device(self, name, speed, vendor):
+        d = self.tmp / 'usb' / name
+        d.mkdir(parents=True, exist_ok=True)
+        (d / 'speed').write_text(str(speed) + '\n')
+        (d / 'idVendor').write_text(vendor + '\n')
+
+    def test_usb_link_device_mode(self):
+        self.usb_udc('high-speed', 'super-speed-plus')
+        for shell in self.each_shell():
+            self.assertEqual(self.info(shell)['usblink'],
+                             {'role': 'device', 'speed': 'high-speed', 'mbps': 480,
+                              'max': 'super-speed-plus', 'max_mbps': 10000})
+        self.usb_udc('super-speed-plus', 'super-speed-plus')
+        for shell in self.each_shell():
+            self.assertEqual(self.info(shell)['usblink']['mbps'], 10000)
+
+    def test_usb_link_unplugged_is_not_a_link(self):
+        """dwc3 keeps the UDC registered without a cable: current_speed says so and there is no rate to show."""
+        self.usb_udc('not attached', 'super-speed-plus')
+        for shell in self.each_shell():
+            link = self.info(shell)['usblink']
+            self.assertIsNone(link['mbps'])
+            self.assertEqual(link['speed'], 'not attached')
+
+    def test_usb_link_host_mode_ignores_the_root_hub(self):
+        """A root hub reports the port's own speed, not the attached device's: a 5 Gbps hub around a 480 Mbps stick
+        must not read as 5 Gbps."""
+        self.usb_device('1-0', 5000, '1d6b')
+        self.usb_device('1-1', 480, '05e3')
+        for shell in self.each_shell():
+            self.assertEqual(self.info(shell)['usblink'],
+                             {'role': 'host', 'speed': '480', 'mbps': 480, 'max': None, 'max_mbps': None})
+
+    def test_usb_link_host_mode_takes_the_fastest_device(self):
+        self.usb_device('1-1', 480, '05e3')
+        self.usb_device('2-1', 10000, '0781')
+        for shell in self.each_shell():
+            self.assertEqual(self.info(shell)['usblink']['mbps'], 10000)
+
+    def test_usb_link_nothing_attached(self):
+        for shell in self.each_shell():
+            self.assertIsNone(self.info(shell)['usblink'])
 
 
 class OwnNumber(ShellTest):
@@ -662,3 +715,46 @@ esac""")
                 (info.tmp / 'wan.json').write_text(WAN)
         finally:
             info.tearDown()
+
+
+@unittest.skipUnless(shutil.which('node'), 'Node.js is needed for the LuCI JS tests')
+class ImeiRows(unittest.TestCase):
+    """home.js's paintIdent: the module's two IMEIs (cell's imei1/imei2, over diag), the active card's tagged, and the
+    AT+CGSN IMEI standing in for the active card's where diag gave nothing (FINDINGS 221)."""
+
+    def paint(self, ident):
+        src = HOME.read_text(encoding='utf-8')
+        start = src.index('paintIdent: function(cell) {')
+        start = src.index('function', start)
+        end = src.index('\n\t},', start)
+        js = r'''
+const _ = (s) => s;
+const out = {}, el = {};
+const M = { set: (id, t) => { out[id] = t; },
+            v: (id) => { if (!/^imei[12]-[kr]$/.test(id)) return null; return el[id] = el[id] || { style: {} }; } };
+const self = { identShown: false, paintIdent: ''' + src[start:end] + '\n\t}' + r''' };
+self.paintIdent({ ident: ''' + json.dumps(ident) + r''' });
+process.stdout.write(JSON.stringify({ out, k1: el['imei1-k'].innerHTML, k2: el['imei2-k'].innerHTML,
+    r1: el['imei1-r'].style.display, r2: el['imei2-r'].style.display, full: self.imeiFull }));
+'''
+        r = subprocess.run(['node', '-'], input=js, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads(r.stdout)
+
+    def test_both_from_diag_the_active_one_tagged(self):
+        t = self.paint({'slot': 1, 'imei': '222222222222228', 'imei1': '111111111111116', 'imei2': '222222222222228'})
+        self.assertEqual((t['out']['imei1'], t['out']['imei2']), ('1111****116', '2222****228'))
+        self.assertNotIn('in use', t['k1'])
+        self.assertIn('in use', t['k2'])
+        self.assertEqual((t['r1'], t['r2']), ('', ''))
+        self.assertEqual(t['full'], ['111111111111116', '222222222222228'])
+
+    def test_without_diag_the_at_imei_is_the_active_cards(self):
+        """F50, V50, the 5.4 kernel: no diag answer, only AT+CGSN's IMEI; the other card's row is not shown."""
+        t = self.paint({'slot': 0, 'imei': '333333333333334', 'imei1': '', 'imei2': ''})
+        self.assertEqual(t['out']['imei1'], '3333****334')
+        self.assertIn('in use', t['k1'])
+        self.assertEqual((t['r1'], t['r2']), ('', 'none'))
+        t = self.paint({'imei': '333333333333334'})                    # an identity cached before the slot field
+        self.assertEqual(t['out']['imei1'], '3333****334')
+

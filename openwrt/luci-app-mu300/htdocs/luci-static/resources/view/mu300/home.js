@@ -205,7 +205,7 @@ return view.extend({
   <div class="mud-hero-l">
     <div style="font-size:.78rem;color:var(--text-muted,var(--text-light,#777))">
       <span class="mud-dot" id="mud-dot"></span><b id="mud-host" style="color:var(--text,#222)">--</b>
-      <span id="mud-uptime"></span></div>
+      <span id="mud-uptime"></span><span class="mud-vsep" id="mud-vsep" hidden></span><span class="mud-usb" id="mud-usb" hidden></span></div>
     <div class="mud-rat" id="mud-rat">--<span class="mud-bars" id="mud-bars"><i style="height:25%"></i><i style="height:45%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></span></div>
     <div class="mud-op" id="mud-op">--</div>
     <div class="mud-cellline" id="mud-cellline"></div>
@@ -303,7 +303,8 @@ return view.extend({
         <div class="mud-r"><span class="mud-k">${_('Modem')}</span><span class="mud-v" id="mud-modem">--</span></div>
         <div class="mud-r"><span class="mud-k">${_('Carrier')}</span><span class="mud-v" id="mud-carr">--</span></div>
         <div class="mud-r"><span class="mud-k">PLMN</span><span class="mud-v" id="mud-plmn">--</span></div>
-        <div class="mud-r"><span class="mud-k">IMEI</span><span class="mud-v" id="mud-imei">--</span></div>
+        <div class="mud-r" id="mud-imei1-r"><span class="mud-k" id="mud-imei1-k">IMEI1 (SIM1)</span><span class="mud-v mud-copy" id="mud-imei1">--</span></div>
+        <div class="mud-r" id="mud-imei2-r" style="display:none"><span class="mud-k" id="mud-imei2-k">IMEI2 (SIM2)</span><span class="mud-v mud-copy" id="mud-imei2">--</span></div>
         <div class="mud-r"><span class="mud-k">IMSI</span><span class="mud-v" id="mud-imsi">--</span></div>
         <div class="mud-r"><span class="mud-k">ICCID</span><span class="mud-v" id="mud-iccid">--</span></div>
         <div class="mud-r" id="mud-msisdn-r" style="display:none"><span class="mud-k">${_('Own number')}</span><span class="mud-v" id="mud-msisdn">--</span></div>
@@ -450,6 +451,29 @@ return view.extend({
 			M.v('reveal').textContent = self.identShown ? _('Hide SIM identifiers') : _('Show SIM identifiers');
 			self.paintIdent(self.lastCell);
 		};
+		/* a click on an IMEI copies the whole value; the panel is plain HTTP (no secure context), so execCommand is
+		 * the fallback of the clipboard API */
+		[ 0, 1 ].forEach(function(n) {
+			var el = q('imei' + (n + 1));
+			if (!el) return;
+			el.onclick = function() {
+				var v = self.imeiFull && self.imeiFull[n];
+				if (!v) return;
+				var copy = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(v)
+					: new Promise(function(res, rej) {
+						var ta = document.createElement('textarea');
+						ta.value = v; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
+						document.body.appendChild(ta); ta.select();
+						try { document.execCommand('copy') ? res() : rej(new Error('copy')); } catch (e) { rej(e); }
+						document.body.removeChild(ta);
+					});
+				copy.then(function() {
+					el.classList.add('ok');
+					setTimeout(function() { el.classList.remove('ok'); }, 900);
+					M.toast('IMEI' + (n + 1) + ' \u2713', { type: 'success' });
+				}, function() { M.toast('\u2717', { type: 'error' }); });
+			};
+		});
 
 		/* Lock from a neighbor row (event delegation) */
 		q('neigh').addEventListener('click', function(ev) {
@@ -550,7 +574,21 @@ return view.extend({
 			if (!s) return '--';
 			return this.identShown ? s : s.substring(0, 4) + '****' + s.substring(s.length - 3);
 		}.bind(this);
-		M.set('imei', mask(id && id.imei));
+		/* The module has two IMEIs, one per card (cell's imei1/imei2, read over diag, FINDINGS 221). Both are shown,
+		 * the active one tagged, and a click copies the full value (the page may be masking it). Where diag gave
+		 * nothing (another modem, the 5.4 kernel), the AT+CGSN IMEI stands in for the active card's, and a row with
+		 * no value at all is hidden. */
+		var slot = id && typeof id.slot === 'number' ? id.slot : 0;
+		var imei = [ id && id.imei1, id && id.imei2 ];
+		if (!imei[slot] && id && id.imei) imei[slot] = id.imei;
+		this.imeiFull = imei;
+		for (var n = 0; n < 2; n++) {
+			var k = M.v('imei' + (n + 1) + '-k'), r = M.v('imei' + (n + 1) + '-r');
+			if (k) k.innerHTML = 'IMEI' + (n + 1) + ' (SIM' + (n + 1) + ')' +
+				(slot === n && imei[n] ? ' <span class="mud-imei-active">\u2713 ' + _('in use') + '</span>' : '');
+			if (r) r.style.display = imei[n] || n === slot ? '' : 'none';
+			M.set('imei' + (n + 1), mask(imei[n]));
+		}
 		M.set('imsi', mask(id && id.imsi));
 		M.set('iccid', mask(id && id.iccid));
 		/* The SIM's own number (CNUM, else the IMS identity; full rounds only): a row only when there is one, masked
@@ -568,6 +606,27 @@ return view.extend({
 		if (el && this.lastCell) el.innerHTML = M.neighborRows(this.lastCell, this.lockedCell);
 	},
 
+	/* The USB cable's link speed (dashboard-info's usblink). Device mode reports the gadget's negotiated
+	 * speed, host mode the attached device's. Hidden with nothing plugged in; amber when the link is below what the
+	 * port can do -- a USB 2.0 cable or host port caps a 10 Gbps port at 480 Mbps. */
+	paintUsb: function(l) {
+		var el = M.v('usb'), sep = M.v('vsep');
+		if (!el) return;
+		var mbps = l && typeof l.mbps === 'number' ? l.mbps : null;
+		if (mbps == null) { el.hidden = true; if (sep) sep.hidden = true; return; }
+		var names = { 'low-speed': 'Low Speed', 'full-speed': 'Full Speed', 'high-speed': 'High Speed',
+			'super-speed': 'SuperSpeed', 'super-speed-plus': 'SuperSpeed+' };
+		var rate = function(n) { return n >= 1000 ? (n / 1000) + ' Gbps' : n + ' Mbps'; };
+		var max = typeof l.max_mbps === 'number' ? l.max_mbps : null;
+		var name = names[l.speed] || (l.role === 'host' ? 'Host' : 'link');
+		el.className = 'mud-usb' + (max == null ? '' : (mbps >= max ? ' ok' : ' warn'));
+		el.innerHTML = '<i></i><b>' + M.esc('USB ' + name + ' \u00b7 ' + rate(mbps)) + '</b>';
+		el.title = l.role === 'host'
+			? 'USB host mode, attached device ' + rate(mbps)
+			: 'USB ' + rate(mbps) + ' now, port maximum ' + (max == null ? '--' : (names[l.max] ? names[l.max] + ' ' : '') + rate(max));
+		el.hidden = false;
+		if (sep) sep.hidden = false;
+	},
 	update: function(st) {
 		var i = st.info || {};
 		this.lastInfo = i;
@@ -598,6 +657,7 @@ return view.extend({
 		M.set('host', i.host);
 		M.set('uptime', i.uptime ? _('Uptime %s').format(M.fmtUptime(i.uptime)) : '');
 		M.v('dot').className = 'mud-dot' + (i.modem && i.modem.alive ? ' on' : '');
+		this.paintUsb(i.usblink);
 
 		var sig = c && !c.error ? (c.sig || {}) : {};
 		var rsrp = sig.rsrp, rsrq = sig.rsrq, sinr = sig.sinr;

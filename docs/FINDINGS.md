@@ -11790,6 +11790,71 @@ Tests: `tests/test_adb.py` (`GadgetOsDescTable`: both unbinds clear the pointer 
 number 0027, mu300-adbd never turns the descriptors off; `Gadget`: after adb leaves, `os_desc/use` is still 1 and
 `os_desc/c.1` still a link).
 
+### 214. Boot time on the U30 Air (OpenWrt, 6.18): mobile data at 14.5 s instead of 34 s
+
+Our U30 Air, OpenWrt 25.12.5 on 6.18.57, data on SIM2 over 5G SA, hotspot on 5 GHz channel 149. Seconds after the
+kernel started, from `/run/mu300/boot-timeline` (`dial-addr-ok`), dmesg and logread:
+
+| | before | after (three boots) |
+|---|---|---|
+| kernel to `/init` | 2.21 | 0.34 |
+| switch_root | 5.02 | 1.15 |
+| procd `- init -` | 13.89 | 2.05 to 2.14 |
+| hotspot `AP-ENABLED` | 28.0 (up at 24.0, then restarted) | 10.5 to 11.7 |
+| mobile data (`dial-addr-ok`) | 34.26 | 14.43, 14.50, 14.61 |
+
+The bootloader's part comes before all of it: the architected counter reads 7.0 s more than CLOCK_BOOTTIME, so LK and
+the firmware before it take about 7 s from power-on. That is the vendor's and was not touched.
+
+What took the time, and what was done:
+* **Kernel, 1.85 s.** The PCIe root port of the Marlin3 waited for a link twice at probe (the 6.18 DWC core's
+  `dw_pcie_wait_for_link`, then pcie-sprd's own check), 10 x 90 ms each, with the init thread waiting; the chip is off
+  until wcn_bsp powers it and brings the link up through `sprd_pcie_configure_device()`. `patches/6.18/0028` lets a host
+  driver skip the core's wait (`skip_link_wait`, with `DW_PCIE_HAS_SKIP_LINK_WAIT` so the shared driver still builds on
+  7.x without it); pcie-sprd sets it and takes a 50 ms look instead of its own 0.9 s wait.
+* **The UART, ~2.9 s.** `boot/init` set the console level to 7, so every KERN_INFO line went to the 115200 baud UART
+  synchronously until OpenWrt's sysctl lowered it at ~14 s: 33 KB, and the initramfs' module loads and procd's first
+  second (the TEE's log, ~100 lines) waited on it. Now 4: the stage lines are KERN_ERR and still reach the UART and
+  console-ramoops.
+* **Fixed pauses in the initramfs, ~1.9 s.** A `sleep 1` before the gadget bind (from the first bring-up, no reason
+  recorded) is gone, and the partition lookup polls every 0.1 s: with the faster kernel the eMMC's partitions appear
+  0.2 s after the modules, and its 1 s pause was then always taken.
+* **The random pool, 0.9 s.** There is no hardware RNG (no SMCCC TRNG in this firmware), so the kernel initialises it
+  only when something waits for it, with its timer-jitter loop; ubusd did, and procd's init stage waited 0.9 s. The
+  initramfs starts one blocking read of `/dev/random` in the background at once (`crng init done` at 1.4 s).
+* **procd's first kmodloader, 1.7 s.** `kmodloader /etc/modules-boot.d/` reads every module of `/lib/modules/<release>`
+  first (2955 files, a few scattered blocks of each, cold: 1.8 s on its own, 1.6 s with the loop device's direct I/O,
+  1.5 s with 16 parallel readers; sequential reads run at 270 MB/s). Its list is all in `/etc/modules.d`, which
+  `/etc/init.d/boot` loads two seconds later. The initramfs bind-mounts a stub over `/sbin/kmodloader` that skips that
+  one call, removes itself (lazily: the shell running it holds it open) at its first run whatever that is, and hands
+  any other call to the real binary by its own name; and it starts one `cat` of the modules, which survives switch_root,
+  so that the later run reads them from the cache.
+* **preinit, 4.9 s.** OpenWrt waited 4 s (`fs_failsafe_wait_timeout`) for a failsafe key typed on a console only test
+  pads reach, and `preinit_ip` ran `board_detect` (0.9 s) to put 192.168.1.1 on usb0 for that failsafe, which `run_init`
+  then flushed together with the early DHCP server's address. `lib/preinit/31_mu300_failsafe_wait` has no wait and sets
+  `pi_preinit_no_failsafe`; `failsafe=` on the command line still enters failsafe mode.
+* **The dial, ~7 s.** `mu300-atd` retried the channel's open every 2 s (now 0.2 s), and the first command on each
+  channel drained for a whole second (`clean=0`); it now drains once when the channel is its own, so the SIM2 cold
+  start's commands take ~0.15 s each instead of three of them taking 1 s more. `sipa-dele-start` slept 3 s after the
+  insmod to look for the channel-open line, which is there in the same millisecond (now looked for every 0.1 s), and
+  asked for the attach every 2 s (now 0.5 s). `mobile-data`, `mu300-sim2-start` and `mu300-sim2-warmup` polled every
+  second on the dial's path (now 0.2 to 0.3 s). Tried and taken back: reading `/proc/uptime` in `mu300-atd` instead of
+  forking `date +%s` for its deadlines. Under bash, `read -t` keeps what it read past a line from the channel in a
+  buffer it does not tie to the file, and both reads are on fd 0, so the next read of `/proc/uptime` returned the
+  modem's reply (empty answers under bash, as on Ubuntu; busybox ash was not affected; the `Atd` tests caught it).
+* **The hotspot, ~10 s later than needed.** `mu300-hw` loaded the vendor extras (ten modprobes of modules this kernel
+  does not have, and the Mali GPU's) and zram before the Wi-Fi, and after netifd's own start had brought the access point
+  up, its unconditional `wifi down; wifi up` took it down again for ~4 s (and the chip with it: a power cycle and a
+  firmware load). Now the regulatory database and the country come first, then the Wi-Fi, then the rest, and the
+  restart only runs when the settings changed meanwhile or the access point did not come up (`ap_enabled_soon`).
+
+What the dial waits for now, on the boots above: procd at 2.1 s starts the vendor stack at 2.2 s; the modem runs at
+5.6 s (modem_control and the TEE: stopping the four subsystems, 50 + 50 ms of power sequencing each, the images'
+verification, and 1.15 s in the TEE's `kbc_update_version`); its first output on nr0 comes at 7.4 s; the SIM2 cold start
+switches the radio on (`AT+SFUN=4`) at 9.2 s; the network registers it at 13.4 s; `AT+CGACT` takes 0.5 to 2 s. The rest
+is the modem's and the network's. Not done: a shorter quiet wait before each AT command (0.1 s, `QUICK`), and the Wi-Fi
+chip is still powered off and on twice while hostapd sets wlan0 up (a firmware load each).
+
 ### 218. CPU0's cluster power-down: USB, IPA and the Wi-Fi's PCIe were not wake sources (ums9620_lpintc)
 
 **Status: built for 6.18.57 and measured on a U30 Air (OpenWrt 25.12.5, 6.18.57); built for 6.18.58 and checked on an
@@ -11842,6 +11907,47 @@ CPU0 still entered cluster-pd (3600 to 6600 entries over 60 pings). An earlier t
 its cluster-pd.
 
 ### 219. (removed)
+
+### 220. The U30 Air's AT+CGSN answers fifteen zeros: the IMEI is read over diag
+
+**Status: fixed in the panel's collector; the diag read is a fallback, used only when AT+CGSN gives nothing
+usable.** Seen on a U30 Air (OpenWrt 25.12.5, v2026.10.23.1, 7.2.11, `MOCORTM_V2_23A_W25.03.2_Debug`).
+
+`AT+CGSN` and `AT+SPIMEI?` answer `000000000000000` on both SIM slots, and through the vendor's own miscserver path
+on the stock Android, while the modem's NV holds both IMEIs. The vendor's backend reads them over `/dev/sdiag_nr`
+(the request `7E 00 00 00 00 0A 00 5E 81/82 00 00 7E`; the value follows the `74 00 5E 01` marker, one 8-byte block,
+nibbles least significant first, an `a` filler before the first digit). The collector cached the zeros as a
+complete identity, so the page showed `0000****000` for 6 h.
+
+`imei-diag` (shell, read-only: no AT and no NV write) makes that read; `cell` asks it only when `AT+CGSN` returned
+nothing or fifteen zeros, and a zero IMEI no longer counts as a complete identity, so an existing zero cache is
+re-read within the minute. Verified on the unit: slot 0 reads IMEI1 and slot 1 IMEI2, over repeated runs; the cache
+and `mu300dash status` then carry the value. `tests/test_imei_diag.py`.
+
+**Device check before merge (U30 Air, OpenWrt):** the dashboard's IMEI row shows the active card's IMEI after a
+round (not `0000****000`), and follows the card when the slot is switched.
+
+OpenWrt's own busybox (25.12.6) has neither `od` nor `timeout`, so on a stock image the read printed nothing:
+`imei-diag` takes both from the image's full busybox (`/opt/mu300/bin/busybox`). Checked before merge on a second
+U30 Air (OpenWrt 25.12.6, 6.18.58, firmware `MOCORTM_V2_23A_W25.30.2_Debug`, whose `AT+CGSN` answers a real IMEI):
+both slots read 15 digits, slot 0's is the one `AT+CGSN` gives, and the collector is unchanged where AT works.
+
+### 221. The panel shows both IMEIs, marks the card in use and copies them on a click
+
+**Status: implemented in the panel; device check below.** Follows 220.
+
+`cell` reads the module's two IMEIs over diag on every identity round (`imei1`/`imei2`, plus `slot`), not only the
+active card's, so a unit with no card in the other slot still shows that slot's IMEI. The dashboard shows two rows
+(`IMEI1 (SIM1)` / `IMEI2 (SIM2)`); the active card's row carries a green tag with the existing `in use` message (no
+new catalog entries), and a click copies the full value -- the page may be masking it -- through the HTTP fallback
+(`execCommand`), as the panel is not a secure context.
+
+Verified on the U30 Air (OpenWrt): `sim-slot1.json` carries `"slot":1,"imei1":...,"imei2":...`; the active slot's
+row carries the tag and the other does not; a click copies the unmasked value.
+
+Checked again before merge on a second U30 Air (OpenWrt 25.12.6, 6.18.58, card in slot 0): the cache carries
+`"slot":0` and two different 15-digit IMEIs, the one of slot 0 equal to `AT+CGSN`'s; the dashboard shows both rows,
+masked, with the tag on IMEI1 only; a click hands the full 15 digits to the copy; no errors in the browser console.
 
 ### 222. The Wi-Fi key toggles the hotspot in one press, awake or asleep
 
