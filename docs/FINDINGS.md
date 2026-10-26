@@ -11927,6 +11927,11 @@ and `mu300dash status` then carry the value. `tests/test_imei_diag.py`.
 **Device check before merge (U30 Air, OpenWrt):** the dashboard's IMEI row shows the active card's IMEI after a
 round (not `0000****000`), and follows the card when the slot is switched.
 
+OpenWrt's own busybox (25.12.6) has neither `od` nor `timeout`, so on a stock image the read printed nothing:
+`imei-diag` takes both from the image's full busybox (`/opt/mu300/bin/busybox`). Checked before merge on a second
+U30 Air (OpenWrt 25.12.6, 6.18.58, firmware `MOCORTM_V2_23A_W25.30.2_Debug`, whose `AT+CGSN` answers a real IMEI):
+both slots read 15 digits, slot 0's is the one `AT+CGSN` gives, and the collector is unchanged where AT works.
+
 ### 221. The panel shows both IMEIs, marks the card in use and copies them on a click
 
 **Status: implemented in the panel; device check below.** Follows 220.
