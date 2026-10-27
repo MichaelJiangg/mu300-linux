@@ -398,6 +398,7 @@
         var lb = lc.appendChild(el('div'));
         var MODES = [ [ 'auto', _('Automatic') ], [ 'auto152', _('Automatic without 2G (152)') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
         var RESTART = _('The modem\'s protocol stack restarts: cellular service stops for about half a minute.');
+        var shownEnd = 0;
         function set(btn, kind, val, what, quick) {
             act(btn, 'lock.set', { kind: kind, val: val }, {
                 confirm: quick ? null : cockpit.format(_('Apply: $0?'), what) + '\n\n' + RESTART,
@@ -442,6 +443,7 @@
             }).join('; ') : _('none')));
             lb.appendChild(row(_('Apply at startup'), on(d.auto_apply === 1 || d.auto_apply === true)));
             var rs = d.reset;
+            shownEnd = (rs && rs.end) || 0;
             if (rs && rs.state) {
                 var st = { running: _('running'), ok: _('done'), done: _('done'), failed: _('failed'), interrupted: _('interrupted') }[rs.state] || rs.state;
                 lb.appendChild(row(_('Last reset to automatic'), st + (rs.error ? ' (' + rs.error + ')' : '')));
@@ -505,10 +507,28 @@
                 act(rb, 'lock.set', { kind: 'reset', val: 'auto' }, {
                     confirm: _('Network mode automatic, EN-DC on, every LTE and NR band, no cell lock; the saved locks are cleared, so nothing is applied at startup.') + '\n\n' + RESTART,
                     ok: _('Started in the background; the reading below follows when the modem is back.'),
-                    done: function () { setTimeout(function () { refresh(true); }, 5000); } });
+                    done: function () { afterReset(shownEnd); } });
             }, 'danger');
             lb.appendChild(actions([ ab, rb ]));
             lb.appendChild(note(_('Off: nothing is sent at startup; the saved settings stay.')));
+        }
+        /* the reset runs detached (half a minute and more): follow its result (lock.get's "reset", new when its end is
+         * after PREV, the device's clock) and paint once it has ended and, when ok, the reading is from after its start
+         * (the lock program rewrites the cache to the verified automatic state before it says ok); a reading taken
+         * while it ran showed the old locks until "Read again". Up to about 150 s, then the reading as it is. */
+        function afterReset(prev) {
+            var tries = 0;
+            clear(lb).appendChild(note(_('Reading the locks from the modem...')));
+            var step = function () {
+                api('lock.get', {}).then(function (r) {
+                    var d = (r && r.data) || {}, rs = d.reset || {};
+                    var ended = rs.state && rs.state !== 'running' && (rs.end || 0) > prev;
+                    if ((ended && (rs.state !== 'ok' || (d.ts || 0) >= (rs.ts || 0))) || ++tries > 50) {
+                        clear(lb); paint(d);
+                    } else setTimeout(step, 3000);
+                }, function () { if (++tries > 50) refresh(false); else setTimeout(step, 3000); });
+            };
+            setTimeout(step, 3000);
         }
         function refresh(fresh) {
             if (fresh) clear(lb).appendChild(note(_('Reading the locks from the modem...')));
