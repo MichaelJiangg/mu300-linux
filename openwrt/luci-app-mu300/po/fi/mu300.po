@@ -1882,6 +1882,12 @@ msgstr "Lataus tauolla: akun lämpötila"
 msgid "Charging paused: charge limit"
 msgstr "Lataus tauolla: latausraja"
 
+msgid "Charging paused: by hand"
+msgstr "Lataus keskeytetty: käsin"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Ladataan kerran täyteen, sitten takaisin rajaan"
+
 msgid "Sleep now"
 msgstr "Nuku nyt"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % ei koskaan lataa akkua (laite toimii laturin varassa), 100 % lataa s
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % säästää akkua laitteessa, joka pysyy verkossa."
+
+msgid "Start charging again under"
+msgstr "Aloita lataus uudelleen alle"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 aloittaa uudelleen 5 pistettä pysäytystason alapuolella. Pienempi arvo aloittaa latauksen vasta sen alapuolella; 100 %:lla täysi akku odottaa, kunnes se laskee sen alle."
+
+msgid "Resume charging"
+msgstr "Jatka latausta"
+
+msgid "Pause charging"
+msgstr "Keskeytä lataus"
+
+msgid "Cancel the full charge"
+msgstr "Peru täyteen lataus"
+
+msgid "Charge to full once"
+msgstr "Lataa kerran täyteen"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Keskeytettynä akkua ei ladata ja laite toimii laturilla; alle 5 %:ssa se latautuu silti, ja lämpötilasuoja on aina voimassa."
 
 msgid "When the charger switches the device on"
 msgstr "Kun laturi käynnistää laitteen"

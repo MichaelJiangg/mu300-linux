@@ -1882,6 +1882,12 @@ msgstr "Opladning sat på pause: batteritemperatur"
 msgid "Charging paused: charge limit"
 msgstr "Opladning sat på pause: opladningsgrænse"
 
+msgid "Charging paused: by hand"
+msgstr "Opladning sat på pause: manuelt"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Oplader helt én gang og vender så tilbage til grænsen"
+
 msgid "Sleep now"
 msgstr "Sov nu"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % oplader aldrig batteriet (enheden kører på opladeren), 100 % lader
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % skåner batteriet i en enhed, der bliver siddende i stikket."
+
+msgid "Start charging again under"
+msgstr "Start opladning igen under"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 starter igen 5 point under stopniveauet. En lavere værdi starter først opladningen igen under den; med 100 % venter et fuldt batteri, til det falder under den."
+
+msgid "Resume charging"
+msgstr "Genoptag opladning"
+
+msgid "Pause charging"
+msgstr "Sæt opladning på pause"
+
+msgid "Cancel the full charge"
+msgstr "Annuller fuld opladning"
+
+msgid "Charge to full once"
+msgstr "Oplad helt én gang"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "På pause oplades batteriet ikke, og enheden kører på opladeren; under 5 % oplades det stadig, og temperaturbeskyttelsen gælder altid."
 
 msgid "When the charger switches the device on"
 msgstr "Når opladeren tænder enheden"

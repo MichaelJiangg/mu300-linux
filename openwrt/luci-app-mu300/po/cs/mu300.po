@@ -1882,6 +1882,12 @@ msgstr "Nabíjení pozastaveno: teplota baterie"
 msgid "Charging paused: charge limit"
 msgstr "Nabíjení pozastaveno: limit nabití"
 
+msgid "Charging paused: by hand"
+msgstr "Nabíjení pozastaveno: ručně"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Jednou nabíjení do plna, pak zpět na limit"
+
 msgid "Sleep now"
 msgstr "Uspat nyní"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % baterii nikdy nenabíjí (zařízení běží z nabíječky), 100 % 
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % šetří baterii zařízení, které zůstává připojené k síti."
+
+msgid "Start charging again under"
+msgstr "Znovu nabíjet pod"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 znovu nabíjí 5 bodů pod úrovní zastavení. Nižší hodnota začne nabíjet až pod ní; se 100 % plná baterie čeká, dokud pod ni neklesne."
+
+msgid "Resume charging"
+msgstr "Obnovit nabíjení"
+
+msgid "Pause charging"
+msgstr "Pozastavit nabíjení"
+
+msgid "Cancel the full charge"
+msgstr "Zrušit nabití do plna"
+
+msgid "Charge to full once"
+msgstr "Jednou nabít do plna"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Při pozastavení se baterie nenabíjí a zařízení běží z nabíječky; pod 5 % se nabíjí vždy a teplotní ochrana platí stále."
 
 msgid "When the charger switches the device on"
 msgstr "Když nabíječka zapne zařízení"

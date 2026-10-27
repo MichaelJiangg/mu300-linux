@@ -1882,6 +1882,12 @@ msgstr "Laden gepauzeerd: batterijtemperatuur"
 msgid "Charging paused: charge limit"
 msgstr "Laden gepauzeerd: laadlimiet"
 
+msgid "Charging paused: by hand"
+msgstr "Laden gepauzeerd: handmatig"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Eenmaal volledig laden, daarna terug naar de grens"
+
 msgid "Sleep now"
 msgstr "Nu slapen"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % laadt de batterij nooit op (het apparaat draait op de lader), 100 % 
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % spaart de batterij van een apparaat dat aangesloten blijft."
+
+msgid "Start charging again under"
+msgstr "Opnieuw laden onder"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 begint weer 5 punten onder het stopniveau. Een lagere waarde begint pas weer te laden onder die waarde; met 100 % wacht een volle accu tot hij eronder zakt."
+
+msgid "Resume charging"
+msgstr "Laden hervatten"
+
+msgid "Pause charging"
+msgstr "Laden pauzeren"
+
+msgid "Cancel the full charge"
+msgstr "Volledig laden annuleren"
+
+msgid "Charge to full once"
+msgstr "Eenmaal volledig laden"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Gepauzeerd wordt de accu niet geladen en draait het apparaat op de lader; onder 5 % laadt hij toch, en de temperatuurbeveiliging geldt altijd."
 
 msgid "When the charger switches the device on"
 msgstr "Wanneer de oplader het apparaat inschakelt"

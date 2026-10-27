@@ -1882,6 +1882,12 @@ msgstr "Carica in pausa: temperatura della batteria"
 msgid "Charging paused: charge limit"
 msgstr "Carica in pausa: limite di carica"
 
+msgid "Charging paused: by hand"
+msgstr "Ricarica in pausa: manuale"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Carica completa una volta, poi torna al limite"
+
 msgid "Sleep now"
 msgstr "Sospendi ora"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % non carica mai la batteria (il dispositivo funziona con il caricator
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "L'80 % protegge meglio la batteria di un dispositivo che resta collegato."
+
+msgid "Start charging again under"
+msgstr "Riprendi la ricarica sotto"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 riprende 5 punti sotto il livello di arresto. Un valore più basso riprende la ricarica solo sotto di esso; con 100 %, una batteria piena attende di scendere sotto."
+
+msgid "Resume charging"
+msgstr "Riprendi ricarica"
+
+msgid "Pause charging"
+msgstr "Metti in pausa la ricarica"
+
+msgid "Cancel the full charge"
+msgstr "Annulla la carica completa"
+
+msgid "Charge to full once"
+msgstr "Carica completa una volta"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "In pausa la batteria non si carica e il dispositivo funziona col caricatore; sotto il 5 % si carica comunque, e la protezione termica vale sempre."
 
 msgid "When the charger switches the device on"
 msgstr "Quando il caricatore accende il dispositivo"

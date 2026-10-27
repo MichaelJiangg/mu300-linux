@@ -1882,6 +1882,12 @@ msgstr "Şarj duraklatıldı: pil sıcaklığı"
 msgid "Charging paused: charge limit"
 msgstr "Şarj duraklatıldı: şarj sınırı"
 
+msgid "Charging paused: by hand"
+msgstr "Şarj duraklatıldı: elle"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Bir kez tam şarj, ardından sınıra dönülür"
+
 msgid "Sleep now"
 msgstr "Şimdi uyut"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % pili hiç şarj etmez (cihaz şarj aletinden çalışır), 100 % tam
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % sınırı, sürekli fişte duran bir cihazda pili daha sağlıklı tutar."
+
+msgid "Start charging again under"
+msgstr "Şarjı yeniden başlatma seviyesi (altında)"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0, durma seviyesinin 5 puan altında yeniden başlatır. Daha düşük bir değer şarjı yalnızca onun altında yeniden başlatır; 100 % ile dolu pil bu değerin altına inene kadar bekler."
+
+msgid "Resume charging"
+msgstr "Şarjı sürdür"
+
+msgid "Pause charging"
+msgstr "Şarjı duraklat"
+
+msgid "Cancel the full charge"
+msgstr "Tam şarjı iptal et"
+
+msgid "Charge to full once"
+msgstr "Bir kez tam şarj et"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Duraklatıldığında pil şarj edilmez ve cihaz şarj cihazıyla çalışır; 5 % altında yine de şarj olur ve sıcaklık koruması her zaman geçerlidir."
 
 msgid "When the charger switches the device on"
 msgstr "Şarj cihazı cihazı açtığında"

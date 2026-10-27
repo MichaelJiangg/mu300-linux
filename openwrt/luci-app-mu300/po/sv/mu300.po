@@ -1882,6 +1882,12 @@ msgstr "Laddningen pausad: batteritemperatur"
 msgid "Charging paused: charge limit"
 msgstr "Laddningen pausad: laddningsgräns"
 
+msgid "Charging paused: by hand"
+msgstr "Laddning pausad: manuellt"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Laddar fullt en gång, sedan tillbaka till gränsen"
+
 msgid "Sleep now"
 msgstr "Sov nu"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % laddar aldrig batteriet (enheten drivs av laddaren), 100 % laddar de
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % skonar batteriet i en enhet som sitter inkopplad."
+
+msgid "Start charging again under"
+msgstr "Börja ladda igen under"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 börjar igen 5 punkter under stoppnivån. Ett lägre värde börjar ladda igen först under det; med 100 % väntar ett fullt batteri tills det sjunker under det."
+
+msgid "Resume charging"
+msgstr "Återuppta laddning"
+
+msgid "Pause charging"
+msgstr "Pausa laddning"
+
+msgid "Cancel the full charge"
+msgstr "Avbryt fulladdning"
+
+msgid "Charge to full once"
+msgstr "Ladda fullt en gång"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Pausat laddas batteriet inte och enheten går på laddaren; under 5 % laddas det ändå, och temperaturskyddet gäller alltid."
 
 msgid "When the charger switches the device on"
 msgstr "När laddaren slår på enheten"

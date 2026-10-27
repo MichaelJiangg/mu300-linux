@@ -1882,6 +1882,12 @@ msgstr "충전 일시 중지: 배터리 온도"
 msgid "Charging paused: charge limit"
 msgstr "충전 일시 중지: 충전 한도"
 
+msgid "Charging paused: by hand"
+msgstr "충전 일시 중지: 수동"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "한 번 완충한 뒤 제한으로 돌아갑니다"
+
 msgid "Sleep now"
 msgstr "지금 절전"
 
@@ -1905,6 +1911,27 @@ msgstr "0 %는 배터리를 충전하지 않고(기기는 충전기 전원으로
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 %는 계속 전원에 연결해 두는 장치에서 배터리를 더 건강하게 유지합니다."
+
+msgid "Start charging again under"
+msgstr "다시 충전 시작 (미만)"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0은 중지 수준보다 5포인트 아래에서 다시 시작합니다. 더 낮은 값은 그 아래에서만 다시 충전합니다. 100 %이면 가득 찬 배터리는 그 아래로 내려갈 때까지 기다립니다."
+
+msgid "Resume charging"
+msgstr "충전 재개"
+
+msgid "Pause charging"
+msgstr "충전 일시 중지"
+
+msgid "Cancel the full charge"
+msgstr "완충 취소"
+
+msgid "Charge to full once"
+msgstr "한 번 완충"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "일시 중지 중에는 배터리를 충전하지 않고 기기는 충전기로 동작합니다. 5 % 미만이면 그래도 충전하며, 온도 보호는 항상 적용됩니다."
 
 msgid "When the charger switches the device on"
 msgstr "충전기가 기기를 켤 때"

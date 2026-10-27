@@ -1882,6 +1882,12 @@ msgstr "הטעינה הושהתה: טמפרטורת הסוללה"
 msgid "Charging paused: charge limit"
 msgstr "הטעינה הושהתה: מגבלת הטעינה"
 
+msgid "Charging paused: by hand"
+msgstr "הטעינה מושהית: ידנית"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "טעינה מלאה פעם אחת, ואז חזרה למגבלה"
+
 msgid "Sleep now"
 msgstr "שינה עכשיו"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % לעולם לא טוען את הסוללה (המכשיר פועל מ
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % שומרים על הסוללה במכשיר שנשאר מחובר לחשמל."
+
+msgid "Start charging again under"
+msgstr "התחל לטעון שוב מתחת ל־"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 מתחיל שוב 5 נקודות מתחת לרמת העצירה. ערך נמוך יותר מתחיל לטעון שוב רק מתחתיו; עם 100 %, סוללה מלאה ממתינה עד שתרד מתחתיו."
+
+msgid "Resume charging"
+msgstr "המשך טעינה"
+
+msgid "Pause charging"
+msgstr "השהה טעינה"
+
+msgid "Cancel the full charge"
+msgstr "בטל טעינה מלאה"
+
+msgid "Charge to full once"
+msgstr "טען עד הסוף פעם אחת"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "בהשהיה הסוללה אינה נטענת והמכשיר פועל מהמטען; מתחת ל־5 % היא נטענת בכל זאת, והגנת הטמפרטורה חלה תמיד."
 
 msgid "When the charger switches the device on"
 msgstr "כאשר המטען מדליק את המכשיר"

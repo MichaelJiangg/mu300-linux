@@ -1319,6 +1319,12 @@ msgstr "充电已暂停：电池温度"
 msgid "Charging paused: charge limit"
 msgstr "充电已暂停：充电上限"
 
+msgid "Charging paused: by hand"
+msgstr "已暂停电池充电：手动"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "正在临时充满一次，之后恢复原来的充电上限"
+
 msgid "Automatic: plugged in / on battery"
 msgstr "自动：接通电源 / 使用电池"
 
@@ -1331,8 +1337,29 @@ msgstr "低于此电量时切换到省电（%）"
 msgid "Stop charging at (%)"
 msgstr "充电至此电量停止（%）"
 
+msgid "Start charging again under (%)"
+msgstr "恢复充电于（低于，%）"
+
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "0 % 表示从不给电池充电（设备由充电器供电），100 % 表示充满；介于两者之间时，充电在该电量停止，低于 5 个百分点时重新开始。电量低于 5 % 时始终充电。对于一直插电的设备，80 % 能让电池更健康。"
+
+msgid "Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "恢复充电于：0 表示在停止电量以下 5 个百分点时恢复。更低的值表示仅在低于该值时恢复充电；设为 100 % 时，充满的电池要等电量降到该值以下才再充。"
+
+msgid "Resume charging"
+msgstr "恢复自动充电"
+
+msgid "Pause charging"
+msgstr "暂停电池充电"
+
+msgid "Cancel the full charge"
+msgstr "取消临时充满"
+
+msgid "Charge to full once"
+msgstr "临时充满一次"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "暂停时电池不充电，设备由充电器供电；电量低于 5 % 时仍会充电，电池温度保护始终有效。"
 
 msgid "Charge only, until a key starts it"
 msgstr "仅充电，按键后启动"

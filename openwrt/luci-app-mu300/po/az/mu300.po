@@ -1882,6 +1882,12 @@ msgstr "Şarj dayandırıldı: batareya temperaturu"
 msgid "Charging paused: charge limit"
 msgstr "Şarj dayandırıldı: şarj həddi"
 
+msgid "Charging paused: by hand"
+msgstr "Şarj dayandırılıb: əl ilə"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Bir dəfə tam şarj, sonra limitə qayıt"
+
 msgid "Sleep now"
 msgstr "İndi yat"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % batareyanı heç vaxt doldurmur (cihaz şarj cihazından işləyir),
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % daim şəbəkədə qalan cihazda batareyanı daha sağlam saxlayır."
+
+msgid "Start charging again under"
+msgstr "Şarjı yenidən bu səviyyədən aşağıda başlat"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0: dayanma səviyyəsindən 5 bal aşağıda yenidən başlayır. Daha aşağı dəyər şarjı yalnız ondan aşağıda başladır; 100 % ilə dolu batareya ondan aşağı düşənə qədər gözləyir."
+
+msgid "Resume charging"
+msgstr "Şarjı davam etdir"
+
+msgid "Pause charging"
+msgstr "Şarjı dayandır"
+
+msgid "Cancel the full charge"
+msgstr "Tam şarjı ləğv et"
+
+msgid "Charge to full once"
+msgstr "Bir dəfə tam şarj et"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Dayandırıldıqda batareya şarj olunmur və cihaz şarj cihazından işləyir; 5 % altında yenə şarj olunur, temperatur qoruması həmişə işləyir."
 
 msgid "When the charger switches the device on"
 msgstr "Şarj cihazı cihazı işə saldıqda"

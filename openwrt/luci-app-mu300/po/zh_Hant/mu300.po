@@ -1882,6 +1882,12 @@ msgstr "充電已暫停：電池溫度"
 msgid "Charging paused: charge limit"
 msgstr "充電已暫停：充電上限"
 
+msgid "Charging paused: by hand"
+msgstr "已暫停電池充電：手動"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "正在臨時充滿一次，之後恢復原來的充電上限"
+
 msgid "Sleep now"
 msgstr "立即休眠"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % 表示從不為電池充電（裝置由充電器供電），100 % �
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % 可讓長期插著電源的裝置電池更健康。"
+
+msgid "Start charging again under"
+msgstr "恢復充電於（低於）"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 表示在停止電量以下 5 個百分點時恢復。更低的值表示僅在低於該值時恢復充電；設為 100 % 時，充滿的電池要等電量降到該值以下才再充。"
+
+msgid "Resume charging"
+msgstr "恢復自動充電"
+
+msgid "Pause charging"
+msgstr "暫停電池充電"
+
+msgid "Cancel the full charge"
+msgstr "取消臨時充滿"
+
+msgid "Charge to full once"
+msgstr "臨時充滿一次"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "暫停時電池不充電，裝置由充電器供電；電量低於 5 % 時仍會充電，電池溫度保護始終有效。"
 
 msgid "When the charger switches the device on"
 msgstr "充電器開機時"

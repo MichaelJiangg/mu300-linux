@@ -1882,6 +1882,12 @@ msgstr "充電を一時停止：バッテリー温度"
 msgid "Charging paused: charge limit"
 msgstr "充電を一時停止：充電上限"
 
+msgid "Charging paused: by hand"
+msgstr "充電を一時停止：手動"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "一度だけ満充電し、その後上限に戻ります"
+
 msgid "Sleep now"
 msgstr "今すぐスリープ"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % ではバッテリーを充電しません（本体は充電器で�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % にすると、常時電源につないだままの機器でバッテリーが長持ちします。"
+
+msgid "Start charging again under"
+msgstr "再開する残量（未満）"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 は停止レベルの 5 ポイント下で再開します。それより低い値ではその値を下回ったときだけ再開します。100 % の場合、満充電のバッテリーはその値を下回るまで待ちます。"
+
+msgid "Resume charging"
+msgstr "充電を再開"
+
+msgid "Pause charging"
+msgstr "充電を一時停止"
+
+msgid "Cancel the full charge"
+msgstr "満充電を取り消す"
+
+msgid "Charge to full once"
+msgstr "一度だけ満充電"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "一時停止中はバッテリーを充電せず、機器は充電器で動作します。5 % 未満では充電し、温度保護は常に有効です。"
 
 msgid "When the charger switches the device on"
 msgstr "充電器がデバイスの電源を入れたとき"

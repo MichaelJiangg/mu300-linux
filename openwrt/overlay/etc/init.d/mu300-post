@@ -5,6 +5,14 @@ START=99
 USE_PROCD=1
 export PATH="$PATH:/opt/mu300/busybox-bin"
 
+service_triggers() {
+	# the NFC tag (U30 Air, V50): the hotspot's new name or password as soon as the wireless settings are saved (LuCI,
+	# the panel, uci commit), not at the next boot; a URL or text on the tag stays (mu300-nfc sync)
+	if /opt/mu300/bin/mu300-nfc supported >/dev/null 2>&1; then
+		procd_add_config_trigger "config.change" wireless /opt/mu300/bin/mu300-nfc sync
+	fi
+}
+
 start_service() {
 	# the commands on the PATH (/usr/bin): new ones on a system installed before they existed, and the extras'
 	/opt/mu300/bin/mu300-extra link >/dev/null 2>&1

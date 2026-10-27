@@ -1882,6 +1882,12 @@ msgstr "Încărcare întreruptă: temperatura bateriei"
 msgid "Charging paused: charge limit"
 msgstr "Încărcare întreruptă: limita de încărcare"
 
+msgid "Charging paused: by hand"
+msgstr "Încărcare în pauză: manual"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Încărcare completă o dată, apoi înapoi la limită"
+
 msgid "Sleep now"
 msgstr "Repaus acum"
 
@@ -1905,6 +1911,27 @@ msgstr "0 % nu încarcă niciodată bateria (dispozitivul funcționează de la �
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % protejează mai bine bateria unui dispozitiv care rămâne la priză."
+
+msgid "Start charging again under"
+msgstr "Reia încărcarea sub"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 reia cu 5 puncte sub nivelul de oprire. O valoare mai mică reia încărcarea doar sub ea; cu 100 %, o baterie plină așteaptă până scade sub ea."
+
+msgid "Resume charging"
+msgstr "Reia încărcarea"
+
+msgid "Pause charging"
+msgstr "Pune încărcarea pe pauză"
+
+msgid "Cancel the full charge"
+msgstr "Anulează încărcarea completă"
+
+msgid "Charge to full once"
+msgstr "Încarcă complet o dată"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "În pauză bateria nu se încarcă și dispozitivul merge de la încărcător; sub 5 % se încarcă totuși, iar protecția termică se aplică mereu."
 
 msgid "When the charger switches the device on"
 msgstr "Când încărcătorul pornește dispozitivul"
