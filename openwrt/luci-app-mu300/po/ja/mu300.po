@@ -2744,6 +2744,9 @@ msgstr "リリースノート"
 msgid "Download"
 msgstr "ダウンロード"
 
+msgid "only what changed since the installed release"
+msgstr "インストール済みのリリースからの変更分のみ"
+
 msgid "Free space needed"
 msgstr "必要な空き容量"
 

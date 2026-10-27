@@ -2744,6 +2744,9 @@ msgstr "Примечания к релизу"
 msgid "Download"
 msgstr "Скачивание"
 
+msgid "only what changed since the installed release"
+msgstr "только то, что изменилось с установленного выпуска"
+
 msgid "Free space needed"
 msgstr "Нужно свободного места"
 

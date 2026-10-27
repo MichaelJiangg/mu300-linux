@@ -2744,6 +2744,9 @@ msgstr "Note de versiune"
 msgid "Download"
 msgstr "Descărcare"
 
+msgid "only what changed since the installed release"
+msgstr "doar ce s-a schimbat de la versiunea instalată"
+
 msgid "Free space needed"
 msgstr "Spațiu liber necesar"
 

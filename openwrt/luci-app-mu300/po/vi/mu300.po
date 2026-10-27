@@ -2744,6 +2744,9 @@ msgstr "Ghi chú phát hành"
 msgid "Download"
 msgstr "Tải xuống"
 
+msgid "only what changed since the installed release"
+msgstr "chỉ những gì đã thay đổi kể từ bản phát hành đã cài"
+
 msgid "Free space needed"
 msgstr "Dung lượng trống cần có"
 

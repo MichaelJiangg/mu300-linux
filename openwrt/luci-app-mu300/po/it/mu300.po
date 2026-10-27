@@ -2744,6 +2744,9 @@ msgstr "Note di rilascio"
 msgid "Download"
 msgstr "Download"
 
+msgid "only what changed since the installed release"
+msgstr "solo ciò che è cambiato dalla versione installata"
+
 msgid "Free space needed"
 msgstr "Spazio libero necessario"
 

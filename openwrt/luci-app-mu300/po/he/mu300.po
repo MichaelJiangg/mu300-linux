@@ -2744,6 +2744,9 @@ msgstr "הערות גרסה"
 msgid "Download"
 msgstr "הורדה"
 
+msgid "only what changed since the installed release"
+msgstr "רק מה שהשתנה מאז הגרסה המותקנת"
+
 msgid "Free space needed"
 msgstr "שטח פנוי נדרש"
 

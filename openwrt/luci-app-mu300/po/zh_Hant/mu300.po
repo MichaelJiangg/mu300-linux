@@ -2739,6 +2739,9 @@ msgstr "版本資訊"
 msgid "Download"
 msgstr "下載"
 
+msgid "only what changed since the installed release"
+msgstr "僅下載自已安裝版本以來的變更"
+
 msgid "Free space needed"
 msgstr "所需可用空間"
 

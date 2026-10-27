@@ -319,6 +319,8 @@ for m in mu300-ubuntu-rootfs mu300-ubuntu-26.04-rootfs mu300-openwrt-rootfs mu30
 done
 [ $fail = 0 ] || { echo "audit failed, nothing published" >&2; exit 1; }
 rm -rf "$IN"
+# the diffs from the releases before this one (tools/make-diffs.sh): listed in SHA256SUMS below, so signed with the rest
+sh "$TOP/tools/make-diffs.sh" "$D" "$TAG"
 # the updater itself: an older mu300-update fetches this one and continues with it
 cp "$TOP/rootfs/overlay/opt/mu300/bin/mu300-update" "$D/mu300-update"
 # mu300-release: the tag, as a file, so that SHA256SUMS - and with it the signature - says which release these
@@ -369,6 +371,7 @@ first with \`./install.sh --check\`.
 | mu300-extra-panel.tar.gz | the web panel for Ubuntu: Cockpit (Ubuntu's web console: terminal, logs, services, networking, storage) and the MU300 page (signal, mobile data, data usage, SMS, VPN, power and CPU, Wi-Fi, updates), on the LAN only: \`sudo mu300-extra install panel\` on the device (Cockpit from Ubuntu's archive), or the installer's question |
 | mu300-extra-panel-offline.tar.gz | the same with Cockpit's packages for Ubuntu 24.04 and 26.04, for a device that is not online: \`sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz\` |
 | mu300-update | the on-device updater of this release (\`mu300-update apply\` switches to it before it changes anything) |
+| mu300-*-rootfs.diff-<tag>.tar.gz | an image without the files the image of release <tag> (one of the five before this one) had as they are: \`mu300-update apply\` on a device that runs <tag> downloads it instead of the whole image, takes the rest from the installed system, and installs it only when the result is, file for file, the image this release's signed manifest describes (else it downloads the whole image) |
 | mu300-*-rootfs.manifest.gz | the list of each image's files (type, mode, owner, size, sha256), which the image also carries: an update reads it to tell the image's files from yours, and carries yours over |
 | mu300-magisk-*.zip | attached a few minutes later by the Magisk installers workflow, one per system and kernel. Two ways to use one: install it in **Magisk** on the device (no computer), or **unpack it on a computer** and run \`start.cmd\` / \`sh start.sh\` (\`start-gui\` for the window): the project's installer, with that system and kernel, offline (\`START-HERE.md\` in the zip; adb from Google's platform-tools is not included) |
 | (the VPN) | not part of this release: the VPN toolkit (\`mu300-vpn\`, module v2: the core with hev-socks5-tunnel, and the engines as extras: \`vpn-xray\`, \`vpn-singbox\`, \`vpn-mihomo\`, \`vpn-dae\`) is the module of https://github.com/dikeckaan/mu300-linux-vpn - \`mu300-extra install vpn\` on the device, or the installer's question, takes its latest release with the engines its profiles need; on OpenWrt with the panel the VPN menu drives it |

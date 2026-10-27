@@ -2744,6 +2744,9 @@ msgstr "रिलीज़ नोट्स"
 msgid "Download"
 msgstr "डाउनलोड"
 
+msgid "only what changed since the installed release"
+msgstr "केवल वह जो स्थापित रिलीज़ के बाद बदला है"
+
 msgid "Free space needed"
 msgstr "ज़रूरी खाली जगह"
 

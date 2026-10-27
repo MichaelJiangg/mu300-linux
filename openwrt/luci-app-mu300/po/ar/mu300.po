@@ -2744,6 +2744,9 @@ msgstr "ملاحظات الإصدار"
 msgid "Download"
 msgstr "التنزيل"
 
+msgid "only what changed since the installed release"
+msgstr "فقط ما تغيّر منذ الإصدار المثبّت"
+
 msgid "Free space needed"
 msgstr "المساحة الحرة المطلوبة"
 
