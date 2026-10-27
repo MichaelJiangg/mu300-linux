@@ -5444,6 +5444,8 @@ Not taken, and why:
   `apn_internal`), kept across updates; nobody has asked for more. A per-SIM APN becomes worth it with dual SIM,
   which is being reworked (#166). It follows that the credentials belong to the settings, not to a card: a
   different card put into the device is offered them too, as it is offered the APN.
+  (2026-10-27: the binding to an ICCID is taken now, as an opt-in on these same settings, not as a second store:
+  FINDINGS 231.)
 - `AT+SPCGAPNCFG` (the initial attach APN): off by default in his tree too; nothing here needs it.
 - "An empty APN clears the modem's": his dial sends `AT+CGDCONT=1,"IP",""` whenever netifd passes no APN, so that
   removing an APN in the settings also removes it from the modem. Ours sends nothing for an empty APN, on purpose
@@ -12107,3 +12109,34 @@ now fails with that, instead of reading a deaf chip.
 
 **Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
 a new hotspot password in LuCI reaches the tag without a reboot.
+
+### 231. The APN settings for one SIM card only (the ICCID binding of kanoqwq's APN profiles)
+
+**Status: in the dial on both systems, tested against a fake modem (tests/test_mu300cell.py); not dialled on a
+device with a second card here.** From kanoqwq's `3826be8b` and `18d3725a` (his APN profiles, a profile bound to a
+card by its ICCID), in the one form FINDINGS 65 left room for.
+
+FINDINGS 65 declined his profile store for two reasons: our APN is one setting per interface, kept across updates,
+and a second store of APNs would compete with it; and nobody had asked for more. It also named what that costs: the
+credentials belong to the settings, not to a card, so *a different card put into the device is offered them too*.
+That cost is what the binding answers, and it needs no second store:
+
+* **One more setting beside the APN, opt-in.** Ubuntu: `MU300_APN_ICCID` in `/etc/mu300/mobile-data.conf`. OpenWrt:
+  `option iccid` on the wan interface, "Only for the SIM card" on its page (the external card's settings, like the
+  credentials; the internal card dials its own `apn_internal` and is never bound). Empty, the default: any card, as
+  before; nothing is asked of the card.
+* **Set,** `mobile-data` asks the card in use for its ICCID (`AT+CCID`, quoted or not, letters allowed: FINDINGS 174)
+  before the context is defined. The same card dials with the APN, its PDP type and its credentials. **Another card
+  dials with none of them**: its own context, as with no APN at all, and credentials given to the modem by an earlier
+  dial are taken back (the mark of FINDINGS 65). **A card that does not say its ICCID gets no dial** (netifd and the
+  watchdog try again): whether it is the card the settings are for is not known, and the password is not sent on a
+  guess.
+* An ICCID is never printed or logged (the radio log says only "the APN settings are for another SIM card").
+
+Not taken, still: the list of up to 32 profiles and its LuCI page, the automatic choice by IMSI for some Chinese
+carriers, `AT+SPCGAPNCFG` (the initial-attach APN), and his "an empty APN clears the modem's" - each for the reasons
+FINDINGS 65 gives.
+
+**Device check (a second SIM card):** with the settings bound to card A, card A dials with the APN (`AT+CGDCONT?`
+shows it); card B in the same slot dials with its own context, and `AT+CGPCO?` holds no user name.
+
