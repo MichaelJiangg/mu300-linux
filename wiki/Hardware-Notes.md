@@ -108,7 +108,7 @@ the device lands in Android about 20 minutes later. The cause is still open.
 * **Buttons:** power: a short press wakes the LEDs, held 3 s shuts down. Wi-Fi key: switches 2.4 / 5 GHz, held 3 s turns
   the hotspot off or on.
 * **NFC (§33g):** a phone held to the device can join the hotspot: `sudo mu300-nfc wifi` writes the hotspot's name and
-  password into the tag (also `url`, `text`, `clear`, `on`/`off`).
+  password into the tag (also `url`, `text`, `clear`, `on`/`off`). The V50 has the same tag (§229).
 * **USB host (§33e):** `sudo mu300-usb host` with an OTG adapter, on the mainline kernels: flash drives (FAT, exFAT),
   keyboards, mice, USB modems and Ethernet adapters. `sudo mu300-usb device` goes back (the default at every boot).
 * **USB-C power delivery (§150, EXPERIMENTAL, off by default):** `sudo mu300-usb pd on` (mainline kernels) hands the

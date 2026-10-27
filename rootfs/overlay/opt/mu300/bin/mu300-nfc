@@ -1,5 +1,5 @@
 #!/bin/sh
-# The U30 Air's NFC tag (Ubuntu and OpenWrt): a phone held against the device reads what is written there.
+# The U30 Air's and the V50's NFC tag (Ubuntu and OpenWrt): a phone held against the device reads what is written there.
 #   mu300-nfc                 what the tag holds (for Wi-Fi only the network name, never the password)
 #   mu300-nfc wifi            the hotspot's name and password: a phone joins the Wi-Fi with a tap
 #   mu300-nfc url URL         a link the phone opens (https://..., tel:..., mailto:..., geo:...)
@@ -8,8 +8,9 @@
 #   mu300-nfc on|off          phones read the tag / get nothing (the switch in ZTE's web interface)
 #   mu300-nfc sync            at hotspot start: "wifi" again if the tag holds Wi-Fi (or nothing), and only if the
 #                             name or password changed; a URL or text written here stays
+#   mu300-nfc supported       exit 0 if this device has a tag mu300-nfc drives (for the callers)
 # The tag is a Fudan FM11NT08 (NTAG-like dual interface EEPROM): the phone reads it over RF by itself, Linux writes it
-# over I2C bus 2 at 0x57. It answers I2C only while GPIO 190 (ZTE's "ntag reset") is low, so each access holds that
+# over I2C bus 2 at 0x57. It answers I2C only while GPIO 190 (ZTE's "ntag reset"; the V50's: 189) is low, so each access holds that
 # line low and lets it go afterwards. Memory: 16 bytes of UID, lock bits and capability container, then the NDEF
 # TLV from 0x10 (the container's size byte: 0x6d, 872 bytes). ZTE's firmware writes the same Wi-Fi record (WSC,
 # WPA2-PSK). Anyone holding a phone to the device can read what is on it - which is what it is for.
@@ -51,6 +52,8 @@ enable() {
     HOLD=$!
     trap disable EXIT INT TERM
     nap 0.3
+    # a line someone else holds (or a gpioset that failed) leaves the chip deaf: say so, not "no answer from the tag"
+    kill -0 "$HOLD" 2>/dev/null || die "cannot hold the tag's reset line (GPIO $LINE)"
 }
 disable() {
     case $HOLD in
@@ -191,20 +194,29 @@ describe() {  # describe HEX: the NDEF message in words (hex on stdin as words)
                 if (id == 4135) key = l
                 p += l
             }
-            print "wifi: " ssid (key ? " (with its password)" : " (open)")
+            print "wifi: " ssid "" (key ? " (with its password)" : " (open)")   # (busybox awk: ssid(...) is a call)
         } else print "other: " type
     }'
 }
 
 # --- main -------------------------------------------------------------------------------------------------------
-# the V50 has a tag of the same kind on another reset line (kano: I2C2 0x57, GPIO189; the U30 Air's is GPIO190): not
-# driven here yet (FINDINGS 95)
-case $(${MU300_BIN:-/opt/mu300/bin}/mu300-device) in
+case $("${MU300_BIN:-/opt/mu300/bin}/mu300-device") in
     u30air) ;;
-    v50) die "the V50's NFC tag is not supported yet (docs/FINDINGS.md 95)" ;;
-    *) die "only the U30 Air has an NFC tag" ;;
+    v50)
+        # the same tag, I2C2 0x57, on reset line 189 (kano's V50, FINDINGS 95). The line comes from the device tree
+        # (ZTE's ntag_fm11_gpio node: phandle, pin, flags, big-endian), and only the one he tested is driven: a V50
+        # whose tree says otherwise, or has no such node, is left alone (mainline boots ZTE's tree unchanged, §31)
+        prop=$R/proc/device-tree/ntag_fm11_gpio/ntag-reset-gpio
+        [ -r "$prop" ] && [ "$(wc -c < "$prop" | tr -d ' ')" = 12 ] || die "the V50's NFC reset line is not in the device tree"
+        pin=$(od -An -tx1 -j4 -N4 "$prop" | tr -d ' \n')
+        case $pin in ????????) ;; *) die "the V50's NFC reset line is not readable" ;; esac
+        case $pin in *[!0-9a-f]*) die "the V50's NFC reset line is not readable" ;; esac
+        LINE=$((0x$pin))
+        [ "$LINE" = 189 ] || die "the V50's NFC reset line is GPIO $LINE, not the 189 it was tested on: left alone" ;;
+    *) die "this device has no NFC tag" ;;
 esac
 case ${1:-show} in
+    supported) exit 0 ;;
     show|status|wifi|url|text|clear|sync|on|off) ;;
     *) sed -n '2,10s/^# \{0,1\}//p' "$0" >&2; exit 2 ;;
 esac

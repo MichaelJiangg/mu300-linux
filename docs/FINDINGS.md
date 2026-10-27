@@ -12019,3 +12019,19 @@ source must offer first is logged (rate-limited) as a frame read wrong. PD stays
 **Device check (U30 Air):** `i2cget` REG04 reads `0x70` after boot on a wall charger, and a charge to the user limit
 behaves as before. With `mu300-usb pd on`, a PD charger and the dock from FINDINGS 150 negotiate, and the log has
 no "source capabilities without 5 V first".
+
+### 229. The V50's NFC tag: the same FM11NT08, its reset line from ZTE's device tree node
+
+**Status: from kanoqwq's `f6b0668d`, run on his V50. No V50 here; not run on a device by us.**
+
+The V50 has the U30 Air's tag (FINDINGS 95): a Fudan FM11NT08 at 0x57 on I2C2, on another reset line, AP GPIO 189
+(the U30 Air's is 190). ZTE's tree describes it in a node of its own, `/ntag_fm11_gpio`, whose `ntag-reset-gpio` is the
+usual 12-byte cell: the GPIO controller's phandle, the pin and the flags, big-endian. `mu300-nfc` reads the pin there on a
+V50 (mainline boots ZTE's tree unchanged, §31) and drives the tag only when it is 189, the line kano tested; a tree
+without the node or with another pin leaves the tag alone. `mu300-nfc supported` says whether this device has a tag it drives, and the
+callers ask it (Ubuntu's hotspot start, OpenWrt's `mu300-hw`); OpenWrt also syncs the tag when the wireless settings
+are saved (a procd config trigger in `mu300-post`), not only at the next boot. A `gpioset` that cannot take the line
+now fails with that, instead of reading a deaf chip.
+
+**Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
+a new hotspot password in LuCI reaches the tag without a reboot.
