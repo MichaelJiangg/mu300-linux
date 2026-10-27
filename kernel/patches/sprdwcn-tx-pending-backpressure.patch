@@ -1,0 +1,57 @@
+WCN PCIe: a full pending ring is backpressure (-EAGAIN), not an error; a failed direct push does not
+leave the channel refusing. 5.4 counterpart of FINDINGS 103 and #339 (mainline wcn_bsp).
+Ported from kanoqwq/mu300-linux 149c9d2a (rebased without his edma-pressure-stats diagnostics).
+
+--- a/drivers/unisoc_platform/sprdwcn/pcie/edma_engine.c
++++ b/drivers/unisoc_platform/sprdwcn/pcie/edma_engine.c
+@@ -12,6 +12,7 @@
+ 
+ #include <linux/delay.h>
+ #include <linux/timer.h>
++#include <linux/ratelimit.h>
+ #include <misc/marlin_platform.h>
+ #include <misc/wcn_bus.h>
+ #include <linux/pci.h>
+@@ -989,8 +990,13 @@
+ 	q = &(edma->chn_sw[chn].pending_q);
+ 
+ 	if ((q->wt + 1) % (q->max) == q->rd) {
+-		pr_warn_ratelimited("WARN %s(%d) full\n", __func__, chn);
+-		return ERROR;
++		/* MU300 (kanoqwq 149c9d2a, #339): nothing was taken; the producer retries after a completion
++		 * (wlan_combo sc2355 pcie.c). Backpressure, not an error: one line a minute at most. */
++		static DEFINE_RATELIMIT_STATE(full_rs, 60 * HZ, 1);
++
++		if (__ratelimit(&full_rs))
++			pr_info("%s(%d) full, backpressure\n", __func__, chn);
++		return -EAGAIN;
+ 	}
+ 	q->ring[q->wt].head = head;
+ 	q->ring[q->wt].tail = tail;
+@@ -1000,6 +1006,8 @@
+ 	return OK;
+ }
+ 
++static int edma_pending_q_num(int chn);
++
+ int edma_push_link_async(int chn, void *head, void *tail, int num)
+ {
+ 	int ret;
+@@ -1020,6 +1028,17 @@
+ 	edma->chn_sw[chn].pending_q.status = 1;
+ 	spin_unlock_irqrestore(q->lock.irq_spinlock_p, q->lock.flag);
+ 	ret = edma_push_link(chn, head, tail, num);
++	/*
++	 * MU300 (#339): status was set before this push, and only a TX completion's flush clears it. A push that
++	 * went nowhere brings no completion, so with nothing queued behind it the channel would refuse every later
++	 * submission with -EAGAIN for good: clear status then. Submissions queued in the meantime stay queued.
++	 */
++	if (ret) {
++		spin_lock_irqsave(q->lock.irq_spinlock_p, q->lock.flag);
++		if (edma_pending_q_num(chn) <= 0)
++			q->status = 0;
++		spin_unlock_irqrestore(q->lock.irq_spinlock_p, q->lock.flag);
++	}
+ 
+ 	return ret;
+ }
