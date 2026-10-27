@@ -149,7 +149,7 @@ module installed, `vpn_extra` mu300-extra there, `wifi_client`, `sms` (`cli`, `p
 | `modem.restart` | - | - (mobile data dials again: Ubuntu's mu300-mobile-data restarted, OpenWrt's WAN down and up) |
 | `ttl.get`, `ttl.set` | -, `value` 1-255 or `off` | `enabled value backend` (mu300-ttl) |
 | `traffic.get`, `traffic.set` | -, `key` `reset_day cap warn cut used clear` and its `value` (1-31, bytes (0: none), 1-100, `on`/`off`, bytes, `yes`) | `traffic` (mu300-traffic json) |
-| `power.get`, `power.set` | -, `key` `PROFILE SAVER_BELOW CHARGE_TO` or `plugged`/`battery`/`saver` `.WIFI_IDLE .RADIO_IDLE .LEDS_IDLE .CPU`, `value` | `state profile why supply battery charge_off conf text` (mu300-power) |
+| `power.get`, `power.set` | -, `key` `PROFILE SAVER_BELOW CHARGE_TO POWER_ON_CHARGER RESUME_AT CHARGE_PAUSE FULL_ONCE` (the last three U30 Air only) or `plugged`/`battery`/`saver` `.WIFI_IDLE .RADIO_IDLE .LEDS_IDLE .CPU`, `value` | `state profile why supply battery charge_off conf text` (mu300-power) |
 | `led.get`, `led.set` | -, `timeout` (seconds, 0: always on) and/or `test` (bool: each LED in turn) | `timeout device` |
 | `zram.get`, `zram.set` | -, `state` on/off | `active enabled text` |
 | `cpu.get` | - | `cpu` (mu300-cpu status --json), `voltage` (mu300-cpu voltage status --json, or null) |

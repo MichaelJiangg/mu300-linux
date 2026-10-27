@@ -90,7 +90,9 @@ the device lands in Android about 20 minutes later. The cause is still open.
   `bq256xx` driver from v2026.10.12 on. `mu300-power` adds profiles (`plugged`, `battery`, `saver`, `auto`), idle radios
   and a **charge limit** (from v2026.10.20: any value from 0 to 100 %, `sudo mu300-power charge-limit 80` or
   `CHARGE_TO`; charging stops at the limit and resumes 5 points below it, 0 never charges, and the battery is never
-  held under 5 %; before: 100 or 80); charging pauses above 45 °C.
+  held under 5 %; before: 100 or 80); charging pauses above 45 °C. Also (U30 Air): `RESUME_AT` (charging starts
+  again only under that level), `mu300-power charge pause|resume` and `charge full` (once to 100 %, then back to the
+  limit); System > Power has them too (FINDINGS 226).
 * **Type-C current (§40, v2026.10.20, mainline kernels):** the charger used to take 500 mA from every port. Now the
   PMIC's Type-C block is read and the larger of the BC1.2 and the Type-C (Rp) current is taken, 3 A capped to 2 A:
   on a 1.5 or 3 A port the battery charges at about 1.6 A instead of 0.36 A.

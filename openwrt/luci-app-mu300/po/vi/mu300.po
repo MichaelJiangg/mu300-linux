@@ -1813,6 +1813,12 @@ msgstr "Tạm dừng sạc: nhiệt độ pin"
 msgid "Charging paused: charge limit"
 msgstr "Tạm dừng sạc: giới hạn sạc"
 
+msgid "Charging paused: by hand"
+msgstr "Đã tạm dừng sạc: thủ công"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Sạc đầy một lần, sau đó trở lại giới hạn"
+
 msgid "Sleep now"
 msgstr "Ngủ ngay"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % không bao giờ sạc pin (thiết bị chạy bằng bộ sạc), 
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % giúp pin bền hơn trên thiết bị luôn cắm sạc."
+
+msgid "Start charging again under"
+msgstr "Bắt đầu sạc lại dưới"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 sạc lại khi thấp hơn mức dừng 5 điểm. Giá trị thấp hơn chỉ sạc lại khi dưới giá trị đó; với 100 %, pin đầy sẽ chờ đến khi xuống dưới giá trị đó."
+
+msgid "Resume charging"
+msgstr "Tiếp tục sạc"
+
+msgid "Pause charging"
+msgstr "Tạm dừng sạc"
+
+msgid "Cancel the full charge"
+msgstr "Hủy sạc đầy"
+
+msgid "Charge to full once"
+msgstr "Sạc đầy một lần"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Khi tạm dừng, pin không được sạc và thiết bị chạy bằng bộ sạc; dưới 5 % pin vẫn được sạc, và bảo vệ nhiệt độ luôn áp dụng."
 
 msgid "When the charger switches the device on"
 msgstr "Khi bộ sạc bật thiết bị"

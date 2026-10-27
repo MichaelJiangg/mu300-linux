@@ -1813,6 +1813,12 @@ msgstr "चार्जिंग रुकी: बैटरी का ताप�
 msgid "Charging paused: charge limit"
 msgstr "चार्जिंग रुकी: चार्ज सीमा"
 
+msgid "Charging paused: by hand"
+msgstr "चार्जिंग रुकी: हाथ से"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "एक बार पूरा चार्ज, फिर सीमा पर वापस"
+
 msgid "Sleep now"
 msgstr "अभी सुलाएँ"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % बैटरी को कभी चार्ज नहीं कर
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % हमेशा बिजली से जुड़े रहने वाले डिवाइस में बैटरी को स्वस्थ रखता है।"
+
+msgid "Start charging again under"
+msgstr "इससे नीचे फिर चार्ज शुरू करें"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 रुकने के स्तर से 5 अंक नीचे फिर शुरू करता है। कम मान चार्जिंग को केवल उसके नीचे फिर शुरू करता है; 100 % के साथ, भरी बैटरी उसके नीचे आने तक रुकती है।"
+
+msgid "Resume charging"
+msgstr "चार्जिंग फिर शुरू करें"
+
+msgid "Pause charging"
+msgstr "चार्जिंग रोकें"
+
+msgid "Cancel the full charge"
+msgstr "पूरा चार्ज रद्द करें"
+
+msgid "Charge to full once"
+msgstr "एक बार पूरा चार्ज करें"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "रुकने पर बैटरी चार्ज नहीं होती और डिवाइस चार्जर से चलता है; 5 % से नीचे यह फिर भी चार्ज होती है, और तापमान सुरक्षा हमेशा लागू रहती है।"
 
 msgid "When the charger switches the device on"
 msgstr "जब चार्जर डिवाइस को चालू करे"

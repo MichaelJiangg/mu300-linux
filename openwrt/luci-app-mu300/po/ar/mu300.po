@@ -1813,6 +1813,12 @@ msgstr "تم إيقاف الشحن مؤقتًا: درجة حرارة البطا�
 msgid "Charging paused: charge limit"
 msgstr "تم إيقاف الشحن مؤقتًا: حد الشحن"
 
+msgid "Charging paused: by hand"
+msgstr "الشحن متوقف: يدويًا"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "شحن كامل لمرة واحدة، ثم العودة إلى الحد"
+
 msgid "Sleep now"
 msgstr "إسبات الآن"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % لا يشحن البطارية أبدًا (يعمل الجهاز م�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % تحافظ على صحة البطارية في جهاز يبقى موصولًا بالكهرباء."
+
+msgid "Start charging again under"
+msgstr "استئناف الشحن تحت"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 يستأنف الشحن عند 5 نقاط تحت مستوى الإيقاف. القيمة الأقل تستأنف الشحن فقط تحتها؛ مع 100 %، تنتظر البطارية الممتلئة حتى تنخفض تحتها."
+
+msgid "Resume charging"
+msgstr "استئناف الشحن"
+
+msgid "Pause charging"
+msgstr "إيقاف الشحن مؤقتًا"
+
+msgid "Cancel the full charge"
+msgstr "إلغاء الشحن الكامل"
+
+msgid "Charge to full once"
+msgstr "شحن كامل مرة واحدة"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "عند الإيقاف المؤقت لا تُشحن البطارية ويعمل الجهاز من الشاحن؛ تحت 5 % تُشحن دائمًا، وحماية درجة الحرارة تبقى سارية."
 
 msgid "When the charger switches the device on"
 msgstr "عندما يشغّل الشاحن الجهاز"

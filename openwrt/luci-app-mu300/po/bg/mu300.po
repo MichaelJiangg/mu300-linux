@@ -1813,6 +1813,12 @@ msgstr "Зареждането е спряно: температура на ба
 msgid "Charging paused: charge limit"
 msgstr "Зареждането е спряно: лимит на зареждане"
 
+msgid "Charging paused: by hand"
+msgstr "Зареждането е спряно: ръчно"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Зареждане до пълно веднъж, после обратно към лимита"
+
 msgid "Sleep now"
 msgstr "Приспи сега"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % никога не зарежда батерията (устройс�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % пазят батерията на устройство, което остава на зарядно."
+
+msgid "Start charging again under"
+msgstr "Възобнови зареждането под"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 възобновява 5 пункта под нивото на спиране. По-ниска стойност възобновява зареждането само под нея; при 100 % пълната батерия изчаква, докато спадне под нея."
+
+msgid "Resume charging"
+msgstr "Възобнови зареждането"
+
+msgid "Pause charging"
+msgstr "Спри зареждането"
+
+msgid "Cancel the full charge"
+msgstr "Отмени пълното зареждане"
+
+msgid "Charge to full once"
+msgstr "Зареди до пълно веднъж"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "При пауза батерията не се зарежда и устройството работи от зарядното; под 5 % тя пак се зарежда, а температурната защита винаги важи."
 
 msgid "When the charger switches the device on"
 msgstr "Когато зарядното включи устройството"

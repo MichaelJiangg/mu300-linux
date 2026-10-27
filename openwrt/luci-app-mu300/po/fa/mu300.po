@@ -1813,6 +1813,12 @@ msgstr "شارژ متوقف شد: دمای باتری"
 msgid "Charging paused: charge limit"
 msgstr "شارژ متوقف شد: حد شارژ"
 
+msgid "Charging paused: by hand"
+msgstr "شارژ متوقف شد: دستی"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "یک بار شارژ کامل، سپس بازگشت به حد"
+
 msgid "Sleep now"
 msgstr "اکنون بخواب"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % هرگز باتری را شارژ نمی‌کند (دستگاه با
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % سلامت باتری را در دستگاهی که همیشه به برق وصل است بهتر حفظ می‌کند."
+
+msgid "Start charging again under"
+msgstr "شروع دوباره شارژ زیر"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 شارژ را ۵ واحد زیر سطح توقف دوباره شروع می‌کند. مقدار کمتر شارژ را فقط زیر آن دوباره شروع می‌کند؛ با 100 %، باتری پر صبر می‌کند تا زیر آن برسد."
+
+msgid "Resume charging"
+msgstr "ادامه شارژ"
+
+msgid "Pause charging"
+msgstr "توقف موقت شارژ"
+
+msgid "Cancel the full charge"
+msgstr "لغو شارژ کامل"
+
+msgid "Charge to full once"
+msgstr "یک بار شارژ کامل"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "در حالت توقف، باتری شارژ نمی‌شود و دستگاه با شارژر کار می‌کند؛ زیر 5 % همچنان شارژ می‌شود و محافظ دما همیشه فعال است."
 
 msgid "When the charger switches the device on"
 msgstr "وقتی شارژر دستگاه را روشن می‌کند"
