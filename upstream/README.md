@@ -1,6 +1,6 @@
 # Mainline (LTS) kernel on the MU300
 
-Mainline **Linux 6.18.58** (the current longterm series) runs Ubuntu 24.04 and OpenWrt 25.12 on the ZTE F50 /
+Mainline **Linux 6.18.59** (the current longterm series) runs Ubuntu 24.04 and OpenWrt 25.12 on the ZTE F50 /
 MU300 (Unisoc UMS9620): all 8 CPUs (4×A55, 4×A76), eMMC, USB NCM + ACM, the 5 GHz hotspot, Bluetooth, the modem
 with mobile data (downlink and uplink), SMS, the VPN, the Mali GPU, thermal/cpufreq, the PMIC watchdog and
 reboot. `docs/FINDINGS.md` 31-31f has what it took and what is still open.
@@ -27,7 +27,7 @@ merged) describes the same GIC/UART/timer layout; this device is derived from th
 ## Build and test
 ```sh
 docker build -t mu300-mainline-build upstream/
-docker volume create mu300-mainline   # build.sh fetches linux-$KV (default 6.18.58) into it, signatures checked (keys/)
+docker volume create mu300-mainline   # build.sh fetches linux-$KV (default 6.18.59) into it, signatures checked (keys/)
 docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build.sh
 docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build-modules.sh
 upstream/make-bundle.sh mu300-kernel-6.18.tar.gz        # Image for LK, generic ramdisk segment, modules
@@ -73,8 +73,8 @@ boot/flash-trial.sh boot-mainline.img      # slot b only, falls back to Android
 
 ## Newer kernels (7.x)
 
-The whole port - kernel and all its out-of-tree modules - also builds against **7.2.12**, the newest stable release
-(2026-10-15), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
+The whole port - kernel and all its out-of-tree modules - also builds against **7.2.13**, the newest stable release
+(2026-10-26), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
 Wi-Fi access point, mobile data (18.7 MB/s), Bluetooth, the Mali GPU, cpufreq and the modem's AT channel working,
 and no warning or oops in the log. (7.2 is a stable, not a longterm release: 6.18 stays the base, 7.x is how the
 next jump is kept small.) One source serves both:
@@ -90,7 +90,7 @@ next jump is kept small.) One source serves both:
   run rather than at the next jump.
 
 Releases carry it as `mu300-kernel-7.2.tar.gz`: `sudo mu300-update kernel 7.2` on the device, or choice 3 in the
-installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.12` for `build.sh` and `build-modules.sh`, and
+installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.13` for `build.sh` and `build-modules.sh`, and
 `MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs them all.
 
 **7.3** (mainline, 2026-10-18) is the fourth kernel, from the release after v2026.10.19.2 on: `mu300-kernel-7.3.tar.gz`,
