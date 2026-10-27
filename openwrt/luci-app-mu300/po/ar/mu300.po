@@ -628,6 +628,9 @@ msgstr "يؤدي وضع المضيف إلى قطع شبكة USB والاتصال
 msgid "USB network mode"
 msgstr "وضع شبكة USB"
 
+msgid "Current sharing protocol"
+msgstr "بروتوكول المشاركة الحالي"
+
 msgid "Network protocol"
 msgstr "بروتوكول الشبكة"
 
@@ -658,6 +661,27 @@ msgstr "تحديث"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "متاح في وضع المضيف فقط. يؤدي «تحديث» إلى تشغيل محوّلات USB المكتشفة؛ والإضافة إلى LAN تحفظ الجسر وتعيد تحميل الشبكة."
 
+msgid "Network performance"
+msgstr "أداء الشبكة"
+
+msgid "Active congestion control"
+msgstr "التحكم في الازدحام الحالي"
+
+msgid "Default queue"
+msgstr "قائمة الانتظار الافتراضية"
+
+msgid "TCP congestion control"
+msgstr "التحكم في ازدحام TCP"
+
+msgid "Apply"
+msgstr "تطبيق"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "يؤثر أساسًا على اتصالات TCP الجديدة التي ينشئها هذا الجهاز. لا تستخدم اتصالات عملاء نقطة الاتصال وUSB المُمرَّرة BBR تلقائيًا."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "يختار BBR قائمة FQ كقائمة انتظار افتراضية للواجهات المُنشأة حديثًا. تبقى الاتصالات والواجهات وQoS الحالية كما هي. تُحفظ الإعدادات بعد إعادة التشغيل."
+
 msgid "Recent modem operations"
 msgstr "عمليات المودم الأخيرة"
 
@@ -670,6 +694,12 @@ msgstr "الاستدعاءات الأخيرة للوحة التحكم، في ه�
 msgid "Unavailable"
 msgstr "غير متاح"
 
+msgid "Mixed"
+msgstr "مختلط"
+
+msgid "None"
+msgstr "بلا"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "وضع شبكة USB غير متاح في وضع المضيف؛ كما أن التشغيل التلقائي لوضع المضيف يعطّل التشغيل التلقائي لشبكة USB."
 
@@ -681,9 +711,6 @@ msgstr "ستُعاد عملية تعداد شبكة USB والاتصال الت�
 
 msgid "Switch USB role?"
 msgstr "تبديل دور USB؟"
-
-msgid "Apply"
-msgstr "تطبيق"
 
 msgid "Switching USB role…"
 msgstr "جارٍ تبديل دور USB…"
@@ -721,6 +748,21 @@ msgstr "تم حفظ الإعدادات"
 msgid "Save failed: %s"
 msgstr "فشل الحفظ: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "تعذّرت قراءة إعدادات أداء الشبكة؛ حدّث الصفحة للمحاولة مجددًا"
+
+msgid "This kernel does not provide this setting"
+msgstr "هذه النواة لا توفر هذا الإعداد"
+
+msgid "System default"
+msgstr "الافتراضي للنظام"
+
+msgid "Applied and saved for future boots."
+msgstr "طُبّق وحُفظ لعمليات الإقلاع القادمة."
+
+msgid "The kernel did not accept the network settings"
+msgstr "لم تقبل النواة إعدادات الشبكة"
+
 msgid "This boot"
 msgstr "هذا الإقلاع"
 
@@ -739,6 +781,9 @@ msgstr "جارٍ البحث عن محوّلات USB…"
 msgid "No USB adapters found."
 msgstr "لم يُعثر على محوّلات USB."
 
+msgid "In use by another network"
+msgstr "مستخدم من شبكة أخرى"
+
 msgid "Link connected"
 msgstr "الرابط متصل"
 
@@ -747,6 +792,9 @@ msgstr "لا يوجد رابط؛ جرت محاولة التفعيل"
 
 msgid "Added to LAN"
 msgstr "أُضيف إلى LAN"
+
+msgid "Cannot add"
+msgstr "لا يمكن الإضافة"
 
 msgid "Add to LAN"
 msgstr "إضافة إلى LAN"
@@ -862,9 +910,6 @@ msgstr "المنفذ"
 msgid "Security"
 msgstr "الأمان"
 
-msgid "None"
-msgstr "بلا"
-
 msgid "User name"
 msgstr "اسم المستخدم"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux مقفل"
+
+msgid "Yes: the next restart starts Android"
+msgstr "نعم: إعادة التشغيل التالية تبدأ Android"
+
+msgid "No"
+msgstr "لا"
+
+msgid "Writable"
+msgstr "قابل للكتابة"
+
+msgid "This boot image cannot change the boot"
+msgstr "لا تستطيع صورة الإقلاع هذه تغيير الإقلاع"
 
 msgid "%s of %s"
 msgstr "%s من %s"
@@ -1114,6 +1174,15 @@ msgstr "التبديل إلى Android"
 msgid "Lock Linux"
 msgstr "قفل Linux"
 
+msgid "Default boot"
+msgstr "الإقلاع الافتراضي"
+
+msgid "One-time boot"
+msgstr "إقلاع لمرة واحدة"
+
+msgid "Boot control"
+msgstr "التحكم في الإقلاع"
+
 msgid "Neighbor cells"
 msgstr "الخلايا المجاورة"
 
@@ -1125,6 +1194,9 @@ msgstr "التردد"
 
 msgid "Running %s…"
 msgstr "جارٍ تنفيذ %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "حُفظت إعدادات نقطة الاتصال؛ يجري تطبيق التغييرات"
 
 msgid "Started in background: %s"
 msgstr "بدأ في الخلفية: %s"
@@ -1246,6 +1318,9 @@ msgstr "تم اختيار SIM الداخلية: تُستخدم بعد إعادة
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "تم اختيار SIM الداخلية لكنها غير مدعومة على هذا الجهاز: تُستخدم SIM الخارجية"
 
+msgid "in use"
+msgstr "قيد الاستخدام"
+
 msgid "Uptime %s"
 msgstr "مدة التشغيل %s"
 
@@ -1312,9 +1387,6 @@ msgstr "رابط LTE"
 msgid "Hidden"
 msgstr "مخفي"
 
-msgid "No"
-msgstr "لا"
-
 msgid "Running"
 msgstr "قيد التشغيل"
 
@@ -1374,9 +1446,6 @@ msgstr "متصل"
 
 msgid "AT adapter unavailable"
 msgstr "محوّل AT غير متاح"
-
-msgid "Linux locked"
-msgstr "Linux مقفل"
 
 msgid "Installing the language pack…"
 msgstr "جارٍ تثبيت حزمة اللغات…"
@@ -2105,9 +2174,6 @@ msgstr "افتراضي المودم"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "قيد الاستخدام"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "إطفاء راديو SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "صورة الإقلاع"
 
 msgid "from the installer"
 msgstr "من المثبِّت"
-
-msgid "Default boot"
-msgstr "الإقلاع الافتراضي"
 
 msgid "Free space"
 msgstr "المساحة الحرة"
@@ -3430,14 +3493,14 @@ msgstr "نوع قفل غير معروف"
 msgid "Invalid value for this lock kind"
 msgstr "قيمة غير صالحة لنوع القفل هذا"
 
-msgid "None of these bands is supported by this modem"
-msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "أقفال النطاق والوضع والخلية غير مدعومة لبطاقة SIM2 بعد"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "أقفال النطاق والوضع والخلية غير مدعومة أثناء إدارة تبديل الشريحتين للراديو"
+
+msgid "None of these bands is supported by this modem"
+msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
 
 msgid "Invalid page"
 msgstr "صفحة غير صالحة"
@@ -3528,6 +3591,15 @@ msgstr "لم يُرجع محول TTL ردًا صالحًا"
 
 msgid "Invalid TTL"
 msgstr "قيمة TTL غير صالحة"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "لم يُرجع محوّل TCP ردًا صالحًا"
+
+msgid "Invalid congestion control"
+msgstr "تحكم ازدحام غير صالح"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "لم يُرجع محوّل الإقلاع ردًا صالحًا"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "لم يُرجع محوّل استهلاك البيانات رداً صالحاً"
@@ -3782,8 +3854,29 @@ msgstr "لم يتبع الراديو إعداده"
 msgid "The data roaming setting could not be saved"
 msgstr "تعذّر حفظ إعداد تجوال البيانات"
 
-msgid "Expected on or off"
-msgstr "المتوقع on أو off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "حُفظ إعداد نقطة الاتصال، لكن فشلت إعادة تحميل اللاسلكي"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "في إعدادات اللاسلكي تغييرات غير محفوظة: احفظها أو تراجع عنها أولًا"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "يجري تبديل نقطة الاتصال بالفعل؛ حاول مجددًا بعد قليل"
+
+msgid "No hotspot (access point) is configured"
+msgstr "لا توجد نقطة اتصال (نقطة وصول) مُهيأة"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "تشغيل هذا الراديو سيؤثر على واجهة أخرى؛ استخدم صفحة اللاسلكي"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "الراديو مستخدم من عميل Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "تعذّرت كتابة إعداد نقطة الاتصال"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "هذه المنصة لا توفر التحكم في نقطة الاتصال"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "هذه المنصة لا توفر تكامل VPN"
@@ -3883,6 +3976,15 @@ msgstr "ليست واجهة شبكة USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "لم يُعثر على قسم جهاز جسر LAN"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "تعذّر تحديد الشبكة المالكة للمحوّل؛ حاول لاحقًا"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "المحوّل تابع لشبكة أخرى ولا يمكن ضمه إلى LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "في إعدادات الشبكة تغييرات غير محفوظة: احفظها أو تراجع عنها أولًا"
 
 msgid "Cannot bring USB network interface up"
 msgstr "تعذّر تشغيل واجهة شبكة USB"
@@ -4018,6 +4120,12 @@ msgstr "عملية حزم غير معروفة"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "هذه المنصة لا توفر التحكم في ازدحام TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "تعذّرت قراءة إعدادات TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "استهلاك البيانات غير متاح على هذا النظام"

@@ -827,6 +827,30 @@ msgstr "TTL, 1 ile 255 arasında bir tam sayıdır."
 msgid "Leave the TTL alone"
 msgstr "TTL'ye dokunma"
 
+msgid "TCP congestion control"
+msgstr "TCP tıkanıklık denetimi"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Temel olarak bu cihazın yeni TCP bağlantılarını etkiler. Hotspot ve USB üzerinden yönlendirilen istemci bağlantıları otomatik olarak BBR kullanmaz."
+
+msgid "Active congestion control"
+msgstr "Etkin tıkanıklık denetimi"
+
+msgid "Default queue"
+msgstr "Varsayılan kuyruk"
+
+msgid "This kernel does not provide this setting"
+msgstr "Bu çekirdek bu ayarı sağlamıyor"
+
+msgid "System default"
+msgstr "Sistem varsayılanı"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR, yeni arayüzler için varsayılan kuyruk olarak FQ kullanır. Mevcut bağlantılar, arayüzler ve QoS korunur. Ayarlar yeniden başlatmada saklanır."
+
+msgid "Save and apply"
+msgstr "Kaydet ve uygula"
+
 msgid "USSD"
 msgstr "USSD"
 

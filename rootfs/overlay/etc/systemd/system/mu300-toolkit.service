@@ -1,7 +1,8 @@
 [Unit]
-Description=MU300 toolkit: apply the saved performance profile and TTL setting
+Description=MU300 toolkit: apply the saved performance profile, TTL and TCP congestion control
 ConditionPathExists=|/etc/mu300/toolkit.conf
 ConditionPathExists=|/etc/mu300/ttl.conf
+ConditionPathExists=|/etc/mu300/tcp.conf
 After=mu300-vendor.service mu300-firewall.service
 
 [Service]

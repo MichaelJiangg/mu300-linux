@@ -628,6 +628,9 @@ msgstr "Η λειτουργία κεντρικού υπολογιστή αποσ
 msgid "USB network mode"
 msgstr "Λειτουργία δικτύου USB"
 
+msgid "Current sharing protocol"
+msgstr "Τρέχον πρωτόκολλο κοινής χρήσης"
+
 msgid "Network protocol"
 msgstr "Πρωτόκολλο δικτύου"
 
@@ -658,6 +661,27 @@ msgstr "Ανανέωση"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Διαθέσιμο μόνο σε λειτουργία κεντρικού υπολογιστή. Η Ανανέωση ενεργοποιεί τους προσαρμογείς USB που εντοπίστηκαν· η προσθήκη στο LAN αποθηκεύει τη γέφυρα και επαναφορτώνει το δίκτυο."
 
+msgid "Network performance"
+msgstr "Απόδοση δικτύου"
+
+msgid "Active congestion control"
+msgstr "Ενεργός έλεγχος συμφόρησης"
+
+msgid "Default queue"
+msgstr "Προεπιλεγμένη ουρά"
+
+msgid "TCP congestion control"
+msgstr "Έλεγχος συμφόρησης TCP"
+
+msgid "Apply"
+msgstr "Εφαρμογή"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Επηρεάζει κυρίως τις νέες συνδέσεις TCP αυτής της συσκευής. Οι προωθούμενες συνδέσεις πελατών hotspot και USB δεν χρησιμοποιούν αυτόματα BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "Το BBR ορίζει το FQ ως προεπιλεγμένη ουρά για τις νέες διεπαφές. Οι υπάρχουσες συνδέσεις, διεπαφές και QoS διατηρούνται. Οι ρυθμίσεις διατηρούνται μετά από επανεκκίνηση."
+
 msgid "Recent modem operations"
 msgstr "Πρόσφατες λειτουργίες μόντεμ"
 
@@ -670,6 +694,12 @@ msgstr "Οι πρόσφατες κλήσεις του πίνακα ελέγχο�
 msgid "Unavailable"
 msgstr "Μη διαθέσιμο"
 
+msgid "Mixed"
+msgstr "Μικτό"
+
+msgid "None"
+msgstr "Καμία"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Η λειτουργία δικτύου USB δεν είναι διαθέσιμη σε λειτουργία κεντρικού υπολογιστή· η αυτόματη εκκίνηση κεντρικού υπολογιστή απενεργοποιεί επίσης την αυτόματη εκκίνηση δικτύου USB."
 
@@ -681,9 +711,6 @@ msgstr "Η δικτύωση USB και η σειριακή σύνδεση θα �
 
 msgid "Switch USB role?"
 msgstr "Αλλαγή ρόλου USB;"
-
-msgid "Apply"
-msgstr "Εφαρμογή"
 
 msgid "Switching USB role…"
 msgstr "Αλλαγή ρόλου USB…"
@@ -721,6 +748,21 @@ msgstr "Οι ρυθμίσεις αποθηκεύτηκαν"
 msgid "Save failed: %s"
 msgstr "Η αποθήκευση απέτυχε: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων απόδοσης δικτύου· ανανεώστε για νέα προσπάθεια"
+
+msgid "This kernel does not provide this setting"
+msgstr "Αυτός ο πυρήνας δεν παρέχει αυτή τη ρύθμιση"
+
+msgid "System default"
+msgstr "Προεπιλογή συστήματος"
+
+msgid "Applied and saved for future boots."
+msgstr "Εφαρμόστηκε και αποθηκεύτηκε για τις επόμενες εκκινήσεις."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ο πυρήνας δεν αποδέχτηκε τις ρυθμίσεις δικτύου"
+
 msgid "This boot"
 msgstr "Αυτή η εκκίνηση"
 
@@ -739,6 +781,9 @@ msgstr "Σάρωση προσαρμογέων USB…"
 msgid "No USB adapters found."
 msgstr "Δεν βρέθηκαν προσαρμογείς USB."
 
+msgid "In use by another network"
+msgstr "Χρησιμοποιείται από άλλο δίκτυο"
+
 msgid "Link connected"
 msgstr "Η ζεύξη συνδέθηκε"
 
@@ -747,6 +792,9 @@ msgstr "Χωρίς ζεύξη· έγινε απόπειρα ενεργοποίη
 
 msgid "Added to LAN"
 msgstr "Προστέθηκε στο LAN"
+
+msgid "Cannot add"
+msgstr "Δεν μπορεί να προστεθεί"
 
 msgid "Add to LAN"
 msgstr "Προσθήκη στο LAN"
@@ -862,9 +910,6 @@ msgstr "Θύρα"
 msgid "Security"
 msgstr "Ασφάλεια"
 
-msgid "None"
-msgstr "Καμία"
-
 msgid "User name"
 msgstr "Όνομα χρήστη"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Το Linux κλειδώθηκε"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ναι: η επόμενη επανεκκίνηση ξεκινά το Android"
+
+msgid "No"
+msgstr "Όχι"
+
+msgid "Writable"
+msgstr "Εγγράψιμο"
+
+msgid "This boot image cannot change the boot"
+msgstr "Αυτή η εικόνα εκκίνησης δεν μπορεί να αλλάξει την εκκίνηση"
 
 msgid "%s of %s"
 msgstr "%s από %s"
@@ -1114,6 +1174,15 @@ msgstr "Μετάβαση σε Android"
 msgid "Lock Linux"
 msgstr "Κλείδωμα Linux"
 
+msgid "Default boot"
+msgstr "Προεπιλεγμένη εκκίνηση"
+
+msgid "One-time boot"
+msgstr "Εκκίνηση μίας φοράς"
+
+msgid "Boot control"
+msgstr "Έλεγχος εκκίνησης"
+
 msgid "Neighbor cells"
 msgstr "Γειτονικές κυψέλες"
 
@@ -1125,6 +1194,9 @@ msgstr "Συχνότητα"
 
 msgid "Running %s…"
 msgstr "Εκτέλεση %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Οι ρυθμίσεις hotspot αποθηκεύτηκαν· εφαρμόζονται οι αλλαγές"
 
 msgid "Started in background: %s"
 msgstr "Ξεκίνησε στο παρασκήνιο: %s"
@@ -1246,6 +1318,9 @@ msgstr "Επιλέχθηκε η εσωτερική SIM: χρησιμοποιεί
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Επιλέχθηκε η εσωτερική SIM, αλλά δεν υποστηρίζεται σε αυτή τη συσκευή: χρησιμοποιείται η εξωτερική SIM"
 
+msgid "in use"
+msgstr "σε χρήση"
+
 msgid "Uptime %s"
 msgstr "Χρόνος λειτουργίας %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Ζεύξη LTE"
 msgid "Hidden"
 msgstr "Κρυφό"
 
-msgid "No"
-msgstr "Όχι"
-
 msgid "Running"
 msgstr "Εκτελείται"
 
@@ -1374,9 +1446,6 @@ msgstr "Σε σύνδεση"
 
 msgid "AT adapter unavailable"
 msgstr "Ο προσαρμογέας AT δεν είναι διαθέσιμος"
-
-msgid "Linux locked"
-msgstr "Το Linux κλειδώθηκε"
 
 msgid "Installing the language pack…"
 msgstr "Εγκατάσταση του πακέτου γλωσσών…"
@@ -2105,9 +2174,6 @@ msgstr "Προεπιλογή μόντεμ"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "σε χρήση"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Απενεργοποίηση πομπού SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Εικόνα εκκίνησης"
 
 msgid "from the installer"
 msgstr "από το πρόγραμμα εγκατάστασης"
-
-msgid "Default boot"
-msgstr "Προεπιλεγμένη εκκίνηση"
 
 msgid "Free space"
 msgstr "Ελεύθερος χώρος"
@@ -3430,14 +3493,14 @@ msgstr "Άγνωστο είδος κλειδώματος"
 msgid "Invalid value for this lock kind"
 msgstr "Μη έγκυρη τιμή για αυτό το είδος κλειδώματος"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Αυτό το μόντεμ δεν υποστηρίζει καμία από αυτές τις ζώνες"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Τα κλειδώματα ζώνης, λειτουργίας και κυψέλης δεν υποστηρίζονται ακόμη για τη SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Τα κλειδώματα ζώνης, λειτουργίας και κυψέλης δεν υποστηρίζονται όσο η εναλλαγή διπλής SIM διαχειρίζεται τον πομπό"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Αυτό το μόντεμ δεν υποστηρίζει καμία από αυτές τις ζώνες"
 
 msgid "Invalid page"
 msgstr "Μη έγκυρη σελίδα"
@@ -3528,6 +3591,15 @@ msgstr "Ο προσαρμογέας TTL δεν έδωσε έγκυρη απάν�
 
 msgid "Invalid TTL"
 msgstr "Μη έγκυρο TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Ο προσαρμογέας TCP δεν έδωσε έγκυρη απάντηση"
+
+msgid "Invalid congestion control"
+msgstr "Μη έγκυρος έλεγχος συμφόρησης"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Ο προσαρμογέας εκκίνησης δεν έδωσε έγκυρη απάντηση"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Ο προσαρμογέας χρήσης δεδομένων δεν έδωσε έγκυρη απάντηση"
@@ -3782,8 +3854,29 @@ msgstr "Ο πομπός δεν ακολούθησε τη ρύθμισή του"
 msgid "The data roaming setting could not be saved"
 msgstr "Δεν ήταν δυνατή η αποθήκευση της ρύθμισης περιαγωγής δεδομένων"
 
-msgid "Expected on or off"
-msgstr "Αναμενόταν on ή off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Η ρύθμιση hotspot αποθηκεύτηκε, αλλά η επαναφόρτωση του ασύρματου απέτυχε"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Οι ασύρματες ρυθμίσεις έχουν μη αποθηκευμένες αλλαγές: αποθηκεύστε ή αναιρέστε τις πρώτα"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Το hotspot ήδη αλλάζει κατάσταση· δοκιμάστε ξανά σε λίγο"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Δεν έχει ρυθμιστεί hotspot (σημείο πρόσβασης)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Η ενεργοποίηση αυτού του ραδιοφώνου θα επηρεάσει άλλη διεπαφή· χρησιμοποιήστε τη σελίδα Ασύρματο"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Το ραδιόφωνο χρησιμοποιείται από τον πελάτη Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Δεν ήταν δυνατή η εγγραφή της ρύθμισης hotspot"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Αυτή η πλατφόρμα δεν παρέχει έλεγχο hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Η ενσωμάτωση VPN δεν παρέχεται από αυτή την πλατφόρμα"
@@ -3883,6 +3976,15 @@ msgstr "Δεν είναι διεπαφή δικτύου USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Δεν βρέθηκε η ενότητα συσκευής της γέφυρας LAN"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Δεν ήταν δυνατό να προσδιοριστεί σε ποιο δίκτυο ανήκει ο προσαρμογέας· δοκιμάστε αργότερα"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Ο προσαρμογέας ανήκει σε άλλο δίκτυο και δεν μπορεί να ενταχθεί στο LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Οι ρυθμίσεις δικτύου έχουν μη αποθηκευμένες αλλαγές: αποθηκεύστε ή αναιρέστε τις πρώτα"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Δεν είναι δυνατή η ενεργοποίηση της διεπαφής δικτύου USB"
@@ -4018,6 +4120,12 @@ msgstr "Άγνωστη ενέργεια πακέτων"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Αυτή η πλατφόρμα δεν παρέχει έλεγχο συμφόρησης TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Η χρήση δεδομένων δεν είναι διαθέσιμη σε αυτό το σύστημα"

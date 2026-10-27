@@ -854,6 +854,28 @@
             };
             tload();
         }
+        /* TCP congestion control of the device's own connections (mu300-tcp; kanoqwq's b9f71e72): only what the kernel
+         * offers (the 5.4 kernel has no BBR) */
+        if (has('tcp.get')) {
+            var cc = root.appendChild(card(_('TCP congestion control'), 'mu-tcp'));
+            var cb = cc.appendChild(el('div'));
+            var cload = function () {
+                return load(cb, 'tcp.get', {}, function (o) {
+                    cb.appendChild(note(_('Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR.')));
+                    cb.appendChild(row(_('Active congestion control'), (o.current || '--').toUpperCase()));
+                    cb.appendChild(row(_('Default queue'), o.qdisc || '--'));
+                    if (!o.supported) { cb.appendChild(note(_('This kernel does not provide this setting'), 'warn')); return; }
+                    var opts = [ [ 'default', _('System default') + (o.default ? ' (' + o.default.toUpperCase() + ')' : '') ] ];
+                    (o.offered || []).forEach(function (a) { opts.push([ a, a.toUpperCase() ]); });
+                    var sel = select('mu-tcp-algo', opts, o.saved || 'default');
+                    cb.appendChild(field(_('TCP congestion control'), sel));
+                    cb.appendChild(note(_('BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots.')));
+                    var s = button(_('Save and apply'), function () { act(s, 'tcp.set', { value: sel.value }, { done: cload }); }, 'primary');
+                    cb.appendChild(actions([ s ]));
+                });
+            };
+            cload();
+        }
         if (has('ussd.send')) {
             var uc = root.appendChild(card(_('USSD'), 'mu-ussd'));
             var code = input('mu-ussd-code', { maxlength: '40', placeholder: '*100#' });

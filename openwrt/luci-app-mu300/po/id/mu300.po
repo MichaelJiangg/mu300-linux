@@ -628,6 +628,9 @@ msgstr "Mode host memutus jaringan USB dan serial pada port ini. F50 tidak memil
 msgid "USB network mode"
 msgstr "Mode jaringan USB"
 
+msgid "Current sharing protocol"
+msgstr "Protokol berbagi saat ini"
+
 msgid "Network protocol"
 msgstr "Protokol jaringan"
 
@@ -658,6 +661,27 @@ msgstr "Segarkan"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Hanya tersedia dalam mode host. Segarkan menyalakan adaptor USB yang ditemukan; menambahkan ke LAN menyimpan bridge dan memuat ulang jaringan."
 
+msgid "Network performance"
+msgstr "Kinerja jaringan"
+
+msgid "Active congestion control"
+msgstr "Kontrol kemacetan aktif"
+
+msgid "Default queue"
+msgstr "Antrean bawaan"
+
+msgid "TCP congestion control"
+msgstr "Kontrol kemacetan TCP"
+
+msgid "Apply"
+msgstr "Terapkan"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Terutama memengaruhi koneksi TCP baru dari perangkat ini. Koneksi klien hotspot dan USB yang diteruskan tidak otomatis memakai BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR memilih FQ sebagai antrean bawaan untuk antarmuka yang baru dibuat. Koneksi, antarmuka, dan QoS yang ada tetap. Pengaturan bertahan setelah reboot."
+
 msgid "Recent modem operations"
 msgstr "Operasi modem terbaru"
 
@@ -670,6 +694,12 @@ msgstr "Panggilan terbaru panel kontrol, dari boot ini dan sebelumnya: kapan, pa
 msgid "Unavailable"
 msgstr "Tidak tersedia"
 
+msgid "Mixed"
+msgstr "Campuran"
+
+msgid "None"
+msgstr "Tidak ada"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Mode jaringan USB tidak tersedia dalam mode host; mulai otomatis host juga menonaktifkan mulai otomatis jaringan USB."
 
@@ -681,9 +711,6 @@ msgstr "Jaringan USB dan serial akan dienumerasi ulang dalam mode perangkat."
 
 msgid "Switch USB role?"
 msgstr "Ganti peran USB?"
-
-msgid "Apply"
-msgstr "Terapkan"
 
 msgid "Switching USB role…"
 msgstr "Mengganti peran USB…"
@@ -721,6 +748,21 @@ msgstr "Pengaturan disimpan"
 msgid "Save failed: %s"
 msgstr "Gagal menyimpan: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Tidak dapat membaca pengaturan kinerja jaringan; segarkan untuk mencoba lagi"
+
+msgid "This kernel does not provide this setting"
+msgstr "Kernel ini tidak menyediakan pengaturan ini"
+
+msgid "System default"
+msgstr "Bawaan sistem"
+
+msgid "Applied and saved for future boots."
+msgstr "Diterapkan dan disimpan untuk boot berikutnya."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Kernel tidak menerima pengaturan jaringan"
+
 msgid "This boot"
 msgstr "Boot ini"
 
@@ -739,6 +781,9 @@ msgstr "Memindai adaptor USB…"
 msgid "No USB adapters found."
 msgstr "Tidak ada adaptor USB yang ditemukan."
 
+msgid "In use by another network"
+msgstr "Dipakai jaringan lain"
+
 msgid "Link connected"
 msgstr "Link tersambung"
 
@@ -747,6 +792,9 @@ msgstr "Tidak ada link; sudah dicoba diaktifkan"
 
 msgid "Added to LAN"
 msgstr "Ditambahkan ke LAN"
+
+msgid "Cannot add"
+msgstr "Tidak dapat ditambahkan"
 
 msgid "Add to LAN"
 msgstr "Tambahkan ke LAN"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Keamanan"
 
-msgid "None"
-msgstr "Tidak ada"
-
 msgid "User name"
 msgstr "Nama pengguna"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux terkunci"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ya: mulai ulang berikutnya menjalankan Android"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "Writable"
+msgstr "Dapat ditulis"
+
+msgid "This boot image cannot change the boot"
+msgstr "Image boot ini tidak dapat mengubah boot"
 
 msgid "%s of %s"
 msgstr "%s dari %s"
@@ -1114,6 +1174,15 @@ msgstr "Beralih ke Android"
 msgid "Lock Linux"
 msgstr "Kunci Linux"
 
+msgid "Default boot"
+msgstr "Boot bawaan"
+
+msgid "One-time boot"
+msgstr "Boot sekali"
+
+msgid "Boot control"
+msgstr "Kontrol boot"
+
 msgid "Neighbor cells"
 msgstr "Sel tetangga"
 
@@ -1125,6 +1194,9 @@ msgstr "Frekuensi"
 
 msgid "Running %s…"
 msgstr "Menjalankan %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Pengaturan hotspot disimpan; menerapkan perubahan"
 
 msgid "Started in background: %s"
 msgstr "Dimulai di latar belakang: %s"
@@ -1246,6 +1318,9 @@ msgstr "SIM internal dipilih: digunakan setelah boot ulang"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM internal dipilih, tetapi tidak didukung di perangkat ini: SIM eksternal yang digunakan"
 
+msgid "in use"
+msgstr "digunakan"
+
 msgid "Uptime %s"
 msgstr "Waktu aktif %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Link LTE"
 msgid "Hidden"
 msgstr "Tersembunyi"
 
-msgid "No"
-msgstr "Tidak"
-
 msgid "Running"
 msgstr "Berjalan"
 
@@ -1374,9 +1446,6 @@ msgstr "Daring"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptor AT tidak tersedia"
-
-msgid "Linux locked"
-msgstr "Linux terkunci"
 
 msgid "Installing the language pack…"
 msgstr "Memasang paket bahasa…"
@@ -2105,9 +2174,6 @@ msgstr "Bawaan modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "digunakan"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Matikan radio SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Image boot"
 
 msgid "from the installer"
 msgstr "dari penginstal"
-
-msgid "Default boot"
-msgstr "Boot bawaan"
 
 msgid "Free space"
 msgstr "Ruang kosong"
@@ -3430,14 +3493,14 @@ msgstr "Jenis kunci tidak diketahui"
 msgid "Invalid value for this lock kind"
 msgstr "Nilai tidak valid untuk jenis kunci ini"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Modem ini tidak mendukung satu pun dari band ini"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Kunci band, mode, dan sel belum didukung untuk SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Kunci band, mode, dan sel tidak didukung selama peralihan dual-SIM mengelola radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Modem ini tidak mendukung satu pun dari band ini"
 
 msgid "Invalid page"
 msgstr "Halaman tidak valid"
@@ -3528,6 +3591,15 @@ msgstr "Adaptor TTL tidak memberi balasan yang valid"
 
 msgid "Invalid TTL"
 msgstr "TTL tidak valid"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptor TCP tidak memberi balasan yang valid"
+
+msgid "Invalid congestion control"
+msgstr "Kontrol kemacetan tidak valid"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptor boot tidak memberi balasan yang valid"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptor penggunaan data tidak memberi balasan yang valid"
@@ -3782,8 +3854,29 @@ msgstr "Radio tidak mengikuti pengaturannya"
 msgid "The data roaming setting could not be saved"
 msgstr "Pengaturan roaming data tidak dapat disimpan"
 
-msgid "Expected on or off"
-msgstr "Diharapkan on atau off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Pengaturan hotspot tersimpan, tetapi memuat ulang nirkabel gagal"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Pengaturan nirkabel memiliki perubahan yang belum disimpan: simpan atau batalkan dulu"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot sedang dialihkan; coba lagi sebentar lagi"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Tidak ada hotspot (titik akses) yang dikonfigurasi"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Menyalakan radio ini akan memengaruhi antarmuka lain; gunakan halaman Nirkabel"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio sedang dipakai klien Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Pengaturan hotspot tidak dapat ditulis"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Platform ini tidak menyediakan kontrol hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Integrasi VPN tidak disediakan oleh platform ini"
@@ -3883,6 +3976,15 @@ msgstr "Bukan antarmuka jaringan USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Bagian perangkat bridge LAN tidak ditemukan"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Tidak dapat menentukan kepemilikan adaptor; coba lagi nanti"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptor milik jaringan lain dan tidak dapat bergabung ke LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Pengaturan jaringan memiliki perubahan yang belum disimpan: simpan atau batalkan dulu"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Tidak dapat menyalakan antarmuka jaringan USB"
@@ -4018,6 +4120,12 @@ msgstr "Operasi paket tidak dikenal"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Platform ini tidak menyediakan kontrol kemacetan TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Pengaturan TCP tidak dapat dibaca"
 
 msgid "Data usage is not available on this system"
 msgstr "Penggunaan data tidak tersedia di sistem ini"

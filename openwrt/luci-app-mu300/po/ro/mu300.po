@@ -628,6 +628,9 @@ msgstr "Modul gazdă deconectează rețeaua USB și portul serial de pe acest po
 msgid "USB network mode"
 msgstr "Mod rețea USB"
 
+msgid "Current sharing protocol"
+msgstr "Protocolul de partajare actual"
+
 msgid "Network protocol"
 msgstr "Protocol de rețea"
 
@@ -658,6 +661,27 @@ msgstr "Reîmprospătare"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Disponibil doar în modul gazdă. Reîmprospătarea activează adaptoarele USB găsite; adăugarea la LAN salvează puntea și reîncarcă rețeaua."
 
+msgid "Network performance"
+msgstr "Performanța rețelei"
+
+msgid "Active congestion control"
+msgstr "Controlul congestiei activ"
+
+msgid "Default queue"
+msgstr "Coadă implicită"
+
+msgid "TCP congestion control"
+msgstr "Controlul congestiei TCP"
+
+msgid "Apply"
+msgstr "Aplicare"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Afectează în principal conexiunile TCP noi ale acestui dispozitiv. Conexiunile redirecționate ale clienților hotspot și USB nu folosesc automat BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR alege FQ drept coadă implicită pentru interfețele nou create. Conexiunile, interfețele și QoS existente se păstrează. Setarea rămâne după repornire."
+
 msgid "Recent modem operations"
 msgstr "Operații recente ale modemului"
 
@@ -670,6 +694,12 @@ msgstr "Apelurile recente ale panoului de control, din această pornire și din 
 msgid "Unavailable"
 msgstr "Indisponibil"
 
+msgid "Mixed"
+msgstr "Mixt"
+
+msgid "None"
+msgstr "Niciuna"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Modul rețea USB nu este disponibil în modul gazdă; pornirea automată a modului gazdă dezactivează și pornirea automată a rețelei USB."
 
@@ -681,9 +711,6 @@ msgstr "Rețeaua USB și portul serial vor fi reenumerate în modul dispozitiv."
 
 msgid "Switch USB role?"
 msgstr "Comutați rolul USB?"
-
-msgid "Apply"
-msgstr "Aplicare"
 
 msgid "Switching USB role…"
 msgstr "Se comută rolul USB…"
@@ -721,6 +748,21 @@ msgstr "Setări salvate"
 msgid "Save failed: %s"
 msgstr "Salvarea a eșuat: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Setările de performanță a rețelei nu au putut fi citite; reîmprospătați pentru a reîncerca"
+
+msgid "This kernel does not provide this setting"
+msgstr "Acest nucleu nu oferă această setare"
+
+msgid "System default"
+msgstr "Implicit sistem"
+
+msgid "Applied and saved for future boots."
+msgstr "Aplicat și salvat pentru pornirile următoare."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nucleul nu a acceptat setările de rețea"
+
 msgid "This boot"
 msgstr "Această pornire"
 
@@ -739,6 +781,9 @@ msgstr "Se caută adaptoare USB…"
 msgid "No USB adapters found."
 msgstr "Nu s-au găsit adaptoare USB."
 
+msgid "In use by another network"
+msgstr "Folosit de altă rețea"
+
 msgid "Link connected"
 msgstr "Legătură conectată"
 
@@ -747,6 +792,9 @@ msgstr "Fără legătură; s-a încercat activarea"
 
 msgid "Added to LAN"
 msgstr "Adăugat la LAN"
+
+msgid "Cannot add"
+msgstr "Nu se poate adăuga"
 
 msgid "Add to LAN"
 msgstr "Adăugare la LAN"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Securitate"
 
-msgid "None"
-msgstr "Niciuna"
-
 msgid "User name"
 msgstr "Nume de utilizator"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux blocat"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Da: următoarea repornire pornește Android"
+
+msgid "No"
+msgstr "Nu"
+
+msgid "Writable"
+msgstr "Inscriptibil"
+
+msgid "This boot image cannot change the boot"
+msgstr "Această imagine de pornire nu poate schimba pornirea"
 
 msgid "%s of %s"
 msgstr "%s din %s"
@@ -1114,6 +1174,15 @@ msgstr "Comutare la Android"
 msgid "Lock Linux"
 msgstr "Blochează Linux"
 
+msgid "Default boot"
+msgstr "Pornire implicită"
+
+msgid "One-time boot"
+msgstr "Pornire unică"
+
+msgid "Boot control"
+msgstr "Controlul pornirii"
+
 msgid "Neighbor cells"
 msgstr "Celule vecine"
 
@@ -1125,6 +1194,9 @@ msgstr "Frecvență"
 
 msgid "Running %s…"
 msgstr "Se rulează %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Setările hotspot au fost salvate; se aplică modificările"
 
 msgid "Started in background: %s"
 msgstr "Pornit în fundal: %s"
@@ -1246,6 +1318,9 @@ msgstr "SIM intern selectat: folosit după o repornire"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM intern selectat, dar neacceptat pe acest dispozitiv: se folosește SIM-ul extern"
 
+msgid "in use"
+msgstr "în uz"
+
 msgid "Uptime %s"
 msgstr "Timp de funcționare %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Legătură LTE"
 msgid "Hidden"
 msgstr "Ascuns"
 
-msgid "No"
-msgstr "Nu"
-
 msgid "Running"
 msgstr "Rulează"
 
@@ -1374,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptor AT indisponibil"
-
-msgid "Linux locked"
-msgstr "Linux blocat"
 
 msgid "Installing the language pack…"
 msgstr "Se instalează pachetul de limbi…"
@@ -2105,9 +2174,6 @@ msgstr "Implicit modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "în uz"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Oprește radioul SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Imagine de pornire"
 
 msgid "from the installer"
 msgstr "din programul de instalare"
-
-msgid "Default boot"
-msgstr "Pornire implicită"
 
 msgid "Free space"
 msgstr "Spațiu liber"
@@ -3430,14 +3493,14 @@ msgstr "Tip de blocare necunoscut"
 msgid "Invalid value for this lock kind"
 msgstr "Valoare invalidă pentru acest tip de blocare"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Blocările de bandă, mod și celulă nu sunt încă acceptate pentru SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Blocările de bandă, mod și celulă nu sunt acceptate cât timp comutarea dual-SIM gestionează radioul"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
 
 msgid "Invalid page"
 msgstr "Pagină invalidă"
@@ -3528,6 +3591,15 @@ msgstr "Adaptorul TTL nu a dat un răspuns valid"
 
 msgid "Invalid TTL"
 msgstr "TTL nevalid"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptorul TCP nu a dat un răspuns valid"
+
+msgid "Invalid congestion control"
+msgstr "Control al congestiei nevalid"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptorul de pornire nu a dat un răspuns valid"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptorul de consum de date nu a dat un răspuns valid"
@@ -3782,8 +3854,29 @@ msgstr "Radioul nu și-a urmat setarea"
 msgid "The data roaming setting could not be saved"
 msgstr "Setarea roamingului de date nu a putut fi salvată"
 
-msgid "Expected on or off"
-msgstr "Se așteaptă on sau off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Setarea hotspot este salvată, dar reîncărcarea wireless a eșuat"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Setările wireless au modificări nesalvate: salvați-le sau anulați-le mai întâi"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspotul este deja în curs de comutare; reîncercați în curând"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Nu este configurat niciun hotspot (punct de acces)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Pornirea acestui radio ar afecta altă interfață; folosiți pagina Wireless"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radioul este folosit de clientul Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Setarea hotspot nu a putut fi scrisă"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Această platformă nu oferă controlul hotspotului"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Integrarea VPN nu este oferită de această platformă"
@@ -3883,6 +3976,15 @@ msgstr "Nu este o interfață de rețea USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Secțiunea de dispozitiv a punții LAN nu a fost găsită"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nu s-a putut stabili cui aparține adaptorul; reîncercați mai târziu"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptorul aparține altei rețele și nu se poate alătura LAN-ului"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Setările de rețea au modificări nesalvate: salvați-le sau anulați-le mai întâi"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Nu se poate activa interfața de rețea USB"
@@ -4018,6 +4120,12 @@ msgstr "Operație pe pachete necunoscută"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Această platformă nu oferă controlul congestiei TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Setările TCP nu au putut fi citite"
 
 msgid "Data usage is not available on this system"
 msgstr "Consumul de date nu este disponibil pe acest sistem"

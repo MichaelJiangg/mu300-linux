@@ -628,6 +628,9 @@ msgstr "Isäntätila katkaisee tämän portin USB-verkon ja sarjayhteyden. F50:s
 msgid "USB network mode"
 msgstr "USB-verkkotila"
 
+msgid "Current sharing protocol"
+msgstr "Nykyinen jakoprotokolla"
+
 msgid "Network protocol"
 msgstr "Verkkoprotokolla"
 
@@ -658,6 +661,27 @@ msgstr "Päivitä"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Käytettävissä vain isäntätilassa. Päivitä ottaa löydetyt USB-sovittimet käyttöön; LAN-verkkoon lisääminen tallentaa sillan ja lataa verkon uudelleen."
 
+msgid "Network performance"
+msgstr "Verkon suorituskyky"
+
+msgid "Active congestion control"
+msgstr "Käytössä oleva ruuhkanhallinta"
+
+msgid "Default queue"
+msgstr "Oletusjono"
+
+msgid "TCP congestion control"
+msgstr "TCP-ruuhkanhallinta"
+
+msgid "Apply"
+msgstr "Käytä"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Vaikuttaa lähinnä tämän laitteen uusiin TCP-yhteyksiin. Välitetyt hotspot- ja USB-asiakkaiden yhteydet eivät käytä BBR:ää automaattisesti."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR valitsee FQ:n uusien liitäntöjen oletusjonoksi. Nykyiset yhteydet, liitännät ja QoS säilyvät. Asetus säilyy uudelleenkäynnistyksissä."
+
 msgid "Recent modem operations"
 msgstr "Viimeisimmät modeemitoiminnot"
 
@@ -670,6 +694,12 @@ msgstr "Ohjauspaneelin viimeisimmät kutsut tältä ja edelliseltä käynnistysk
 msgid "Unavailable"
 msgstr "Ei käytettävissä"
 
+msgid "Mixed"
+msgstr "Sekoitettu"
+
+msgid "None"
+msgstr "Ei mitään"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-verkkotila ei ole käytettävissä isäntätilassa; isäntätilan automaattinen käynnistys poistaa käytöstä myös USB-verkon automaattisen käynnistyksen."
 
@@ -681,9 +711,6 @@ msgstr "USB-verkko ja sarjayhteys tunnistetaan uudelleen laitetilassa."
 
 msgid "Switch USB role?"
 msgstr "Vaihdetaanko USB-rooli?"
-
-msgid "Apply"
-msgstr "Käytä"
 
 msgid "Switching USB role…"
 msgstr "Vaihdetaan USB-roolia…"
@@ -721,6 +748,21 @@ msgstr "Asetukset tallennettu"
 msgid "Save failed: %s"
 msgstr "Tallennus epäonnistui: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Verkon suorituskykyasetuksia ei voitu lukea; yritä uudelleen päivittämällä"
+
+msgid "This kernel does not provide this setting"
+msgstr "Tämä ydin ei tarjoa tätä asetusta"
+
+msgid "System default"
+msgstr "Järjestelmän oletus"
+
+msgid "Applied and saved for future boots."
+msgstr "Otettu käyttöön ja tallennettu tuleville käynnistyksille."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ydin ei hyväksynyt verkkoasetuksia"
+
 msgid "This boot"
 msgstr "Tämä käynnistys"
 
@@ -739,6 +781,9 @@ msgstr "Etsitään USB-sovittimia…"
 msgid "No USB adapters found."
 msgstr "USB-sovittimia ei löytynyt."
 
+msgid "In use by another network"
+msgstr "Toisen verkon käytössä"
+
 msgid "Link connected"
 msgstr "Linkki yhdistetty"
 
@@ -747,6 +792,9 @@ msgstr "Ei linkkiä; käyttöönottoa yritetty"
 
 msgid "Added to LAN"
 msgstr "Lisätty LAN-verkkoon"
+
+msgid "Cannot add"
+msgstr "Ei voi lisätä"
 
 msgid "Add to LAN"
 msgstr "Lisää LAN-verkkoon"
@@ -862,9 +910,6 @@ msgstr "Portti"
 msgid "Security"
 msgstr "Suojaus"
 
-msgid "None"
-msgstr "Ei mitään"
-
 msgid "User name"
 msgstr "Käyttäjänimi"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux lukittu"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Kyllä: seuraava uudelleenkäynnistys käynnistää Androidin"
+
+msgid "No"
+msgstr "Ei"
+
+msgid "Writable"
+msgstr "Kirjoitettavissa"
+
+msgid "This boot image cannot change the boot"
+msgstr "Tämä käynnistyskuva ei voi muuttaa käynnistystä"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Vaihda Androidiin"
 msgid "Lock Linux"
 msgstr "Lukitse Linux"
 
+msgid "Default boot"
+msgstr "Oletuskäynnistys"
+
+msgid "One-time boot"
+msgstr "Kertakäynnistys"
+
+msgid "Boot control"
+msgstr "Käynnistyksen hallinta"
+
 msgid "Neighbor cells"
 msgstr "Naapurisolut"
 
@@ -1125,6 +1194,9 @@ msgstr "Taajuus"
 
 msgid "Running %s…"
 msgstr "Suoritetaan %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspotin asetukset tallennettu; muutoksia otetaan käyttöön"
 
 msgid "Started in background: %s"
 msgstr "Käynnistetty taustalla: %s"
@@ -1246,6 +1318,9 @@ msgstr "Sisäinen SIM valittu: käytössä uudelleenkäynnistyksen jälkeen"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Sisäinen SIM valittu, mutta tämä laite ei tue sitä: ulkoinen SIM on käytössä"
 
+msgid "in use"
+msgstr "käytössä"
+
 msgid "Uptime %s"
 msgstr "Käynnissä %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE-linkki"
 msgid "Hidden"
 msgstr "Piilotettu"
 
-msgid "No"
-msgstr "Ei"
-
 msgid "Running"
 msgstr "Käynnissä"
 
@@ -1374,9 +1446,6 @@ msgstr "Verkossa"
 
 msgid "AT adapter unavailable"
 msgstr "AT-sovitin ei käytettävissä"
-
-msgid "Linux locked"
-msgstr "Linux lukittu"
 
 msgid "Installing the language pack…"
 msgstr "Asennetaan kielipakettia…"
@@ -2105,9 +2174,6 @@ msgstr "Modeemin oletus"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "käytössä"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Kytke SIM%d:n radio pois"
 
@@ -2512,9 +2578,6 @@ msgstr "Käynnistyskuva"
 
 msgid "from the installer"
 msgstr "asennusohjelmasta"
-
-msgid "Default boot"
-msgstr "Oletuskäynnistys"
 
 msgid "Free space"
 msgstr "Vapaa tila"
@@ -3430,14 +3493,14 @@ msgstr "Tuntematon lukitustyyppi"
 msgid "Invalid value for this lock kind"
 msgstr "Virheellinen arvo tälle lukitustyypille"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Taajuusalueen, tilan ja solun lukitusta ei vielä tueta SIM2:lle"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Taajuusalueen, tilan ja solun lukitusta ei tueta, kun kahden SIM-kortin vaihto hallitsee radiota"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
 
 msgid "Invalid page"
 msgstr "Virheellinen sivu"
@@ -3528,6 +3591,15 @@ msgstr "TTL-sovitin ei antanut kelvollista vastausta"
 
 msgid "Invalid TTL"
 msgstr "Virheellinen TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP-sovitin ei antanut kelvollista vastausta"
+
+msgid "Invalid congestion control"
+msgstr "Virheellinen ruuhkanhallinta"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Käynnistyssovitin ei antanut kelvollista vastausta"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Datan käytön sovitin ei antanut kelvollista vastausta"
@@ -3782,8 +3854,29 @@ msgstr "Radio ei seurannut asetustaan"
 msgid "The data roaming setting could not be saved"
 msgstr "Datavierailun asetusta ei voitu tallentaa"
 
-msgid "Expected on or off"
-msgstr "Odotettiin on tai off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspot-asetus on tallennettu, mutta langattoman uudelleenlataus epäonnistui"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Langattomissa asetuksissa on tallentamattomia muutoksia: tallenna tai peru ne ensin"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspotin tilaa vaihdetaan jo; yritä hetken päästä uudelleen"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Hotspotia (tukiasemaa) ei ole määritetty"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Tämän radion käynnistäminen vaikuttaisi toiseen liitäntään; käytä Langaton-sivua"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Wi-Fi-asiakas käyttää radiota"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspot-asetusta ei voitu kirjoittaa"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Tämä alusta ei tarjoa hotspotin hallintaa"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Tämä alusta ei tarjoa VPN-integraatiota"
@@ -3883,6 +3976,15 @@ msgstr "Ei USB-verkkoliitäntä"
 
 msgid "LAN bridge device section was not found"
 msgstr "LAN-sillan laiteosiota ei löytynyt"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Sovittimen omistajaa ei voitu selvittää; yritä myöhemmin uudelleen"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Sovitin kuuluu toiseen verkkoon eikä voi liittyä LANiin"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Verkkoasetuksissa on tallentamattomia muutoksia: tallenna tai peru ne ensin"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB-verkkoliitäntää ei voi ottaa käyttöön"
@@ -4018,6 +4120,12 @@ msgstr "Tuntematon pakettitoiminto"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Tämä alusta ei tarjoa TCP-ruuhkanhallintaa"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP-asetuksia ei voitu lukea"
 
 msgid "Data usage is not available on this system"
 msgstr "Datan käyttö ei ole käytettävissä tässä järjestelmässä"

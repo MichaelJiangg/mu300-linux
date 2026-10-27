@@ -628,6 +628,9 @@ msgstr "Режим хоста отключает USB-сеть и последо�
 msgid "USB network mode"
 msgstr "Режим USB-сети"
 
+msgid "Current sharing protocol"
+msgstr "Текущий протокол раздачи"
+
 msgid "Network protocol"
 msgstr "Сетевой протокол"
 
@@ -658,6 +661,27 @@ msgstr "Обновить"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Доступно только в режиме хоста. «Обновить» поднимает найденные USB-адаптеры; добавление в LAN сохраняет мост и перезагружает сеть."
 
+msgid "Network performance"
+msgstr "Производительность сети"
+
+msgid "Active congestion control"
+msgstr "Текущее управление перегрузкой"
+
+msgid "Default queue"
+msgstr "Очередь по умолчанию"
+
+msgid "TCP congestion control"
+msgstr "Управление перегрузкой TCP"
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Влияет в основном на новые TCP-соединения самого устройства. Пересылаемые соединения клиентов точки доступа и USB не переходят на BBR автоматически."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR выбирает FQ очередью по умолчанию для новых интерфейсов. Существующие соединения, интерфейсы и QoS сохраняются. Настройка сохраняется после перезагрузки."
+
 msgid "Recent modem operations"
 msgstr "Последние операции модема"
 
@@ -670,6 +694,12 @@ msgstr "Последние вызовы панели управления в э�
 msgid "Unavailable"
 msgstr "Недоступно"
 
+msgid "Mixed"
+msgstr "Смешанный"
+
+msgid "None"
+msgstr "Нет"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Режим USB-сети недоступен в режиме хоста; автозапуск режима хоста также отключает автозапуск USB-сети."
 
@@ -681,9 +711,6 @@ msgstr "USB-сеть и последовательный порт будут з�
 
 msgid "Switch USB role?"
 msgstr "Сменить роль USB?"
-
-msgid "Apply"
-msgstr "Применить"
 
 msgid "Switching USB role…"
 msgstr "Смена роли USB…"
@@ -721,6 +748,21 @@ msgstr "Настройки сохранены"
 msgid "Save failed: %s"
 msgstr "Ошибка сохранения: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Не удалось прочитать настройки производительности сети; обновите, чтобы повторить"
+
+msgid "This kernel does not provide this setting"
+msgstr "Это ядро не поддерживает эту настройку"
+
+msgid "System default"
+msgstr "Системное по умолчанию"
+
+msgid "Applied and saved for future boots."
+msgstr "Применено и сохранено для следующих загрузок."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ядро не приняло сетевые настройки"
+
 msgid "This boot"
 msgstr "Эта загрузка"
 
@@ -739,6 +781,9 @@ msgstr "Поиск USB-адаптеров…"
 msgid "No USB adapters found."
 msgstr "USB-адаптеры не найдены."
 
+msgid "In use by another network"
+msgstr "Используется другой сетью"
+
 msgid "Link connected"
 msgstr "Канал подключён"
 
@@ -747,6 +792,9 @@ msgstr "Нет канала; выполнена попытка включени�
 
 msgid "Added to LAN"
 msgstr "Добавлено в LAN"
+
+msgid "Cannot add"
+msgstr "Нельзя добавить"
 
 msgid "Add to LAN"
 msgstr "Добавить в LAN"
@@ -862,9 +910,6 @@ msgstr "Порт"
 msgid "Security"
 msgstr "Защита"
 
-msgid "None"
-msgstr "Нет"
-
 msgid "User name"
 msgstr "Имя пользователя"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux закреплён"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Да: следующая перезагрузка запустит Android"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "Writable"
+msgstr "Доступно для записи"
+
+msgid "This boot image cannot change the boot"
+msgstr "Этот загрузочный образ не может менять загрузку"
 
 msgid "%s of %s"
 msgstr "%s из %s"
@@ -1114,6 +1174,15 @@ msgstr "Переключиться на Android"
 msgid "Lock Linux"
 msgstr "Закрепить Linux"
 
+msgid "Default boot"
+msgstr "Загрузка по умолчанию"
+
+msgid "One-time boot"
+msgstr "Однократная загрузка"
+
+msgid "Boot control"
+msgstr "Управление загрузкой"
+
 msgid "Neighbor cells"
 msgstr "Соседние соты"
 
@@ -1125,6 +1194,9 @@ msgstr "Частота"
 
 msgid "Running %s…"
 msgstr "Выполняется %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Настройки точки доступа сохранены; изменения применяются"
 
 msgid "Started in background: %s"
 msgstr "Запущено в фоне: %s"
@@ -1246,6 +1318,9 @@ msgstr "Выбрана встроенная SIM: будет использова
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Выбрана встроенная SIM, но на этом устройстве она не поддерживается: используется внешняя SIM"
 
+msgid "in use"
+msgstr "используется"
+
 msgid "Uptime %s"
 msgstr "Время работы %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Канал LTE"
 msgid "Hidden"
 msgstr "Скрыт"
 
-msgid "No"
-msgstr "Нет"
-
 msgid "Running"
 msgstr "Работает"
 
@@ -1374,9 +1446,6 @@ msgstr "В сети"
 
 msgid "AT adapter unavailable"
 msgstr "AT-адаптер недоступен"
-
-msgid "Linux locked"
-msgstr "Linux закреплён"
 
 msgid "Installing the language pack…"
 msgstr "Установка языкового пакета…"
@@ -2105,9 +2174,6 @@ msgstr "По умолчанию модема"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "используется"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Выключить радио SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Загрузочный образ"
 
 msgid "from the installer"
 msgstr "от установщика"
-
-msgid "Default boot"
-msgstr "Загрузка по умолчанию"
 
 msgid "Free space"
 msgstr "Свободное место"
@@ -3430,14 +3493,14 @@ msgstr "Неизвестный тип фиксации"
 msgid "Invalid value for this lock kind"
 msgstr "Недопустимое значение для этого типа фиксации"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Этот модем не поддерживает ни один из этих диапазонов"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Блокировка диапазонов, режима и соты пока не поддерживается для SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Блокировка диапазонов, режима и соты не поддерживается, пока переключение двух SIM управляет радиомодулем"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Этот модем не поддерживает ни один из этих диапазонов"
 
 msgid "Invalid page"
 msgstr "Недопустимая страница"
@@ -3528,6 +3591,15 @@ msgstr "Адаптер TTL не дал корректного ответа"
 
 msgid "Invalid TTL"
 msgstr "Недопустимый TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Адаптер TCP не дал корректного ответа"
+
+msgid "Invalid congestion control"
+msgstr "Недопустимое управление перегрузкой"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Адаптер загрузки не дал корректного ответа"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Адаптер расхода трафика не дал корректного ответа"
@@ -3782,8 +3854,29 @@ msgstr "Радио не последовало своей настройке"
 msgid "The data roaming setting could not be saved"
 msgstr "Не удалось сохранить настройку роуминга данных"
 
-msgid "Expected on or off"
-msgstr "Ожидается on или off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Настройка точки доступа сохранена, но перезагрузка беспроводной сети не удалась"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "В настройках беспроводной сети есть несохранённые изменения: сначала сохраните или отмените их"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Точка доступа уже переключается; повторите чуть позже"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Точка доступа не настроена"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Включение этого радио затронет другой интерфейс; используйте страницу «Беспроводная сеть»"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Радио занято Wi-Fi-клиентом"
+
+msgid "The hotspot setting could not be written"
+msgstr "Не удалось записать настройку точки доступа"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Эта платформа не поддерживает управление точкой доступа"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Интеграция VPN не предоставляется этой платформой"
@@ -3883,6 +3976,15 @@ msgstr "Не является сетевым интерфейсом USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Секция устройства моста LAN не найдена"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Не удалось определить, какой сети принадлежит адаптер; повторите позже"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Адаптер принадлежит другой сети и не может войти в LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "В сетевых настройках есть несохранённые изменения: сначала сохраните или отмените их"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Не удаётся поднять сетевой интерфейс USB"
@@ -4018,6 +4120,12 @@ msgstr "Неизвестная операция с пакетами"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Эта платформа не поддерживает управление перегрузкой TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Не удалось прочитать настройки TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Учёт трафика недоступен в этой системе"

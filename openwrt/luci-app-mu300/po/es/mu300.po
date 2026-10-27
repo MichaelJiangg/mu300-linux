@@ -628,6 +628,9 @@ msgstr "El modo host desconecta la red USB y el puerto serie en este puerto. El 
 msgid "USB network mode"
 msgstr "Modo de red USB"
 
+msgid "Current sharing protocol"
+msgstr "Protocolo de uso compartido actual"
+
 msgid "Network protocol"
 msgstr "Protocolo de red"
 
@@ -658,6 +661,27 @@ msgstr "Actualizar"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Disponible solo en modo host. «Actualizar» activa los adaptadores USB detectados; añadir a la LAN guarda el puente y recarga la red."
 
+msgid "Network performance"
+msgstr "Rendimiento de red"
+
+msgid "Active congestion control"
+msgstr "Control de congestión activo"
+
+msgid "Default queue"
+msgstr "Cola predeterminada"
+
+msgid "TCP congestion control"
+msgstr "Control de congestión TCP"
+
+msgid "Apply"
+msgstr "Aplicar"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Afecta sobre todo a las nuevas conexiones TCP de este dispositivo. Las conexiones reenviadas de clientes del punto de acceso y USB no usan BBR automáticamente."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR elige FQ como cola predeterminada de las interfaces nuevas. Se mantienen las conexiones, interfaces y QoS existentes. La configuración se conserva tras reiniciar."
+
 msgid "Recent modem operations"
 msgstr "Operaciones recientes del módem"
 
@@ -670,6 +694,12 @@ msgstr "Las llamadas recientes del panel de control, de este arranque y del ante
 msgid "Unavailable"
 msgstr "No disponible"
 
+msgid "Mixed"
+msgstr "Mixto"
+
+msgid "None"
+msgstr "Ninguna"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "El modo de red USB no está disponible en modo host; el inicio automático del modo host también desactiva el inicio automático de la red USB."
 
@@ -681,9 +711,6 @@ msgstr "La red USB y el puerto serie se volverán a enumerar en modo dispositivo
 
 msgid "Switch USB role?"
 msgstr "¿Cambiar el rol USB?"
-
-msgid "Apply"
-msgstr "Aplicar"
 
 msgid "Switching USB role…"
 msgstr "Cambiando el rol USB…"
@@ -721,6 +748,21 @@ msgstr "Ajustes guardados"
 msgid "Save failed: %s"
 msgstr "Error al guardar: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "No se pudo leer la configuración de rendimiento de red; actualice para reintentar"
+
+msgid "This kernel does not provide this setting"
+msgstr "Este kernel no ofrece este ajuste"
+
+msgid "System default"
+msgstr "Predeterminado del sistema"
+
+msgid "Applied and saved for future boots."
+msgstr "Aplicado y guardado para los próximos arranques."
+
+msgid "The kernel did not accept the network settings"
+msgstr "El kernel no aceptó la configuración de red"
+
 msgid "This boot"
 msgstr "Este arranque"
 
@@ -739,6 +781,9 @@ msgstr "Buscando adaptadores USB…"
 msgid "No USB adapters found."
 msgstr "No se encontraron adaptadores USB."
 
+msgid "In use by another network"
+msgstr "En uso por otra red"
+
 msgid "Link connected"
 msgstr "Enlace conectado"
 
@@ -747,6 +792,9 @@ msgstr "Sin enlace; se intentó activar"
 
 msgid "Added to LAN"
 msgstr "Añadido a la LAN"
+
+msgid "Cannot add"
+msgstr "No se puede añadir"
 
 msgid "Add to LAN"
 msgstr "Añadir a la LAN"
@@ -862,9 +910,6 @@ msgstr "Puerto"
 msgid "Security"
 msgstr "Seguridad"
 
-msgid "None"
-msgstr "Ninguna"
-
 msgid "User name"
 msgstr "Nombre de usuario"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux bloqueado"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Sí: el próximo reinicio inicia Android"
+
+msgid "No"
+msgstr "No"
+
+msgid "Writable"
+msgstr "Escribible"
+
+msgid "This boot image cannot change the boot"
+msgstr "Esta imagen de arranque no puede cambiar el arranque"
 
 msgid "%s of %s"
 msgstr "%s de %s"
@@ -1114,6 +1174,15 @@ msgstr "Cambiar a Android"
 msgid "Lock Linux"
 msgstr "Bloquear Linux"
 
+msgid "Default boot"
+msgstr "Arranque predeterminado"
+
+msgid "One-time boot"
+msgstr "Arranque único"
+
+msgid "Boot control"
+msgstr "Control de arranque"
+
 msgid "Neighbor cells"
 msgstr "Celdas vecinas"
 
@@ -1125,6 +1194,9 @@ msgstr "Frecuencia"
 
 msgid "Running %s…"
 msgstr "Ejecutando %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Configuración del punto de acceso guardada; aplicando cambios"
 
 msgid "Started in background: %s"
 msgstr "Iniciado en segundo plano: %s"
@@ -1246,6 +1318,9 @@ msgstr "SIM interna seleccionada: se usará tras reiniciar"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM interna seleccionada, pero no compatible con este dispositivo: se usa la SIM externa"
 
+msgid "in use"
+msgstr "en uso"
+
 msgid "Uptime %s"
 msgstr "Tiempo activo %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Enlace LTE"
 msgid "Hidden"
 msgstr "Oculto"
 
-msgid "No"
-msgstr "No"
-
 msgid "Running"
 msgstr "En ejecución"
 
@@ -1374,9 +1446,6 @@ msgstr "En línea"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptador AT no disponible"
-
-msgid "Linux locked"
-msgstr "Linux bloqueado"
 
 msgid "Installing the language pack…"
 msgstr "Instalando el paquete de idiomas…"
@@ -2105,9 +2174,6 @@ msgstr "Predeterminado del módem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "en uso"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Apagar la radio de la SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Imagen de arranque"
 
 msgid "from the installer"
 msgstr "del instalador"
-
-msgid "Default boot"
-msgstr "Arranque predeterminado"
 
 msgid "Free space"
 msgstr "Espacio libre"
@@ -3430,14 +3493,14 @@ msgstr "Tipo de bloqueo desconocido"
 msgid "Invalid value for this lock kind"
 msgstr "Valor no válido para este tipo de bloqueo"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Este módem no admite ninguna de estas bandas"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Los bloqueos de banda, modo y celda aún no son compatibles con la SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Los bloqueos de banda, modo y celda no son compatibles mientras el cambio de doble SIM gestiona la radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Este módem no admite ninguna de estas bandas"
 
 msgid "Invalid page"
 msgstr "Página no válida"
@@ -3528,6 +3591,15 @@ msgstr "El adaptador de TTL no dio una respuesta válida"
 
 msgid "Invalid TTL"
 msgstr "TTL no válido"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "El adaptador TCP no dio una respuesta válida"
+
+msgid "Invalid congestion control"
+msgstr "Control de congestión no válido"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "El adaptador de arranque no dio una respuesta válida"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "El adaptador de uso de datos no dio una respuesta válida"
@@ -3782,8 +3854,29 @@ msgstr "La radio no siguió su ajuste"
 msgid "The data roaming setting could not be saved"
 msgstr "No se pudo guardar el ajuste de itinerancia de datos"
 
-msgid "Expected on or off"
-msgstr "Se esperaba on u off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "La configuración del punto de acceso se guardó, pero falló la recarga inalámbrica"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "La configuración inalámbrica tiene cambios sin guardar: guárdelos o reviértalos primero"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "El punto de acceso ya se está cambiando; inténtelo de nuevo en breve"
+
+msgid "No hotspot (access point) is configured"
+msgstr "No hay ningún punto de acceso configurado"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Encender esta radio afectaría a otra interfaz; use la página Inalámbrico"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "La radio está en uso por el cliente Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "No se pudo escribir la configuración del punto de acceso"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Esta plataforma no ofrece control del punto de acceso"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "La integración VPN no la proporciona esta plataforma"
@@ -3883,6 +3976,15 @@ msgstr "No es una interfaz de red USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "No se encontró la sección de dispositivo del puente LAN"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "No se pudo determinar a qué red pertenece el adaptador; inténtelo más tarde"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "El adaptador pertenece a otra red y no puede unirse a la LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "La configuración de red tiene cambios sin guardar: guárdelos o reviértalos primero"
 
 msgid "Cannot bring USB network interface up"
 msgstr "No se puede activar la interfaz de red USB"
@@ -4018,6 +4120,12 @@ msgstr "Operación de paquetes desconocida"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Esta plataforma no ofrece control de congestión TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "No se pudo leer la configuración TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "El uso de datos no está disponible en este sistema"

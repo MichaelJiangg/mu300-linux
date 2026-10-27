@@ -628,6 +628,9 @@ msgstr "Värdläge kopplar bort USB-nätverk och seriell anslutning på denna po
 msgid "USB network mode"
 msgstr "USB-nätverksläge"
 
+msgid "Current sharing protocol"
+msgstr "Aktuellt delningsprotokoll"
+
 msgid "Network protocol"
 msgstr "Nätverksprotokoll"
 
@@ -658,6 +661,27 @@ msgstr "Uppdatera"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Endast tillgängligt i värdläge. Uppdatera aktiverar upptäckta USB-adaptrar; att lägga till i LAN sparar bryggan och läser om nätverket."
 
+msgid "Network performance"
+msgstr "Nätverksprestanda"
+
+msgid "Active congestion control"
+msgstr "Aktiv överbelastningskontroll"
+
+msgid "Default queue"
+msgstr "Standardkö"
+
+msgid "TCP congestion control"
+msgstr "TCP-överbelastningskontroll"
+
+msgid "Apply"
+msgstr "Verkställ"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Påverkar främst nya TCP-anslutningar från den här enheten. Vidarebefordrade anslutningar från hotspot- och USB-klienter använder inte BBR automatiskt."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR väljer FQ som standardkö för nyskapade gränssnitt. Befintliga anslutningar, gränssnitt och QoS behålls. Inställningen finns kvar efter omstart."
+
 msgid "Recent modem operations"
 msgstr "Senaste modemåtgärder"
 
@@ -670,6 +694,12 @@ msgstr "Kontrollpanelens senaste anrop, från den här och den förra starten: n
 msgid "Unavailable"
 msgstr "Inte tillgängligt"
 
+msgid "Mixed"
+msgstr "Blandat"
+
+msgid "None"
+msgstr "Ingen"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-nätverksläget är inte tillgängligt i värdläge; automatisk start som värd inaktiverar även automatisk start av USB-nätverket."
 
@@ -681,9 +711,6 @@ msgstr "USB-nätverk och seriell anslutning enumereras om i enhetsläge."
 
 msgid "Switch USB role?"
 msgstr "Byta USB-roll?"
-
-msgid "Apply"
-msgstr "Verkställ"
 
 msgid "Switching USB role…"
 msgstr "Byter USB-roll…"
@@ -721,6 +748,21 @@ msgstr "Inställningar sparade"
 msgid "Save failed: %s"
 msgstr "Sparandet misslyckades: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Inställningarna för nätverksprestanda kunde inte läsas; uppdatera för att försöka igen"
+
+msgid "This kernel does not provide this setting"
+msgstr "Den här kärnan har inte den här inställningen"
+
+msgid "System default"
+msgstr "Systemstandard"
+
+msgid "Applied and saved for future boots."
+msgstr "Tillämpat och sparat för kommande starter."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Kärnan godtog inte nätverksinställningarna"
+
 msgid "This boot"
 msgstr "Den här starten"
 
@@ -739,6 +781,9 @@ msgstr "Söker efter USB-adaptrar…"
 msgid "No USB adapters found."
 msgstr "Inga USB-adaptrar hittades."
 
+msgid "In use by another network"
+msgstr "Används av ett annat nätverk"
+
 msgid "Link connected"
 msgstr "Länk ansluten"
 
@@ -747,6 +792,9 @@ msgstr "Ingen länk; aktivering försökt"
 
 msgid "Added to LAN"
 msgstr "Tillagd i LAN"
+
+msgid "Cannot add"
+msgstr "Kan inte läggas till"
 
 msgid "Add to LAN"
 msgstr "Lägg till i LAN"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Säkerhet"
 
-msgid "None"
-msgstr "Ingen"
-
 msgid "User name"
 msgstr "Användarnamn"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux låst"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ja: nästa omstart startar Android"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "Writable"
+msgstr "Skrivbar"
+
+msgid "This boot image cannot change the boot"
+msgstr "Den här startavbildningen kan inte ändra starten"
 
 msgid "%s of %s"
 msgstr "%s av %s"
@@ -1114,6 +1174,15 @@ msgstr "Byt till Android"
 msgid "Lock Linux"
 msgstr "Lås Linux"
 
+msgid "Default boot"
+msgstr "Standardstart"
+
+msgid "One-time boot"
+msgstr "Engångsstart"
+
+msgid "Boot control"
+msgstr "Startstyrning"
+
 msgid "Neighbor cells"
 msgstr "Grannceller"
 
@@ -1125,6 +1194,9 @@ msgstr "Frekvens"
 
 msgid "Running %s…"
 msgstr "Kör %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspotinställningar sparade; ändringarna tillämpas"
 
 msgid "Started in background: %s"
 msgstr "Startat i bakgrunden: %s"
@@ -1246,6 +1318,9 @@ msgstr "Intern SIM vald: används efter en omstart"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Intern SIM vald, men stöds inte på den här enheten: den externa SIM:en används"
 
+msgid "in use"
+msgstr "används"
+
 msgid "Uptime %s"
 msgstr "Drifttid %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE-länk"
 msgid "Hidden"
 msgstr "Dold"
 
-msgid "No"
-msgstr "Nej"
-
 msgid "Running"
 msgstr "Körs"
 
@@ -1374,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "AT-adapter inte tillgänglig"
-
-msgid "Linux locked"
-msgstr "Linux låst"
 
 msgid "Installing the language pack…"
 msgstr "Installerar språkpaketet…"
@@ -2105,9 +2174,6 @@ msgstr "Modemets standard"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "används"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Stäng av radion i SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Startavbild"
 
 msgid "from the installer"
 msgstr "från installationsprogrammet"
-
-msgid "Default boot"
-msgstr "Standardstart"
 
 msgid "Free space"
 msgstr "Ledigt utrymme"
@@ -3430,14 +3493,14 @@ msgstr "Okänd låstyp"
 msgid "Invalid value for this lock kind"
 msgstr "Ogiltigt värde för denna låstyp"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Det här modemet stöder inget av dessa band"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Lås av band, läge och cell stöds ännu inte för SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Lås av band, läge och cell stöds inte medan växling mellan två SIM styr radion"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Det här modemet stöder inget av dessa band"
 
 msgid "Invalid page"
 msgstr "Ogiltig sida"
@@ -3528,6 +3591,15 @@ msgstr "TTL-adaptern gav inget giltigt svar"
 
 msgid "Invalid TTL"
 msgstr "Ogiltig TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP-adaptern gav inget giltigt svar"
+
+msgid "Invalid congestion control"
+msgstr "Ogiltig överbelastningskontroll"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Startadaptern gav inget giltigt svar"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptern för dataförbrukning gav inget giltigt svar"
@@ -3782,8 +3854,29 @@ msgstr "Radion följde inte sin inställning"
 msgid "The data roaming setting could not be saved"
 msgstr "Inställningen för dataroaming kunde inte sparas"
 
-msgid "Expected on or off"
-msgstr "Förväntade on eller off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspotinställningen är sparad, men omladdningen av trådlöst misslyckades"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "De trådlösa inställningarna har osparade ändringar: spara eller ångra dem först"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspoten växlas redan; försök igen om en stund"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Ingen hotspot (åtkomstpunkt) är konfigurerad"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Att slå på den här radion påverkar ett annat gränssnitt; använd sidan Trådlöst"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radion används av Wi-Fi-klienten"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspotinställningen kunde inte skrivas"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Den här plattformen har ingen hotspotstyrning"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN-integration tillhandahålls inte av denna plattform"
@@ -3883,6 +3976,15 @@ msgstr "Inte ett USB-nätverksgränssnitt"
 
 msgid "LAN bridge device section was not found"
 msgstr "Enhetsavsnittet för LAN-bryggan hittades inte"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Kunde inte avgöra vem adaptern tillhör; försök igen senare"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptern tillhör ett annat nätverk och kan inte gå med i LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Nätverksinställningarna har osparade ändringar: spara eller ångra dem först"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Kan inte aktivera USB-nätverksgränssnittet"
@@ -4018,6 +4120,12 @@ msgstr "Okänd paketåtgärd"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Den här plattformen har ingen TCP-överbelastningskontroll"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP-inställningarna kunde inte läsas"
 
 msgid "Data usage is not available on this system"
 msgstr "Dataförbrukning är inte tillgänglig på detta system"

@@ -628,6 +628,9 @@ msgstr "Host rejimi bu portda USB şəbəkəsini və serial bağlantını kəsir
 msgid "USB network mode"
 msgstr "USB şəbəkə rejimi"
 
+msgid "Current sharing protocol"
+msgstr "Cari paylaşım protokolu"
+
 msgid "Network protocol"
 msgstr "Şəbəkə protokolu"
 
@@ -658,6 +661,27 @@ msgstr "Yenilə"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Yalnız host rejimində mövcuddur. Yeniləmə tapılan USB adapterlərini aktivləşdirir; LAN-a əlavə etmək körpünü saxlayır və şəbəkəni yenidən yükləyir."
 
+msgid "Network performance"
+msgstr "Şəbəkə performansı"
+
+msgid "Active congestion control"
+msgstr "Aktiv sıxlıq idarəsi"
+
+msgid "Default queue"
+msgstr "Standart növbə"
+
+msgid "TCP congestion control"
+msgstr "TCP sıxlıq idarəsi"
+
+msgid "Apply"
+msgstr "Tətbiq et"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Əsasən bu cihazın yaratdığı yeni TCP bağlantılarına təsir edir. Hotspot və USB müştərilərinin ötürülən bağlantıları avtomatik BBR istifadə etmir."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR yeni yaradılan interfeyslər üçün standart növbə olaraq FQ seçir. Mövcud bağlantılar, interfeyslər və QoS saxlanılır. Ayarlar yenidən başladıqdan sonra qalır."
+
 msgid "Recent modem operations"
 msgstr "Son modem əməliyyatları"
 
@@ -670,6 +694,12 @@ msgstr "İdarə panelinin bu və əvvəlki açılışdakı son çağırışları
 msgid "Unavailable"
 msgstr "Əlçatan deyil"
 
+msgid "Mixed"
+msgstr "Qarışıq"
+
+msgid "None"
+msgstr "Yoxdur"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Host rejimində USB şəbəkə rejimi əlçatan deyil; host avtomatik başlatması USB şəbəkəsinin avtomatik başlatmasını da söndürür."
 
@@ -681,9 +711,6 @@ msgstr "Cihaz rejimində USB şəbəkəsi və serial bağlantı yenidən tanına
 
 msgid "Switch USB role?"
 msgstr "USB rolu dəyişdirilsin?"
-
-msgid "Apply"
-msgstr "Tətbiq et"
 
 msgid "Switching USB role…"
 msgstr "USB rolu dəyişdirilir…"
@@ -721,6 +748,21 @@ msgstr "Parametrlər saxlanıldı"
 msgid "Save failed: %s"
 msgstr "Saxlama uğursuz oldu: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Şəbəkə performansı ayarları oxunmadı; yeniləyib təkrar cəhd edin"
+
+msgid "This kernel does not provide this setting"
+msgstr "Bu nüvə bu ayarı təmin etmir"
+
+msgid "System default"
+msgstr "Sistem standartı"
+
+msgid "Applied and saved for future boots."
+msgstr "Tətbiq edildi və növbəti açılışlar üçün saxlanıldı."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nüvə şəbəkə ayarlarını qəbul etmədi"
+
 msgid "This boot"
 msgstr "Bu açılış"
 
@@ -739,6 +781,9 @@ msgstr "USB adapterləri axtarılır…"
 msgid "No USB adapters found."
 msgstr "USB adapter tapılmadı."
 
+msgid "In use by another network"
+msgstr "Başqa şəbəkə tərəfindən istifadə olunur"
+
 msgid "Link connected"
 msgstr "Bağlantı qurulub"
 
@@ -747,6 +792,9 @@ msgstr "Bağlantı yoxdur; aktivləşdirmə cəhd edildi"
 
 msgid "Added to LAN"
 msgstr "LAN-a əlavə edildi"
+
+msgid "Cannot add"
+msgstr "Əlavə etmək olmur"
 
 msgid "Add to LAN"
 msgstr "LAN-a əlavə et"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Təhlükəsizlik"
 
-msgid "None"
-msgstr "Yoxdur"
-
 msgid "User name"
 msgstr "İstifadəçi adı"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux kilidlənib"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Bəli: növbəti yenidən başlatma Android-i açır"
+
+msgid "No"
+msgstr "Xeyr"
+
+msgid "Writable"
+msgstr "Yazıla bilər"
+
+msgid "This boot image cannot change the boot"
+msgstr "Bu açılış imajı açılışı dəyişə bilməz"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Android-ə keç"
 msgid "Lock Linux"
 msgstr "Linux-u kilidlə"
 
+msgid "Default boot"
+msgstr "Standart açılış"
+
+msgid "One-time boot"
+msgstr "Birdəfəlik açılış"
+
+msgid "Boot control"
+msgstr "Açılış idarəsi"
+
 msgid "Neighbor cells"
 msgstr "Qonşu hüceyrələr"
 
@@ -1125,6 +1194,9 @@ msgstr "Tezlik"
 
 msgid "Running %s…"
 msgstr "%s icra olunur…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspot ayarları saxlanıldı; dəyişikliklər tətbiq olunur"
 
 msgid "Started in background: %s"
 msgstr "Arxa planda başladıldı: %s"
@@ -1246,6 +1318,9 @@ msgstr "Daxili SIM seçilib: yenidən başladıldıqdan sonra istifadə olunacaq
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Daxili SIM seçilib, lakin bu cihazda dəstəklənmir: xarici SIM istifadə olunur"
 
+msgid "in use"
+msgstr "istifadədə"
+
 msgid "Uptime %s"
 msgstr "İş müddəti %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE bağlantısı"
 msgid "Hidden"
 msgstr "Gizli"
 
-msgid "No"
-msgstr "Xeyr"
-
 msgid "Running"
 msgstr "İşləyir"
 
@@ -1374,9 +1446,6 @@ msgstr "Onlayn"
 
 msgid "AT adapter unavailable"
 msgstr "AT adapteri əlçatan deyil"
-
-msgid "Linux locked"
-msgstr "Linux kilidlənib"
 
 msgid "Installing the language pack…"
 msgstr "Dil paketi quraşdırılır…"
@@ -2105,9 +2174,6 @@ msgstr "Modemin öz ayarı"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "istifadədə"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d radiosunu söndür"
 
@@ -2512,9 +2578,6 @@ msgstr "Açılış obrazı"
 
 msgid "from the installer"
 msgstr "quraşdırıcıdan"
-
-msgid "Default boot"
-msgstr "Standart açılış"
 
 msgid "Free space"
 msgstr "Boş yer"
@@ -3430,14 +3493,14 @@ msgstr "Naməlum kilid növü"
 msgid "Invalid value for this lock kind"
 msgstr "Bu kilid növü üçün yanlış dəyər"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Bu modem bu zolaqların heç birini dəstəkləmir"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Diapazon, rejim və hüceyrə kilidləri SIM2 üçün hələ dəstəklənmir"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "İkili SIM keçidi radionu idarə edərkən diapazon, rejim və hüceyrə kilidləri dəstəklənmir"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Bu modem bu zolaqların heç birini dəstəkləmir"
 
 msgid "Invalid page"
 msgstr "Yanlış səhifə"
@@ -3528,6 +3591,15 @@ msgstr "TTL adapteri etibarlı cavab vermədi"
 
 msgid "Invalid TTL"
 msgstr "Yanlış TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP adapteri etibarlı cavab vermədi"
+
+msgid "Invalid congestion control"
+msgstr "Yanlış sıxlıq idarəsi"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Açılış adapteri etibarlı cavab vermədi"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Məlumat istifadəsi adapteri etibarlı cavab vermədi"
@@ -3782,8 +3854,29 @@ msgstr "Radio ayarına uyğunlaşmadı"
 msgid "The data roaming setting could not be saved"
 msgstr "Məlumat rouminqi ayarı yadda saxlanıla bilmədi"
 
-msgid "Expected on or off"
-msgstr "on və ya off gözlənilir"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspot ayarı saxlanıldı, lakin simsiz şəbəkənin yenidən yüklənməsi alınmadı"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Simsiz ayarlarda saxlanılmamış dəyişikliklər var: əvvəlcə saxlayın və ya geri alın"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot artıq dəyişdirilir; bir azdan yenidən cəhd edin"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Heç bir hotspot (giriş nöqtəsi) qurulmayıb"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Bu radionu açmaq başqa interfeysə təsir edər; Simsiz səhifəsindən istifadə edin"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio Wi-Fi müştərisi tərəfindən istifadə olunur"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspot ayarı yazıla bilmədi"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Bu platforma hotspot idarəsini təmin etmir"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Bu platforma VPN inteqrasiyası təqdim etmir"
@@ -3883,6 +3976,15 @@ msgstr "USB şəbəkə interfeysi deyil"
 
 msgid "LAN bridge device section was not found"
 msgstr "LAN körpüsü cihaz bölməsi tapılmadı"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Adapterin hansı şəbəkəyə aid olduğu müəyyənləşmədi; sonra yenidən cəhd edin"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adapter başqa şəbəkəyə aiddir və LAN-a qoşula bilməz"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Şəbəkə ayarlarında saxlanılmamış dəyişikliklər var: əvvəlcə saxlayın və ya geri alın"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB şəbəkə interfeysini aktivləşdirmək mümkün deyil"
@@ -4018,6 +4120,12 @@ msgstr "Naməlum paket əməliyyatı"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Bu platforma TCP sıxlıq idarəsini təmin etmir"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP ayarları oxuna bilmədi"
 
 msgid "Data usage is not available on this system"
 msgstr "Məlumat istifadəsi bu sistemdə mövcud deyil"

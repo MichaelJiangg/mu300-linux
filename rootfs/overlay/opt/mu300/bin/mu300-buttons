@@ -75,15 +75,15 @@ hotspot_is_up() {
     if is_openwrt; then probe ubus -t 5 call hostapd.wlan0 get_status
     else probe systemctl is-active --quiet mu300-hotspot; fi
 }
-hotspot_set() {  # hotspot_set on|off: the toggle itself, and the persistent flag the panel writes
+# hotspot_set on|off: the toggle itself, with the persistent flag the panel writes. OpenWrt: the panel's own path
+# (/opt/mu300/lib/hotspot-ap.sh: the access point's wifi-iface, the radio only when it was off; nothing unsaved in
+# LuCI committed with it), so that the key and the page always undo each other.
+hotspot_set() {
     if is_openwrt; then
-        if [ "$1" = off ]; then
-            uci -q set wireless.@wifi-device[0].disabled=1; uci -q commit wireless
-            wifi down; mu300-led wifi off
-        else
-            uci -q set wireless.@wifi-device[0].disabled=0; uci -q commit wireless
-            wifi up; mu300-led wifi sync 120
-        fi
+        _r=$(. "${MU300_HOTSPOT_AP_LIB:-/opt/mu300/lib/hotspot-ap.sh}" && hotspot_ap_set "$1")
+        logger -t mu300-buttons "hotspot $1: ${_r:-failed}" 2>/dev/null
+        case $_r in pending|unchanged|saved) ;; *) return 1 ;; esac
+        if [ "$1" = off ]; then mu300-led wifi off; else mu300-led wifi sync 120; fi
     elif [ "$1" = off ]; then systemctl stop mu300-hotspot
     else systemctl start mu300-hotspot; fi
 }

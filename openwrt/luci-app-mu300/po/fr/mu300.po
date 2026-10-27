@@ -628,6 +628,9 @@ msgstr "Le mode hôte coupe le réseau USB et la liaison série sur ce port. Le 
 msgid "USB network mode"
 msgstr "Mode réseau USB"
 
+msgid "Current sharing protocol"
+msgstr "Protocole de partage actuel"
+
 msgid "Network protocol"
 msgstr "Protocole réseau"
 
@@ -658,6 +661,27 @@ msgstr "Actualiser"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Disponible uniquement en mode hôte. « Actualiser » active les adaptateurs USB détectés ; l'ajout au LAN enregistre le pont et recharge le réseau."
 
+msgid "Network performance"
+msgstr "Performances réseau"
+
+msgid "Active congestion control"
+msgstr "Contrôle de congestion actif"
+
+msgid "Default queue"
+msgstr "File d'attente par défaut"
+
+msgid "TCP congestion control"
+msgstr "Contrôle de congestion TCP"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Concerne surtout les nouvelles connexions TCP de cet appareil. Les connexions relayées des clients du point d'accès et USB n'utilisent pas BBR automatiquement."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR choisit FQ comme file par défaut des nouvelles interfaces. Les connexions, interfaces et QoS existantes sont conservées. Le réglage persiste après redémarrage."
+
 msgid "Recent modem operations"
 msgstr "Opérations récentes du modem"
 
@@ -670,6 +694,12 @@ msgstr "Les appels récents du panneau de contrôle, de ce démarrage et du pré
 msgid "Unavailable"
 msgstr "Indisponible"
 
+msgid "Mixed"
+msgstr "Mixte"
+
+msgid "None"
+msgstr "Aucune"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Le mode réseau USB est indisponible en mode hôte ; le démarrage automatique en mode hôte désactive aussi le démarrage automatique du réseau USB."
 
@@ -681,9 +711,6 @@ msgstr "Le réseau USB et la liaison série seront ré-énumérés en mode péri
 
 msgid "Switch USB role?"
 msgstr "Changer le rôle USB ?"
-
-msgid "Apply"
-msgstr "Appliquer"
 
 msgid "Switching USB role…"
 msgstr "Changement du rôle USB…"
@@ -721,6 +748,21 @@ msgstr "Paramètres enregistrés"
 msgid "Save failed: %s"
 msgstr "Échec de l'enregistrement : %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Impossible de lire les réglages de performances réseau ; actualisez pour réessayer"
+
+msgid "This kernel does not provide this setting"
+msgstr "Ce noyau ne propose pas ce réglage"
+
+msgid "System default"
+msgstr "Valeur par défaut du système"
+
+msgid "Applied and saved for future boots."
+msgstr "Appliqué et enregistré pour les prochains démarrages."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Le noyau n'a pas accepté les réglages réseau"
+
 msgid "This boot"
 msgstr "Ce démarrage"
 
@@ -739,6 +781,9 @@ msgstr "Recherche des adaptateurs USB…"
 msgid "No USB adapters found."
 msgstr "Aucun adaptateur USB trouvé."
 
+msgid "In use by another network"
+msgstr "Utilisé par un autre réseau"
+
 msgid "Link connected"
 msgstr "Lien connecté"
 
@@ -747,6 +792,9 @@ msgstr "Pas de lien ; activation tentée"
 
 msgid "Added to LAN"
 msgstr "Ajouté au LAN"
+
+msgid "Cannot add"
+msgstr "Ajout impossible"
 
 msgid "Add to LAN"
 msgstr "Ajouter au LAN"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Sécurité"
 
-msgid "None"
-msgstr "Aucune"
-
 msgid "User name"
 msgstr "Nom d'utilisateur"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux verrouillé"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Oui : le prochain redémarrage lance Android"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Writable"
+msgstr "Modifiable"
+
+msgid "This boot image cannot change the boot"
+msgstr "Cette image de démarrage ne peut pas changer le démarrage"
 
 msgid "%s of %s"
 msgstr "%s sur %s"
@@ -1114,6 +1174,15 @@ msgstr "Basculer vers Android"
 msgid "Lock Linux"
 msgstr "Verrouiller Linux"
 
+msgid "Default boot"
+msgstr "Démarrage par défaut"
+
+msgid "One-time boot"
+msgstr "Démarrage unique"
+
+msgid "Boot control"
+msgstr "Contrôle du démarrage"
+
 msgid "Neighbor cells"
 msgstr "Cellules voisines"
 
@@ -1125,6 +1194,9 @@ msgstr "Fréquence"
 
 msgid "Running %s…"
 msgstr "Exécution de %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Réglages du point d'accès enregistrés ; application en cours"
 
 msgid "Started in background: %s"
 msgstr "Lancé en arrière-plan : %s"
@@ -1246,6 +1318,9 @@ msgstr "SIM interne sélectionnée : utilisée après un redémarrage"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM interne sélectionnée, mais non prise en charge sur cet appareil : la SIM externe est utilisée"
 
+msgid "in use"
+msgstr "utilisée"
+
 msgid "Uptime %s"
 msgstr "Disponibilité %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Liaison LTE"
 msgid "Hidden"
 msgstr "Masqué"
 
-msgid "No"
-msgstr "Non"
-
 msgid "Running"
 msgstr "En cours d'exécution"
 
@@ -1374,9 +1446,6 @@ msgstr "En ligne"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptateur AT indisponible"
-
-msgid "Linux locked"
-msgstr "Linux verrouillé"
 
 msgid "Installing the language pack…"
 msgstr "Installation du pack de langues…"
@@ -2105,9 +2174,6 @@ msgstr "Valeur du modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "utilisée"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Éteindre la radio de la SIM%d"
 
@@ -2512,9 +2578,6 @@ msgstr "Image de démarrage"
 
 msgid "from the installer"
 msgstr "depuis l'installateur"
-
-msgid "Default boot"
-msgstr "Démarrage par défaut"
 
 msgid "Free space"
 msgstr "Espace libre"
@@ -3430,14 +3493,14 @@ msgstr "Type de verrouillage inconnu"
 msgid "Invalid value for this lock kind"
 msgstr "Valeur invalide pour ce type de verrouillage"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Ce modem ne prend en charge aucune de ces bandes"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Les verrous de bande, de mode et de cellule ne sont pas encore pris en charge pour la SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Les verrous de bande, de mode et de cellule ne sont pas pris en charge tant que la bascule double SIM gère la radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Ce modem ne prend en charge aucune de ces bandes"
 
 msgid "Invalid page"
 msgstr "Page invalide"
@@ -3528,6 +3591,15 @@ msgstr "L'adaptateur TTL n'a pas donné de réponse valide"
 
 msgid "Invalid TTL"
 msgstr "TTL invalide"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "L'adaptateur TCP n'a pas donné de réponse valide"
+
+msgid "Invalid congestion control"
+msgstr "Contrôle de congestion non valide"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "L'adaptateur de démarrage n'a pas donné de réponse valide"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "L'adaptateur de consommation de données n'a pas donné de réponse valide"
@@ -3782,8 +3854,29 @@ msgstr "La radio n'a pas suivi son réglage"
 msgid "The data roaming setting could not be saved"
 msgstr "Le réglage de l'itinérance des données n'a pas pu être enregistré"
 
-msgid "Expected on or off"
-msgstr "Valeur attendue : on ou off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Le réglage du point d'accès est enregistré, mais le rechargement du sans-fil a échoué"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Les réglages sans fil ont des modifications non enregistrées : enregistrez-les ou annulez-les d'abord"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Le point d'accès est déjà en cours de basculement ; réessayez sous peu"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Aucun point d'accès n'est configuré"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Activer cette radio affecterait une autre interface ; utilisez la page Sans fil"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "La radio est utilisée par le client Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Impossible d'écrire le réglage du point d'accès"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Cette plateforme ne fournit pas le contrôle du point d'accès"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "L'intégration VPN n'est pas fournie par cette plateforme"
@@ -3883,6 +3976,15 @@ msgstr "Ce n'est pas une interface réseau USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Section du périphérique du pont LAN introuvable"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Impossible de déterminer à qui appartient l'adaptateur ; réessayez plus tard"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "L'adaptateur appartient à un autre réseau et ne peut pas rejoindre le LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Les réglages réseau ont des modifications non enregistrées : enregistrez-les ou annulez-les d'abord"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Impossible d'activer l'interface réseau USB"
@@ -4018,6 +4120,12 @@ msgstr "Opération sur les paquets inconnue"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Cette plateforme ne fournit pas le contrôle de congestion TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Impossible de lire les réglages TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "La consommation de données n'est pas disponible sur ce système"

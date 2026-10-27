@@ -827,6 +827,30 @@ msgstr "TTL 必须是 1 到 255 之间的整数。"
 msgid "Leave the TTL alone"
 msgstr "不修改 TTL"
 
+msgid "TCP congestion control"
+msgstr "TCP 拥塞控制"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "主要影响设备自身新建的 TCP 连接；不会将热点或 USB 转发的客户端连接统一改为 BBR。"
+
+msgid "Active congestion control"
+msgstr "当前拥塞控制"
+
+msgid "Default queue"
+msgstr "默认队列"
+
+msgid "This kernel does not provide this setting"
+msgstr "当前内核不提供此设置"
+
+msgid "System default"
+msgstr "系统默认"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR 配套使用 FQ 作为新建接口的默认队列；现有连接、接口和 QoS 不重置。设置重启后保留。"
+
+msgid "Save and apply"
+msgstr "保存并应用"
+
 msgid "USSD"
 msgstr "USSD"
 
