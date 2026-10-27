@@ -835,6 +835,9 @@ msgstr "Forma (URL kodlu)"
 msgid "Plain text"
 msgstr "Sadə mətn"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Həmçinin {sim} (SIM 1 və ya SIM 2) və {kind} (sms, test və ya power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Alınan mesajlar SMS hovuzuna çatan kimi yönləndirilir. Uğursuz göndəriş 30 san sonra, sonra hər dəfə iki dəfə uzun müddətdən sonra (ən çox bir saat) təkrarlanır, cəmi on dəfə."
 
@@ -862,6 +865,15 @@ msgstr "Yalnız bu sözlərdən birini ehtiva edən mesajlar"
 msgid "One per line; empty: every message."
 msgstr "Hər sətirdə bir; boş: bütün mesajlar."
 
+msgid "Battery"
+msgstr "Batareya"
+
+msgid "Battery and charger notices"
+msgstr "Batareya və şarj cihazı bildirişləri"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Batareya 5, 20, 40, 60, 80 və ya 100 % həddini keçəndə və şarj cihazı taxılanda və ya çıxarılanda hər hədəfə bir mesaj."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "Xüsusi gövdə"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Boş: standart sahələr (sadə mətn: mesaj). Yertutanlar: {sender}, {time}, {text}, {device}, {message}. Hər dəyər seçilmiş növə uyğun kodlanır. Bu gövdə burada yenidən göstərilir: gizli məlumatları ünvanda və ya başlıqda saxlayın."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Xüsusi gövdədəki {secret} üçün gizli açar"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Tokenini gövdədə istəyən xidmət üçün (PushPlus). Yalnız bu ünvan üçün saxlanılır: yeni ünvan onu yenidən tələb edir."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Əlavə başlıqlar (hər sətirdə bir \"Ad: dəyər\")"
 
@@ -891,6 +909,9 @@ msgstr "Cavabda olmalıdır"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Boş: hər HTTP 2xx cavabı çatdırılmış sayılır. açar=dəyər ilə (məsələn, errcode=0) cavab həm də ən üst səviyyəsində bu açarın altında bu dəyəri daşıyan JSON obyekti olmalıdır; əks halda çatdırılma uğursuz sayılır. Jurnala yalnız yoxlamanın nəticəsi yazılır, cavabın özü heç vaxt."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Sorğu vaxt aşımı (saniyə, 1-120; webhook və Telegram)"
 
 msgid "Bot token"
 msgstr "Bot tokeni"
@@ -1095,9 +1116,6 @@ msgstr "Yaddaş"
 
 msgid "Storage"
 msgstr "Saxlama yeri"
-
-msgid "Battery"
-msgstr "Batareya"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -2314,6 +2332,9 @@ msgstr "Silindi (yalnız yerli)"
 
 msgid "Enter both a number and a message."
 msgstr "Həm nömrəni, həm də mesajı daxil edin."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM yaddaşı: %d / %d yuva istifadədədir (%s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaj, %d oxunmamış · %d söhbət"
@@ -4111,6 +4132,12 @@ msgstr "Webhook gövdəsi çox uzundur və ya idarəetmə simvolu ehtiva edir"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Cavab yoxlaması açar=dəyər şəklində olmalıdır, məsələn errcode=0 və ya ok=true (dəyər tam ədəd və ya kiçik hərflər, ən çoxu 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Yanlış webhook gizli açarı (256-ya qədər çap olunan simvol, boşluqsuz)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Vaxt aşımı 1 ilə 120 saniyə arasında olmalıdır"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Yanlış başlıq (hər sətirdə bir \"Ad: dəyər\"; Host, Content-Type, Content-Length, Transfer-Encoding və Connection cihaz tərəfindən təyin edilir)"

@@ -835,6 +835,9 @@ msgstr "フォーム（URL エンコード）"
 msgid "Plain text"
 msgstr "プレーンテキスト"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "ほかに {sim} (SIM 1 または SIM 2) と {kind} (sms、test、power)。"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "受信したメッセージは SMS プールに届きしだい転送されます。送信に失敗すると 30 秒後に再試行し、その後は毎回 2 倍の間隔（最大 1 時間）で、合計 10 回試みます。"
 
@@ -862,6 +865,15 @@ msgstr "これらの語のいずれかを含むメッセージのみ"
 msgid "One per line; empty: every message."
 msgstr "1 行に 1 つ。空欄: すべてのメッセージ。"
 
+msgid "Battery"
+msgstr "バッテリー"
+
+msgid "Battery and charger notices"
+msgstr "バッテリーと充電器の通知"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "バッテリーが 5、20、40、60、80、100 % を通過したときと、充電器の抜き差しのときに、すべての送信先へメッセージを送ります。"
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "カスタム本文"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "空欄: 標準のフィールド（プレーンテキスト: メッセージ）。プレースホルダー: {sender}、{time}、{text}、{device}、{message}。各値は選択した形式に合わせてエスケープされます。この本文はここに再表示されます。秘密情報はアドレスかヘッダーに入れてください。"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "カスタム本文の {secret} に入れるシークレット"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "本文にトークンを求めるサービス (PushPlus) 用。このアドレス専用に保存され、新しいアドレスでは再入力が必要です。"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "追加ヘッダー（1 行に 1 つの \"Name: value\"）"
 
@@ -891,6 +909,9 @@ msgstr "応答に含まれるべき内容"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "空欄: HTTP 2xx の応答はすべて配信済みとみなします。キー=値（例: errcode=0）を指定すると、応答はさらに、最上位のそのキーにその値を持つ JSON オブジェクトでなければならず、そうでない場合は配信失敗になります。ログに記録されるのは確認の結果だけで、応答そのものは記録されません。"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "リクエストのタイムアウト (秒、1-120、webhook と Telegram)"
 
 msgid "Bot token"
 msgstr "ボットトークン"
@@ -1095,9 +1116,6 @@ msgstr "メモリ"
 
 msgid "Storage"
 msgstr "ストレージ"
-
-msgid "Battery"
-msgstr "バッテリー"
 
 msgid "Channel"
 msgstr "チャネル"
@@ -2314,6 +2332,9 @@ msgstr "削除しました (ローカルのみ)"
 
 msgid "Enter both a number and a message."
 msgstr "番号とメッセージの両方を入力してください。"
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM ストレージ: %d / %d 件使用中 (%s 時点)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 件、未読 %d 件 · 会話 %d 件"
@@ -4111,6 +4132,12 @@ msgstr "Webhook の本文が長すぎるか、制御文字を含んでいます"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "応答の確認は キー=値 の形式（例: errcode=0 や ok=true）で指定してください（値は整数または英小文字、16 文字まで）"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "無効な webhook シークレット (印字可能文字 256 文字まで、空白なし)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "タイムアウトは 1-120 秒にしてください"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "無効なヘッダー（1 行に 1 つの \"Name: value\"。Host、Content-Type、Content-Length、Transfer-Encoding、Connection はデバイスが設定します）"

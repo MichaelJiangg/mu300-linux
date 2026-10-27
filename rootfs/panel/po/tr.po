@@ -563,6 +563,15 @@ msgstr "Asla bu gönderenler"
 msgid "Only messages with one of these words (one per line; empty: every message)"
 msgstr "Yalnızca bu sözcüklerden birini içeren mesajlar (satır başına bir; boş: tüm mesajlar)"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power), in the template and the custom body."
+msgstr "Şablonda ve özel gövdede ayrıca {sim} (SIM 1 ya da SIM 2) ve {kind} (sms, test ya da power)."
+
+msgid "Battery and charger notices"
+msgstr "Pil ve şarj bildirimleri"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Pil %5, %20, %40, %60, %80 ya da %100 seviyesini geçtiğinde ve şarj cihazı takılıp çıkarıldığında her hedefe bir mesaj."
+
 msgid "Address (http:// or https://)"
 msgstr "Adres (http:// veya https://)"
 
@@ -587,6 +596,12 @@ msgstr "Gövde hazır ayarları"
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ek başlıklar (satır başına bir \"Ad: değer\")"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Özel gövdedeki {secret} için gizli değer"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Belirtecini gövdede isteyen bir hizmet için (PushPlus). Yalnızca bu adres için saklanır: yeni bir adres onu yeniden ister."
+
 msgid "The answer must contain (key=value; empty: every HTTP 2xx answer counts)"
 msgstr "Yanıt şunu içermeli (anahtar=değer; boş: her HTTP 2xx yanıtı sayılır)"
 
@@ -595,6 +610,9 @@ msgstr "Yanıt hazır ayarları"
 
 msgid "With key=value the answer must be a JSON object with that value under that key at its top level, or the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "anahtar=değer ile yanıt, en üst düzeyinde bu anahtarın altında bu değeri taşıyan bir JSON nesnesi olmalıdır; değilse teslim başarısız olur. Günlüğe yalnızca denetimin sonucu yazılır, yanıtın kendisi asla."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "İstek zaman aşımı (saniye, 1-120; webhook ve Telegram)"
 
 msgid "Bot token"
 msgstr "Bot belirteci"

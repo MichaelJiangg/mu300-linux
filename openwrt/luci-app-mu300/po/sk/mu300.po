@@ -835,6 +835,9 @@ msgstr "Formulár (kódovanie URL)"
 msgid "Plain text"
 msgstr "Obyčajný text"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Tiež {sim} (SIM 1 alebo SIM 2) a {kind} (sms, test alebo power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Prijaté správy sa preposielajú hneď, ako prídu do fondu SMS. Neúspešné doručenie sa zopakuje po 30 s a potom zakaždým po dvojnásobnom čase (najviac hodina), celkovo desaťkrát."
 
@@ -862,6 +865,15 @@ msgstr "Len správy obsahujúce niektoré z týchto slov"
 msgid "One per line; empty: every message."
 msgstr "Jedno na riadok; prázdne: všetky správy."
 
+msgid "Battery"
+msgstr "Batéria"
+
+msgid "Battery and charger notices"
+msgstr "Upozornenia o batérii a nabíjačke"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Správa všetkým cieľom, keď batéria prejde 5, 20, 40, 60, 80 alebo 100 % a keď sa nabíjačka pripojí alebo odpojí."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "Vlastné telo"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Prázdne: štandardné polia (obyčajný text: správa). Zástupné symboly: {sender}, {time}, {text}, {device}, {message}. Každá hodnota sa escapuje podľa zvoleného typu. Toto telo sa tu znova zobrazí: tajné údaje dajte do adresy alebo do hlavičky."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Tajomstvo pre {secret} vo vlastnom tele"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pre službu, ktorá chce svoj token v tele (PushPlus). Uloží sa len pre túto adresu: nová adresa ho potrebuje znova."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ďalšie hlavičky (jedna \"Názov: hodnota\" na riadok)"
 
@@ -891,6 +909,9 @@ msgstr "Odpoveď musí obsahovať"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Prázdne: každá odpoveď HTTP 2xx sa počíta ako doručenie. S kľúč=hodnota (napríklad errcode=0) musí byť odpoveď navyše objekt JSON, ktorý má na najvyššej úrovni pod týmto kľúčom túto hodnotu; inak doručenie zlyhá. Do záznamu sa zapisuje len výsledok kontroly, nikdy odpoveď."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Časový limit požiadavky (sekundy, 1-120; webhook a Telegram)"
 
 msgid "Bot token"
 msgstr "Token bota"
@@ -1095,9 +1116,6 @@ msgstr "Pamäť"
 
 msgid "Storage"
 msgstr "Úložisko"
-
-msgid "Battery"
-msgstr "Batéria"
 
 msgid "Channel"
 msgstr "Kanál"
@@ -2314,6 +2332,9 @@ msgstr "Odstránené (iba lokálne)"
 
 msgid "Enter both a number and a message."
 msgstr "Zadajte číslo aj správu."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Úložisko SIM: obsadené %d z %d pozícií (o %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· správ: %d, neprečítaných: %d · konverzácií: %d"
@@ -4111,6 +4132,12 @@ msgstr "Telo webhooku je príliš dlhé alebo obsahuje riadiaci znak"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Kontrola odpovede musí mať tvar kľúč=hodnota, napríklad errcode=0 alebo ok=true (hodnota celé číslo alebo malé písmená, najviac 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Neplatné tajomstvo webhooku (najviac 256 tlačiteľných znakov, bez medzery)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Časový limit musí byť 1 až 120 sekúnd"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Neplatná hlavička (jedna \"Názov: hodnota\" na riadok; Host, Content-Type, Content-Length, Transfer-Encoding a Connection nastavuje zariadenie)"

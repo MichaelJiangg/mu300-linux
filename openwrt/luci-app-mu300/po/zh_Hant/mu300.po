@@ -835,6 +835,9 @@ msgstr "表單（URL 編碼）"
 msgid "Plain text"
 msgstr "純文字"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "另有 {sim}（SIM 1 或 SIM 2）和 {kind}（sms、test 或 power）。"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "收到的簡訊進入簡訊池後即被轉寄。傳送失敗時 30 秒後重試，之後每次間隔加倍（最長一小時），共十次。"
 
@@ -862,6 +865,15 @@ msgstr "僅限包含以下任一字詞的簡訊"
 msgid "One per line; empty: every message."
 msgstr "每行一個；留空：所有簡訊。"
 
+msgid "Battery"
+msgstr "電池"
+
+msgid "Battery and charger notices"
+msgstr "電量與充電提醒"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "電量經過 5、20、40、60、80 或 100 % 時，以及插上或拔下充電器時，向每個目標傳送一則訊息。"
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "自訂請求本文"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "留空：使用標準欄位（純文字：訊息本身）。預留位置：{sender}、{time}、{text}、{device}、{message}。每個值都會依所選類型跳脫。此請求本文會在這裡再次顯示：請把密鑰放在位址或標頭裡。"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "自訂內文中 {secret} 的密鑰"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "用於要求在內文中攜帶權杖的服務（PushPlus）。只為目前位址保存：更換位址後需重新填寫。"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "額外標頭（每行一個 \"Name: value\"）"
 
@@ -891,6 +909,9 @@ msgstr "回應必須包含"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "留空：任何 HTTP 2xx 回應都算作已送達。填寫 鍵=值（例如 errcode=0）後，回應還必須是一個 JSON 物件，且其頂層的該鍵為該值；否則本次傳送算作失敗。記錄中只寫入檢查結果，絕不寫入回應內容。"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "請求逾時（秒，1-120；Webhook 和 Telegram）"
 
 msgid "Bot token"
 msgstr "機器人權杖"
@@ -1095,9 +1116,6 @@ msgstr "記憶體"
 
 msgid "Storage"
 msgstr "儲存空間"
-
-msgid "Battery"
-msgstr "電池"
 
 msgid "Channel"
 msgstr "頻道"
@@ -2309,6 +2327,9 @@ msgstr "已刪除（僅本機）"
 
 msgid "Enter both a number and a message."
 msgstr "請同時輸入號碼與訊息。"
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM 儲存：已用 %d / %d 則（%s）"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 則，%d 則未讀 · %d 個對話"
@@ -4104,6 +4125,12 @@ msgstr "Webhook 請求本文過長或包含控制字元"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "回應檢查必須是 鍵=值 的形式，例如 errcode=0 或 ok=true（值為整數或小寫字母，最多 16 個字元）"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Webhook 密鑰無效（最多 256 個可列印字元，不含空格）"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "逾時須為 1 到 120 秒"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "無效的標頭（每行一個 \"Name: value\"；Host、Content-Type、Content-Length、Transfer-Encoding 和 Connection 由裝置設定）"

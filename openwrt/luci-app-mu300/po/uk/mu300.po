@@ -835,6 +835,9 @@ msgstr "Форма (URL-кодування)"
 msgid "Plain text"
 msgstr "Простий текст"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Також {sim} (SIM 1 або SIM 2) і {kind} (sms, test або power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Отримані повідомлення пересилаються, щойно потрапляють до пулу SMS. Невдале надсилання повторюється через 30 с, далі щоразу через удвічі довший інтервал (не більше години), усього десять разів."
 
@@ -862,6 +865,15 @@ msgstr "Лише повідомлення, що містять одне з ци�
 msgid "One per line; empty: every message."
 msgstr "По одному в рядку; порожньо: усі повідомлення."
 
+msgid "Battery"
+msgstr "Батарея"
+
+msgid "Battery and charger notices"
+msgstr "Сповіщення про батарею і заряджання"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Повідомлення кожному отримувачу, коли заряд проходить 5, 20, 40, 60, 80 або 100 % і коли зарядку під'єднують чи від'єднують."
+
 msgid "Webhook"
 msgstr "Вебхук"
 
@@ -883,6 +895,12 @@ msgstr "Власне тіло запиту"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Порожньо: стандартні поля (простий текст: повідомлення). Підстановки: {sender}, {time}, {text}, {device}, {message}. Кожне значення екранується відповідно до вибраного типу. Це тіло знову показується тут: секрети тримайте в адресі або в заголовку."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Секрет для {secret} у власному тілі запиту"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Для сервісу, якому потрібен токен у тілі запиту (PushPlus). Зберігається лише для цієї адреси: для нової адреси його треба ввести знову."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Додаткові заголовки (по одному \"Ім'я: значення\" в рядку)"
 
@@ -891,6 +909,9 @@ msgstr "Відповідь має містити"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Порожньо: будь-яка відповідь HTTP 2xx вважається доставкою. Якщо задано ключ=значення (наприклад, errcode=0), відповідь має також бути об’єктом JSON, у якого на верхньому рівні під цим ключем стоїть це значення; інакше доставка вважається невдалою. До журналу потрапляє лише результат перевірки, сама відповідь — ніколи."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Тайм-аут запиту (секунди, 1-120; webhook і Telegram)"
 
 msgid "Bot token"
 msgstr "Токен бота"
@@ -1095,9 +1116,6 @@ msgstr "Пам'ять"
 
 msgid "Storage"
 msgstr "Сховище"
-
-msgid "Battery"
-msgstr "Батарея"
 
 msgid "Channel"
 msgstr "Канал"
@@ -2314,6 +2332,9 @@ msgstr "Видалено (лише локально)"
 
 msgid "Enter both a number and a message."
 msgstr "Введіть номер і повідомлення."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Пам'ять SIM: зайнято %d з %d комірок (на %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· повідомлень: %d, непрочитаних: %d · розмов: %d"
@@ -4111,6 +4132,12 @@ msgstr "Тіло webhook надто довге або містить керів�
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Перевірка відповіді має бути у вигляді ключ=значення, наприклад errcode=0 або ok=true (значення — ціле число або малі літери, не більше 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Неправильний секрет webhook (до 256 друкованих символів, без пробілів)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Тайм-аут має бути від 1 до 120 секунд"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Неправильний заголовок (по одному \"Ім'я: значення\" в рядку; Host, Content-Type, Content-Length, Transfer-Encoding і Connection задає пристрій)"

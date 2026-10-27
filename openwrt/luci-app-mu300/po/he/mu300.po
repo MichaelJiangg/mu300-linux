@@ -835,6 +835,9 @@ msgstr "טופס (קידוד URL)"
 msgid "Plain text"
 msgstr "טקסט פשוט"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "וגם {sim} (SIM 1 או SIM 2) ו-{kind} (sms,‏ test או power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "הודעות שהתקבלו מועברות ברגע שהן מגיעות למאגר ה-SMS. מסירה שנכשלה מנוסה שוב אחרי 30 שניות, ואז בכל פעם אחרי זמן כפול (שעה לכל היותר), עשר פעמים בסך הכול."
 
@@ -862,6 +865,15 @@ msgstr "רק הודעות שמכילות אחת מהמילים האלה"
 msgid "One per line; empty: every message."
 msgstr "אחת בכל שורה; ריק: כל ההודעות."
 
+msgid "Battery"
+msgstr "סוללה"
+
+msgid "Battery and charger notices"
+msgstr "התראות סוללה ומטען"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "הודעה לכל יעד כשהסוללה עוברת 5, 20, 40, 60, 80 או 100 % וכשהמטען מחובר או מנותק."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "גוף מותאם אישית"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "ריק: השדות הרגילים (טקסט פשוט: ההודעה). מצייני מקום: {sender}, {time}, {text}, {device}, {message}. כל ערך עובר escape לפי הסוג שנבחר. גוף זה מוצג כאן שוב: שמרו סודות בכתובת או בכותרת."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "סוד עבור {secret} בגוף המותאם"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "לשירות שרוצה את האסימון שלו בגוף (PushPlus). נשמר לכתובת זו בלבד: כתובת חדשה צריכה אותו שוב."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "כותרות נוספות (\"Name: value\" אחת בכל שורה)"
 
@@ -891,6 +909,9 @@ msgstr "התשובה חייבת להכיל"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "ריק: כל תשובת HTTP 2xx נחשבת כמסירה. עם מפתח=ערך (למשל errcode=0) התשובה חייבת בנוסף להיות אובייקט JSON שברמה העליונה שלו יש את הערך הזה תחת המפתח הזה; אחרת המסירה נכשלת. ביומן נרשמת רק תוצאת הבדיקה, ולעולם לא התשובה עצמה."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "זמן קצוב לבקשה (שניות, 1-120; webhook ו-Telegram)"
 
 msgid "Bot token"
 msgstr "אסימון בוט"
@@ -1095,9 +1116,6 @@ msgstr "זיכרון"
 
 msgid "Storage"
 msgstr "אחסון"
-
-msgid "Battery"
-msgstr "סוללה"
 
 msgid "Channel"
 msgstr "ערוץ"
@@ -2314,6 +2332,9 @@ msgstr "נמחק (מקומי בלבד)"
 
 msgid "Enter both a number and a message."
 msgstr "יש להזין גם מספר וגם הודעה."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "אחסון SIM: ‏%d מתוך %d משבצות בשימוש (ב-%s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d הודעות, %d שלא נקראו · %d שיחות"
@@ -4111,6 +4132,12 @@ msgstr "גוף ה-webhook ארוך מדי או מכיל תו בקרה"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "בדיקת התשובה חייבת להיות בצורת מפתח=ערך, כמו errcode=0 או ok=true (הערך מספר שלם או אותיות קטנות, 16 לכל היותר)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "סוד webhook לא תקין (עד 256 תווים מודפסים, ללא רווח)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "הזמן הקצוב חייב להיות בין 1 ל-120 שניות"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "כותרת לא תקינה (\"Name: value\" אחת בכל שורה; את Host, Content-Type, Content-Length, Transfer-Encoding ו-Connection המכשיר קובע)"

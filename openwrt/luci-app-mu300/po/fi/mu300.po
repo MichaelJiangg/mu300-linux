@@ -835,6 +835,9 @@ msgstr "Lomake (URL-koodattu)"
 msgid "Plain text"
 msgstr "Pelkkä teksti"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Myös {sim} (SIM 1 tai SIM 2) ja {kind} (sms, test tai power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Vastaanotetut viestit lähetetään edelleen heti, kun ne saapuvat SMS-pooliin. Epäonnistunut toimitus yritetään uudelleen 30 s kuluttua ja sen jälkeen aina kaksinkertaisen ajan päästä (enintään tunti), yhteensä kymmenen kertaa."
 
@@ -862,6 +865,15 @@ msgstr "Vain viestit, joissa on jokin näistä sanoista"
 msgid "One per line; empty: every message."
 msgstr "Yksi riviä kohden; tyhjä: kaikki viestit."
 
+msgid "Battery"
+msgstr "Akku"
+
+msgid "Battery and charger notices"
+msgstr "Akku- ja laturi-ilmoitukset"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Viesti jokaiseen kohteeseen, kun akku ohittaa 5, 20, 40, 60, 80 tai 100 % ja kun laturi kytketään tai irrotetaan."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "Mukautettu runko"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Tyhjä: vakiokentät (pelkkä teksti: viesti). Paikkamerkit: {sender}, {time}, {text}, {device}, {message}. Jokainen arvo suojataan valitun tyypin mukaan. Tämä runko näytetään tässä uudelleen: pidä salaisuudet osoitteessa tai otsakkeessa."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Salaisuus kohtaan {secret} omassa rungossa"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Palvelulle, joka haluaa tunnuksensa runkoon (PushPlus). Tallennetaan vain tälle osoitteelle: uusi osoite tarvitsee sen uudelleen."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Lisäotsakkeet (yksi \"Nimi: arvo\" riviä kohden)"
 
@@ -891,6 +909,9 @@ msgstr "Vastauksessa on oltava"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Tyhjä: jokainen HTTP 2xx -vastaus lasketaan toimitetuksi. Kun annetaan avain=arvo (esimerkiksi errcode=0), vastauksen on lisäksi oltava JSON-objekti, jonka ylimmällä tasolla tällä avaimella on tämä arvo; muuten toimitus epäonnistuu. Lokiin kirjataan vain tarkistuksen tulos, ei koskaan vastausta."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Pyynnön aikaraja (sekuntia, 1-120; webhook ja Telegram)"
 
 msgid "Bot token"
 msgstr "Botin tunnus"
@@ -1095,9 +1116,6 @@ msgstr "Muisti"
 
 msgid "Storage"
 msgstr "Tallennustila"
-
-msgid "Battery"
-msgstr "Akku"
 
 msgid "Channel"
 msgstr "Kanava"
@@ -2314,6 +2332,9 @@ msgstr "Poistettu (vain paikallinen)"
 
 msgid "Enter both a number and a message."
 msgstr "Anna sekä numero että viesti."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-muisti: %d / %d paikkaa käytössä (klo %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d viestiä, %d lukematonta · %d keskustelua"
@@ -4111,6 +4132,12 @@ msgstr "Webhookin runko on liian pitkä tai sisältää ohjausmerkin"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Vastauksen tarkistuksen on oltava muotoa avain=arvo, kuten errcode=0 tai ok=true (arvo kokonaisluku tai pieniä kirjaimia, enintään 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Virheellinen webhook-salaisuus (enintään 256 tulostettavaa merkkiä, ei välilyöntiä)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Aikarajan on oltava 1-120 sekuntia"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Virheellinen otsake (yksi \"Nimi: arvo\" riviä kohden; laite asettaa Host-, Content-Type-, Content-Length-, Transfer-Encoding- ja Connection-otsakkeet)"

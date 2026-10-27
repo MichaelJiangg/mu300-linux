@@ -835,6 +835,9 @@ msgstr "Formulář (kódování URL)"
 msgid "Plain text"
 msgstr "Prostý text"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Také {sim} (SIM 1 nebo SIM 2) a {kind} (sms, test nebo power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Přijaté zprávy se přeposílají, jakmile dorazí do fondu SMS. Neúspěšné doručení se zopakuje po 30 s a pak pokaždé po dvojnásobné době (nejvýše hodina), celkem desetkrát."
 
@@ -862,6 +865,15 @@ msgstr "Jen zprávy obsahující některé z těchto slov"
 msgid "One per line; empty: every message."
 msgstr "Jedno na řádek; prázdné: všechny zprávy."
 
+msgid "Battery"
+msgstr "Baterie"
+
+msgid "Battery and charger notices"
+msgstr "Oznámení o baterii a nabíječce"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Zpráva všem cílům, když baterie projde 5, 20, 40, 60, 80 nebo 100 % a když se nabíječka připojí nebo odpojí."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "Vlastní tělo"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Prázdné: standardní pole (prostý text: zpráva). Zástupné symboly: {sender}, {time}, {text}, {device}, {message}. Každá hodnota se escapuje podle zvoleného typu. Toto tělo se zde znovu zobrazí: tajné údaje dejte do adresy nebo do hlavičky."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Tajemství pro {secret} ve vlastním těle"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pro službu, která chce svůj token v těle (PushPlus). Uloží se jen pro tuto adresu: nová adresa ho potřebuje znovu."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Další hlavičky (jedna \"Název: hodnota\" na řádek)"
 
@@ -891,6 +909,9 @@ msgstr "Odpověď musí obsahovat"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Prázdné: každá odpověď HTTP 2xx se počítá jako doručení. S klíč=hodnota (například errcode=0) musí být odpověď navíc objekt JSON, který má na nejvyšší úrovni pod tímto klíčem tuto hodnotu; jinak doručení selže. Do protokolu se zapisuje jen výsledek kontroly, nikdy odpověď."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Časový limit požadavku (sekundy, 1-120; webhook a Telegram)"
 
 msgid "Bot token"
 msgstr "Token bota"
@@ -1095,9 +1116,6 @@ msgstr "Paměť"
 
 msgid "Storage"
 msgstr "Úložiště"
-
-msgid "Battery"
-msgstr "Baterie"
 
 msgid "Channel"
 msgstr "Kanál"
@@ -2314,6 +2332,9 @@ msgstr "Smazáno (pouze místně)"
 
 msgid "Enter both a number and a message."
 msgstr "Zadejte číslo i zprávu."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Úložiště SIM: obsazeno %d z %d pozic (v %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· zpráv: %d, nepřečtených: %d · konverzací: %d"
@@ -4111,6 +4132,12 @@ msgstr "Tělo webhooku je příliš dlouhé nebo obsahuje řídicí znak"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Kontrola odpovědi musí mít tvar klíč=hodnota, například errcode=0 nebo ok=true (hodnota celé číslo nebo malá písmena, nejvýše 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Neplatné tajemství webhooku (až 256 tisknutelných znaků, bez mezer)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Časový limit musí být 1 až 120 sekund"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Neplatná hlavička (jedna \"Název: hodnota\" na řádek; Host, Content-Type, Content-Length, Transfer-Encoding a Connection nastavuje zařízení)"

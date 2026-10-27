@@ -84,6 +84,24 @@ the value is a whole number or lowercase letters (16 at most).
 The delivery log is kept in memory (the last 100 lines, gone after a reboot); "Clear" under it empties it. Messages
 that still wait to be delivered are not affected.
 
+From the next release (ported from kanoqwq's fork):
+
+* **More presets.** Bark, PushPlus and ServerChan are on the body preset list. Each sets the body, the type and the
+  answer check, and fills in the address when none is saved. Bark (`https://api.day.app/YOUR_KEY`) and ServerChan
+  (`https://sctapi.ftqq.com/YOUR_SENDKEY.send`) take their key in the address: type yours over `YOUR_...`.
+* **Webhook secret.** PushPlus wants its token in the body, but the body is shown again in the panel. Put
+  `{secret}` in the body and the token under "Secret for {secret}". It is stored and shown like the address (never
+  again). It belongs to the address it was saved with: a new address drops it unless you enter it again.
+* **More placeholders.** `{sim}` is the SIM this boot runs on (`SIM 1` or `SIM 2`) and `{kind}` is `sms`, `test`
+  or `power`.
+* **Request timeout.** 1-120 seconds (15 by default), for the webhook and Telegram.
+* **Battery and charger notices** (off by default; only on a board with a battery, so not the F50).
+  - A message goes to every target that is on when the battery passes 5, 20, 40, 60, 80 or 100 %, and when the
+    charger is plugged in or out.
+  - Each notice is tried once and not queued. The log shows it as "Battery", with no text.
+* **SIM storage.** The SMS page shows how full the SIM storage was after the last sync. That is what the sync's own
+  `AT+CPMS` reported, less what moved off the SIM; the page itself asks the modem nothing.
+
 Since v2026.10.18 a message leaves the SIM only once its copy is on the disk, so a power cut loses none, and a long
 message whose other parts never arrive is shown after an hour, marked incomplete.
 

@@ -835,6 +835,9 @@ msgstr "Formulario (codificado en URL)"
 msgid "Plain text"
 msgstr "Texto sin formato"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "También {sim} (SIM 1 o SIM 2) y {kind} (sms, test o power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Los mensajes recibidos se reenvían en cuanto llegan al pool de SMS. Un envío fallido se reintenta tras 30 s y después cada vez tras el doble de tiempo (una hora como máximo), diez veces en total."
 
@@ -862,6 +865,15 @@ msgstr "Solo mensajes que contengan una de estas palabras"
 msgid "One per line; empty: every message."
 msgstr "Una por línea; vacío: todos los mensajes."
 
+msgid "Battery"
+msgstr "Batería"
+
+msgid "Battery and charger notices"
+msgstr "Avisos de batería y cargador"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Un mensaje a cada destino cuando la batería pasa del 5, 20, 40, 60, 80 o 100 % y cuando se conecta o desconecta el cargador."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "Cuerpo personalizado"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Vacío: los campos estándar (texto sin formato: el mensaje). Marcadores: {sender}, {time}, {text}, {device}, {message}. Cada valor se escapa según el tipo elegido. Este cuerpo se vuelve a mostrar aquí: ponga los secretos en la dirección o en una cabecera."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Secreto para {secret} en el cuerpo personalizado"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Para un servicio que quiere su token en el cuerpo (PushPlus). Se guarda solo para esta dirección: una dirección nueva lo necesita otra vez."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Cabeceras adicionales (un \"Nombre: valor\" por línea)"
 
@@ -891,6 +909,9 @@ msgstr "La respuesta debe contener"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Vacío: toda respuesta HTTP 2xx cuenta como entregada. Con clave=valor (por ejemplo errcode=0), la respuesta debe ser además un objeto JSON que tenga ese valor bajo esa clave en su nivel superior; de lo contrario, el envío falla. Solo se registra el resultado de la comprobación, nunca la respuesta."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Tiempo límite de la petición (segundos, 1-120; webhook y Telegram)"
 
 msgid "Bot token"
 msgstr "Token del bot"
@@ -1095,9 +1116,6 @@ msgstr "Memoria"
 
 msgid "Storage"
 msgstr "Almacenamiento"
-
-msgid "Battery"
-msgstr "Batería"
 
 msgid "Channel"
 msgstr "Canal"
@@ -2314,6 +2332,9 @@ msgstr "Eliminado (solo local)"
 
 msgid "Enter both a number and a message."
 msgstr "Introduzca un número y un mensaje."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Almacenamiento de la SIM: %d de %d posiciones en uso (a las %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mensajes, %d sin leer · %d conversaciones"
@@ -4111,6 +4132,12 @@ msgstr "El cuerpo del webhook es demasiado largo o contiene un carácter de cont
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "La comprobación de la respuesta debe ser clave=valor, como errcode=0 u ok=true (el valor, un número entero o letras minúsculas, 16 como máximo)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Secreto del webhook no válido (hasta 256 caracteres imprimibles, sin espacios)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "El tiempo límite debe ser de 1 a 120 segundos"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Cabecera no válida (un \"Nombre: valor\" por línea; Host, Content-Type, Content-Length, Transfer-Encoding y Connection los pone el dispositivo)"

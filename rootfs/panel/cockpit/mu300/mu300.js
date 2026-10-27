@@ -520,7 +520,9 @@
     /* SMS forwarding (sms.forward, sms.forward_set, sms.forward_test, sms.forward_log_clear): received messages sent on
      * to a webhook, a Telegram chat, an e-mail address (with msmtp) or another phone. The secrets (the webhook address
      * and headers, the bot token, the mail password) are never sent back: an empty field keeps the saved one, a box
-     * removes it. The webhook's own body and the answer check are templates, not secrets: they come back. */
+     * removes it. The webhook's own body and the answer check are templates, not secrets: they come back. The webhook
+     * secret ({secret} in the body, PushPlus's token) is a secret; the timeout and the battery notices (where the board
+     * has a battery) are kanoqwq's, with his Bark, PushPlus and ServerChan presets. */
     var FWD_TEMPLATE = '{text}\n-- {sender}, {time} ({device})';
     function forwardCard(root) {
         var fc = root.appendChild(card(_('SMS forwarding'), 'mu-sms-forward'));
@@ -553,7 +555,7 @@
             var log = st.log || [];
             if (!log.length) logb.appendChild(note(_('No deliveries yet.')));
             else logb.appendChild(table([ _('Time'), _('Message'), _('Target'), _('Result'), _('Detail') ], log.map(function (e) {
-                return [ new Date((e.time || 0) * 1000).toLocaleString(), e.id === 'test' ? _('Test') : '#' + e.id,
+                return [ new Date((e.time || 0) * 1000).toLocaleString(), e.id === 'test' ? _('Test') : e.id === 'power' ? _('Battery') : '#' + e.id,
                     targets[e.target] || '-', results[e.result] || e.result, e.detail || '' ];
             })));
             var cl = button(_('Clear the log'), function () { act(cl, 'sms.forward_log_clear', {}, { done: refresh }); });
@@ -573,6 +575,11 @@
             fb.appendChild(field(_('Never these senders'), F.deny));
             F.keywords = area('mu-fwd-keywords', st.keywords, 2);
             fb.appendChild(field(_('Only messages with one of these words (one per line; empty: every message)'), F.keywords));
+            fb.appendChild(note(_('Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power), in the template and the custom body.')));
+            if (st.power_available) {
+                box('power', _('Battery and charger notices'), st.power);
+                fb.appendChild(note(_('A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out.')));
+            }
 
             fb.appendChild(el('h3', { text: _('Webhook') }));
             box('webhook', _('On'), st.webhook);
@@ -582,26 +589,38 @@
             fb.appendChild(field(_('Body (fields: sender, time, text, device, message)'), F.webhook_format));
             F.webhook_body = area('mu-fwd-webhook_body', st.webhook_body, 4, '{"text":"{message}"}');
             fb.appendChild(field(_('Custom body (empty: the standard fields; placeholders {sender}, {time}, {text}, {device}, {message}, each escaped for the type; shown again here: keep secrets in the address or a header)'), F.webhook_body));
+            /* [ body, answer check, type, address ] (the address filled in only when none is saved) */
             var BODIES = { wecom: [ '{"msgtype":"text","text":{"content":"{message}"}}', 'errcode=0' ],
-                feishu: [ '{"msg_type":"text","content":{"text":"{message}"}}', 'code=0' ] };
-            var bp = select('mu-fwd-body-preset', [ [ '', _('Presets') ], [ 'wecom', 'WeCom, DingTalk' ], [ 'feishu', 'Feishu, Lark' ] ], '');
+                feishu: [ '{"msg_type":"text","content":{"text":"{message}"}}', 'code=0' ],
+                bark: [ '{"title":"{sender}","body":"{message}","group":"MU300"}', 'code=200', 'json', 'https://api.day.app/YOUR_KEY' ],
+                pushplus: [ '{"token":"{secret}","title":"{sender}","content":"{message}","template":"txt"}', 'code=200', 'json',
+                    'https://www.pushplus.plus/send' ],
+                serverchan: [ 'title={sender}&desp={message}', 'code=0', 'form', 'https://sctapi.ftqq.com/YOUR_SENDKEY.send' ] };
+            var bp = select('mu-fwd-body-preset', [ [ '', _('Presets') ], [ 'wecom', 'WeCom, DingTalk' ], [ 'feishu', 'Feishu, Lark' ],
+                [ 'bark', 'Bark' ], [ 'pushplus', 'PushPlus' ], [ 'serverchan', 'ServerChan' ] ], '');
             bp.addEventListener('change', function () {
                 var b = Object.prototype.hasOwnProperty.call(BODIES, bp.value) ? BODIES[bp.value] : null;
                 if (b) {
                     F.webhook_body.value = b[0];
-                    F.webhook_format.value = 'json';
+                    F.webhook_format.value = b[2] || 'json';
                     if (!F.webhook_expect.value.trim()) F.webhook_expect.value = b[1];
+                    if (b[3] && !F.webhook_url.value.trim()) {
+                        if (st.webhook_url_set) F.webhook_url.placeholder = b[3]; else F.webhook_url.value = b[3];
+                    }
                 }
                 bp.value = '';
             });
             fb.appendChild(field(_('Body presets'), bp));
             secret('webhook_headers', st.webhook_headers_set, st.webhook_header_names, _('Extra headers (one "Name: value" per line)'), { area: true, ph: 'Authorization: Bearer ...' });
+            secret('webhook_secret', st.webhook_secret_set, '', _('Secret for {secret} in the custom body'), { password: true });
+            fb.appendChild(note(_('For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again.')));
             text('webhook_expect', _('The answer must contain (key=value; empty: every HTTP 2xx answer counts)'), st.webhook_expect, 'errcode=0');
             var ep = select('mu-fwd-expect-preset', [ [ '', _('Presets') ], [ 'errcode=0', 'DingTalk, WeCom: errcode=0' ], [ 'code=0', 'Feishu, Lark: code=0' ],
-                [ 'code=200', 'Bark: code=200' ], [ 'ok=true', 'Slack API, Telegram API: ok=true' ] ], '');
+                [ 'code=200', 'Bark, PushPlus: code=200' ], [ 'ok=true', 'Slack API, Telegram API: ok=true' ] ], '');
             ep.addEventListener('change', function () { if (ep.value) F.webhook_expect.value = ep.value; ep.value = ''; });
             fb.appendChild(field(_('Answer presets'), ep));
             fb.appendChild(note(_('With key=value the answer must be a JSON object with that value under that key at its top level, or the delivery fails. Only the result of the check is logged, never the answer.')));
+            text('timeout', _('Request timeout (seconds, 1-120; webhook and Telegram)'), String(st.timeout || 15));
 
             fb.appendChild(el('h3', { text: 'Telegram' }));
             box('telegram', _('On'), st.telegram);
@@ -628,11 +647,12 @@
                 var req = {}, clear = [];
                 [ 'enabled', 'webhook', 'telegram', 'email', 'sms' ].forEach(function (k) { req[k] = !!F[k].checked; });
                 [ 'template', 'allow', 'deny', 'keywords', 'webhook_body' ].forEach(function (k) { req[k] = F[k].value; });
-                [ 'webhook_url', 'webhook_expect', 'telegram_token', 'telegram_chat', 'email_host', 'email_port', 'email_user',
-                    'email_from', 'email_to', 'sms_number' ].forEach(function (k) { req[k] = F[k].value.trim(); });
+                [ 'webhook_url', 'webhook_expect', 'webhook_secret', 'timeout', 'telegram_token', 'telegram_chat', 'email_host',
+                    'email_port', 'email_user', 'email_from', 'email_to', 'sms_number' ].forEach(function (k) { req[k] = F[k].value.trim(); });
                 req.webhook_format = F.webhook_format.value; req.email_tls = F.email_tls.value;
                 req.webhook_headers = F.webhook_headers.value; req.email_password = F.email_password.value;
-                [ 'webhook_url', 'webhook_headers', 'telegram_token', 'email_password' ].forEach(function (k) {
+                if (F.power) req.power = !!F.power.checked;   /* no battery: left out, the saved setting stays */
+                [ 'webhook_url', 'webhook_headers', 'webhook_secret', 'telegram_token', 'email_password' ].forEach(function (k) {
                     if (F[k + '_clear'] && F[k + '_clear'].checked) clear.push(k);
                 });
                 req.clear = clear.join(' ');

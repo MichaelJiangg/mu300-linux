@@ -563,6 +563,15 @@ msgstr "排除这些发件人"
 msgid "Only messages with one of these words (one per line; empty: every message)"
 msgstr "仅包含以下任一关键词的短信（每行一个；留空：所有短信）"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power), in the template and the custom body."
+msgstr "模板和自定义正文中另有 {sim}（SIM 1 或 SIM 2）和 {kind}（sms、test 或 power）。"
+
+msgid "Battery and charger notices"
+msgstr "电量与充电提醒"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "电量经过 5、20、40、60、80 或 100 % 时，以及插上或拔下充电器时，向每个目标发送一条消息。"
+
 msgid "Address (http:// or https://)"
 msgstr "地址（http:// 或 https://）"
 
@@ -587,6 +596,12 @@ msgstr "正文预设"
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "额外请求头（每行一个 \"Name: value\"）"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "自定义正文中 {secret} 的密钥"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "用于要求在正文中携带令牌的服务（PushPlus）。只为当前地址保存：更换地址后需重新填写。"
+
 msgid "The answer must contain (key=value; empty: every HTTP 2xx answer counts)"
 msgstr "响应必须包含（key=value；留空：任何 HTTP 2xx 响应都算成功）"
 
@@ -595,6 +610,9 @@ msgstr "响应预设"
 
 msgid "With key=value the answer must be a JSON object with that value under that key at its top level, or the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "设置 key=value 后，响应必须是一个 JSON 对象，其顶层该键下为该值，否则投递失败。日志中只记录检查结果，从不记录响应内容。"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "请求超时（秒，1-120；Webhook 和 Telegram）"
 
 msgid "Bot token"
 msgstr "机器人令牌"

@@ -835,6 +835,9 @@ msgstr "فرم (کدگذاری URL)"
 msgid "Plain text"
 msgstr "متن ساده"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "همچنین {sim} (SIM 1 یا SIM 2) و {kind} (sms، test یا power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "پیام‌های دریافتی به‌محض رسیدن به مخزن پیامک بازارسال می‌شوند. ارسال ناموفق پس از ۳۰ ثانیه و سپس هر بار پس از دو برابر زمان قبل (حداکثر یک ساعت) دوباره تلاش می‌شود، در مجموع ده بار."
 
@@ -862,6 +865,15 @@ msgstr "فقط پیام‌هایی که یکی از این واژه‌ها را 
 msgid "One per line; empty: every message."
 msgstr "هر سطر یکی؛ خالی: همه پیام‌ها."
 
+msgid "Battery"
+msgstr "باتری"
+
+msgid "Battery and charger notices"
+msgstr "اعلان‌های باتری و شارژر"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "پیامی به هر مقصد وقتی باتری از 5، 20، 40، 60، 80 یا 100 % بگذرد و وقتی شارژر وصل یا جدا شود."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -883,6 +895,12 @@ msgstr "بدنهٔ سفارشی"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "خالی: فیلدهای استاندارد (متن ساده: پیام). جای‌نگهدارها: {sender}، {time}، {text}، {device}، {message}. هر مقدار متناسب با نوع انتخاب‌شده escape می‌شود. این بدنه دوباره اینجا نمایش داده می‌شود: اطلاعات محرمانه را در نشانی یا یک سرآیند بگذارید."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "رمز برای {secret} در بدنه سفارشی"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "برای سرویسی که توکنش را در بدنه می‌خواهد (PushPlus). فقط برای همین نشانی ذخیره می‌شود: نشانی جدید دوباره آن را لازم دارد."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "سرآیندهای اضافی (هر سطر یک \"Name: value\")"
 
@@ -891,6 +909,9 @@ msgstr "پاسخ باید شامل این باشد"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "خالی: هر پاسخ HTTP 2xx تحویل‌شده به شمار می‌آید. با کلید=مقدار (برای نمونه errcode=0) پاسخ باید افزون بر آن یک شیء JSON باشد که در بالاترین سطح خود زیر این کلید همین مقدار را دارد؛ وگرنه تحویل ناموفق است. تنها نتیجهٔ بررسی در گزارش ثبت می‌شود، خودِ پاسخ هرگز."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "مهلت درخواست (ثانیه، 1-120؛ webhook و Telegram)"
 
 msgid "Bot token"
 msgstr "توکن ربات"
@@ -1095,9 +1116,6 @@ msgstr "حافظه"
 
 msgid "Storage"
 msgstr "فضای ذخیره‌سازی"
-
-msgid "Battery"
-msgstr "باتری"
 
 msgid "Channel"
 msgstr "کانال"
@@ -2314,6 +2332,9 @@ msgstr "حذف شد (فقط محلی)"
 
 msgid "Enter both a number and a message."
 msgstr "هم شماره و هم پیام را وارد کنید."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "حافظه SIM: ‏%d از %d جایگاه در استفاده (در %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d پیام، %d خوانده‌نشده · %d گفت‌وگو"
@@ -4111,6 +4132,12 @@ msgstr "بدنهٔ webhook بیش از حد طولانی است یا نویسه�
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "بررسی پاسخ باید به شکل کلید=مقدار باشد، مانند errcode=0 یا ok=true (مقدار یک عدد صحیح یا حروف کوچک، حداکثر ۱۶)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "رمز webhook نامعتبر است (تا 256 نویسه قابل چاپ، بدون فاصله)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "مهلت باید بین 1 تا 120 ثانیه باشد"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "سرآیند نامعتبر (هر سطر یک \"Name: value\"؛ Host، Content-Type، Content-Length، Transfer-Encoding و Connection را دستگاه تنظیم می‌کند)"
