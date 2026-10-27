@@ -1744,11 +1744,11 @@ msgstr "Aucune donnée de réseau de service"
 msgid "NR serving cell"
 msgstr "Cellule de service NR"
 
-msgid "Status confirmed"
-msgstr "État confirmé"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Délai de relecture dépassé ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "Status confirmed"
+msgstr "État confirmé"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Réinitialisation vérifiée : mode réseau automatique, EN-DC activé, toutes les bandes, aucun verrouillage de cellule ; les réglages de verrouillage enregistrés sont effacés"
@@ -3610,6 +3610,12 @@ msgstr "Les verrous de bande, de mode et de cellule ne sont pas pris en charge t
 msgid "None of these bands is supported by this modem"
 msgstr "Ce modem ne prend en charge aucune de ces bandes"
 
+msgid "Lock change failed"
+msgstr "Échec de la modification du verrouillage"
+
+msgid "Invalid job id"
+msgstr "Identifiant de tâche non valide"
+
 msgid "Invalid page"
 msgstr "Page invalide"
 
@@ -4228,6 +4234,21 @@ msgstr "La relecture après le redémarrage de la pile ne correspond pas aux val
 
 msgid "The reset was interrupted"
 msgstr "La réinitialisation a été interrompue"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Le résultat de cette modification du verrouillage n'est plus connu"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "La modification du verrouillage a pris trop de temps ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "La modification du verrouillage a été interrompue ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Une autre modification du verrouillage est en cours de lancement ; réessayez dans un instant"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Trop de modifications du verrouillage en attente ; réessayez lorsqu'elles seront terminées"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "La réinstallation des paquets n'est pas disponible sur ce système"

@@ -12107,3 +12107,33 @@ now fails with that, instead of reading a deaf chip.
 
 **Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
 a new hotspot password in LuCI reaches the tag without a reboot.
+
+### 233. A lock change is a job the page follows to its end (kanoqwq's lock job queue)
+
+**Status: in the panel's lock helper and its rpcd backend; tested against a fake modem (tests/test_unisoc_plugin.py,
+tests/test_mu300dash_security.py) and run on F50-B (Ubuntu, the helper by hand: 5.4, 2026-10-27).** From kanoqwq's
+`lock-jobs.sh` (`db4e5d2a`, reworked up to `b8d4f222`); deferred in the 2026-10-11 review.
+
+A band, mode, EN-DC or cell lock runs detached from the rpcd call (half a minute of stack restart, longer while
+another change or the dial holds the radio), so the page only ever saw a read-back afterwards: a write the modem
+refused looked like a lock that "did not take", and "Status confirmed" was shown for it all the same.
+
+* `lock start KIND VALUE` checks the value, makes a job (ten random letters and digits, a directory of its own under
+  the private runtime directory, in RAM), starts the worker detached and answers at once with the id. `lock status ID`
+  says queued, running, done or error, with the reason, and sends no AT. The worker runs the same `apply` as before
+  and keeps how it ended. rpcd's `lock_set` starts jobs (the reset and the replay switch as before) and returns the id;
+  the new `lock_job` (read ACL) is what the page polls before its read-back. A failure is said, and the read-back is
+  skipped; a job that has not ended after 420 s, or whose worker is gone, is reported as such.
+* Bounded like his: four jobs not yet ended and 64 in all; a start waits for no other start (one at a time, else
+  "try again in a moment"); a job that ended ten minutes ago is removed by the next start.
+* What a job can say is one of the helper's fixed messages, translated by the page (seven new ones, in the 31
+  catalogs). With it, the mode, EN-DC and cell writes are checked as the band writes have been since #356 (his
+  `write_setting`): an explicit ERROR ends the apply with nothing saved and no stack restart; silence still does not.
+
+Not taken: his split of the helper into `lock-apply.sh`/`lock-jobs.sh`, his Chinese messages, his ACK-based early
+replay (C10b) and the voice-switch receipts. The Ubuntu panel (mu300-api) still starts `apply` as before.
+
+**On F50-B (5.4, the helper by hand):** a mode change and an unsupported NR band started together: the mode job ran
+(stack restart, radio back in 7 s) and ended `done`, the band job waited for it and ended `error` "None of these bands
+is supported by this modem"; an LTE lock on every supported band and back to automatic both ended `done`, the modem
+read back automatic, data came back; an unknown id answered "no longer known".

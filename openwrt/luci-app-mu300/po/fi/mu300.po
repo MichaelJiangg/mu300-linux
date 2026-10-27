@@ -1744,11 +1744,11 @@ msgstr "Ei palvelevan verkon tietoja"
 msgid "NR serving cell"
 msgstr "Palveleva NR-solu"
 
-msgid "Status confirmed"
-msgstr "Tila vahvistettu"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Takaisinluku aikakatkaistiin; valitse ”Päivitä lukitusten tila”"
+
+msgid "Status confirmed"
+msgstr "Tila vahvistettu"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Palautus vahvistettu: verkkotila automaattinen, EN-DC päällä, kaikki taajuusalueet, ei solulukitusta; tallennetut lukitusasetukset on poistettu"
@@ -3610,6 +3610,12 @@ msgstr "Taajuusalueen, tilan ja solun lukitusta ei tueta, kun kahden SIM-kortin 
 msgid "None of these bands is supported by this modem"
 msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
 
+msgid "Lock change failed"
+msgstr "Lukituksen muutos epäonnistui"
+
+msgid "Invalid job id"
+msgstr "Virheellinen työn tunniste"
+
 msgid "Invalid page"
 msgstr "Virheellinen sivu"
 
@@ -4228,6 +4234,21 @@ msgstr "Takaisinluku pinon uudelleenkäynnistyksen jälkeen ei vastaa automaatti
 
 msgid "The reset was interrupted"
 msgstr "Palautus keskeytyi"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Tämän lukitusmuutoksen tulosta ei enää tiedetä"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Lukituksen muutos kesti liian kauan; valitse ”Päivitä lukitusten tila”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Lukituksen muutos keskeytyi; valitse ”Päivitä lukitusten tila”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Toista lukitusmuutosta aloitetaan; yritä hetken kuluttua uudelleen"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Liian monta lukitusmuutosta odottaa; yritä uudelleen, kun ne ovat päättyneet"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pakettien uudelleenasennus ei ole käytettävissä tässä järjestelmässä"

@@ -1744,11 +1744,11 @@ msgstr "Žádná data o obsluhující síti"
 msgid "NR serving cell"
 msgstr "Obsluhující buňka NR"
 
-msgid "Status confirmed"
-msgstr "Stav ověřen"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Časový limit zpětného čtení vypršel; zvolte „Obnovit stav zámků“"
+
+msgid "Status confirmed"
+msgstr "Stav ověřen"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Reset ověřen: síťový režim automatický, EN-DC zapnuto, všechna pásma, bez zámku buňky; uložená nastavení zámků byla vymazána"
@@ -3610,6 +3610,12 @@ msgstr "Zámky pásem, režimu a buňky nejsou podporovány, dokud rádio říd�
 msgid "None of these bands is supported by this modem"
 msgstr "Tento modem nepodporuje žádné z těchto pásem"
 
+msgid "Lock change failed"
+msgstr "Změna zámku selhala"
+
+msgid "Invalid job id"
+msgstr "Neplatné ID úlohy"
+
 msgid "Invalid page"
 msgstr "Neplatná stránka"
 
@@ -4228,6 +4234,21 @@ msgstr "Zpětné čtení po restartu zásobníku neodpovídá automatickým hodn
 
 msgid "The reset was interrupted"
 msgstr "Reset byl přerušen"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Výsledek této změny zámku již není znám"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Změna zámku trvala příliš dlouho; zvolte „Obnovit stav zámků“"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Změna zámku byla přerušena; zvolte „Obnovit stav zámků“"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Spouští se jiná změna zámku; zkuste to za chvíli znovu"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Čeká příliš mnoho změn zámků; zkuste to znovu, až skončí"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Opětovná instalace balíčků není v tomto systému k dispozici"

@@ -1744,11 +1744,11 @@ msgstr "Nessun dato sulla rete di servizio"
 msgid "NR serving cell"
 msgstr "Cella di servizio NR"
 
-msgid "Status confirmed"
-msgstr "Stato confermato"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Rilettura scaduta; selezionare «Aggiorna stato dei blocchi»"
+
+msgid "Status confirmed"
+msgstr "Stato confermato"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Ripristino verificato: modalità di rete automatica, EN-DC attivo, tutte le bande, nessun blocco di cella; le impostazioni di blocco salvate sono state cancellate"
@@ -3610,6 +3610,12 @@ msgstr "I blocchi di banda, modalità e cella non sono supportati mentre il camb
 msgid "None of these bands is supported by this modem"
 msgstr "Questo modem non supporta nessuna di queste bande"
 
+msgid "Lock change failed"
+msgstr "Modifica del blocco non riuscita"
+
+msgid "Invalid job id"
+msgstr "ID attività non valido"
+
 msgid "Invalid page"
 msgstr "Pagina non valida"
 
@@ -4228,6 +4234,21 @@ msgstr "La rilettura dopo il riavvio dello stack non corrisponde ai valori autom
 
 msgid "The reset was interrupted"
 msgstr "Il ripristino è stato interrotto"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Il risultato di questa modifica del blocco non è più noto"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "La modifica del blocco ha richiesto troppo tempo; selezionare «Aggiorna stato dei blocchi»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "La modifica del blocco è stata interrotta; selezionare «Aggiorna stato dei blocchi»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "È in avvio un'altra modifica del blocco; riprovare tra un momento"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Troppe modifiche del blocco in attesa; riprovare quando saranno terminate"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "La reinstallazione dei pacchetti non è disponibile su questo sistema"

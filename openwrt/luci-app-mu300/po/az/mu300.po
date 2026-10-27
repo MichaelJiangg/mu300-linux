@@ -1744,11 +1744,11 @@ msgstr "Xidmət edən şəbəkə məlumatı yoxdur"
 msgid "NR serving cell"
 msgstr "NR xidmət edən hüceyrə"
 
-msgid "Status confirmed"
-msgstr "Status təsdiqləndi"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Geri oxuma vaxtı bitdi; “Kilid statusunu yenilə” seçin"
+
+msgid "Status confirmed"
+msgstr "Status təsdiqləndi"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Sıfırlama təsdiqləndi: şəbəkə rejimi avtomatik, EN-DC açıq, bütün zolaqlar, hüceyrə kilidi yoxdur; saxlanmış kilid ayarları silindi"
@@ -3610,6 +3610,12 @@ msgstr "İkili SIM keçidi radionu idarə edərkən diapazon, rejim və hüceyr�
 msgid "None of these bands is supported by this modem"
 msgstr "Bu modem bu zolaqların heç birini dəstəkləmir"
 
+msgid "Lock change failed"
+msgstr "Kilid dəyişikliyi uğursuz oldu"
+
+msgid "Invalid job id"
+msgstr "Yanlış iş identifikatoru"
+
 msgid "Invalid page"
 msgstr "Yanlış səhifə"
 
@@ -4228,6 +4234,21 @@ msgstr "Stekin yenidən başladılmasından sonra geri oxunma avtomatik dəyərl
 
 msgid "The reset was interrupted"
 msgstr "Sıfırlama yarımçıq qaldı"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Bu kilid dəyişikliyinin nəticəsi artıq məlum deyil"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Kilid dəyişikliyi çox uzun çəkdi; “Kilid statusunu yenilə” seçin"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Kilid dəyişikliyi kəsildi; “Kilid statusunu yenilə” seçin"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Başqa bir kilid dəyişikliyi başladılır; bir azdan yenidən cəhd edin"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Çox sayda kilid dəyişikliyi gözləyir; bitdikdən sonra yenidən cəhd edin"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Paketlərin yenidən quraşdırılması bu sistemdə mövcud deyil"

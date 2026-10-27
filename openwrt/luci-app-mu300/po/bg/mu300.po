@@ -1744,11 +1744,11 @@ msgstr "Няма данни за обслужващата мрежа"
 msgid "NR serving cell"
 msgstr "NR обслужваща клетка"
 
-msgid "Status confirmed"
-msgstr "Състоянието е потвърдено"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Времето за прочитане изтече; изберете „Опресняване на състоянието на заключването“"
+
+msgid "Status confirmed"
+msgstr "Състоянието е потвърдено"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Нулирането е потвърдено: мрежов режим автоматичен, EN-DC включен, всички ленти, без заключване на клетка; запазените настройки за заключване са изчистени"
@@ -3610,6 +3610,12 @@ msgstr "Заключването на обхват, режим и клетка �
 msgid "None of these bands is supported by this modem"
 msgstr "Този модем не поддържа нито една от тези ленти"
 
+msgid "Lock change failed"
+msgstr "Промяната на заключването не успя"
+
+msgid "Invalid job id"
+msgstr "Невалиден идентификатор на задача"
+
 msgid "Invalid page"
 msgstr "Невалидна страница"
 
@@ -4228,6 +4234,21 @@ msgstr "Обратното четене след рестарта на стек�
 
 msgid "The reset was interrupted"
 msgstr "Нулирането беше прекъснато"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Резултатът от тази промяна на заключването вече не е известен"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Промяната на заключването продължи твърде дълго; изберете „Опресняване на състоянието на заключването“"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Промяната на заключването беше прекъсната; изберете „Опресняване на състоянието на заключването“"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Започва друга промяна на заключването; опитайте отново след малко"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Твърде много промени на заключването чакат; опитайте отново, когато приключат"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Повторното инсталиране на пакети не е налично в тази система"

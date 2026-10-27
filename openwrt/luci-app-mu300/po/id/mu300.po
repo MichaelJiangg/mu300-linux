@@ -1744,11 +1744,11 @@ msgstr "Tidak ada data jaringan layanan"
 msgid "NR serving cell"
 msgstr "Sel layanan NR"
 
-msgid "Status confirmed"
-msgstr "Status dipastikan"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Waktu pembacaan habis; pilih “Segarkan status kunci”"
+
+msgid "Status confirmed"
+msgstr "Status dipastikan"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Pengaturan ulang terverifikasi: mode jaringan otomatis, EN-DC aktif, semua band, tanpa kunci sel; pengaturan kunci yang tersimpan dihapus"
@@ -3610,6 +3610,12 @@ msgstr "Kunci band, mode, dan sel tidak didukung selama peralihan dual-SIM menge
 msgid "None of these bands is supported by this modem"
 msgstr "Modem ini tidak mendukung satu pun dari band ini"
 
+msgid "Lock change failed"
+msgstr "Perubahan kunci gagal"
+
+msgid "Invalid job id"
+msgstr "ID tugas tidak valid"
+
 msgid "Invalid page"
 msgstr "Halaman tidak valid"
 
@@ -4228,6 +4234,21 @@ msgstr "Pembacaan ulang setelah tumpukan dimulai ulang tidak cocok dengan nilai 
 
 msgid "The reset was interrupted"
 msgstr "Pengaturan ulang terputus"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Hasil perubahan kunci ini tidak diketahui lagi"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Perubahan kunci memakan waktu terlalu lama; pilih “Segarkan status kunci”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Perubahan kunci terputus; pilih “Segarkan status kunci”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Perubahan kunci lain sedang dimulai; coba lagi sebentar lagi"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Terlalu banyak perubahan kunci yang menunggu; coba lagi setelah selesai"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pemasangan ulang paket tidak tersedia di sistem ini"

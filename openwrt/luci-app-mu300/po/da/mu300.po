@@ -1744,11 +1744,11 @@ msgstr "Ingen data om betjenende netværk"
 msgid "NR serving cell"
 msgstr "Betjenende NR-celle"
 
-msgid "Status confirmed"
-msgstr "Status bekræftet"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Tilbagelæsning fik timeout; vælg “Opdater låsestatus”"
+
+msgid "Status confirmed"
+msgstr "Status bekræftet"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Nulstilling bekræftet: netværkstilstand automatisk, EN-DC til, alle bånd, ingen cellelås; de gemte låseindstillinger er ryddet"
@@ -3610,6 +3610,12 @@ msgstr "Lås af bånd, tilstand og celle understøttes ikke, mens dobbelt-SIM-sk
 msgid "None of these bands is supported by this modem"
 msgstr "Dette modem understøtter ingen af disse bånd"
 
+msgid "Lock change failed"
+msgstr "Låseændringen mislykkedes"
+
+msgid "Invalid job id"
+msgstr "Ugyldigt job-id"
+
 msgid "Invalid page"
 msgstr "Ugyldig side"
 
@@ -4228,6 +4234,21 @@ msgstr "Tilbagelæsningen efter genstart af stakken stemmer ikke med de automati
 
 msgid "The reset was interrupted"
 msgstr "Nulstillingen blev afbrudt"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Resultatet af denne låseændring kendes ikke længere"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Låseændringen tog for lang tid; vælg “Opdater låsestatus”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Låseændringen blev afbrudt; vælg “Opdater låsestatus”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "En anden låseændring er ved at blive startet; prøv igen om et øjeblik"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "For mange låseændringer venter; prøv igen, når de er afsluttet"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Geninstallation af pakker er ikke tilgængelig på dette system"

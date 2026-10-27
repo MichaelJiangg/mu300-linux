@@ -1744,11 +1744,11 @@ msgstr "Bağlı olunan ağ verisi yok"
 msgid "NR serving cell"
 msgstr "NR hizmet hücresi"
 
-msgid "Status confirmed"
-msgstr "Durum doğrulandı"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Geri okuma zaman aşımına uğradı; “Kilit durumunu yenile”yi seçin"
+
+msgid "Status confirmed"
+msgstr "Durum doğrulandı"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Sıfırlama doğrulandı: ağ modu otomatik, EN-DC açık, tüm bantlar, hücre kilidi yok; kaydedilen kilit ayarları temizlendi"
@@ -3603,6 +3603,12 @@ msgstr "Çift SIM geçişi radyoyu yönetirken bant, mod ve hücre kilitleri des
 msgid "None of these bands is supported by this modem"
 msgstr "Bu modem bu bantların hiçbirini desteklemiyor"
 
+msgid "Lock change failed"
+msgstr "Kilit değişikliği başarısız oldu"
+
+msgid "Invalid job id"
+msgstr "Geçersiz iş kimliği"
+
 msgid "Invalid page"
 msgstr "Geçersiz sayfa"
 
@@ -4221,6 +4227,21 @@ msgstr "Yığın yeniden başlatıldıktan sonraki geri okuma otomatik değerler
 
 msgid "The reset was interrupted"
 msgstr "Sıfırlama yarıda kesildi"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Bu kilit değişikliğinin sonucu artık bilinmiyor"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Kilit değişikliği çok uzun sürdü; “Kilit durumunu yenile”yi seçin"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Kilit değişikliği yarıda kesildi; “Kilit durumunu yenile”yi seçin"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Başka bir kilit değişikliği başlatılıyor; biraz sonra yeniden deneyin"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Bekleyen kilit değişikliği çok fazla; bittiklerinde yeniden deneyin"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Paketleri yeniden kurma bu sistemde kullanılamıyor"

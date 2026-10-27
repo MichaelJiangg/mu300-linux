@@ -1744,11 +1744,11 @@ msgstr "Keine Daten zum versorgenden Netz"
 msgid "NR serving cell"
 msgstr "Versorgende NR-Zelle"
 
-msgid "Status confirmed"
-msgstr "Status bestätigt"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Zeitüberschreitung beim Zurücklesen; „Sperrstatus aktualisieren“ wählen"
+
+msgid "Status confirmed"
+msgstr "Status bestätigt"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Zurücksetzen bestätigt: Netzmodus automatisch, EN-DC an, alle Bänder, keine Zellsperre; die gespeicherten Sperreinstellungen sind gelöscht"
@@ -3610,6 +3610,12 @@ msgstr "Band-, Modus- und Zellsperren werden nicht unterstützt, solange der Dua
 msgid "None of these bands is supported by this modem"
 msgstr "Dieses Modem unterstützt keines dieser Bänder"
 
+msgid "Lock change failed"
+msgstr "Sperränderung fehlgeschlagen"
+
+msgid "Invalid job id"
+msgstr "Ungültige Auftrags-ID"
+
 msgid "Invalid page"
 msgstr "Ungültige Seite"
 
@@ -4228,6 +4234,21 @@ msgstr "Das Zurücklesen nach dem Neustart des Protokollstacks stimmt nicht mit 
 
 msgid "The reset was interrupted"
 msgstr "Das Zurücksetzen wurde unterbrochen"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Das Ergebnis dieser Sperränderung ist nicht mehr bekannt"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Die Sperränderung hat zu lange gedauert; „Sperrstatus aktualisieren“ wählen"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Die Sperränderung wurde unterbrochen; „Sperrstatus aktualisieren“ wählen"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Eine andere Sperränderung wird gerade gestartet; gleich noch einmal versuchen"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Zu viele Sperränderungen warten; erneut versuchen, wenn sie beendet sind"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Neuinstallation von Paketen ist auf diesem System nicht verfügbar"

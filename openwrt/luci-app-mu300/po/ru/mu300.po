@@ -1744,11 +1744,11 @@ msgstr "Нет данных об обслуживающей сети"
 msgid "NR serving cell"
 msgstr "Обслуживающая сота NR"
 
-msgid "Status confirmed"
-msgstr "Состояние подтверждено"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Истекло время считывания; нажмите «Обновить состояние фиксации»"
+
+msgid "Status confirmed"
+msgstr "Состояние подтверждено"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Сброс подтверждён: режим сети автоматический, EN-DC включён, все диапазоны, без блокировки соты; сохранённые настройки блокировок удалены"
@@ -3610,6 +3610,12 @@ msgstr "Блокировка диапазонов, режима и соты не
 msgid "None of these bands is supported by this modem"
 msgstr "Этот модем не поддерживает ни один из этих диапазонов"
 
+msgid "Lock change failed"
+msgstr "Не удалось изменить фиксацию"
+
+msgid "Invalid job id"
+msgstr "Неверный идентификатор задания"
+
 msgid "Invalid page"
 msgstr "Недопустимая страница"
 
@@ -4228,6 +4234,21 @@ msgstr "Обратное чтение после перезапуска стек
 
 msgid "The reset was interrupted"
 msgstr "Сброс был прерван"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Результат этого изменения фиксации больше не известен"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Изменение фиксации заняло слишком много времени; нажмите «Обновить состояние фиксации»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Изменение фиксации было прервано; нажмите «Обновить состояние фиксации»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Запускается другое изменение фиксации; повторите попытку через мгновение"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Ожидает слишком много изменений фиксации; повторите попытку, когда они завершатся"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Повторная установка пакетов недоступна в этой системе"

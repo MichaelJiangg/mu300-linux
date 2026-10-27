@@ -1744,11 +1744,11 @@ msgstr "لا توجد بيانات عن الشبكة الخادمة"
 msgid "NR serving cell"
 msgstr "خلية NR الخادمة"
 
-msgid "Status confirmed"
-msgstr "تم تأكيد الحالة"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "انتهت مهلة القراءة؛ اختر «تحديث حالة القفل»"
+
+msgid "Status confirmed"
+msgstr "تم تأكيد الحالة"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "تم التحقق من إعادة الضبط: وضع الشبكة تلقائي، EN-DC مفعّل، كل النطاقات، لا قفل خلية؛ تم مسح إعدادات القفل المحفوظة"
@@ -3610,6 +3610,12 @@ msgstr "أقفال النطاق والوضع والخلية غير مدعومة 
 msgid "None of these bands is supported by this modem"
 msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
 
+msgid "Lock change failed"
+msgstr "فشل تغيير القفل"
+
+msgid "Invalid job id"
+msgstr "معرّف مهمة غير صالح"
+
 msgid "Invalid page"
 msgstr "صفحة غير صالحة"
 
@@ -4228,6 +4234,21 @@ msgstr "القراءة المرتجعة بعد إعادة تشغيل المكد�
 
 msgid "The reset was interrupted"
 msgstr "تمت مقاطعة إعادة الضبط"
+
+msgid "The result of this lock change is no longer known"
+msgstr "لم تعد نتيجة تغيير القفل هذا معروفة"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "استغرق تغيير القفل وقتًا طويلًا؛ اختر «تحديث حالة القفل»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "انقطع تغيير القفل؛ اختر «تحديث حالة القفل»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "يجري بدء تغيير قفل آخر؛ حاول مرة أخرى بعد لحظة"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "تغييرات قفل كثيرة في الانتظار؛ حاول مرة أخرى عند انتهائها"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "إعادة تثبيت الحزم غير متاحة على هذا النظام"

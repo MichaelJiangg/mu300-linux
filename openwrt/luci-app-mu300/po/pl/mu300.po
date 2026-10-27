@@ -1744,11 +1744,11 @@ msgstr "Brak danych o sieci obsługującej"
 msgid "NR serving cell"
 msgstr "Komórka obsługująca NR"
 
-msgid "Status confirmed"
-msgstr "Stan potwierdzony"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Przekroczono czas odczytu; wybierz „Odśwież stan blokad”"
+
+msgid "Status confirmed"
+msgstr "Stan potwierdzony"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Reset zweryfikowany: tryb sieci automatyczny, EN-DC włączone, wszystkie pasma, brak blokady komórki; zapisane ustawienia blokad zostały usunięte"
@@ -3610,6 +3610,12 @@ msgstr "Blokady pasma, trybu i komórki nie są obsługiwane, gdy przełączanie
 msgid "None of these bands is supported by this modem"
 msgstr "Ten modem nie obsługuje żadnego z tych pasm"
 
+msgid "Lock change failed"
+msgstr "Zmiana blokady nie powiodła się"
+
+msgid "Invalid job id"
+msgstr "Nieprawidłowy identyfikator zadania"
+
 msgid "Invalid page"
 msgstr "Nieprawidłowa strona"
 
@@ -4228,6 +4234,21 @@ msgstr "Odczyt zwrotny po restarcie stosu nie zgadza się z wartościami automat
 
 msgid "The reset was interrupted"
 msgstr "Reset został przerwany"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Wynik tej zmiany blokady nie jest już znany"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Zmiana blokady trwała zbyt długo; wybierz „Odśwież stan blokad”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Zmiana blokady została przerwana; wybierz „Odśwież stan blokad”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Trwa uruchamianie innej zmiany blokady; spróbuj ponownie za chwilę"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Czeka zbyt wiele zmian blokad; spróbuj ponownie, gdy się zakończą"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Ponowna instalacja pakietów nie jest dostępna w tym systemie"

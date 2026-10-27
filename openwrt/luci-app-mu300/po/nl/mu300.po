@@ -1744,11 +1744,11 @@ msgstr "Geen gegevens over het serving netwerk"
 msgid "NR serving cell"
 msgstr "NR serving cell"
 
-msgid "Status confirmed"
-msgstr "Status bevestigd"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Time-out bij teruglezen; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "Status confirmed"
+msgstr "Status bevestigd"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Reset geverifieerd: netwerkmodus automatisch, EN-DC aan, alle banden, geen celvergrendeling; de opgeslagen vergrendelingsinstellingen zijn gewist"
@@ -3610,6 +3610,12 @@ msgstr "Band-, modus- en celvergrendeling wordt niet ondersteund zolang dubbele-
 msgid "None of these bands is supported by this modem"
 msgstr "Deze modem ondersteunt geen van deze banden"
 
+msgid "Lock change failed"
+msgstr "Vergrendeling wijzigen mislukt"
+
+msgid "Invalid job id"
+msgstr "Ongeldige taak-ID"
+
 msgid "Invalid page"
 msgstr "Ongeldige pagina"
 
@@ -4228,6 +4234,21 @@ msgstr "Het teruglezen na de herstart van de stack komt niet overeen met de auto
 
 msgid "The reset was interrupted"
 msgstr "Het resetten is onderbroken"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Het resultaat van deze vergrendelingswijziging is niet meer bekend"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Het wijzigen van de vergrendeling duurde te lang; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Het wijzigen van de vergrendeling is onderbroken; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Er wordt al een andere vergrendelingswijziging gestart; probeer het zo opnieuw"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Er wachten te veel vergrendelingswijzigingen; probeer het opnieuw als ze klaar zijn"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pakketten opnieuw installeren is op dit systeem niet beschikbaar"
