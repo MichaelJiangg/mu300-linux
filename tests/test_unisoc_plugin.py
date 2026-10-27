@@ -488,7 +488,9 @@ printf 'OK\n'
             self.assertIn('interrupted', st['error'])
             # an old one past the limit: timed out, whatever its worker does
             (job / 'result').write_text('{"state":"running"}\n')
-            (job / 'started').write_text('0\n')
+            # (more than ten minutes ago, also on a machine up for less than that, as a fresh CI runner is: the
+            # uptime clock then gives a start before the boot)
+            (job / 'started').write_text(f'{up - 700}\n')
             st = json.loads(self.script(shell, lock, 'status', jid, MU300_JOB_TIMEOUT='5', **self.job_env(run)).stdout)
             self.assertIn('took too long', st['error'])
             # four that have not ended: the fifth is refused, nothing started
