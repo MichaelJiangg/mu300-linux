@@ -1813,6 +1813,12 @@ msgstr "Pengisian dijeda: suhu baterai"
 msgid "Charging paused: charge limit"
 msgstr "Pengisian dijeda: batas pengisian"
 
+msgid "Charging paused: by hand"
+msgstr "Pengisian dijeda: manual"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Mengisi penuh sekali, lalu kembali ke batas"
+
 msgid "Sleep now"
 msgstr "Tidurkan sekarang"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % tidak pernah mengisi baterai (perangkat berjalan dari pengisi daya),
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % menjaga baterai tetap sehat pada perangkat yang terus tercolok."
+
+msgid "Start charging again under"
+msgstr "Mulai mengisi lagi di bawah"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 mulai lagi 5 poin di bawah level berhenti. Nilai lebih rendah mulai mengisi lagi hanya di bawahnya; dengan 100 %, baterai penuh menunggu hingga turun di bawahnya."
+
+msgid "Resume charging"
+msgstr "Lanjutkan pengisian"
+
+msgid "Pause charging"
+msgstr "Jeda pengisian"
+
+msgid "Cancel the full charge"
+msgstr "Batalkan isi penuh"
+
+msgid "Charge to full once"
+msgstr "Isi penuh sekali"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Saat dijeda, baterai tidak diisi dan perangkat berjalan dari pengisi daya; di bawah 5 % tetap diisi, dan pelindung suhu selalu berlaku."
 
 msgid "When the charger switches the device on"
 msgstr "Saat pengisi daya menyalakan perangkat"

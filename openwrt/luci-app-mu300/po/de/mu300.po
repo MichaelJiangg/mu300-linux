@@ -1813,6 +1813,12 @@ msgstr "Laden pausiert: Akkutemperatur"
 msgid "Charging paused: charge limit"
 msgstr "Laden pausiert: Ladegrenze"
 
+msgid "Charging paused: by hand"
+msgstr "Laden pausiert: von Hand"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Einmal voll laden, dann zurück zur Ladegrenze"
+
 msgid "Sleep now"
 msgstr "Jetzt schlafen"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % lädt den Akku nie (das Gerät läuft am Ladegerät), 100 % lädt ih
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % schonen den Akku bei einem Gerät, das dauerhaft am Netz hängt."
+
+msgid "Start charging again under"
+msgstr "Laden wieder starten unter"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 startet wieder 5 Punkte unter der Stoppgrenze. Ein niedrigerer Wert startet das Laden erst darunter wieder; bei 100 % wartet ein voller Akku, bis er darunter fällt."
+
+msgid "Resume charging"
+msgstr "Laden fortsetzen"
+
+msgid "Pause charging"
+msgstr "Laden pausieren"
+
+msgid "Cancel the full charge"
+msgstr "Volladung abbrechen"
+
+msgid "Charge to full once"
+msgstr "Einmal voll laden"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Pausiert wird der Akku nicht geladen und das Gerät läuft am Ladegerät; unter 5 % lädt er trotzdem, und der Temperaturschutz gilt immer."
 
 msgid "When the charger switches the device on"
 msgstr "Wenn das Ladegerät das Gerät einschaltet"

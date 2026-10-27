@@ -1813,6 +1813,12 @@ msgstr "Töltés szüneteltetve: akkumulátor hőmérséklete"
 msgid "Charging paused: charge limit"
 msgstr "Töltés szüneteltetve: töltési korlát"
 
+msgid "Charging paused: by hand"
+msgstr "Töltés szüneteltetve: kézzel"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Egyszeri teljes töltés, utána vissza a korláthoz"
+
 msgid "Sleep now"
 msgstr "Altatás most"
 
@@ -1836,6 +1842,27 @@ msgstr "A 0 % soha nem tölti az akkumulátort (az eszköz a töltőről működ
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "A 80 % kíméli az akkumulátort egy folyamatosan hálózaton lévő eszközben."
+
+msgid "Start charging again under"
+msgstr "Töltés újraindítása ez alatt"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "A 0 a leállítási szint alatt 5 ponttal indít újra. Kisebb érték csak alatta indítja újra a töltést; 100 % esetén a teli akku megvárja, amíg alá esik."
+
+msgid "Resume charging"
+msgstr "Töltés folytatása"
+
+msgid "Pause charging"
+msgstr "Töltés szüneteltetése"
+
+msgid "Cancel the full charge"
+msgstr "Teljes töltés megszakítása"
+
+msgid "Charge to full once"
+msgstr "Egyszer töltsd fel teljesen"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Szüneteltetve az akku nem töltődik, és az eszköz a töltőről működik; 5 % alatt mégis töltődik, és a hővédelem mindig érvényes."
 
 msgid "When the charger switches the device on"
 msgstr "Amikor a töltő bekapcsolja az eszközt"

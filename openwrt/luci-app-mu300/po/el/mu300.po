@@ -1813,6 +1813,12 @@ msgstr "Η φόρτιση σταμάτησε προσωρινά: θερμοκρ�
 msgid "Charging paused: charge limit"
 msgstr "Η φόρτιση σταμάτησε προσωρινά: όριο φόρτισης"
 
+msgid "Charging paused: by hand"
+msgstr "Η φόρτιση σε παύση: χειροκίνητα"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Πλήρης φόρτιση μία φορά, μετά επιστροφή στο όριο"
+
 msgid "Sleep now"
 msgstr "Αναστολή τώρα"
 
@@ -1836,6 +1842,27 @@ msgstr "Το 0 % δεν φορτίζει ποτέ την μπαταρία (η σ
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "Το 80 % προστατεύει την μπαταρία μιας συσκευής που μένει στην πρίζα."
+
+msgid "Start charging again under"
+msgstr "Επανέναρξη φόρτισης κάτω από"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "Το 0 ξαναρχίζει 5 μονάδες κάτω από το επίπεδο διακοπής. Μικρότερη τιμή ξαναρχίζει τη φόρτιση μόνο κάτω από αυτήν· με 100 %, η γεμάτη μπαταρία περιμένει να πέσει κάτω από αυτήν."
+
+msgid "Resume charging"
+msgstr "Συνέχιση φόρτισης"
+
+msgid "Pause charging"
+msgstr "Παύση φόρτισης"
+
+msgid "Cancel the full charge"
+msgstr "Ακύρωση πλήρους φόρτισης"
+
+msgid "Charge to full once"
+msgstr "Πλήρης φόρτιση μία φορά"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Σε παύση η μπαταρία δεν φορτίζεται και η συσκευή λειτουργεί από τον φορτιστή· κάτω από 5 % φορτίζεται πάντα, και η προστασία θερμοκρασίας ισχύει πάντα."
 
 msgid "When the charger switches the device on"
 msgstr "Όταν ο φορτιστής ενεργοποιεί τη συσκευή"

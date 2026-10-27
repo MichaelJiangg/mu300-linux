@@ -1813,6 +1813,12 @@ msgstr "Зарядтау тоқтатылды: батарея температу
 msgid "Charging paused: charge limit"
 msgstr "Зарядтау тоқтатылды: заряд шегі"
 
+msgid "Charging paused: by hand"
+msgstr "Зарядтау тоқтатылды: қолмен"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Бір рет толық зарядтау, содан кейін шекке оралу"
+
 msgid "Sleep now"
 msgstr "Қазір ұйықтату"
 
@@ -1836,6 +1842,27 @@ msgstr "0 % батареяны ешқашан зарядтамайды (құры
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % үнемі желіде тұратын құрылғыда батареяны сақтайды."
+
+msgid "Start charging again under"
+msgstr "Зарядтауды мына деңгейден төмен қайта бастау"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 тоқтау деңгейінен 5 пункт төмен қайта бастайды. Төменірек мән зарядтауды тек одан төмен қайта бастайды; 100 % кезінде толы батарея одан төмен түскенше күтеді."
+
+msgid "Resume charging"
+msgstr "Зарядтауды жалғастыру"
+
+msgid "Pause charging"
+msgstr "Зарядтауды тоқтату"
+
+msgid "Cancel the full charge"
+msgstr "Толық зарядтаудан бас тарту"
+
+msgid "Charge to full once"
+msgstr "Бір рет толық зарядтау"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Тоқтатылғанда батарея зарядталмайды, құрылғы зарядтағыштан жұмыс істейді; 5 % төмен болса бәрібір зарядталады, ал температура қорғанысы әрқашан жұмыс істейді."
 
 msgid "When the charger switches the device on"
 msgstr "Зарядтағыш құрылғыны қосқанда"
