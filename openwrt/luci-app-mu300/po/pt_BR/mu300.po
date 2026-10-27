@@ -2390,8 +2390,26 @@ msgstr "Limite mensal"
 msgid "%s, warning at %d%%"
 msgstr "%s, aviso em %d%%"
 
+msgid "Daily quota"
+msgstr "Cota diária"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "O limite mensal foi atingido: os dados móveis foram desligados. Eles voltam quando o próximo ciclo começar."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "A cota diária foi atingida: os dados móveis foram desligados. Voltam à meia-noite."
+
+msgid "The daily quota is reached"
+msgstr "A cota diária foi atingida"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% da cota diária foi usado"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "O limite e a cota diária contam só os downloads."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "O limite e a cota diária contam só os uploads."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s aguarda o relógio: ele ainda não foi acertado pela rede. Já conta para este ciclo e vai para o seu dia assim que o relógio for acertado."
@@ -2423,6 +2441,9 @@ msgstr "Por ciclo de cobrança"
 msgid "Billing cycle"
 msgstr "Ciclo de cobrança"
 
+msgid "Counted"
+msgstr "Contado"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Digite um tamanho em GB, por exemplo 50 ou 2.5"
 
@@ -2434,6 +2455,21 @@ msgstr "Desligar os dados móveis no limite"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Quando este ciclo atingir o limite, os dados móveis são desligados: sem internet pela operadora até o próximo ciclo começar, o limite ser aumentado ou esta opção ser desligada. Religar os dados móveis manualmente os mantém ligados até a próxima reinicialização."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Desligar os dados móveis na cota diária"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Quando o uso de hoje atinge a cota diária, os dados móveis são desligados até a meia-noite, até a cota ser aumentada ou até isto ser desligado de novo. Religar os dados móveis manualmente os mantém ligados até a próxima reinicialização."
+
+msgid "Both ways"
+msgstr "Nos dois sentidos"
+
+msgid "Downloads only"
+msgstr "Só downloads"
+
+msgid "Uploads only"
+msgstr "Só uploads"
 
 msgid "Set"
 msgstr "Definir"
@@ -2458,6 +2494,15 @@ msgstr "Limite mensal (GB, 0: nenhum)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Avisar nesta porcentagem do limite"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Cota diária (GB, 0: nenhuma)"
+
+msgid "The cap and the daily quota count"
+msgstr "O que o limite e a cota diária contam"
+
+msgid "Plan name"
+msgstr "Nome do plano"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Usado até agora neste ciclo (GB)"

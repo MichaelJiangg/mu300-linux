@@ -2390,8 +2390,26 @@ msgstr "Månedsgrænse"
 msgid "%s, warning at %d%%"
 msgstr "%s, advarsel ved %d%%"
 
+msgid "Daily quota"
+msgstr "Daglig kvote"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Månedsgrænsen er nået: mobildata blev slået fra. Det tændes igen, når næste periode begynder."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Den daglige kvote er nået: mobildata blev slået fra. De slås til igen ved midnat."
+
+msgid "The daily quota is reached"
+msgstr "Den daglige kvote er nået"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% af den daglige kvote er brugt"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Grænsen og den daglige kvote tæller kun downloads."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Grænsen og den daglige kvote tæller kun uploads."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s venter på uret: det er endnu ikke stillet via netværket. Det tæller allerede med i denne periode og kommer på sin dag, når uret er stillet."
@@ -2423,6 +2441,9 @@ msgstr "Pr. faktureringsperiode"
 msgid "Billing cycle"
 msgstr "Faktureringsperiode"
 
+msgid "Counted"
+msgstr "Talt"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Angiv en størrelse i GB, for eksempel 50 eller 2.5"
 
@@ -2434,6 +2455,21 @@ msgstr "Slå mobildata fra ved grænsen"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Når denne periode når grænsen, slås mobildata fra: intet internet via operatøren, før næste periode begynder, grænsen hæves, eller dette slås fra igen. Mobildata, der tændes igen i hånden, forbliver tændt til næste genstart."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Slå mobildata fra ved den daglige kvote"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Når dagens forbrug når den daglige kvote, slås mobildata fra indtil midnat, indtil kvoten hæves, eller indtil dette slås fra igen. Slår du mobildata til manuelt, forbliver de tændt indtil næste genstart."
+
+msgid "Both ways"
+msgstr "Begge veje"
+
+msgid "Downloads only"
+msgstr "Kun downloads"
+
+msgid "Uploads only"
+msgstr "Kun uploads"
 
 msgid "Set"
 msgstr "Sæt"
@@ -2458,6 +2494,15 @@ msgstr "Månedsgrænse (GB, 0: ingen)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Advar ved denne procentdel af grænsen"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Daglig kvote (GB, 0: ingen)"
+
+msgid "The cap and the daily quota count"
+msgstr "Hvad grænsen og den daglige kvote tæller"
+
+msgid "Plan name"
+msgstr "Abonnementets navn"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Brugt indtil nu i denne periode (GB)"

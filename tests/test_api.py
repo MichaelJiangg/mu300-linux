@@ -1162,11 +1162,20 @@ class ModemTools(ApiCase):
                               ({'key': 'warn', 'value': 90}, ['set', 'warn', '90']),
                               ({'key': 'cut', 'value': 'on'}, ['set', 'cut', 'on']),
                               ({'key': 'used', 'value': '1000'}, ['used', '1000']),
-                              ({'key': 'clear', 'value': 'yes'}, ['clear', '--yes'])):
+                              ({'key': 'clear', 'value': 'yes'}, ['clear', '--yes']),
+                              ({'key': 'daily', 'value': '0'}, ['set', 'daily', 'off']),
+                              ({'key': 'daily', 'value': '2147483648'}, ['set', 'daily', '2147483648']),
+                              ({'key': 'daily_cut', 'value': 'on'}, ['set', 'daily-cut', 'on']),
+                              ({'key': 'count', 'value': 'rx'}, ['set', 'count', 'rx']),
+                              ({'key': 'plan', 'value': 'Gece "50" \u6708'}, ['set', 'plan', 'Gece "50" \u6708']),
+                              ({'key': 'plan', 'value': ''}, ['set', 'plan', ''])):
                 self.ok(shell, 'traffic.set', req)
                 self.assertEqual(self.calls('mu300-traffic')[-1], ['mu300-traffic'] + argv, req)
             for req in ({'key': 'reset_day', 'value': 32}, {'key': 'cap', 'value': '-1'}, {'key': 'cut', 'value': 'x'},
-                        {'key': 'clear', 'value': 'no'}, {'key': 'device', 'value': 'eth0'}):
+                        {'key': 'clear', 'value': 'no'}, {'key': 'device', 'value': 'eth0'},
+                        {'key': 'daily', 'value': '1.5'}, {'key': 'count', 'value': 'both'},
+                        {'key': 'daily_cut', 'value': 'yes'}, {'key': 'plan', 'value': 'a\nb'},
+                        {'key': 'plan', 'value': 'x' * 97}, {'key': 'plan', 'value': 'a\tb'}):
                 self.assertEqual(self.call(shell, 'traffic.set', req)[1]['error'], 'bad-value', req)
             self.out('mu300-traffic', 'nope\n')
             self.refused(shell, 'traffic.get', {}, 'failed')

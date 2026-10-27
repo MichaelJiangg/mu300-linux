@@ -2390,8 +2390,26 @@ msgstr "מכסה חודשית"
 msgid "%s, warning at %d%%"
 msgstr "%s, אזהרה ב-%d%%"
 
+msgid "Daily quota"
+msgstr "מכסה יומית"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "המכסה החודשית הושגה: הנתונים הסלולריים כובו. הם יחזרו כשהמחזור הבא יתחיל."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "המכסה היומית מוצתה: נתוני הסלולר כובו. הם יחזרו בחצות."
+
+msgid "The daily quota is reached"
+msgstr "המכסה היומית מוצתה"
+
+msgid "%d%% of the daily quota is used"
+msgstr "נוצלו %d%% מהמכסה היומית"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "המכסה והמכסה היומית סופרות הורדות בלבד."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "המכסה והמכסה היומית סופרות העלאות בלבד."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s ממתין לשעון: השעון עוד לא כוון מהרשת. זה כבר נספר במחזור הזה ויעבור ליום שלו כשהשעון יכוון."
@@ -2423,6 +2441,9 @@ msgstr "לפי מחזור חיוב"
 msgid "Billing cycle"
 msgstr "מחזור חיוב"
 
+msgid "Counted"
+msgstr "נספר"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "הזינו גודל ב-GB, למשל 50 או 2.5"
 
@@ -2434,6 +2455,21 @@ msgstr "כיבוי נתונים סלולריים במכסה"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "כשהמחזור הזה מגיע למכסה, הנתונים הסלולריים כבים: אין אינטרנט דרך המפעיל עד שהמחזור הבא מתחיל, המכסה מוגדלת או שאפשרות זו מכובה שוב. הדלקה ידנית של הנתונים הסלולריים משאירה אותם דולקים עד ההפעלה מחדש הבאה."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "כיבוי נתוני סלולר במכסה היומית"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "כשהשימוש היום מגיע למכסה היומית, נתוני הסלולר נכבים עד חצות, עד שהמכסה מוגדלת או עד שאפשרות זו מכובה. הפעלה ידנית של נתוני הסלולר משאירה אותם פעילים עד האתחול הבא."
+
+msgid "Both ways"
+msgstr "בשני הכיוונים"
+
+msgid "Downloads only"
+msgstr "הורדות בלבד"
+
+msgid "Uploads only"
+msgstr "העלאות בלבד"
 
 msgid "Set"
 msgstr "קבע"
@@ -2458,6 +2494,15 @@ msgstr "מכסה חודשית (GB, 0: אין)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "אזהרה באחוז זה מהמכסה"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "מכסה יומית (GB, 0: אין)"
+
+msgid "The cap and the daily quota count"
+msgstr "מה המכסה והמכסה היומית סופרות"
+
+msgid "Plan name"
+msgstr "שם החבילה"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "נוצל עד כה במחזור הזה (GB)"

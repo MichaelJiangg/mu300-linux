@@ -2390,8 +2390,26 @@ msgstr "Месечен лимит"
 msgid "%s, warning at %d%%"
 msgstr "%s, предупреждение при %d%%"
 
+msgid "Daily quota"
+msgstr "Дневна квота"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Месечният лимит е достигнат: мобилните данни бяха изключени. Ще се включат отново в началото на следващия период."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Дневната квота е достигната: мобилните данни са изключени. Включват се отново в полунощ."
+
+msgid "The daily quota is reached"
+msgstr "Дневната квота е достигната"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Използвани са %d%% от дневната квота"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Лимитът и дневната квота броят само изтеглянията."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Лимитът и дневната квота броят само качванията."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s чака часовника: той още не е сверен от мрежата. Вече се брои към този период и ще отиде към своя ден, щом часовникът бъде сверен."
@@ -2423,6 +2441,9 @@ msgstr "По периоди на таксуване"
 msgid "Billing cycle"
 msgstr "Период на таксуване"
 
+msgid "Counted"
+msgstr "Отчетено"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Въведете размер в GB, например 50 или 2.5"
 
@@ -2434,6 +2455,21 @@ msgstr "Изключване на мобилните данни при лими�
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Когато този период достигне лимита, мобилните данни се изключват: няма интернет през оператора, докато не започне следващият период, не се увеличи лимитът или това не се изключи отново. Ако включите мобилните данни ръчно, те остават включени до следващото рестартиране."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Изключване на мобилните данни при дневната квота"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Когато днешният трафик достигне дневната квота, мобилните данни се изключват до полунощ, докато квотата не бъде увеличена или това не бъде изключено. Ръчното им включване ги оставя включени до следващото рестартиране."
+
+msgid "Both ways"
+msgstr "В двете посоки"
+
+msgid "Downloads only"
+msgstr "Само изтегляния"
+
+msgid "Uploads only"
+msgstr "Само качвания"
 
 msgid "Set"
 msgstr "Задай"
@@ -2458,6 +2494,15 @@ msgstr "Месечен лимит (GB, 0: няма)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Предупреждение при този процент от лимита"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Дневна квота (GB, 0: няма)"
+
+msgid "The cap and the daily quota count"
+msgstr "Какво броят лимитът и дневната квота"
+
+msgid "Plan name"
+msgstr "Име на плана"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Използвано досега в този период (GB)"

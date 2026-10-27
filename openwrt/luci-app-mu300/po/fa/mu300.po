@@ -2390,8 +2390,26 @@ msgstr "سقف ماهانه"
 msgid "%s, warning at %d%%"
 msgstr "%s، هشدار در %d%%"
 
+msgid "Daily quota"
+msgstr "سهمیه روزانه"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "سقف ماهانه پر شد: داده همراه خاموش شد. با شروع دوره بعد دوباره روشن می‌شود."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "سهمیه روزانه تمام شد: داده همراه خاموش شد. نیمه‌شب دوباره روشن می‌شود."
+
+msgid "The daily quota is reached"
+msgstr "سهمیه روزانه تمام شد"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% از سهمیه روزانه مصرف شده"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "سقف و سهمیه روزانه فقط دانلود را می‌شمارند."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "سقف و سهمیه روزانه فقط آپلود را می‌شمارند."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s منتظر ساعت است: ساعت هنوز از شبکه تنظیم نشده. این مقدار از هم‌اکنون در این دوره حساب می‌شود و پس از تنظیم ساعت به روز خودش می‌رود."
@@ -2423,6 +2441,9 @@ msgstr "بر اساس دوره صورتحساب"
 msgid "Billing cycle"
 msgstr "دوره صورتحساب"
 
+msgid "Counted"
+msgstr "شمارش‌شده"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "اندازه را به گیگابایت وارد کنید، مثلاً 50 یا 2.5"
 
@@ -2434,6 +2455,21 @@ msgstr "خاموش کردن داده همراه در سقف"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "وقتی این دوره به سقف برسد، داده همراه خاموش می‌شود: تا شروع دوره بعد، بالا بردن سقف یا خاموش کردن دوباره این گزینه، اینترنتی از طریق اپراتور نیست. اگر داده همراه را دستی دوباره روشن کنید، تا راه‌اندازی مجدد بعدی روشن می‌ماند."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "خاموش کردن داده همراه در سهمیه روزانه"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "وقتی مصرف امروز به سهمیه روزانه برسد، داده همراه تا نیمه‌شب، افزایش سهمیه یا خاموش کردن این گزینه خاموش می‌ماند. روشن کردن دستی داده همراه آن را تا راه‌اندازی مجدد بعدی روشن نگه می‌دارد."
+
+msgid "Both ways"
+msgstr "هر دو جهت"
+
+msgid "Downloads only"
+msgstr "فقط دانلود"
+
+msgid "Uploads only"
+msgstr "فقط آپلود"
 
 msgid "Set"
 msgstr "تنظیم"
@@ -2458,6 +2494,15 @@ msgstr "سقف ماهانه (گیگابایت، 0: هیچ)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "هشدار در این درصد از سقف"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "سهمیه روزانه (گیگابایت، 0: هیچ)"
+
+msgid "The cap and the daily quota count"
+msgstr "آنچه سقف و سهمیه روزانه می‌شمارند"
+
+msgid "Plan name"
+msgstr "نام طرح"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "مصرف تا کنون در این دوره (گیگابایت)"

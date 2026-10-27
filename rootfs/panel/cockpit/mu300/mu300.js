@@ -996,7 +996,8 @@
         history();
     };
 
-    /* Data usage: mu300-traffic's count (per day, per billing cycle) and the monthly cap */
+    /* Data usage: mu300-traffic's count (per day, per billing cycle), the monthly cap, the daily quota, the count mode
+     * and the plan's name */
     pages.usage = function (root) {
         var sc = root.appendChild(card(_('Data usage'), 'mu-traffic'));
         var sb = sc.appendChild(el('div'));
@@ -1008,7 +1009,8 @@
         function set(btn, key, value, conf) { act(btn, 'traffic.set', { key: key, value: value }, { done: refresh, confirm: conf }); }
         function refresh() {
             return load(sb, 'traffic.get', {}, function (o) {
-                var t = o.traffic || {};
+                var t = o.traffic || {}, daily = t.daily || {};
+                if (t.plan) sb.appendChild(row(_('Plan'), t.plan));
                 if (t.today) sb.appendChild(row(_('Today'), fmtBytes(Number(t.today.rx) + Number(t.today.tx)) + '  (↓ ' + fmtBytes(t.today.rx) + ', ↑ ' + fmtBytes(t.today.tx) + ')'));
                 if (t.cycle) {
                     sb.appendChild(row(_('This billing cycle'), fmtBytes(t.cycle.used)));
@@ -1019,6 +1021,12 @@
                 if (cap.bytes && t.cycle) sb.appendChild(row(_('Of the cap'), Math.round(100 * t.cycle.used / cap.bytes) + ' %'));
                 if (cap.cut_active) sb.appendChild(note(_('The cap is reached: mobile data is off until the next cycle.'), 'warn'));
                 else if (cap.level === 'warn') sb.appendChild(note(_('Close to the monthly cap.'), 'warn'));
+                if (daily.bytes) sb.appendChild(row(_('Daily quota'), fmtBytes(daily.used) + ' / ' + fmtBytes(daily.bytes)));
+                if (daily.cut_active) sb.appendChild(note(_('The daily quota is reached: mobile data is off until midnight.'), 'warn'));
+                else if (daily.level === 'over') sb.appendChild(note(_('The daily quota is reached.'), 'warn'));
+                else if (daily.level === 'warn') sb.appendChild(note(_('Close to the daily quota.'), 'warn'));
+                if (t.count === 'rx') sb.appendChild(note(_('The cap and the daily quota count downloads only.')));
+                else if (t.count === 'tx') sb.appendChild(note(_('The cap and the daily quota count uploads only.')));
                 sb.appendChild(row(_('Interface counted'), t.device));
                 if (!t.clock) sb.appendChild(note(_('The clock is not set yet (no network time): new traffic waits to be put on its day.')));
 
@@ -1027,16 +1035,26 @@
                 var capIn = input('mu-tr-cap', { type: 'number', min: '0', step: '0.5', value: cap.bytes ? String(+(cap.bytes / GIB).toFixed(2)) : '0' });
                 var warn = input('mu-tr-warn', { type: 'number', min: '1', max: '100', value: String(cap.warn || 90) });
                 var cut = check('mu-tr-cut', _('Turn mobile data off at the cap until the next cycle'), !!cap.cut);
+                var dIn = input('mu-tr-daily', { type: 'number', min: '0', step: '0.1', value: daily.bytes ? String(+(daily.bytes / GIB).toFixed(2)) : '0' });
+                var dcut = check('mu-tr-dcut', _('Turn mobile data off at the daily quota until midnight'), !!daily.cut);
+                var count = select('mu-tr-count', [ [ 'total', _('Both ways') ], [ 'rx', _('Downloads only') ], [ 'tx', _('Uploads only') ] ], t.count || 'total');
+                var plan = input('mu-tr-plan', { maxlength: '32', value: t.plan || '' });
+                cb.appendChild(field(_('Plan name'), plan));
                 cb.appendChild(field(_('The day a billing cycle starts (31: the month\'s last day)'), rd));
                 cb.appendChild(field(_('Monthly cap in GiB (0: none)'), capIn));
                 cb.appendChild(field(_('Warn at this percentage of the cap'), warn));
                 cb.appendChild(cut.node);
+                cb.appendChild(field(_('Daily quota in GiB (0: none)'), dIn));
+                cb.appendChild(dcut.node);
+                cb.appendChild(field(_('The cap and the daily quota count'), count));
                 var save = button(_('Save'), function () {
-                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value);
-                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
+                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value), dg = Number(dIn.value);
+                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(dg >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
                         toast(_('Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100.'), 'error'); return;
                     }
-                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ] ];
+                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ],
+                        [ 'daily', String(Math.round(dg * GIB)) ], [ 'daily_cut', dcut.box.checked ? 'on' : 'off' ], [ 'count', count.value ],
+                        [ 'plan', String(plan.value).trim() ] ];
                     busy(save, true);
                     steps.reduce(function (p, s) { return p.then(function () { return api('traffic.set', { key: s[0], value: s[1] }); }); },
                         Promise.resolve()).then(function () { busy(save, false); toast(_('Saved'), 'ok'); refresh(); },
@@ -1061,8 +1079,9 @@
                     return [ d.date, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx)) ];
                 })));
                 hb.appendChild(el('h3', { text: _('Billing cycles') }));
-                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), _('Total') ], (t.cycles || []).map(function (d) {
-                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
+                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), t.count === 'rx' || t.count === 'tx' ? _('Counted') : _('Total') ], (t.cycles || []).map(function (d) {
+                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx),
+                        fmtBytes(d.used !== undefined ? Number(d.used) : Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
                 })));
             });
         }
