@@ -131,5 +131,58 @@ class WifiCommandNotSent(unittest.TestCase):
         self.assertEqual(p.count('+\t\t\tret = -EBUSY;'), 2)
 
 
+class WifiTxPath54(unittest.TestCase):
+    """FINDINGS 230: the 5.4 kernel's versions of the same fixes (kanoqwq 149c9d2a, 3cbf37fc, 0438ab01), as patches
+    to the vendor trees: the kernel ones in build-all.sh's KPATCHES, the Wi-Fi ones by the wlan_combo-*.patch glob.
+    The build applies them; these check what they carry and that the diagnostics stay out."""
+    P = TOP / 'kernel' / 'patches'
+
+    def kpatches(self):
+        import re
+        return re.search(r'^KPATCHES="([^"]*)"', (TOP / 'kernel/build-all.sh').read_text(), re.M).group(1).split()
+
+    def test_the_kernel_patches_are_applied(self):
+        kp = self.kpatches()
+        for name in ('sprdwcn-tx-pending-backpressure', 'sdhci-sprd-dma-ordering'):
+            with self.subTest(patch=name):
+                self.assertIn(name, kp)
+                self.assertTrue((self.P / (name + '.patch')).is_file())
+        # the backpressure patch edits what wcn-pcie-rx-push-cursor leaves
+        self.assertLess(kp.index('wcn-pcie-rx-push-cursor'), kp.index('sprdwcn-tx-pending-backpressure'))
+        for name in ('wlan_combo-tx-retry', 'wlan_combo-skb-headroom', 'wlan_combo-special-data-prefix',
+                     'wlan_combo-ipv6-multicast-data', 'wlan_combo-stale-tx-ratelimit'):
+            with self.subTest(patch=name):
+                self.assertTrue((self.P / (name + '.patch')).is_file())
+
+    def test_his_diagnostics_stay_out(self):
+        for name in ('sprdwcn-edma-pressure-stats', 'wlan_combo-tx-pressure-logging', 'wlan_combo-rx-ip-multicast-endian'):
+            with self.subTest(patch=name):
+                self.assertFalse((self.P / (name + '.patch')).exists())
+                self.assertNotIn(name, self.kpatches())
+
+    def test_a_full_ring_is_backpressure_and_does_not_stick(self):
+        p = (self.P / 'sprdwcn-tx-pending-backpressure.patch').read_text()
+        self.assertIn('-\t\treturn ERROR;\n', p)
+        self.assertIn('+\t\treturn -EAGAIN;\n', p)
+        self.assertIn('+\t\tstatic DEFINE_RATELIMIT_STATE(full_rs, 60 * HZ, 1);', p)
+        self.assertIn('+\t\tif (edma_pending_q_num(chn) <= 0)\n+\t\t\tq->status = 0;', p)
+        self.assertNotIn('atomic64', p)
+        w = (self.P / 'wlan_combo-tx-retry.patch').read_text()
+        self.assertEqual(w.count('+\t\t\tNULL, sc2355_pcie_tx_data_complete, NULL),'), 2)
+        self.assertIn('+\tif (ret && ret != -EAGAIN) {', w)
+        self.assertIn('+\t\tif (hif->hw_type == SPRD_HW_SC2355_PCIE && ret == -EAGAIN)\n+\t\t\treturn ret;', w)
+
+    def test_the_descriptor_fill_keeps_the_skb(self):
+        p = (self.P / 'wlan_combo-skb-headroom.patch').read_text()
+        self.assertEqual(p.count('-\t\tkfree_skb(temp_skb);'), 2)
+        self.assertEqual(p.count('+\t\tif (skb_cow_head(skb, DSCR_LEN + offset + hif->hif_offset +'), 2)
+
+    def test_sdhci_accessors_are_ordered(self):
+        p = (self.P / 'sdhci-sprd-dma-ordering.patch').read_text()
+        for acc in ('readl', 'writel', 'writew', 'writeb'):
+            with self.subTest(accessor=acc):
+                self.assertIn('-\t' + ('return ' if acc == 'readl' else '') + acc + '_relaxed(', p)
+
+
 if __name__ == '__main__':
     unittest.main()

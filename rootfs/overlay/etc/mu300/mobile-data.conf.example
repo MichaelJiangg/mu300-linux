@@ -20,6 +20,11 @@
 #MU300_APN_PASSWORD=
 #MU300_APN_AUTH=both
 
+# Only for settings meant for one SIM card: its ICCID (on the label of the card, or `mu300-at AT+CCID`). The APN, the
+# PDP type and the credentials above are then used with that card alone; another card in the device dials with its
+# own context and is never offered them. Empty (the default): any card gets them.
+#MU300_APN_ICCID=
+
 # Data roaming: 1 (the default, as before) uses mobile data on any network the SIM registers on; 0 keeps mobile data
 # down while the SIM is registered as roaming (SMS and calls are not affected), and brings it back at home. Some SIMs
 # report roaming at home (an MVNO, national roaming): those need 1. `sudo mobile-data roaming on|off` writes this line;
