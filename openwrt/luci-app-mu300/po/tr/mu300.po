@@ -2739,6 +2739,9 @@ msgstr "Sürüm notları"
 msgid "Download"
 msgstr "İndirme"
 
+msgid "only what changed since the installed release"
+msgstr "yalnızca kurulu sürümden bu yana değişenler"
+
 msgid "Free space needed"
 msgstr "Gereken boş alan"
 

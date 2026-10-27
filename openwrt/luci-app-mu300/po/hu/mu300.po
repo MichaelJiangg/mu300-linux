@@ -2744,6 +2744,9 @@ msgstr "Kiadási megjegyzések"
 msgid "Download"
 msgstr "Letöltés"
 
+msgid "only what changed since the installed release"
+msgstr "csak ami a telepített kiadás óta változott"
+
 msgid "Free space needed"
 msgstr "Szükséges szabad hely"
 

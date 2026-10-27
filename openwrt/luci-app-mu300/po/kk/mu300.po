@@ -2744,6 +2744,9 @@ msgstr "Релиз ескертпелері"
 msgid "Download"
 msgstr "Жүктеп алу"
 
+msgid "only what changed since the installed release"
+msgstr "тек орнатылған шығарылымнан бергі өзгерістер"
+
 msgid "Free space needed"
 msgstr "Қажетті бос орын"
 

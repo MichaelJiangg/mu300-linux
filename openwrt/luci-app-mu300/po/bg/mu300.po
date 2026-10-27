@@ -2744,6 +2744,9 @@ msgstr "Бележки към изданието"
 msgid "Download"
 msgstr "Изтегляне"
 
+msgid "only what changed since the installed release"
+msgstr "само промененото след инсталираното издание"
+
 msgid "Free space needed"
 msgstr "Нужно свободно място"
 

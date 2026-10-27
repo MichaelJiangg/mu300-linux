@@ -2744,6 +2744,9 @@ msgstr "Poznámky k vydaniu"
 msgid "Download"
 msgstr "Stiahnutie"
 
+msgid "only what changed since the installed release"
+msgstr "len to, čo sa zmenilo od nainštalovaného vydania"
+
 msgid "Free space needed"
 msgstr "Potrebné voľné miesto"
 
