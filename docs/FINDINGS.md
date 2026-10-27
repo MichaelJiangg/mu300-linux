@@ -12188,3 +12188,34 @@ FINDINGS 65 gives.
 **Device check (a second SIM card):** with the settings bound to card A, card A dials with the APN (`AT+CGDCONT?`
 shows it); card B in the same slot dials with its own context, and `AT+CGPCO?` holds no user name.
 
+### 232. Mainline keeps the UMP9620 fuel gauge and ZTE's charger node off the F50 and the V50
+
+**Status: built for 6.18.58, 7.2.12 and 7.3 (the patch applies to all three with `--fuzz=0`); run on F50-B with
+7.3, compared with v2026.10.27.1's 7.3 on the same board (2026-10-27). Not run on a V50 or a U30 Air here.** From
+kanoqwq's `f59a2968` (his patch 0019, which he had checked on an F50 read-only, not flashed).
+
+The F50 and the V50 have the U30 Air's PMIC, and ZTE's device tree gives them its fuel gauge and charger nodes, but
+no battery. Mainline bound the gauge there and listed a battery `sc27xx-fgu`: status Full, health "Over voltage", a
+capacity read back from the PMIC's saved-capacity register ("boot capacity 56 % (saved 0x038)"), a temperature from an
+unconnected NTC input. Every reader of `/sys/class/power_supply` had been taught to ignore it by board (mu300-power,
+mu300-api, the panel, thermal-guard, mu300-sms-forward, the LuCI dashboard). Patch 0016 kept only the charger's 0x1a
+fallback to the board with a battery.
+
+`upstream/patches/0030` ends both probes with `-ENODEV` before any register access unless the device tree has
+`/charger_policy_service`: the same test as 0016, 0023 and mu300-device (kano's version also asked whether the node
+is enabled; here it is only ever tested for presence, so a U30 Air is told apart exactly as everywhere else). Only
+the UMP9620 gauge (`sprd,ump9620-fgu`) and ZTE's charger node (`ti,bq2560x_chg`) are affected.
+
+**F50-B, 7.3, release kernel against this patch:**
+
+| | v2026.10.27.1 | with 0030 |
+|---|---|---|
+| `/sys/class/power_supply` | `sc27xx-fgu` | empty |
+| kernel lines about bq256xx/fgu/charger | 5 ("no charger: -5", the IIO retries, "boot capacity 56 %") | 0 |
+| `mu300-power status` | battery: none, supply: plugged, profile plugged (auto) | the same |
+| `mu300-api power.get` | `"battery":null`, supply plugged | the same |
+| mu300 units | 27 services and 3 timers active, 0 failed | the same |
+| thermal zones | 20 | the same 20 |
+
+**Device check (U30 Air):** `sc27xx-fgu` and `bq256xx-charger` are still in `/sys/class/power_supply`, with the
+battery's capacity, and charging works as before.

@@ -153,5 +153,29 @@ class NcmRetry(unittest.TestCase):
         self.assertIn('20260817192638.437798-1-cosmin-gabriel.tanislav.xa@renesas.com', self.text)
 
 
+class BatteryBoardIsolation(unittest.TestCase):
+    """0030 (kanoqwq f59a2968, his 0019; FINDINGS 232): on a board without the U30 Air's charger policy service (the
+    F50, the V50) the UMP9620 fuel gauge and ZTE's charger node end their probe before any register access."""
+
+    def setUp(self):
+        self.text = patch('0030')
+
+    def test_both_probes_stop_first_on_a_board_without_a_battery(self):
+        self.assertIn('f59a2968', self.text)
+        for compat, first in (('ti,bq2560x_chg', 'bq = devm_kzalloc(dev, sizeof(*bq), GFP_KERNEL);'),
+                              ('sprd,ump9620-fgu', 'data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);')):
+            with self.subTest(node=compat):
+                body = after(self.text)
+                gate = body.index(f'if (of_device_is_compatible(dev->of_node, "{compat}")) {{')
+                self.assertLess(gate, body.index(first, gate))
+                block = body[gate:body.index(first, gate)]
+                # the same test as 0016, 0023 and mu300-device: the node is there or not
+                self.assertIn('of_find_node_by_path("/charger_policy_service");', block)
+                self.assertIn('of_node_put(policy);', block)
+                self.assertIn('if (!policy)\n\t\t\treturn -ENODEV;', block)
+        # nothing else is changed, nothing is taken away
+        self.assertEqual(removed(self.text).strip(), '')
+
+
 if __name__ == '__main__':
     unittest.main()
