@@ -37,6 +37,18 @@ for m in "$UO"/modules/*.ko; do
     v=$(strings "$m" | sed -n 's/^vermagic=\([^ ]*\) .*/\1/p' | head -1)
     [ "$v" = "$krel" ] || { echo "$m is built for '$v', the kernel is '$krel'" >&2; exit 1; }
 done
+# --- stale begin
+# ... and a vendor module built before its source last changed has the right vermagic and the old code (kanoqwq
+# 265f4de3, f6b0668d: a Wi-Fi fix that was in the tree and not in the bundle). build-modules.sh logs each module directory's build
+# to modules/NAME.log, so a file of upstream/modules/NAME newer than that log was changed after the build: refused
+# until build-modules.sh has run again. (A release builds from a fresh checkout, where the logs come last.)
+for d in "$U"/modules/*/; do
+    d=${d%/}; n=${d##*/}
+    [ -f "$UO/modules/$n.log" ] || { echo "$n was not built for this kernel: no $UO/modules/$n.log (build-modules.sh)" >&2; exit 1; }
+    f=$(find "$d" -type f -newer "$UO/modules/$n.log" | head -n 1)
+    [ -z "$f" ] || { echo "${f#"$TOP"/} changed after $n was built for $krel: run build-modules.sh $n again" >&2; exit 1; }
+done
+# --- stale end
 for m in $(cat "$U/module-order.txt"); do
     [ -f "$UO/modules/$m" ] || { echo "module-order.txt names $m, which was not built" >&2; exit 1; }
 done

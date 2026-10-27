@@ -69,6 +69,8 @@ fetch /src/realme "$MODULES_REPO" "$MODULES_REV" $M/wcn/wlan/wlan_combo $M/wcn/b
 patched_copy() { # patched_copy DEST SOURCE PATCH-GLOB
     local sum; sum=$(cat /work/patches/$3 | sha256sum | cut -d" " -f1)
     [ "$(cat "$1/.mu300-patches" 2>/dev/null)" = "$sum" ] && return 0
+    # it removes DEST whole: only ever one of its own copies (kanoqwq f0926715)
+    case $1 in /src/ext-wlan_combo|/src/ext-sprdbt) ;; *) echo "patched_copy: refusing to replace $1" >&2; exit 1 ;; esac
     rm -rf "$1" && cp -r "$2" "$1"
     (cd "$1" && for p in /work/patches/$3; do patch -p1 -s -f < "$p"; done)
     echo "$sum" > "$1/.mu300-patches"
