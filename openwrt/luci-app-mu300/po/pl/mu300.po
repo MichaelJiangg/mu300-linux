@@ -1246,6 +1246,9 @@ msgstr "Wybrano wewnętrzną kartę SIM: będzie używana po ponownym uruchomien
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Wybrano wewnętrzną kartę SIM, ale to urządzenie jej nie obsługuje: używana jest zewnętrzna karta SIM"
 
+msgid "in use"
+msgstr "w użyciu"
+
 msgid "Uptime %s"
 msgstr "Czas pracy %s"
 
@@ -2078,9 +2081,6 @@ msgstr "Domyślne modemu"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "w użyciu"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Wyłącz radio SIM%d"
 
@@ -2255,8 +2255,26 @@ msgstr "Miesięczny limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, ostrzeżenie przy %d%%"
 
+msgid "Daily quota"
+msgstr "Limit dzienny"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Osiągnięto miesięczny limit: dane komórkowe zostały wyłączone. Włączą się ponownie z początkiem następnego okresu."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Osiągnięto limit dzienny: dane komórkowe zostały wyłączone. Włączą się ponownie o północy."
+
+msgid "The daily quota is reached"
+msgstr "Osiągnięto limit dzienny"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Wykorzystano %d%% limitu dziennego"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit i limit dzienny liczą tylko pobieranie."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit i limit dzienny liczą tylko wysyłanie."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s czeka na zegar: nie został jeszcze ustawiony przez sieć. Już liczy się do tego okresu i trafi do swojego dnia, gdy zegar zostanie ustawiony."
@@ -2288,6 +2306,9 @@ msgstr "Według okresów rozliczeniowych"
 msgid "Billing cycle"
 msgstr "Okres rozliczeniowy"
 
+msgid "Counted"
+msgstr "Liczone"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Podaj rozmiar w GB, na przykład 50 lub 2.5"
 
@@ -2299,6 +2320,21 @@ msgstr "Wyłączaj dane komórkowe po osiągnięciu limitu"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Gdy ten okres osiągnie limit, dane komórkowe zostaną wyłączone: brak internetu przez operatora do początku następnego okresu, podniesienia limitu albo wyłączenia tej opcji. Dane komórkowe włączone ponownie ręcznie pozostaną włączone do następnego restartu."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Wyłącz dane komórkowe po osiągnięciu limitu dziennego"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Gdy dzisiejsze zużycie osiągnie limit dzienny, dane komórkowe zostaną wyłączone do północy, do zwiększenia limitu lub do ponownego wyłączenia tej opcji. Ręczne włączenie danych pozostawia je włączone do następnego restartu."
+
+msgid "Both ways"
+msgstr "Oba kierunki"
+
+msgid "Downloads only"
+msgstr "Tylko pobieranie"
+
+msgid "Uploads only"
+msgstr "Tylko wysyłanie"
 
 msgid "Set"
 msgstr "Ustaw"
@@ -2323,6 +2359,15 @@ msgstr "Miesięczny limit (GB, 0: brak)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Ostrzegaj przy tym procencie limitu"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Limit dzienny (GB, 0: brak)"
+
+msgid "The cap and the daily quota count"
+msgstr "Co liczą limit i limit dzienny"
+
+msgid "Plan name"
+msgstr "Nazwa taryfy"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Zużyte dotąd w tym okresie (GB)"
@@ -3403,14 +3448,14 @@ msgstr "Nieznany rodzaj blokady"
 msgid "Invalid value for this lock kind"
 msgstr "Nieprawidłowa wartość dla tego rodzaju blokady"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Ten modem nie obsługuje żadnego z tych pasm"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Blokady pasma, trybu i komórki nie są jeszcze obsługiwane dla SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Blokady pasma, trybu i komórki nie są obsługiwane, gdy przełączanie dwóch kart SIM zarządza radiem"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Ten modem nie obsługuje żadnego z tych pasm"
 
 msgid "Invalid page"
 msgstr "Nieprawidłowa strona"

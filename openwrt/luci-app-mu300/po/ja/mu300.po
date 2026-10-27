@@ -1246,6 +1246,9 @@ msgstr "内蔵 SIM を選択済み: 再起動後に使用されます"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "内蔵 SIM を選択済みですが、このデバイスでは対応していません: 外部 SIM を使用中です"
 
+msgid "in use"
+msgstr "使用中"
+
 msgid "Uptime %s"
 msgstr "稼働時間 %s"
 
@@ -2078,9 +2081,6 @@ msgstr "モデムの既定値"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "使用中"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d の無線をオフにする"
 
@@ -2255,8 +2255,26 @@ msgstr "月間上限"
 msgid "%s, warning at %d%%"
 msgstr "%s、%d%% で警告"
 
+msgid "Daily quota"
+msgstr "1日の上限"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "月間上限に達しました: モバイルデータをオフにしました。次の期間が始まるとオンに戻ります。"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "1日の上限に達しました: モバイルデータをオフにしました。午前0時に再びオンになります。"
+
+msgid "The daily quota is reached"
+msgstr "1日の上限に達しました"
+
+msgid "%d%% of the daily quota is used"
+msgstr "1日の上限の %d%% を使用済み"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "上限と1日の上限はダウンロードのみを数えます。"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "上限と1日の上限はアップロードのみを数えます。"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s は時刻待ちです: 時刻がまだネットワークから設定されていません。すでに今回の期間に計上されており、時刻が設定されるとその日に記録されます。"
@@ -2288,6 +2306,9 @@ msgstr "請求期間別"
 msgid "Billing cycle"
 msgstr "請求期間"
 
+msgid "Counted"
+msgstr "計上"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB 単位でサイズを入力してください (例: 50 や 2.5)"
 
@@ -2299,6 +2320,21 @@ msgstr "上限でモバイルデータをオフにする"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "今回の期間が上限に達するとモバイルデータをオフにします: 次の期間が始まる、上限を上げる、またはこの設定をオフにするまで、通信事業者経由のインターネットは使えません。手動でモバイルデータをオンに戻すと、次の再起動までオンのままです。"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "1日の上限でモバイルデータをオフにする"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "今日の使用量が1日の上限に達すると、午前0時まで、上限を引き上げるまで、またはこれをオフにするまでモバイルデータをオフにします。手動でモバイルデータをオンにすると、次の再起動までオンのままです。"
+
+msgid "Both ways"
+msgstr "上下合計"
+
+msgid "Downloads only"
+msgstr "ダウンロードのみ"
+
+msgid "Uploads only"
+msgstr "アップロードのみ"
 
 msgid "Set"
 msgstr "設定"
@@ -2323,6 +2359,15 @@ msgstr "月間上限 (GB、0: なし)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "上限のこのパーセントで警告"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "1日の上限 (GB、0: なし)"
+
+msgid "The cap and the daily quota count"
+msgstr "上限と1日の上限の計量方法"
+
+msgid "Plan name"
+msgstr "プラン名"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "今回の期間のこれまでの使用量 (GB)"
@@ -3403,14 +3448,14 @@ msgstr "不明なロック種別"
 msgid "Invalid value for this lock kind"
 msgstr "このロック種別に対して無効な値です"
 
-msgid "None of these bands is supported by this modem"
-msgstr "このモデムはこれらのバンドのいずれにも対応していません"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "バンド・モード・セルのロックは SIM2 ではまだサポートされていません"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "デュアル SIM 切り替えが無線を管理している間は、バンド・モード・セルのロックはサポートされていません"
+
+msgid "None of these bands is supported by this modem"
+msgstr "このモデムはこれらのバンドのいずれにも対応していません"
 
 msgid "Invalid page"
 msgstr "無効なページ"

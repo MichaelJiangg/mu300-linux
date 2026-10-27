@@ -1246,6 +1246,9 @@ msgstr "आंतरिक SIM चुना गया: रीबूट के �
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "आंतरिक SIM चुना गया, पर इस डिवाइस पर समर्थित नहीं है: बाहरी SIM उपयोग में है"
 
+msgid "in use"
+msgstr "उपयोग में"
+
 msgid "Uptime %s"
 msgstr "अपटाइम %s"
 
@@ -2078,9 +2081,6 @@ msgstr "मॉडेम का डिफ़ॉल्ट"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "उपयोग में"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d का रेडियो बंद करें"
 
@@ -2255,8 +2255,26 @@ msgstr "मासिक सीमा"
 msgid "%s, warning at %d%%"
 msgstr "%s, %d%% पर चेतावनी"
 
+msgid "Daily quota"
+msgstr "दैनिक कोटा"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "मासिक सीमा पूरी हो गई: मोबाइल डेटा बंद कर दिया गया। अगला चक्र शुरू होने पर यह फिर चालू होगा।"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "दैनिक कोटा पूरा हो गया: मोबाइल डेटा बंद कर दिया गया। यह आधी रात को फिर चालू होगा।"
+
+msgid "The daily quota is reached"
+msgstr "दैनिक कोटा पूरा हो गया"
+
+msgid "%d%% of the daily quota is used"
+msgstr "दैनिक कोटे का %d%% उपयोग हो चुका है"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "सीमा और दैनिक कोटा केवल डाउनलोड गिनते हैं।"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "सीमा और दैनिक कोटा केवल अपलोड गिनते हैं।"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s घड़ी की प्रतीक्षा में है: घड़ी अभी नेटवर्क से सेट नहीं हुई है। यह पहले से इस चक्र में गिना जा रहा है और घड़ी सेट होने पर अपने दिन में जाएगा।"
@@ -2288,6 +2306,9 @@ msgstr "प्रति बिलिंग चक्र"
 msgid "Billing cycle"
 msgstr "बिलिंग चक्र"
 
+msgid "Counted"
+msgstr "गिना गया"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB में आकार दर्ज करें, उदाहरण 50 या 2.5"
 
@@ -2299,6 +2320,21 @@ msgstr "सीमा पर मोबाइल डेटा बंद करे�
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "जब यह चक्र सीमा तक पहुँचेगा, मोबाइल डेटा बंद हो जाएगा: अगला चक्र शुरू होने, सीमा बढ़ाने या यह विकल्प फिर बंद करने तक ऑपरेटर से इंटरनेट नहीं मिलेगा। मोबाइल डेटा हाथ से फिर चालू करने पर वह अगले रीबूट तक चालू रहता है।"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "दैनिक कोटे पर मोबाइल डेटा बंद करें"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "जब आज का उपयोग दैनिक कोटे तक पहुँचता है, तो मोबाइल डेटा आधी रात तक, कोटा बढ़ाए जाने तक या इसे फिर से बंद किए जाने तक बंद रहता है। मोबाइल डेटा को हाथ से चालू करने पर वह अगले रीबूट तक चालू रहता है।"
+
+msgid "Both ways"
+msgstr "दोनों दिशाएँ"
+
+msgid "Downloads only"
+msgstr "केवल डाउनलोड"
+
+msgid "Uploads only"
+msgstr "केवल अपलोड"
 
 msgid "Set"
 msgstr "सेट करें"
@@ -2323,6 +2359,15 @@ msgstr "मासिक सीमा (GB, 0: कोई नहीं)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "सीमा के इस प्रतिशत पर चेतावनी दें"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "दैनिक कोटा (GB, 0: कोई नहीं)"
+
+msgid "The cap and the daily quota count"
+msgstr "सीमा और दैनिक कोटा क्या गिनते हैं"
+
+msgid "Plan name"
+msgstr "प्लान का नाम"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "इस चक्र में अब तक उपयोग (GB)"
@@ -3403,14 +3448,14 @@ msgstr "अज्ञात लॉक प्रकार"
 msgid "Invalid value for this lock kind"
 msgstr "इस लॉक प्रकार के लिए अमान्य मान"
 
-msgid "None of these bands is supported by this modem"
-msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "बैंड, मोड और सेल लॉक अभी SIM2 के लिए समर्थित नहीं हैं"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "जब डुअल-SIM स्विचिंग रेडियो को नियंत्रित करती है, तब बैंड, मोड और सेल लॉक समर्थित नहीं हैं"
+
+msgid "None of these bands is supported by this modem"
+msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
 
 msgid "Invalid page"
 msgstr "अमान्य पेज"

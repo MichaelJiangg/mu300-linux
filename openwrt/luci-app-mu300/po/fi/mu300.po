@@ -1246,6 +1246,9 @@ msgstr "Sisäinen SIM valittu: käytössä uudelleenkäynnistyksen jälkeen"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Sisäinen SIM valittu, mutta tämä laite ei tue sitä: ulkoinen SIM on käytössä"
 
+msgid "in use"
+msgstr "käytössä"
+
 msgid "Uptime %s"
 msgstr "Käynnissä %s"
 
@@ -2078,9 +2081,6 @@ msgstr "Modeemin oletus"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "käytössä"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Kytke SIM%d:n radio pois"
 
@@ -2255,8 +2255,26 @@ msgstr "Kuukausiraja"
 msgid "%s, warning at %d%%"
 msgstr "%s, varoitus %d%%:ssa"
 
+msgid "Daily quota"
+msgstr "Päiväkiintiö"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Kuukausiraja on täynnä: mobiilidata kytkettiin pois. Se kytkeytyy takaisin, kun seuraava jakso alkaa."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Päiväkiintiö on täynnä: mobiilidata kytkettiin pois. Se palaa keskiyöllä."
+
+msgid "The daily quota is reached"
+msgstr "Päiväkiintiö on täynnä"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% päiväkiintiöstä on käytetty"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Raja ja päiväkiintiö laskevat vain lataukset."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Raja ja päiväkiintiö laskevat vain lähetykset."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s odottaa kelloa: sitä ei ole vielä asetettu verkosta. Se lasketaan jo tähän jaksoon ja siirtyy omalle päivälleen, kun kello on asetettu."
@@ -2288,6 +2306,9 @@ msgstr "Laskutusjaksoittain"
 msgid "Billing cycle"
 msgstr "Laskutusjakso"
 
+msgid "Counted"
+msgstr "Laskettu"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Anna koko gigatavuina, esimerkiksi 50 tai 2.5"
 
@@ -2299,6 +2320,21 @@ msgstr "Katkaise mobiilidata rajalla"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Kun tämä jakso saavuttaa rajan, mobiilidata katkaistaan: ei internetiä operaattorin kautta ennen kuin seuraava jakso alkaa, rajaa nostetaan tai tämä kytketään taas pois. Käsin uudelleen kytketty mobiilidata pysyy päällä seuraavaan uudelleenkäynnistykseen asti."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Katkaise mobiilidata päiväkiintiön täyttyessä"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Kun päivän käyttö saavuttaa päiväkiintiön, mobiilidata katkaistaan keskiyöhön asti, kunnes kiintiötä nostetaan tai tämä kytketään pois. Jos kytket mobiilidatan käsin takaisin, se pysyy päällä seuraavaan uudelleenkäynnistykseen asti."
+
+msgid "Both ways"
+msgstr "Molemmat suunnat"
+
+msgid "Downloads only"
+msgstr "Vain lataukset"
+
+msgid "Uploads only"
+msgstr "Vain lähetykset"
 
 msgid "Set"
 msgstr "Aseta"
@@ -2323,6 +2359,15 @@ msgstr "Kuukausiraja (GB, 0: ei rajaa)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varoita tällä prosentilla rajasta"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Päiväkiintiö (GB, 0: ei kiintiötä)"
+
+msgid "The cap and the daily quota count"
+msgstr "Mitä raja ja päiväkiintiö laskevat"
+
+msgid "Plan name"
+msgstr "Liittymän nimi"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Käytetty tähän mennessä tässä jaksossa (GB)"
@@ -3403,14 +3448,14 @@ msgstr "Tuntematon lukitustyyppi"
 msgid "Invalid value for this lock kind"
 msgstr "Virheellinen arvo tälle lukitustyypille"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Taajuusalueen, tilan ja solun lukitusta ei vielä tueta SIM2:lle"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Taajuusalueen, tilan ja solun lukitusta ei tueta, kun kahden SIM-kortin vaihto hallitsee radiota"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
 
 msgid "Invalid page"
 msgstr "Virheellinen sivu"

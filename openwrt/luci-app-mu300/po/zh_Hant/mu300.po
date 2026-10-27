@@ -1246,6 +1246,9 @@ msgstr "已選擇內建 SIM：重新啟動後生效"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "已選擇內建 SIM，但此裝置不支援：正在使用外接 SIM"
 
+msgid "in use"
+msgstr "使用中"
+
 msgid "Uptime %s"
 msgstr "已運作 %s"
 
@@ -2073,9 +2076,6 @@ msgstr "模組預設"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "使用中"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "關閉 SIM%d 射頻"
 
@@ -2250,8 +2250,26 @@ msgstr "每月上限"
 msgid "%s, warning at %d%%"
 msgstr "%s，%d%% 時提醒"
 
+msgid "Daily quota"
+msgstr "每日額度"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "已達到每月流量上限：行動數據已關閉，下一個週期開始時自動恢復。"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "已達每日額度：行動數據已關閉，午夜後自動恢復。"
+
+msgid "The daily quota is reached"
+msgstr "已達每日額度"
+
+msgid "%d%% of the daily quota is used"
+msgstr "已用每日額度的 %d%%"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "上限和每日額度僅統計下行。"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "上限和每日額度僅統計上行。"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s 正在等待時鐘：時鐘尚未透過網路校準。這部分流量已計入本週期，時鐘校準後會記到對應的日期。"
@@ -2283,6 +2301,9 @@ msgstr "按計費週期"
 msgid "Billing cycle"
 msgstr "計費週期"
 
+msgid "Counted"
+msgstr "計量"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "請輸入以 GB 為單位的大小，例如 50 或 2.5"
 
@@ -2294,6 +2315,21 @@ msgstr "達到上限時關閉行動數據"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "本週期達到上限時將關閉行動數據：在下一個週期開始、提高上限或關閉此選項之前，無法透過電信業者上網。手動重新開啟行動數據後，它會保持開啟直到下次重新啟動。"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "達到每日額度時關閉行動數據"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "當天用量達到每日額度時，行動數據會關閉，直到午夜、額度調高或再次關閉此項。手動重新開啟行動數據後，它會保持開啟直到下次重新啟動。"
+
+msgid "Both ways"
+msgstr "上下行合計"
+
+msgid "Downloads only"
+msgstr "僅下行"
+
+msgid "Uploads only"
+msgstr "僅上行"
 
 msgid "Set"
 msgstr "設定"
@@ -2318,6 +2354,15 @@ msgstr "每月上限（GB，0 表示無）"
 
 msgid "Warning at this percentage of the cap"
 msgstr "達到上限的此百分比時提醒"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "每日額度（GB，0 表示無）"
+
+msgid "The cap and the daily quota count"
+msgstr "套餐計量方式"
+
+msgid "Plan name"
+msgstr "套餐名稱"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "本週期已用（GB）"
@@ -3396,14 +3441,14 @@ msgstr "未知的鎖定類型"
 msgid "Invalid value for this lock kind"
 msgstr "此鎖定類型的值無效"
 
-msgid "None of these bands is supported by this modem"
-msgstr "此數據機不支援其中任何頻段"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "SIM2 暫不支援頻段、模式和基地台鎖定"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "雙卡切換管理射頻時，不支援頻段、模式和基地台鎖定"
+
+msgid "None of these bands is supported by this modem"
+msgstr "此數據機不支援其中任何頻段"
 
 msgid "Invalid page"
 msgstr "頁碼無效"

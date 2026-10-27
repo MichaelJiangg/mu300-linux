@@ -1246,6 +1246,9 @@ msgstr "Intern SIM vald: används efter en omstart"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Intern SIM vald, men stöds inte på den här enheten: den externa SIM:en används"
 
+msgid "in use"
+msgstr "används"
+
 msgid "Uptime %s"
 msgstr "Drifttid %s"
 
@@ -2078,9 +2081,6 @@ msgstr "Modemets standard"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "används"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Stäng av radion i SIM%d"
 
@@ -2255,8 +2255,26 @@ msgstr "Månadsgräns"
 msgid "%s, warning at %d%%"
 msgstr "%s, varning vid %d%%"
 
+msgid "Daily quota"
+msgstr "Daglig kvot"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Månadsgränsen är nådd: mobildata stängdes av. Den slås på igen när nästa period börjar."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Den dagliga kvoten är nådd: mobildata stängdes av. Den slås på igen vid midnatt."
+
+msgid "The daily quota is reached"
+msgstr "Den dagliga kvoten är nådd"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% av den dagliga kvoten är använd"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Gränsen och den dagliga kvoten räknar bara nedladdningar."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Gränsen och den dagliga kvoten räknar bara uppladdningar."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s väntar på klockan: den har ännu inte ställts via nätet. Det räknas redan till denna period och hamnar på sin dag när klockan är ställd."
@@ -2288,6 +2306,9 @@ msgstr "Per faktureringsperiod"
 msgid "Billing cycle"
 msgstr "Faktureringsperiod"
 
+msgid "Counted"
+msgstr "Räknat"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Ange en storlek i GB, till exempel 50 eller 2.5"
 
@@ -2299,6 +2320,21 @@ msgstr "Stäng av mobildata vid gränsen"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "När denna period når gränsen stängs mobildata av: inget internet via operatören förrän nästa period börjar, gränsen höjs eller detta stängs av igen. Mobildata som slås på igen för hand förblir på till nästa omstart."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Stäng av mobildata vid den dagliga kvoten"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "När dagens förbrukning når den dagliga kvoten stängs mobildata av till midnatt, tills kvoten höjs eller detta stängs av igen. Slår du på mobildata för hand förblir den på till nästa omstart."
+
+msgid "Both ways"
+msgstr "Båda riktningarna"
+
+msgid "Downloads only"
+msgstr "Bara nedladdningar"
+
+msgid "Uploads only"
+msgstr "Bara uppladdningar"
 
 msgid "Set"
 msgstr "Sätt"
@@ -2323,6 +2359,15 @@ msgstr "Månadsgräns (GB, 0: ingen)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varna vid denna procent av gränsen"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Daglig kvot (GB, 0: ingen)"
+
+msgid "The cap and the daily quota count"
+msgstr "Vad gränsen och den dagliga kvoten räknar"
+
+msgid "Plan name"
+msgstr "Abonnemangets namn"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Använt hittills i denna period (GB)"
@@ -3403,14 +3448,14 @@ msgstr "Okänd låstyp"
 msgid "Invalid value for this lock kind"
 msgstr "Ogiltigt värde för denna låstyp"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Det här modemet stöder inget av dessa band"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Lås av band, läge och cell stöds ännu inte för SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Lås av band, läge och cell stöds inte medan växling mellan två SIM styr radion"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Det här modemet stöder inget av dessa band"
 
 msgid "Invalid page"
 msgstr "Ogiltig sida"
