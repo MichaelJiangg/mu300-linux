@@ -12020,6 +12020,58 @@ source must offer first is logged (rate-limited) as a frame read wrong. PD stays
 behaves as before. With `mu300-usb pd on`, a PD charger and the dock from FINDINGS 150 negotiate, and the log has
 no "source capabilities without 5 V first".
 
+### 225. 7.2 and 7.3 skip the PCIe link wait too; utilisation clamps let the Wi-Fi TX thread's floor take effect
+
+**Status: built for 6.18.58, 7.2.12 and 7.3 here; kanoqwq ran the 7.2 patch and the options on his U30 Air (7.2.8).
+Not run on a device here.** From kanoqwq's `f0b5ad43` (his `patches/7.2/0026` and config, after liuwang97).
+
+**The link wait.** FINDINGS 214's patch (`patches/6.18/0028`) was 6.18 only. 7.2 and 7.3 have the same wait, 10 x
+90 ms in `dw_pcie_host_init()`, but now act on its result: a timeout fails the probe, nothing in Detect is `-ENODEV`
+and goes on. `patches/7.2/0028` and `patches/7.3/0028` let a driver that sets `skip_link_wait` count the skipped wait as
+no error; the wait on resume is untouched. pcie-sprd already set it wherever the header defines
+`DW_PCIE_HAS_SKIP_LINK_WAIT`, so on 7.x the Marlin3's root port stops waiting 0.9 s at every boot as on 6.18.
+
+**Utilisation clamps (`UCLAMP_TASK`, `UCLAMP_TASK_GROUP`).** The vendor Wi-Fi driver asks for a utilisation floor of
+400 for its TX thread while TX or RX is above 25 MB/s (`sc2355_set_thread_uclamp`, `SET_UCLAMP_THRESHOLD`) and drops it
+below; without the option the kernel refused that request, so the floor never took effect. With it, schedutil runs
+the CPU that thread is on at about 40 % of its capacity or more during heavy Wi-Fi traffic. Nothing else sets a clamp:
+the static key stays off until something does, and real-time tasks get the maximum frequency with or without it.
+`THERMAL_NETLINK` adds the thermal core's netlink events (trip crossings, cooling changes) for a listener; nothing
+listens yet.
+
+**Device check:** on 7.2 or 7.3, dmesg has no "Phy link never came up" / link-wait pause before the root port probe,
+and the Wi-Fi comes up as before; a Wi-Fi speed test shows `uclamp.min` 400 on the TX thread (`chrt`/`/proc/<pid>/sched`)
+while it runs.
+
+### 226. The U30 Air's bq256xx `charge_type` as a pause: N/A keeps the input, Fast charges again
+
+**Status: kanoqwq's reading on his U30 Air (OpenWrt, 2026-10-16); the mu300-power side runs offline only here.**
+From kanoqwq's `61bb5a30` (his `docs/U30AIR-WEB-CHARGING-20261016.zh-CN.md`), which answers the open question of §36
+("what the bq256xx `charge_type` node does on writes"):
+
+- Writing `N/A` to `/sys/class/power_supply/bq256xx-charger/charge_type` pauses the battery's charge and nothing else:
+  the node then reads `N/A`, `status` reads `Not charging`, `online` stays `1`, the input current limit stays where
+  BC1.2 / Type-C put it (2,000,000 uA on his charger), and USB LAN and the cellular WAN stay up. The device keeps
+  running on the charger; the driver only clears CHG_CONFIG and remembers the pause for its next VBUS check, so it
+  holds across a replug (§33d). It is not a battery bypass: a load the input does not cover still draws on the battery.
+- Writing `Fast` charges again. `Fast` is the enum the driver takes for "on", not a fast-charge protocol or a higher
+  current.
+- With a 70/80 % band set on a battery at 100 %, the pause came at once. Not checked by him: the restart at the lower
+  level after a discharge, and a replug or a PD dock during a pause.
+
+mu300-power now offers what his separate `mu300-charge` service did, as keys of the one charge guard (his service
+and ours would both have written `charge_type`): `RESUME_AT` (charging starts again under it instead of 5 points under
+`CHARGE_TO`; with `CHARGE_TO=100` a full battery waits until it drops under it), `CHARGE_PAUSE=1` (a pause by hand,
+`mu300-power charge pause|resume`, kept across boots) and `FULL_ONCE=1` (`mu300-power charge full`: the limit is set
+aside until the battery says Full at 100 %, then the key clears itself). All off by default; refused where there is
+no battery (F50, V50). The temperature pause keeps the last word: a resume or a full charge never turns charging on
+while the battery is out of range. The pause and the limit both give way under 5 % (as `CHARGE_TO=0` already did).
+On the LuCI and Cockpit power pages, U30 Air only.
+
+**Device check (U30 Air):** `mu300-power charge pause`: within 10 s `charge_type` N/A, `status` Not charging, the
+panel says "Charging paused: by hand"; `charge resume` charges again. `CHARGE_TO=80 RESUME_AT=60`: stops at 80 %, stays
+off down to 60 %, charges under it. `charge full` from 80 %: charges to 100 %, `FULL_ONCE=0` once Full, then held.
+
 ### 227. LED brightness: which lamps dim, and what the U30 Air's PMIC reads back
 
 **Status: kanoqwq's readings on his U30 Air (7.2.8, 2026-10-16, his `docs/U30AIR-LEDS-20261016.zh-CN.md`) and the
@@ -12055,54 +12107,3 @@ now fails with that, instead of reading a deaf chip.
 
 **Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
 a new hotspot password in LuCI reaches the tag without a reboot.
-
-### 226. The U30 Air's bq256xx `charge_type` as a pause: N/A keeps the input, Fast charges again
-
-**Status: kanoqwq's reading on his U30 Air (OpenWrt, 2026-10-16); the mu300-power side runs offline only here.**
-From kanoqwq's `61bb5a30` (his `docs/U30AIR-WEB-CHARGING-20261016.zh-CN.md`), which answers the open question of §36
-("what the bq256xx `charge_type` node does on writes"):
-
-- Writing `N/A` to `/sys/class/power_supply/bq256xx-charger/charge_type` pauses the battery's charge and nothing else:
-  the node then reads `N/A`, `status` reads `Not charging`, `online` stays `1`, the input current limit stays where
-  BC1.2 / Type-C put it (2,000,000 uA on his charger), and USB LAN and the cellular WAN stay up. The device keeps
-  running on the charger; the driver only clears CHG_CONFIG and remembers the pause for its next VBUS check, so it
-  holds across a replug (§33d). It is not a battery bypass: a load the input does not cover still draws on the battery.
-- Writing `Fast` charges again. `Fast` is the enum the driver takes for "on", not a fast-charge protocol or a higher
-  current.
-- With a 70/80 % band set on a battery at 100 %, the pause came at once. Not checked by him: the restart at the lower
-  level after a discharge, and a replug or a PD dock during a pause.
-
-mu300-power now offers what his separate `mu300-charge` service did, as keys of the one charge guard (his service
-and ours would both have written `charge_type`): `RESUME_AT` (charging starts again under it instead of 5 points under
-`CHARGE_TO`; with `CHARGE_TO=100` a full battery waits until it drops under it), `CHARGE_PAUSE=1` (a pause by hand,
-`mu300-power charge pause|resume`, kept across boots) and `FULL_ONCE=1` (`mu300-power charge full`: the limit is set
-aside until the battery says Full at 100 %, then the key clears itself). All off by default; refused where there is
-no battery (F50, V50). The temperature pause keeps the last word: a resume or a full charge never turns charging on
-while the battery is out of range. The pause and the limit both give way under 5 % (as `CHARGE_TO=0` already did).
-On the LuCI and Cockpit power pages, U30 Air only.
-
-**Device check (U30 Air):** `mu300-power charge pause`: within 10 s `charge_type` N/A, `status` Not charging, the
-panel says "Charging paused: by hand"; `charge resume` charges again. `CHARGE_TO=80 RESUME_AT=60`: stops at 80 %, stays
-off down to 60 %, charges under it. `charge full` from 80 %: charges to 100 %, `FULL_ONCE=0` once Full, then held.
-### 225. 7.2 and 7.3 skip the PCIe link wait too; utilisation clamps let the Wi-Fi TX thread's floor take effect
-
-**Status: built for 6.18.58, 7.2.12 and 7.3 here; kanoqwq ran the 7.2 patch and the options on his U30 Air (7.2.8).
-Not run on a device here.** From kanoqwq's `f0b5ad43` (his `patches/7.2/0026` and config, after liuwang97).
-
-**The link wait.** FINDINGS 214's patch (`patches/6.18/0028`) was 6.18 only. 7.2 and 7.3 have the same wait, 10 x
-90 ms in `dw_pcie_host_init()`, but now act on its result: a timeout fails the probe, nothing in Detect is `-ENODEV`
-and goes on. `patches/7.2/0028` and `patches/7.3/0028` let a driver that sets `skip_link_wait` count the skipped wait as
-no error; the wait on resume is untouched. pcie-sprd already set it wherever the header defines
-`DW_PCIE_HAS_SKIP_LINK_WAIT`, so on 7.x the Marlin3's root port stops waiting 0.9 s at every boot as on 6.18.
-
-**Utilisation clamps (`UCLAMP_TASK`, `UCLAMP_TASK_GROUP`).** The vendor Wi-Fi driver asks for a utilisation floor of
-400 for its TX thread while TX or RX is above 25 MB/s (`sc2355_set_thread_uclamp`, `SET_UCLAMP_THRESHOLD`) and drops it
-below; without the option the kernel refused that request, so the floor never took effect. With it, schedutil runs
-the CPU that thread is on at about 40 % of its capacity or more during heavy Wi-Fi traffic. Nothing else sets a clamp:
-the static key stays off until something does, and real-time tasks get the maximum frequency with or without it.
-`THERMAL_NETLINK` adds the thermal core's netlink events (trip crossings, cooling changes) for a listener; nothing
-listens yet.
-
-**Device check:** on 7.2 or 7.3, dmesg has no "Phy link never came up" / link-wait pause before the root port probe,
-and the Wi-Fi comes up as before; a Wi-Fi speed test shows `uclamp.min` 400 on the TX thread (`chrt`/`/proc/<pid>/sched`)
-while it runs.
