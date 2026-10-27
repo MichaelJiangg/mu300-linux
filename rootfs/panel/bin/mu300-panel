@@ -46,6 +46,15 @@ is_ubuntu() { [ ! -e "$R/etc/openwrt_release" ] && grep -q '^ID=ubuntu' "$R/etc/
 release() { sed -n 's/^VERSION_ID="\{0,1\}\([0-9.]*\)"\{0,1\}$/\1/p' "$R/etc/os-release" 2>/dev/null | head -n1; }
 need_root() { [ "$(id -u)" = 0 ] || die "run as root (sudo mu300-panel $*)"; }
 have_cockpit() { [ -x "$R/usr/libexec/cockpit-ws" ] || [ -x "$R/usr/lib/cockpit/cockpit-ws" ]; }
+# cockpit-ws's state in dpkg's database (installed, half-configured, ...; empty: not installed)
+ws_status() { dpkg-query ${R:+--admindir="$R/var/lib/dpkg"} -W -f='${db:Status-Status}' cockpit-ws 2>/dev/null; }
+# Cockpit there and configured. A half-configured cockpit-ws (its postinst failed, see clear_stale_links) counts as
+# missing: the restore installs it again.
+cockpit_ok() {
+    have_cockpit || return 1
+    case $(ws_status) in half-configured|unpacked|half-installed|triggers-awaited|triggers-pending) return 1 ;; esac
+    return 0
+}
 
 # ---- configuration ---------------------------------------------------------------------------------------------
 conf_text() {
@@ -116,10 +125,23 @@ apt_net() {
         apt_env apt-get "$_cmd" $APT_NET_OPTS "$@"
     fi
 }
+# clear_stale_links: cockpit-ws's postinst, on a first install, links /etc/motd.d/cockpit and /etc/issue.d/cockpit.issue
+# with a plain ln -s, which fails when the link is already there. An update carries /etc over to the new system, the
+# links with it, but not the packages: the restore's install then failed (ln: failed to create symbolic link
+# '/etc/motd.d/cockpit': File exists) and dpkg left cockpit-ws half-configured (F50, v2026.10.27.2). Removed before
+# the install while cockpit-ws is not configured; the postinst makes them again. Only links into /run/cockpit.
+clear_stale_links() {
+    [ "$(ws_status)" = installed ] && return 0
+    for _l in "$R/etc/motd.d/cockpit" "$R/etc/issue.d/cockpit.issue"; do
+        [ -L "$_l" ] || continue
+        case $(readlink "$_l") in *run/cockpit/*) rm -f "$_l" ;; esac
+    done
+}
 # install_pkgs: this extra's packages for this release first (offline), then Ubuntu's archive. What the archive gives
 # is kept in the extra (debs/RELEASE, as the offline extra has them): an update replaces the system and its packages,
 # and the restore at its first boot then installs Cockpit from there, online or not.
 install_pkgs() {
+    clear_stale_links
     _rel=$(release)
     _debs=$PANEL/debs/$_rel
     if ls "$_debs"/*.deb >/dev/null 2>&1; then
@@ -157,7 +179,7 @@ do_install() {
     # the LAN, not even for a moment
     configure || true
     link_page
-    if ! have_cockpit; then
+    if ! cockpit_ok; then
         install_pkgs || die "Cockpit could not be installed (is the device online? Offline: copy mu300-extra-panel-offline.tar.gz of the release onto it and run: sudo mu300-extra install panel --from FILE)"
     fi
     reload_socket
@@ -183,13 +205,13 @@ do_remove() {
 do_link() {
     is_ubuntu || return 0
     link_page
-    if have_cockpit; then
+    if cockpit_ok; then
         # only when a file of ours was changed or deleted since (an update brings no Cockpit, see below)
         if configure; then reload_socket; fi
         return 0
     fi
-    # Cockpit gone: this system was replaced by an update (its packages are not carried over). Put it back in the
-    # background, the configuration first.
+    # Cockpit gone: this system was replaced by an update (its packages are not carried over), or cockpit-ws is left
+    # half-configured. Put it back in the background, the configuration first.
     configure || true
     if command -v systemd-run >/dev/null 2>&1; then
         systemd-run --no-block --quiet --collect --unit=mu300-panel-restore \
@@ -208,7 +230,7 @@ do_restore() {
     exec 9>"$RUN/restore.lock"
     if command -v flock >/dev/null 2>&1; then flock -n 9 || return 0; fi
     _try=1
-    while ! have_cockpit; do
+    while ! cockpit_ok; do
         install_pkgs && break
         [ "$_try" -ge "${MU300_PANEL_TRIES:-10}" ] && die "Cockpit could not be installed again: the device is offline and the panel extra has no packages for Ubuntu $(release). Copy mu300-extra-panel-offline.tar.gz of the release onto the device and run: sudo mu300-extra install panel --from FILE (or, once online: sudo mu300-panel install)"
         _try=$((_try + 1))

@@ -350,6 +350,46 @@ class PanelExtra(ExtrasBase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertTrue((self.root / 'usr/lib/cockpit/cockpit-ws').exists())
 
+    def test_restore_clears_the_carried_motd_links(self):
+        # an update carries /etc over (cockpit-ws's motd and issue links with it) but not the packages: cockpit-ws's
+        # postinst then failed on its plain ln -s and dpkg left it half-configured (F50, v2026.10.27.2)
+        off = panel_tarball(self.tmp / 'p.tar.gz', debs=[('24.04', 'cockpit-ws_314-1_arm64.deb')])
+        self.stub('apt-get', 'echo "apt-get $*" >> "$STUBLOG/apt"; '
+                  'mkdir -p "$MU300_SYSROOT/etc/motd.d" "$MU300_SYSROOT/etc/issue.d" && '
+                  'ln -s ../../run/cockpit/motd "$MU300_SYSROOT/etc/motd.d/cockpit" && '
+                  'ln -s ../../run/cockpit/issue "$MU300_SYSROOT/etc/issue.d/cockpit.issue" || exit 1; '
+                  'mkdir -p "$MU300_SYSROOT/usr/lib/cockpit" && : > "$MU300_SYSROOT/usr/lib/cockpit/cockpit-ws" && '
+                  'chmod 755 "$MU300_SYSROOT/usr/lib/cockpit/cockpit-ws"')
+        for shell in self.each_shell():
+            self.reset(shell)
+            self.up(shell, f'extra_unpack panel "{off}"')
+            for d in ('motd.d', 'issue.d'):
+                shutil.rmtree(self.root / 'etc' / d, ignore_errors=True)
+                (self.root / 'etc' / d).mkdir(parents=True)
+            os.symlink('../../run/cockpit/motd', self.root / 'etc/motd.d/cockpit')
+            os.symlink('../../run/cockpit/issue', self.root / 'etc/issue.d/cockpit.issue')
+            os.symlink('../../run/other/motd', self.root / 'etc/motd.d/other')      # not Cockpit's: stays
+            env = dict(MU300_SYSROOT=self.root, MU300_PANEL_DIR=self.panel(), MU300_RUN=self.tmp / 'run',
+                       MU300_PANEL_RETRY=0, MU300_PANEL_TRIES=1)
+            r = self.script(shell, CMD, 'restore', **env)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertNotIn('Ubuntu\'s archive', r.stderr)        # the extra's packages installed the first time
+            self.assertEqual(os.readlink(self.root / 'etc/motd.d/cockpit'), '../../run/cockpit/motd')
+            self.assertTrue((self.root / 'etc/motd.d/other').is_symlink())
+            self.assertTrue((self.root / 'usr/lib/cockpit/cockpit-ws').exists())
+
+    def test_half_configured_cockpit_is_restored(self):
+        # a cockpit-ws left half-configured (its files there) counts as missing: link starts the restore job
+        off = panel_tarball(self.tmp / 'p.tar.gz', debs=[('24.04', 'cockpit-ws_314-1_arm64.deb')])
+        for shell in self.each_shell():
+            self.reset(shell)
+            self.ex(shell, 'install', 'panel', '--from', off)
+            self.log('systemd-run')
+            self.stub('dpkg-query', 'echo half-configured')
+            self.assertEqual(self.ex(shell, 'link').returncode, 0)
+            self.assertIn('mu300-panel restore', self.log('systemd-run'))
+            self.stub('dpkg-query', 'exit 1')
+
 
 class Command(ShellTest):
     """mu300-panel info and hotspot-set"""
