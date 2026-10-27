@@ -51,6 +51,23 @@ node_ok() {
 }
 # --- node end
 [ -b "$LOGDEV" ] || exit 0
+# --- cpus begin
+# On the little cluster (kanoqwq f0b5ad43, after liuwang97): a round reads the kernel's whole log, work that woke a big
+# core every two seconds of the boot's first minutes. This starts before anything places services, so it pins itself
+# (and what it starts) to the CPUs of the lowest cpu_capacity, where there is a taskset; nothing changes without one.
+little_cpus() {
+    _lc_min= _lc_list=
+    for _c in "${MU300_CPUDIR:-/sys/devices/system/cpu}"/cpu[0-9]*; do
+        _cap=; read -r _cap < "$_c/cpu_capacity" 2>/dev/null
+        case $_cap in ''|*[!0-9]*) continue ;; esac
+        if [ -z "$_lc_min" ] || [ "$_cap" -lt "$_lc_min" ]; then _lc_min=$_cap; _lc_list=${_c##*/cpu}
+        elif [ "$_cap" = "$_lc_min" ]; then _lc_list="$_lc_list,${_c##*/cpu}"; fi
+    done
+    echo "$_lc_list"
+}
+# --- cpus end
+_lc=$(little_cpus)
+[ -z "$_lc" ] || taskset -pc "$_lc" $$ >/dev/null 2>&1 || true
 end=$(( $(cut -d. -f1 /proc/uptime) + ${1:-300} ))
 while [ "$(cut -d. -f1 /proc/uptime)" -lt "$end" ]; do
     {
@@ -59,7 +76,7 @@ while [ "$(cut -d. -f1 /proc/uptime)" -lt "$end" ]; do
         ip -br addr 2>/dev/null
         echo "--- lsmod"
         systemctl list-units --no-legend --plain --state=activating,failed 2>/dev/null
-        [ -f /etc/openwrt_release ] && { echo "--- ps"; ps w 2>/dev/null; echo "--- logread"; logread 2>/dev/null | grep -v PR_CAPBSET | tail -300; echo "--- android logcat"; tail -150 /var/log/android-logcat.txt 2>/dev/null; echo "--- mu300 logs"; tail -40 /tmp/mu300-*.log 2>/dev/null; }
+        [ -f /etc/openwrt_release ] && { echo "--- ps"; ps w 2>/dev/null; echo "--- logread"; logread -l 300 2>/dev/null | grep -v PR_CAPBSET; echo "--- android logcat"; tail -150 /var/log/android-logcat.txt 2>/dev/null; echo "--- mu300 logs"; tail -40 /tmp/mu300-*.log 2>/dev/null; }
         echo "--- dmesg"
         dmesg | tail -c 1000000
         echo "MU300-PERSIST-END"

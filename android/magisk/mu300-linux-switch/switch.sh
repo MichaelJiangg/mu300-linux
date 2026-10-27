@@ -4,6 +4,7 @@
 #   mu300-linux            arm the one-shot trial and reboot
 #   mu300-linux status     show what is on each slot, change nothing
 #   mu300-linux --dry-run  do everything except writing and rebooting
+#   mu300-linux --no-reboot  arm the trial and stop there (for an installer that reboots by itself)
 #   mu300-linux bootchain  whether the boot chain (uboot, sml, teecfg, trustos, vbmeta) differs between the slots
 #   mu300-linux bootchain sync   copy Android's slot's chain to the Linux slot, backed up first (bootchain.sh)
 #
@@ -20,9 +21,11 @@ ANDROID_ARMED=158       # 0x9e: priority 14, tries 1, successful 1
 LINUX_ARMED=47          # 0x2f: priority 15, tries 2, successful 0
 
 DRY=0
+REBOOT=1
 case ${1:-} in
     status) ACTION=status ;;
     --dry-run|-n) DRY=1; ACTION=switch ;;
+    --no-reboot) REBOOT=0; ACTION=switch ;;
     ''|switch) ACTION=switch ;;
     bootchain)
         case ${2:-check} in
@@ -30,8 +33,8 @@ case ${1:-} in
             sync) exec sh "${0%/*}/bootchain.sh" sync ${3:+"$3"} ;;
             *) echo "usage: mu300-linux bootchain [sync]" >&2; exit 2 ;;
         esac ;;
-    -h|--help|help) sed -n '2,16s/^# \{0,1\}//p' "$0"; exit 0 ;;
-    *) echo "usage: mu300-linux [status|--dry-run|bootchain [sync]]" >&2; exit 2 ;;
+    -h|--help|help) sed -n '2,17s/^# \{0,1\}//p' "$0"; exit 0 ;;
+    *) echo "usage: mu300-linux [status|--dry-run|--no-reboot|bootchain [sync]]" >&2; exit 2 ;;
 esac
 
 die() { echo "mu300-linux: $*" >&2; exit 1; }
@@ -175,14 +178,22 @@ fi
 case $new in *[!0-9a-f]*) die "the new block is not hex ($new)" ;; esac
 esc=$(echo "$new" | sed 's/../\\x&/g')
 [ "$($BB printf "$esc" | $BB wc -c | tr -d ' ')" = 32 ] || die "the new block is not 32 bytes"
-$BB printf "$esc" | dd of="$MISC" bs=1 count=32 seek="$BC_OFFSET" conv=notrunc 2>/dev/null ||
-    die "writing misc failed"
+# conv=fsync: the block is on the eMMC itself, not only in its cache, before this says armed (kanoqwq f6b0668d); sync
+# alone writes the page cache back but asks the eMMC for no flush. A dd that does not know fsync refuses it before
+# writing anything, and then writes the block as it always did.
+write_bc() { $BB printf "$esc" | dd of="$MISC" bs=1 count=32 seek="$BC_OFFSET" conv="$1" 2>/dev/null; }
+write_bc notrunc,fsync || write_bc notrunc || die "writing misc failed"
 sync
 
 back=$(hex_of "$MISC" "$BC_OFFSET" 32)
 [ "$back" = "$new" ] || die "misc verify failed ($back) - reboot normally, Android is unaffected"
 
 echo
+if [ "$REBOOT" = 0 ]; then
+    echo "slot $linux_slot armed for one boot: Linux starts at the next reboot."
+    echo "If it does not boot, the device returns to Android by itself."
+    exit 0
+fi
 echo "slot $linux_slot armed for one boot. Rebooting into Linux."
 echo "If it does not boot, the device returns to Android by itself."
 sleep 3

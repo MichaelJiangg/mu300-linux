@@ -3311,6 +3311,28 @@ class Led(ShellTest):
             self.led(shell, 'u30air', 'sleep', '--if-due')
             self.assertEqual(self.state()['sc27xx:green'], '0')
 
+    def test_sleep_darkens_lamps_it_has_no_state_for(self):
+        """kanoqwq dbd6bf1e: a lamp lit without a state file here (the boot's hand-off, a late driver, a run cut
+        short) stayed lit past the timeout; the battery LED is written again, not taken as last written."""
+        for shell in self.each_shell():
+            self.reset()
+            self.sim(0)
+            self.uptime(100)
+            self.led(shell, 'u30air', 'power', 'on')
+            self.led(shell, 'u30air', 'data', 'on')
+            for n in ('zte-ldo1', 'zte-ldo2', 'net_blue'):    # lit behind this script's back
+                (self.root / 'sys/class/leds' / n / 'brightness').write_text('255\n')
+            self.uptime(161)
+            self.led(shell, 'u30air', 'sleep', '--if-due')
+            self.assertEqual({v for v in self.state().values()}, {'0'})
+            self.assertFalse((self.root / 'run/mu300/led/zte-ldo1').exists())   # no state made up for them
+            # dark already, and the battery channel lit again by something else: idle on puts it out too
+            (self.root / 'sys/class/leds/sc27xx:green/brightness').write_text('120\n')
+            (self.root / 'sys/class/leds/zte-ldo2/brightness').write_text('255\n')
+            self.led(shell, 'u30air', 'idle', 'on')
+            self.assertEqual({v for v in self.state().values()}, {'0'})
+            self.led(shell, 'u30air', 'idle', 'off')
+
     def test_idle_darkens_everything_but_a_key_still_shows_them(self):
         """2026-10-07: under the idle flag a key press lit nothing, and the device looked powered off for hours. A
         key's wake now shows the LEDs for LED_TIMEOUT (a minute when it is 0) in idle too; then dark again."""
@@ -4445,6 +4467,25 @@ class ThermalGuard(ShellTest):
                 self.round(shell, 60000)
             self.assertEqual((p / 'scaling_max_freq').read_text().strip(), '2002000')
 
+    def test_a_round_without_a_reading_lifts_no_cap_and_keeps_the_alarm(self):
+        # every zone failing (no number this round) reads as 0: that is not a cool SoC, so no cap goes and the alarm
+        # stays on until a real reading is cool (after kanoqwq cc0ecce7)
+        freqs = [614400, 936000, 1105000, 2002000]
+        self.stub('logger', 'echo "$*" >> "$STUBLOG/log"')
+        for shell in self.each_shell():
+            shutil.rmtree(self.root, ignore_errors=True)
+            self.device('u30air')
+            p = self.policy('policy0', freqs, 936000)
+            self.assertEqual(self.round(shell, 90000), ['mu300-led alarm on'])
+            capped = (p / 'scaling_max_freq').read_text().strip()
+            for bad in ('', 'error', '-'):
+                (self.tmp / 'log').unlink(missing_ok=True)
+                self.assertEqual(self.round(shell, bad), [], repr(bad))
+                self.assertEqual((p / 'scaling_max_freq').read_text().strip(), capped, repr(bad))
+                self.assertIn('no thermal zone gave a temperature', self.log())
+            self.assertEqual(self.round(shell, 60000), ['mu300-led alarm off'])
+            self.assertNotEqual((p / 'scaling_max_freq').read_text().strip(), capped)
+
 
 class Nfc(ShellTest):
     """mu300-nfc against a fake FM11NT08: 1 KiB behind a stub i2ctransfer, which answers only while a stub gpioset
@@ -5389,6 +5430,29 @@ class NextBoot(ShellTest):
         self.assertEqual((self.bc()[14], conf.read_text()), (0x6f, 'linux\n'))
         self.assertEqual([p.name for p in self.tmp.glob('.default-boot.*')], [])
 
+    def test_misc_put_back_when_the_default_boot_cannot_be_written(self):
+        # kanoqwq f6b0668d: misc written and read back, then the file fails: misc gets its previous block back, so
+        # the file and misc never disagree (here: misc on Android's block with the file still saying linux)
+        android_a, _ = self.slot_b_blocks()
+        conf = self.tmp / 'default-boot'
+        self.assertEqual(self.nb('--rearm').returncode, 0)
+        before = self.misc.read_bytes()
+        self.assertNotEqual(self.bc(), android_a)
+        os.chmod(self.tmp, 0o555)                   # the file's directory cannot take the new file
+        try:
+            if os.access(self.tmp, os.W_OK):
+                self.skipTest('running as root: a read-only directory is still writable')
+            r = self.nb('android')
+        finally:
+            os.chmod(self.tmp, 0o755)
+        self.assertEqual(r.returncode, 1, r.stderr)
+        self.assertIn('misc put back as it was', r.stderr)
+        self.assertEqual(self.misc.read_bytes(), before)
+        self.assertEqual(conf.read_text(), 'linux\n')
+        r = self.nb('android')                       # and once it can be written, as usual
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual((self.bc(), conf.read_text()), (android_a, 'android\n'))
+
     def test_the_degraded_arm_still_records_linux(self):
         # FINDINGS 32: a slot block that cannot be rebuilt here gets the initramfs' one-shot block - written and read
         # back, so "linux" is recorded with it as before (exit 1 says the arm is degraded)
@@ -5532,6 +5596,34 @@ class EarlyRecorder(ShellTest):
                         p.write_text(data)
                 r = self.sh(shell, m.group(1) + '\necho "$PART"', MU300_RUN=run, MU300_CMDLINE_SRC=cmdline)
                 self.assertEqual((r.stdout.strip(), r.stderr), (f'boot_{want}', ''), (v, cl))
+
+
+class EarlyRecorderCpus(ShellTest):
+    """early-recorder pins itself to the CPUs of the lowest cpu_capacity (kanoqwq f0b5ad43, after liuwang97)."""
+
+    def little(self, shell, caps):
+        import re
+        m = re.search(r'# --- cpus begin\n(.*?)# --- cpus end', (BIN / 'early-recorder').read_text(), re.S)
+        self.assertIsNotNone(m, 'early-recorder has no cpus block')
+        cpus = self.tmp / 'cpu'
+        shutil.rmtree(cpus, ignore_errors=True)
+        for n, cap in caps.items():
+            d = cpus / f'cpu{n}'
+            d.mkdir(parents=True)
+            if cap is not None:
+                (d / 'cpu_capacity').write_text(f'{cap}\n')
+        (cpus / 'cpufreq').mkdir(parents=True, exist_ok=True)
+        r = self.sh(shell, f'MU300_CPUDIR="{cpus}"\n' + m.group(1) + '\nlittle_cpus')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def test_lowest_capacity(self):
+        for shell in self.each_shell():
+            # three clusters, as cpufreq's policy0, policy4 and policy7 have them here
+            self.assertEqual(self.little(shell, {0: 436, 1: 436, 2: 436, 3: 436, 4: 943, 5: 943, 6: 943, 7: 1024}),
+                             '0,1,2,3')
+            self.assertEqual(self.little(shell, {0: 1024, 1: 512, 2: None, 3: 512}), '1,3')
+            self.assertEqual(self.little(shell, {0: None}), '')       # nothing known: no pinning
 
 
 class EarlyRecorderNode(ShellTest):

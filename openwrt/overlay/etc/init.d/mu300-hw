@@ -20,6 +20,8 @@ hw_bringup() {
 	# as the phy is there) already runs under them. The Wi-Fi then comes before the vendor extras and zram, which held
 	# it back ~2 s at every boot (10 modprobes of modules this kernel does not have, and the Mali GPU's).
 	/opt/mu300/bin/regdb-load >/tmp/mu300-wifi-start.log 2>&1
+	# a broken /etc/board.json made again before the wifi-scripts read it (the bring-up goes on either way)
+	/opt/mu300/bin/openwrt-board-check >>/tmp/mu300-wifi-start.log 2>&1
 	country=$(uci -q get wireless.radio0.country)
 	[ -n "$country" ] && iw reg set "$country"
 	/opt/mu300/bin/wifi-start >>/tmp/mu300-wifi-start.log 2>&1
@@ -52,13 +54,15 @@ hw_bringup() {
 	wifi up >>/tmp/mu300-wifi-start.log 2>&1
 }
 
-# ap_enabled_soon: true once hostapd reports wlan0 ENABLED (20 s at most); false when it gives up (DISABLED) or never
-# gets there
+# ap_enabled_soon: true once the Wi-Fi is up as configured (wifi-ready: every enabled radio and interface, each access
+# point ENABLED; one switched off counts as up), 20 s at most; false when it fails (a radio netifd gave up on, an access
+# point DISABLED) or never gets there. It asked hostapd.wlan0 alone before, which a hotspot switched off never has.
 ap_enabled_soon() {
 	for n in $(seq 1 100); do
-		case $(ubus -S call hostapd.wlan0 get_status 2>/dev/null | jsonfilter -e '@.status' 2>/dev/null) in
-			ENABLED) return 0 ;;
-			DISABLED) return 1 ;;
+		/opt/mu300/bin/wifi-ready
+		case $? in
+			0) return 0 ;;
+			2) return 1 ;;
 		esac
 		/opt/mu300/bin/busybox sleep 0.2 2>/dev/null || sleep 1
 	done
