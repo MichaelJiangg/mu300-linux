@@ -1,0 +1,34 @@
+SC2355: address the real command descriptor before applying group BK priority; keep per-frame logs debug-only.
+Ported from kanoqwq/mu300-linux 149c9d2a (5.4 counterpart of the mainline fix).
+
+--- a/sc2355/cmdevt.c
++++ b/sc2355/cmdevt.c
+@@ -2662,6 +2662,13 @@
+ 			return -EPERM;
+ 		}
+ 	}
++	/* PCIe prepended its address prefix; SDIO has not added FLAG_SIZE yet.
++	 * Select the real descriptor before adding the SDIO transport prefix.
++	 * E5's SDIO driver likewise uses skb->data + hif->dscr_rsvd here.
++	 */
++	dscr = (struct tx_msdu_dscr *)(skb->data +
++		(hif->hw_type == SPRD_HW_SC2355_PCIE ? MSDU_DSCR_RSVD : 0));
++
+ 	/*alloc five byte for fw 16 byte need
+ 	 *dscr:11+flag:5 =16
+ 	 */
+@@ -2669,12 +2676,11 @@
+ 		skb_push(skb,FLAG_SIZE);
+ 		memcpy(skb->data,temp_flag,FLAG_SIZE);
+ 	}
+-	    /*send group in BK to avoid FW hang*/
+-	    dscr = (struct tx_msdu_dscr *)skb->data;
++	/*send group in BK to avoid FW hang*/
+ 	if ((vif->mode == SPRD_MODE_AP ||
+ 	     vif->mode == SPRD_MODE_P2P_GO) && dscr->sta_lut_index < 6) {
+ 		dscr->buffer_info.msdu_tid = prio_1;
+-		pr_info("%s, %d, SOFTAP/GO group go as BK\n", __func__,
++		pr_debug("%s, %d, SOFTAP/GO group go as BK\n", __func__,
+ 			__LINE__);
+ 	}
+ 

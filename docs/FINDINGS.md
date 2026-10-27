@@ -12107,3 +12107,51 @@ now fails with that, instead of reading a deaf chip.
 
 **Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
 a new hotspot password in LuCI reaches the tag without a reboot.
+
+### 230. The 5.4 kernel gets the Wi-Fi TX and SDHCI fixes the mainline kernels have (FINDINGS 92, 93, 103, #339)
+
+**Status: built for 5.4.254 and run on F50-B, 5 boots (2026-10-27).** From kanoqwq's `149c9d2a`, `3cbf37fc` and
+`0438ab01`, his 5.4 versions of fixes we had made for mainline only ("the vendor tree is not in the repo" - but
+`kernel/build-all.sh` fetches it). He applied them to the pristine trees and compiled the Wi-Fi module; he did not
+run them.
+
+Seven patches, applied with `--fuzz=0` after ours:
+
+| patch | what | mainline |
+|---|---|---|
+| `wlan_combo-tx-retry` | a full EDMA pending ring is retried, not counted as a TX failure (more than 50 flushed the queue); the bus's completion wakes the TX thread | FINDINGS 103 |
+| `sprdwcn-tx-pending-backpressure` (kernel) | that ring answers `-EAGAIN` instead of `ERROR`, logged once a minute; a direct push that fails clears the channel's "pending" state when nothing is queued behind it | FINDINGS 103, #339 |
+| `wlan_combo-skb-headroom` | the descriptor fill keeps the caller's skb (it freed it and went on with the pointer) and makes a cloned header writable | FINDINGS 103 |
+| `wlan_combo-special-data-prefix` | the AP's group-frame BK priority is set in the real descriptor, behind the PCIe prefix | FINDINGS 103 |
+| `wlan_combo-ipv6-multicast-data` | the AP's IPv6 multicast goes by the flow-controlled data queue on PCIe (DHCPv6 and VoWiFi keep the command path) | FINDINGS 103 |
+| `wlan_combo-stale-tx-ratelimit` | per-frame "sta disconn" / "group lut_index" / "drop msg" lines debug-only or rate-limited | FINDINGS 92 |
+| `sdhci-sprd-dma-ordering` (kernel) | the SDHCI accessors use ordered MMIO, so ADMA descriptors are visible before the doorbell | FINDINGS 93 |
+
+Not taken: his `sprdwcn-edma-pressure-stats`, `wlan_combo-tx-pressure-logging` and `wlan_combo-rx-ip-multicast-endian`
+(diagnostics and a change FINDINGS 92 declined). His backpressure patch was written on top of the first; it is rebased
+here, and gets the two #339 changes the mainline `wcn_bsp` has since (quiet log, the stuck "pending" state), and the
+Wi-Fi driver no longer logs `-EAGAIN` as "push link fail".
+
+**Measured on F50-B** (5 GHz AP, 80 MHz, a MacBook as the client; 150 MB down and 80 MB up over SSH, IPv6 link-local
+ping, `ping6 ff02::1`, RA addresses; the SD card read twice with `O_DIRECT` and compared; 128 MiB written to the eMMC
+with `O_DIRECT`, read back and compared):
+
+| | v2026.10.27.1's 5.4 | with these patches (5 boots) |
+|---|---|---|
+| "push link fail: -1" + "tx return err!" lines after one test | 204 + 203 | 0 + 0 |
+| "edma_pending_q_buffer(10) full" lines | 10 | 1 (once a minute at most) |
+| downlink (device TX), Mbit/s | 214 | 127-440 (median 261); 378-412 in a later run |
+| uplink, Mbit/s | 483 | 81-500 (median 448) |
+| IPv6 multicast / RA over Wi-Fi | yes | yes, every boot |
+| SD read, eMMC write/read-back | equal, 0 mmc errors | equal, 0 mmc errors, every boot |
+
+The throughput spread is the client's (the same runs on 7.3 spread as much); no stall, no lost ping, no call trace
+beyond the vendor's `add_uevent_var` warning every 5.4 boot has.
+
+**Two resets, not reproduced.** Later the same afternoon F50-B (no battery, on one of the Mac's own USB ports) lost
+power twice: once 1 s into a lock change's stack restart (SFUN 5 -> 4) and once during a 56 MB copy over USB
+networking. Both times LK reported `bootcause="Charger connected"`, there was no ramoops (no panic) and the journal
+just stops: a power cut, not a kernel fault. The second boot ran this patched kernel with the release's modules on
+the root file system. Afterwards neither came back, neither on the release's 5.4 (two 56 MB copies, two stack
+restarts) nor on this one again (three copies, three stack restarts, the Wi-Fi run above). Nothing in these patches
+reaches the PMIC or the power path; noted here in case it turns up again on 5.4.
