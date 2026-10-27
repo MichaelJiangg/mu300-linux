@@ -93,6 +93,10 @@ mu300-traffic                       # today, this billing cycle and the cap
 sudo mu300-traffic set reset-day 1  # the day a billing cycle starts
 sudo mu300-traffic set cap 50G      # a monthly cap; it warns at 90 % unless you set another level
 sudo mu300-traffic set cut on       # optional: mobile data off at the cap, back on when the next cycle starts
+sudo mu300-traffic set daily 2G     # optional: a daily quota, warned at the same percentage
+sudo mu300-traffic set daily-cut on # optional: mobile data off at the daily quota, back on at midnight
+sudo mu300-traffic set count rx     # the cap and the quota count downloads only (tx: uploads; total: both, default)
+sudo mu300-traffic set plan 'Night 50GB'   # a name for the plan, shown with the count
 mu300-traffic days                  # the last days with traffic
 ```
 

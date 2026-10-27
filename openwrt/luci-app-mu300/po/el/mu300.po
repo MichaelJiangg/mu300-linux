@@ -2348,8 +2348,26 @@ msgstr "Μηνιαίο όριο"
 msgid "%s, warning at %d%%"
 msgstr "%s, προειδοποίηση στο %d%%"
 
+msgid "Daily quota"
+msgstr "Ημερήσιο όριο"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Το μηνιαίο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά όταν αρχίσει η επόμενη περίοδος."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Το ημερήσιο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά τα μεσάνυχτα."
+
+msgid "The daily quota is reached"
+msgstr "Το ημερήσιο όριο εξαντλήθηκε"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Χρησιμοποιήθηκε το %d%% του ημερήσιου ορίου"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Το όριο και το ημερήσιο όριο μετρούν μόνο τις λήψεις."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Το όριο και το ημερήσιο όριο μετρούν μόνο τις αποστολές."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s περιμένει το ρολόι: δεν έχει ρυθμιστεί ακόμη από το δίκτυο. Ήδη μετράει σε αυτή την περίοδο και θα πάει στη μέρα του μόλις ρυθμιστεί το ρολόι."
@@ -2381,6 +2399,9 @@ msgstr "Ανά περίοδο χρέωσης"
 msgid "Billing cycle"
 msgstr "Περίοδος χρέωσης"
 
+msgid "Counted"
+msgstr "Μετρημένα"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Εισαγάγετε μέγεθος σε GB, για παράδειγμα 50 ή 2.5"
 
@@ -2392,6 +2413,21 @@ msgstr "Απενεργοποίηση δεδομένων κινητής στο ό
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Όταν αυτή η περίοδος φτάσει το όριο, τα δεδομένα κινητής απενεργοποιούνται: χωρίς internet μέσω του παρόχου μέχρι να αρχίσει η επόμενη περίοδος, να αυξηθεί το όριο ή να απενεργοποιηθεί ξανά αυτή η επιλογή. Αν ενεργοποιήσετε ξανά χειροκίνητα τα δεδομένα κινητής, μένουν ενεργά μέχρι την επόμενη επανεκκίνηση."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Απενεργοποίηση δεδομένων κινητής στο ημερήσιο όριο"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Όταν η σημερινή χρήση φτάσει το ημερήσιο όριο, τα δεδομένα κινητής απενεργοποιούνται έως τα μεσάνυχτα, έως ότου αυξηθεί το όριο ή απενεργοποιηθεί αυτή η επιλογή. Αν τα ενεργοποιήσετε χειροκίνητα, μένουν ενεργά έως την επόμενη επανεκκίνηση."
+
+msgid "Both ways"
+msgstr "Και προς τις δύο κατευθύνσεις"
+
+msgid "Downloads only"
+msgstr "Μόνο λήψεις"
+
+msgid "Uploads only"
+msgstr "Μόνο αποστολές"
 
 msgid "Set"
 msgstr "Ορισμός"
@@ -2416,6 +2452,15 @@ msgstr "Μηνιαίο όριο (GB, 0: κανένα)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Προειδοποίηση σε αυτό το ποσοστό του ορίου"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Ημερήσιο όριο (GB, 0: κανένα)"
+
+msgid "The cap and the daily quota count"
+msgstr "Τι μετρούν το όριο και το ημερήσιο όριο"
+
+msgid "Plan name"
+msgstr "Όνομα πακέτου"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Χρήση ως τώρα σε αυτή την περίοδο (GB)"

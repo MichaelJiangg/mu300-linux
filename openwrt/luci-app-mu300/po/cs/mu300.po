@@ -2348,8 +2348,26 @@ msgstr "Měsíční limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, varování při %d%%"
 
+msgid "Daily quota"
+msgstr "Denní kvóta"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Měsíční limit je vyčerpán: mobilní data byla vypnuta. Znovu se zapnou na začátku dalšího období."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Denní kvóta je vyčerpána: mobilní data byla vypnuta. Znovu se zapnou o půlnoci."
+
+msgid "The daily quota is reached"
+msgstr "Denní kvóta je vyčerpána"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Využito %d%% denní kvóty"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit a denní kvóta počítají jen stahování."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit a denní kvóta počítají jen odesílání."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s čeká na hodiny: ještě nebyly nastaveny ze sítě. Už se započítává do tohoto období a přejde ke svému dni, jakmile budou hodiny nastaveny."
@@ -2381,6 +2399,9 @@ msgstr "Po zúčtovacích obdobích"
 msgid "Billing cycle"
 msgstr "Zúčtovací období"
 
+msgid "Counted"
+msgstr "Započteno"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Zadejte velikost v GB, například 50 nebo 2.5"
 
@@ -2392,6 +2413,21 @@ msgstr "Vypnout mobilní data při dosažení limitu"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Když toto období dosáhne limitu, mobilní data se vypnou: žádný internet přes operátora, dokud nezačne další období, nezvýší se limit nebo se tato volba znovu nevypne. Ručně znovu zapnutá mobilní data zůstanou zapnutá do dalšího restartu."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Vypnout mobilní data při denní kvótě"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Když dnešní provoz dosáhne denní kvóty, mobilní data se vypnou do půlnoci, do zvýšení kvóty nebo do vypnutí této volby. Ruční zapnutí mobilních dat je ponechá zapnutá do dalšího restartu."
+
+msgid "Both ways"
+msgstr "Oba směry"
+
+msgid "Downloads only"
+msgstr "Jen stahování"
+
+msgid "Uploads only"
+msgstr "Jen odesílání"
 
 msgid "Set"
 msgstr "Nastavit"
@@ -2416,6 +2452,15 @@ msgstr "Měsíční limit (GB, 0: žádný)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varovat při tomto procentu limitu"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Denní kvóta (GB, 0: žádná)"
+
+msgid "The cap and the daily quota count"
+msgstr "Co počítá limit a denní kvóta"
+
+msgid "Plan name"
+msgstr "Název tarifu"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Dosud spotřebováno v tomto období (GB)"

@@ -2348,8 +2348,26 @@ msgstr "Plafond mensuel"
 msgid "%s, warning at %d%%"
 msgstr "%s, alerte à %d%%"
 
+msgid "Daily quota"
+msgstr "Quota journalier"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Le plafond mensuel est atteint : les données mobiles ont été coupées. Elles reviennent au début de la prochaine période."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Le quota journalier est atteint : les données mobiles ont été coupées. Elles reviennent à minuit."
+
+msgid "The daily quota is reached"
+msgstr "Le quota journalier est atteint"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% du quota journalier est utilisé"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Le plafond et le quota journalier ne comptent que les téléchargements."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Le plafond et le quota journalier ne comptent que les envois."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s attend l'horloge : elle n'a pas encore été réglée par le réseau. Cela compte déjà dans cette période et ira à son jour une fois l'horloge réglée."
@@ -2381,6 +2399,9 @@ msgstr "Par période de facturation"
 msgid "Billing cycle"
 msgstr "Période de facturation"
 
+msgid "Counted"
+msgstr "Compté"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Saisissez une taille en Go, par exemple 50 ou 2.5"
 
@@ -2392,6 +2413,21 @@ msgstr "Couper les données mobiles au plafond"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Quand cette période atteint le plafond, les données mobiles sont coupées : pas d'internet via l'opérateur jusqu'au début de la prochaine période, au relèvement du plafond ou à la désactivation de cette option. Les données mobiles réactivées à la main restent actives jusqu'au prochain redémarrage."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Couper les données mobiles au quota journalier"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Quand la consommation du jour atteint le quota journalier, les données mobiles sont coupées jusqu'à minuit, jusqu'à ce que le quota soit relevé ou que ceci soit désactivé. Les rallumer à la main les garde actives jusqu'au prochain redémarrage."
+
+msgid "Both ways"
+msgstr "Dans les deux sens"
+
+msgid "Downloads only"
+msgstr "Téléchargements seulement"
+
+msgid "Uploads only"
+msgstr "Envois seulement"
 
 msgid "Set"
 msgstr "Définir"
@@ -2416,6 +2452,15 @@ msgstr "Plafond mensuel (Go, 0 : aucun)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Alerte à ce pourcentage du plafond"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Quota journalier (Go, 0 : aucun)"
+
+msgid "The cap and the daily quota count"
+msgstr "Ce que comptent le plafond et le quota journalier"
+
+msgid "Plan name"
+msgstr "Nom du forfait"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Déjà utilisé dans cette période (Go)"

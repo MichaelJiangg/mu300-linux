@@ -944,6 +944,9 @@ msgstr "Fatura dönemi ve kota"
 msgid "History"
 msgstr "Geçmiş"
 
+msgid "Plan"
+msgstr "Tarife"
+
 msgid "$0 days left"
 msgstr "$0 gün kaldı"
 
@@ -956,6 +959,24 @@ msgstr "Kotaya ulaşıldı: mobil veri sonraki döneme kadar kapalı."
 msgid "Close to the monthly cap."
 msgstr "Aylık kotaya yaklaşıldı."
 
+msgid "Daily quota"
+msgstr "Günlük kota"
+
+msgid "The daily quota is reached: mobile data is off until midnight."
+msgstr "Günlük kotaya ulaşıldı: mobil veri gece yarısına kadar kapalı."
+
+msgid "The daily quota is reached."
+msgstr "Günlük kotaya ulaşıldı."
+
+msgid "Close to the daily quota."
+msgstr "Günlük kotaya yaklaşıldı."
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Kota ve günlük kota yalnızca indirmeleri sayar."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Kota ve günlük kota yalnızca yüklemeleri sayar."
+
 msgid "Interface counted"
 msgstr "Sayılan arayüz"
 
@@ -965,6 +986,21 @@ msgstr "Saat henüz ayarlanmadı (ağ saati yok): yeni trafik kendi gününe yaz
 msgid "Turn mobile data off at the cap until the next cycle"
 msgstr "Kotaya ulaşınca mobil veriyi sonraki döneme kadar kapat"
 
+msgid "Turn mobile data off at the daily quota until midnight"
+msgstr "Günlük kotada mobil veriyi gece yarısına kadar kapat"
+
+msgid "Both ways"
+msgstr "İki yön"
+
+msgid "Downloads only"
+msgstr "Yalnızca indirme"
+
+msgid "Uploads only"
+msgstr "Yalnızca yükleme"
+
+msgid "Plan name"
+msgstr "Tarife adı"
+
 msgid "The day a billing cycle starts (31: the month's last day)"
 msgstr "Fatura döneminin başladığı gün (31: ayın son günü)"
 
@@ -973,6 +1009,12 @@ msgstr "GiB cinsinden aylık kota (0: yok)"
 
 msgid "Warn at this percentage of the cap"
 msgstr "Kotanın bu yüzdesinde uyar"
+
+msgid "Daily quota in GiB (0: none)"
+msgstr "GiB cinsinden günlük kota (0: yok)"
+
+msgid "The cap and the daily quota count"
+msgstr "Kota ve günlük kotanın saydığı"
 
 msgid "Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100."
 msgstr "Değerleri kontrol edin: 1 ile 31 arası bir gün, 0 veya daha büyük bir kota, 1 ile 100 arası bir yüzde."
@@ -1009,6 +1051,9 @@ msgstr "Toplam"
 
 msgid "Billing cycles"
 msgstr "Fatura dönemleri"
+
+msgid "Counted"
+msgstr "Sayılan"
 
 msgid "Hotspot"
 msgstr "Hotspot"

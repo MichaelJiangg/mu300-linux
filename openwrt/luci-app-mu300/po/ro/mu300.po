@@ -2348,8 +2348,26 @@ msgstr "Limită lunară"
 msgid "%s, warning at %d%%"
 msgstr "%s, avertizare la %d%%"
 
+msgid "Daily quota"
+msgstr "Cotă zilnică"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Limita lunară a fost atinsă: datele mobile au fost oprite. Revin când începe ciclul următor."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Cota zilnică a fost atinsă: datele mobile au fost oprite. Revin la miezul nopții."
+
+msgid "The daily quota is reached"
+msgstr "Cota zilnică a fost atinsă"
+
+msgid "%d%% of the daily quota is used"
+msgstr "S-a folosit %d%% din cota zilnică"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limita și cota zilnică numără doar descărcările."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limita și cota zilnică numără doar încărcările."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s așteaptă ceasul: nu a fost încă setat din rețea. Se socotește deja în acest ciclu și va merge la ziua lui după ce ceasul e setat."
@@ -2381,6 +2399,9 @@ msgstr "Pe ciclu de facturare"
 msgid "Billing cycle"
 msgstr "Ciclu de facturare"
 
+msgid "Counted"
+msgstr "Numărat"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Introduceți o dimensiune în GB, de exemplu 50 sau 2.5"
 
@@ -2392,6 +2413,21 @@ msgstr "Oprește datele mobile la limită"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Când acest ciclu atinge limita, datele mobile se opresc: fără internet prin operator până începe ciclul următor, se mărește limita sau se dezactivează din nou această opțiune. Datele mobile repornite manual rămân pornite până la următoarea repornire."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Oprește datele mobile la cota zilnică"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Când consumul de azi atinge cota zilnică, datele mobile sunt oprite până la miezul nopții, până când cota este mărită sau până când aceasta este oprită din nou. Repornirea manuală a datelor mobile le păstrează pornite până la următoarea repornire."
+
+msgid "Both ways"
+msgstr "Ambele sensuri"
+
+msgid "Downloads only"
+msgstr "Doar descărcări"
+
+msgid "Uploads only"
+msgstr "Doar încărcări"
 
 msgid "Set"
 msgstr "Setează"
@@ -2416,6 +2452,15 @@ msgstr "Limită lunară (GB, 0: niciuna)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Avertizează la acest procent din limită"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Cotă zilnică (GB, 0: niciuna)"
+
+msgid "The cap and the daily quota count"
+msgstr "Ce numără limita și cota zilnică"
+
+msgid "Plan name"
+msgstr "Numele abonamentului"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Folosit până acum în acest ciclu (GB)"

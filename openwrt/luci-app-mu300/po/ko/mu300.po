@@ -2348,8 +2348,26 @@ msgstr "월 한도"
 msgid "%s, warning at %d%%"
 msgstr "%s, %d%%에서 경고"
 
+msgid "Daily quota"
+msgstr "일일 한도"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "월 한도에 도달했습니다: 모바일 데이터를 껐습니다. 다음 기간이 시작되면 다시 켜집니다."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "일일 한도에 도달했습니다: 모바일 데이터를 껐습니다. 자정에 다시 켜집니다."
+
+msgid "The daily quota is reached"
+msgstr "일일 한도에 도달했습니다"
+
+msgid "%d%% of the daily quota is used"
+msgstr "일일 한도의 %d%%를 사용했습니다"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "한도와 일일 한도는 다운로드만 셉니다."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "한도와 일일 한도는 업로드만 셉니다."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s은(는) 시계를 기다리는 중입니다: 시계가 아직 네트워크로 설정되지 않았습니다. 이미 이번 기간에 포함되며, 시계가 설정되면 해당 날짜로 기록됩니다."
@@ -2381,6 +2399,9 @@ msgstr "청구 기간별"
 msgid "Billing cycle"
 msgstr "청구 기간"
 
+msgid "Counted"
+msgstr "집계"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB 단위로 크기를 입력하세요 (예: 50 또는 2.5)"
 
@@ -2392,6 +2413,21 @@ msgstr "한도에서 모바일 데이터 끄기"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "이번 기간이 한도에 도달하면 모바일 데이터가 꺼집니다: 다음 기간이 시작되거나, 한도를 올리거나, 이 옵션을 다시 끌 때까지 통신사를 통한 인터넷을 사용할 수 없습니다. 모바일 데이터를 수동으로 다시 켜면 다음 재부팅까지 켜진 상태로 유지됩니다."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "일일 한도에서 모바일 데이터 끄기"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "오늘 사용량이 일일 한도에 도달하면 자정까지, 한도를 올리거나 이 기능을 끌 때까지 모바일 데이터가 꺼집니다. 모바일 데이터를 직접 다시 켜면 다음 재부팅까지 켜진 상태로 유지됩니다."
+
+msgid "Both ways"
+msgstr "양방향"
+
+msgid "Downloads only"
+msgstr "다운로드만"
+
+msgid "Uploads only"
+msgstr "업로드만"
 
 msgid "Set"
 msgstr "설정"
@@ -2416,6 +2452,15 @@ msgstr "월 한도 (GB, 0: 없음)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "한도의 이 백분율에서 경고"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "일일 한도 (GB, 0: 없음)"
+
+msgid "The cap and the daily quota count"
+msgstr "한도와 일일 한도의 집계 방식"
+
+msgid "Plan name"
+msgstr "요금제 이름"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "이번 기간 지금까지 사용량 (GB)"
