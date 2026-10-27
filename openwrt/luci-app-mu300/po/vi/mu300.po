@@ -1744,11 +1744,11 @@ msgstr "Không có dữ liệu mạng phục vụ"
 msgid "NR serving cell"
 msgstr "Cell phục vụ NR"
 
-msgid "Status confirmed"
-msgstr "Đã xác nhận trạng thái"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Hết thời gian đọc lại; hãy chọn “Làm mới trạng thái khóa”"
+
+msgid "Status confirmed"
+msgstr "Đã xác nhận trạng thái"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Đặt lại đã được xác minh: chế độ mạng tự động, EN-DC bật, tất cả các băng tần, không khóa ô; các thiết lập khóa đã lưu đã được xóa"
@@ -3610,6 +3610,12 @@ msgstr "Khóa băng tần, chế độ và cell không được hỗ trợ khi c
 msgid "None of these bands is supported by this modem"
 msgstr "Modem này không hỗ trợ băng tần nào trong số này"
 
+msgid "Lock change failed"
+msgstr "Thay đổi khóa thất bại"
+
+msgid "Invalid job id"
+msgstr "ID tác vụ không hợp lệ"
+
 msgid "Invalid page"
 msgstr "Trang không hợp lệ"
 
@@ -4228,6 +4234,21 @@ msgstr "Giá trị đọc lại sau khi khởi động lại ngăn xếp không 
 
 msgid "The reset was interrupted"
 msgstr "Việc đặt lại đã bị gián đoạn"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Kết quả của lần thay đổi khóa này không còn được biết"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Thay đổi khóa mất quá nhiều thời gian; hãy chọn “Làm mới trạng thái khóa”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Thay đổi khóa bị gián đoạn; hãy chọn “Làm mới trạng thái khóa”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Một thay đổi khóa khác đang được bắt đầu; hãy thử lại sau giây lát"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Có quá nhiều thay đổi khóa đang chờ; hãy thử lại khi chúng kết thúc"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Cài lại gói không khả dụng trên hệ thống này"

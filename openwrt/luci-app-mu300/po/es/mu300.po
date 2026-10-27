@@ -1744,11 +1744,11 @@ msgstr "Sin datos de la red de servicio"
 msgid "NR serving cell"
 msgstr "Celda de servicio NR"
 
-msgid "Status confirmed"
-msgstr "Estado confirmado"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Se agotó el tiempo de lectura; seleccione «Actualizar estado de bloqueos»"
+
+msgid "Status confirmed"
+msgstr "Estado confirmado"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Restablecimiento verificado: modo de red automático, EN-DC activado, todas las bandas, sin bloqueo de celda; los ajustes de bloqueo guardados se han borrado"
@@ -3610,6 +3610,12 @@ msgstr "Los bloqueos de banda, modo y celda no son compatibles mientras el cambi
 msgid "None of these bands is supported by this modem"
 msgstr "Este módem no admite ninguna de estas bandas"
 
+msgid "Lock change failed"
+msgstr "Error al cambiar el bloqueo"
+
+msgid "Invalid job id"
+msgstr "ID de tarea no válido"
+
 msgid "Invalid page"
 msgstr "Página no válida"
 
@@ -4228,6 +4234,21 @@ msgstr "La relectura tras el reinicio de la pila no coincide con los valores aut
 
 msgid "The reset was interrupted"
 msgstr "El restablecimiento se interrumpió"
+
+msgid "The result of this lock change is no longer known"
+msgstr "El resultado de este cambio de bloqueo ya no se conoce"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "El cambio de bloqueo tardó demasiado; seleccione «Actualizar estado de bloqueos»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "El cambio de bloqueo se interrumpió; seleccione «Actualizar estado de bloqueos»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Se está iniciando otro cambio de bloqueo; inténtelo de nuevo en un momento"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Hay demasiados cambios de bloqueo en espera; inténtelo de nuevo cuando terminen"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Reinstalar paquetes no está disponible en este sistema"

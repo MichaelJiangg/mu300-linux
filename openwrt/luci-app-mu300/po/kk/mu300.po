@@ -1744,11 +1744,11 @@ msgstr "Қызмет көрсететін желі туралы дерек жо�
 msgid "NR serving cell"
 msgstr "NR қызмет көрсететін ұяшығы"
 
-msgid "Status confirmed"
-msgstr "Күй расталды"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Қайта оқу уақыты өтті; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "Status confirmed"
+msgstr "Күй расталды"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Қалпына келтіру тексерілді: желі режимі автоматты, EN-DC қосулы, барлық жолақтар, ұяшық құлпы жоқ; сақталған құлып параметрлері өшірілді"
@@ -3610,6 +3610,12 @@ msgstr "Қос SIM ауыстыру радионы басқарып тұрған
 msgid "None of these bands is supported by this modem"
 msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
 
+msgid "Lock change failed"
+msgstr "Бекітуді өзгерту сәтсіз аяқталды"
+
+msgid "Invalid job id"
+msgstr "Жарамсыз тапсырма идентификаторы"
+
 msgid "Invalid page"
 msgstr "Жарамсыз бет"
 
@@ -4228,6 +4234,21 @@ msgstr "Стек қайта іске қосылғаннан кейінгі ке�
 
 msgid "The reset was interrupted"
 msgstr "Қалпына келтіру үзілді"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Бұл бекіту өзгерісінің нәтижесі енді белгісіз"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Бекітуді өзгерту тым ұзаққа созылды; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Бекітуді өзгерту үзілді; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Басқа бекіту өзгерісі басталуда; сәлден кейін қайталап көріңіз"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Тым көп бекіту өзгерісі күтуде; олар аяқталғанда қайталап көріңіз"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Бұл жүйеде пакеттерді қайта орнату қолжетімсіз"

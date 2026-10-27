@@ -1744,11 +1744,11 @@ msgstr "サービングネットワークのデータなし"
 msgid "NR serving cell"
 msgstr "NR サービングセル"
 
-msgid "Status confirmed"
-msgstr "ステータスを確認しました"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "読み戻しがタイムアウトしました。「ロック状態を更新」を選択してください"
+
+msgid "Status confirmed"
+msgstr "ステータスを確認しました"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "リセットを確認しました: ネットワークモード自動、EN-DC オン、全バンド、セルロックなし。保存されたロック設定は消去されました"
@@ -3610,6 +3610,12 @@ msgstr "デュアル SIM 切り替えが無線を管理している間は、バ�
 msgid "None of these bands is supported by this modem"
 msgstr "このモデムはこれらのバンドのいずれにも対応していません"
 
+msgid "Lock change failed"
+msgstr "ロックの変更に失敗しました"
+
+msgid "Invalid job id"
+msgstr "無効なジョブ ID です"
+
 msgid "Invalid page"
 msgstr "無効なページ"
 
@@ -4228,6 +4234,21 @@ msgstr "スタック再起動後の読み戻し値が自動の値と一致しま
 
 msgid "The reset was interrupted"
 msgstr "リセットが中断されました"
+
+msgid "The result of this lock change is no longer known"
+msgstr "このロック変更の結果はもうわかりません"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "ロックの変更に時間がかかりすぎました。「ロック状態を更新」を選択してください"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "ロックの変更が中断されました。「ロック状態を更新」を選択してください"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "別のロック変更を開始中です。しばらくしてからもう一度お試しください"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "待機中のロック変更が多すぎます。終了してからもう一度お試しください"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "このシステムではパッケージの再インストールを利用できません"

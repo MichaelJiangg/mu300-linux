@@ -1744,11 +1744,11 @@ msgstr "Nincsenek kiszolgálóhálózat-adatok"
 msgid "NR serving cell"
 msgstr "NR kiszolgáló cella"
 
-msgid "Status confirmed"
-msgstr "Állapot megerősítve"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "A visszaolvasás időtúllépés miatt megszakadt; válassza a „Zárolási állapot frissítése” lehetőséget"
+
+msgid "Status confirmed"
+msgstr "Állapot megerősítve"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Visszaállítás ellenőrizve: hálózati mód automatikus, EN-DC be, minden sáv, nincs cellazárolás; a mentett zárolási beállítások törölve"
@@ -3610,6 +3610,12 @@ msgstr "A sáv-, mód- és cellazár nem támogatott, amíg a kettős SIM vált�
 msgid "None of these bands is supported by this modem"
 msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
 
+msgid "Lock change failed"
+msgstr "A zárolás módosítása sikertelen"
+
+msgid "Invalid job id"
+msgstr "Érvénytelen feladatazonosító"
+
 msgid "Invalid page"
 msgstr "Érvénytelen oldal"
 
@@ -4228,6 +4234,21 @@ msgstr "A verem újraindítása utáni visszaolvasás nem egyezik az automatikus
 
 msgid "The reset was interrupted"
 msgstr "A visszaállítás megszakadt"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Ennek a zárolásmódosításnak az eredménye már nem ismert"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "A zárolás módosítása túl sokáig tartott; válassza a „Zárolási állapot frissítése” lehetőséget"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "A zárolás módosítása megszakadt; válassza a „Zárolási állapot frissítése” lehetőséget"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Egy másik zárolásmódosítás indul; próbálja újra egy pillanat múlva"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Túl sok zárolásmódosítás várakozik; próbálja újra, ha befejeződtek"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "A csomagok újratelepítése nem érhető el ezen a rendszeren"

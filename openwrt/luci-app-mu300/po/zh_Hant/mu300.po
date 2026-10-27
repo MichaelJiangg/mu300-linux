@@ -1744,11 +1744,11 @@ msgstr "尚無註冊網路資料"
 msgid "NR serving cell"
 msgstr "NR 服務基地台"
 
-msgid "Status confirmed"
-msgstr "狀態已確認"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "回讀逾時；請選擇「重新整理鎖定狀態」"
+
+msgid "Status confirmed"
+msgstr "狀態已確認"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "重設已核對：網路模式自動、EN-DC 開啟、全部頻段、無小區鎖定；已儲存的鎖定設定已清除"
@@ -3603,6 +3603,12 @@ msgstr "雙卡切換管理射頻時，不支援頻段、模式和基地台鎖定
 msgid "None of these bands is supported by this modem"
 msgstr "此數據機不支援其中任何頻段"
 
+msgid "Lock change failed"
+msgstr "鎖定變更失敗"
+
+msgid "Invalid job id"
+msgstr "無效的工作 ID"
+
 msgid "Invalid page"
 msgstr "頁碼無效"
 
@@ -4221,6 +4227,21 @@ msgstr "協定堆疊重新啟動後的回讀結果與自動值不一致"
 
 msgid "The reset was interrupted"
 msgstr "重設被中斷"
+
+msgid "The result of this lock change is no longer known"
+msgstr "此鎖定變更的結果已無從得知"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "鎖定變更耗時過長；請選擇「重新整理鎖定狀態」"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "鎖定變更已中斷；請選擇「重新整理鎖定狀態」"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "另一項鎖定變更正在啟動；請稍後再試"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "等待中的鎖定變更過多；請在其結束後再試"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "此系統不支援重新安裝套件"

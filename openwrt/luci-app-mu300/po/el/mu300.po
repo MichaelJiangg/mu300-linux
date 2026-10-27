@@ -1744,11 +1744,11 @@ msgstr "Δεν υπάρχουν δεδομένα δικτύου εξυπηρέτ
 msgid "NR serving cell"
 msgstr "Κυψέλη εξυπηρέτησης NR"
 
-msgid "Status confirmed"
-msgstr "Η κατάσταση επιβεβαιώθηκε"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Λήξη χρόνου ανάγνωσης· επιλέξτε «Ανανέωση κατάστασης κλειδώματος»"
+
+msgid "Status confirmed"
+msgstr "Η κατάσταση επιβεβαιώθηκε"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Η επαναφορά επαληθεύτηκε: λειτουργία δικτύου αυτόματη, EN-DC ενεργό, όλες οι ζώνες, χωρίς κλείδωμα κυψέλης· οι αποθηκευμένες ρυθμίσεις κλειδώματος διαγράφηκαν"
@@ -3610,6 +3610,12 @@ msgstr "Τα κλειδώματα ζώνης, λειτουργίας και κυ
 msgid "None of these bands is supported by this modem"
 msgstr "Αυτό το μόντεμ δεν υποστηρίζει καμία από αυτές τις ζώνες"
 
+msgid "Lock change failed"
+msgstr "Η αλλαγή κλειδώματος απέτυχε"
+
+msgid "Invalid job id"
+msgstr "Μη έγκυρο αναγνωριστικό εργασίας"
+
 msgid "Invalid page"
 msgstr "Μη έγκυρη σελίδα"
 
@@ -4228,6 +4234,21 @@ msgstr "Η επανάγνωση μετά την επανεκκίνηση της 
 
 msgid "The reset was interrupted"
 msgstr "Η επαναφορά διακόπηκε"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Το αποτέλεσμα αυτής της αλλαγής κλειδώματος δεν είναι πλέον γνωστό"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Η αλλαγή κλειδώματος διήρκεσε πολύ· επιλέξτε «Ανανέωση κατάστασης κλειδώματος»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Η αλλαγή κλειδώματος διακόπηκε· επιλέξτε «Ανανέωση κατάστασης κλειδώματος»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Ξεκινά άλλη αλλαγή κλειδώματος· δοκιμάστε ξανά σε λίγο"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Πάρα πολλές αλλαγές κλειδώματος σε αναμονή· δοκιμάστε ξανά όταν ολοκληρωθούν"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Η επανεγκατάσταση πακέτων δεν είναι διαθέσιμη σε αυτό το σύστημα"

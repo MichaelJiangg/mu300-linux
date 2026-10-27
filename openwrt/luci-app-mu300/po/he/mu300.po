@@ -1744,11 +1744,11 @@ msgstr "אין נתוני רשת משרתת"
 msgid "NR serving cell"
 msgstr "תא משרת NR"
 
-msgid "Status confirmed"
-msgstr "המצב אושר"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "תם הזמן לקריאה חוזרת; יש לבחור “רענון מצב הנעילה”"
+
+msgid "Status confirmed"
+msgstr "המצב אושר"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "האיפוס אומת: מצב רשת אוטומטי, EN-DC פועל, כל הפסים, ללא נעילת תא; הגדרות הנעילה השמורות נוקו"
@@ -3610,6 +3610,12 @@ msgstr "נעילות פס, מצב ותא אינן נתמכות בזמן שהחל
 msgid "None of these bands is supported by this modem"
 msgstr "המודם הזה אינו תומך באף אחד מהתדרים האלה"
 
+msgid "Lock change failed"
+msgstr "שינוי הנעילה נכשל"
+
+msgid "Invalid job id"
+msgstr "מזהה משימה לא תקין"
+
 msgid "Invalid page"
 msgstr "דף לא חוקי"
 
@@ -4228,6 +4234,21 @@ msgstr "הקריאה החוזרת לאחר הפעלת המחסנית מחדש א
 
 msgid "The reset was interrupted"
 msgstr "האיפוס הופסק"
+
+msgid "The result of this lock change is no longer known"
+msgstr "התוצאה של שינוי נעילה זה כבר אינה ידועה"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "שינוי הנעילה נמשך זמן רב מדי; יש לבחור “רענון מצב הנעילה”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "שינוי הנעילה נקטע; יש לבחור “רענון מצב הנעילה”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "שינוי נעילה אחר מתחיל כעת; יש לנסות שוב בעוד רגע"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "יותר מדי שינויי נעילה ממתינים; יש לנסות שוב כשיסתיימו"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "התקנה מחדש של חבילות אינה זמינה במערכת זו"

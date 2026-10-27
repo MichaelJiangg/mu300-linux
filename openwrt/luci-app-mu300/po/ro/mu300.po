@@ -1744,11 +1744,11 @@ msgstr "Nu există date despre rețeaua de servire"
 msgid "NR serving cell"
 msgstr "Celulă de servire NR"
 
-msgid "Status confirmed"
-msgstr "Stare confirmată"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Citirea de verificare a expirat; selectați „Reîmprospătare stare blocări”"
+
+msgid "Status confirmed"
+msgstr "Stare confirmată"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Resetare verificată: mod de rețea automatic, EN-DC pornit, toate benzile, fără blocare de celulă; setările de blocare salvate au fost șterse"
@@ -3610,6 +3610,12 @@ msgstr "Blocările de bandă, mod și celulă nu sunt acceptate cât timp comuta
 msgid "None of these bands is supported by this modem"
 msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
 
+msgid "Lock change failed"
+msgstr "Modificarea blocării a eșuat"
+
+msgid "Invalid job id"
+msgstr "ID de sarcină nevalid"
+
 msgid "Invalid page"
 msgstr "Pagină invalidă"
 
@@ -4228,6 +4234,21 @@ msgstr "Recitirea după repornirea stivei nu corespunde valorilor automate"
 
 msgid "The reset was interrupted"
 msgstr "Resetarea a fost întreruptă"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Rezultatul acestei modificări a blocării nu mai este cunoscut"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Modificarea blocării a durat prea mult; selectați „Reîmprospătare stare blocări”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Modificarea blocării a fost întreruptă; selectați „Reîmprospătare stare blocări”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Se pornește o altă modificare a blocării; încercați din nou peste un moment"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Prea multe modificări ale blocării așteaptă; încercați din nou când se termină"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Reinstalarea pachetelor nu este disponibilă pe acest sistem"

@@ -1744,11 +1744,11 @@ msgstr "Немає даних про обслуговуючу мережу"
 msgid "NR serving cell"
 msgstr "Обслуговуюча сота NR"
 
-msgid "Status confirmed"
-msgstr "Стан підтверджено"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Час зчитування минув; натисніть «Оновити стан фіксації»"
+
+msgid "Status confirmed"
+msgstr "Стан підтверджено"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Скидання підтверджено: режим мережі автоматичний, EN-DC увімкнено, усі діапазони, без блокування соти; збережені налаштування блокувань видалено"
@@ -3610,6 +3610,12 @@ msgstr "Блокування діапазонів, режиму й соти не
 msgid "None of these bands is supported by this modem"
 msgstr "Цей модем не підтримує жодного з цих діапазонів"
 
+msgid "Lock change failed"
+msgstr "Не вдалося змінити фіксацію"
+
+msgid "Invalid job id"
+msgstr "Неправильний ідентифікатор завдання"
+
 msgid "Invalid page"
 msgstr "Неприпустима сторінка"
 
@@ -4228,6 +4234,21 @@ msgstr "Зворотне читання після перезапуску сте
 
 msgid "The reset was interrupted"
 msgstr "Скидання було перервано"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Результат цієї зміни фіксації більше не відомий"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Зміна фіксації тривала надто довго; натисніть «Оновити стан фіксації»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Зміну фіксації перервано; натисніть «Оновити стан фіксації»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Запускається інша зміна фіксації; спробуйте ще раз за мить"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Очікує забагато змін фіксації; спробуйте ще раз, коли вони завершаться"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Повторне встановлення пакетів недоступне в цій системі"

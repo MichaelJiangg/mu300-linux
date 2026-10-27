@@ -1744,11 +1744,11 @@ msgstr "सर्विंग नेटवर्क का कोई डेट�
 msgid "NR serving cell"
 msgstr "NR सर्विंग सेल"
 
-msgid "Status confirmed"
-msgstr "स्थिति की पुष्टि हुई"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "वापस पढ़ने का समय समाप्त; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "Status confirmed"
+msgstr "स्थिति की पुष्टि हुई"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "रीसेट सत्यापित: नेटवर्क मोड स्वचालित, EN-DC चालू, सभी बैंड, कोई सेल लॉक नहीं; सहेजी गई लॉक सेटिंग्स साफ़ कर दी गईं"
@@ -3610,6 +3610,12 @@ msgstr "जब डुअल-SIM स्विचिंग रेडियो क�
 msgid "None of these bands is supported by this modem"
 msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
 
+msgid "Lock change failed"
+msgstr "लॉक बदलना विफल रहा"
+
+msgid "Invalid job id"
+msgstr "अमान्य जॉब आईडी"
+
 msgid "Invalid page"
 msgstr "अमान्य पेज"
 
@@ -4228,6 +4234,21 @@ msgstr "स्टैक पुनरारंभ के बाद रीड-ब�
 
 msgid "The reset was interrupted"
 msgstr "रीसेट बाधित हो गया"
+
+msgid "The result of this lock change is no longer known"
+msgstr "इस लॉक बदलाव का परिणाम अब ज्ञात नहीं है"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "लॉक बदलने में बहुत समय लगा; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "लॉक बदलना बाधित हो गया; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "एक और लॉक बदलाव शुरू किया जा रहा है; थोड़ी देर में फिर से प्रयास करें"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "बहुत सारे लॉक बदलाव प्रतीक्षा में हैं; उनके समाप्त होने पर फिर से प्रयास करें"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "इस सिस्टम पर पैकेज फिर से इंस्टॉल करना उपलब्ध नहीं है"

@@ -1744,11 +1744,11 @@ msgstr "서빙 네트워크 데이터 없음"
 msgid "NR serving cell"
 msgstr "NR 서빙 셀"
 
-msgid "Status confirmed"
-msgstr "상태 확인됨"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "다시 읽기 시간 초과. “잠금 상태 새로 고침”을 선택하십시오"
+
+msgid "Status confirmed"
+msgstr "상태 확인됨"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "초기화 확인됨: 네트워크 모드 자동, EN-DC 켜짐, 모든 대역, 셀 잠금 없음. 저장된 잠금 설정이 지워졌습니다"
@@ -3610,6 +3610,12 @@ msgstr "듀얼 SIM 전환이 무선을 관리하는 동안에는 밴드, 모드,
 msgid "None of these bands is supported by this modem"
 msgstr "이 모뎀은 이 밴드 중 어느 것도 지원하지 않습니다"
 
+msgid "Lock change failed"
+msgstr "잠금 변경에 실패했습니다"
+
+msgid "Invalid job id"
+msgstr "잘못된 작업 ID입니다"
+
 msgid "Invalid page"
 msgstr "잘못된 페이지"
 
@@ -4228,6 +4234,21 @@ msgstr "스택 재시작 후 다시 읽은 값이 자동 값과 일치하지 않
 
 msgid "The reset was interrupted"
 msgstr "초기화가 중단되었습니다"
+
+msgid "The result of this lock change is no longer known"
+msgstr "이 잠금 변경의 결과를 더 이상 알 수 없습니다"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "잠금 변경이 너무 오래 걸렸습니다. “잠금 상태 새로 고침”을 선택하십시오"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "잠금 변경이 중단되었습니다. “잠금 상태 새로 고침”을 선택하십시오"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "다른 잠금 변경을 시작하는 중입니다. 잠시 후 다시 시도하십시오"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "대기 중인 잠금 변경이 너무 많습니다. 끝난 후 다시 시도하십시오"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "이 시스템에서는 패키지 재설치를 사용할 수 없습니다"

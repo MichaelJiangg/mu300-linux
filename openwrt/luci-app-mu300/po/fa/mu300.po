@@ -1744,11 +1744,11 @@ msgstr "داده‌ای از شبکهٔ سرویس‌دهنده نیست"
 msgid "NR serving cell"
 msgstr "سلول سرویس‌دهندهٔ NR"
 
-msgid "Status confirmed"
-msgstr "وضعیت تأیید شد"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "مهلت خواندن دوباره تمام شد؛ «تازه‌سازی وضعیت قفل» را انتخاب کنید"
+
+msgid "Status confirmed"
+msgstr "وضعیت تأیید شد"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "بازنشانی تأیید شد: حالت شبکه خودکار، EN-DC روشن، همه باندها، بدون قفل سلول؛ تنظیمات قفل ذخیره‌شده پاک شدند"
@@ -3610,6 +3610,12 @@ msgstr "قفل باند، حالت و سلول تا وقتی جابه‌جایی
 msgid "None of these bands is supported by this modem"
 msgstr "این مودم هیچ‌یک از این باندها را پشتیبانی نمی‌کند"
 
+msgid "Lock change failed"
+msgstr "تغییر قفل ناموفق بود"
+
+msgid "Invalid job id"
+msgstr "شناسهٔ کار نامعتبر است"
+
 msgid "Invalid page"
 msgstr "صفحهٔ نامعتبر"
 
@@ -4228,6 +4234,21 @@ msgstr "بازخوانی پس از راه‌اندازی مجدد پشته با 
 
 msgid "The reset was interrupted"
 msgstr "بازنشانی قطع شد"
+
+msgid "The result of this lock change is no longer known"
+msgstr "نتیجهٔ این تغییر قفل دیگر معلوم نیست"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "تغییر قفل بیش از حد طول کشید؛ «تازه‌سازی وضعیت قفل» را انتخاب کنید"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "تغییر قفل قطع شد؛ «تازه‌سازی وضعیت قفل» را انتخاب کنید"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "تغییر قفل دیگری در حال شروع است؛ کمی بعد دوباره تلاش کنید"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "تغییرات قفل زیادی در انتظارند؛ پس از پایان آن‌ها دوباره تلاش کنید"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "نصب دوباره بسته‌ها روی این سیستم در دسترس نیست"
