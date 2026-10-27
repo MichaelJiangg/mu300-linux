@@ -1,6 +1,10 @@
-"""kanoqwq's charger and NCM kernel patches (upstream/patches/0024-0026; FINDINGS 207, 208): the U30 Air's battery
-CV and stock safety-timer policy on, its 3 A and the NCM busy-flush retry off unless asked for."""
+"""kanoqwq's charger and NCM kernel patches (upstream/patches/0024-0026, 0029; FINDINGS 207, 208, 224): the U30 Air's
+battery CV (in the stock driver's encoding) and stock safety-timer policy on, its 3 A and the NCM busy-flush retry off
+unless asked for."""
 import re
+import shutil
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -54,6 +58,53 @@ class ChargerCV(unittest.TestCase):
 
     def test_the_current_budget_is_not_this_patch(self):
         self.assertNotIn('ICHG', added(self.text).replace('ICHG_MAX_uA', ''))
+
+
+class ChargerStockCV(unittest.TestCase):
+    """0029 (kanoqwq b4748534): the vendor node's CV as ZTE's sqc_mp_set_cv encodes it, floor((mV - 3856) / 32) + 1"""
+
+    def setUp(self):
+        self.text = patch('0029')
+        self.plus = added(self.text)
+
+    def test_kano_is_the_author(self):
+        self.assertTrue(self.text.startswith('From: kanoqwq <kanoqwq@qq.com>\n'))
+        self.assertIn('b4748534', self.text)
+
+    def test_only_the_vendor_node_with_battery_info(self):
+        self.assertIn('bq->init_data.vbatreg_max = !ret && bat_info->constant_charge_voltage_max_uv > 0 ?\n'
+                      '\t\t\tbq2560x_chg_stock_cv(', self.plus)
+        self.assertIn('if (bq->bq2560x_chg && vbatreg_reg_code == BQ2560X_CHG_VBATREG_SPECIAL)', self.plus)
+
+    @unittest.skipUnless(shutil.which('cc'), 'needs a C compiler')
+    def test_the_encoding(self):
+        m = re.search(r'\nstatic int bq2560x_chg_stock_cv\(.*?\n}\n', after(self.text), re.S)
+        self.assertTrue(m)
+        prog = (
+            '#include <stdio.h>\n#define min_t(t, a, b) ((t)(a) < (t)(b) ? (t)(a) : (t)(b))\n'
+            '#define BQ2560X_VBATREG_STEP_uV 32000\n#define BQ2560X_VBATREG_OFFSET_uV 3856000\n'
+            '#define BQ2560X_VBATREG_MIN_uV 3856000\n'
+            + '\n'.join(l for l in self.plus.splitlines() if l.startswith('#define BQ2560X_CHG_VBATREG_SPECIAL'))
+            + m.group(0) +
+            'int main(void) { int v[] = { 4300000, 4272000, 4304000, 4400000, 4624000, 5000000, 3000000 };'
+            ' for (unsigned i = 0; i < sizeof(v) / sizeof(v[0]); i++)'
+            ' printf("%d\\n", bq2560x_chg_stock_cv(v[i], 4624000)); return 0; }\n')
+        with tempfile.TemporaryDirectory() as d:
+            src = f'{d}/t.c'
+            with open(src, 'w') as f:
+                f.write(prog)
+            r = subprocess.run(['cc', '-o', f'{d}/t', src], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = subprocess.run([f'{d}/t'], capture_output=True, text=True).stdout.split()
+        got = [int(x) for x in out]
+        # 4.3 V: code 14, REG04 0x70, 4.304 V (stock Android reads 0x70 on the same unit); not 0x68's 4.272 V
+        self.assertEqual(got[0], 4304000)
+        self.assertEqual((got[0] - 3856000) // 32000 << 3, 0x70)
+        self.assertEqual(got[1], 4304000)               # 4.272 V, on the grid: one step up all the same
+        self.assertEqual(got[2], 4352000)               # code 0xf: the chip's special 4.352 V, not 4.336 V
+        self.assertEqual(got[3], 4432000)
+        self.assertEqual(got[4:6], [4624000, 4624000])  # the chip's maximum bounds it
+        self.assertEqual(got[6], 3856000)
 
 
 class Charger3A(unittest.TestCase):

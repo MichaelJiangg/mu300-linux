@@ -11538,14 +11538,16 @@ from his U30 Air's `vendor_dlkm_a`, SHA-256 `ce42c87c...`) and its source:
   takes the battery node's CV (4.3 V on the U30 Air SSV; every JEITA step of SDP/CDP/DCP says 4.3 V too). A low CV
   enters the constant-voltage phase early and can terminate at a low percentage. **Patch 0024**
   (`upstream/patches/0024-power-bq256xx-U30-Air-battery-CV-and-stock-safety-timer.patch`): the vendor node
-  (`ti,bq2560x_chg`, already kept off the F50 and V50 by patch 0016) takes the battery node's CV bounded by the chip
-  (4.3 V is 4.272 V in the chip's 32 mV steps); without a valid node, the chip default. Other bq256xx boards as before.
+  (`ti,bq2560x_chg`, already kept off the F50 and V50 by patch 0016) takes the battery node's CV bounded by the chip;
+  without a valid node, the chip default. Other bq256xx boards as before. *Corrected (FINDINGS 224):* 0024 rounded
+  4.3 V down to 4.272 V (REG04 `0x68`); ZTE's driver programs one step more, 4.304 V (`0x70`), and patch 0029 does too.
 - **The safety timer.** ZTE's probe clears REG05 bit 3 (`EN_TIMER`, at probe+0xdd8), as its source's
   `bq2560x_charger_set_safety_timer(.., DISABLE)` does; ours left the chip's timer on, which can end a long slow
   charge until a replug. 0024 clears it and keeps `EN_TERM`; TS/NTC, overvoltage and thermal protection are other
   bits and stay.
 
-kanoqwq's check on his U30 Air: REG04 `0x68` (4.272 V), REG05 `0x87` (termination on, timer off), the 1.98 A ICHG,
+kanoqwq's check on his U30 Air: REG04 `0x68` (4.272 V; what 0024 itself wrote, not the stock value: FINDINGS 224),
+REG05 `0x87` (termination on, timer off), the 1.98 A ICHG,
 the computer port's 500 mA and the user charge limit unchanged; he did not run a full cycle or catch the original
 early "Full" again. His regression for the second point is ours already: mu300-power's charge limit
 (FINDINGS 33l, 36) works from the capacity, never from a "Full" status. Not taken: ZTE's 16-hour plugged-in policy
@@ -11562,8 +11564,8 @@ forces its own command line, FINDINGS 160).
 
 `tests/test_u30air_charger_ncm.py` reads both patches. His `tests/bq256xx_stock_cv.py` and
 `tests/bq256xx_typec_current.py` compile the driver's functions out of a prepared kernel tree; they are not here
-(no kernel tree in the test run). **Device check before merge (U30 Air):** `i2cget` of REG04/REG05 (0x68/0x87 as
-his), a charge from about 80 % on a wall charger with the 90 % limit (no early Full, no stop before it), and with
+(no kernel tree in the test run). **Device check before merge (U30 Air):** `i2cget` of REG04/REG05 (`0x70`/`0x87`
+with 0029, FINDINGS 224), a charge from about 80 % on a wall charger with the 90 % limit (no early Full, no stop before it), and with
 `u30air_3a=1` a test build, `constant_charge_current` 3000000 and the current measured from a charger that offers 3 A.
 
 ### 208. NCM: a timer flush that finds the USB requests busy (off unless asked for)
@@ -11990,3 +11992,30 @@ a lock sent by hand (`AT+SPLBAND=1,0,450,0,149,0`) read back as `34,39,40,41,1,3
 from a lock and from that hand lock verified `ok` and left no saved setting. **F50 (Ubuntu, 7.3.0):** the table and
 the cleared read-back unchanged; `20,7` refused (none supported), `3,7` locked B3 (B7 left out), reset back to
 automatic with nothing saved.
+
+### 224. The U30 Air's battery CV is 4.304 V (REG04 0x70), and a PD frame is waited for before it is read
+
+**Status: patch 0029 and the 0020 change build on 6.18.58 and 7.2.12 here; kanoqwq read both on his U30 Air (7.2.8).
+Not run on a device here.** From kanoqwq's `b4748534` (his patch 0027 and his `sc27xx-ump9620.c`).
+
+**The CV.** Patch 0024 (FINDINGS 207) gave the vendor charger node the battery node's 4.3 V and let the generic
+bq2560x path round it down to the chip's 32 mV grid: code 13, REG04 `0x68`, 4.272 V. ZTE's driver does not round
+down. `sqc_bq2560x.ko` (SHA-256 `ce42c87c...`, `sqc_mp_set_cv` +0x28..+0x5c) and the matching `sqc_v8` source program
+`floor((mV - 3856) / 32) + 1`: code 14, REG04 `0x70`, 4.304 V. kanoqwq read `0x70` under stock Android and, with his
+patch, under Linux on the same U30 Air. The `0x68` of FINDINGS 207 was what our 0024 had written, not a stock value.
+**Patch 0029** (`upstream/patches/0029-power-bq256xx-U30-Air-CV-in-the-stock-encoding.patch`) computes the CV that
+way for the vendor node with a battery CV from the device tree, still bounded by the chip's maximum. Without battery
+information it uses the chip default, and every other board is unchanged. The chip's code `0xf` is its special
+4.352 V (not 3.856 V + 15 x 32 mV), both when it is chosen and when it is read back, as in ZTE's driver. The
+difference is 32 mV more at the top of the charge, the stock value.
+
+**A PD frame before the FIFO has it.** The PD block's packet-received interrupt can come before the receive FIFO
+holds the frame. Unisoc's receive path first polls `PD_STS1` (50 us steps, 2 ms at most) until the FIFO is not empty.
+Our port controller (patch 0020, FINDINGS 150) read the header at once and could hand TCPM a frame of empty words.
+0020 now waits the same way. A frame that is already there does not wait. With nothing after 2 ms, nothing goes to
+TCPM and the FIFO is flushed as before. A Source_Capabilities whose first object is not the fixed 5 V that every
+source must offer first is logged (rate-limited) as a frame read wrong. PD stays off unless `mu300-usb pd on`.
+
+**Device check (U30 Air):** `i2cget` REG04 reads `0x70` after boot on a wall charger, and a charge to the user limit
+behaves as before. With `mu300-usb pd on`, a PD charger and the dock from FINDINGS 150 negotiate, and the log has
+no "source capabilities without 5 V first".
