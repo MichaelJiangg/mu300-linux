@@ -12147,3 +12147,11 @@ with `O_DIRECT`, read back and compared):
 
 The throughput spread is the client's (the same runs on 7.3 spread as much); no stall, no lost ping, no call trace
 beyond the vendor's `add_uevent_var` warning every 5.4 boot has.
+
+**Two resets, not reproduced.** Later the same afternoon F50-B (no battery, on one of the Mac's own USB ports) lost
+power twice: once 1 s into a lock change's stack restart (SFUN 5 -> 4) and once during a 56 MB copy over USB
+networking. Both times LK reported `bootcause="Charger connected"`, there was no ramoops (no panic) and the journal
+just stops: a power cut, not a kernel fault. The second boot ran this patched kernel with the release's modules on
+the root file system. Afterwards neither came back, neither on the release's 5.4 (two 56 MB copies, two stack
+restarts) nor on this one again (three copies, three stack restarts, the Wi-Fi run above). Nothing in these patches
+reaches the PMIC or the power path; noted here in case it turns up again on 5.4.
