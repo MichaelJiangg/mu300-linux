@@ -408,6 +408,18 @@ class MakeDiffs(ShellTest):
             self.assertNotEqual(r.returncode, 0)
             self.assertIn('does not match its SHA256SUMS', r.stderr)
 
+    def test_an_openssl_that_cannot_check_stops_it_and_MU300_OPENSSL_is_used(self):
+        # macOS's openssl (LibreSSL) has no -rawin: every base came out unsigned and a release went out without diffs
+        self.stub('openssl', 'echo "usage: pkeyutl [options]" >&2; exit 1')
+        for shell in list(self.each_shell())[:1]:
+            r = self.run_it(shell)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn('no openssl here checks Ed25519 signatures', r.stderr)
+            self.assertEqual(self.made(), [])
+            r = self.run_it(shell, MU300_OPENSSL=OPENSSL)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertEqual(self.made(), ['v2026.10.13.1', 'v2026.10.14.1', 'v2026.10.15.1', 'v2026.10.16.1', BASE])
+
     def test_make_release_lists_the_diffs_in_the_signed_sums(self):
         rel = (TOP / 'tools/make-release.sh').read_text()
         self.assertLess(rel.index('tools/make-diffs.sh" "$D" "$TAG"'), rel.index('> SHA256SUMS)'))
