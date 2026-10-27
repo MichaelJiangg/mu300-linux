@@ -628,6 +628,9 @@ msgstr "A gazda mód bontja az USB-hálózatot és a soros kapcsolatot ezen a po
 msgid "USB network mode"
 msgstr "USB-hálózati mód"
 
+msgid "Current sharing protocol"
+msgstr "Jelenlegi megosztási protokoll"
+
 msgid "Network protocol"
 msgstr "Hálózati protokoll"
 
@@ -658,6 +661,27 @@ msgstr "Frissítés"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Csak gazda módban érhető el. A Frissítés aktiválja a felismert USB-adaptereket; a LAN-hoz adás menti a hidat és újratölti a hálózatot."
 
+msgid "Network performance"
+msgstr "Hálózati teljesítmény"
+
+msgid "Active congestion control"
+msgstr "Aktív torlódásvezérlés"
+
+msgid "Default queue"
+msgstr "Alapértelmezett sor"
+
+msgid "TCP congestion control"
+msgstr "TCP torlódásvezérlés"
+
+msgid "Apply"
+msgstr "Alkalmaz"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Főleg az eszköz új TCP-kapcsolatait érinti. A hotspot- és USB-kliensek továbbított kapcsolatai nem használnak automatikusan BBR-t."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "A BBR az FQ-t választja az újonnan létrehozott interfészek alapértelmezett sorának. A meglévő kapcsolatok, interfészek és QoS megmaradnak. A beállítás újraindítás után is megmarad."
+
 msgid "Recent modem operations"
 msgstr "Legutóbbi modemműveletek"
 
@@ -670,6 +694,12 @@ msgstr "A vezérlőpult legutóbbi hívásai ebből és az előző indításból
 msgid "Unavailable"
 msgstr "Nem érhető el"
 
+msgid "Mixed"
+msgstr "Vegyes"
+
+msgid "None"
+msgstr "Nincs"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Az USB-hálózati mód gazda módban nem érhető el; a gazda mód automatikus indítása az USB-hálózat automatikus indítását is letiltja."
 
@@ -681,9 +711,6 @@ msgstr "Az USB-hálózat és a soros kapcsolat eszköz módban újra enumeráló
 
 msgid "Switch USB role?"
 msgstr "USB-szerep váltása?"
-
-msgid "Apply"
-msgstr "Alkalmaz"
 
 msgid "Switching USB role…"
 msgstr "USB-szerep váltása…"
@@ -721,6 +748,21 @@ msgstr "Beállítások mentve"
 msgid "Save failed: %s"
 msgstr "A mentés sikertelen: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "A hálózati teljesítmény beállításai nem olvashatók; frissítsen az újrapróbáláshoz"
+
+msgid "This kernel does not provide this setting"
+msgstr "Ez a kernel nem biztosítja ezt a beállítást"
+
+msgid "System default"
+msgstr "Rendszer alapértelmezése"
+
+msgid "Applied and saved for future boots."
+msgstr "Alkalmazva és mentve a következő indításokhoz."
+
+msgid "The kernel did not accept the network settings"
+msgstr "A kernel nem fogadta el a hálózati beállításokat"
+
 msgid "This boot"
 msgstr "Ez az indítás"
 
@@ -739,6 +781,9 @@ msgstr "USB-adapterek keresése…"
 msgid "No USB adapters found."
 msgstr "Nem található USB-adapter."
 
+msgid "In use by another network"
+msgstr "Másik hálózat használja"
+
 msgid "Link connected"
 msgstr "Kapcsolat létrejött"
 
@@ -747,6 +792,9 @@ msgstr "Nincs kapcsolat; aktiválás megkísérelve"
 
 msgid "Added to LAN"
 msgstr "Hozzáadva a LAN-hoz"
+
+msgid "Cannot add"
+msgstr "Nem adható hozzá"
 
 msgid "Add to LAN"
 msgstr "Hozzáadás a LAN-hoz"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Biztonság"
 
-msgid "None"
-msgstr "Nincs"
-
 msgid "User name"
 msgstr "Felhasználónév"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux zárolva"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Igen: a következő újraindítás az Androidot indítja"
+
+msgid "No"
+msgstr "Nem"
+
+msgid "Writable"
+msgstr "Írható"
+
+msgid "This boot image cannot change the boot"
+msgstr "Ez a rendszerindító lemezkép nem tudja módosítani az indítást"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Váltás Androidra"
 msgid "Lock Linux"
 msgstr "Linux zárolása"
 
+msgid "Default boot"
+msgstr "Alapértelmezett indítás"
+
+msgid "One-time boot"
+msgstr "Egyszeri indítás"
+
+msgid "Boot control"
+msgstr "Indításvezérlés"
+
 msgid "Neighbor cells"
 msgstr "Szomszédos cellák"
 
@@ -1125,6 +1194,9 @@ msgstr "Frekvencia"
 
 msgid "Running %s…"
 msgstr "%s futtatása…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspot-beállítások mentve; a módosítások alkalmazása folyamatban"
 
 msgid "Started in background: %s"
 msgstr "Elindítva a háttérben: %s"
@@ -1246,6 +1318,9 @@ msgstr "Belső SIM kiválasztva: újraindítás után lesz használatban"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Belső SIM kiválasztva, de ez az eszköz nem támogatja: a külső SIM van használatban"
 
+msgid "in use"
+msgstr "használatban"
+
 msgid "Uptime %s"
 msgstr "Üzemidő: %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE-kapcsolat"
 msgid "Hidden"
 msgstr "Rejtett"
 
-msgid "No"
-msgstr "Nem"
-
 msgid "Running"
 msgstr "Fut"
 
@@ -1374,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Az AT-adapter nem érhető el"
-
-msgid "Linux locked"
-msgstr "Linux zárolva"
 
 msgid "Installing the language pack…"
 msgstr "A nyelvi csomag telepítése…"
@@ -2078,9 +2147,6 @@ msgstr "A modem alapértéke"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "használatban"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d rádiójának kikapcsolása"
 
@@ -2485,9 +2551,6 @@ msgstr "Rendszerindító kép"
 
 msgid "from the installer"
 msgstr "a telepítőből"
-
-msgid "Default boot"
-msgstr "Alapértelmezett indítás"
 
 msgid "Free space"
 msgstr "Szabad hely"
@@ -3403,14 +3466,14 @@ msgstr "Ismeretlen zárolástípus"
 msgid "Invalid value for this lock kind"
 msgstr "Érvénytelen érték ehhez a zárolástípushoz"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "A sáv-, mód- és cellazár a SIM2-nél még nem támogatott"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "A sáv-, mód- és cellazár nem támogatott, amíg a kettős SIM váltás kezeli a rádiót"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
 
 msgid "Invalid page"
 msgstr "Érvénytelen oldal"
@@ -3501,6 +3564,15 @@ msgstr "A TTL-adapter nem adott érvényes választ"
 
 msgid "Invalid TTL"
 msgstr "Érvénytelen TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "A TCP-adapter nem adott érvényes választ"
+
+msgid "Invalid congestion control"
+msgstr "Érvénytelen torlódásvezérlés"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Az indítási adapter nem adott érvényes választ"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Az adatforgalom-adapter nem adott érvényes választ"
@@ -3755,8 +3827,29 @@ msgstr "A rádió nem követte a beállítását"
 msgid "The data roaming setting could not be saved"
 msgstr "Az adatroaming beállítását nem sikerült menteni"
 
-msgid "Expected on or off"
-msgstr "on vagy off érték szükséges"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "A hotspot-beállítás mentve, de a vezeték nélküli újratöltés nem sikerült"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "A vezeték nélküli beállításokban mentetlen módosítások vannak: előbb mentse vagy vonja vissza őket"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "A hotspot átkapcsolása már folyamatban; próbálja újra kicsit később"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Nincs beállított hotspot (hozzáférési pont)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "A rádió bekapcsolása másik interfészt is érintene; használja a Vezeték nélküli oldalt"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "A rádiót a Wi-Fi-kliens használja"
+
+msgid "The hotspot setting could not be written"
+msgstr "A hotspot-beállítás nem írható"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Ez a platform nem biztosít hotspot-vezérlést"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Ez a platform nem biztosít VPN-integrációt"
@@ -3856,6 +3949,15 @@ msgstr "Nem USB-hálózati csatoló"
 
 msgid "LAN bridge device section was not found"
 msgstr "A LAN-híd eszközszakasza nem található"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nem állapítható meg, melyik hálózathoz tartozik az adapter; próbálja később"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Az adapter másik hálózathoz tartozik, nem csatlakozhat a LAN-hoz"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "A hálózati beállításokban mentetlen módosítások vannak: előbb mentse vagy vonja vissza őket"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Az USB-hálózati csatoló nem aktiválható"
@@ -3991,6 +4093,12 @@ msgstr "Ismeretlen csomagművelet"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Ez a platform nem biztosít TCP torlódásvezérlést"
+
+msgid "The TCP settings could not be read"
+msgstr "A TCP-beállítások nem olvashatók"
 
 msgid "Data usage is not available on this system"
 msgstr "Az adatforgalom ezen a rendszeren nem érhető el"

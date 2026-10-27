@@ -628,6 +628,9 @@ msgstr "Hostmodus verbreekt USB-netwerk en seriële verbinding op deze poort. De
 msgid "USB network mode"
 msgstr "USB-netwerkmodus"
 
+msgid "Current sharing protocol"
+msgstr "Huidig deelprotocol"
+
 msgid "Network protocol"
 msgstr "Netwerkprotocol"
 
@@ -658,6 +661,27 @@ msgstr "Vernieuwen"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Alleen beschikbaar in hostmodus. Vernieuwen activeert gevonden USB-adapters; toevoegen aan LAN slaat de bridge op en herlaadt het netwerk."
 
+msgid "Network performance"
+msgstr "Netwerkprestaties"
+
+msgid "Active congestion control"
+msgstr "Actieve congestiecontrole"
+
+msgid "Default queue"
+msgstr "Standaardwachtrij"
+
+msgid "TCP congestion control"
+msgstr "TCP-congestiecontrole"
+
+msgid "Apply"
+msgstr "Toepassen"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Geldt vooral voor nieuwe TCP-verbindingen van dit apparaat. Doorgestuurde verbindingen van hotspot- en USB-clients gebruiken niet automatisch BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR kiest FQ als standaardwachtrij voor nieuw aangemaakte interfaces. Bestaande verbindingen, interfaces en QoS blijven behouden. De instelling blijft na herstarten."
+
 msgid "Recent modem operations"
 msgstr "Recente modembewerkingen"
 
@@ -670,6 +694,12 @@ msgstr "De recente aanroepen van het bedieningspaneel, van deze opstart en de vo
 msgid "Unavailable"
 msgstr "Niet beschikbaar"
 
+msgid "Mixed"
+msgstr "Gemengd"
+
+msgid "None"
+msgstr "Geen"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-netwerkmodus is niet beschikbaar in hostmodus; automatisch starten als host schakelt ook het automatisch starten van het USB-netwerk uit."
 
@@ -681,9 +711,6 @@ msgstr "USB-netwerk en seriële verbinding worden in apparaatmodus opnieuw geën
 
 msgid "Switch USB role?"
 msgstr "USB-rol wisselen?"
-
-msgid "Apply"
-msgstr "Toepassen"
 
 msgid "Switching USB role…"
 msgstr "USB-rol wordt gewisseld…"
@@ -721,6 +748,21 @@ msgstr "Instellingen opgeslagen"
 msgid "Save failed: %s"
 msgstr "Opslaan mislukt: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Netwerkprestatie-instellingen konden niet worden gelezen; vernieuw om opnieuw te proberen"
+
+msgid "This kernel does not provide this setting"
+msgstr "Deze kernel biedt deze instelling niet"
+
+msgid "System default"
+msgstr "Systeemstandaard"
+
+msgid "Applied and saved for future boots."
+msgstr "Toegepast en opgeslagen voor volgende opstarts."
+
+msgid "The kernel did not accept the network settings"
+msgstr "De kernel heeft de netwerkinstellingen niet geaccepteerd"
+
 msgid "This boot"
 msgstr "Deze opstart"
 
@@ -739,6 +781,9 @@ msgstr "USB-adapters zoeken…"
 msgid "No USB adapters found."
 msgstr "Geen USB-adapters gevonden."
 
+msgid "In use by another network"
+msgstr "In gebruik door een ander netwerk"
+
 msgid "Link connected"
 msgstr "Link verbonden"
 
@@ -747,6 +792,9 @@ msgstr "Geen link; inschakelen geprobeerd"
 
 msgid "Added to LAN"
 msgstr "Toegevoegd aan LAN"
+
+msgid "Cannot add"
+msgstr "Kan niet worden toegevoegd"
 
 msgid "Add to LAN"
 msgstr "Toevoegen aan LAN"
@@ -862,9 +910,6 @@ msgstr "Poort"
 msgid "Security"
 msgstr "Beveiliging"
 
-msgid "None"
-msgstr "Geen"
-
 msgid "User name"
 msgstr "Gebruikersnaam"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux vergrendeld"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ja: de volgende herstart start Android"
+
+msgid "No"
+msgstr "Nee"
+
+msgid "Writable"
+msgstr "Beschrijfbaar"
+
+msgid "This boot image cannot change the boot"
+msgstr "Deze boot-image kan het opstarten niet wijzigen"
 
 msgid "%s of %s"
 msgstr "%s van %s"
@@ -1114,6 +1174,15 @@ msgstr "Overschakelen naar Android"
 msgid "Lock Linux"
 msgstr "Linux vergrendelen"
 
+msgid "Default boot"
+msgstr "Standaardstart"
+
+msgid "One-time boot"
+msgstr "Eenmalige start"
+
+msgid "Boot control"
+msgstr "Opstartbeheer"
+
 msgid "Neighbor cells"
 msgstr "Buurcellen"
 
@@ -1125,6 +1194,9 @@ msgstr "Frequentie"
 
 msgid "Running %s…"
 msgstr "%s wordt uitgevoerd…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspotinstellingen opgeslagen; wijzigingen worden toegepast"
 
 msgid "Started in background: %s"
 msgstr "Op de achtergrond gestart: %s"
@@ -1246,6 +1318,9 @@ msgstr "Interne SIM gekozen: in gebruik na een herstart"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Interne SIM gekozen, maar niet ondersteund op dit apparaat: de externe SIM is in gebruik"
 
+msgid "in use"
+msgstr "in gebruik"
+
 msgid "Uptime %s"
 msgstr "Uptime %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE-verbinding"
 msgid "Hidden"
 msgstr "Verborgen"
 
-msgid "No"
-msgstr "Nee"
-
 msgid "Running"
 msgstr "Actief"
 
@@ -1374,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "AT-adapter niet beschikbaar"
-
-msgid "Linux locked"
-msgstr "Linux vergrendeld"
 
 msgid "Installing the language pack…"
 msgstr "Taalpakket wordt geïnstalleerd…"
@@ -2078,9 +2147,6 @@ msgstr "Standaard van de modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "in gebruik"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Radio van SIM%d uitzetten"
 
@@ -2485,9 +2551,6 @@ msgstr "Boot-image"
 
 msgid "from the installer"
 msgstr "van het installatieprogramma"
-
-msgid "Default boot"
-msgstr "Standaardstart"
 
 msgid "Free space"
 msgstr "Vrije ruimte"
@@ -3403,14 +3466,14 @@ msgstr "Onbekend type vergrendeling"
 msgid "Invalid value for this lock kind"
 msgstr "Ongeldige waarde voor dit type vergrendeling"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Deze modem ondersteunt geen van deze banden"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Band-, modus- en celvergrendeling wordt nog niet ondersteund voor SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Band-, modus- en celvergrendeling wordt niet ondersteund zolang dubbele-SIM-wisseling de radio beheert"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Deze modem ondersteunt geen van deze banden"
 
 msgid "Invalid page"
 msgstr "Ongeldige pagina"
@@ -3501,6 +3564,15 @@ msgstr "De TTL-adapter gaf geen geldig antwoord"
 
 msgid "Invalid TTL"
 msgstr "Ongeldige TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "De TCP-adapter gaf geen geldig antwoord"
+
+msgid "Invalid congestion control"
+msgstr "Ongeldige congestiecontrole"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "De opstartadapter gaf geen geldig antwoord"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "De dataverbruik-adapter gaf geen geldig antwoord"
@@ -3755,8 +3827,29 @@ msgstr "De radio volgde zijn instelling niet"
 msgid "The data roaming setting could not be saved"
 msgstr "De instelling voor dataroaming kon niet worden opgeslagen"
 
-msgid "Expected on or off"
-msgstr "on of off verwacht"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "De hotspotinstelling is opgeslagen, maar het herladen van wifi is mislukt"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "De wifi-instellingen hebben niet-opgeslagen wijzigingen: sla ze eerst op of draai ze terug"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "De hotspot wordt al omgeschakeld; probeer het zo opnieuw"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Er is geen hotspot (access point) ingesteld"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Deze radio inschakelen raakt een andere interface; gebruik de pagina Draadloos"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "De radio wordt gebruikt door de wifi-client"
+
+msgid "The hotspot setting could not be written"
+msgstr "De hotspotinstelling kon niet worden geschreven"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Dit platform biedt geen hotspotbeheer"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN-integratie wordt niet door dit platform geboden"
@@ -3856,6 +3949,15 @@ msgstr "Geen USB-netwerkinterface"
 
 msgid "LAN bridge device section was not found"
 msgstr "Apparaatsectie van de LAN-bridge niet gevonden"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Kon niet bepalen bij welk netwerk de adapter hoort; probeer het later opnieuw"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "De adapter hoort bij een ander netwerk en kan niet aan het LAN worden toegevoegd"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "De netwerkinstellingen hebben niet-opgeslagen wijzigingen: sla ze eerst op of draai ze terug"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Kan USB-netwerkinterface niet activeren"
@@ -3991,6 +4093,12 @@ msgstr "Onbekende pakketbewerking"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Dit platform biedt geen TCP-congestiecontrole"
+
+msgid "The TCP settings could not be read"
+msgstr "De TCP-instellingen konden niet worden gelezen"
 
 msgid "Data usage is not available on this system"
 msgstr "Dataverbruik is op dit systeem niet beschikbaar"

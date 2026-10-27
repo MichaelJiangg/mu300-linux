@@ -628,6 +628,9 @@ msgstr "Хост режимі осы порттағы USB желісі мен с
 msgid "USB network mode"
 msgstr "USB желі режимі"
 
+msgid "Current sharing protocol"
+msgstr "Ағымдағы бөлісу хаттамасы"
+
 msgid "Network protocol"
 msgstr "Желі протоколы"
 
@@ -658,6 +661,27 @@ msgstr "Жаңарту"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Тек хост режимінде қолжетімді. «Жаңарту» табылған USB адаптерлерін іске қосады; LAN-ға қосу көпірді сақтап, желіні қайта жүктейді."
 
+msgid "Network performance"
+msgstr "Желі өнімділігі"
+
+msgid "Active congestion control"
+msgstr "Белсенді кептелісті басқару"
+
+msgid "Default queue"
+msgstr "Әдепкі кезек"
+
+msgid "TCP congestion control"
+msgstr "TCP кептелісін басқару"
+
+msgid "Apply"
+msgstr "Қолдану"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Негізінен осы құрылғының жаңа TCP қосылымдарына әсер етеді. Хотспот пен USB клиенттерінің бағытталған қосылымдары BBR-ді автоматты түрде қолданбайды."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR жаңадан құрылған интерфейстер үшін әдепкі кезек ретінде FQ таңдайды. Бар қосылымдар, интерфейстер және QoS сақталады. Баптаулар қайта жүктегеннен кейін де сақталады."
+
 msgid "Recent modem operations"
 msgstr "Модемнің соңғы операциялары"
 
@@ -670,6 +694,12 @@ msgstr "Басқару панелінің осы және алдыңғы жүк�
 msgid "Unavailable"
 msgstr "Қолжетімсіз"
 
+msgid "Mixed"
+msgstr "Аралас"
+
+msgid "None"
+msgstr "Жоқ"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB желі режимі хост режимінде қолжетімсіз; хост режимін автоматты іске қосу USB желісін автоматты іске қосуды да өшіреді."
 
@@ -681,9 +711,6 @@ msgstr "USB желісі мен сериялық порт құрылғы реж�
 
 msgid "Switch USB role?"
 msgstr "USB рөлін ауыстыру керек пе?"
-
-msgid "Apply"
-msgstr "Қолдану"
 
 msgid "Switching USB role…"
 msgstr "USB рөлі ауыстырылуда…"
@@ -721,6 +748,21 @@ msgstr "Параметрлер сақталды"
 msgid "Save failed: %s"
 msgstr "Сақтау сәтсіз: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Желі өнімділігі баптауларын оқу мүмкін болмады; қайталау үшін жаңартыңыз"
+
+msgid "This kernel does not provide this setting"
+msgstr "Бұл ядро бұл баптауды қамтамасыз етпейді"
+
+msgid "System default"
+msgstr "Жүйе әдепкісі"
+
+msgid "Applied and saved for future boots."
+msgstr "Қолданылды және келесі іске қосулар үшін сақталды."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ядро желі баптауларын қабылдамады"
+
 msgid "This boot"
 msgstr "Осы жүктелу"
 
@@ -739,6 +781,9 @@ msgstr "USB адаптерлері ізделуде…"
 msgid "No USB adapters found."
 msgstr "USB адаптерлері табылмады."
 
+msgid "In use by another network"
+msgstr "Басқа желі пайдалануда"
+
 msgid "Link connected"
 msgstr "Байланыс орнатылды"
 
@@ -747,6 +792,9 @@ msgstr "Байланыс жоқ; қосу әрекеті жасалды"
 
 msgid "Added to LAN"
 msgstr "LAN-ға қосылды"
+
+msgid "Cannot add"
+msgstr "Қосу мүмкін емес"
 
 msgid "Add to LAN"
 msgstr "LAN-ға қосу"
@@ -862,9 +910,6 @@ msgstr "Порт"
 msgid "Security"
 msgstr "Қауіпсіздік"
 
-msgid "None"
-msgstr "Жоқ"
-
 msgid "User name"
 msgstr "Пайдаланушы аты"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux құлыпталған"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Иә: келесі қайта іске қосу Android-ты бастайды"
+
+msgid "No"
+msgstr "Жоқ"
+
+msgid "Writable"
+msgstr "Жазуға болады"
+
+msgid "This boot image cannot change the boot"
+msgstr "Бұл жүктеу бейнесі жүктеуді өзгерте алмайды"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Android-ге ауысу"
 msgid "Lock Linux"
 msgstr "Linux-ты құлыптау"
 
+msgid "Default boot"
+msgstr "Әдепкі жүктелу"
+
+msgid "One-time boot"
+msgstr "Бір реттік жүктеу"
+
+msgid "Boot control"
+msgstr "Жүктеуді басқару"
+
 msgid "Neighbor cells"
 msgstr "Көрші ұяшықтар"
 
@@ -1125,6 +1194,9 @@ msgstr "Жиілік"
 
 msgid "Running %s…"
 msgstr "%s орындалуда…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Хотспот баптаулары сақталды; өзгерістер қолданылуда"
 
 msgid "Started in background: %s"
 msgstr "Фонда іске қосылды: %s"
@@ -1246,6 +1318,9 @@ msgstr "Ішкі SIM таңдалды: қайта жүктегеннен кей�
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Ішкі SIM таңдалды, бірақ бұл құрылғыда қолдау көрсетілмейді: сыртқы SIM қолданылуда"
 
+msgid "in use"
+msgstr "қолданыста"
+
 msgid "Uptime %s"
 msgstr "Жұмыс уақыты %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE байланысы"
 msgid "Hidden"
 msgstr "Жасырын"
 
-msgid "No"
-msgstr "Жоқ"
-
 msgid "Running"
 msgstr "Жұмыс істеуде"
 
@@ -1374,9 +1446,6 @@ msgstr "Желіде"
 
 msgid "AT adapter unavailable"
 msgstr "AT адаптері қолжетімсіз"
-
-msgid "Linux locked"
-msgstr "Linux құлыпталған"
 
 msgid "Installing the language pack…"
 msgstr "Тіл бумасы орнатылуда…"
@@ -2078,9 +2147,6 @@ msgstr "Модемнің әдепкі мәні"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "қолданыста"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d радиосын өшіру"
 
@@ -2485,9 +2551,6 @@ msgstr "Жүктеу бейнесі"
 
 msgid "from the installer"
 msgstr "орнатқыштан"
-
-msgid "Default boot"
-msgstr "Әдепкі жүктелу"
 
 msgid "Free space"
 msgstr "Бос орын"
@@ -3403,14 +3466,14 @@ msgstr "Белгісіз бекіту түрі"
 msgid "Invalid value for this lock kind"
 msgstr "Бұл бекіту түрі үшін жарамсыз мән"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Жолақ, режим және ұяшық құлыптары SIM2 үшін әлі қолдау көрсетілмейді"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Қос SIM ауыстыру радионы басқарып тұрғанда жолақ, режим және ұяшық құлыптарына қолдау көрсетілмейді"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
 
 msgid "Invalid page"
 msgstr "Жарамсыз бет"
@@ -3501,6 +3564,15 @@ msgstr "TTL адаптері жарамды жауап бермеді"
 
 msgid "Invalid TTL"
 msgstr "Жарамсыз TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP адаптері жарамды жауап бермеді"
+
+msgid "Invalid congestion control"
+msgstr "Жарамсыз кептелісті басқару"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Жүктеу адаптері жарамды жауап бермеді"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Деректер шығыны адаптері дұрыс жауап бермеді"
@@ -3755,8 +3827,29 @@ msgstr "Радио өз баптауына сәйкестенбеді"
 msgid "The data roaming setting could not be saved"
 msgstr "Деректер роумингі параметрін сақтау мүмкін болмады"
 
-msgid "Expected on or off"
-msgstr "on немесе off күтіледі"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Хотспот баптауы сақталды, бірақ сымсыз желіні қайта жүктеу сәтсіз болды"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Сымсыз баптауларда сақталмаған өзгерістер бар: алдымен сақтаңыз немесе қайтарыңыз"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Хотспот қазір ауыстырылуда; сәлден соң қайталаңыз"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Ешбір хотспот (кіру нүктесі) бапталмаған"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Бұл радионы қосу басқа интерфейске әсер етеді; Сымсыз бетін пайдаланыңыз"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Радионы Wi-Fi клиенті пайдалануда"
+
+msgid "The hotspot setting could not be written"
+msgstr "Хотспот баптауын жазу мүмкін болмады"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Бұл платформа хотспотты басқаруды қамтамасыз етпейді"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN интеграциясын бұл платформа қамтамасыз етпейді"
@@ -3856,6 +3949,15 @@ msgstr "USB желі интерфейсі емес"
 
 msgid "LAN bridge device section was not found"
 msgstr "LAN көпірі құрылғысының бөлімі табылмады"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Адаптердің қай желіге тиесілі екенін анықтау мүмкін болмады; кейінірек қайталаңыз"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Адаптер басқа желіге тиесілі және LAN-ға қосыла алмайды"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Желі баптауларында сақталмаған өзгерістер бар: алдымен сақтаңыз немесе қайтарыңыз"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB желі интерфейсін іске қосу мүмкін емес"
@@ -3991,6 +4093,12 @@ msgstr "Пакеттермен белгісіз әрекет"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Бұл платформа TCP кептелісін басқаруды қамтамасыз етпейді"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP баптауларын оқу мүмкін болмады"
 
 msgid "Data usage is not available on this system"
 msgstr "Бұл жүйеде деректер шығыны қолжетімсіз"

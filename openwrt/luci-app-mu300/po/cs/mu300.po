@@ -628,6 +628,9 @@ msgstr "Režim hostitele odpojí síť a sériovou linku přes USB na tomto port
 msgid "USB network mode"
 msgstr "Režim sítě USB"
 
+msgid "Current sharing protocol"
+msgstr "Aktuální protokol sdílení"
+
 msgid "Network protocol"
 msgstr "Síťový protokol"
 
@@ -658,6 +661,27 @@ msgstr "Obnovit"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Dostupné pouze v režimu hostitele. Obnovit aktivuje nalezené adaptéry USB; přidání do LAN uloží most a znovu načte síť."
 
+msgid "Network performance"
+msgstr "Výkon sítě"
+
+msgid "Active congestion control"
+msgstr "Aktivní řízení zahlcení"
+
+msgid "Default queue"
+msgstr "Výchozí fronta"
+
+msgid "TCP congestion control"
+msgstr "Řízení zahlcení TCP"
+
+msgid "Apply"
+msgstr "Použít"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Týká se hlavně nových TCP spojení tohoto zařízení. Předávaná spojení klientů hotspotu a USB nepoužijí BBR automaticky."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR nastaví FQ jako výchozí frontu nově vytvořených rozhraní. Stávající spojení, rozhraní a QoS zůstanou. Nastavení přetrvá restart."
+
 msgid "Recent modem operations"
 msgstr "Nedávné operace modemu"
 
@@ -670,6 +694,12 @@ msgstr "Nedávná volání ovládacího panelu z tohoto a předchozího spuště
 msgid "Unavailable"
 msgstr "Nedostupné"
 
+msgid "Mixed"
+msgstr "Smíšený"
+
+msgid "None"
+msgstr "Žádné"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Režim sítě USB není v režimu hostitele dostupný; automatické spuštění hostitele vypne i automatické spuštění sítě USB."
 
@@ -681,9 +711,6 @@ msgstr "Síť a sériová linka přes USB se v režimu zařízení znovu enumeru
 
 msgid "Switch USB role?"
 msgstr "Přepnout roli USB?"
-
-msgid "Apply"
-msgstr "Použít"
 
 msgid "Switching USB role…"
 msgstr "Přepínání role USB…"
@@ -721,6 +748,21 @@ msgstr "Nastavení uloženo"
 msgid "Save failed: %s"
 msgstr "Uložení selhalo: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Nastavení výkonu sítě nelze načíst; obnovte a zkuste znovu"
+
+msgid "This kernel does not provide this setting"
+msgstr "Toto jádro toto nastavení nenabízí"
+
+msgid "System default"
+msgstr "Výchozí systému"
+
+msgid "Applied and saved for future boots."
+msgstr "Použito a uloženo pro další spuštění."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Jádro nepřijalo síťová nastavení"
+
 msgid "This boot"
 msgstr "Toto spuštění"
 
@@ -739,6 +781,9 @@ msgstr "Vyhledávání adaptérů USB…"
 msgid "No USB adapters found."
 msgstr "Nebyly nalezeny žádné adaptéry USB."
 
+msgid "In use by another network"
+msgstr "Používá jiná síť"
+
 msgid "Link connected"
 msgstr "Linka připojena"
 
@@ -747,6 +792,9 @@ msgstr "Žádná linka; pokus o aktivaci proveden"
 
 msgid "Added to LAN"
 msgstr "Přidáno do LAN"
+
+msgid "Cannot add"
+msgstr "Nelze přidat"
 
 msgid "Add to LAN"
 msgstr "Přidat do LAN"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Zabezpečení"
 
-msgid "None"
-msgstr "Žádné"
-
 msgid "User name"
 msgstr "Uživatelské jméno"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux zamčen"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ano: příští restart spustí Android"
+
+msgid "No"
+msgstr "Ne"
+
+msgid "Writable"
+msgstr "Zapisovatelné"
+
+msgid "This boot image cannot change the boot"
+msgstr "Tento zaváděcí obraz nemůže změnit spouštění"
 
 msgid "%s of %s"
 msgstr "%s z %s"
@@ -1114,6 +1174,15 @@ msgstr "Přepnout na Android"
 msgid "Lock Linux"
 msgstr "Zamknout Linux"
 
+msgid "Default boot"
+msgstr "Výchozí spouštění"
+
+msgid "One-time boot"
+msgstr "Jednorázové spuštění"
+
+msgid "Boot control"
+msgstr "Řízení spouštění"
+
 msgid "Neighbor cells"
 msgstr "Sousední buňky"
 
@@ -1125,6 +1194,9 @@ msgstr "Frekvence"
 
 msgid "Running %s…"
 msgstr "Spouštění %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Nastavení hotspotu uloženo; změny se uplatňují"
 
 msgid "Started in background: %s"
 msgstr "Spuštěno na pozadí: %s"
@@ -1246,6 +1318,9 @@ msgstr "Vybrána interní SIM: použije se po restartu"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Vybrána interní SIM, ale toto zařízení ji nepodporuje: používá se externí SIM"
 
+msgid "in use"
+msgstr "používá se"
+
 msgid "Uptime %s"
 msgstr "Doba provozu %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Linka LTE"
 msgid "Hidden"
 msgstr "Skryté"
 
-msgid "No"
-msgstr "Ne"
-
 msgid "Running"
 msgstr "Běží"
 
@@ -1374,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptér AT nedostupný"
-
-msgid "Linux locked"
-msgstr "Linux zamčen"
 
 msgid "Installing the language pack…"
 msgstr "Instalace jazykového balíčku…"
@@ -2078,9 +2147,6 @@ msgstr "Výchozí nastavení modemu"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "používá se"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Vypnout rádio SIM%d"
 
@@ -2485,9 +2551,6 @@ msgstr "Spouštěcí obraz"
 
 msgid "from the installer"
 msgstr "z instalátoru"
-
-msgid "Default boot"
-msgstr "Výchozí spouštění"
 
 msgid "Free space"
 msgstr "Volné místo"
@@ -3403,14 +3466,14 @@ msgstr "Neznámý druh zámku"
 msgid "Invalid value for this lock kind"
 msgstr "Neplatná hodnota pro tento druh zámku"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Tento modem nepodporuje žádné z těchto pásem"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Zámky pásem, režimu a buňky zatím nejsou pro SIM2 podporovány"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Zámky pásem, režimu a buňky nejsou podporovány, dokud rádio řídí přepínání dvou SIM"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Tento modem nepodporuje žádné z těchto pásem"
 
 msgid "Invalid page"
 msgstr "Neplatná stránka"
@@ -3501,6 +3564,15 @@ msgstr "Adaptér TTL nevrátil platnou odpověď"
 
 msgid "Invalid TTL"
 msgstr "Neplatné TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptér TCP nevrátil platnou odpověď"
+
+msgid "Invalid congestion control"
+msgstr "Neplatné řízení zahlcení"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptér spouštění nevrátil platnou odpověď"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptér spotřeby dat nedal platnou odpověď"
@@ -3755,8 +3827,29 @@ msgstr "Rádio se neřídilo svým nastavením"
 msgid "The data roaming setting could not be saved"
 msgstr "Nastavení datového roamingu se nepodařilo uložit"
 
-msgid "Expected on or off"
-msgstr "Očekáváno on nebo off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Nastavení hotspotu je uloženo, ale znovunačtení bezdrátové sítě selhalo"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Bezdrátová nastavení mají neuložené změny: nejprve je uložte nebo vraťte"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot se právě přepíná; zkuste to za chvíli znovu"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Není nastaven žádný hotspot (přístupový bod)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Zapnutí tohoto rádia by ovlivnilo jiné rozhraní; použijte stránku Bezdrátové"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Rádio používá klient Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Nastavení hotspotu nelze zapsat"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Tato platforma neposkytuje ovládání hotspotu"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Tato platforma neposkytuje integraci VPN"
@@ -3856,6 +3949,15 @@ msgstr "Nejde o síťové rozhraní USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Sekce zařízení mostu LAN nebyla nalezena"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nelze zjistit, které síti adaptér patří; zkuste to později"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptér patří jiné síti a nemůže se připojit k LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Síťová nastavení mají neuložené změny: nejprve je uložte nebo vraťte"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Nelze aktivovat síťové rozhraní USB"
@@ -3991,6 +4093,12 @@ msgstr "Neznámá operace s balíčky"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Tato platforma neposkytuje řízení zahlcení TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Nastavení TCP nelze načíst"
 
 msgid "Data usage is not available on this system"
 msgstr "Spotřeba dat není v tomto systému k dispozici"

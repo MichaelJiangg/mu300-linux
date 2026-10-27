@@ -628,6 +628,9 @@ msgstr "Chế độ host ngắt mạng USB và cổng nối tiếp trên cổng 
 msgid "USB network mode"
 msgstr "Chế độ mạng USB"
 
+msgid "Current sharing protocol"
+msgstr "Giao thức chia sẻ hiện tại"
+
 msgid "Network protocol"
 msgstr "Giao thức mạng"
 
@@ -658,6 +661,27 @@ msgstr "Làm mới"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Chỉ khả dụng ở chế độ host. Làm mới sẽ bật các bộ điều hợp USB tìm thấy; thêm vào LAN sẽ lưu cầu nối và tải lại mạng."
 
+msgid "Network performance"
+msgstr "Hiệu năng mạng"
+
+msgid "Active congestion control"
+msgstr "Kiểm soát tắc nghẽn hiện hành"
+
+msgid "Default queue"
+msgstr "Hàng đợi mặc định"
+
+msgid "TCP congestion control"
+msgstr "Kiểm soát tắc nghẽn TCP"
+
+msgid "Apply"
+msgstr "Áp dụng"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Chủ yếu ảnh hưởng đến các kết nối TCP mới do thiết bị này tạo. Kết nối được chuyển tiếp của máy khách hotspot và USB không tự động dùng BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR chọn FQ làm hàng đợi mặc định cho các giao diện mới tạo. Kết nối, giao diện và QoS hiện có được giữ nguyên. Cài đặt được giữ sau khi khởi động lại."
+
 msgid "Recent modem operations"
 msgstr "Thao tác modem gần đây"
 
@@ -670,6 +694,12 @@ msgstr "Các lệnh gọi gần đây của bảng điều khiển trong lần k
 msgid "Unavailable"
 msgstr "Không khả dụng"
 
+msgid "Mixed"
+msgstr "Hỗn hợp"
+
+msgid "None"
+msgstr "Không"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Chế độ mạng USB không khả dụng ở chế độ host; tự khởi động host cũng tắt tự khởi động mạng USB."
 
@@ -681,9 +711,6 @@ msgstr "Mạng USB và cổng nối tiếp sẽ được nhận diện lại ở
 
 msgid "Switch USB role?"
 msgstr "Chuyển vai trò USB?"
-
-msgid "Apply"
-msgstr "Áp dụng"
 
 msgid "Switching USB role…"
 msgstr "Đang chuyển vai trò USB…"
@@ -721,6 +748,21 @@ msgstr "Đã lưu cài đặt"
 msgid "Save failed: %s"
 msgstr "Lưu thất bại: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Không đọc được cài đặt hiệu năng mạng; làm mới để thử lại"
+
+msgid "This kernel does not provide this setting"
+msgstr "Nhân này không cung cấp cài đặt này"
+
+msgid "System default"
+msgstr "Mặc định hệ thống"
+
+msgid "Applied and saved for future boots."
+msgstr "Đã áp dụng và lưu cho các lần khởi động sau."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nhân không chấp nhận cài đặt mạng"
+
 msgid "This boot"
 msgstr "Lần khởi động này"
 
@@ -739,6 +781,9 @@ msgstr "Đang quét bộ điều hợp USB…"
 msgid "No USB adapters found."
 msgstr "Không tìm thấy bộ điều hợp USB."
 
+msgid "In use by another network"
+msgstr "Đang được mạng khác sử dụng"
+
 msgid "Link connected"
 msgstr "Đã có liên kết"
 
@@ -747,6 +792,9 @@ msgstr "Không có liên kết; đã thử bật"
 
 msgid "Added to LAN"
 msgstr "Đã thêm vào LAN"
+
+msgid "Cannot add"
+msgstr "Không thể thêm"
 
 msgid "Add to LAN"
 msgstr "Thêm vào LAN"
@@ -862,9 +910,6 @@ msgstr "Cổng"
 msgid "Security"
 msgstr "Bảo mật"
 
-msgid "None"
-msgstr "Không"
-
 msgid "User name"
 msgstr "Tên người dùng"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux đã khóa"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Có: lần khởi động lại tiếp theo sẽ vào Android"
+
+msgid "No"
+msgstr "Không"
+
+msgid "Writable"
+msgstr "Có thể ghi"
+
+msgid "This boot image cannot change the boot"
+msgstr "Ảnh khởi động này không thể thay đổi khởi động"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Chuyển sang Android"
 msgid "Lock Linux"
 msgstr "Khóa Linux"
 
+msgid "Default boot"
+msgstr "Khởi động mặc định"
+
+msgid "One-time boot"
+msgstr "Khởi động một lần"
+
+msgid "Boot control"
+msgstr "Điều khiển khởi động"
+
 msgid "Neighbor cells"
 msgstr "Cell lân cận"
 
@@ -1125,6 +1194,9 @@ msgstr "Tần số"
 
 msgid "Running %s…"
 msgstr "Đang chạy %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Đã lưu cài đặt hotspot; đang áp dụng thay đổi"
 
 msgid "Started in background: %s"
 msgstr "Đã bắt đầu chạy nền: %s"
@@ -1246,6 +1318,9 @@ msgstr "Đã chọn SIM trong máy: được dùng sau khi khởi động lại"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Đã chọn SIM trong máy, nhưng thiết bị này không hỗ trợ: SIM ngoài đang được dùng"
 
+msgid "in use"
+msgstr "đang dùng"
+
 msgid "Uptime %s"
 msgstr "Thời gian hoạt động %s"
 
@@ -1312,9 +1387,6 @@ msgstr "Liên kết LTE"
 msgid "Hidden"
 msgstr "Ẩn"
 
-msgid "No"
-msgstr "Không"
-
 msgid "Running"
 msgstr "Đang chạy"
 
@@ -1374,9 +1446,6 @@ msgstr "Trực tuyến"
 
 msgid "AT adapter unavailable"
 msgstr "Bộ điều hợp AT không khả dụng"
-
-msgid "Linux locked"
-msgstr "Linux đã khóa"
 
 msgid "Installing the language pack…"
 msgstr "Đang cài đặt gói ngôn ngữ…"
@@ -2078,9 +2147,6 @@ msgstr "Mặc định của modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "đang dùng"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Tắt radio của SIM%d"
 
@@ -2485,9 +2551,6 @@ msgstr "Ảnh khởi động"
 
 msgid "from the installer"
 msgstr "từ trình cài đặt"
-
-msgid "Default boot"
-msgstr "Khởi động mặc định"
 
 msgid "Free space"
 msgstr "Dung lượng trống"
@@ -3403,14 +3466,14 @@ msgstr "Loại khóa không xác định"
 msgid "Invalid value for this lock kind"
 msgstr "Giá trị không hợp lệ cho loại khóa này"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Modem này không hỗ trợ băng tần nào trong số này"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Khóa băng tần, chế độ và cell chưa được hỗ trợ cho SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Khóa băng tần, chế độ và cell không được hỗ trợ khi chuyển đổi hai SIM đang quản lý sóng"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Modem này không hỗ trợ băng tần nào trong số này"
 
 msgid "Invalid page"
 msgstr "Trang không hợp lệ"
@@ -3501,6 +3564,15 @@ msgstr "Bộ điều hợp TTL không trả lời hợp lệ"
 
 msgid "Invalid TTL"
 msgstr "TTL không hợp lệ"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "Bộ điều hợp TCP không trả lời hợp lệ"
+
+msgid "Invalid congestion control"
+msgstr "Kiểm soát tắc nghẽn không hợp lệ"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Bộ điều hợp khởi động không trả lời hợp lệ"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "Bộ điều hợp lưu lượng dữ liệu không trả lời hợp lệ"
@@ -3755,8 +3827,29 @@ msgstr "Radio không làm theo cài đặt"
 msgid "The data roaming setting could not be saved"
 msgstr "Không thể lưu cài đặt chuyển vùng dữ liệu"
 
-msgid "Expected on or off"
-msgstr "Cần giá trị on hoặc off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Đã lưu cài đặt hotspot nhưng tải lại không dây thất bại"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Cài đặt không dây có thay đổi chưa lưu: hãy lưu hoặc hoàn tác trước"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot đang được chuyển; hãy thử lại sau ít phút"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Chưa cấu hình hotspot (điểm truy cập)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Bật radio này sẽ ảnh hưởng giao diện khác; hãy dùng trang Không dây"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio đang được máy khách Wi-Fi sử dụng"
+
+msgid "The hotspot setting could not be written"
+msgstr "Không thể ghi cài đặt hotspot"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Nền tảng này không hỗ trợ điều khiển hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Nền tảng này không cung cấp tích hợp VPN"
@@ -3856,6 +3949,15 @@ msgstr "Không phải giao diện mạng USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "Không tìm thấy mục thiết bị cầu nối LAN"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Không xác định được bộ điều hợp thuộc mạng nào; hãy thử lại sau"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Bộ điều hợp thuộc mạng khác và không thể tham gia LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Cài đặt mạng có thay đổi chưa lưu: hãy lưu hoặc hoàn tác trước"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Không thể bật giao diện mạng USB"
@@ -3991,6 +4093,12 @@ msgstr "Thao tác gói không xác định"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Nền tảng này không hỗ trợ kiểm soát tắc nghẽn TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Không đọc được cài đặt TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Lưu lượng dữ liệu không khả dụng trên hệ thống này"

@@ -628,6 +628,9 @@ msgstr "호스트 모드에서는 이 포트의 USB 네트워킹과 시리얼 �
 msgid "USB network mode"
 msgstr "USB 네트워크 모드"
 
+msgid "Current sharing protocol"
+msgstr "현재 공유 프로토콜"
+
 msgid "Network protocol"
 msgstr "네트워크 프로토콜"
 
@@ -658,6 +661,27 @@ msgstr "새로 고침"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "호스트 모드에서만 사용할 수 있습니다. 새로 고침하면 발견된 USB 어댑터를 활성화하고, LAN에 추가하면 브리지 설정을 저장하고 네트워크를 다시 불러옵니다."
 
+msgid "Network performance"
+msgstr "네트워크 성능"
+
+msgid "Active congestion control"
+msgstr "현재 혼잡 제어"
+
+msgid "Default queue"
+msgstr "기본 큐"
+
+msgid "TCP congestion control"
+msgstr "TCP 혼잡 제어"
+
+msgid "Apply"
+msgstr "적용"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "주로 이 장치가 새로 만드는 TCP 연결에 영향을 줍니다. 전달되는 핫스팟 및 USB 클라이언트 연결이 자동으로 BBR을 쓰지는 않습니다."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR은 새로 만들어지는 인터페이스의 기본 큐로 FQ를 사용합니다. 기존 연결, 인터페이스, QoS는 그대로 유지됩니다. 설정은 재부팅 후에도 유지됩니다."
+
 msgid "Recent modem operations"
 msgstr "최근 모뎀 작업"
 
@@ -670,6 +694,12 @@ msgstr "이번 부팅과 이전 부팅에서 제어판이 최근에 수행한 �
 msgid "Unavailable"
 msgstr "사용 불가"
 
+msgid "Mixed"
+msgstr "혼합"
+
+msgid "None"
+msgstr "없음"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "호스트 모드에서는 USB 네트워크 모드를 사용할 수 없습니다. 호스트 자동 시작을 켜면 USB 네트워크 자동 시작도 꺼집니다."
 
@@ -681,9 +711,6 @@ msgstr "장치 모드에서는 USB 네트워킹과 시리얼이 다시 열거됩
 
 msgid "Switch USB role?"
 msgstr "USB 역할을 전환하시겠습니까?"
-
-msgid "Apply"
-msgstr "적용"
 
 msgid "Switching USB role…"
 msgstr "USB 역할 전환 중…"
@@ -721,6 +748,21 @@ msgstr "설정 저장됨"
 msgid "Save failed: %s"
 msgstr "저장 실패: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "네트워크 성능 설정을 읽을 수 없습니다. 새로 고쳐 다시 시도하세요"
+
+msgid "This kernel does not provide this setting"
+msgstr "이 커널은 이 설정을 제공하지 않습니다"
+
+msgid "System default"
+msgstr "시스템 기본값"
+
+msgid "Applied and saved for future boots."
+msgstr "적용했으며 다음 부팅에도 유지되도록 저장했습니다."
+
+msgid "The kernel did not accept the network settings"
+msgstr "커널이 네트워크 설정을 받아들이지 않았습니다"
+
 msgid "This boot"
 msgstr "이번 부팅"
 
@@ -739,6 +781,9 @@ msgstr "USB 어댑터 검색 중…"
 msgid "No USB adapters found."
 msgstr "USB 어댑터를 찾을 수 없습니다."
 
+msgid "In use by another network"
+msgstr "다른 네트워크에서 사용 중"
+
 msgid "Link connected"
 msgstr "링크 연결됨"
 
@@ -747,6 +792,9 @@ msgstr "링크 없음, 활성화 시도함"
 
 msgid "Added to LAN"
 msgstr "LAN에 추가됨"
+
+msgid "Cannot add"
+msgstr "추가할 수 없음"
 
 msgid "Add to LAN"
 msgstr "LAN에 추가"
@@ -862,9 +910,6 @@ msgstr "포트"
 msgid "Security"
 msgstr "보안"
 
-msgid "None"
-msgstr "없음"
-
 msgid "User name"
 msgstr "사용자 이름"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux 잠김"
+
+msgid "Yes: the next restart starts Android"
+msgstr "예: 다음 재시작 시 Android로 부팅됩니다"
+
+msgid "No"
+msgstr "아니요"
+
+msgid "Writable"
+msgstr "쓰기 가능"
+
+msgid "This boot image cannot change the boot"
+msgstr "이 부트 이미지로는 부팅 설정을 바꿀 수 없습니다"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Android로 전환"
 msgid "Lock Linux"
 msgstr "Linux 잠금"
 
+msgid "Default boot"
+msgstr "기본 부팅"
+
+msgid "One-time boot"
+msgstr "일회성 부팅"
+
+msgid "Boot control"
+msgstr "부팅 제어"
+
 msgid "Neighbor cells"
 msgstr "인접 셀"
 
@@ -1125,6 +1194,9 @@ msgstr "주파수"
 
 msgid "Running %s…"
 msgstr "%s 실행 중…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "핫스팟 설정을 저장했습니다. 변경 사항을 적용하는 중입니다"
 
 msgid "Started in background: %s"
 msgstr "백그라운드에서 시작됨: %s"
@@ -1246,6 +1318,9 @@ msgstr "내장 SIM 선택됨: 재부팅 후 사용됩니다"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "내장 SIM을 선택했지만 이 기기에서는 지원되지 않습니다: 외부 SIM을 사용 중입니다"
 
+msgid "in use"
+msgstr "사용 중"
+
 msgid "Uptime %s"
 msgstr "가동 시간 %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE 링크"
 msgid "Hidden"
 msgstr "숨김"
 
-msgid "No"
-msgstr "아니요"
-
 msgid "Running"
 msgstr "실행 중"
 
@@ -1374,9 +1446,6 @@ msgstr "온라인"
 
 msgid "AT adapter unavailable"
 msgstr "AT 어댑터를 사용할 수 없음"
-
-msgid "Linux locked"
-msgstr "Linux 잠김"
 
 msgid "Installing the language pack…"
 msgstr "언어 팩 설치 중…"
@@ -2078,9 +2147,6 @@ msgstr "모뎀 기본값"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "사용 중"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d 무선 끄기"
 
@@ -2485,9 +2551,6 @@ msgstr "부트 이미지"
 
 msgid "from the installer"
 msgstr "설치 프로그램에서"
-
-msgid "Default boot"
-msgstr "기본 부팅"
 
 msgid "Free space"
 msgstr "여유 공간"
@@ -3403,14 +3466,14 @@ msgstr "알 수 없는 잠금 종류"
 msgid "Invalid value for this lock kind"
 msgstr "이 잠금 종류에 대해 잘못된 값입니다"
 
-msgid "None of these bands is supported by this modem"
-msgstr "이 모뎀은 이 밴드 중 어느 것도 지원하지 않습니다"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "밴드, 모드, 셀 잠금은 아직 SIM2에서 지원되지 않습니다"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "듀얼 SIM 전환이 무선을 관리하는 동안에는 밴드, 모드, 셀 잠금이 지원되지 않습니다"
+
+msgid "None of these bands is supported by this modem"
+msgstr "이 모뎀은 이 밴드 중 어느 것도 지원하지 않습니다"
 
 msgid "Invalid page"
 msgstr "잘못된 페이지"
@@ -3501,6 +3564,15 @@ msgstr "TTL 어댑터가 올바른 응답을 주지 않았습니다"
 
 msgid "Invalid TTL"
 msgstr "잘못된 TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP 어댑터가 올바른 응답을 주지 않았습니다"
+
+msgid "Invalid congestion control"
+msgstr "잘못된 혼잡 제어"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "부팅 어댑터가 올바른 응답을 주지 않았습니다"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "데이터 사용량 어댑터가 올바른 응답을 주지 않았습니다"
@@ -3755,8 +3827,29 @@ msgstr "무선이 설정을 따르지 않았습니다"
 msgid "The data roaming setting could not be saved"
 msgstr "데이터 로밍 설정을 저장할 수 없습니다"
 
-msgid "Expected on or off"
-msgstr "on 또는 off여야 합니다"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "핫스팟 설정은 저장했지만 무선 다시 불러오기에 실패했습니다"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "무선 설정에 저장되지 않은 변경 사항이 있습니다. 먼저 저장하거나 되돌리세요"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "핫스팟을 이미 전환하는 중입니다. 잠시 후 다시 시도하세요"
+
+msgid "No hotspot (access point) is configured"
+msgstr "구성된 핫스팟(액세스 포인트)이 없습니다"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "이 라디오를 켜면 다른 인터페이스에도 영향을 줍니다. 무선 페이지를 사용하세요"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "라디오를 Wi-Fi 클라이언트가 사용 중입니다"
+
+msgid "The hotspot setting could not be written"
+msgstr "핫스팟 설정을 기록할 수 없습니다"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "이 플랫폼은 핫스팟 제어를 제공하지 않습니다"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "이 플랫폼은 VPN 통합을 제공하지 않습니다"
@@ -3856,6 +3949,15 @@ msgstr "USB 네트워크 인터페이스가 아닙니다"
 
 msgid "LAN bridge device section was not found"
 msgstr "LAN 브리지 장치 섹션을 찾을 수 없습니다"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "어댑터가 어느 네트워크 소속인지 확인할 수 없습니다. 나중에 다시 시도하세요"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "어댑터가 다른 네트워크에 속해 있어 LAN에 추가할 수 없습니다"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "네트워크 설정에 저장되지 않은 변경 사항이 있습니다. 먼저 저장하거나 되돌리세요"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB 네트워크 인터페이스를 활성화할 수 없습니다"
@@ -3991,6 +4093,12 @@ msgstr "알 수 없는 패키지 작업"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "이 플랫폼은 TCP 혼잡 제어를 제공하지 않습니다"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP 설정을 읽을 수 없습니다"
 
 msgid "Data usage is not available on this system"
 msgstr "이 시스템에서는 데이터 사용량을 사용할 수 없습니다"

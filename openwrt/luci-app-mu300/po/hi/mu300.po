@@ -628,6 +628,9 @@ msgstr "होस्ट मोड इस पोर्ट पर USB नेटव
 msgid "USB network mode"
 msgstr "USB नेटवर्क मोड"
 
+msgid "Current sharing protocol"
+msgstr "वर्तमान साझाकरण प्रोटोकॉल"
+
 msgid "Network protocol"
 msgstr "नेटवर्क प्रोटोकॉल"
 
@@ -658,6 +661,27 @@ msgstr "रीफ़्रेश करें"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "केवल होस्ट मोड में उपलब्ध। रीफ़्रेश करने पर मिले हुए USB एडेप्टर चालू हो जाते हैं; LAN में जोड़ने से ब्रिज सहेजा जाता है और नेटवर्किंग पुनः लोड होती है।"
 
+msgid "Network performance"
+msgstr "नेटवर्क प्रदर्शन"
+
+msgid "Active congestion control"
+msgstr "सक्रिय कंजेशन नियंत्रण"
+
+msgid "Default queue"
+msgstr "डिफ़ॉल्ट कतार"
+
+msgid "TCP congestion control"
+msgstr "TCP कंजेशन नियंत्रण"
+
+msgid "Apply"
+msgstr "लागू करें"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "मुख्य रूप से इस डिवाइस के नए TCP कनेक्शन प्रभावित होते हैं। हॉटस्पॉट और USB क्लाइंट के अग्रेषित कनेक्शन अपने आप BBR का उपयोग नहीं करते।"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR नए बनाए गए इंटरफ़ेस के लिए FQ को डिफ़ॉल्ट कतार चुनता है। मौजूदा कनेक्शन, इंटरफ़ेस और QoS बने रहते हैं। सेटिंग्स रीबूट के बाद भी बनी रहती हैं।"
+
 msgid "Recent modem operations"
 msgstr "हाल के मॉडेम संचालन"
 
@@ -670,6 +694,12 @@ msgstr "इस और पिछले बूट में कंट्रोल 
 msgid "Unavailable"
 msgstr "अनुपलब्ध"
 
+msgid "Mixed"
+msgstr "मिश्रित"
+
+msgid "None"
+msgstr "कोई नहीं"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "होस्ट मोड में USB नेटवर्क मोड उपलब्ध नहीं है; होस्ट ऑटो-स्टार्ट USB नेटवर्क का ऑटो-स्टार्ट भी बंद कर देता है।"
 
@@ -681,9 +711,6 @@ msgstr "डिवाइस मोड में USB नेटवर्किं�
 
 msgid "Switch USB role?"
 msgstr "USB भूमिका बदलें?"
-
-msgid "Apply"
-msgstr "लागू करें"
 
 msgid "Switching USB role…"
 msgstr "USB भूमिका बदली जा रही है…"
@@ -721,6 +748,21 @@ msgstr "सेटिंग्स सहेजी गईं"
 msgid "Save failed: %s"
 msgstr "सहेजना विफल: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "नेटवर्क प्रदर्शन सेटिंग्स नहीं पढ़ी जा सकीं; पुनः प्रयास के लिए रीफ़्रेश करें"
+
+msgid "This kernel does not provide this setting"
+msgstr "यह कर्नेल यह सेटिंग प्रदान नहीं करता"
+
+msgid "System default"
+msgstr "सिस्टम डिफ़ॉल्ट"
+
+msgid "Applied and saved for future boots."
+msgstr "लागू किया गया और आगे के बूट के लिए सहेजा गया।"
+
+msgid "The kernel did not accept the network settings"
+msgstr "कर्नेल ने नेटवर्क सेटिंग्स स्वीकार नहीं कीं"
+
 msgid "This boot"
 msgstr "यह बूट"
 
@@ -739,6 +781,9 @@ msgstr "USB एडेप्टर स्कैन किए जा रहे ह
 msgid "No USB adapters found."
 msgstr "कोई USB एडेप्टर नहीं मिला।"
 
+msgid "In use by another network"
+msgstr "किसी अन्य नेटवर्क द्वारा उपयोग में"
+
 msgid "Link connected"
 msgstr "लिंक जुड़ा है"
 
@@ -747,6 +792,9 @@ msgstr "लिंक नहीं; सक्षम करने का प्र
 
 msgid "Added to LAN"
 msgstr "LAN में जोड़ा गया"
+
+msgid "Cannot add"
+msgstr "जोड़ा नहीं जा सकता"
 
 msgid "Add to LAN"
 msgstr "LAN में जोड़ें"
@@ -862,9 +910,6 @@ msgstr "पोर्ट"
 msgid "Security"
 msgstr "सुरक्षा"
 
-msgid "None"
-msgstr "कोई नहीं"
-
 msgid "User name"
 msgstr "उपयोगकर्ता नाम"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux लॉक है"
+
+msgid "Yes: the next restart starts Android"
+msgstr "हाँ: अगला रीस्टार्ट Android शुरू करेगा"
+
+msgid "No"
+msgstr "नहीं"
+
+msgid "Writable"
+msgstr "लिखने योग्य"
+
+msgid "This boot image cannot change the boot"
+msgstr "यह बूट इमेज बूट नहीं बदल सकती"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1114,6 +1174,15 @@ msgstr "Android पर जाएँ"
 msgid "Lock Linux"
 msgstr "Linux लॉक करें"
 
+msgid "Default boot"
+msgstr "डिफ़ॉल्ट बूट"
+
+msgid "One-time boot"
+msgstr "एक-बार का बूट"
+
+msgid "Boot control"
+msgstr "बूट नियंत्रण"
+
 msgid "Neighbor cells"
 msgstr "पड़ोसी सेल"
 
@@ -1125,6 +1194,9 @@ msgstr "आवृत्ति"
 
 msgid "Running %s…"
 msgstr "%s चल रहा है…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "हॉटस्पॉट सेटिंग्स सहेजी गईं; बदलाव लागू हो रहे हैं"
 
 msgid "Started in background: %s"
 msgstr "पृष्ठभूमि में शुरू किया गया: %s"
@@ -1246,6 +1318,9 @@ msgstr "आंतरिक SIM चुना गया: रीबूट के �
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "आंतरिक SIM चुना गया, पर इस डिवाइस पर समर्थित नहीं है: बाहरी SIM उपयोग में है"
 
+msgid "in use"
+msgstr "उपयोग में"
+
 msgid "Uptime %s"
 msgstr "अपटाइम %s"
 
@@ -1312,9 +1387,6 @@ msgstr "LTE लिंक"
 msgid "Hidden"
 msgstr "छिपा"
 
-msgid "No"
-msgstr "नहीं"
-
 msgid "Running"
 msgstr "चल रहा है"
 
@@ -1374,9 +1446,6 @@ msgstr "ऑनलाइन"
 
 msgid "AT adapter unavailable"
 msgstr "AT एडेप्टर उपलब्ध नहीं"
-
-msgid "Linux locked"
-msgstr "Linux लॉक है"
 
 msgid "Installing the language pack…"
 msgstr "भाषा पैक इंस्टॉल किया जा रहा है…"
@@ -2078,9 +2147,6 @@ msgstr "मॉडेम का डिफ़ॉल्ट"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "उपयोग में"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d का रेडियो बंद करें"
 
@@ -2485,9 +2551,6 @@ msgstr "बूट इमेज"
 
 msgid "from the installer"
 msgstr "इंस्टॉलर से"
-
-msgid "Default boot"
-msgstr "डिफ़ॉल्ट बूट"
 
 msgid "Free space"
 msgstr "खाली जगह"
@@ -3403,14 +3466,14 @@ msgstr "अज्ञात लॉक प्रकार"
 msgid "Invalid value for this lock kind"
 msgstr "इस लॉक प्रकार के लिए अमान्य मान"
 
-msgid "None of these bands is supported by this modem"
-msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "बैंड, मोड और सेल लॉक अभी SIM2 के लिए समर्थित नहीं हैं"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "जब डुअल-SIM स्विचिंग रेडियो को नियंत्रित करती है, तब बैंड, मोड और सेल लॉक समर्थित नहीं हैं"
+
+msgid "None of these bands is supported by this modem"
+msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
 
 msgid "Invalid page"
 msgstr "अमान्य पेज"
@@ -3501,6 +3564,15 @@ msgstr "TTL एडेप्टर ने कोई मान्य उत्त�
 
 msgid "Invalid TTL"
 msgstr "अमान्य TTL"
+
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
+
+msgid "Invalid congestion control"
+msgstr "अमान्य कंजेशन नियंत्रण"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "बूट एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
 
 msgid "The data usage adapter gave no valid reply"
 msgstr "डेटा उपयोग एडेप्टर ने मान्य उत्तर नहीं दिया"
@@ -3755,8 +3827,29 @@ msgstr "रेडियो ने अपनी सेटिंग का पा�
 msgid "The data roaming setting could not be saved"
 msgstr "डेटा रोमिंग सेटिंग सहेजी नहीं जा सकी"
 
-msgid "Expected on or off"
-msgstr "on या off अपेक्षित है"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "हॉटस्पॉट सेटिंग सहेज ली गई, पर वायरलेस रीलोड विफल रहा"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "वायरलेस सेटिंग्स में बिना सहेजे बदलाव हैं: पहले उन्हें सहेजें या वापस लें"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "हॉटस्पॉट पहले से बदला जा रहा है; थोड़ी देर में फिर प्रयास करें"
+
+msgid "No hotspot (access point) is configured"
+msgstr "कोई हॉटस्पॉट (एक्सेस पॉइंट) कॉन्फ़िगर नहीं है"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "इस रेडियो को चालू करने से दूसरा इंटरफ़ेस प्रभावित होगा; वायरलेस पेज का उपयोग करें"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "रेडियो Wi-Fi क्लाइंट द्वारा उपयोग में है"
+
+msgid "The hotspot setting could not be written"
+msgstr "हॉटस्पॉट सेटिंग लिखी नहीं जा सकी"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "यह प्लेटफ़ॉर्म हॉटस्पॉट नियंत्रण प्रदान नहीं करता"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "यह प्लेटफ़ॉर्म VPN एकीकरण प्रदान नहीं करता"
@@ -3856,6 +3949,15 @@ msgstr "यह USB नेटवर्क इंटरफ़ेस नहीं �
 
 msgid "LAN bridge device section was not found"
 msgstr "LAN ब्रिज डिवाइस सेक्शन नहीं मिला"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "एडेप्टर किस नेटवर्क का है, यह तय नहीं हो सका; बाद में प्रयास करें"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "एडेप्टर किसी अन्य नेटवर्क का है और LAN में नहीं जुड़ सकता"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "नेटवर्क सेटिंग्स में बिना सहेजे बदलाव हैं: पहले उन्हें सहेजें या वापस लें"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB नेटवर्क इंटरफ़ेस चालू नहीं किया जा सकता"
@@ -3991,6 +4093,12 @@ msgstr "अज्ञात पैकेज क्रिया"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "यह प्लेटफ़ॉर्म TCP कंजेशन नियंत्रण प्रदान नहीं करता"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP सेटिंग्स पढ़ी नहीं जा सकीं"
 
 msgid "Data usage is not available on this system"
 msgstr "इस सिस्टम पर डेटा उपयोग उपलब्ध नहीं है"
