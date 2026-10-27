@@ -1,0 +1,55 @@
+#!/usr/bin/ucode
+// wifi-ready: is the Wi-Fi up as /etc/config/wireless has it? One read-only look at netifd's and hostapd's state over
+// ubus; it never enables a radio or an interface (after kanoqwq f0b5ad43).
+//   exit 0  every enabled radio up, every enabled interface on it there, every enabled access point ENABLED in
+//           hostapd. A radio or an interface switched off counts as ready: there is nothing to wait for.
+//   exit 2  it will not come by waiting: netifd gave a radio up (retry_setup_failed), or hostapd reports an access point DISABLED (an AP
+//           started under the world regulatory domain ends there, and only a Wi-Fi restart brings it back).
+//   exit 1  not there yet, no radio configured, or ubus not answering.
+// mu300-hw asks it before deciding on its one Wi-Fi restart. It used to ask hostapd.wlan0 alone, which a hotspot
+// switched off never has: such a boot waited the full 20 s and then restarted the Wi-Fi for nothing.
+import { cursor } from 'uci';
+import { connect } from 'ubus';
+
+let bus = connect(null, 2);
+if (!bus)
+	exit(1);
+let runtime = bus.call('network.wireless', 'status', {});
+if (runtime == null)
+	exit(1);
+
+let uci = cursor(), configured = 0, waiting = false, failed = false;
+uci.foreach('wireless', 'wifi-device', (radio) => {
+	configured++;
+	if (radio.disabled == '1')
+		return;
+	let r = runtime[radio['.name']];
+	if (r?.retry_setup_failed || r?.failed) {
+		failed = true;
+		return;
+	}
+	if (!r?.up || r.pending) {
+		waiting = true;
+		return;
+	}
+	uci.foreach('wireless', 'wifi-iface', (iface) => {
+		if (iface.device != radio['.name'] || iface.disabled == '1')
+			return;
+		let actual = null;
+		for (let i in r.interfaces || [])
+			if (i.section == iface['.name'])
+				actual = i;
+		if (!actual?.ifname) {
+			waiting = true;
+			return;
+		}
+		if (iface.mode != 'ap')
+			return;
+		let st = bus.call('hostapd.' + actual.ifname, 'get_status', {})?.status;
+		if (st == 'DISABLED')
+			failed = true;
+		else if (st != 'ENABLED')
+			waiting = true;
+	});
+});
+exit(failed ? 2 : (waiting || !configured) ? 1 : 0);

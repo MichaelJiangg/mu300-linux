@@ -758,3 +758,50 @@ process.stdout.write(JSON.stringify({ out, k1: el['imei1-k'].innerHTML, k2: el['
         t = self.paint({'imei': '333333333333334'})                    # an identity cached before the slot field
         self.assertEqual(t['out']['imei1'], '3333****334')
 
+
+
+@unittest.skipUnless(shutil.which('node'), 'Node.js is needed for the LuCI JS tests')
+class CellRecovery(unittest.TestCase):
+    """home.js lays the fast tier (sig) over the slow tier's cache (cell). A newer successful sig read clears the
+    slow tier's old error: the card said "No response" after the modem had recovered until the slow tier's next full
+    refresh (ported from kanoqwq/mu300-linux@3c350105)."""
+
+    def merge(self, cell, sig):
+        src = HOME.read_text(encoding='utf-8')
+        start = src.index('var c = st.cell || null;')
+        end = src.index('this.lastCell = c;', start)
+        js = 'const st = ' + json.dumps({'cell': cell, 'sig': sig}) + ';\n' + src[start:end] + r'''
+process.stdout.write(JSON.stringify({ c: c, cell: st.cell, sig: st.sig }));
+'''
+        r = subprocess.run(['node', '-'], input=js, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads(r.stdout)
+
+    ERR = {'ts': 100, 'error': 'AT backend did not answer'}
+    SIG = {'ts': 101, 'cfun': 1, 'reg': {'stat': 1, 'act': 7}, 'reg5g': None, 'sig_src': 'lte',
+           'sig': {'rsrp': -95.0}, 'lte': {'band': 3}, 'nr': None}
+
+    def test_newer_read_clears_the_old_error(self):
+        t = self.merge(self.ERR, self.SIG)
+        self.assertNotIn('error', t['c'])
+        self.assertEqual(t['c']['sig'], {'rsrp': -95.0})
+        self.assertEqual(t['cell'], self.ERR)                 # the cache object itself is not changed
+
+    def test_partial_read_after_an_error_still_shows_its_signal(self):
+        t = self.merge(self.ERR, dict(self.SIG, partial=1, sig_src='cesq', lte=None))
+        self.assertNotIn('error', t['c'])
+        self.assertEqual(t['c']['sig'], {'rsrp': -95.0})
+
+    def test_partial_read_keeps_the_last_engineering_signal(self):
+        cell = dict(self.SIG, ts=100, sig={'rsrp': -90.0})
+        t = self.merge(cell, dict(self.SIG, partial=1, sig={}))
+        self.assertEqual(t['c']['sig'], {'rsrp': -90.0})
+        self.assertEqual(t['c']['ts'], 101)
+
+    def test_older_or_failed_read_keeps_the_error(self):
+        self.assertEqual(self.merge(self.ERR, dict(self.SIG, ts=99))['c']['error'], self.ERR['error'])
+        self.assertEqual(self.merge(self.ERR, {'ts': 101, 'error': 'x'})['c']['error'], self.ERR['error'])
+
+    def test_sig_alone_is_copied(self):
+        t = self.merge(None, self.SIG)
+        self.assertEqual(t['c'], self.SIG)

@@ -34,13 +34,19 @@ LED=${MU300_BIN:-/opt/mu300/bin}/mu300-led
 # the kernel, for the log only: what this guard does is decided by the zones it finds, on every kernel (#229)
 release=$(cat "$R/proc/sys/kernel/osrelease" 2>/dev/null || uname -r)
 
+# hottest: the hottest zone's reading; false when no zone gave a number this round (every sensor failing, or no zone
+# yet). That 0 is not a cool SoC: a round without a reading lifts no cap and turns no alarm off (after kanoqwq
+# cc0ecce7, where a failed read also keeps the fast cadence).
 hottest() {
-    local max=0 t
+    local max=0 t found=0
     for z in "$R"/sys/class/thermal/thermal_zone*/temp; do
         read -r t < "$z" 2>/dev/null || continue
+        case $t in ''|-|*[!0-9-]*|?*-*) continue ;; esac
+        found=1
         [ "$t" -gt "$max" ] 2>/dev/null && max=$t
     done
     echo "$max"
+    [ "$found" = 1 ]
 }
 DEVICE=$(${MU300_BIN:-/opt/mu300/bin}/mu300-device)
 battery() {  # the battery's temperature in tenths of a degree; the U30 Air only
@@ -148,8 +154,15 @@ raise_caps() {  # every policy one step up towards its ceiling; the marker goes 
 ALARM=$R/run/mu300/thermal-alarm
 native_was=
 first=1
+blind=
 while :; do
-    t=$(hottest)
+    if t=$(hottest); then
+        [ -z "$blind" ] || logger -t thermal-guard "thermal zones read again (${t} mC)"
+        blind=
+    else
+        [ -n "$blind" ] || logger -t thermal-guard "no thermal zone gave a temperature: keeping caps and alarm as they are"
+        blind=1
+    fi
     b=$(battery)
     throttle=0
     native=$(native_cpu_cooling "$t") || native=
@@ -175,7 +188,7 @@ while :; do
         for p in "$R"/sys/devices/system/cpu/cpufreq/policy*; do step "$p" -1; done
         mkdir -p "${CAPPED%/*}" && : > "$CAPPED"
         logger -t thermal-guard "hot (${t} mC): lowered cpufreq limits"
-    elif [ "$t" -le "$COOL" ] && [ "$throttle" = 1 ]; then
+    elif [ "$t" -le "$COOL" ] && [ "$throttle" = 1 ] && [ -z "$blind" ]; then
         raise_caps
     elif [ "$t" -ge "$BACKSTOP" ] && [ "$throttle" = 0 ]; then
         # the kernel throttles but does not hold the SoC: one step more per round on top of its cap, the A76
@@ -186,14 +199,14 @@ while :; do
             step "$p" -1
         done
         mkdir -p "${CAPPED%/*}" && echo backstop > "$CAPPED"
-    elif [ "$t" -le "$HOT" ] && [ "$throttle" = 0 ] && [ -e "$CAPPED" ]; then
+    elif [ "$t" -le "$HOT" ] && [ "$throttle" = 0 ] && [ -e "$CAPPED" ] && [ -z "$blind" ]; then
         raise_caps   # the backstop's caps, a step a round once the kernel holds the SoC at its trip again
     fi
     if [ ! -e "$ALARM" ] && { [ "$t" -ge "$HOT" ] || [ "${b:-0}" -ge "$BATT_HOT" ]; }; then
         mkdir -p "${ALARM%/*}" && : > "$ALARM"
         logger -t thermal-guard "too hot (SoC ${t} mC, battery ${b:--} dC): LED alarm on"
         "$LED" alarm on
-    elif [ -e "$ALARM" ] && [ "$t" -le "$COOL" ] && [ "${b:-0}" -le "$BATT_COOL" ]; then
+    elif [ -e "$ALARM" ] && [ -z "$blind" ] && [ "$t" -le "$COOL" ] && [ "${b:-0}" -le "$BATT_COOL" ]; then
         rm -f "$ALARM"
         logger -t thermal-guard "cooled down (SoC ${t} mC, battery ${b:--} dC): LED alarm off"
         "$LED" alarm off

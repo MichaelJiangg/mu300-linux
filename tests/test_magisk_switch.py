@@ -140,6 +140,40 @@ class Switch(ShellTest):
             self.assertEqual(sorted(p.name for p in shared.iterdir()), ['mu300-bc.bin'])
             self.assertIn('reboot', (self.tmp / 'reboot.log').read_text())
 
+    def test_no_reboot_arms_and_stops_there(self):
+        # kanoqwq f6b0668d: an installer arms the trial and reboots by itself
+        _, linux_b, _, _ = self.blocks
+        for shell in self.each_shell():
+            self.images()
+            fake_misc(self.parts / 'misc')
+            (self.tmp / 'reboot.log').unlink(missing_ok=True)
+            self.stub('reboot', 'echo reboot >> "$STUBLOG/reboot.log"')
+            r = self.switch(shell, '_a', '--no-reboot')
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn('armed for one boot', r.stdout)
+            self.assertEqual((self.parts / 'misc').read_bytes()[0x800:0x820], linux_b)
+            self.assertFalse((self.tmp / 'reboot.log').exists())
+
+    def test_misc_written_with_fsync_and_without_where_dd_lacks_it(self):
+        _, linux_b, _, _ = self.blocks
+        real_dd = shutil.which('dd')
+        for shell in self.each_shell():
+            for knows_fsync in (True, False):
+                self.images()
+                fake_misc(self.parts / 'misc')
+                (self.tmp / 'dd.log').unlink(missing_ok=True)
+                self.stub('dd', 'echo "$*" >> "$STUBLOG/dd.log"\n'
+                          + ('' if knows_fsync else 'case "$*" in *fsync*) echo "dd: unknown conv" >&2; exit 1 ;; esac\n')
+                          + f'exec {real_dd} "$@"')
+                r = self.armed(shell)
+                self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+                self.assertEqual((self.parts / 'misc').read_bytes()[0x800:0x820], linux_b)
+                if not (self.tmp / 'dd.log').exists() and 'busybox' in ' '.join(shell):
+                    break          # a busybox built to run its own applets first never asks PATH for dd
+                calls = [l for l in (self.tmp / 'dd.log').read_text().splitlines() if 'seek=2048' in l]
+                self.assertIn('conv=notrunc,fsync', calls[0])
+                self.assertEqual(len(calls), 1 if knows_fsync else 2, calls)
+
     def test_misc_is_resolved_once_and_must_be_the_misc_partition(self):
         # by-name/misc is followed once, to a device whose sysfs entry says PARTNAME=misc; a link to anything else
         # (here: another partition's file) is refused before anything is written, and the target stays as it was
