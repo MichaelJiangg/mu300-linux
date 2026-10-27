@@ -52,6 +52,9 @@ msgstr "Γλώσσες"
 msgid "Power"
 msgstr "Ισχύς"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Η λειτουργία κεντρικού υπολογιστή αποσ
 msgid "USB network mode"
 msgstr "Λειτουργία δικτύου USB"
 
+msgid "Current sharing protocol"
+msgstr "Τρέχον πρωτόκολλο κοινής χρήσης"
+
 msgid "Network protocol"
 msgstr "Πρωτόκολλο δικτύου"
 
@@ -658,6 +664,27 @@ msgstr "Ανανέωση"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Διαθέσιμο μόνο σε λειτουργία κεντρικού υπολογιστή. Η Ανανέωση ενεργοποιεί τους προσαρμογείς USB που εντοπίστηκαν· η προσθήκη στο LAN αποθηκεύει τη γέφυρα και επαναφορτώνει το δίκτυο."
 
+msgid "Network performance"
+msgstr "Απόδοση δικτύου"
+
+msgid "Active congestion control"
+msgstr "Ενεργός έλεγχος συμφόρησης"
+
+msgid "Default queue"
+msgstr "Προεπιλεγμένη ουρά"
+
+msgid "TCP congestion control"
+msgstr "Έλεγχος συμφόρησης TCP"
+
+msgid "Apply"
+msgstr "Εφαρμογή"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Επηρεάζει κυρίως τις νέες συνδέσεις TCP αυτής της συσκευής. Οι προωθούμενες συνδέσεις πελατών hotspot και USB δεν χρησιμοποιούν αυτόματα BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "Το BBR ορίζει το FQ ως προεπιλεγμένη ουρά για τις νέες διεπαφές. Οι υπάρχουσες συνδέσεις, διεπαφές και QoS διατηρούνται. Οι ρυθμίσεις διατηρούνται μετά από επανεκκίνηση."
+
 msgid "Recent modem operations"
 msgstr "Πρόσφατες λειτουργίες μόντεμ"
 
@@ -670,6 +697,12 @@ msgstr "Οι πρόσφατες κλήσεις του πίνακα ελέγχο�
 msgid "Unavailable"
 msgstr "Μη διαθέσιμο"
 
+msgid "Mixed"
+msgstr "Μικτό"
+
+msgid "None"
+msgstr "Καμία"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Η λειτουργία δικτύου USB δεν είναι διαθέσιμη σε λειτουργία κεντρικού υπολογιστή· η αυτόματη εκκίνηση κεντρικού υπολογιστή απενεργοποιεί επίσης την αυτόματη εκκίνηση δικτύου USB."
 
@@ -681,9 +714,6 @@ msgstr "Η δικτύωση USB και η σειριακή σύνδεση θα �
 
 msgid "Switch USB role?"
 msgstr "Αλλαγή ρόλου USB;"
-
-msgid "Apply"
-msgstr "Εφαρμογή"
 
 msgid "Switching USB role…"
 msgstr "Αλλαγή ρόλου USB…"
@@ -721,6 +751,21 @@ msgstr "Οι ρυθμίσεις αποθηκεύτηκαν"
 msgid "Save failed: %s"
 msgstr "Η αποθήκευση απέτυχε: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων απόδοσης δικτύου· ανανεώστε για νέα προσπάθεια"
+
+msgid "This kernel does not provide this setting"
+msgstr "Αυτός ο πυρήνας δεν παρέχει αυτή τη ρύθμιση"
+
+msgid "System default"
+msgstr "Προεπιλογή συστήματος"
+
+msgid "Applied and saved for future boots."
+msgstr "Εφαρμόστηκε και αποθηκεύτηκε για τις επόμενες εκκινήσεις."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ο πυρήνας δεν αποδέχτηκε τις ρυθμίσεις δικτύου"
+
 msgid "This boot"
 msgstr "Αυτή η εκκίνηση"
 
@@ -739,6 +784,9 @@ msgstr "Σάρωση προσαρμογέων USB…"
 msgid "No USB adapters found."
 msgstr "Δεν βρέθηκαν προσαρμογείς USB."
 
+msgid "In use by another network"
+msgstr "Χρησιμοποιείται από άλλο δίκτυο"
+
 msgid "Link connected"
 msgstr "Η ζεύξη συνδέθηκε"
 
@@ -747,6 +795,9 @@ msgstr "Χωρίς ζεύξη· έγινε απόπειρα ενεργοποίη
 
 msgid "Added to LAN"
 msgstr "Προστέθηκε στο LAN"
+
+msgid "Cannot add"
+msgstr "Δεν μπορεί να προστεθεί"
 
 msgid "Add to LAN"
 msgstr "Προσθήκη στο LAN"
@@ -883,9 +934,6 @@ msgstr "Θύρα"
 msgid "Security"
 msgstr "Ασφάλεια"
 
-msgid "None"
-msgstr "Καμία"
-
 msgid "User name"
 msgstr "Όνομα χρήστη"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Το Linux κλειδώθηκε"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ναι: η επόμενη επανεκκίνηση ξεκινά το Android"
+
+msgid "No"
+msgstr "Όχι"
+
+msgid "Writable"
+msgstr "Εγγράψιμο"
+
+msgid "This boot image cannot change the boot"
+msgstr "Αυτή η εικόνα εκκίνησης δεν μπορεί να αλλάξει την εκκίνηση"
 
 msgid "%s of %s"
 msgstr "%s από %s"
@@ -1132,6 +1195,15 @@ msgstr "Μετάβαση σε Android"
 msgid "Lock Linux"
 msgstr "Κλείδωμα Linux"
 
+msgid "Default boot"
+msgstr "Προεπιλεγμένη εκκίνηση"
+
+msgid "One-time boot"
+msgstr "Εκκίνηση μίας φοράς"
+
+msgid "Boot control"
+msgstr "Έλεγχος εκκίνησης"
+
 msgid "Neighbor cells"
 msgstr "Γειτονικές κυψέλες"
 
@@ -1143,6 +1215,9 @@ msgstr "Συχνότητα"
 
 msgid "Running %s…"
 msgstr "Εκτέλεση %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Οι ρυθμίσεις hotspot αποθηκεύτηκαν· εφαρμόζονται οι αλλαγές"
 
 msgid "Started in background: %s"
 msgstr "Ξεκίνησε στο παρασκήνιο: %s"
@@ -1333,9 +1408,6 @@ msgstr "Ζεύξη LTE"
 msgid "Hidden"
 msgstr "Κρυφό"
 
-msgid "No"
-msgstr "Όχι"
-
 msgid "Running"
 msgstr "Εκτελείται"
 
@@ -1395,9 +1467,6 @@ msgstr "Σε σύνδεση"
 
 msgid "AT adapter unavailable"
 msgstr "Ο προσαρμογέας AT δεν είναι διαθέσιμος"
-
-msgid "Linux locked"
-msgstr "Το Linux κλειδώθηκε"
 
 msgid "Installing the language pack…"
 msgstr "Εγκατάσταση του πακέτου γλωσσών…"
@@ -1476,6 +1545,51 @@ msgstr "Μεταφρασμένο"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Οι μεταφράσεις του ίδιου του LuCI προέρχονται από το OpenWrt. Οι μεταφράσεις αυτού του πίνακα εκτός των Τουρκικών και των Κινεζικών είναι αυτόματες (AI)· οι διορθώσεις είναι ευπρόσδεκτες."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "Εισαγάγετε έναν ακέραιο από 0 έως %d"
+
+msgid "Network lamp"
+msgstr "Λυχνία δικτύου"
+
+msgid "Wi-Fi lamp"
+msgstr "Λυχνία Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Λυχνία μπαταρίας"
+
+msgid "On"
+msgstr "Ενεργό"
+
+msgid "Brightness (%)"
+msgstr "Φωτεινότητα (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Μια λυχνία που είναι κλειστή μένει σβηστή· ο συναγερμός θερμότητας εμφανίζεται πάντως στο LED του."
+
+msgid "Device default"
+msgstr "Προεπιλογή της συσκευής"
+
+msgid "LED timeout (seconds)"
+msgstr "Χρόνος LED (δευτερόλεπτα)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Πόσο μένουν αναμμένα τα LED μετά από πάτημα πλήκτρου ή αλλαγή· το 0 τα κρατά αναμμένα. Στον φορτιστή μένουν αναμμένα."
+
+msgid "Boot indicator"
+msgstr "Ένδειξη εκκίνησης"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Το LED δείχνει τα χρώματά του με τη σειρά όσο ξεκινά το σύστημα"
+
+msgid "Heat alarm"
+msgstr "Συναγερμός θερμότητας"
+
+msgid "Siren"
+msgstr "Σειρήνα"
+
+msgid "Red blink"
+msgstr "Κόκκινο αναβόσβημα"
 
 msgid "Automatic"
 msgstr "Αυτόματο"
@@ -1774,9 +1888,6 @@ msgstr "αφύπνιση με το πλήκτρο %s"
 msgid "the modem is suspended (%s)"
 msgstr "το μόντεμ έχει ανασταλεί (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Εισαγάγετε έναν ακέραιο από 0 έως %d"
-
 msgid "Power status unavailable"
 msgstr "Η κατάσταση ισχύος δεν είναι διαθέσιμη"
 
@@ -1834,6 +1945,12 @@ msgstr "Η φόρτιση σταμάτησε προσωρινά: θερμοκρ�
 msgid "Charging paused: charge limit"
 msgstr "Η φόρτιση σταμάτησε προσωρινά: όριο φόρτισης"
 
+msgid "Charging paused: by hand"
+msgstr "Η φόρτιση σε παύση: χειροκίνητα"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Πλήρης φόρτιση μία φορά, μετά επιστροφή στο όριο"
+
 msgid "Sleep now"
 msgstr "Αναστολή τώρα"
 
@@ -1858,6 +1975,27 @@ msgstr "Το 0 % δεν φορτίζει ποτέ την μπαταρία (η σ
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "Το 80 % προστατεύει την μπαταρία μιας συσκευής που μένει στην πρίζα."
 
+msgid "Start charging again under"
+msgstr "Επανέναρξη φόρτισης κάτω από"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "Το 0 ξαναρχίζει 5 μονάδες κάτω από το επίπεδο διακοπής. Μικρότερη τιμή ξαναρχίζει τη φόρτιση μόνο κάτω από αυτήν· με 100 %, η γεμάτη μπαταρία περιμένει να πέσει κάτω από αυτήν."
+
+msgid "Resume charging"
+msgstr "Συνέχιση φόρτισης"
+
+msgid "Pause charging"
+msgstr "Παύση φόρτισης"
+
+msgid "Cancel the full charge"
+msgstr "Ακύρωση πλήρους φόρτισης"
+
+msgid "Charge to full once"
+msgstr "Πλήρης φόρτιση μία φορά"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Σε παύση η μπαταρία δεν φορτίζεται και η συσκευή λειτουργεί από τον φορτιστή· κάτω από 5 % φορτίζεται πάντα, και η προστασία θερμοκρασίας ισχύει πάντα."
+
 msgid "When the charger switches the device on"
 msgstr "Όταν ο φορτιστής ενεργοποιεί τη συσκευή"
 
@@ -1872,9 +2010,6 @@ msgstr "Να μείνει ως έχει"
 
 msgid "LTE only (5G off)"
 msgstr "Μόνο LTE (5G κλειστό)"
-
-msgid "On"
-msgstr "Ενεργό"
 
 msgid "Full"
 msgstr "Πλήρες"
@@ -2276,8 +2411,26 @@ msgstr "Μηνιαίο όριο"
 msgid "%s, warning at %d%%"
 msgstr "%s, προειδοποίηση στο %d%%"
 
+msgid "Daily quota"
+msgstr "Ημερήσιο όριο"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Το μηνιαίο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά όταν αρχίσει η επόμενη περίοδος."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Το ημερήσιο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά τα μεσάνυχτα."
+
+msgid "The daily quota is reached"
+msgstr "Το ημερήσιο όριο εξαντλήθηκε"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Χρησιμοποιήθηκε το %d%% του ημερήσιου ορίου"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Το όριο και το ημερήσιο όριο μετρούν μόνο τις λήψεις."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Το όριο και το ημερήσιο όριο μετρούν μόνο τις αποστολές."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s περιμένει το ρολόι: δεν έχει ρυθμιστεί ακόμη από το δίκτυο. Ήδη μετράει σε αυτή την περίοδο και θα πάει στη μέρα του μόλις ρυθμιστεί το ρολόι."
@@ -2309,6 +2462,9 @@ msgstr "Ανά περίοδο χρέωσης"
 msgid "Billing cycle"
 msgstr "Περίοδος χρέωσης"
 
+msgid "Counted"
+msgstr "Μετρημένα"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Εισαγάγετε μέγεθος σε GB, για παράδειγμα 50 ή 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "Απενεργοποίηση δεδομένων κινητής στο ό
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Όταν αυτή η περίοδος φτάσει το όριο, τα δεδομένα κινητής απενεργοποιούνται: χωρίς internet μέσω του παρόχου μέχρι να αρχίσει η επόμενη περίοδος, να αυξηθεί το όριο ή να απενεργοποιηθεί ξανά αυτή η επιλογή. Αν ενεργοποιήσετε ξανά χειροκίνητα τα δεδομένα κινητής, μένουν ενεργά μέχρι την επόμενη επανεκκίνηση."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Απενεργοποίηση δεδομένων κινητής στο ημερήσιο όριο"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Όταν η σημερινή χρήση φτάσει το ημερήσιο όριο, τα δεδομένα κινητής απενεργοποιούνται έως τα μεσάνυχτα, έως ότου αυξηθεί το όριο ή απενεργοποιηθεί αυτή η επιλογή. Αν τα ενεργοποιήσετε χειροκίνητα, μένουν ενεργά έως την επόμενη επανεκκίνηση."
+
+msgid "Both ways"
+msgstr "Και προς τις δύο κατευθύνσεις"
+
+msgid "Downloads only"
+msgstr "Μόνο λήψεις"
+
+msgid "Uploads only"
+msgstr "Μόνο αποστολές"
 
 msgid "Set"
 msgstr "Ορισμός"
@@ -2344,6 +2515,15 @@ msgstr "Μηνιαίο όριο (GB, 0: κανένα)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Προειδοποίηση σε αυτό το ποσοστό του ορίου"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Ημερήσιο όριο (GB, 0: κανένα)"
+
+msgid "The cap and the daily quota count"
+msgstr "Τι μετρούν το όριο και το ημερήσιο όριο"
+
+msgid "Plan name"
+msgstr "Όνομα πακέτου"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Χρήση ως τώρα σε αυτή την περίοδο (GB)"
@@ -2506,9 +2686,6 @@ msgstr "Εικόνα εκκίνησης"
 
 msgid "from the installer"
 msgstr "από το πρόγραμμα εγκατάστασης"
-
-msgid "Default boot"
-msgstr "Προεπιλεγμένη εκκίνηση"
 
 msgid "Free space"
 msgstr "Ελεύθερος χώρος"
@@ -3523,14 +3700,29 @@ msgstr "Ο προσαρμογέας TTL δεν έδωσε έγκυρη απάν�
 msgid "Invalid TTL"
 msgstr "Μη έγκυρο TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Ο προσαρμογέας TCP δεν έδωσε έγκυρη απάντηση"
+
+msgid "Invalid congestion control"
+msgstr "Μη έγκυρος έλεγχος συμφόρησης"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Ο προσαρμογέας εκκίνησης δεν έδωσε έγκυρη απάντηση"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Ο προσαρμογέας LED δεν έδωσε έγκυρη απάντηση"
+
+msgid "Unknown LED setting"
+msgstr "Άγνωστη ρύθμιση LED"
+
+msgid "Invalid value for this setting"
+msgstr "Μη έγκυρη τιμή για αυτή τη ρύθμιση"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Ο προσαρμογέας χρήσης δεδομένων δεν έδωσε έγκυρη απάντηση"
 
 msgid "Unknown data usage setting"
 msgstr "Άγνωστη ρύθμιση χρήσης δεδομένων"
-
-msgid "Invalid value for this setting"
-msgstr "Μη έγκυρη τιμή για αυτή τη ρύθμιση"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Ο προσαρμογέας προώθησης δεν έδωσε έγκυρη απάντηση"
@@ -3776,8 +3968,29 @@ msgstr "Ο πομπός δεν ακολούθησε τη ρύθμισή του"
 msgid "The data roaming setting could not be saved"
 msgstr "Δεν ήταν δυνατή η αποθήκευση της ρύθμισης περιαγωγής δεδομένων"
 
-msgid "Expected on or off"
-msgstr "Αναμενόταν on ή off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Η ρύθμιση hotspot αποθηκεύτηκε, αλλά η επαναφόρτωση του ασύρματου απέτυχε"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Οι ασύρματες ρυθμίσεις έχουν μη αποθηκευμένες αλλαγές: αποθηκεύστε ή αναιρέστε τις πρώτα"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Το hotspot ήδη αλλάζει κατάσταση· δοκιμάστε ξανά σε λίγο"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Δεν έχει ρυθμιστεί hotspot (σημείο πρόσβασης)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Η ενεργοποίηση αυτού του ραδιοφώνου θα επηρεάσει άλλη διεπαφή· χρησιμοποιήστε τη σελίδα Ασύρματο"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Το ραδιόφωνο χρησιμοποιείται από τον πελάτη Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Δεν ήταν δυνατή η εγγραφή της ρύθμισης hotspot"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Αυτή η πλατφόρμα δεν παρέχει έλεγχο hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Η ενσωμάτωση VPN δεν παρέχεται από αυτή την πλατφόρμα"
@@ -3878,6 +4091,15 @@ msgstr "Δεν είναι διεπαφή δικτύου USB"
 msgid "LAN bridge device section was not found"
 msgstr "Δεν βρέθηκε η ενότητα συσκευής της γέφυρας LAN"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Δεν ήταν δυνατό να προσδιοριστεί σε ποιο δίκτυο ανήκει ο προσαρμογέας· δοκιμάστε αργότερα"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Ο προσαρμογέας ανήκει σε άλλο δίκτυο και δεν μπορεί να ενταχθεί στο LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Οι ρυθμίσεις δικτύου έχουν μη αποθηκευμένες αλλαγές: αποθηκεύστε ή αναιρέστε τις πρώτα"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Δεν είναι δυνατή η ενεργοποίηση της διεπαφής δικτύου USB"
 
@@ -3977,6 +4199,12 @@ msgstr "Μια εγκατάσταση εκτελείται ήδη"
 msgid "The language pack could not be removed"
 msgstr "Δεν ήταν δυνατή η αφαίρεση του πακέτου γλωσσών"
 
+msgid "The LED settings could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων LED"
+
+msgid "The LED setting could not be saved"
+msgstr "Δεν ήταν δυνατή η αποθήκευση της ρύθμισης LED"
+
 msgid "Lock cache unavailable"
 msgstr "Η κρυφή μνήμη κλειδωμάτων δεν είναι διαθέσιμη"
 
@@ -4018,6 +4246,12 @@ msgstr "Άγνωστη ενέργεια πακέτων"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Αυτή η πλατφόρμα δεν παρέχει έλεγχο συμφόρησης TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Η χρήση δεδομένων δεν είναι διαθέσιμη σε αυτό το σύστημα"

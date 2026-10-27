@@ -35,14 +35,18 @@ Pick it at install ("Which OpenWrt?" -> 2, or `MU300_OPENWRT=luci`), or switch a
   time, name and address; the carrier's DNS servers and the number of connections; on the U30
   Air also the battery: level, whether it charges, and the power in watts. While the modem is busy the page keeps its
   last readings and says how old they are. The home page also has **Switch to
-  Android** and **Lock Linux** (see [Going Back to Android](Going-Back-to-Android)).
+  Android** and **Lock Linux** (see [Going Back to Android](Going-Back-to-Android)), with the boot state under them:
+  the default boot, whether this boot is a one-time one (the next restart goes to Android) and whether the boot
+  control blocks can be written (`mu300-next-boot status`). Its **Wi-Fi hotspot** button turns the access point
+  itself on or off (not the whole radio, so a Wi-Fi client on it stays), the same way the U30 Air's Wi-Fi key does; it
+  refuses while the Wireless page has unsaved changes, and the access point comes or goes a few seconds later.
 * **Cellular > Network locks:** network mode, band, cell and EN-DC locks that persist across reboots and are replayed
   at boot. **Reset all to automatic** clears them. Locks live in the modem, so they also apply in Android.
 * **Cellular > SMS:** read, send and delete messages (see [SMS](SMS) for the one rule to remember).
 * **Cellular > SMS forwarding:** pass incoming messages on to a webhook, a Telegram chat or another phone (see
   [SMS](SMS#sms-forwarding)).
-* **Cellular > Data usage:** mobile data per day and per billing cycle, with a reset day and a monthly cap
-  (`mu300-traffic`, see [Mobile Data and APN](Mobile-Data-and-APN#data-usage)).
+* **Cellular > Data usage:** mobile data per day and per billing cycle, with a reset day, a monthly cap, a daily
+  quota, a count mode and a plan name (`mu300-traffic`, see [Mobile Data and APN](Mobile-Data-and-APN#data-usage)).
 * **Cellular > AT terminal:** guarded AT commands over the same channel the system uses. A command that scans, changes
   the radio, the APN or the SIM, or writes a setting that persists into Android, is explained first and sent only
   after a click; a network scan runs in the background and the page follows it.
@@ -55,7 +59,11 @@ Pick it at install ("Which OpenWrt?" -> 2, or `MU300_OPENWRT=luci`), or switch a
   per-profile options) and **Logs**. Without the module every page offers to install it.
 * **Cellular > TTL:** a fixed TTL for mobile data (`mu300-ttl`).
 * **Cellular > Device management:** USB role (device or host), the USB network mode (NCM, ECM or RNDIS, applied at the
-  next boot), and host-mode adapters that can join the LAN bridge.
+  next boot) beside the one the USB gadget runs now, and host-mode adapters that can join the LAN bridge (wired
+  Ethernet adapters only, and none that another network already uses). **Network performance:** the TCP congestion
+  control of the device's own connections, the kernel's default, CUBIC or BBR (BBR also makes fq the default queue);
+  only what the kernel offers is listed (the 5.4 kernel has no BBR), and it is kept across reboots and updates
+  (`mu300-tcp`). Hotspot and USB clients keep their own.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom adapter).
 * **System > Update:** update the device from the browser: what is installed, the newest release on GitHub with its
   download size, an update that keeps running when the page is closed, an update from an uploaded release file for a

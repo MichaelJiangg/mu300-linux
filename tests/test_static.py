@@ -85,6 +85,26 @@ class Rules(unittest.TestCase):
         self.assertIn('power_get', acl['luci-app-mu300']['read']['ubus']['mu300dash'])
         self.assertIn('power_set', acl['luci-app-mu300']['write']['ubus']['mu300dash'])
 
+    def test_led_page_is_wired(self):
+        # System > LEDs (kanoqwq's LED settings, as a page of this app over mu300-led, not LuCI's own LED page): the menu
+        # entry, its view, the rpc declarations, led_get readable and led_set only with write access, the adapter
+        app = TOP / 'openwrt' / 'luci-app-mu300'
+        menu = json.loads((app / 'root/usr/share/luci/menu.d/luci-app-mu300.json').read_text())
+        self.assertEqual(menu['admin/system/mu300-leds']['action'], {'type': 'view', 'path': 'mu300/leds'})
+        self.assertNotIn('admin/system/leds', menu)
+        self.assertFalse((TOP / 'openwrt/overlay/www/luci-static/resources/view/system/leds.js').exists())
+        common = (app / 'htdocs/luci-static/resources/mu300/common.js').read_text()
+        self.assertIn("method: 'led_get'", common)
+        self.assertIn("method: 'led_set', params: [ 'key', 'value' ]", common)
+        view = (app / 'htdocs/luci-static/resources/view/mu300/leds.js').read_text()
+        for s in ('callLedGet', 'callLedSet', "'timeout'", "'boot'", "'thermal'", "_brightness'"):
+            self.assertIn(s, view)
+        acl = json.loads((app / 'root/usr/share/rpcd/acl.d/luci-app-mu300.json').read_text())['luci-app-mu300']
+        self.assertIn('led_get', acl['read']['ubus']['mu300dash'])
+        self.assertNotIn('led_set', acl['read']['ubus']['mu300dash'])
+        self.assertIn('led_set', acl['write']['ubus']['mu300dash'])
+        self.assertTrue((app / 'root/usr/libexec/unisoc-modem/led').stat().st_mode & 0o111)
+
     def test_power_profiles_are_wired_in(self):
         # the daemon runs on both systems, the keys wake it, the Ubuntu units skip the radios in a charging boot,
         # the command is on PATH, OpenWrt's own power-key handler (a tap = poweroff) is neutralised, and power.conf is kept
@@ -824,6 +844,34 @@ class Rules(unittest.TestCase):
         # the fast-path note belongs to the nft backend only
         view = (app / 'htdocs/luci-static/resources/view/mu300/ttl.js').read_text()
         self.assertRegex(view, r"if \(st\.backend === 'nft'\)\s*card\.appendChild\([^;]*firewall fast-path is off")
+
+    def test_tcp_and_boot_cards_are_wired(self):
+        # kanoqwq's b9f71e72 (the TCP card on the Device page) and f6b0668d (the boot state on the dashboard): rpc
+        # declarations, tcp_get/boot_get readable, tcp_set only with write access, the adapters executable; the boot
+        # card only reads (its changes stay the act os buttons)
+        import json
+        app = TOP / 'openwrt' / 'luci-app-mu300'
+        common = (app / 'htdocs/luci-static/resources/mu300/common.js').read_text()
+        self.assertIn("method: 'tcp_get'", common)
+        self.assertIn("method: 'tcp_set', params: [ 'value' ]", common)
+        self.assertIn("method: 'boot_get', expect", common)
+        self.assertIn('callTcpGet: callTcpGet, callTcpSet: callTcpSet, callBootGet: callBootGet', common)
+        acl = json.loads((app / 'root/usr/share/rpcd/acl.d/luci-app-mu300.json').read_text())['luci-app-mu300']
+        self.assertIn('tcp_get', acl['read']['ubus']['mu300dash'])
+        self.assertIn('boot_get', acl['read']['ubus']['mu300dash'])
+        self.assertNotIn('tcp_set', acl['read']['ubus']['mu300dash'])
+        self.assertIn('tcp_set', acl['write']['ubus']['mu300dash'])
+        self.assertNotIn('boot_set', json.dumps(acl))
+        for name in ('tcp', 'boot'):
+            self.assertTrue((app / 'root/usr/libexec/unisoc-modem' / name).stat().st_mode & 0o111, name)
+        self.assertTrue((TOP / 'rootfs/overlay/opt/mu300/bin/mu300-tcp').stat().st_mode & 0o111)
+        device = (app / 'htdocs/luci-static/resources/view/mu300/device.js').read_text()
+        self.assertIn('M.callTcpGet()', device)
+        self.assertIn('M.callTcpSet(value)', device)
+        self.assertIn('s.net_current', device)
+        self.assertIn('d.eligible === 0', device)
+        home = (app / 'htdocs/luci-static/resources/view/mu300/home.js').read_text()
+        self.assertIn('M.callBootGet()', home)
 
     def test_mainline_rewrites_the_ttl_in_tc(self):
         # mu300-ttl's tc backend (clsact egress, matchall, pedit, csum): the flowtable transmits through egress, so

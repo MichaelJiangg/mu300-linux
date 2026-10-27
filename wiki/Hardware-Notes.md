@@ -90,7 +90,9 @@ the device lands in Android about 20 minutes later. The cause is still open.
   `bq256xx` driver from v2026.10.12 on. `mu300-power` adds profiles (`plugged`, `battery`, `saver`, `auto`), idle radios
   and a **charge limit** (from v2026.10.20: any value from 0 to 100 %, `sudo mu300-power charge-limit 80` or
   `CHARGE_TO`; charging stops at the limit and resumes 5 points below it, 0 never charges, and the battery is never
-  held under 5 %; before: 100 or 80); charging pauses above 45 °C.
+  held under 5 %; before: 100 or 80); charging pauses above 45 °C. Also (U30 Air): `RESUME_AT` (charging starts
+  again only under that level), `mu300-power charge pause|resume` and `charge full` (once to 100 %, then back to the
+  limit); System > Power has them too (FINDINGS 226).
 * **Type-C current (§40, v2026.10.20, mainline kernels):** the charger used to take 500 mA from every port. Now the
   PMIC's Type-C block is read and the larger of the BC1.2 and the Type-C (Rp) current is taken, 3 A capped to 2 A:
   on a 1.5 or 3 A port the battery charges at about 1.6 A instead of 0.36 A.
@@ -105,10 +107,13 @@ the device lands in Android about 20 minutes later. The cause is still open.
   2.4 GHz, as ZTE's firmware and its guide, §152). `sudo mu300-led test` shows which is which.
 * **Heat alarm:** the battery LED flashes red, white, blue in turn when the chip reaches 85 °C or the battery 50 °C
   (`thermal-guard`). On the F50 the network LED does this.
+* **LED settings (every board):** each lamp on or off, the dimmable ones' brightness (§227), the timeout, a boot
+  indicator (the RGB LED's colours in turn while the system starts) and the heat alarm as the siren, a red blink or
+  nothing: `mu300-led set ...`, System -> LEDs on `openwrt-luci`, the panel's LEDs card on Ubuntu. Off by default.
 * **Buttons:** power: a short press wakes the LEDs, held 3 s shuts down. Wi-Fi key: switches 2.4 / 5 GHz, held 3 s turns
   the hotspot off or on.
 * **NFC (§33g):** a phone held to the device can join the hotspot: `sudo mu300-nfc wifi` writes the hotspot's name and
-  password into the tag (also `url`, `text`, `clear`, `on`/`off`).
+  password into the tag (also `url`, `text`, `clear`, `on`/`off`). The V50 has the same tag (§229).
 * **USB host (§33e):** `sudo mu300-usb host` with an OTG adapter, on the mainline kernels: flash drives (FAT, exFAT),
   keyboards, mice, USB modems and Ethernet adapters. `sudo mu300-usb device` goes back (the default at every boot).
 * **USB-C power delivery (§150, EXPERIMENTAL, off by default):** `sudo mu300-usb pd on` (mainline kernels) hands the

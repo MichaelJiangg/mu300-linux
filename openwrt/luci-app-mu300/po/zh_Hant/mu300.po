@@ -52,6 +52,9 @@ msgstr "語言"
 msgid "Power"
 msgstr "電源"
 
+msgid "LEDs"
+msgstr "狀態燈"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "主機模式會中斷此連接埠的 USB 網路與序列埠連線。F50 
 msgid "USB network mode"
 msgstr "USB 網路模式"
 
+msgid "Current sharing protocol"
+msgstr "目前共享協定"
+
 msgid "Network protocol"
 msgstr "網路協定"
 
@@ -658,6 +664,27 @@ msgstr "重新整理"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "僅限主機模式使用。重新整理會啟用偵測到的 USB 網路卡；加入 LAN 會儲存橋接設定並重新載入網路。"
 
+msgid "Network performance"
+msgstr "網路效能"
+
+msgid "Active congestion control"
+msgstr "目前壅塞控制"
+
+msgid "Default queue"
+msgstr "預設佇列"
+
+msgid "TCP congestion control"
+msgstr "TCP 壅塞控制"
+
+msgid "Apply"
+msgstr "套用"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "主要影響裝置自身新建的 TCP 連線；不會將熱點或 USB 轉發的用戶端連線統一改為 BBR。"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR 搭配 FQ 作為新建介面的預設佇列；現有連線、介面與 QoS 不會重設。設定重新開機後保留。"
+
 msgid "Recent modem operations"
 msgstr "最近的數據機操作"
 
@@ -670,6 +697,12 @@ msgstr "控制面板在本次及上一次開機中的最近呼叫：時間、哪
 msgid "Unavailable"
 msgstr "無法使用"
 
+msgid "Mixed"
+msgstr "混合"
+
+msgid "None"
+msgstr "無"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "主機模式下無法使用 USB 網路模式；啟用主機開機自動啟動也會停用 USB 網路開機自動啟動。"
 
@@ -681,9 +714,6 @@ msgstr "切回裝置模式後，USB 網路與序列埠會重新列舉。"
 
 msgid "Switch USB role?"
 msgstr "要切換 USB 角色嗎？"
-
-msgid "Apply"
-msgstr "套用"
 
 msgid "Switching USB role…"
 msgstr "正在切換 USB 角色…"
@@ -721,6 +751,21 @@ msgstr "設定已儲存"
 msgid "Save failed: %s"
 msgstr "儲存失敗：%s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "無法讀取網路效能設定，請重新整理再試"
+
+msgid "This kernel does not provide this setting"
+msgstr "目前核心不提供此設定"
+
+msgid "System default"
+msgstr "系統預設"
+
+msgid "Applied and saved for future boots."
+msgstr "已套用並儲存，開機後繼續生效。"
+
+msgid "The kernel did not accept the network settings"
+msgstr "核心未接受網路效能設定"
+
 msgid "This boot"
 msgstr "本次開機"
 
@@ -739,6 +784,9 @@ msgstr "正在掃描 USB 網路卡…"
 msgid "No USB adapters found."
 msgstr "找不到 USB 網路卡。"
 
+msgid "In use by another network"
+msgstr "已被其他網路佔用"
+
 msgid "Link connected"
 msgstr "連結已連線"
 
@@ -747,6 +795,9 @@ msgstr "無連結，已嘗試啟用"
 
 msgid "Added to LAN"
 msgstr "已加入 LAN"
+
+msgid "Cannot add"
+msgstr "不可新增"
 
 msgid "Add to LAN"
 msgstr "加入 LAN"
@@ -883,9 +934,6 @@ msgstr "連接埠"
 msgid "Security"
 msgstr "安全性"
 
-msgid "None"
-msgstr "無"
-
 msgid "User name"
 msgstr "使用者名稱"
 
@@ -993,6 +1041,21 @@ msgstr "MCS 下行/上行"
 
 msgid "BLER DL/UL"
 msgstr "BLER 下行/上行"
+
+msgid "Linux locked"
+msgstr "Linux 已鎖定"
+
+msgid "Yes: the next restart starts Android"
+msgstr "是：下次重新啟動將進入 Android"
+
+msgid "No"
+msgstr "否"
+
+msgid "Writable"
+msgstr "可寫入"
+
+msgid "This boot image cannot change the boot"
+msgstr "目前開機映像不支援變更開機設定"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1132,6 +1195,15 @@ msgstr "切換到 Android"
 msgid "Lock Linux"
 msgstr "鎖定 Linux"
 
+msgid "Default boot"
+msgstr "預設開機"
+
+msgid "One-time boot"
+msgstr "臨時啟動"
+
+msgid "Boot control"
+msgstr "啟動控制"
+
 msgid "Neighbor cells"
 msgstr "鄰近基地台"
 
@@ -1143,6 +1215,9 @@ msgstr "頻率"
 
 msgid "Running %s…"
 msgstr "正在執行 %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "熱點設定已儲存，正在套用"
 
 msgid "Started in background: %s"
 msgstr "已在背景啟動：%s"
@@ -1333,9 +1408,6 @@ msgstr "LTE 連結"
 msgid "Hidden"
 msgstr "已隱藏"
 
-msgid "No"
-msgstr "否"
-
 msgid "Running"
 msgstr "執行中"
 
@@ -1395,9 +1467,6 @@ msgstr "線上"
 
 msgid "AT adapter unavailable"
 msgstr "AT 轉接器無法使用"
-
-msgid "Linux locked"
-msgstr "Linux 已鎖定"
 
 msgid "Installing the language pack…"
 msgstr "正在安裝語言套件…"
@@ -1476,6 +1545,51 @@ msgstr "翻譯範圍"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI 本身的翻譯來自 OpenWrt。本面板除土耳其文與中文外的翻譯皆為機器（AI）翻譯，歡迎指正。"
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "請輸入 0 到 %d 之間的整數"
+
+msgid "Network lamp"
+msgstr "訊號燈"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi 熱點燈"
+
+msgid "Battery lamp"
+msgstr "電池燈"
+
+msgid "On"
+msgstr "開"
+
+msgid "Brightness (%)"
+msgstr "亮度（%）"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "關閉的燈保持熄滅；溫度警報仍會在其指示燈上顯示。"
+
+msgid "Device default"
+msgstr "裝置預設值"
+
+msgid "LED timeout (seconds)"
+msgstr "狀態燈自動熄滅（秒）"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "按鍵或狀態變化後指示燈保持點亮的時間；0 表示常亮。連接充電器時保持點亮。"
+
+msgid "Boot indicator"
+msgstr "開機指示"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "系統啟動期間指示燈依序顯示各顏色"
+
+msgid "Heat alarm"
+msgstr "溫度警報"
+
+msgid "Siren"
+msgstr "警燈輪閃"
+
+msgid "Red blink"
+msgstr "紅色閃爍"
 
 msgid "Automatic"
 msgstr "自動"
@@ -1774,9 +1888,6 @@ msgstr "%s 鍵喚醒"
 msgid "the modem is suspended (%s)"
 msgstr "數據機已暫停（%s）"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "請輸入 0 到 %d 之間的整數"
-
 msgid "Power status unavailable"
 msgstr "無法取得電源狀態"
 
@@ -1834,6 +1945,12 @@ msgstr "充電已暫停：電池溫度"
 msgid "Charging paused: charge limit"
 msgstr "充電已暫停：充電上限"
 
+msgid "Charging paused: by hand"
+msgstr "已暫停電池充電：手動"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "正在臨時充滿一次，之後恢復原來的充電上限"
+
 msgid "Sleep now"
 msgstr "立即休眠"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % 表示從不為電池充電（裝置由充電器供電），100 % �
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % 可讓長期插著電源的裝置電池更健康。"
 
+msgid "Start charging again under"
+msgstr "恢復充電於（低於）"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 表示在停止電量以下 5 個百分點時恢復。更低的值表示僅在低於該值時恢復充電；設為 100 % 時，充滿的電池要等電量降到該值以下才再充。"
+
+msgid "Resume charging"
+msgstr "恢復自動充電"
+
+msgid "Pause charging"
+msgstr "暫停電池充電"
+
+msgid "Cancel the full charge"
+msgstr "取消臨時充滿"
+
+msgid "Charge to full once"
+msgstr "臨時充滿一次"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "暫停時電池不充電，裝置由充電器供電；電量低於 5 % 時仍會充電，電池溫度保護始終有效。"
+
 msgid "When the charger switches the device on"
 msgstr "充電器開機時"
 
@@ -1872,9 +2010,6 @@ msgstr "維持不變"
 
 msgid "LTE only (5G off)"
 msgstr "僅 LTE（關閉 5G）"
-
-msgid "On"
-msgstr "開"
 
 msgid "Full"
 msgstr "全速"
@@ -2271,8 +2406,26 @@ msgstr "每月上限"
 msgid "%s, warning at %d%%"
 msgstr "%s，%d%% 時提醒"
 
+msgid "Daily quota"
+msgstr "每日額度"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "已達到每月流量上限：行動數據已關閉，下一個週期開始時自動恢復。"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "已達每日額度：行動數據已關閉，午夜後自動恢復。"
+
+msgid "The daily quota is reached"
+msgstr "已達每日額度"
+
+msgid "%d%% of the daily quota is used"
+msgstr "已用每日額度的 %d%%"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "上限和每日額度僅統計下行。"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "上限和每日額度僅統計上行。"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s 正在等待時鐘：時鐘尚未透過網路校準。這部分流量已計入本週期，時鐘校準後會記到對應的日期。"
@@ -2304,6 +2457,9 @@ msgstr "按計費週期"
 msgid "Billing cycle"
 msgstr "計費週期"
 
+msgid "Counted"
+msgstr "計量"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "請輸入以 GB 為單位的大小，例如 50 或 2.5"
 
@@ -2315,6 +2471,21 @@ msgstr "達到上限時關閉行動數據"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "本週期達到上限時將關閉行動數據：在下一個週期開始、提高上限或關閉此選項之前，無法透過電信業者上網。手動重新開啟行動數據後，它會保持開啟直到下次重新啟動。"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "達到每日額度時關閉行動數據"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "當天用量達到每日額度時，行動數據會關閉，直到午夜、額度調高或再次關閉此項。手動重新開啟行動數據後，它會保持開啟直到下次重新啟動。"
+
+msgid "Both ways"
+msgstr "上下行合計"
+
+msgid "Downloads only"
+msgstr "僅下行"
+
+msgid "Uploads only"
+msgstr "僅上行"
 
 msgid "Set"
 msgstr "設定"
@@ -2339,6 +2510,15 @@ msgstr "每月上限（GB，0 表示無）"
 
 msgid "Warning at this percentage of the cap"
 msgstr "達到上限的此百分比時提醒"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "每日額度（GB，0 表示無）"
+
+msgid "The cap and the daily quota count"
+msgstr "套餐計量方式"
+
+msgid "Plan name"
+msgstr "套餐名稱"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "本週期已用（GB）"
@@ -2501,9 +2681,6 @@ msgstr "開機映像"
 
 msgid "from the installer"
 msgstr "來自安裝程式"
-
-msgid "Default boot"
-msgstr "預設開機"
 
 msgid "Free space"
 msgstr "可用空間"
@@ -3516,14 +3693,29 @@ msgstr "TTL 介面卡未傳回有效回覆"
 msgid "Invalid TTL"
 msgstr "無效的 TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP 介接程式未傳回有效回應"
+
+msgid "Invalid congestion control"
+msgstr "壅塞控制演算法無效"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "啟動介接程式未傳回有效回應"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED 介面卡未傳回有效回覆"
+
+msgid "Unknown LED setting"
+msgstr "未知的狀態燈設定"
+
+msgid "Invalid value for this setting"
+msgstr "此設定的值無效"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "流量統計介面卡沒有回傳有效的回覆"
 
 msgid "Unknown data usage setting"
 msgstr "未知的流量統計設定"
-
-msgid "Invalid value for this setting"
-msgstr "此設定的值無效"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "轉寄配接器沒有傳回有效的回覆"
@@ -3769,8 +3961,29 @@ msgstr "射頻未按設定生效"
 msgid "The data roaming setting could not be saved"
 msgstr "無法儲存數據漫遊設定"
 
-msgid "Expected on or off"
-msgstr "應為 on 或 off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "熱點設定已儲存，但套用失敗，請重試"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "無線設定有未套用的變更，請先儲存或撤銷"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "熱點正在套用設定，請稍後再試"
+
+msgid "No hotspot (access point) is configured"
+msgstr "沒有設定熱點"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "啟用此無線電會影響其他介面，請在無線頁面處理"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "無線電正被 Wi-Fi 用戶端佔用"
+
+msgid "The hotspot setting could not be written"
+msgstr "熱點設定寫入失敗"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "此平台未提供熱點控制"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "此平台不提供 VPN 整合"
@@ -3871,6 +4084,15 @@ msgstr "不是 USB 網路介面"
 msgid "LAN bridge device section was not found"
 msgstr "找不到 LAN 橋接裝置設定區段"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "無法確認網卡歸屬，請稍後再試"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "網卡已被其他網路佔用，不可加入 LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "設定有未儲存的變更，請先處理後再試"
+
 msgid "Cannot bring USB network interface up"
 msgstr "無法啟用 USB 網路介面"
 
@@ -3970,6 +4192,12 @@ msgstr "已有安裝作業正在進行"
 msgid "The language pack could not be removed"
 msgstr "無法移除語言套件"
 
+msgid "The LED settings could not be read"
+msgstr "無法讀取狀態燈設定"
+
+msgid "The LED setting could not be saved"
+msgstr "無法儲存狀態燈設定"
+
 msgid "Lock cache unavailable"
 msgstr "鎖定快取無法使用"
 
@@ -4011,6 +4239,12 @@ msgstr "未知的套件操作"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "此平台未提供 TCP 壅塞控制"
+
+msgid "The TCP settings could not be read"
+msgstr "無法讀取 TCP 設定"
 
 msgid "Data usage is not available on this system"
 msgstr "此系統不支援流量統計"

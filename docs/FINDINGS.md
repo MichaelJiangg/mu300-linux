@@ -12019,3 +12019,90 @@ source must offer first is logged (rate-limited) as a frame read wrong. PD stays
 **Device check (U30 Air):** `i2cget` REG04 reads `0x70` after boot on a wall charger, and a charge to the user limit
 behaves as before. With `mu300-usb pd on`, a PD charger and the dock from FINDINGS 150 negotiate, and the log has
 no "source capabilities without 5 V first".
+
+### 227. LED brightness: which lamps dim, and what the U30 Air's PMIC reads back
+
+**Status: kanoqwq's readings on his U30 Air (7.2.8, 2026-10-16, his `docs/U30AIR-LEDS-20261016.zh-CN.md`) and the
+drivers in this tree; nothing measured here.** Behind `mu300-led`'s per-lamp brightness (LED_*_BRIGHTNESS, ported from
+kanoqwq's `f6b0668d`, `2af101f8`, `c1293746`).
+
+* **They dim:** the PMIC's RGB channels (`sc27xx:red|green|blue`, 0-255: the F50's network lamp, the U30 Air's battery
+  lamp); the F50's keypad sink (`keyboard-backlight`, 0-127; ZTE lights it at 48); the V50's AW9523B lamps, whose DIM
+  registers take 0 up to each lamp's `max_brightness` from the device tree (FINDINGS 95).
+* **They only switch:** the U30 Air's network and Wi-Fi lamps: LDOs VDDCAMA0-2 (`zte-ldo0..2`, 5.4's `vddcamaN_status`)
+  and the GPIO `net_blue`, `max_brightness` 1. The network lamp's red is the keypad sink, but dimming it alone would
+  make one colour of that lamp darker than the others, so the lamp is on or off (kanoqwq's page offers the same).
+* **The breathing peak follows the level written.** kanoqwq wrote the pattern `0 625 255 750 0 625 0 250` to the U30
+  Air's battery channel and read the PMIC back: peak register `0xffff`, curve registers `0x0505` / `0x0206`. A peak
+  of 255 is the PMIC's full scale, so a lower level in `hw_pattern` (ZTE's 120/200/150, scaled by the setting) is a
+  dimmer breath with the same curve; the curve here stays ZTE's (FINDINGS 151), not his faster one.
+
+**Device check:** on each board `mu300-led set network_brightness 20` (U30 Air: `battery_brightness`) visibly dims
+that lamp, a breathing battery lamp too, and `mu300-led set network 0` darkens it until `... network 1`.
+
+### 229. The V50's NFC tag: the same FM11NT08, its reset line from ZTE's device tree node
+
+**Status: from kanoqwq's `f6b0668d`, run on his V50. No V50 here; not run on a device by us.**
+
+The V50 has the U30 Air's tag (FINDINGS 95): a Fudan FM11NT08 at 0x57 on I2C2, on another reset line, AP GPIO 189
+(the U30 Air's is 190). ZTE's tree describes it in a node of its own, `/ntag_fm11_gpio`, whose `ntag-reset-gpio` is the
+usual 12-byte cell: the GPIO controller's phandle, the pin and the flags, big-endian. `mu300-nfc` reads the pin there on a
+V50 (mainline boots ZTE's tree unchanged, §31) and drives the tag only when it is 189, the line kano tested; a tree
+without the node or with another pin leaves the tag alone. `mu300-nfc supported` says whether this device has a tag it drives, and the
+callers ask it (Ubuntu's hotspot start, OpenWrt's `mu300-hw`); OpenWrt also syncs the tag when the wireless settings
+are saved (a procd config trigger in `mu300-post`), not only at the next boot. A `gpioset` that cannot take the line
+now fails with that, instead of reading a deaf chip.
+
+**Device check (V50, mainline):** `mu300-nfc supported` exits 0; `mu300-nfc wifi` and a phone joins the hotspot with a tap;
+a new hotspot password in LuCI reaches the tag without a reboot.
+
+### 226. The U30 Air's bq256xx `charge_type` as a pause: N/A keeps the input, Fast charges again
+
+**Status: kanoqwq's reading on his U30 Air (OpenWrt, 2026-10-16); the mu300-power side runs offline only here.**
+From kanoqwq's `61bb5a30` (his `docs/U30AIR-WEB-CHARGING-20261016.zh-CN.md`), which answers the open question of §36
+("what the bq256xx `charge_type` node does on writes"):
+
+- Writing `N/A` to `/sys/class/power_supply/bq256xx-charger/charge_type` pauses the battery's charge and nothing else:
+  the node then reads `N/A`, `status` reads `Not charging`, `online` stays `1`, the input current limit stays where
+  BC1.2 / Type-C put it (2,000,000 uA on his charger), and USB LAN and the cellular WAN stay up. The device keeps
+  running on the charger; the driver only clears CHG_CONFIG and remembers the pause for its next VBUS check, so it
+  holds across a replug (§33d). It is not a battery bypass: a load the input does not cover still draws on the battery.
+- Writing `Fast` charges again. `Fast` is the enum the driver takes for "on", not a fast-charge protocol or a higher
+  current.
+- With a 70/80 % band set on a battery at 100 %, the pause came at once. Not checked by him: the restart at the lower
+  level after a discharge, and a replug or a PD dock during a pause.
+
+mu300-power now offers what his separate `mu300-charge` service did, as keys of the one charge guard (his service
+and ours would both have written `charge_type`): `RESUME_AT` (charging starts again under it instead of 5 points under
+`CHARGE_TO`; with `CHARGE_TO=100` a full battery waits until it drops under it), `CHARGE_PAUSE=1` (a pause by hand,
+`mu300-power charge pause|resume`, kept across boots) and `FULL_ONCE=1` (`mu300-power charge full`: the limit is set
+aside until the battery says Full at 100 %, then the key clears itself). All off by default; refused where there is
+no battery (F50, V50). The temperature pause keeps the last word: a resume or a full charge never turns charging on
+while the battery is out of range. The pause and the limit both give way under 5 % (as `CHARGE_TO=0` already did).
+On the LuCI and Cockpit power pages, U30 Air only.
+
+**Device check (U30 Air):** `mu300-power charge pause`: within 10 s `charge_type` N/A, `status` Not charging, the
+panel says "Charging paused: by hand"; `charge resume` charges again. `CHARGE_TO=80 RESUME_AT=60`: stops at 80 %, stays
+off down to 60 %, charges under it. `charge full` from 80 %: charges to 100 %, `FULL_ONCE=0` once Full, then held.
+### 225. 7.2 and 7.3 skip the PCIe link wait too; utilisation clamps let the Wi-Fi TX thread's floor take effect
+
+**Status: built for 6.18.58, 7.2.12 and 7.3 here; kanoqwq ran the 7.2 patch and the options on his U30 Air (7.2.8).
+Not run on a device here.** From kanoqwq's `f0b5ad43` (his `patches/7.2/0026` and config, after liuwang97).
+
+**The link wait.** FINDINGS 214's patch (`patches/6.18/0028`) was 6.18 only. 7.2 and 7.3 have the same wait, 10 x
+90 ms in `dw_pcie_host_init()`, but now act on its result: a timeout fails the probe, nothing in Detect is `-ENODEV`
+and goes on. `patches/7.2/0028` and `patches/7.3/0028` let a driver that sets `skip_link_wait` count the skipped wait as
+no error; the wait on resume is untouched. pcie-sprd already set it wherever the header defines
+`DW_PCIE_HAS_SKIP_LINK_WAIT`, so on 7.x the Marlin3's root port stops waiting 0.9 s at every boot as on 6.18.
+
+**Utilisation clamps (`UCLAMP_TASK`, `UCLAMP_TASK_GROUP`).** The vendor Wi-Fi driver asks for a utilisation floor of
+400 for its TX thread while TX or RX is above 25 MB/s (`sc2355_set_thread_uclamp`, `SET_UCLAMP_THRESHOLD`) and drops it
+below; without the option the kernel refused that request, so the floor never took effect. With it, schedutil runs
+the CPU that thread is on at about 40 % of its capacity or more during heavy Wi-Fi traffic. Nothing else sets a clamp:
+the static key stays off until something does, and real-time tasks get the maximum frequency with or without it.
+`THERMAL_NETLINK` adds the thermal core's netlink events (trip crossings, cooling changes) for a listener; nothing
+listens yet.
+
+**Device check:** on 7.2 or 7.3, dmesg has no "Phy link never came up" / link-wait pause before the root port probe,
+and the Wi-Fi comes up as before; a Wi-Fi speed test shows `uclamp.min` 400 on the TX thread (`chrt`/`/proc/<pid>/sched`)
+while it runs.

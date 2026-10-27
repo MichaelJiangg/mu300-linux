@@ -874,6 +874,28 @@
             };
             tload();
         }
+        /* TCP congestion control of the device's own connections (mu300-tcp; kanoqwq's b9f71e72): only what the kernel
+         * offers (the 5.4 kernel has no BBR) */
+        if (has('tcp.get')) {
+            var cc = root.appendChild(card(_('TCP congestion control'), 'mu-tcp'));
+            var cb = cc.appendChild(el('div'));
+            var cload = function () {
+                return load(cb, 'tcp.get', {}, function (o) {
+                    cb.appendChild(note(_('Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR.')));
+                    cb.appendChild(row(_('Active congestion control'), (o.current || '--').toUpperCase()));
+                    cb.appendChild(row(_('Default queue'), o.qdisc || '--'));
+                    if (!o.supported) { cb.appendChild(note(_('This kernel does not provide this setting'), 'warn')); return; }
+                    var opts = [ [ 'default', _('System default') + (o.default ? ' (' + o.default.toUpperCase() + ')' : '') ] ];
+                    (o.offered || []).forEach(function (a) { opts.push([ a, a.toUpperCase() ]); });
+                    var sel = select('mu-tcp-algo', opts, o.saved || 'default');
+                    cb.appendChild(field(_('TCP congestion control'), sel));
+                    cb.appendChild(note(_('BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots.')));
+                    var s = button(_('Save and apply'), function () { act(s, 'tcp.set', { value: sel.value }, { done: cload }); }, 'primary');
+                    cb.appendChild(actions([ s ]));
+                });
+            };
+            cload();
+        }
         if (has('ussd.send')) {
             var uc = root.appendChild(card(_('USSD'), 'mu-ussd'));
             var code = input('mu-ussd-code', { maxlength: '40', placeholder: '*100#' });
@@ -994,7 +1016,8 @@
         history();
     };
 
-    /* Data usage: mu300-traffic's count (per day, per billing cycle) and the monthly cap */
+    /* Data usage: mu300-traffic's count (per day, per billing cycle), the monthly cap, the daily quota, the count mode
+     * and the plan's name */
     pages.usage = function (root) {
         var sc = root.appendChild(card(_('Data usage'), 'mu-traffic'));
         var sb = sc.appendChild(el('div'));
@@ -1006,7 +1029,8 @@
         function set(btn, key, value, conf) { act(btn, 'traffic.set', { key: key, value: value }, { done: refresh, confirm: conf }); }
         function refresh() {
             return load(sb, 'traffic.get', {}, function (o) {
-                var t = o.traffic || {};
+                var t = o.traffic || {}, daily = t.daily || {};
+                if (t.plan) sb.appendChild(row(_('Plan'), t.plan));
                 if (t.today) sb.appendChild(row(_('Today'), fmtBytes(Number(t.today.rx) + Number(t.today.tx)) + '  (↓ ' + fmtBytes(t.today.rx) + ', ↑ ' + fmtBytes(t.today.tx) + ')'));
                 if (t.cycle) {
                     sb.appendChild(row(_('This billing cycle'), fmtBytes(t.cycle.used)));
@@ -1017,6 +1041,12 @@
                 if (cap.bytes && t.cycle) sb.appendChild(row(_('Of the cap'), Math.round(100 * t.cycle.used / cap.bytes) + ' %'));
                 if (cap.cut_active) sb.appendChild(note(_('The cap is reached: mobile data is off until the next cycle.'), 'warn'));
                 else if (cap.level === 'warn') sb.appendChild(note(_('Close to the monthly cap.'), 'warn'));
+                if (daily.bytes) sb.appendChild(row(_('Daily quota'), fmtBytes(daily.used) + ' / ' + fmtBytes(daily.bytes)));
+                if (daily.cut_active) sb.appendChild(note(_('The daily quota is reached: mobile data is off until midnight.'), 'warn'));
+                else if (daily.level === 'over') sb.appendChild(note(_('The daily quota is reached.'), 'warn'));
+                else if (daily.level === 'warn') sb.appendChild(note(_('Close to the daily quota.'), 'warn'));
+                if (t.count === 'rx') sb.appendChild(note(_('The cap and the daily quota count downloads only.')));
+                else if (t.count === 'tx') sb.appendChild(note(_('The cap and the daily quota count uploads only.')));
                 sb.appendChild(row(_('Interface counted'), t.device));
                 if (!t.clock) sb.appendChild(note(_('The clock is not set yet (no network time): new traffic waits to be put on its day.')));
 
@@ -1025,16 +1055,26 @@
                 var capIn = input('mu-tr-cap', { type: 'number', min: '0', step: '0.5', value: cap.bytes ? String(+(cap.bytes / GIB).toFixed(2)) : '0' });
                 var warn = input('mu-tr-warn', { type: 'number', min: '1', max: '100', value: String(cap.warn || 90) });
                 var cut = check('mu-tr-cut', _('Turn mobile data off at the cap until the next cycle'), !!cap.cut);
+                var dIn = input('mu-tr-daily', { type: 'number', min: '0', step: '0.1', value: daily.bytes ? String(+(daily.bytes / GIB).toFixed(2)) : '0' });
+                var dcut = check('mu-tr-dcut', _('Turn mobile data off at the daily quota until midnight'), !!daily.cut);
+                var count = select('mu-tr-count', [ [ 'total', _('Both ways') ], [ 'rx', _('Downloads only') ], [ 'tx', _('Uploads only') ] ], t.count || 'total');
+                var plan = input('mu-tr-plan', { maxlength: '32', value: t.plan || '' });
+                cb.appendChild(field(_('Plan name'), plan));
                 cb.appendChild(field(_('The day a billing cycle starts (31: the month\'s last day)'), rd));
                 cb.appendChild(field(_('Monthly cap in GiB (0: none)'), capIn));
                 cb.appendChild(field(_('Warn at this percentage of the cap'), warn));
                 cb.appendChild(cut.node);
+                cb.appendChild(field(_('Daily quota in GiB (0: none)'), dIn));
+                cb.appendChild(dcut.node);
+                cb.appendChild(field(_('The cap and the daily quota count'), count));
                 var save = button(_('Save'), function () {
-                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value);
-                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
+                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value), dg = Number(dIn.value);
+                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(dg >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
                         toast(_('Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100.'), 'error'); return;
                     }
-                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ] ];
+                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ],
+                        [ 'daily', String(Math.round(dg * GIB)) ], [ 'daily_cut', dcut.box.checked ? 'on' : 'off' ], [ 'count', count.value ],
+                        [ 'plan', String(plan.value).trim() ] ];
                     busy(save, true);
                     steps.reduce(function (p, s) { return p.then(function () { return api('traffic.set', { key: s[0], value: s[1] }); }); },
                         Promise.resolve()).then(function () { busy(save, false); toast(_('Saved'), 'ok'); refresh(); },
@@ -1059,8 +1099,9 @@
                     return [ d.date, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx)) ];
                 })));
                 hb.appendChild(el('h3', { text: _('Billing cycles') }));
-                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), _('Total') ], (t.cycles || []).map(function (d) {
-                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
+                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), t.count === 'rx' || t.count === 'tx' ? _('Counted') : _('Total') ], (t.cycles || []).map(function (d) {
+                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx),
+                        fmtBytes(d.used !== undefined ? Number(d.used) : Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
                 })));
             });
         }
@@ -1383,6 +1424,8 @@
                 else b.appendChild(row(_('Battery'), _('none (powered by USB)')));
                 if (o.charge_off === 'temp') b.appendChild(note(_('Charging paused: battery temperature'), 'warn'));
                 else if (o.charge_off === 'limit') b.appendChild(note(_('Charging paused: charge limit')));
+                else if (o.charge_off === 'manual') b.appendChild(note(_('Charging paused: by hand')));
+                if (bt && (o.conf || {}).FULL_ONCE === 1) b.appendChild(note(_('Charging to full once, then back to the limit')));
                 var conf = o.conf || {};
                 clear(pb);
                 var prof = select('mu-pw-profile', [ [ 'auto', _('Automatic: plugged in / on battery') ], [ 'plugged', NAMES.plugged ],
@@ -1395,15 +1438,26 @@
                     var cto = input('mu-pw-chargeto', { type: 'number', min: '0', max: '100', value: show(conf.CHARGE_TO) });
                     pb.appendChild(field(_('Switch to Saver under (%)'), saver));
                     pb.appendChild(field(_('Stop charging at (%)'), cto));
+                    var res = input('mu-pw-resume', { type: 'number', min: '0', max: '99', value: show(conf.RESUME_AT) });
+                    pb.appendChild(field(_('Start charging again under (%)'), res));
                     pb.appendChild(note(_('0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in.')));
                     var bs = button(_('Save'), function () {
                         busy(bs, true);
                         api('power.set', { key: 'SAVER_BELOW', value: Number(saver.value) }).then(function () {
                             return api('power.set', { key: 'CHARGE_TO', value: Number(cto.value) });
+                        }).then(function () {
+                            return api('power.set', { key: 'RESUME_AT', value: Number(res.value) });
                         }).then(function () { busy(bs, false); toast(_('Saved'), 'ok'); refresh(); },
                             function (ex) { busy(bs, false); toast(errText(ex), 'error'); });
                     });
+                    pb.appendChild(note(_('Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it.')));
                     pb.appendChild(actions([ bs ]));
+                    // the pause and the full charge by hand (kanoqwq's controls); the temperature guard always applies
+                    var paused = conf.CHARGE_PAUSE === 1, full = conf.FULL_ONCE === 1;
+                    var pz = button(paused ? _('Resume charging') : _('Pause charging'), function () { set(pz, 'CHARGE_PAUSE', paused ? 0 : 1); });
+                    var fo = button(full ? _('Cancel the full charge') : _('Charge to full once'), function () { set(fo, 'FULL_ONCE', full ? 0 : 1); });
+                    pb.appendChild(actions([ pz, fo ]));
+                    pb.appendChild(note(_('Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies.')));
                     var pon = select('mu-pw-poweron', [ [ '0', _('Charge only, until a key starts it') ], [ '1', _('Start normally') ] ],
                         conf.POWER_ON_CHARGER === 1 ? '1' : '0');
                     pon.addEventListener('change', function () { set(null, 'POWER_ON_CHARGER', Number(pon.value)); });
@@ -1437,10 +1491,45 @@
                 var t = input('mu-led-timeout', { type: 'number', min: '0', max: '86400', value: o.timeout === null ? '' : String(o.timeout),
                     placeholder: o.device === 'u30air' ? '60' : '0' });
                 b.appendChild(field(_('Seconds (empty: the device\'s default)'), t));
+                /* mu300-led's settings (kanoqwq's): each lamp on or off and, where it dims, its brightness; the boot
+                 * indicator; how the heat alarm shows */
+                var st = o.settings, names = { network: _('Network lamp'), wifi: _('Wi-Fi lamp'), battery: _('Battery lamp') };
+                var onoff = [ [ 1, _('On') ], [ 0, _('Off') ] ], lamps = [];
+                if (st && Array.isArray(st.lamps)) {
+                    st.lamps.forEach(function (l) {
+                        if (!names[l]) return;
+                        var sw = select('mu-led-' + l, onoff, st[l] ? 1 : 0), br = null;
+                        b.appendChild(field(names[l], sw));
+                        if ((st.dimmable || []).indexOf(l) >= 0) {
+                            br = input('mu-led-' + l + '-brightness', { type: 'number', min: '1', max: '100',
+                                value: String(st[l + '_brightness']) });
+                            b.appendChild(field(names[l] + ': ' + _('Brightness (%)'), br));
+                        }
+                        lamps.push([ l, sw, br ]);
+                    });
+                    b.appendChild(note(_('A lamp switched off stays dark; the heat alarm still shows on its LED.')));
+                    var boot = select('mu-led-boot', onoff, st.boot ? 1 : 0);
+                    b.appendChild(field(_('Boot indicator'), boot));
+                    b.appendChild(note(_('The LED shows its colours in turn while the system starts')));
+                    var heat = select('mu-led-thermal', [ [ 'siren', _('Siren') ], [ 'blink', _('Red blink') ], [ 'off', _('Off') ] ],
+                        st.thermal || 'siren');
+                    b.appendChild(field(_('Heat alarm'), heat));
+                }
                 var s = button(_('Save'), function () {
-                    var n = Number(t.value);
-                    if (t.value === '' || !(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
-                    act(s, 'led.set', { timeout: n }, { done: refresh });
+                    var n = Number(t.value), req = {};
+                    if (t.value === '') req.timeout_default = true;
+                    else if (!(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
+                    else req.timeout = n;
+                    for (var i = 0; i < lamps.length; i++) {
+                        req[lamps[i][0]] = lamps[i][1].value === '1';
+                        if (lamps[i][2]) {
+                            var p = Number(lamps[i][2].value);
+                            if (!(p >= 1 && p <= 100 && Math.floor(p) === p)) { toast(_('A brightness is a whole number from 1 to 100.'), 'error'); return; }
+                            req[lamps[i][0] + '_brightness'] = p;
+                        }
+                    }
+                    if (boot) { req.boot = boot.value === '1'; req.thermal = heat.value; }
+                    act(s, 'led.set', req, { done: refresh });
                 }, 'primary');
                 var tb = button(_('Light each LED in turn'), function () { act(tb, 'led.set', { test: true }, { ok: _('Each LED lights for 2 seconds, one after the other.') }); });
                 b.appendChild(actions([ s, tb ]));

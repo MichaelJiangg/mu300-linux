@@ -52,6 +52,9 @@ msgstr "Dillər"
 msgid "Power"
 msgstr "Enerji"
 
+msgid "LEDs"
+msgstr "LED-lər"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Host rejimi bu portda USB şəbəkəsini və serial bağlantını kəsir
 msgid "USB network mode"
 msgstr "USB şəbəkə rejimi"
 
+msgid "Current sharing protocol"
+msgstr "Cari paylaşım protokolu"
+
 msgid "Network protocol"
 msgstr "Şəbəkə protokolu"
 
@@ -658,6 +664,27 @@ msgstr "Yenilə"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Yalnız host rejimində mövcuddur. Yeniləmə tapılan USB adapterlərini aktivləşdirir; LAN-a əlavə etmək körpünü saxlayır və şəbəkəni yenidən yükləyir."
 
+msgid "Network performance"
+msgstr "Şəbəkə performansı"
+
+msgid "Active congestion control"
+msgstr "Aktiv sıxlıq idarəsi"
+
+msgid "Default queue"
+msgstr "Standart növbə"
+
+msgid "TCP congestion control"
+msgstr "TCP sıxlıq idarəsi"
+
+msgid "Apply"
+msgstr "Tətbiq et"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Əsasən bu cihazın yaratdığı yeni TCP bağlantılarına təsir edir. Hotspot və USB müştərilərinin ötürülən bağlantıları avtomatik BBR istifadə etmir."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR yeni yaradılan interfeyslər üçün standart növbə olaraq FQ seçir. Mövcud bağlantılar, interfeyslər və QoS saxlanılır. Ayarlar yenidən başladıqdan sonra qalır."
+
 msgid "Recent modem operations"
 msgstr "Son modem əməliyyatları"
 
@@ -670,6 +697,12 @@ msgstr "İdarə panelinin bu və əvvəlki açılışdakı son çağırışları
 msgid "Unavailable"
 msgstr "Əlçatan deyil"
 
+msgid "Mixed"
+msgstr "Qarışıq"
+
+msgid "None"
+msgstr "Yoxdur"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Host rejimində USB şəbəkə rejimi əlçatan deyil; host avtomatik başlatması USB şəbəkəsinin avtomatik başlatmasını da söndürür."
 
@@ -681,9 +714,6 @@ msgstr "Cihaz rejimində USB şəbəkəsi və serial bağlantı yenidən tanına
 
 msgid "Switch USB role?"
 msgstr "USB rolu dəyişdirilsin?"
-
-msgid "Apply"
-msgstr "Tətbiq et"
 
 msgid "Switching USB role…"
 msgstr "USB rolu dəyişdirilir…"
@@ -721,6 +751,21 @@ msgstr "Parametrlər saxlanıldı"
 msgid "Save failed: %s"
 msgstr "Saxlama uğursuz oldu: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Şəbəkə performansı ayarları oxunmadı; yeniləyib təkrar cəhd edin"
+
+msgid "This kernel does not provide this setting"
+msgstr "Bu nüvə bu ayarı təmin etmir"
+
+msgid "System default"
+msgstr "Sistem standartı"
+
+msgid "Applied and saved for future boots."
+msgstr "Tətbiq edildi və növbəti açılışlar üçün saxlanıldı."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nüvə şəbəkə ayarlarını qəbul etmədi"
+
 msgid "This boot"
 msgstr "Bu açılış"
 
@@ -739,6 +784,9 @@ msgstr "USB adapterləri axtarılır…"
 msgid "No USB adapters found."
 msgstr "USB adapter tapılmadı."
 
+msgid "In use by another network"
+msgstr "Başqa şəbəkə tərəfindən istifadə olunur"
+
 msgid "Link connected"
 msgstr "Bağlantı qurulub"
 
@@ -747,6 +795,9 @@ msgstr "Bağlantı yoxdur; aktivləşdirmə cəhd edildi"
 
 msgid "Added to LAN"
 msgstr "LAN-a əlavə edildi"
+
+msgid "Cannot add"
+msgstr "Əlavə etmək olmur"
 
 msgid "Add to LAN"
 msgstr "LAN-a əlavə et"
@@ -883,9 +934,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Təhlükəsizlik"
 
-msgid "None"
-msgstr "Yoxdur"
-
 msgid "User name"
 msgstr "İstifadəçi adı"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux kilidlənib"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Bəli: növbəti yenidən başlatma Android-i açır"
+
+msgid "No"
+msgstr "Xeyr"
+
+msgid "Writable"
+msgstr "Yazıla bilər"
+
+msgid "This boot image cannot change the boot"
+msgstr "Bu açılış imajı açılışı dəyişə bilməz"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1132,6 +1195,15 @@ msgstr "Android-ə keç"
 msgid "Lock Linux"
 msgstr "Linux-u kilidlə"
 
+msgid "Default boot"
+msgstr "Standart açılış"
+
+msgid "One-time boot"
+msgstr "Birdəfəlik açılış"
+
+msgid "Boot control"
+msgstr "Açılış idarəsi"
+
 msgid "Neighbor cells"
 msgstr "Qonşu hüceyrələr"
 
@@ -1143,6 +1215,9 @@ msgstr "Tezlik"
 
 msgid "Running %s…"
 msgstr "%s icra olunur…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspot ayarları saxlanıldı; dəyişikliklər tətbiq olunur"
 
 msgid "Started in background: %s"
 msgstr "Arxa planda başladıldı: %s"
@@ -1333,9 +1408,6 @@ msgstr "LTE bağlantısı"
 msgid "Hidden"
 msgstr "Gizli"
 
-msgid "No"
-msgstr "Xeyr"
-
 msgid "Running"
 msgstr "İşləyir"
 
@@ -1395,9 +1467,6 @@ msgstr "Onlayn"
 
 msgid "AT adapter unavailable"
 msgstr "AT adapteri əlçatan deyil"
-
-msgid "Linux locked"
-msgstr "Linux kilidlənib"
 
 msgid "Installing the language pack…"
 msgstr "Dil paketi quraşdırılır…"
@@ -1476,6 +1545,51 @@ msgstr "Tərcümə olunub"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI-nin öz tərcümələri OpenWrt-dən gəlir. Bu panelin türk və Çin dillərindən başqa tərcümələri maşın (AI) tərcümələridir; düzəlişlər məmnuniyyətlə qəbul edilir."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 ilə %d arasında tam ədəd daxil edin"
+
+msgid "Network lamp"
+msgstr "Şəbəkə lampası"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi lampası"
+
+msgid "Battery lamp"
+msgstr "Batareya lampası"
+
+msgid "On"
+msgstr "Aktiv"
+
+msgid "Brightness (%)"
+msgstr "Parlaqlıq (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Söndürülmüş lampa qaranlıq qalır; istilik siqnalı yenə də öz LED-ində görünür."
+
+msgid "Device default"
+msgstr "Cihazın standartı"
+
+msgid "LED timeout (seconds)"
+msgstr "LED vaxt həddi (saniyə)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Düymə basıldıqdan və ya dəyişiklikdən sonra LED-lərin nə qədər yanılı qaldığı; 0 onları həmişə yanılı saxlayır. Şarj cihazında yanılı qalırlar."
+
+msgid "Boot indicator"
+msgstr "Yükləmə göstəricisi"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Sistem başlayarkən LED rənglərini növbə ilə göstərir"
+
+msgid "Heat alarm"
+msgstr "İstilik siqnalı"
+
+msgid "Siren"
+msgstr "Sirena"
+
+msgid "Red blink"
+msgstr "Qırmızı yanıb-sönmə"
 
 msgid "Automatic"
 msgstr "Avtomatik"
@@ -1774,9 +1888,6 @@ msgstr "%s düyməsi ilə oyandı"
 msgid "the modem is suspended (%s)"
 msgstr "modem dayandırılıb (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 ilə %d arasında tam ədəd daxil edin"
-
 msgid "Power status unavailable"
 msgstr "Enerji vəziyyəti əlçatan deyil"
 
@@ -1834,6 +1945,12 @@ msgstr "Şarj dayandırıldı: batareya temperaturu"
 msgid "Charging paused: charge limit"
 msgstr "Şarj dayandırıldı: şarj həddi"
 
+msgid "Charging paused: by hand"
+msgstr "Şarj dayandırılıb: əl ilə"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Bir dəfə tam şarj, sonra limitə qayıt"
+
 msgid "Sleep now"
 msgstr "İndi yat"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % batareyanı heç vaxt doldurmur (cihaz şarj cihazından işləyir),
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % daim şəbəkədə qalan cihazda batareyanı daha sağlam saxlayır."
 
+msgid "Start charging again under"
+msgstr "Şarjı yenidən bu səviyyədən aşağıda başlat"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0: dayanma səviyyəsindən 5 bal aşağıda yenidən başlayır. Daha aşağı dəyər şarjı yalnız ondan aşağıda başladır; 100 % ilə dolu batareya ondan aşağı düşənə qədər gözləyir."
+
+msgid "Resume charging"
+msgstr "Şarjı davam etdir"
+
+msgid "Pause charging"
+msgstr "Şarjı dayandır"
+
+msgid "Cancel the full charge"
+msgstr "Tam şarjı ləğv et"
+
+msgid "Charge to full once"
+msgstr "Bir dəfə tam şarj et"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Dayandırıldıqda batareya şarj olunmur və cihaz şarj cihazından işləyir; 5 % altında yenə şarj olunur, temperatur qoruması həmişə işləyir."
+
 msgid "When the charger switches the device on"
 msgstr "Şarj cihazı cihazı işə saldıqda"
 
@@ -1872,9 +2010,6 @@ msgstr "Olduğu kimi saxla"
 
 msgid "LTE only (5G off)"
 msgstr "Yalnız LTE (5G söndürülüb)"
-
-msgid "On"
-msgstr "Aktiv"
 
 msgid "Full"
 msgstr "Tam"
@@ -2276,8 +2411,26 @@ msgstr "Aylıq limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, xəbərdarlıq %d%%-də"
 
+msgid "Daily quota"
+msgstr "Gündəlik kvota"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Aylıq limitə çatıldı: mobil məlumat söndürüldü. Növbəti dövr başlayanda yenidən açılacaq."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Gündəlik kvotaya çatıldı: mobil data söndürüldü. Gecə yarısı yenidən açılır."
+
+msgid "The daily quota is reached"
+msgstr "Gündəlik kvotaya çatıldı"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Gündəlik kvotanın %d%%-i istifadə olunub"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit və gündəlik kvota yalnız endirmələri sayır."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit və gündəlik kvota yalnız yükləmələri (göndərmə) sayır."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s saatı gözləyir: saat hələ şəbəkədən qurulmayıb. Artıq bu dövrə hesablanır və saat qurulanda öz gününə yazılır."
@@ -2309,6 +2462,9 @@ msgstr "Hesab dövrünə görə"
 msgid "Billing cycle"
 msgstr "Hesab dövrü"
 
+msgid "Counted"
+msgstr "Sayılan"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB ilə ölçü daxil edin, məsələn 50 və ya 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "Limitdə mobil məlumatı söndür"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Bu dövr limitə çatanda mobil məlumat söndürülür: növbəti dövr başlayana, limit artırılana və ya bu seçim yenidən söndürülənə qədər operator vasitəsilə internet olmur. Mobil məlumatı əllə yenidən açsanız, növbəti yenidən başlamaya qədər açıq qalır."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Gündəlik kvotada mobil datanı söndür"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Bugünkü istifadə gündəlik kvotaya çatanda mobil data gecə yarısına, kvota artırılana və ya bu yenidən söndürülənə qədər söndürülür. Mobil datanı əl ilə açmaq onu növbəti yenidən başladılmaya qədər açıq saxlayır."
+
+msgid "Both ways"
+msgstr "Hər iki istiqamət"
+
+msgid "Downloads only"
+msgstr "Yalnız endirmələr"
+
+msgid "Uploads only"
+msgstr "Yalnız göndərmə"
 
 msgid "Set"
 msgstr "Təyin et"
@@ -2344,6 +2515,15 @@ msgstr "Aylıq limit (GB, 0: yoxdur)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Limitin bu faizində xəbərdar et"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Gündəlik kvota (GB, 0: yoxdur)"
+
+msgid "The cap and the daily quota count"
+msgstr "Limit və gündəlik kvota nəyi sayır"
+
+msgid "Plan name"
+msgstr "Tarifin adı"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Bu dövrdə indiyə qədər istifadə edilən (GB)"
@@ -2506,9 +2686,6 @@ msgstr "Açılış obrazı"
 
 msgid "from the installer"
 msgstr "quraşdırıcıdan"
-
-msgid "Default boot"
-msgstr "Standart açılış"
 
 msgid "Free space"
 msgstr "Boş yer"
@@ -3523,14 +3700,29 @@ msgstr "TTL adapteri etibarlı cavab vermədi"
 msgid "Invalid TTL"
 msgstr "Yanlış TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP adapteri etibarlı cavab vermədi"
+
+msgid "Invalid congestion control"
+msgstr "Yanlış sıxlıq idarəsi"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Açılış adapteri etibarlı cavab vermədi"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED adapteri etibarlı cavab vermədi"
+
+msgid "Unknown LED setting"
+msgstr "Naməlum LED ayarı"
+
+msgid "Invalid value for this setting"
+msgstr "Bu ayar üçün yanlış dəyər"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Məlumat istifadəsi adapteri etibarlı cavab vermədi"
 
 msgid "Unknown data usage setting"
 msgstr "Naməlum məlumat istifadəsi ayarı"
-
-msgid "Invalid value for this setting"
-msgstr "Bu ayar üçün yanlış dəyər"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Yönləndirmə adapteri etibarlı cavab vermədi"
@@ -3776,8 +3968,29 @@ msgstr "Radio ayarına uyğunlaşmadı"
 msgid "The data roaming setting could not be saved"
 msgstr "Məlumat rouminqi ayarı yadda saxlanıla bilmədi"
 
-msgid "Expected on or off"
-msgstr "on və ya off gözlənilir"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspot ayarı saxlanıldı, lakin simsiz şəbəkənin yenidən yüklənməsi alınmadı"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Simsiz ayarlarda saxlanılmamış dəyişikliklər var: əvvəlcə saxlayın və ya geri alın"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot artıq dəyişdirilir; bir azdan yenidən cəhd edin"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Heç bir hotspot (giriş nöqtəsi) qurulmayıb"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Bu radionu açmaq başqa interfeysə təsir edər; Simsiz səhifəsindən istifadə edin"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio Wi-Fi müştərisi tərəfindən istifadə olunur"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspot ayarı yazıla bilmədi"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Bu platforma hotspot idarəsini təmin etmir"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Bu platforma VPN inteqrasiyası təqdim etmir"
@@ -3878,6 +4091,15 @@ msgstr "USB şəbəkə interfeysi deyil"
 msgid "LAN bridge device section was not found"
 msgstr "LAN körpüsü cihaz bölməsi tapılmadı"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Adapterin hansı şəbəkəyə aid olduğu müəyyənləşmədi; sonra yenidən cəhd edin"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adapter başqa şəbəkəyə aiddir və LAN-a qoşula bilməz"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Şəbəkə ayarlarında saxlanılmamış dəyişikliklər var: əvvəlcə saxlayın və ya geri alın"
+
 msgid "Cannot bring USB network interface up"
 msgstr "USB şəbəkə interfeysini aktivləşdirmək mümkün deyil"
 
@@ -3977,6 +4199,12 @@ msgstr "Artıq bir quraşdırma icra olunur"
 msgid "The language pack could not be removed"
 msgstr "Dil paketini silmək mümkün olmadı"
 
+msgid "The LED settings could not be read"
+msgstr "LED ayarları oxuna bilmədi"
+
+msgid "The LED setting could not be saved"
+msgstr "LED ayarı saxlanıla bilmədi"
+
 msgid "Lock cache unavailable"
 msgstr "Kilid keşi əlçatan deyil"
 
@@ -4018,6 +4246,12 @@ msgstr "Naməlum paket əməliyyatı"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Bu platforma TCP sıxlıq idarəsini təmin etmir"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP ayarları oxuna bilmədi"
 
 msgid "Data usage is not available on this system"
 msgstr "Məlumat istifadəsi bu sistemdə mövcud deyil"

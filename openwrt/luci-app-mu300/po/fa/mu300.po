@@ -52,6 +52,9 @@ msgstr "زبان‌ها"
 msgid "Power"
 msgstr "توان"
 
+msgid "LEDs"
+msgstr "چراغ‌های LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "حالت میزبان، شبکهٔ USB و پورت سریال این د�
 msgid "USB network mode"
 msgstr "حالت شبکهٔ USB"
 
+msgid "Current sharing protocol"
+msgstr "پروتکل اشتراک‌گذاری فعلی"
+
 msgid "Network protocol"
 msgstr "پروتکل شبکه"
 
@@ -658,6 +664,27 @@ msgstr "تازه‌سازی"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "فقط در حالت میزبان در دسترس است. «تازه‌سازی» آداپتورهای USB شناسایی‌شده را فعال می‌کند؛ افزودن به LAN پل را ذخیره و شبکه را دوباره بارگذاری می‌کند."
 
+msgid "Network performance"
+msgstr "کارایی شبکه"
+
+msgid "Active congestion control"
+msgstr "کنترل ازدحام فعال"
+
+msgid "Default queue"
+msgstr "صف پیش‌فرض"
+
+msgid "TCP congestion control"
+msgstr "کنترل ازدحام TCP"
+
+msgid "Apply"
+msgstr "اعمال"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "عمدتاً بر اتصال‌های TCP جدیدی که این دستگاه برقرار می‌کند اثر دارد. اتصال‌های هدایت‌شده‌ی کلاینت‌های هات‌اسپات و USB به‌طور خودکار از BBR استفاده نمی‌کنند."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR صف FQ را به‌عنوان صف پیش‌فرض رابط‌های تازه انتخاب می‌کند. اتصال‌ها، رابط‌ها و QoS موجود حفظ می‌شوند. تنظیمات پس از راه‌اندازی مجدد باقی می‌مانند."
+
 msgid "Recent modem operations"
 msgstr "عملیات اخیر مودم"
 
@@ -670,6 +697,12 @@ msgstr "فراخوانی‌های اخیر پنل کنترل، در این را�
 msgid "Unavailable"
 msgstr "در دسترس نیست"
 
+msgid "Mixed"
+msgstr "ترکیبی"
+
+msgid "None"
+msgstr "هیچ"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "حالت شبکهٔ USB در حالت میزبان در دسترس نیست؛ راه‌اندازی خودکار میزبان، راه‌اندازی خودکار شبکهٔ USB را هم غیرفعال می‌کند."
 
@@ -681,9 +714,6 @@ msgstr "شبکهٔ USB و پورت سریال در حالت دستگاه دوب�
 
 msgid "Switch USB role?"
 msgstr "نقش USB تغییر کند؟"
-
-msgid "Apply"
-msgstr "اعمال"
 
 msgid "Switching USB role…"
 msgstr "در حال تغییر نقش USB…"
@@ -721,6 +751,21 @@ msgstr "تنظیمات ذخیره شد"
 msgid "Save failed: %s"
 msgstr "ذخیره ناموفق بود: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "تنظیمات کارایی شبکه خوانده نشد؛ برای تلاش دوباره بازخوانی کنید"
+
+msgid "This kernel does not provide this setting"
+msgstr "این هسته این تنظیم را ارائه نمی‌دهد"
+
+msgid "System default"
+msgstr "پیش‌فرض سیستم"
+
+msgid "Applied and saved for future boots."
+msgstr "اعمال و برای راه‌اندازی‌های بعدی ذخیره شد."
+
+msgid "The kernel did not accept the network settings"
+msgstr "هسته تنظیمات شبکه را نپذیرفت"
+
 msgid "This boot"
 msgstr "این راه‌اندازی"
 
@@ -739,6 +784,9 @@ msgstr "در حال جست‌وجوی آداپتورهای USB…"
 msgid "No USB adapters found."
 msgstr "هیچ آداپتور USB یافت نشد."
 
+msgid "In use by another network"
+msgstr "در اختیار شبکه‌ای دیگر"
+
 msgid "Link connected"
 msgstr "لینک وصل است"
 
@@ -747,6 +795,9 @@ msgstr "لینک نیست؛ تلاش برای فعال‌سازی انجام ش�
 
 msgid "Added to LAN"
 msgstr "به LAN افزوده شد"
+
+msgid "Cannot add"
+msgstr "قابل افزودن نیست"
 
 msgid "Add to LAN"
 msgstr "افزودن به LAN"
@@ -883,9 +934,6 @@ msgstr "درگاه"
 msgid "Security"
 msgstr "امنیت"
 
-msgid "None"
-msgstr "هیچ"
-
 msgid "User name"
 msgstr "نام کاربری"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux قفل است"
+
+msgid "Yes: the next restart starts Android"
+msgstr "بله: راه‌اندازی مجدد بعدی Android را اجرا می‌کند"
+
+msgid "No"
+msgstr "خیر"
+
+msgid "Writable"
+msgstr "قابل نوشتن"
+
+msgid "This boot image cannot change the boot"
+msgstr "این ایمیج بوت نمی‌تواند بوت را تغییر دهد"
 
 msgid "%s of %s"
 msgstr "%s از %s"
@@ -1132,6 +1195,15 @@ msgstr "رفتن به Android"
 msgid "Lock Linux"
 msgstr "قفل کردن Linux"
 
+msgid "Default boot"
+msgstr "راه‌اندازی پیش‌فرض"
+
+msgid "One-time boot"
+msgstr "بوت یک‌باره"
+
+msgid "Boot control"
+msgstr "کنترل بوت"
+
 msgid "Neighbor cells"
 msgstr "سلول‌های همسایه"
 
@@ -1143,6 +1215,9 @@ msgstr "فرکانس"
 
 msgid "Running %s…"
 msgstr "در حال اجرای %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "تنظیمات هات‌اسپات ذخیره شد؛ در حال اعمال تغییرات"
 
 msgid "Started in background: %s"
 msgstr "در پس‌زمینه آغاز شد: %s"
@@ -1333,9 +1408,6 @@ msgstr "لینک LTE"
 msgid "Hidden"
 msgstr "پنهان"
 
-msgid "No"
-msgstr "خیر"
-
 msgid "Running"
 msgstr "در حال اجرا"
 
@@ -1395,9 +1467,6 @@ msgstr "آنلاین"
 
 msgid "AT adapter unavailable"
 msgstr "آداپتور AT در دسترس نیست"
-
-msgid "Linux locked"
-msgstr "Linux قفل است"
 
 msgid "Installing the language pack…"
 msgstr "در حال نصب بستهٔ زبان…"
@@ -1476,6 +1545,51 @@ msgstr "ترجمه‌شده"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "ترجمه‌های خود LuCI از OpenWrt می‌آیند. ترجمه‌های این پنل به‌جز ترکی و چینی، ترجمهٔ ماشینی (هوش مصنوعی) هستند؛ از اصلاحات استقبال می‌شود."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "یک عدد صحیح از 0 تا %d وارد کنید"
+
+msgid "Network lamp"
+msgstr "چراغ شبکه"
+
+msgid "Wi-Fi lamp"
+msgstr "چراغ Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "چراغ باتری"
+
+msgid "On"
+msgstr "روشن"
+
+msgid "Brightness (%)"
+msgstr "روشنایی (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "چراغی که خاموش شده تاریک می‌ماند؛ هشدار دما همچنان روی LED خودش نشان داده می‌شود."
+
+msgid "Device default"
+msgstr "پیش‌فرض دستگاه"
+
+msgid "LED timeout (seconds)"
+msgstr "زمان روشن ماندن LEDها (ثانیه)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "مدتی که LEDها پس از فشردن یک کلید یا یک تغییر روشن می‌مانند؛ 0 آن‌ها را روشن نگه می‌دارد. روی شارژر روشن می‌مانند."
+
+msgid "Boot indicator"
+msgstr "نشانگر راه‌اندازی"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED هنگام راه‌اندازی سیستم رنگ‌هایش را به نوبت نشان می‌دهد"
+
+msgid "Heat alarm"
+msgstr "هشدار دما"
+
+msgid "Siren"
+msgstr "آژیر"
+
+msgid "Red blink"
+msgstr "چشمک قرمز"
 
 msgid "Automatic"
 msgstr "خودکار"
@@ -1774,9 +1888,6 @@ msgstr "با کلید %s بیدار شد"
 msgid "the modem is suspended (%s)"
 msgstr "مودم معلق است (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "یک عدد صحیح از 0 تا %d وارد کنید"
-
 msgid "Power status unavailable"
 msgstr "وضعیت توان در دسترس نیست"
 
@@ -1834,6 +1945,12 @@ msgstr "شارژ متوقف شد: دمای باتری"
 msgid "Charging paused: charge limit"
 msgstr "شارژ متوقف شد: حد شارژ"
 
+msgid "Charging paused: by hand"
+msgstr "شارژ متوقف شد: دستی"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "یک بار شارژ کامل، سپس بازگشت به حد"
+
 msgid "Sleep now"
 msgstr "اکنون بخواب"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % هرگز باتری را شارژ نمی‌کند (دستگاه با
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % سلامت باتری را در دستگاهی که همیشه به برق وصل است بهتر حفظ می‌کند."
 
+msgid "Start charging again under"
+msgstr "شروع دوباره شارژ زیر"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 شارژ را ۵ واحد زیر سطح توقف دوباره شروع می‌کند. مقدار کمتر شارژ را فقط زیر آن دوباره شروع می‌کند؛ با 100 %، باتری پر صبر می‌کند تا زیر آن برسد."
+
+msgid "Resume charging"
+msgstr "ادامه شارژ"
+
+msgid "Pause charging"
+msgstr "توقف موقت شارژ"
+
+msgid "Cancel the full charge"
+msgstr "لغو شارژ کامل"
+
+msgid "Charge to full once"
+msgstr "یک بار شارژ کامل"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "در حالت توقف، باتری شارژ نمی‌شود و دستگاه با شارژر کار می‌کند؛ زیر 5 % همچنان شارژ می‌شود و محافظ دما همیشه فعال است."
+
 msgid "When the charger switches the device on"
 msgstr "وقتی شارژر دستگاه را روشن می‌کند"
 
@@ -1872,9 +2010,6 @@ msgstr "بدون تغییر"
 
 msgid "LTE only (5G off)"
 msgstr "فقط LTE (5G خاموش)"
-
-msgid "On"
-msgstr "روشن"
 
 msgid "Full"
 msgstr "کامل"
@@ -2276,8 +2411,26 @@ msgstr "سقف ماهانه"
 msgid "%s, warning at %d%%"
 msgstr "%s، هشدار در %d%%"
 
+msgid "Daily quota"
+msgstr "سهمیه روزانه"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "سقف ماهانه پر شد: داده همراه خاموش شد. با شروع دوره بعد دوباره روشن می‌شود."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "سهمیه روزانه تمام شد: داده همراه خاموش شد. نیمه‌شب دوباره روشن می‌شود."
+
+msgid "The daily quota is reached"
+msgstr "سهمیه روزانه تمام شد"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% از سهمیه روزانه مصرف شده"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "سقف و سهمیه روزانه فقط دانلود را می‌شمارند."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "سقف و سهمیه روزانه فقط آپلود را می‌شمارند."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s منتظر ساعت است: ساعت هنوز از شبکه تنظیم نشده. این مقدار از هم‌اکنون در این دوره حساب می‌شود و پس از تنظیم ساعت به روز خودش می‌رود."
@@ -2309,6 +2462,9 @@ msgstr "بر اساس دوره صورتحساب"
 msgid "Billing cycle"
 msgstr "دوره صورتحساب"
 
+msgid "Counted"
+msgstr "شمارش‌شده"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "اندازه را به گیگابایت وارد کنید، مثلاً 50 یا 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "خاموش کردن داده همراه در سقف"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "وقتی این دوره به سقف برسد، داده همراه خاموش می‌شود: تا شروع دوره بعد، بالا بردن سقف یا خاموش کردن دوباره این گزینه، اینترنتی از طریق اپراتور نیست. اگر داده همراه را دستی دوباره روشن کنید، تا راه‌اندازی مجدد بعدی روشن می‌ماند."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "خاموش کردن داده همراه در سهمیه روزانه"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "وقتی مصرف امروز به سهمیه روزانه برسد، داده همراه تا نیمه‌شب، افزایش سهمیه یا خاموش کردن این گزینه خاموش می‌ماند. روشن کردن دستی داده همراه آن را تا راه‌اندازی مجدد بعدی روشن نگه می‌دارد."
+
+msgid "Both ways"
+msgstr "هر دو جهت"
+
+msgid "Downloads only"
+msgstr "فقط دانلود"
+
+msgid "Uploads only"
+msgstr "فقط آپلود"
 
 msgid "Set"
 msgstr "تنظیم"
@@ -2344,6 +2515,15 @@ msgstr "سقف ماهانه (گیگابایت، 0: هیچ)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "هشدار در این درصد از سقف"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "سهمیه روزانه (گیگابایت، 0: هیچ)"
+
+msgid "The cap and the daily quota count"
+msgstr "آنچه سقف و سهمیه روزانه می‌شمارند"
+
+msgid "Plan name"
+msgstr "نام طرح"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "مصرف تا کنون در این دوره (گیگابایت)"
@@ -2506,9 +2686,6 @@ msgstr "ایمیج راه‌اندازی"
 
 msgid "from the installer"
 msgstr "از نصب‌کننده"
-
-msgid "Default boot"
-msgstr "راه‌اندازی پیش‌فرض"
 
 msgid "Free space"
 msgstr "فضای خالی"
@@ -3523,14 +3700,29 @@ msgstr "آداپتور TTL پاسخ معتبری نداد"
 msgid "Invalid TTL"
 msgstr "TTL نامعتبر"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "آداپتور TCP پاسخ معتبری نداد"
+
+msgid "Invalid congestion control"
+msgstr "کنترل ازدحام نامعتبر"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "آداپتور بوت پاسخ معتبری نداد"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "آداپتور LED پاسخ معتبری نداد"
+
+msgid "Unknown LED setting"
+msgstr "تنظیم LED ناشناخته"
+
+msgid "Invalid value for this setting"
+msgstr "مقدار نامعتبر برای این تنظیم"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "آداپتور مصرف داده پاسخ معتبری نداد"
 
 msgid "Unknown data usage setting"
 msgstr "تنظیم ناشناخته مصرف داده"
-
-msgid "Invalid value for this setting"
-msgstr "مقدار نامعتبر برای این تنظیم"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "آداپتور بازارسال پاسخ معتبری نداد"
@@ -3776,8 +3968,29 @@ msgstr "رادیو از تنظیم خود پیروی نکرد"
 msgid "The data roaming setting could not be saved"
 msgstr "تنظیم رومینگ داده ذخیره نشد"
 
-msgid "Expected on or off"
-msgstr "on یا off مورد انتظار است"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "تنظیم هات‌اسپات ذخیره شد، اما بارگذاری مجدد بی‌سیم ناموفق بود"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "تنظیمات بی‌سیم تغییرات ذخیره‌نشده دارد: ابتدا آن‌ها را ذخیره یا لغو کنید"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "هات‌اسپات در حال تغییر وضعیت است؛ کمی بعد دوباره تلاش کنید"
+
+msgid "No hotspot (access point) is configured"
+msgstr "هیچ هات‌اسپات (نقطه دسترسی) پیکربندی نشده است"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "روشن‌کردن این رادیو بر رابط دیگری اثر می‌گذارد؛ از صفحه بی‌سیم استفاده کنید"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "رادیو در اختیار کلاینت Wi-Fi است"
+
+msgid "The hotspot setting could not be written"
+msgstr "تنظیم هات‌اسپات نوشته نشد"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "این پلتفرم کنترل هات‌اسپات را ارائه نمی‌دهد"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "یکپارچه‌سازی VPN در این پلتفرم ارائه نشده است"
@@ -3878,6 +4091,15 @@ msgstr "رابط شبکهٔ USB نیست"
 msgid "LAN bridge device section was not found"
 msgstr "بخش دستگاه پل LAN یافت نشد"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "تعیین مالکیت آداپتور ممکن نشد؛ بعداً دوباره تلاش کنید"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "آداپتور متعلق به شبکه‌ای دیگر است و نمی‌تواند به LAN بپیوندد"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "تنظیمات شبکه تغییرات ذخیره‌نشده دارد: ابتدا آن‌ها را ذخیره یا لغو کنید"
+
 msgid "Cannot bring USB network interface up"
 msgstr "فعال کردن رابط شبکهٔ USB ممکن نیست"
 
@@ -3977,6 +4199,12 @@ msgstr "یک نصب از قبل در حال اجراست"
 msgid "The language pack could not be removed"
 msgstr "حذف بستهٔ زبان ممکن نشد"
 
+msgid "The LED settings could not be read"
+msgstr "تنظیمات LED خوانده نشد"
+
+msgid "The LED setting could not be saved"
+msgstr "تنظیم LED ذخیره نشد"
+
 msgid "Lock cache unavailable"
 msgstr "حافظهٔ نهان قفل در دسترس نیست"
 
@@ -4018,6 +4246,12 @@ msgstr "عملیات بسته ناشناخته"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "این پلتفرم کنترل ازدحام TCP را ارائه نمی‌دهد"
+
+msgid "The TCP settings could not be read"
+msgstr "تنظیمات TCP خوانده نشد"
 
 msgid "Data usage is not available on this system"
 msgstr "مصرف داده در این سیستم در دسترس نیست"

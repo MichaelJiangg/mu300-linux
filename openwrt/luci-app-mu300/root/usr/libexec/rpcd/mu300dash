@@ -30,6 +30,11 @@
 #   lang_get, lang_set  LuCI's languages and the lang extra (unisoc-modem/languages, mu300-extra)
 #   power_get, power_set  the power profiles (unisoc-modem/power, mu300-power)
 #   ttl_get, ttl_set value  the TTL of mobile data (unisoc-modem/ttl, mu300-ttl); value off or 1-255
+#   tcp_get, tcp_set value  the TCP congestion control of the device's own connections (unisoc-modem/tcp, mu300-tcp);
+#                     value default|cubic|bbr
+#   boot_get          the dual boot's state, read only (unisoc-modem/boot, mu300-next-boot status)
+#   led_get, led_set key value  the LED settings (unisoc-modem/led, mu300-led): the lamps' switches and brightness,
+#                     the timeout, the boot indicator, the heat alarm's light
 #   traffic_get, traffic_set op value  the mobile data count, its billing cycle and cap (unisoc-modem/traffic,
 #                     mu300-traffic)
 #   forward_get, forward_set ..., forward_test, forward_log_clear  SMS forwarding (unisoc-modem/forward,
@@ -782,7 +787,7 @@ m_power_set() {
     allowed "$op" '(set|wake|idle)' || { refuse 'Unknown power operation'; return; }
     case $op in
         set)
-            allowed "$key" '(PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU))' ||
+            allowed "$key" '(PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|RESUME_AT|CHARGE_PAUSE|FULL_ONCE|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU))' ||
                 { refuse 'Unknown power setting'; return; }
             allowed "$value" '[a-z0-9]{1,5}' || { refuse 'Invalid power value'; return; }
             out=$("$POWERA" set "$key" "$value" 2>/dev/null) ;;
@@ -838,6 +843,37 @@ m_ttl_set() {
     reply_obj "$("$TTLA" set "$value" 2>/dev/null)" 'The TTL adapter gave no valid reply'
 }
 
+# ------------------------------------------------------------ TCP, boot
+# The Device page's TCP congestion control card: mu300-tcp through the adapter, which checks the value again
+TCPA=${MU300_TCP_ADAPTER:-$DASH/tcp}
+m_tcp_get() { reply_obj "$("$TCPA" get 2>/dev/null)" 'The TCP adapter gave no valid reply'; }
+m_tcp_set() {
+    local value
+    inp '@.value'; value=$V
+    allowed "$value" '(default|cubic|bbr)' || { refuse 'Invalid congestion control'; return; }
+    reply_obj "$("$TCPA" set "$value" 2>/dev/null)" 'The TCP adapter gave no valid reply'
+}
+# The dashboard's boot card: mu300-next-boot status, read only (the changes are act os ...)
+BOOTA=${MU300_BOOT_ADAPTER:-$DASH/boot}
+m_boot_get() { reply_obj "$("$BOOTA" get 2>/dev/null)" 'The boot adapter gave no valid reply'; }
+# --------------------------------------------------------------------- LEDs
+# The LED page: mu300-led through the adapter, which checks the key and the value again (and mu300-led after it)
+LEDA=${MU300_LED_ADAPTER:-$DASH/led}
+m_led_get() { reply_obj "$("$LEDA" get 2>/dev/null)" 'The LED adapter gave no valid reply'; }
+m_led_set() {
+    local key value
+    inp '@.key'; key=$V
+    inp '@.value'; value=$V
+    case $key in
+        timeout) allowed "$value" '(default|0|[1-9][0-9]{0,4})' && { [ "$value" = default ] || [ "$value" -le 86400 ]; } ;;
+        network|wifi|battery|boot) allowed "$value" '[01]' ;;
+        network_brightness|wifi_brightness|battery_brightness) allowed "$value" '([1-9][0-9]?|100)' ;;
+        thermal) allowed "$value" '(siren|blink|off)' ;;
+        *) refuse 'Unknown LED setting'; return ;;
+    esac || { refuse 'Invalid value for this setting'; return; }
+    reply_obj "$("$LEDA" set "$key" "$value" 2>/dev/null)" 'The LED adapter gave no valid reply'
+}
+
 # --------------------------------------------------------------- data usage
 # The Data usage page: mu300-traffic through the adapter, which checks every value again. Sizes are whole bytes.
 TRAFA=${MU300_TRAFFIC_ADAPTER:-$DASH/traffic}
@@ -848,9 +884,13 @@ m_traffic_set() {
     inp '@.value'; value=$V
     case $op in
         reset_day) allowed "$value" '([1-9]|[12][0-9]|3[01])' ;;
-        cap|used)  allowed "$value" '(0|[1-9][0-9]{0,15})' ;;
+        cap|used|daily) allowed "$value" '(0|[1-9][0-9]{0,15})' ;;
         warn)      allowed "$value" '([1-9]|[1-9][0-9]|100)' ;;
-        cut)       allowed "$value" '(on|off)' ;;
+        cut|daily_cut) allowed "$value" '(on|off)' ;;
+        count)     allowed "$value" '(total|rx|tx)' ;;
+        # the plan's name: one line of text (UTF-8 allowed), no control character, at most 96 bytes; empty: none
+        plan)      [ "$(printf '%s' "$value" | LC_ALL=C tr -d '\040-\176\200-\377'; echo x)" = x ] &&
+                       [ "$(printf '%s' "$value" | wc -c)" -le 96 ] ;;
         clear)     allowed "$value" 'yes' ;;
         *)         refuse 'Unknown data usage setting'; return ;;
     esac || { refuse 'Invalid value for this setting'; return; }
@@ -1010,6 +1050,11 @@ do_list() {
 	"simcard_set": { "kind": "String", "slot": "String", "state": "String" },
 	"ttl_get": { },
 	"ttl_set": { "value": "String" },
+	"tcp_get": { },
+	"tcp_set": { "value": "String" },
+	"boot_get": { },
+	"led_get": { },
+	"led_set": { "key": "String", "value": "String" },
 	"traffic_get": { },
 	"traffic_set": { "op": "String", "value": "String" },
 	"forward_get": { },
@@ -1167,6 +1212,7 @@ ops_detail() {
         update_act) inp '@.op'; allowed "$V" '[a-z_]{1,16}' && printf '%s\n' "$V" ;;
         cpu_voltage_set) inp '@.op'; allowed "$V" '[a-z]{1,8}' && printf '%s\n' "$V" ;;
         cpu_tune) inp '@.op'; allowed "$V" '[a-z]{1,10}' && printf '%s\n' "$V" ;;
+        led_set) inp '@.key'; allowed "$V" '[a-z_]{1,20}' && printf '%s\n' "$V" ;;
     esac
 }
 
@@ -1302,6 +1348,11 @@ call)
         simcard_set)  run_m simcard_set  m_simcard_set ;;
         ttl_get)      run_m ttl_get      m_ttl_get ;;
         ttl_set)      run_m ttl_set      m_ttl_set ;;
+        tcp_get)      run_m tcp_get      m_tcp_get ;;
+        tcp_set)      run_m tcp_set      m_tcp_set ;;
+        boot_get)     run_m boot_get     m_boot_get ;;
+        led_get)      run_m led_get      m_led_get ;;
+        led_set)      run_m led_set      m_led_set ;;
         traffic_get)  run_m traffic_get  m_traffic_get ;;
         traffic_set)  run_m traffic_set  m_traffic_set ;;
         forward_get)  run_m forward_get  m_forward_get ;;

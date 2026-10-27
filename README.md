@@ -97,7 +97,8 @@ this project has a V50 or has tested one**: install it only if you can get back 
 | LEDs | NET1 lamp: blue 4G, white 5G, red no service; Wi-Fi lamp: white 5 GHz, blue 2.4 GHz; NET2 dark (`leds-aw9523b`, mainline) |
 | USB network | `192.168.79.1` (neither the F50's nor the U30 Air's subnet) |
 | SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 204); untested on a V50 here |
-| Not yet | NFC; the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
+| NFC | the U30 Air's `mu300-nfc` on the same tag (reset line 189 from ZTE's device tree, FINDINGS 229); untested on a V50 here |
+| Not yet | the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
 
 The installers say so in one line and stop a V50 that is not exactly that (a model V50 with another device or
 platform). Linux tells the board by its device tree, as before for the other two: the V50's has the AW9523B, which no
@@ -392,7 +393,7 @@ whenever OpenWrt is chosen (`MU300_OPENWRT=plain|luci` answers without asking), 
   adapters in host mode that can join the LAN bridge.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom AT adapter).
 * **System > Languages:** the language of the interface, and the lang extra: download it, or upload the file.
-* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`), and what a boot the charger started does (U30 Air: charge only until the Wi-Fi key or a held power key starts it, off when unplugged; or start normally, `POWER_ON_CHARGER=1`). The U30 Air powers off cleanly on an empty battery by the stock rules (docs/FINDINGS.md 196, 197).
+* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`), where charging starts again (`RESUME_AT`), a pause by hand and a one-off full charge (U30 Air; `mu300-power charge pause|resume|full`), and what a boot the charger started does (U30 Air: charge only until the Wi-Fi key or a held power key starts it, off when unplugged; or start normally, `POWER_ON_CHARGER=1`). The U30 Air powers off cleanly on an empty battery by the stock rules (docs/FINDINGS.md 196, 197).
 * **System > Packages after an update:** the packages you had installed yourself and what the update did with them
   (see [Updating](#updating)): what came back, what is pending or failed and why, the settings set aside, and the
   buttons Try again, Repair DNS (after a confirmation) and Dismiss.
@@ -465,6 +466,7 @@ the archive once online). `mu300-panel status` says where it is.
 | Connect the device to someone else's Wi-Fi | `sudo mu300-toolkit` → Network → Wi-Fi → "Join a network", or `sudo wifi-client scan` then `sudo wifi-client connect "NAME"` (it asks for the password); see [Wi-Fi client](#wi-fi-client) |
 | Update to the newest release | `sudo mu300-update check` then `sudo mu300-update apply`. The device looks for a new release at boot and every 6 hours and says so at login and in `mu300-toolkit`; it never installs one by itself |
 | Fixed TTL for mobile data (so the operator cannot tell hotspot traffic from the device's own) | `sudo mu300-ttl set 64` (`sudo mu300-ttl off` goes back to the default), `mu300-toolkit` -> Network -> TTL, or LuCI Cellular -> TTL. On the mainline kernels the rule is in tc and flow offloading stays on; on 5.4 it is in nftables and offloading is off while a TTL is set |
+| TCP congestion control (BBR or CUBIC) for the device's own connections | `sudo mu300-tcp set bbr` (`sudo mu300-tcp set default` goes back to the kernel's own), or LuCI Cellular -> Device management. Only what the kernel offers: the mainline kernels have BBR, 5.4 does not |
 | Compressed swap in RAM (zram) | On by default on every system and kernel: half the RAM (~700 MB of swap), lz4, priority 100, `vm.swappiness` 100. `mu300-zram` shows it and what it costs; `sudo mu300-zram off` / `on` (kept across reboots and updates), or `mu300-toolkit` → System → Compressed swap. Size, compressor (`zstd` packs ~3.5:1 against lz4's ~2.5:1, for more CPU) and swappiness: `/etc/mu300/zram.conf`, see `/opt/mu300/lib/zram.conf.example` (FINDINGS 162) |
 | Switch between OpenWrt and Ubuntu | `sudo mu300-os openwrt` / `sudo mu300-os ubuntu` (`openwrt-luci` for the one with the control panel) |
 | Failed boots in a row before it falls back to Android (1-6, default 5) | `sudo mu300-next-boot attempts N` |
@@ -476,6 +478,7 @@ the archive once online). `mu300-panel status` says where it is.
 | Save battery: profiles, radios that go idle when nobody is connected, a charge limit | `mu300-power status`, `sudo mu300-power profile battery` (`plugged`, `saver`, `auto`), `sudo mu300-power set battery.WIFI_IDLE 10`, `mu300-power log 5 /tmp/power.csv`; on `openwrt-luci` the page System -> Power. A boot that started from a charger stays a charging boot (LED blinking, hotspot and modem down) until the Wi-Fi key is pressed; see FINDINGS 36 |
 | Language of the web interface (OpenWrt) | System -> System -> Language and Style; more languages: see Languages below |
 | Find out which LED is which | `sudo mu300-led test` |
+| LEDs: a lamp off, dimmer, how long they stay lit, a boot indicator, how the heat alarm shows | `mu300-led settings`, `sudo mu300-led set network 0` (`wifi`, `battery`; `network_brightness 30`, `timeout 120`, `boot 1`, `thermal blink` or `off`); on `openwrt-luci` the page System -> LEDs, on Ubuntu the panel's LEDs card. By default nothing changes: every lamp on at its usual level, no boot indicator, the siren |
 | `adb shell`, `adb push`/`pull`, `adb forward` to Linux from a computer, as with Android | on by default, for every computer (a root shell without a password for anyone with a cable); only your own computers: `sudo mu300-usb adb key adbkey.pub`, then `sudo mu300-usb adb auth keys`; not at all: `sudo mu300-usb adb off`; see [adb to Linux](#adb-to-linux) |
 
 ### CPU voltage offset (EXPERIMENTAL)

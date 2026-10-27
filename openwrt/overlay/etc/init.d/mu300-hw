@@ -33,8 +33,8 @@ hw_bringup() {
 	# WPA2-PSK with the same password, before the Wi-Fi restart below, which is the start that brings the hotspot up
 	# (netifd's own, earlier one ends AP-DISABLED under the world regulatory domain; the wifi-scripts refuse SAE)
 	/opt/mu300/bin/openwrt-wifi-wpa2-only migrate >>/tmp/mu300-wifi-start.log 2>&1
-	# the U30 Air's NFC tag: the hotspot's name and password, if that is what it holds (see mu300-nfc)
-	[ "$(/opt/mu300/bin/mu300-device)" = u30air ] && /opt/mu300/bin/mu300-nfc sync >/tmp/mu300-nfc.log 2>&1
+	# the NFC tag (U30 Air, V50): the hotspot's name and password, if that is what it holds (see mu300-nfc)
+	/opt/mu300/bin/mu300-nfc supported 2>/dev/null && /opt/mu300/bin/mu300-nfc sync >/tmp/mu300-nfc.log 2>&1
 	# apply the country before netifd starts hostapd, otherwise 5 GHz channels are still NO-IR under world rules
 	country=$(uci -q get wireless.radio0.country)
 	if [ -n "$country" ]; then

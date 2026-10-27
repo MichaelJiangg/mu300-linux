@@ -845,6 +845,30 @@ msgstr "TTL 必须是 1 到 255 之间的整数。"
 msgid "Leave the TTL alone"
 msgstr "不修改 TTL"
 
+msgid "TCP congestion control"
+msgstr "TCP 拥塞控制"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "主要影响设备自身新建的 TCP 连接；不会将热点或 USB 转发的客户端连接统一改为 BBR。"
+
+msgid "Active congestion control"
+msgstr "当前拥塞控制"
+
+msgid "Default queue"
+msgstr "默认队列"
+
+msgid "This kernel does not provide this setting"
+msgstr "当前内核不提供此设置"
+
+msgid "System default"
+msgstr "系统默认"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR 配套使用 FQ 作为新建接口的默认队列；现有连接、接口和 QoS 不重置。设置重启后保留。"
+
+msgid "Save and apply"
+msgstr "保存并应用"
+
 msgid "USSD"
 msgstr "USSD"
 
@@ -938,6 +962,9 @@ msgstr "计费周期和上限"
 msgid "History"
 msgstr "历史"
 
+msgid "Plan"
+msgstr "套餐"
+
 msgid "$0 days left"
 msgstr "剩余 $0 天"
 
@@ -950,6 +977,24 @@ msgstr "已达到上限：移动数据将关闭至下一周期。"
 msgid "Close to the monthly cap."
 msgstr "接近每月上限。"
 
+msgid "Daily quota"
+msgstr "每日额度"
+
+msgid "The daily quota is reached: mobile data is off until midnight."
+msgstr "已达每日额度：移动数据关闭至午夜。"
+
+msgid "The daily quota is reached."
+msgstr "已达每日额度。"
+
+msgid "Close to the daily quota."
+msgstr "接近每日额度。"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "上限和每日额度仅统计下行。"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "上限和每日额度仅统计上行。"
+
 msgid "Interface counted"
 msgstr "统计的接口"
 
@@ -959,6 +1004,21 @@ msgstr "时钟尚未设置（无网络时间）：新的流量等待计入对应
 msgid "Turn mobile data off at the cap until the next cycle"
 msgstr "达到上限时关闭移动数据，直到下一周期"
 
+msgid "Turn mobile data off at the daily quota until midnight"
+msgstr "达到每日额度时关闭移动数据至午夜"
+
+msgid "Both ways"
+msgstr "上下行合计"
+
+msgid "Downloads only"
+msgstr "仅下行"
+
+msgid "Uploads only"
+msgstr "仅上行"
+
+msgid "Plan name"
+msgstr "套餐名称"
+
 msgid "The day a billing cycle starts (31: the month's last day)"
 msgstr "计费周期的起始日（31：当月最后一天）"
 
@@ -967,6 +1027,12 @@ msgstr "每月上限，单位 GiB（0：无）"
 
 msgid "Warn at this percentage of the cap"
 msgstr "达到上限的此百分比时提醒"
+
+msgid "Daily quota in GiB (0: none)"
+msgstr "每日额度，单位 GiB（0：无）"
+
+msgid "The cap and the daily quota count"
+msgstr "套餐计量方式"
 
 msgid "Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100."
 msgstr "请检查数值：日期为 1 到 31，上限为 0 或以上，百分比为 1 到 100。"
@@ -1003,6 +1069,9 @@ msgstr "总计"
 
 msgid "Billing cycles"
 msgstr "计费周期"
+
+msgid "Counted"
+msgstr "计量"
 
 msgid "Hotspot"
 msgstr "热点"
@@ -1313,6 +1382,12 @@ msgstr "充电已暂停：电池温度"
 msgid "Charging paused: charge limit"
 msgstr "充电已暂停：充电上限"
 
+msgid "Charging paused: by hand"
+msgstr "已暂停电池充电：手动"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "正在临时充满一次，之后恢复原来的充电上限"
+
 msgid "Automatic: plugged in / on battery"
 msgstr "自动：接通电源 / 使用电池"
 
@@ -1325,8 +1400,29 @@ msgstr "低于此电量时切换到省电（%）"
 msgid "Stop charging at (%)"
 msgstr "充电至此电量停止（%）"
 
+msgid "Start charging again under (%)"
+msgstr "恢复充电于（低于，%）"
+
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "0 % 表示从不给电池充电（设备由充电器供电），100 % 表示充满；介于两者之间时，充电在该电量停止，低于 5 个百分点时重新开始。电量低于 5 % 时始终充电。对于一直插电的设备，80 % 能让电池更健康。"
+
+msgid "Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "恢复充电于：0 表示在停止电量以下 5 个百分点时恢复。更低的值表示仅在低于该值时恢复充电；设为 100 % 时，充满的电池要等电量降到该值以下才再充。"
+
+msgid "Resume charging"
+msgstr "恢复自动充电"
+
+msgid "Pause charging"
+msgstr "暂停电池充电"
+
+msgid "Cancel the full charge"
+msgstr "取消临时充满"
+
+msgid "Charge to full once"
+msgstr "临时充满一次"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "暂停时电池不充电，设备由充电器供电；电量低于 5 % 时仍会充电，电池温度保护始终有效。"
 
 msgid "Charge only, until a key starts it"
 msgstr "仅充电，按键后启动"
@@ -1376,8 +1472,41 @@ msgstr "按键或发生变化后 LED 保持点亮的时长；0 表示常亮。"
 msgid "Seconds (empty: the device's default)"
 msgstr "秒（留空：设备默认值）"
 
+msgid "Network lamp"
+msgstr "信号灯"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi 热点灯"
+
+msgid "Battery lamp"
+msgstr "电池灯"
+
+msgid "Brightness (%)"
+msgstr "亮度（%）"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "关闭的灯保持熄灭；温度告警仍会在其指示灯上显示。"
+
+msgid "Boot indicator"
+msgstr "开机指示"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "系统启动期间指示灯依次显示各颜色"
+
+msgid "Siren"
+msgstr "警灯轮闪"
+
+msgid "Red blink"
+msgstr "红色闪烁"
+
+msgid "Heat alarm"
+msgstr "温度告警"
+
 msgid "A whole number of seconds, 0 or more."
 msgstr "秒数，0 或以上的整数。"
+
+msgid "A brightness is a whole number from 1 to 100."
+msgstr "亮度为 1 到 100 之间的整数。"
 
 msgid "Light each LED in turn"
 msgstr "依次点亮各 LED"

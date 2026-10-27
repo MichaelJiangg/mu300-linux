@@ -52,6 +52,9 @@ msgstr "Jazyky"
 msgid "Power"
 msgstr "Napájanie"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Režim hostiteľa odpojí sieť a sériovú linku cez USB na tomto porte
 msgid "USB network mode"
 msgstr "Režim siete USB"
 
+msgid "Current sharing protocol"
+msgstr "Aktuálny protokol zdieľania"
+
 msgid "Network protocol"
 msgstr "Sieťový protokol"
 
@@ -658,6 +664,27 @@ msgstr "Obnoviť"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Dostupné iba v režime hostiteľa. Obnoviť aktivuje nájdené adaptéry USB; pridanie do LAN uloží most a znova načíta sieť."
 
+msgid "Network performance"
+msgstr "Výkon siete"
+
+msgid "Active congestion control"
+msgstr "Aktívne riadenie zahltenia"
+
+msgid "Default queue"
+msgstr "Predvolená fronta"
+
+msgid "TCP congestion control"
+msgstr "Riadenie zahltenia TCP"
+
+msgid "Apply"
+msgstr "Použiť"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Týka sa hlavne nových TCP spojení tohto zariadenia. Preposielané spojenia klientov hotspotu a USB nepoužijú BBR automaticky."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR nastaví FQ ako predvolenú frontu novovytvorených rozhraní. Existujúce spojenia, rozhrania a QoS zostanú. Nastavenie pretrvá reštart."
+
 msgid "Recent modem operations"
 msgstr "Nedávne operácie modemu"
 
@@ -670,6 +697,12 @@ msgstr "Nedávne volania ovládacieho panela z tohto a predchádzajúceho spuste
 msgid "Unavailable"
 msgstr "Nedostupné"
 
+msgid "Mixed"
+msgstr "Zmiešaný"
+
+msgid "None"
+msgstr "Žiadne"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Režim siete USB nie je v režime hostiteľa dostupný; automatický štart hostiteľa vypne aj automatický štart siete USB."
 
@@ -681,9 +714,6 @@ msgstr "Sieť a sériová linka cez USB sa v režime zariadenia znova enumerujú
 
 msgid "Switch USB role?"
 msgstr "Prepnúť rolu USB?"
-
-msgid "Apply"
-msgstr "Použiť"
 
 msgid "Switching USB role…"
 msgstr "Prepínanie roly USB…"
@@ -721,6 +751,21 @@ msgstr "Nastavenia uložené"
 msgid "Save failed: %s"
 msgstr "Uloženie zlyhalo: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Nastavenia výkonu siete nemožno načítať; obnovte a skúste znova"
+
+msgid "This kernel does not provide this setting"
+msgstr "Toto jadro toto nastavenie neponúka"
+
+msgid "System default"
+msgstr "Predvolené systémom"
+
+msgid "Applied and saved for future boots."
+msgstr "Použité a uložené pre ďalšie spustenia."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Jadro neprijalo sieťové nastavenia"
+
 msgid "This boot"
 msgstr "Toto spustenie"
 
@@ -739,6 +784,9 @@ msgstr "Vyhľadávanie adaptérov USB…"
 msgid "No USB adapters found."
 msgstr "Nenašli sa žiadne adaptéry USB."
 
+msgid "In use by another network"
+msgstr "Používa iná sieť"
+
 msgid "Link connected"
 msgstr "Linka pripojená"
 
@@ -747,6 +795,9 @@ msgstr "Žiadna linka; pokus o aktiváciu vykonaný"
 
 msgid "Added to LAN"
 msgstr "Pridané do LAN"
+
+msgid "Cannot add"
+msgstr "Nemožno pridať"
 
 msgid "Add to LAN"
 msgstr "Pridať do LAN"
@@ -883,9 +934,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Zabezpečenie"
 
-msgid "None"
-msgstr "Žiadne"
-
 msgid "User name"
 msgstr "Používateľské meno"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux zamknutý"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Áno: ďalší reštart spustí Android"
+
+msgid "No"
+msgstr "Nie"
+
+msgid "Writable"
+msgstr "Zapisovateľné"
+
+msgid "This boot image cannot change the boot"
+msgstr "Tento zavádzací obraz nemôže zmeniť spúšťanie"
 
 msgid "%s of %s"
 msgstr "%s z %s"
@@ -1132,6 +1195,15 @@ msgstr "Prepnúť na Android"
 msgid "Lock Linux"
 msgstr "Zamknúť Linux"
 
+msgid "Default boot"
+msgstr "Predvolené spúšťanie"
+
+msgid "One-time boot"
+msgstr "Jednorazové spustenie"
+
+msgid "Boot control"
+msgstr "Riadenie spúšťania"
+
 msgid "Neighbor cells"
 msgstr "Susedné bunky"
 
@@ -1143,6 +1215,9 @@ msgstr "Frekvencia"
 
 msgid "Running %s…"
 msgstr "Spúšťanie %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Nastavenia hotspotu uložené; zmeny sa uplatňujú"
 
 msgid "Started in background: %s"
 msgstr "Spustené na pozadí: %s"
@@ -1333,9 +1408,6 @@ msgstr "Linka LTE"
 msgid "Hidden"
 msgstr "Skryté"
 
-msgid "No"
-msgstr "Nie"
-
 msgid "Running"
 msgstr "Beží"
 
@@ -1395,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptér AT nedostupný"
-
-msgid "Linux locked"
-msgstr "Linux zamknutý"
 
 msgid "Installing the language pack…"
 msgstr "Inštalácia jazykového balíka…"
@@ -1476,6 +1545,51 @@ msgstr "Preložené"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Vlastné preklady LuCI pochádzajú z OpenWrt. Preklady tohto panelu okrem turečtiny a čínštiny sú strojové (AI); opravy sú vítané."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "Zadajte celé číslo od 0 do %d"
+
+msgid "Network lamp"
+msgstr "Kontrolka siete"
+
+msgid "Wi-Fi lamp"
+msgstr "Kontrolka Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Kontrolka batérie"
+
+msgid "On"
+msgstr "Zapnuté"
+
+msgid "Brightness (%)"
+msgstr "Jas (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Vypnutá kontrolka zostane tmavá; tepelný alarm sa aj tak ukáže na svojej LED."
+
+msgid "Device default"
+msgstr "Predvolená hodnota zariadenia"
+
+msgid "LED timeout (seconds)"
+msgstr "Doba svietenia LED (sekundy)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Ako dlho LED svietia po stlačení tlačidla alebo zmene; 0 ich nechá svietiť. Na nabíjačke svietia."
+
+msgid "Boot indicator"
+msgstr "Indikácia spúšťania"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED počas štartu systému postupne ukazuje svoje farby"
+
+msgid "Heat alarm"
+msgstr "Tepelný alarm"
+
+msgid "Siren"
+msgstr "Siréna"
+
+msgid "Red blink"
+msgstr "Červené blikanie"
 
 msgid "Automatic"
 msgstr "Automaticky"
@@ -1774,9 +1888,6 @@ msgstr "prebudené tlačidlom %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem je pozastavený (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Zadajte celé číslo od 0 do %d"
-
 msgid "Power status unavailable"
 msgstr "Stav napájania nie je dostupný"
 
@@ -1834,6 +1945,12 @@ msgstr "Nabíjanie pozastavené: teplota batérie"
 msgid "Charging paused: charge limit"
 msgstr "Nabíjanie pozastavené: limit nabitia"
 
+msgid "Charging paused: by hand"
+msgstr "Nabíjanie pozastavené: ručne"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Raz nabíjanie do plna, potom späť na limit"
+
 msgid "Sleep now"
 msgstr "Uspať teraz"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % batériu nikdy nenabíja (zariadenie beží z nabíjačky), 100 % ju
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % šetrí batériu zariadenia, ktoré zostáva pripojené k sieti."
 
+msgid "Start charging again under"
+msgstr "Znova nabíjať pod"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 znova nabíja 5 bodov pod úrovňou zastavenia. Nižšia hodnota začne nabíjať až pod ňou; so 100 % plná batéria čaká, kým pod ňu neklesne."
+
+msgid "Resume charging"
+msgstr "Obnoviť nabíjanie"
+
+msgid "Pause charging"
+msgstr "Pozastaviť nabíjanie"
+
+msgid "Cancel the full charge"
+msgstr "Zrušiť nabitie do plna"
+
+msgid "Charge to full once"
+msgstr "Raz nabiť do plna"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Pri pozastavení sa batéria nenabíja a zariadenie beží z nabíjačky; pod 5 % sa nabíja vždy a teplotná ochrana platí stále."
+
 msgid "When the charger switches the device on"
 msgstr "Keď nabíjačka zapne zariadenie"
 
@@ -1872,9 +2010,6 @@ msgstr "Ponechať bez zmeny"
 
 msgid "LTE only (5G off)"
 msgstr "Iba LTE (5G vypnuté)"
-
-msgid "On"
-msgstr "Zapnuté"
 
 msgid "Full"
 msgstr "Plný"
@@ -2276,8 +2411,26 @@ msgstr "Mesačný limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, varovanie pri %d%%"
 
+msgid "Daily quota"
+msgstr "Denná kvóta"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Mesačný limit je vyčerpaný: mobilné dáta boli vypnuté. Znova sa zapnú na začiatku ďalšieho obdobia."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Denná kvóta je vyčerpaná: mobilné dáta boli vypnuté. Znova sa zapnú o polnoci."
+
+msgid "The daily quota is reached"
+msgstr "Denná kvóta je vyčerpaná"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Využité %d%% dennej kvóty"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit a denná kvóta počítajú len sťahovanie."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit a denná kvóta počítajú len odosielanie."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s čaká na hodiny: ešte neboli nastavené zo siete. Už sa započítava do tohto obdobia a prejde k svojmu dňu, keď budú hodiny nastavené."
@@ -2309,6 +2462,9 @@ msgstr "Po zúčtovacích obdobiach"
 msgid "Billing cycle"
 msgstr "Zúčtovacie obdobie"
 
+msgid "Counted"
+msgstr "Započítané"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Zadajte veľkosť v GB, napríklad 50 alebo 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "Vypnúť mobilné dáta pri dosiahnutí limitu"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Keď toto obdobie dosiahne limit, mobilné dáta sa vypnú: žiadny internet cez operátora, kým nezačne ďalšie obdobie, nezvýši sa limit alebo sa táto voľba znova nevypne. Ručne znova zapnuté mobilné dáta zostanú zapnuté do ďalšieho reštartu."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Vypnúť mobilné dáta pri dennej kvóte"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Keď dnešná prevádzka dosiahne dennú kvótu, mobilné dáta sa vypnú do polnoci, do zvýšenia kvóty alebo do vypnutia tejto voľby. Ručné zapnutie mobilných dát ich ponechá zapnuté do ďalšieho reštartu."
+
+msgid "Both ways"
+msgstr "Oba smery"
+
+msgid "Downloads only"
+msgstr "Len sťahovanie"
+
+msgid "Uploads only"
+msgstr "Len odosielanie"
 
 msgid "Set"
 msgstr "Nastaviť"
@@ -2344,6 +2515,15 @@ msgstr "Mesačný limit (GB, 0: žiadny)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varovať pri tomto percente limitu"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Denná kvóta (GB, 0: žiadna)"
+
+msgid "The cap and the daily quota count"
+msgstr "Čo počíta limit a denná kvóta"
+
+msgid "Plan name"
+msgstr "Názov tarifu"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Doteraz spotrebované v tomto období (GB)"
@@ -2506,9 +2686,6 @@ msgstr "Spúšťací obraz"
 
 msgid "from the installer"
 msgstr "z inštalátora"
-
-msgid "Default boot"
-msgstr "Predvolené spúšťanie"
 
 msgid "Free space"
 msgstr "Voľné miesto"
@@ -3523,14 +3700,29 @@ msgstr "Adaptér TTL nevrátil platnú odpoveď"
 msgid "Invalid TTL"
 msgstr "Neplatné TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptér TCP nevrátil platnú odpoveď"
+
+msgid "Invalid congestion control"
+msgstr "Neplatné riadenie zahltenia"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptér spúšťania nevrátil platnú odpoveď"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptér LED nevrátil platnú odpoveď"
+
+msgid "Unknown LED setting"
+msgstr "Neznáme nastavenie LED"
+
+msgid "Invalid value for this setting"
+msgstr "Neplatná hodnota pre toto nastavenie"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptér spotreby dát nedal platnú odpoveď"
 
 msgid "Unknown data usage setting"
 msgstr "Neznáme nastavenie spotreby dát"
-
-msgid "Invalid value for this setting"
-msgstr "Neplatná hodnota pre toto nastavenie"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptér preposielania nedal platnú odpoveď"
@@ -3776,8 +3968,29 @@ msgstr "Rádio sa neriadilo svojím nastavením"
 msgid "The data roaming setting could not be saved"
 msgstr "Nastavenie dátového roamingu sa nepodarilo uložiť"
 
-msgid "Expected on or off"
-msgstr "Očakávalo sa on alebo off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Nastavenie hotspotu je uložené, ale opätovné načítanie bezdrôtovej siete zlyhalo"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Bezdrôtové nastavenia majú neuložené zmeny: najprv ich uložte alebo vráťte"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot sa práve prepína; skúste to o chvíľu znova"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Nie je nastavený žiadny hotspot (prístupový bod)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Zapnutie tohto rádia by ovplyvnilo iné rozhranie; použite stránku Bezdrôtové"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Rádio používa klient Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Nastavenie hotspotu nemožno zapísať"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Táto platforma neposkytuje ovládanie hotspotu"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Táto platforma neposkytuje integráciu VPN"
@@ -3878,6 +4091,15 @@ msgstr "Nejde o sieťové rozhranie USB"
 msgid "LAN bridge device section was not found"
 msgstr "Sekcia zariadenia mosta LAN sa nenašla"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nemožno zistiť, ktorej sieti adaptér patrí; skúste to neskôr"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptér patrí inej sieti a nemôže sa pripojiť k LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Sieťové nastavenia majú neuložené zmeny: najprv ich uložte alebo vráťte"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Nemožno aktivovať sieťové rozhranie USB"
 
@@ -3977,6 +4199,12 @@ msgstr "Inštalácia už prebieha"
 msgid "The language pack could not be removed"
 msgstr "Jazykový balík sa nepodarilo odstrániť"
 
+msgid "The LED settings could not be read"
+msgstr "Nastavenia LED sa nedajú prečítať"
+
+msgid "The LED setting could not be saved"
+msgstr "Nastavenie LED sa nedá uložiť"
+
 msgid "Lock cache unavailable"
 msgstr "Vyrovnávacia pamäť zámkov nie je dostupná"
 
@@ -4018,6 +4246,12 @@ msgstr "Neznáma operácia s balíkmi"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Táto platforma neposkytuje riadenie zahltenia TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Nastavenia TCP nemožno načítať"
 
 msgid "Data usage is not available on this system"
 msgstr "Spotreba dát nie je v tomto systéme dostupná"

@@ -52,6 +52,9 @@ msgstr "Języki"
 msgid "Power"
 msgstr "Zasilanie"
 
+msgid "LEDs"
+msgstr "Diody LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Tryb hosta rozłącza sieć USB i port szeregowy na tym porcie. F50 nie 
 msgid "USB network mode"
 msgstr "Tryb sieci USB"
 
+msgid "Current sharing protocol"
+msgstr "Bieżący protokół udostępniania"
+
 msgid "Network protocol"
 msgstr "Protokół sieciowy"
 
@@ -658,6 +664,27 @@ msgstr "Odśwież"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Dostępne tylko w trybie hosta. Odśwież uruchamia wykryte adaptery USB; dodanie do LAN zapisuje most i przeładowuje sieć."
 
+msgid "Network performance"
+msgstr "Wydajność sieci"
+
+msgid "Active congestion control"
+msgstr "Aktywna kontrola przeciążenia"
+
+msgid "Default queue"
+msgstr "Domyślna kolejka"
+
+msgid "TCP congestion control"
+msgstr "Kontrola przeciążenia TCP"
+
+msgid "Apply"
+msgstr "Zastosuj"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Dotyczy głównie nowych połączeń TCP tego urządzenia. Przekazywane połączenia klientów hotspotu i USB nie używają automatycznie BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR ustawia FQ jako domyślną kolejkę nowo tworzonych interfejsów. Istniejące połączenia, interfejsy i QoS pozostają. Ustawienie przetrwa ponowne uruchomienie."
+
 msgid "Recent modem operations"
 msgstr "Ostatnie operacje modemu"
 
@@ -670,6 +697,12 @@ msgstr "Ostatnie wywołania panelu sterowania z tego i poprzedniego uruchomienia
 msgid "Unavailable"
 msgstr "Niedostępne"
 
+msgid "Mixed"
+msgstr "Mieszany"
+
+msgid "None"
+msgstr "Brak"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Tryb sieci USB jest niedostępny w trybie hosta; automatyczne uruchamianie hosta wyłącza też automatyczne uruchamianie sieci USB."
 
@@ -681,9 +714,6 @@ msgstr "Sieć USB i port szeregowy zostaną ponownie wyliczone w trybie urządze
 
 msgid "Switch USB role?"
 msgstr "Przełączyć rolę USB?"
-
-msgid "Apply"
-msgstr "Zastosuj"
 
 msgid "Switching USB role…"
 msgstr "Przełączanie roli USB…"
@@ -721,6 +751,21 @@ msgstr "Zapisano ustawienia"
 msgid "Save failed: %s"
 msgstr "Zapis nie powiódł się: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Nie można odczytać ustawień wydajności sieci; odśwież, aby spróbować ponownie"
+
+msgid "This kernel does not provide this setting"
+msgstr "To jądro nie udostępnia tego ustawienia"
+
+msgid "System default"
+msgstr "Domyślne systemu"
+
+msgid "Applied and saved for future boots."
+msgstr "Zastosowano i zapisano na kolejne uruchomienia."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Jądro nie przyjęło ustawień sieci"
+
 msgid "This boot"
 msgstr "To uruchomienie"
 
@@ -739,6 +784,9 @@ msgstr "Wyszukiwanie adapterów USB…"
 msgid "No USB adapters found."
 msgstr "Nie znaleziono adapterów USB."
 
+msgid "In use by another network"
+msgstr "Używany przez inną sieć"
+
 msgid "Link connected"
 msgstr "Łącze połączone"
 
@@ -747,6 +795,9 @@ msgstr "Brak łącza; próbowano włączyć"
 
 msgid "Added to LAN"
 msgstr "Dodano do LAN"
+
+msgid "Cannot add"
+msgstr "Nie można dodać"
 
 msgid "Add to LAN"
 msgstr "Dodaj do LAN"
@@ -883,9 +934,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Zabezpieczenia"
 
-msgid "None"
-msgstr "Brak"
-
 msgid "User name"
 msgstr "Nazwa użytkownika"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux zablokowany"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Tak: następny restart uruchomi Androida"
+
+msgid "No"
+msgstr "Nie"
+
+msgid "Writable"
+msgstr "Zapisywalne"
+
+msgid "This boot image cannot change the boot"
+msgstr "Ten obraz rozruchowy nie może zmienić rozruchu"
 
 msgid "%s of %s"
 msgstr "%s z %s"
@@ -1132,6 +1195,15 @@ msgstr "Przełącz na Android"
 msgid "Lock Linux"
 msgstr "Zablokuj Linuksa"
 
+msgid "Default boot"
+msgstr "Domyślne uruchamianie"
+
+msgid "One-time boot"
+msgstr "Jednorazowy rozruch"
+
+msgid "Boot control"
+msgstr "Sterowanie rozruchem"
+
 msgid "Neighbor cells"
 msgstr "Komórki sąsiednie"
 
@@ -1143,6 +1215,9 @@ msgstr "Częstotliwość"
 
 msgid "Running %s…"
 msgstr "Wykonywanie %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Ustawienia hotspotu zapisane; trwa wprowadzanie zmian"
 
 msgid "Started in background: %s"
 msgstr "Uruchomiono w tle: %s"
@@ -1333,9 +1408,6 @@ msgstr "Łącze LTE"
 msgid "Hidden"
 msgstr "Ukryty"
 
-msgid "No"
-msgstr "Nie"
-
 msgid "Running"
 msgstr "Działa"
 
@@ -1395,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adapter AT niedostępny"
-
-msgid "Linux locked"
-msgstr "Linux zablokowany"
 
 msgid "Installing the language pack…"
 msgstr "Instalowanie pakietu językowego…"
@@ -1476,6 +1545,51 @@ msgstr "Przetłumaczono"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Tłumaczenia samego LuCI pochodzą z OpenWrt. Tłumaczenia tego panelu, poza tureckim i chińskim, są tłumaczeniami maszynowymi (AI); poprawki są mile widziane."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "Wpisz liczbę całkowitą od 0 do %d"
+
+msgid "Network lamp"
+msgstr "Lampka sieci"
+
+msgid "Wi-Fi lamp"
+msgstr "Lampka Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Lampka baterii"
+
+msgid "On"
+msgstr "Włączony"
+
+msgid "Brightness (%)"
+msgstr "Jasność (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Wyłączona lampka pozostaje ciemna; alarm temperatury nadal pokazuje się na swojej diodzie."
+
+msgid "Device default"
+msgstr "Domyślne urządzenia"
+
+msgid "LED timeout (seconds)"
+msgstr "Czas świecenia diod (sekundy)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Jak długo diody świecą po naciśnięciu przycisku lub zmianie; 0 pozostawia je włączone. Na ładowarce świecą."
+
+msgid "Boot indicator"
+msgstr "Wskaźnik uruchamiania"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Dioda pokazuje kolejno swoje kolory podczas uruchamiania systemu"
+
+msgid "Heat alarm"
+msgstr "Alarm temperatury"
+
+msgid "Siren"
+msgstr "Syrena"
+
+msgid "Red blink"
+msgstr "Czerwone miganie"
 
 msgid "Automatic"
 msgstr "Automatyczny"
@@ -1774,9 +1888,6 @@ msgstr "wybudzono przyciskiem %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem jest wstrzymany (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Wpisz liczbę całkowitą od 0 do %d"
-
 msgid "Power status unavailable"
 msgstr "Stan zasilania niedostępny"
 
@@ -1834,6 +1945,12 @@ msgstr "Ładowanie wstrzymane: temperatura baterii"
 msgid "Charging paused: charge limit"
 msgstr "Ładowanie wstrzymane: limit ładowania"
 
+msgid "Charging paused: by hand"
+msgstr "Ładowanie wstrzymane: ręcznie"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Jednorazowe ładowanie do pełna, potem powrót do limitu"
+
 msgid "Sleep now"
 msgstr "Uśpij teraz"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % nigdy nie ładuje baterii (urządzenie działa z ładowarki), 100 % 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % lepiej chroni baterię urządzenia, które stale jest podłączone."
 
+msgid "Start charging again under"
+msgstr "Wznów ładowanie poniżej"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 wznawia 5 punktów poniżej poziomu zatrzymania. Niższa wartość wznawia ładowanie dopiero poniżej niej; przy 100 % pełna bateria czeka, aż spadnie poniżej."
+
+msgid "Resume charging"
+msgstr "Wznów ładowanie"
+
+msgid "Pause charging"
+msgstr "Wstrzymaj ładowanie"
+
+msgid "Cancel the full charge"
+msgstr "Anuluj ładowanie do pełna"
+
+msgid "Charge to full once"
+msgstr "Naładuj raz do pełna"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Po wstrzymaniu bateria nie jest ładowana, a urządzenie działa z ładowarki; poniżej 5 % i tak się ładuje, a ochrona temperaturowa działa zawsze."
+
 msgid "When the charger switches the device on"
 msgstr "Gdy ładowarka włącza urządzenie"
 
@@ -1872,9 +2010,6 @@ msgstr "Bez zmian"
 
 msgid "LTE only (5G off)"
 msgstr "Tylko LTE (5G wyłączone)"
-
-msgid "On"
-msgstr "Włączony"
 
 msgid "Full"
 msgstr "Pełna"
@@ -2276,8 +2411,26 @@ msgstr "Miesięczny limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, ostrzeżenie przy %d%%"
 
+msgid "Daily quota"
+msgstr "Limit dzienny"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Osiągnięto miesięczny limit: dane komórkowe zostały wyłączone. Włączą się ponownie z początkiem następnego okresu."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Osiągnięto limit dzienny: dane komórkowe zostały wyłączone. Włączą się ponownie o północy."
+
+msgid "The daily quota is reached"
+msgstr "Osiągnięto limit dzienny"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Wykorzystano %d%% limitu dziennego"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit i limit dzienny liczą tylko pobieranie."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit i limit dzienny liczą tylko wysyłanie."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s czeka na zegar: nie został jeszcze ustawiony przez sieć. Już liczy się do tego okresu i trafi do swojego dnia, gdy zegar zostanie ustawiony."
@@ -2309,6 +2462,9 @@ msgstr "Według okresów rozliczeniowych"
 msgid "Billing cycle"
 msgstr "Okres rozliczeniowy"
 
+msgid "Counted"
+msgstr "Liczone"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Podaj rozmiar w GB, na przykład 50 lub 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "Wyłączaj dane komórkowe po osiągnięciu limitu"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Gdy ten okres osiągnie limit, dane komórkowe zostaną wyłączone: brak internetu przez operatora do początku następnego okresu, podniesienia limitu albo wyłączenia tej opcji. Dane komórkowe włączone ponownie ręcznie pozostaną włączone do następnego restartu."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Wyłącz dane komórkowe po osiągnięciu limitu dziennego"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Gdy dzisiejsze zużycie osiągnie limit dzienny, dane komórkowe zostaną wyłączone do północy, do zwiększenia limitu lub do ponownego wyłączenia tej opcji. Ręczne włączenie danych pozostawia je włączone do następnego restartu."
+
+msgid "Both ways"
+msgstr "Oba kierunki"
+
+msgid "Downloads only"
+msgstr "Tylko pobieranie"
+
+msgid "Uploads only"
+msgstr "Tylko wysyłanie"
 
 msgid "Set"
 msgstr "Ustaw"
@@ -2344,6 +2515,15 @@ msgstr "Miesięczny limit (GB, 0: brak)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Ostrzegaj przy tym procencie limitu"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Limit dzienny (GB, 0: brak)"
+
+msgid "The cap and the daily quota count"
+msgstr "Co liczą limit i limit dzienny"
+
+msgid "Plan name"
+msgstr "Nazwa taryfy"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Zużyte dotąd w tym okresie (GB)"
@@ -2506,9 +2686,6 @@ msgstr "Obraz rozruchowy"
 
 msgid "from the installer"
 msgstr "z instalatora"
-
-msgid "Default boot"
-msgstr "Domyślne uruchamianie"
 
 msgid "Free space"
 msgstr "Wolne miejsce"
@@ -3523,14 +3700,29 @@ msgstr "Adapter TTL nie zwrócił poprawnej odpowiedzi"
 msgid "Invalid TTL"
 msgstr "Nieprawidłowy TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adapter TCP nie zwrócił poprawnej odpowiedzi"
+
+msgid "Invalid congestion control"
+msgstr "Nieprawidłowa kontrola przeciążenia"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adapter rozruchu nie zwrócił poprawnej odpowiedzi"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Adapter LED nie zwrócił poprawnej odpowiedzi"
+
+msgid "Unknown LED setting"
+msgstr "Nieznane ustawienie diod"
+
+msgid "Invalid value for this setting"
+msgstr "Nieprawidłowa wartość tego ustawienia"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adapter zużycia danych nie dał poprawnej odpowiedzi"
 
 msgid "Unknown data usage setting"
 msgstr "Nieznane ustawienie zużycia danych"
-
-msgid "Invalid value for this setting"
-msgstr "Nieprawidłowa wartość tego ustawienia"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adapter przekazywania nie dał poprawnej odpowiedzi"
@@ -3776,8 +3968,29 @@ msgstr "Radio nie dostosowało się do ustawienia"
 msgid "The data roaming setting could not be saved"
 msgstr "Nie udało się zapisać ustawienia roamingu danych"
 
-msgid "Expected on or off"
-msgstr "Oczekiwano on lub off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Ustawienie hotspotu zapisano, ale przeładowanie sieci bezprzewodowej nie powiodło się"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Ustawienia sieci bezprzewodowej mają niezapisane zmiany: najpierw je zapisz lub cofnij"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot jest już przełączany; spróbuj ponownie za chwilę"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Nie skonfigurowano hotspotu (punktu dostępowego)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Włączenie tego radia wpłynie na inny interfejs; użyj strony Sieć bezprzewodowa"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio jest używane przez klienta Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Nie można zapisać ustawienia hotspotu"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Ta platforma nie zapewnia sterowania hotspotem"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Ta platforma nie zapewnia integracji VPN"
@@ -3878,6 +4091,15 @@ msgstr "To nie jest interfejs sieciowy USB"
 msgid "LAN bridge device section was not found"
 msgstr "Nie znaleziono sekcji urządzenia mostu LAN"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nie można ustalić, do której sieci należy adapter; spróbuj później"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adapter należy do innej sieci i nie może dołączyć do LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Ustawienia sieci mają niezapisane zmiany: najpierw je zapisz lub cofnij"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Nie można uruchomić interfejsu sieciowego USB"
 
@@ -3977,6 +4199,12 @@ msgstr "Instalacja jest już w toku"
 msgid "The language pack could not be removed"
 msgstr "Nie udało się usunąć pakietu językowego"
 
+msgid "The LED settings could not be read"
+msgstr "Nie udało się odczytać ustawień diod"
+
+msgid "The LED setting could not be saved"
+msgstr "Nie udało się zapisać ustawienia diody"
+
 msgid "Lock cache unavailable"
 msgstr "Pamięć podręczna blokad niedostępna"
 
@@ -4018,6 +4246,12 @@ msgstr "Nieznana operacja na pakietach"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Ta platforma nie zapewnia kontroli przeciążenia TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Nie można odczytać ustawień TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Zużycie danych nie jest dostępne w tym systemie"

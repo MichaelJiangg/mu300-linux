@@ -52,6 +52,9 @@ msgstr "Ngôn ngữ"
 msgid "Power"
 msgstr "Nguồn"
 
+msgid "LEDs"
+msgstr "Đèn LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Chế độ host ngắt mạng USB và cổng nối tiếp trên cổng 
 msgid "USB network mode"
 msgstr "Chế độ mạng USB"
 
+msgid "Current sharing protocol"
+msgstr "Giao thức chia sẻ hiện tại"
+
 msgid "Network protocol"
 msgstr "Giao thức mạng"
 
@@ -658,6 +664,27 @@ msgstr "Làm mới"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Chỉ khả dụng ở chế độ host. Làm mới sẽ bật các bộ điều hợp USB tìm thấy; thêm vào LAN sẽ lưu cầu nối và tải lại mạng."
 
+msgid "Network performance"
+msgstr "Hiệu năng mạng"
+
+msgid "Active congestion control"
+msgstr "Kiểm soát tắc nghẽn hiện hành"
+
+msgid "Default queue"
+msgstr "Hàng đợi mặc định"
+
+msgid "TCP congestion control"
+msgstr "Kiểm soát tắc nghẽn TCP"
+
+msgid "Apply"
+msgstr "Áp dụng"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Chủ yếu ảnh hưởng đến các kết nối TCP mới do thiết bị này tạo. Kết nối được chuyển tiếp của máy khách hotspot và USB không tự động dùng BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR chọn FQ làm hàng đợi mặc định cho các giao diện mới tạo. Kết nối, giao diện và QoS hiện có được giữ nguyên. Cài đặt được giữ sau khi khởi động lại."
+
 msgid "Recent modem operations"
 msgstr "Thao tác modem gần đây"
 
@@ -670,6 +697,12 @@ msgstr "Các lệnh gọi gần đây của bảng điều khiển trong lần k
 msgid "Unavailable"
 msgstr "Không khả dụng"
 
+msgid "Mixed"
+msgstr "Hỗn hợp"
+
+msgid "None"
+msgstr "Không"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Chế độ mạng USB không khả dụng ở chế độ host; tự khởi động host cũng tắt tự khởi động mạng USB."
 
@@ -681,9 +714,6 @@ msgstr "Mạng USB và cổng nối tiếp sẽ được nhận diện lại ở
 
 msgid "Switch USB role?"
 msgstr "Chuyển vai trò USB?"
-
-msgid "Apply"
-msgstr "Áp dụng"
 
 msgid "Switching USB role…"
 msgstr "Đang chuyển vai trò USB…"
@@ -721,6 +751,21 @@ msgstr "Đã lưu cài đặt"
 msgid "Save failed: %s"
 msgstr "Lưu thất bại: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Không đọc được cài đặt hiệu năng mạng; làm mới để thử lại"
+
+msgid "This kernel does not provide this setting"
+msgstr "Nhân này không cung cấp cài đặt này"
+
+msgid "System default"
+msgstr "Mặc định hệ thống"
+
+msgid "Applied and saved for future boots."
+msgstr "Đã áp dụng và lưu cho các lần khởi động sau."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nhân không chấp nhận cài đặt mạng"
+
 msgid "This boot"
 msgstr "Lần khởi động này"
 
@@ -739,6 +784,9 @@ msgstr "Đang quét bộ điều hợp USB…"
 msgid "No USB adapters found."
 msgstr "Không tìm thấy bộ điều hợp USB."
 
+msgid "In use by another network"
+msgstr "Đang được mạng khác sử dụng"
+
 msgid "Link connected"
 msgstr "Đã có liên kết"
 
@@ -747,6 +795,9 @@ msgstr "Không có liên kết; đã thử bật"
 
 msgid "Added to LAN"
 msgstr "Đã thêm vào LAN"
+
+msgid "Cannot add"
+msgstr "Không thể thêm"
 
 msgid "Add to LAN"
 msgstr "Thêm vào LAN"
@@ -883,9 +934,6 @@ msgstr "Cổng"
 msgid "Security"
 msgstr "Bảo mật"
 
-msgid "None"
-msgstr "Không"
-
 msgid "User name"
 msgstr "Tên người dùng"
 
@@ -993,6 +1041,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux đã khóa"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Có: lần khởi động lại tiếp theo sẽ vào Android"
+
+msgid "No"
+msgstr "Không"
+
+msgid "Writable"
+msgstr "Có thể ghi"
+
+msgid "This boot image cannot change the boot"
+msgstr "Ảnh khởi động này không thể thay đổi khởi động"
 
 msgid "%s of %s"
 msgstr "%s / %s"
@@ -1132,6 +1195,15 @@ msgstr "Chuyển sang Android"
 msgid "Lock Linux"
 msgstr "Khóa Linux"
 
+msgid "Default boot"
+msgstr "Khởi động mặc định"
+
+msgid "One-time boot"
+msgstr "Khởi động một lần"
+
+msgid "Boot control"
+msgstr "Điều khiển khởi động"
+
 msgid "Neighbor cells"
 msgstr "Cell lân cận"
 
@@ -1143,6 +1215,9 @@ msgstr "Tần số"
 
 msgid "Running %s…"
 msgstr "Đang chạy %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Đã lưu cài đặt hotspot; đang áp dụng thay đổi"
 
 msgid "Started in background: %s"
 msgstr "Đã bắt đầu chạy nền: %s"
@@ -1333,9 +1408,6 @@ msgstr "Liên kết LTE"
 msgid "Hidden"
 msgstr "Ẩn"
 
-msgid "No"
-msgstr "Không"
-
 msgid "Running"
 msgstr "Đang chạy"
 
@@ -1395,9 +1467,6 @@ msgstr "Trực tuyến"
 
 msgid "AT adapter unavailable"
 msgstr "Bộ điều hợp AT không khả dụng"
-
-msgid "Linux locked"
-msgstr "Linux đã khóa"
 
 msgid "Installing the language pack…"
 msgstr "Đang cài đặt gói ngôn ngữ…"
@@ -1476,6 +1545,51 @@ msgstr "Đã dịch"
 
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Bản dịch riêng của LuCI đến từ OpenWrt. Các bản dịch của bảng điều khiển này, trừ tiếng Thổ Nhĩ Kỳ và tiếng Trung, là bản dịch máy (AI); rất hoan nghênh các góp ý sửa lỗi."
+
+msgid "Enter a whole number from 0 to %d"
+msgstr "Nhập số nguyên từ 0 đến %d"
+
+msgid "Network lamp"
+msgstr "Đèn mạng"
+
+msgid "Wi-Fi lamp"
+msgstr "Đèn Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Đèn pin"
+
+msgid "On"
+msgstr "Bật"
+
+msgid "Brightness (%)"
+msgstr "Độ sáng (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Đèn bị tắt vẫn tối; cảnh báo nhiệt vẫn hiện trên đèn LED của nó."
+
+msgid "Device default"
+msgstr "Mặc định của thiết bị"
+
+msgid "LED timeout (seconds)"
+msgstr "Thời gian sáng của LED (giây)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Thời gian các đèn LED sáng sau khi nhấn phím hoặc có thay đổi; 0 giữ chúng luôn sáng. Khi cắm sạc chúng vẫn sáng."
+
+msgid "Boot indicator"
+msgstr "Chỉ báo khởi động"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Đèn LED lần lượt hiện các màu của nó trong khi hệ thống khởi động"
+
+msgid "Heat alarm"
+msgstr "Cảnh báo nhiệt"
+
+msgid "Siren"
+msgstr "Còi báo"
+
+msgid "Red blink"
+msgstr "Nháy đỏ"
 
 msgid "Automatic"
 msgstr "Tự động"
@@ -1774,9 +1888,6 @@ msgstr "được đánh thức bằng phím %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem đang tạm ngưng (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Nhập số nguyên từ 0 đến %d"
-
 msgid "Power status unavailable"
 msgstr "Không có trạng thái nguồn"
 
@@ -1834,6 +1945,12 @@ msgstr "Tạm dừng sạc: nhiệt độ pin"
 msgid "Charging paused: charge limit"
 msgstr "Tạm dừng sạc: giới hạn sạc"
 
+msgid "Charging paused: by hand"
+msgstr "Đã tạm dừng sạc: thủ công"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Sạc đầy một lần, sau đó trở lại giới hạn"
+
 msgid "Sleep now"
 msgstr "Ngủ ngay"
 
@@ -1858,6 +1975,27 @@ msgstr "0 % không bao giờ sạc pin (thiết bị chạy bằng bộ sạc), 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % giúp pin bền hơn trên thiết bị luôn cắm sạc."
 
+msgid "Start charging again under"
+msgstr "Bắt đầu sạc lại dưới"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 sạc lại khi thấp hơn mức dừng 5 điểm. Giá trị thấp hơn chỉ sạc lại khi dưới giá trị đó; với 100 %, pin đầy sẽ chờ đến khi xuống dưới giá trị đó."
+
+msgid "Resume charging"
+msgstr "Tiếp tục sạc"
+
+msgid "Pause charging"
+msgstr "Tạm dừng sạc"
+
+msgid "Cancel the full charge"
+msgstr "Hủy sạc đầy"
+
+msgid "Charge to full once"
+msgstr "Sạc đầy một lần"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Khi tạm dừng, pin không được sạc và thiết bị chạy bằng bộ sạc; dưới 5 % pin vẫn được sạc, và bảo vệ nhiệt độ luôn áp dụng."
+
 msgid "When the charger switches the device on"
 msgstr "Khi bộ sạc bật thiết bị"
 
@@ -1872,9 +2010,6 @@ msgstr "Giữ nguyên"
 
 msgid "LTE only (5G off)"
 msgstr "Chỉ LTE (tắt 5G)"
-
-msgid "On"
-msgstr "Bật"
 
 msgid "Full"
 msgstr "Đầy đủ"
@@ -2276,8 +2411,26 @@ msgstr "Hạn mức hằng tháng"
 msgid "%s, warning at %d%%"
 msgstr "%s, cảnh báo ở %d%%"
 
+msgid "Daily quota"
+msgstr "Hạn mức hằng ngày"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Đã đạt hạn mức hằng tháng: dữ liệu di động đã bị tắt. Nó sẽ bật lại khi chu kỳ tiếp theo bắt đầu."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Đã đạt hạn mức hằng ngày: dữ liệu di động đã bị tắt. Sẽ bật lại lúc nửa đêm."
+
+msgid "The daily quota is reached"
+msgstr "Đã đạt hạn mức hằng ngày"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Đã dùng %d%% hạn mức hằng ngày"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Hạn mức và hạn mức hằng ngày chỉ tính tải xuống."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Hạn mức và hạn mức hằng ngày chỉ tính tải lên."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s đang chờ đồng hồ: đồng hồ chưa được đặt qua mạng. Phần này đã được tính vào chu kỳ này và sẽ được ghi vào đúng ngày khi đồng hồ được đặt."
@@ -2309,6 +2462,9 @@ msgstr "Theo chu kỳ tính cước"
 msgid "Billing cycle"
 msgstr "Chu kỳ tính cước"
 
+msgid "Counted"
+msgstr "Đã tính"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Nhập dung lượng theo GB, ví dụ 50 hoặc 2.5"
 
@@ -2320,6 +2476,21 @@ msgstr "Tắt dữ liệu di động khi đạt hạn mức"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Khi chu kỳ này đạt hạn mức, dữ liệu di động sẽ bị tắt: không có internet qua nhà mạng cho đến khi chu kỳ tiếp theo bắt đầu, hạn mức được nâng lên hoặc tùy chọn này được tắt lại. Bật lại dữ liệu di động bằng tay thì nó sẽ bật đến lần khởi động lại tiếp theo."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Tắt dữ liệu di động khi đạt hạn mức hằng ngày"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Khi lưu lượng hôm nay đạt hạn mức hằng ngày, dữ liệu di động bị tắt cho đến nửa đêm, cho đến khi hạn mức được nâng hoặc tùy chọn này được tắt. Bật lại dữ liệu di động thủ công sẽ giữ nó bật cho đến lần khởi động lại tiếp theo."
+
+msgid "Both ways"
+msgstr "Cả hai chiều"
+
+msgid "Downloads only"
+msgstr "Chỉ tải xuống"
+
+msgid "Uploads only"
+msgstr "Chỉ tải lên"
 
 msgid "Set"
 msgstr "Đặt"
@@ -2344,6 +2515,15 @@ msgstr "Hạn mức hằng tháng (GB, 0: không có)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Cảnh báo ở phần trăm hạn mức này"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Hạn mức hằng ngày (GB, 0: không có)"
+
+msgid "The cap and the daily quota count"
+msgstr "Hạn mức và hạn mức hằng ngày tính gì"
+
+msgid "Plan name"
+msgstr "Tên gói cước"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Đã dùng đến nay trong chu kỳ này (GB)"
@@ -2506,9 +2686,6 @@ msgstr "Ảnh khởi động"
 
 msgid "from the installer"
 msgstr "từ trình cài đặt"
-
-msgid "Default boot"
-msgstr "Khởi động mặc định"
 
 msgid "Free space"
 msgstr "Dung lượng trống"
@@ -3523,14 +3700,29 @@ msgstr "Bộ điều hợp TTL không trả lời hợp lệ"
 msgid "Invalid TTL"
 msgstr "TTL không hợp lệ"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Bộ điều hợp TCP không trả lời hợp lệ"
+
+msgid "Invalid congestion control"
+msgstr "Kiểm soát tắc nghẽn không hợp lệ"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Bộ điều hợp khởi động không trả lời hợp lệ"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Bộ điều hợp LED không trả lời hợp lệ"
+
+msgid "Unknown LED setting"
+msgstr "Thiết lập LED không xác định"
+
+msgid "Invalid value for this setting"
+msgstr "Giá trị không hợp lệ cho thiết lập này"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Bộ điều hợp lưu lượng dữ liệu không trả lời hợp lệ"
 
 msgid "Unknown data usage setting"
 msgstr "Thiết lập lưu lượng dữ liệu không xác định"
-
-msgid "Invalid value for this setting"
-msgstr "Giá trị không hợp lệ cho thiết lập này"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Bộ điều hợp chuyển tiếp không trả lời hợp lệ"
@@ -3776,8 +3968,29 @@ msgstr "Radio không làm theo cài đặt"
 msgid "The data roaming setting could not be saved"
 msgstr "Không thể lưu cài đặt chuyển vùng dữ liệu"
 
-msgid "Expected on or off"
-msgstr "Cần giá trị on hoặc off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Đã lưu cài đặt hotspot nhưng tải lại không dây thất bại"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Cài đặt không dây có thay đổi chưa lưu: hãy lưu hoặc hoàn tác trước"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot đang được chuyển; hãy thử lại sau ít phút"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Chưa cấu hình hotspot (điểm truy cập)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Bật radio này sẽ ảnh hưởng giao diện khác; hãy dùng trang Không dây"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio đang được máy khách Wi-Fi sử dụng"
+
+msgid "The hotspot setting could not be written"
+msgstr "Không thể ghi cài đặt hotspot"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Nền tảng này không hỗ trợ điều khiển hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Nền tảng này không cung cấp tích hợp VPN"
@@ -3878,6 +4091,15 @@ msgstr "Không phải giao diện mạng USB"
 msgid "LAN bridge device section was not found"
 msgstr "Không tìm thấy mục thiết bị cầu nối LAN"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Không xác định được bộ điều hợp thuộc mạng nào; hãy thử lại sau"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Bộ điều hợp thuộc mạng khác và không thể tham gia LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Cài đặt mạng có thay đổi chưa lưu: hãy lưu hoặc hoàn tác trước"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Không thể bật giao diện mạng USB"
 
@@ -3977,6 +4199,12 @@ msgstr "Đang có một quá trình cài đặt khác chạy"
 msgid "The language pack could not be removed"
 msgstr "Không thể gỡ gói ngôn ngữ"
 
+msgid "The LED settings could not be read"
+msgstr "Không đọc được thiết lập LED"
+
+msgid "The LED setting could not be saved"
+msgstr "Không lưu được thiết lập LED"
+
 msgid "Lock cache unavailable"
 msgstr "Bộ đệm khóa không khả dụng"
 
@@ -4018,6 +4246,12 @@ msgstr "Thao tác gói không xác định"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Nền tảng này không hỗ trợ kiểm soát tắc nghẽn TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Không đọc được cài đặt TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Lưu lượng dữ liệu không khả dụng trên hệ thống này"
