@@ -854,6 +854,28 @@
             };
             tload();
         }
+        /* TCP congestion control of the device's own connections (mu300-tcp; kanoqwq's b9f71e72): only what the kernel
+         * offers (the 5.4 kernel has no BBR) */
+        if (has('tcp.get')) {
+            var cc = root.appendChild(card(_('TCP congestion control'), 'mu-tcp'));
+            var cb = cc.appendChild(el('div'));
+            var cload = function () {
+                return load(cb, 'tcp.get', {}, function (o) {
+                    cb.appendChild(note(_('Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR.')));
+                    cb.appendChild(row(_('Active congestion control'), (o.current || '--').toUpperCase()));
+                    cb.appendChild(row(_('Default queue'), o.qdisc || '--'));
+                    if (!o.supported) { cb.appendChild(note(_('This kernel does not provide this setting'), 'warn')); return; }
+                    var opts = [ [ 'default', _('System default') + (o.default ? ' (' + o.default.toUpperCase() + ')' : '') ] ];
+                    (o.offered || []).forEach(function (a) { opts.push([ a, a.toUpperCase() ]); });
+                    var sel = select('mu-tcp-algo', opts, o.saved || 'default');
+                    cb.appendChild(field(_('TCP congestion control'), sel));
+                    cb.appendChild(note(_('BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots.')));
+                    var s = button(_('Save and apply'), function () { act(s, 'tcp.set', { value: sel.value }, { done: cload }); }, 'primary');
+                    cb.appendChild(actions([ s ]));
+                });
+            };
+            cload();
+        }
         if (has('ussd.send')) {
             var uc = root.appendChild(card(_('USSD'), 'mu-ussd'));
             var code = input('mu-ussd-code', { maxlength: '40', placeholder: '*100#' });
@@ -1382,6 +1404,8 @@
                 else b.appendChild(row(_('Battery'), _('none (powered by USB)')));
                 if (o.charge_off === 'temp') b.appendChild(note(_('Charging paused: battery temperature'), 'warn'));
                 else if (o.charge_off === 'limit') b.appendChild(note(_('Charging paused: charge limit')));
+                else if (o.charge_off === 'manual') b.appendChild(note(_('Charging paused: by hand')));
+                if (bt && (o.conf || {}).FULL_ONCE === 1) b.appendChild(note(_('Charging to full once, then back to the limit')));
                 var conf = o.conf || {};
                 clear(pb);
                 var prof = select('mu-pw-profile', [ [ 'auto', _('Automatic: plugged in / on battery') ], [ 'plugged', NAMES.plugged ],
@@ -1394,15 +1418,26 @@
                     var cto = input('mu-pw-chargeto', { type: 'number', min: '0', max: '100', value: show(conf.CHARGE_TO) });
                     pb.appendChild(field(_('Switch to Saver under (%)'), saver));
                     pb.appendChild(field(_('Stop charging at (%)'), cto));
+                    var res = input('mu-pw-resume', { type: 'number', min: '0', max: '99', value: show(conf.RESUME_AT) });
+                    pb.appendChild(field(_('Start charging again under (%)'), res));
                     pb.appendChild(note(_('0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in.')));
                     var bs = button(_('Save'), function () {
                         busy(bs, true);
                         api('power.set', { key: 'SAVER_BELOW', value: Number(saver.value) }).then(function () {
                             return api('power.set', { key: 'CHARGE_TO', value: Number(cto.value) });
+                        }).then(function () {
+                            return api('power.set', { key: 'RESUME_AT', value: Number(res.value) });
                         }).then(function () { busy(bs, false); toast(_('Saved'), 'ok'); refresh(); },
                             function (ex) { busy(bs, false); toast(errText(ex), 'error'); });
                     });
+                    pb.appendChild(note(_('Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it.')));
                     pb.appendChild(actions([ bs ]));
+                    // the pause and the full charge by hand (kanoqwq's controls); the temperature guard always applies
+                    var paused = conf.CHARGE_PAUSE === 1, full = conf.FULL_ONCE === 1;
+                    var pz = button(paused ? _('Resume charging') : _('Pause charging'), function () { set(pz, 'CHARGE_PAUSE', paused ? 0 : 1); });
+                    var fo = button(full ? _('Cancel the full charge') : _('Charge to full once'), function () { set(fo, 'FULL_ONCE', full ? 0 : 1); });
+                    pb.appendChild(actions([ pz, fo ]));
+                    pb.appendChild(note(_('Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies.')));
                     var pon = select('mu-pw-poweron', [ [ '0', _('Charge only, until a key starts it') ], [ '1', _('Start normally') ] ],
                         conf.POWER_ON_CHARGER === 1 ? '1' : '0');
                     pon.addEventListener('change', function () { set(null, 'POWER_ON_CHARGER', Number(pon.value)); });

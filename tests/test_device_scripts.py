@@ -4489,7 +4489,7 @@ class ThermalGuard(ShellTest):
 
 class Nfc(ShellTest):
     """mu300-nfc against a fake FM11NT08: 1 KiB behind a stub i2ctransfer, which answers only while a stub gpioset
-    holds line 190 low, as the tag does."""
+    holds the tag's reset line low (190 on the U30 Air, 189 on the V50, in $STUBLOG/line), as the tag does."""
     EEPROM = r'''
 import os, sys
 mem = os.path.join(os.environ['STUBLOG'], 'tag.bin')
@@ -4525,10 +4525,19 @@ elif op.startswith('w'):
         self.stub('i2ctransfer', 'exec python3 "$STUBLOG/eeprom.py" "$@"')
         # libgpiod 2: holds the line until killed
         self.stub('gpioset', '[ "$1" = --help ] && { echo "  -c, --chip"; exit 0; }; '
-                             '[ "$*" = "-c gpiochip4 190=0" ] || exit 1; touch "$STUBLOG/held"; '
+                             '[ "$*" = "-c gpiochip4 $(cat "$STUBLOG/line")=0" ] || exit 1; touch "$STUBLOG/held"; '
                              'trap \'rm -f "$STUBLOG/held"; exit 0\' TERM; while :; do sleep 0.05; done')
+        (self.tmp / 'line').write_text('190')
         self.conf = self.tmp / 'hotspot.conf'
         self.conf.write_text('SSID=U30 AIR\nPSK=secret pass!\nBAND=5\n')
+
+    def v50_tree(self, pin):
+        # ZTE's node in the V50's device tree: the reset line as <phandle pin flags>, big-endian
+        node = self.root / 'proc/device-tree/ntag_fm11_gpio'
+        node.mkdir(parents=True, exist_ok=True)
+        # (with a device tree there, mu300-device believes a v50 label only on the V50's AW9523B node)
+        (self.root / 'proc/device-tree/soc/ap-ahb/i2c@2270000/aw9523b_led@5b').mkdir(parents=True, exist_ok=True)
+        (node / 'ntag-reset-gpio').write_bytes((0x8f).to_bytes(4, 'big') + pin.to_bytes(4, 'big') + bytes(4))
 
     def blank(self, ndef=b'\x03\x00\xfe'):
         (self.tmp / 'tag.bin').write_bytes(self.ZTE + ndef + bytes(1024 - 16 - len(ndef)))
@@ -4631,11 +4640,14 @@ elif op.startswith('w'):
             self.blank()
             r = self.nfc(shell, 'wifi', device='f50')
             self.assertEqual(r.returncode, 1)
-            self.assertIn('only the U30 Air', r.stderr)
-            # the V50's tag is on another reset line: not driven, and the tag is not touched (FINDINGS 95)
+            self.assertIn('this device has no NFC tag', r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='f50').returncode, 1)
+            self.assertEqual(self.nfc(shell, 'supported').returncode, 0)
+            # a V50 whose device tree has no reset line for the tag: not driven, the tag not touched
             r = self.nfc(shell, 'wifi', device='v50')
             self.assertEqual(r.returncode, 1)
-            self.assertIn("the V50's NFC tag is not supported yet", r.stderr)
+            self.assertIn("the V50's NFC reset line is not in the device tree", r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 1)
             self.assertEqual(self.writes(), [])
             self.assertEqual(self.nfc(shell, 'blink').returncode, 2)
             self.assertEqual(self.nfc(shell, 'url').returncode, 1)
@@ -4644,6 +4656,35 @@ elif op.startswith('w'):
             r = self.nfc(shell, 'url', 'https://example.com/')
             self.assertEqual(r.returncode, 1)
             self.assertIn('capability container', r.stderr)
+            self.assertEqual(self.writes(), [])
+
+
+    def test_v50(self):
+        # the V50's tag: the same chip on reset line 189, from ZTE's node in the device tree (kano's V50, FINDINGS 95)
+        (self.tmp / 'line').write_text('189')
+        for shell in self.each_shell():
+            self.blank()
+            self.v50_tree(189)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 0)
+            r = self.nfc(shell, 'wifi', device='v50')
+            self.assertEqual((r.returncode, r.stdout.strip()), (0, 'wifi: U30 AIR (with its password)'), r.stderr)
+            # a line other than the one tested on: left alone
+            self.blank()
+            self.v50_tree(190)
+            r = self.nfc(shell, 'wifi', device='v50')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('GPIO 190, not the 189', r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 1)
+            self.assertEqual(self.writes(), [])
+
+    def test_line_held_elsewhere(self):
+        # gpioset cannot take the line (someone holds it): said so, and the tag is not touched
+        (self.tmp / 'line').write_text('77')
+        for shell in self.each_shell():
+            self.blank()
+            r = self.nfc(shell, 'wifi')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('cannot hold the tag', r.stderr)
             self.assertEqual(self.writes(), [])
 
 
@@ -5574,6 +5615,21 @@ class NextBoot(ShellTest):
         (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_a)
         self.assertEqual(self.nb('android').returncode, 0)
         self.assertEqual(self.bc(), android_b)
+
+    def test_status_says_whether_boot_control_can_be_written(self):
+        """The panel's boot card (unisoc-modem/boot, kanoqwq's f6b0668d) reads this line."""
+        android_a, linux_b, android_b, linux_a = self.blocks
+        line = lambda: [l for l in self.nb('status').stdout.splitlines() if l.startswith('boot control:')]
+        (self.run_dir / 'linux-slot').write_text('b\n')
+        self.assertEqual(line(), ['boot control: not writable'])            # no blocks published
+        (self.run_dir / 'misc-bc-android.bin').write_bytes(android_a)
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_b)
+        self.assertEqual(line(), ['boot control: writable'])
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_a)       # the pair of another slot
+        self.assertEqual(line(), ['boot control: not writable'])
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_b)
+        (self.run_dir / 'misc-dev').write_text(str(self.tmp / 'no-misc'))
+        self.assertEqual(line(), ['boot control: not writable'])
 
 
 class EarlyRecorder(ShellTest):

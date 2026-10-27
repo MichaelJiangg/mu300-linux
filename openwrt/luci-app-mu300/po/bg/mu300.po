@@ -628,6 +628,9 @@ msgstr "Режимът хост прекъсва USB мрежата и сери�
 msgid "USB network mode"
 msgstr "USB мрежов режим"
 
+msgid "Current sharing protocol"
+msgstr "Текущ протокол за споделяне"
+
 msgid "Network protocol"
 msgstr "Мрежов протокол"
 
@@ -658,6 +661,27 @@ msgstr "Опресняване"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Достъпно само в режим хост. Опресняването активира откритите USB адаптери; добавянето към LAN запазва моста и презарежда мрежата."
 
+msgid "Network performance"
+msgstr "Мрежова производителност"
+
+msgid "Active congestion control"
+msgstr "Активен контрол на задръстванията"
+
+msgid "Default queue"
+msgstr "Опашка по подразбиране"
+
+msgid "TCP congestion control"
+msgstr "Контрол на задръстванията на TCP"
+
+msgid "Apply"
+msgstr "Прилагане"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Засяга главно новите TCP връзки, създадени от това устройство. Препращаните връзки на клиентите на точката за достъп и USB не използват автоматично BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR избира FQ за опашка по подразбиране на новосъздадените интерфейси. Съществуващите връзки, интерфейси и QoS се запазват. Настройките остават след рестарт."
+
 msgid "Recent modem operations"
 msgstr "Последни операции на модема"
 
@@ -670,6 +694,12 @@ msgstr "Последните извиквания на контролния па
 msgid "Unavailable"
 msgstr "Недостъпно"
 
+msgid "Mixed"
+msgstr "Смесен"
+
+msgid "None"
+msgstr "Няма"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB мрежовият режим е недостъпен в режим хост; автоматичното стартиране на хост изключва и автоматичното стартиране на USB мрежата."
 
@@ -681,9 +711,6 @@ msgstr "USB мрежата и серийната връзка ще се енум
 
 msgid "Switch USB role?"
 msgstr "Смяна на USB ролята?"
-
-msgid "Apply"
-msgstr "Прилагане"
 
 msgid "Switching USB role…"
 msgstr "Смяна на USB ролята…"
@@ -721,6 +748,21 @@ msgstr "Настройките са запазени"
 msgid "Save failed: %s"
 msgstr "Запазването е неуспешно: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Настройките за мрежова производителност не можаха да се прочетат; опреснете, за да опитате отново"
+
+msgid "This kernel does not provide this setting"
+msgstr "Това ядро не предоставя тази настройка"
+
+msgid "System default"
+msgstr "По подразбиране за системата"
+
+msgid "Applied and saved for future boots."
+msgstr "Приложено и запазено за следващите стартирания."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ядрото не прие мрежовите настройки"
+
 msgid "This boot"
 msgstr "Това стартиране"
 
@@ -739,6 +781,9 @@ msgstr "Сканиране за USB адаптери…"
 msgid "No USB adapters found."
 msgstr "Не са открити USB адаптери."
 
+msgid "In use by another network"
+msgstr "Използва се от друга мрежа"
+
 msgid "Link connected"
 msgstr "Връзката е установена"
 
@@ -747,6 +792,9 @@ msgstr "Няма връзка; опит за активиране"
 
 msgid "Added to LAN"
 msgstr "Добавен към LAN"
+
+msgid "Cannot add"
+msgstr "Не може да се добави"
 
 msgid "Add to LAN"
 msgstr "Добавяне към LAN"
@@ -862,9 +910,6 @@ msgstr "Порт"
 msgid "Security"
 msgstr "Защита"
 
-msgid "None"
-msgstr "Няма"
-
 msgid "User name"
 msgstr "Потребителско име"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux е заключен"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Да: следващото рестартиране стартира Android"
+
+msgid "No"
+msgstr "Не"
+
+msgid "Writable"
+msgstr "Може да се записва"
+
+msgid "This boot image cannot change the boot"
+msgstr "Този образ за зареждане не може да променя зареждането"
 
 msgid "%s of %s"
 msgstr "%s от %s"
@@ -1114,6 +1174,15 @@ msgstr "Превключване към Android"
 msgid "Lock Linux"
 msgstr "Заключи Linux"
 
+msgid "Default boot"
+msgstr "Стартиране по подразбиране"
+
+msgid "One-time boot"
+msgstr "Еднократно зареждане"
+
+msgid "Boot control"
+msgstr "Управление на зареждането"
+
 msgid "Neighbor cells"
 msgstr "Съседни клетки"
 
@@ -1125,6 +1194,9 @@ msgstr "Честота"
 
 msgid "Running %s…"
 msgstr "Изпълнение на %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Настройките на точката за достъп са запазени; промените се прилагат"
 
 msgid "Started in background: %s"
 msgstr "Стартирано във фонов режим: %s"
@@ -1315,9 +1387,6 @@ msgstr "LTE връзка"
 msgid "Hidden"
 msgstr "Скрит"
 
-msgid "No"
-msgstr "Не"
-
 msgid "Running"
 msgstr "Работи"
 
@@ -1377,9 +1446,6 @@ msgstr "Онлайн"
 
 msgid "AT adapter unavailable"
 msgstr "AT адаптерът е недостъпен"
-
-msgid "Linux locked"
-msgstr "Linux е заключен"
 
 msgid "Installing the language pack…"
 msgstr "Инсталиране на езиковия пакет…"
@@ -1816,6 +1882,12 @@ msgstr "Зареждането е спряно: температура на ба
 msgid "Charging paused: charge limit"
 msgstr "Зареждането е спряно: лимит на зареждане"
 
+msgid "Charging paused: by hand"
+msgstr "Зареждането е спряно: ръчно"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Зареждане до пълно веднъж, после обратно към лимита"
+
 msgid "Sleep now"
 msgstr "Приспи сега"
 
@@ -1839,6 +1911,27 @@ msgstr "0 % никога не зарежда батерията (устройс�
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % пазят батерията на устройство, което остава на зарядно."
+
+msgid "Start charging again under"
+msgstr "Възобнови зареждането под"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 възобновява 5 пункта под нивото на спиране. По-ниска стойност възобновява зареждането само под нея; при 100 % пълната батерия изчаква, докато спадне под нея."
+
+msgid "Resume charging"
+msgstr "Възобнови зареждането"
+
+msgid "Pause charging"
+msgstr "Спри зареждането"
+
+msgid "Cancel the full charge"
+msgstr "Отмени пълното зареждане"
+
+msgid "Charge to full once"
+msgstr "Зареди до пълно веднъж"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "При пауза батерията не се зарежда и устройството работи от зарядното; под 5 % тя пак се зарежда, а температурната защита винаги важи."
 
 msgid "When the charger switches the device on"
 msgstr "Когато зарядното включи устройството"
@@ -2530,9 +2623,6 @@ msgstr "Стартов образ"
 
 msgid "from the installer"
 msgstr "от инсталатора"
-
-msgid "Default boot"
-msgstr "Стартиране по подразбиране"
 
 msgid "Free space"
 msgstr "Свободно място"
@@ -3547,6 +3637,15 @@ msgstr "Адаптерът за TTL не върна валиден отгово�
 msgid "Invalid TTL"
 msgstr "Невалиден TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP адаптерът не върна валиден отговор"
+
+msgid "Invalid congestion control"
+msgstr "Невалиден контрол на задръстванията"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Адаптерът за зареждане не върна валиден отговор"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Адаптерът за използване на данни не върна валиден отговор"
 
@@ -3800,8 +3899,29 @@ msgstr "Радиото не последва настройката си"
 msgid "The data roaming setting could not be saved"
 msgstr "Настройката за роуминг на данни не можа да бъде запазена"
 
-msgid "Expected on or off"
-msgstr "Очаква се on или off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Настройката на точката за достъп е запазена, но презареждането на безжичната мрежа не успя"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Безжичните настройки имат незапазени промени: първо ги запазете или отменете"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Точката за достъп вече се превключва; опитайте отново след малко"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Няма конфигурирана точка за достъп"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Включването на това радио ще засегне друг интерфейс; използвайте страницата Безжична мрежа"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Радиото се използва от Wi-Fi клиента"
+
+msgid "The hotspot setting could not be written"
+msgstr "Настройката на точката за достъп не можа да се запише"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Тази платформа не предоставя управление на точката за достъп"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Тази платформа не предоставя VPN интеграция"
@@ -3901,6 +4021,15 @@ msgstr "Не е USB мрежов интерфейс"
 
 msgid "LAN bridge device section was not found"
 msgstr "Секцията за устройството на LAN моста не е открита"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Не можа да се установи на коя мрежа принадлежи адаптерът; опитайте по-късно"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Адаптерът принадлежи на друга мрежа и не може да се присъедини към LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Мрежовите настройки имат незапазени промени: първо ги запазете или отменете"
 
 msgid "Cannot bring USB network interface up"
 msgstr "Не може да се активира USB мрежовият интерфейс"
@@ -4036,6 +4165,12 @@ msgstr "Непозната операция с пакети"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Тази платформа не предоставя контрол на задръстванията на TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Настройките на TCP не можаха да се прочетат"
 
 msgid "Data usage is not available on this system"
 msgstr "Използването на данни не е налично в тази система"

@@ -628,6 +628,9 @@ msgstr "Der Host-Modus trennt USB-Netzwerk und seriellen Zugang an diesem Port. 
 msgid "USB network mode"
 msgstr "USB-Netzwerkmodus"
 
+msgid "Current sharing protocol"
+msgstr "Aktuelles Freigabeprotokoll"
+
 msgid "Network protocol"
 msgstr "Netzwerkprotokoll"
 
@@ -658,6 +661,27 @@ msgstr "Aktualisieren"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Nur im Host-Modus verfügbar. Aktualisieren aktiviert erkannte USB-Adapter; Hinzufügen zum LAN speichert die Bridge und lädt das Netzwerk neu."
 
+msgid "Network performance"
+msgstr "Netzwerkleistung"
+
+msgid "Active congestion control"
+msgstr "Aktive Überlastkontrolle"
+
+msgid "Default queue"
+msgstr "Standard-Warteschlange"
+
+msgid "TCP congestion control"
+msgstr "TCP-Überlastkontrolle"
+
+msgid "Apply"
+msgstr "Anwenden"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Betrifft vor allem neue TCP-Verbindungen dieses Geräts. Weitergeleitete Verbindungen von Hotspot- und USB-Clients nutzen nicht automatisch BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR wählt FQ als Standard-Warteschlange für neu angelegte Schnittstellen. Bestehende Verbindungen, Schnittstellen und QoS bleiben erhalten. Die Einstellung bleibt nach Neustarts bestehen."
+
 msgid "Recent modem operations"
 msgstr "Letzte Modemvorgänge"
 
@@ -670,6 +694,12 @@ msgstr "Die letzten Aufrufe der Bedienoberfläche in diesem und im vorigen Start
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
+msgid "Mixed"
+msgstr "Gemischt"
+
+msgid "None"
+msgstr "Keine"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Der USB-Netzwerkmodus ist im Host-Modus nicht verfügbar; der Host-Autostart deaktiviert auch den USB-Netzwerk-Autostart."
 
@@ -681,9 +711,6 @@ msgstr "USB-Netzwerk und serieller Zugang werden im Gerätemodus neu enumeriert.
 
 msgid "Switch USB role?"
 msgstr "USB-Rolle wechseln?"
-
-msgid "Apply"
-msgstr "Anwenden"
 
 msgid "Switching USB role…"
 msgstr "USB-Rolle wird gewechselt…"
@@ -721,6 +748,21 @@ msgstr "Einstellungen gespeichert"
 msgid "Save failed: %s"
 msgstr "Speichern fehlgeschlagen: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Netzwerkleistungseinstellungen konnten nicht gelesen werden; zum erneuten Versuch aktualisieren"
+
+msgid "This kernel does not provide this setting"
+msgstr "Dieser Kernel bietet diese Einstellung nicht"
+
+msgid "System default"
+msgstr "Systemstandard"
+
+msgid "Applied and saved for future boots."
+msgstr "Angewendet und für künftige Starts gespeichert."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Der Kernel hat die Netzwerkeinstellungen nicht übernommen"
+
 msgid "This boot"
 msgstr "Dieser Start"
 
@@ -739,6 +781,9 @@ msgstr "USB-Adapter werden gesucht…"
 msgid "No USB adapters found."
 msgstr "Keine USB-Adapter gefunden."
 
+msgid "In use by another network"
+msgstr "Von einem anderen Netzwerk belegt"
+
 msgid "Link connected"
 msgstr "Link verbunden"
 
@@ -747,6 +792,9 @@ msgstr "Kein Link; Aktivierung versucht"
 
 msgid "Added to LAN"
 msgstr "Zum LAN hinzugefügt"
+
+msgid "Cannot add"
+msgstr "Nicht hinzufügbar"
 
 msgid "Add to LAN"
 msgstr "Zum LAN hinzufügen"
@@ -862,9 +910,6 @@ msgstr "Port"
 msgid "Security"
 msgstr "Sicherheit"
 
-msgid "None"
-msgstr "Keine"
-
 msgid "User name"
 msgstr "Benutzername"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux gesperrt"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ja: der nächste Neustart startet Android"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Writable"
+msgstr "Beschreibbar"
+
+msgid "This boot image cannot change the boot"
+msgstr "Dieses Boot-Image kann den Start nicht ändern"
 
 msgid "%s of %s"
 msgstr "%s von %s"
@@ -1114,6 +1174,15 @@ msgstr "Zu Android wechseln"
 msgid "Lock Linux"
 msgstr "Linux sperren"
 
+msgid "Default boot"
+msgstr "Standardstart"
+
+msgid "One-time boot"
+msgstr "Einmaliger Start"
+
+msgid "Boot control"
+msgstr "Startsteuerung"
+
 msgid "Neighbor cells"
 msgstr "Nachbarzellen"
 
@@ -1125,6 +1194,9 @@ msgstr "Frequenz"
 
 msgid "Running %s…"
 msgstr "%s wird ausgeführt…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspot-Einstellungen gespeichert; Änderungen werden angewendet"
 
 msgid "Started in background: %s"
 msgstr "Im Hintergrund gestartet: %s"
@@ -1315,9 +1387,6 @@ msgstr "LTE-Verbindung"
 msgid "Hidden"
 msgstr "Versteckt"
 
-msgid "No"
-msgstr "Nein"
-
 msgid "Running"
 msgstr "Läuft"
 
@@ -1377,9 +1446,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "AT-Adapter nicht verfügbar"
-
-msgid "Linux locked"
-msgstr "Linux gesperrt"
 
 msgid "Installing the language pack…"
 msgstr "Sprachpaket wird installiert…"
@@ -1816,6 +1882,12 @@ msgstr "Laden pausiert: Akkutemperatur"
 msgid "Charging paused: charge limit"
 msgstr "Laden pausiert: Ladegrenze"
 
+msgid "Charging paused: by hand"
+msgstr "Laden pausiert: von Hand"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Einmal voll laden, dann zurück zur Ladegrenze"
+
 msgid "Sleep now"
 msgstr "Jetzt schlafen"
 
@@ -1839,6 +1911,27 @@ msgstr "0 % lädt den Akku nie (das Gerät läuft am Ladegerät), 100 % lädt ih
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % schonen den Akku bei einem Gerät, das dauerhaft am Netz hängt."
+
+msgid "Start charging again under"
+msgstr "Laden wieder starten unter"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 startet wieder 5 Punkte unter der Stoppgrenze. Ein niedrigerer Wert startet das Laden erst darunter wieder; bei 100 % wartet ein voller Akku, bis er darunter fällt."
+
+msgid "Resume charging"
+msgstr "Laden fortsetzen"
+
+msgid "Pause charging"
+msgstr "Laden pausieren"
+
+msgid "Cancel the full charge"
+msgstr "Volladung abbrechen"
+
+msgid "Charge to full once"
+msgstr "Einmal voll laden"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Pausiert wird der Akku nicht geladen und das Gerät läuft am Ladegerät; unter 5 % lädt er trotzdem, und der Temperaturschutz gilt immer."
 
 msgid "When the charger switches the device on"
 msgstr "Wenn das Ladegerät das Gerät einschaltet"
@@ -2530,9 +2623,6 @@ msgstr "Boot-Image"
 
 msgid "from the installer"
 msgstr "vom Installationsprogramm"
-
-msgid "Default boot"
-msgstr "Standardstart"
 
 msgid "Free space"
 msgstr "Freier Speicherplatz"
@@ -3547,6 +3637,15 @@ msgstr "Der TTL-Adapter gab keine gültige Antwort"
 msgid "Invalid TTL"
 msgstr "Ungültige TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Der TCP-Adapter gab keine gültige Antwort"
+
+msgid "Invalid congestion control"
+msgstr "Ungültige Überlastkontrolle"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Der Start-Adapter gab keine gültige Antwort"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Der Datenverbrauchs-Adapter gab keine gültige Antwort"
 
@@ -3800,8 +3899,29 @@ msgstr "Das Funkteil ist seiner Einstellung nicht gefolgt"
 msgid "The data roaming setting could not be saved"
 msgstr "Die Datenroaming-Einstellung konnte nicht gespeichert werden"
 
-msgid "Expected on or off"
-msgstr "on oder off erwartet"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Die Hotspot-Einstellung ist gespeichert, aber das Neuladen des WLANs ist fehlgeschlagen"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Die WLAN-Einstellungen haben ungespeicherte Änderungen: zuerst speichern oder verwerfen"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Der Hotspot wird bereits umgeschaltet; gleich erneut versuchen"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Kein Hotspot (Access Point) konfiguriert"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Das Einschalten dieses Funkmoduls würde eine andere Schnittstelle betreffen; die WLAN-Seite verwenden"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Das Funkmodul wird vom WLAN-Client verwendet"
+
+msgid "The hotspot setting could not be written"
+msgstr "Die Hotspot-Einstellung konnte nicht geschrieben werden"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Diese Plattform bietet keine Hotspot-Steuerung"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN-Integration wird von dieser Plattform nicht bereitgestellt"
@@ -3901,6 +4021,15 @@ msgstr "Keine USB-Netzwerkschnittstelle"
 
 msgid "LAN bridge device section was not found"
 msgstr "Geräteabschnitt der LAN-Bridge wurde nicht gefunden"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Zugehörigkeit des Adapters nicht feststellbar; später erneut versuchen"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Der Adapter gehört zu einem anderen Netzwerk und kann nicht ins LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Die Netzwerkeinstellungen haben ungespeicherte Änderungen: zuerst speichern oder verwerfen"
 
 msgid "Cannot bring USB network interface up"
 msgstr "USB-Netzwerkschnittstelle kann nicht aktiviert werden"
@@ -4036,6 +4165,12 @@ msgstr "Unbekannte Paket-Operation"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Diese Plattform bietet keine TCP-Überlastkontrolle"
+
+msgid "The TCP settings could not be read"
+msgstr "Die TCP-Einstellungen konnten nicht gelesen werden"
 
 msgid "Data usage is not available on this system"
 msgstr "Datenverbrauch ist auf diesem System nicht verfügbar"

@@ -628,6 +628,9 @@ msgstr "מצב מארח מנתק את רשת ה-USB ואת הממשק הטורי
 msgid "USB network mode"
 msgstr "מצב רשת USB"
 
+msgid "Current sharing protocol"
+msgstr "פרוטוקול השיתוף הנוכחי"
+
 msgid "Network protocol"
 msgstr "פרוטוקול רשת"
 
@@ -658,6 +661,27 @@ msgstr "רענון"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "זמין במצב מארח בלבד. רענון מעלה את מתאמי ה-USB שהתגלו; הוספה ל-LAN שומרת את הגשר וטוענת מחדש את הרשת."
 
+msgid "Network performance"
+msgstr "ביצועי רשת"
+
+msgid "Active congestion control"
+msgstr "בקרת עומס פעילה"
+
+msgid "Default queue"
+msgstr "תור ברירת מחדל"
+
+msgid "TCP congestion control"
+msgstr "בקרת עומס TCP"
+
+msgid "Apply"
+msgstr "החלה"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "משפיע בעיקר על חיבורי TCP חדשים שהמכשיר הזה יוצר. חיבורים מועברים של לקוחות נקודה חמה ו-USB אינם משתמשים ב-BBR אוטומטית."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR בוחר ב-FQ כתור ברירת המחדל לממשקים חדשים. חיבורים, ממשקים ו-QoS קיימים נשמרים. ההגדרות נשמרות גם אחרי הפעלה מחדש."
+
 msgid "Recent modem operations"
 msgstr "פעולות מודם אחרונות"
 
@@ -670,6 +694,12 @@ msgstr "הקריאות האחרונות של לוח הבקרה, מהאתחול �
 msgid "Unavailable"
 msgstr "לא זמין"
 
+msgid "Mixed"
+msgstr "מעורב"
+
+msgid "None"
+msgstr "ללא"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "מצב רשת USB אינו זמין במצב מארח; הפעלה אוטומטית של מצב מארח משביתה גם את ההפעלה האוטומטית של רשת ה-USB."
 
@@ -681,9 +711,6 @@ msgstr "רשת ה-USB והממשק הטורי יזוהו מחדש במצב הת�
 
 msgid "Switch USB role?"
 msgstr "להחליף את תפקיד ה-USB?"
-
-msgid "Apply"
-msgstr "החלה"
 
 msgid "Switching USB role…"
 msgstr "מחליף תפקיד USB…"
@@ -721,6 +748,21 @@ msgstr "ההגדרות נשמרו"
 msgid "Save failed: %s"
 msgstr "השמירה נכשלה: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "לא ניתן לקרוא את הגדרות ביצועי הרשת; רענן כדי לנסות שוב"
+
+msgid "This kernel does not provide this setting"
+msgstr "הליבה הזו אינה מספקת הגדרה זו"
+
+msgid "System default"
+msgstr "ברירת המחדל של המערכת"
+
+msgid "Applied and saved for future boots."
+msgstr "הוחל ונשמר לאתחולים הבאים."
+
+msgid "The kernel did not accept the network settings"
+msgstr "הליבה לא קיבלה את הגדרות הרשת"
+
 msgid "This boot"
 msgstr "האתחול הזה"
 
@@ -739,6 +781,9 @@ msgstr "סורק מתאמי USB…"
 msgid "No USB adapters found."
 msgstr "לא נמצאו מתאמי USB."
 
+msgid "In use by another network"
+msgstr "בשימוש רשת אחרת"
+
 msgid "Link connected"
 msgstr "הקישור מחובר"
 
@@ -747,6 +792,9 @@ msgstr "אין קישור; בוצע ניסיון הפעלה"
 
 msgid "Added to LAN"
 msgstr "נוסף ל-LAN"
+
+msgid "Cannot add"
+msgstr "לא ניתן להוסיף"
 
 msgid "Add to LAN"
 msgstr "הוספה ל-LAN"
@@ -862,9 +910,6 @@ msgstr "פורט"
 msgid "Security"
 msgstr "אבטחה"
 
-msgid "None"
-msgstr "ללא"
-
 msgid "User name"
 msgstr "שם משתמש"
 
@@ -972,6 +1017,21 @@ msgstr "MCS DL/UL"
 
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
+
+msgid "Linux locked"
+msgstr "Linux נעול"
+
+msgid "Yes: the next restart starts Android"
+msgstr "כן: ההפעלה מחדש הבאה תפעיל את Android"
+
+msgid "No"
+msgstr "לא"
+
+msgid "Writable"
+msgstr "ניתן לכתיבה"
+
+msgid "This boot image cannot change the boot"
+msgstr "תמונת האתחול הזו אינה יכולה לשנות את האתחול"
 
 msgid "%s of %s"
 msgstr "%s מתוך %s"
@@ -1114,6 +1174,15 @@ msgstr "מעבר ל-Android"
 msgid "Lock Linux"
 msgstr "נעילת Linux"
 
+msgid "Default boot"
+msgstr "ברירת המחדל לאתחול"
+
+msgid "One-time boot"
+msgstr "אתחול חד־פעמי"
+
+msgid "Boot control"
+msgstr "בקרת אתחול"
+
 msgid "Neighbor cells"
 msgstr "תאים שכנים"
 
@@ -1125,6 +1194,9 @@ msgstr "תדר"
 
 msgid "Running %s…"
 msgstr "מריץ %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "הגדרות הנקודה החמה נשמרו; השינויים מוחלים"
 
 msgid "Started in background: %s"
 msgstr "הופעל ברקע: %s"
@@ -1315,9 +1387,6 @@ msgstr "קישור LTE"
 msgid "Hidden"
 msgstr "מוסתר"
 
-msgid "No"
-msgstr "לא"
-
 msgid "Running"
 msgstr "פועל"
 
@@ -1377,9 +1446,6 @@ msgstr "מקוון"
 
 msgid "AT adapter unavailable"
 msgstr "מתאם AT אינו זמין"
-
-msgid "Linux locked"
-msgstr "Linux נעול"
 
 msgid "Installing the language pack…"
 msgstr "מתקין את חבילת השפות…"
@@ -1816,6 +1882,12 @@ msgstr "הטעינה הושהתה: טמפרטורת הסוללה"
 msgid "Charging paused: charge limit"
 msgstr "הטעינה הושהתה: מגבלת הטעינה"
 
+msgid "Charging paused: by hand"
+msgstr "הטעינה מושהית: ידנית"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "טעינה מלאה פעם אחת, ואז חזרה למגבלה"
+
 msgid "Sleep now"
 msgstr "שינה עכשיו"
 
@@ -1839,6 +1911,27 @@ msgstr "0 % לעולם לא טוען את הסוללה (המכשיר פועל מ
 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % שומרים על הסוללה במכשיר שנשאר מחובר לחשמל."
+
+msgid "Start charging again under"
+msgstr "התחל לטעון שוב מתחת ל־"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 מתחיל שוב 5 נקודות מתחת לרמת העצירה. ערך נמוך יותר מתחיל לטעון שוב רק מתחתיו; עם 100 %, סוללה מלאה ממתינה עד שתרד מתחתיו."
+
+msgid "Resume charging"
+msgstr "המשך טעינה"
+
+msgid "Pause charging"
+msgstr "השהה טעינה"
+
+msgid "Cancel the full charge"
+msgstr "בטל טעינה מלאה"
+
+msgid "Charge to full once"
+msgstr "טען עד הסוף פעם אחת"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "בהשהיה הסוללה אינה נטענת והמכשיר פועל מהמטען; מתחת ל־5 % היא נטענת בכל זאת, והגנת הטמפרטורה חלה תמיד."
 
 msgid "When the charger switches the device on"
 msgstr "כאשר המטען מדליק את המכשיר"
@@ -2530,9 +2623,6 @@ msgstr "תמונת אתחול"
 
 msgid "from the installer"
 msgstr "מהמתקין"
-
-msgid "Default boot"
-msgstr "ברירת המחדל לאתחול"
 
 msgid "Free space"
 msgstr "שטח פנוי"
@@ -3547,6 +3637,15 @@ msgstr "מתאם ה-TTL לא החזיר תשובה תקינה"
 msgid "Invalid TTL"
 msgstr "TTL לא תקין"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "מתאם ה-TCP לא החזיר תשובה תקינה"
+
+msgid "Invalid congestion control"
+msgstr "בקרת עומס לא תקינה"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "מתאם האתחול לא החזיר תשובה תקינה"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "מתאם השימוש בנתונים לא החזיר תשובה תקינה"
 
@@ -3800,8 +3899,29 @@ msgstr "הרדיו לא פעל לפי ההגדרה שלו"
 msgid "The data roaming setting could not be saved"
 msgstr "לא ניתן היה לשמור את הגדרת נדידת הנתונים"
 
-msgid "Expected on or off"
-msgstr "נדרש on או off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "הגדרת הנקודה החמה נשמרה, אך טעינה מחדש של האלחוט נכשלה"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "בהגדרות האלחוט יש שינויים שלא נשמרו: שמור או בטל אותם קודם"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "הנקודה החמה כבר מוחלפת; נסה שוב בעוד רגע"
+
+msgid "No hotspot (access point) is configured"
+msgstr "לא הוגדרה נקודה חמה (נקודת גישה)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "הפעלת רדיו זה תשפיע על ממשק אחר; השתמש בדף האלחוט"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "הרדיו בשימוש לקוח ה-Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "לא ניתן לכתוב את הגדרת הנקודה החמה"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "הפלטפורמה הזו אינה מספקת שליטה בנקודה החמה"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "הפלטפורמה אינה מספקת שילוב VPN"
@@ -3901,6 +4021,15 @@ msgstr "אינו ממשק רשת USB"
 
 msgid "LAN bridge device section was not found"
 msgstr "מקטע ההתקן של גשר ה-LAN לא נמצא"
+
+msgid "Could not determine adapter ownership; try again later"
+msgstr "לא ניתן לקבוע לאיזו רשת שייך המתאם; נסה שוב מאוחר יותר"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "המתאם שייך לרשת אחרת ואינו יכול להצטרף ל-LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "בהגדרות הרשת יש שינויים שלא נשמרו: שמור או בטל אותם קודם"
 
 msgid "Cannot bring USB network interface up"
 msgstr "לא ניתן להעלות את ממשק רשת ה-USB"
@@ -4036,6 +4165,12 @@ msgstr "פעולת חבילות לא ידועה"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "הפלטפורמה הזו אינה מספקת בקרת עומס TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "לא ניתן לקרוא את הגדרות ה-TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "שימוש בנתונים אינו זמין במערכת זו"

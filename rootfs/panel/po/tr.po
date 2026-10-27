@@ -827,6 +827,30 @@ msgstr "TTL, 1 ile 255 arasında bir tam sayıdır."
 msgid "Leave the TTL alone"
 msgstr "TTL'ye dokunma"
 
+msgid "TCP congestion control"
+msgstr "TCP tıkanıklık denetimi"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Temel olarak bu cihazın yeni TCP bağlantılarını etkiler. Hotspot ve USB üzerinden yönlendirilen istemci bağlantıları otomatik olarak BBR kullanmaz."
+
+msgid "Active congestion control"
+msgstr "Etkin tıkanıklık denetimi"
+
+msgid "Default queue"
+msgstr "Varsayılan kuyruk"
+
+msgid "This kernel does not provide this setting"
+msgstr "Bu çekirdek bu ayarı sağlamıyor"
+
+msgid "System default"
+msgstr "Sistem varsayılanı"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR, yeni arayüzler için varsayılan kuyruk olarak FQ kullanır. Mevcut bağlantılar, arayüzler ve QoS korunur. Ayarlar yeniden başlatmada saklanır."
+
+msgid "Save and apply"
+msgstr "Kaydet ve uygula"
+
 msgid "USSD"
 msgstr "USSD"
 
@@ -1340,6 +1364,12 @@ msgstr "Şarj duraklatıldı: pil sıcaklığı"
 msgid "Charging paused: charge limit"
 msgstr "Şarj duraklatıldı: şarj sınırı"
 
+msgid "Charging paused: by hand"
+msgstr "Şarj duraklatıldı: elle"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Bir kez tam şarj, ardından sınıra dönülür"
+
 msgid "Automatic: plugged in / on battery"
 msgstr "Otomatik: şarjda / pilde"
 
@@ -1352,8 +1382,29 @@ msgstr "Şu seviyenin altında Tasarruf'a geç (%)"
 msgid "Stop charging at (%)"
 msgstr "Şarjı şu seviyede durdur (%)"
 
+msgid "Start charging again under (%)"
+msgstr "Şarjı yeniden başlatma seviyesi (altında, %)"
+
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "%0 pili hiç şarj etmez (cihaz şarj cihazıyla çalışır), %100 tam şarj eder; arada şarj o seviyede durur ve 5 puan aşağıda yeniden başlar. %5'in altında pil her zaman şarj olur. Sürekli takılı kalan bir cihazda %80 pili daha sağlıklı tutar."
+
+msgid "Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "Şarjı yeniden başlatma seviyesi: 0, durma seviyesinin 5 puan altında yeniden başlatır. Daha düşük bir değer şarjı yalnızca onun altında yeniden başlatır; 100 % ile dolu pil bu değerin altına inene kadar bekler."
+
+msgid "Resume charging"
+msgstr "Şarjı sürdür"
+
+msgid "Pause charging"
+msgstr "Şarjı duraklat"
+
+msgid "Cancel the full charge"
+msgstr "Tam şarjı iptal et"
+
+msgid "Charge to full once"
+msgstr "Bir kez tam şarj et"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Duraklatıldığında pil şarj edilmez ve cihaz şarj cihazıyla çalışır; 5 % altında yine de şarj olur ve sıcaklık koruması her zaman geçerlidir."
 
 msgid "Charge only, until a key starts it"
 msgstr "Yalnızca şarj, bir tuş başlatana kadar"

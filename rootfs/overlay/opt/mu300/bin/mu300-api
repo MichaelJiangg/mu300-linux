@@ -66,7 +66,7 @@ lan.get lan.set usb.role usb.net adb.auth
 system.get system.hostname system.timezone system.password system.ssh system.reboot system.boot system.bootos
 update.check update.apply kernel.set extra.list extra.install extra.remove logs
 backup.export backup.import
-at.send at.history ussd.send ussd.cancel modem.restart ttl.get ttl.set traffic.get traffic.set
+at.send at.history ussd.send ussd.cancel modem.restart ttl.get ttl.set tcp.get tcp.set traffic.get traffic.set
 power.get power.set led.get led.set zram.get zram.set cpu.get cpu.profile cpu.core cpu.lowlatency cpu.voltage
 update.status update.source packages.get packages.act docker.status
 job.status job.cancel job.clear'
@@ -1434,6 +1434,30 @@ m_ttl_set() {
         refuse failed "$ERR"
     ok
 }
+# tcp.get: the TCP congestion control of the device's own connections (mu300-tcp): saved (default|cubic|bbr), what is in
+# force, the kernel's own default and what it offers of cubic and bbr (the 5.4 kernel has no BBR)
+m_tcp_get() {
+    only
+    [ -x "$BIN/mu300-tcp" ] || refuse unsupported mu300-tcp
+    tool 20 "$BIN/mu300-tcp" state </dev/null || refuse failed "$ERR"
+    _tv() { printf '%s\n' "$OUT" | sed -n "s/^$1=//p" | head -n 1; }
+    _s=$(_tv SAVED); case $_s in cubic|bbr) ;; *) _s=default ;; esac
+    _c=$(_tv CURRENT); allowed "$_c" '[a-z][a-z0-9_]{0,31}' || _c=
+    _q=$(_tv QDISC); allowed "$_q" '[a-z][a-z0-9_]{0,31}' || _q=
+    _d=$(_tv DEFAULT); allowed "$_d" '[a-z][a-z0-9_]{0,31}' || _d=
+    _o=
+    for _a in $(_tv OFFERED); do case $_a in cubic|bbr) _o="$_o $_a" ;; esac; done
+    ok "\"supported\":$(jb "$(_tv SUPPORTED)"),\"saved\":\"$_s\",\"current\":$(js "$_c"),\"qdisc\":$(js "$_q"),\"default\":$(js "$_d"),\"offered\":$(jlist $_o)"
+}
+# tcp.set {value}: default, cubic or bbr (bbr also makes fq the default queue); what the kernel lacks is refused
+m_tcp_set() {
+    only value
+    word value 'default|cubic|bbr'; need value
+    [ -x "$BIN/mu300-tcp" ] || refuse unsupported mu300-tcp
+    checked
+    tool 30 "$BIN/mu300-tcp" set "$V" </dev/null || refuse failed "$ERR"
+    ok
+}
 m_traffic_get() {
     only
     [ -x "$BIN/mu300-traffic" ] || refuse unsupported mu300-traffic
@@ -1489,6 +1513,8 @@ m_power_get() {
     _state=$(echo "$_pst" | sed -n 's/^state: //p' | head -n 1); _supply=$(echo "$_pst" | sed -n 's/^supply: //p' | head -n 1)
     _sb=$(echo "$_pst" | sed -n 's/^SAVER_BELOW=\([0-9]*\) .*/\1/p'); _ct=$(echo "$_pst" | sed -n 's/.*CHARGE_TO=\([0-9]*\)$/\1/p')
     _poc=$(echo "$_pst" | sed -n 's/^POWER_ON_CHARGER=\([01]\)$/\1/p')
+    _ra=$(echo "$_pst" | sed -n 's/^RESUME_AT=\([0-9]*\) .*/\1/p'); _cp=$(echo "$_pst" | sed -n 's/.* CHARGE_PAUSE=\([01]\) .*/\1/p')
+    _fo=$(echo "$_pst" | sed -n 's/.* FULL_ONCE=\([01]\)$/\1/p')
     _bat=null
     if ! echo "$_pst" | grep -qx 'battery: none'; then
         for _d in "$R"/sys/class/power_supply/*; do
@@ -1505,20 +1531,22 @@ m_power_get() {
     printf '{"ok":1,"state":%s,"profile":%s,"why":%s,"supply":%s,"battery":%s,"charge_off":%s,' \
         "$(js "${_state:-active}")" "$(js "$_prof")" "$(js "$_why")" "$(js "$_supply")" "$_bat" \
         "$(js "$(first "$R/run/mu300/power/charge-off")")"
-    printf '"conf":{"PROFILE":"%s","SAVER_BELOW":%s,"CHARGE_TO":%s,"POWER_ON_CHARGER":%s,"plugged":%s,"battery":%s,"saver":%s},"text":%s}\n' \
-        "$_conf" "$(jn "$_sb")" "$(jn "$_ct")" "$(jn "$_poc")" "$(power_knobs plugged)" "$(power_knobs battery)" "$(power_knobs saver)" \
+    printf '"conf":{"PROFILE":"%s","SAVER_BELOW":%s,"CHARGE_TO":%s,"POWER_ON_CHARGER":%s,"RESUME_AT":%s,"CHARGE_PAUSE":%s,"FULL_ONCE":%s,"plugged":%s,"battery":%s,"saver":%s},"text":%s}\n' \
+        "$_conf" "$(jn "$_sb")" "$(jn "$_ct")" "$(jn "$_poc")" "$(jn "$_ra")" "$(jn "$_cp")" "$(jn "$_fo")" "$(power_knobs plugged)" "$(power_knobs battery)" "$(power_knobs saver)" \
         "$(js "$_pst")"
     exit 0
 }
-# power.set {key, value}: as mu300-power set takes them (it checks the value again): PROFILE, SAVER_BELOW, CHARGE_TO,
-# POWER_ON_CHARGER, PROFILE.KNOB
+# power.set {key, value}: as mu300-power set takes them (it checks the value again, and refuses the charging controls
+# where there is no battery): PROFILE, SAVER_BELOW, CHARGE_TO, POWER_ON_CHARGER, RESUME_AT, CHARGE_PAUSE, FULL_ONCE,
+# PROFILE.KNOB
 m_power_set() {
     only key value
-    word key 'PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU)'; need key; _k=$V
+    word key 'PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|RESUME_AT|CHARGE_PAUSE|FULL_ONCE|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU)'; need key; _k=$V
     case $_k in
         PROFILE) word value 'auto|plugged|battery|saver' ;;
         SAVER_BELOW|CHARGE_TO) int value 0 100 ;;
-        POWER_ON_CHARGER) int value 0 1 ;;
+        POWER_ON_CHARGER|CHARGE_PAUSE|FULL_ONCE) int value 0 1 ;;
+        RESUME_AT) int value 0 99 ;;
         *.WIFI_IDLE) int value 0 1440 ;;
         *.RADIO_IDLE) word value 'keep|lte|off' ;;
         *.LEDS_IDLE) word value 'on|off' ;;
@@ -1931,6 +1959,8 @@ case $METHOD in
     modem.restart) m_modem_restart ;;
     ttl.get) m_ttl_get ;;
     ttl.set) m_ttl_set ;;
+    tcp.get) m_tcp_get ;;
+    tcp.set) m_tcp_set ;;
     traffic.get) m_traffic_get ;;
     traffic.set) m_traffic_set ;;
     power.get) m_power_get ;;
