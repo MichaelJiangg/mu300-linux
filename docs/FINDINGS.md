@@ -12064,3 +12064,25 @@ On the LuCI and Cockpit power pages, U30 Air only.
 **Device check (U30 Air):** `mu300-power charge pause`: within 10 s `charge_type` N/A, `status` Not charging, the
 panel says "Charging paused: by hand"; `charge resume` charges again. `CHARGE_TO=80 RESUME_AT=60`: stops at 80 %, stays
 off down to 60 %, charges under it. `charge full` from 80 %: charges to 100 %, `FULL_ONCE=0` once Full, then held.
+### 225. 7.2 and 7.3 skip the PCIe link wait too; utilisation clamps let the Wi-Fi TX thread's floor take effect
+
+**Status: built for 6.18.58, 7.2.12 and 7.3 here; kanoqwq ran the 7.2 patch and the options on his U30 Air (7.2.8).
+Not run on a device here.** From kanoqwq's `f0b5ad43` (his `patches/7.2/0026` and config, after liuwang97).
+
+**The link wait.** FINDINGS 214's patch (`patches/6.18/0028`) was 6.18 only. 7.2 and 7.3 have the same wait, 10 x
+90 ms in `dw_pcie_host_init()`, but now act on its result: a timeout fails the probe, nothing in Detect is `-ENODEV`
+and goes on. `patches/7.2/0028` and `patches/7.3/0028` let a driver that sets `skip_link_wait` count the skipped wait as
+no error; the wait on resume is untouched. pcie-sprd already set it wherever the header defines
+`DW_PCIE_HAS_SKIP_LINK_WAIT`, so on 7.x the Marlin3's root port stops waiting 0.9 s at every boot as on 6.18.
+
+**Utilisation clamps (`UCLAMP_TASK`, `UCLAMP_TASK_GROUP`).** The vendor Wi-Fi driver asks for a utilisation floor of
+400 for its TX thread while TX or RX is above 25 MB/s (`sc2355_set_thread_uclamp`, `SET_UCLAMP_THRESHOLD`) and drops it
+below; without the option the kernel refused that request, so the floor never took effect. With it, schedutil runs
+the CPU that thread is on at about 40 % of its capacity or more during heavy Wi-Fi traffic. Nothing else sets a clamp:
+the static key stays off until something does, and real-time tasks get the maximum frequency with or without it.
+`THERMAL_NETLINK` adds the thermal core's netlink events (trip crossings, cooling changes) for a listener; nothing
+listens yet.
+
+**Device check:** on 7.2 or 7.3, dmesg has no "Phy link never came up" / link-wait pause before the root port probe,
+and the Wi-Fi comes up as before; a Wi-Fi speed test shows `uclamp.min` 400 on the TX thread (`chrt`/`/proc/<pid>/sched`)
+while it runs.
