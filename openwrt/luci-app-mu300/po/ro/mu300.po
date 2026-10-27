@@ -784,6 +784,9 @@ msgstr "Formular (codificat URL)"
 msgid "Plain text"
 msgstr "Text simplu"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "De asemenea {sim} (SIM 1 sau SIM 2) și {kind} (sms, test sau power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Mesajele primite sunt redirecționate imediat ce ajung în fondul de SMS. O livrare eșuată este reîncercată după 30 s, apoi de fiecare dată după un timp de două ori mai lung (cel mult o oră), de zece ori în total."
 
@@ -811,6 +814,15 @@ msgstr "Doar mesajele care conțin unul dintre aceste cuvinte"
 msgid "One per line; empty: every message."
 msgstr "Unul pe linie; gol: toate mesajele."
 
+msgid "Battery"
+msgstr "Baterie"
+
+msgid "Battery and charger notices"
+msgstr "Notificări despre baterie și încărcător"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Un mesaj către fiecare destinație când bateria trece de 5, 20, 40, 60, 80 sau 100 % și când încărcătorul este conectat sau deconectat."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Corp personalizat"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Gol: câmpurile standard (text simplu: mesajul). Substituenți: {sender}, {time}, {text}, {device}, {message}. Fiecare valoare este escapată potrivit tipului ales. Acest corp este afișat din nou aici: păstrați secretele în adresă sau într-un antet."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Secret pentru {secret} în corpul personalizat"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pentru un serviciu care vrea tokenul în corp (PushPlus). Salvat doar pentru această adresă: o adresă nouă are din nou nevoie de el."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Antete suplimentare (un \"Nume: valoare\" pe linie)"
 
@@ -840,6 +858,9 @@ msgstr "Răspunsul trebuie să conțină"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Gol: orice răspuns HTTP 2xx contează ca livrat. Cu cheie=valoare (de exemplu errcode=0), răspunsul trebuie să fie în plus un obiect JSON care are această valoare sub această cheie la nivelul său superior; altfel livrarea eșuează. În jurnal ajunge doar rezultatul verificării, niciodată răspunsul."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Timp limită pentru cerere (secunde, 1-120; webhook și Telegram)"
 
 msgid "Bot token"
 msgstr "Tokenul botului"
@@ -1032,9 +1053,6 @@ msgstr "Memorie"
 
 msgid "Storage"
 msgstr "Stocare"
-
-msgid "Battery"
-msgstr "Baterie"
 
 msgid "Channel"
 msgstr "Canal"
@@ -1245,6 +1263,9 @@ msgstr "SIM intern selectat: folosit după o repornire"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM intern selectat, dar neacceptat pe acest dispozitiv: se folosește SIM-ul extern"
+
+msgid "in use"
+msgstr "în uz"
 
 msgid "Uptime %s"
 msgstr "Timp de funcționare %s"
@@ -2078,9 +2099,6 @@ msgstr "Implicit modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "în uz"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Oprește radioul SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Șters (doar local)"
 
 msgid "Enter both a number and a message."
 msgstr "Introduceți atât un număr, cât și un mesaj."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Memoria SIM: %d din %d locuri ocupate (la %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaje, %d necitite · %d conversații"
@@ -3403,14 +3424,14 @@ msgstr "Tip de blocare necunoscut"
 msgid "Invalid value for this lock kind"
 msgstr "Valoare invalidă pentru acest tip de blocare"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Blocările de bandă, mod și celulă nu sunt încă acceptate pentru SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Blocările de bandă, mod și celulă nu sunt acceptate cât timp comutarea dual-SIM gestionează radioul"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
 
 msgid "Invalid page"
 msgstr "Pagină invalidă"
@@ -3889,6 +3910,12 @@ msgstr "Corpul webhook-ului este prea lung sau conține un caracter de control"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Verificarea răspunsului trebuie să fie cheie=valoare, ca errcode=0 sau ok=true (valoarea un număr întreg sau litere mici, cel mult 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Secret webhook nevalid (până la 256 de caractere imprimabile, fără spațiu)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Timpul limită trebuie să fie între 1 și 120 de secunde"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Antet nevalid (un \"Nume: valoare\" pe linie; Host, Content-Type, Content-Length, Transfer-Encoding și Connection sunt setate de dispozitiv)"

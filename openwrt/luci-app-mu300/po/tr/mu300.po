@@ -784,6 +784,9 @@ msgstr "Form (URL kodlu)"
 msgid "Plain text"
 msgstr "Düz metin"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Ayrıca {sim} (SIM 1 ya da SIM 2) ve {kind} (sms, test ya da power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Gelen mesajlar SMS havuzuna ulaştıkça iletilir. Başarısız bir gönderim 30 sn sonra, ardından her seferinde iki kat sonra (en fazla bir saat) yeniden denenir; toplam on kez."
 
@@ -811,6 +814,15 @@ msgstr "Yalnızca bu sözcüklerden birini içeren mesajlar"
 msgid "One per line; empty: every message."
 msgstr "Satır başına bir tane; boş: tüm mesajlar."
 
+msgid "Battery"
+msgstr "Pil"
+
+msgid "Battery and charger notices"
+msgstr "Pil ve şarj bildirimleri"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Pil %5, %20, %40, %60, %80 ya da %100 seviyesini geçtiğinde ve şarj cihazı takılıp çıkarıldığında her hedefe bir mesaj."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Özel gövde"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Boş: standart alanlar (düz metin: ileti). Yer tutucular: {sender}, {time}, {text}, {device}, {message}. Her değer seçilen türe göre kaçışlanır. Bu gövde burada yeniden gösterilir: gizli bilgileri adreste veya bir başlıkta tutun."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Özel gövdedeki {secret} için gizli değer"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Belirtecini gövdede isteyen bir hizmet için (PushPlus). Yalnızca bu adres için saklanır: yeni bir adres onu yeniden ister."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ek başlıklar (satır başına bir \"Ad: değer\")"
 
@@ -840,6 +858,9 @@ msgstr "Yanıtta bulunması gereken"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Boş: her HTTP 2xx yanıtı teslim edilmiş sayılır. anahtar=değer ile (örneğin errcode=0) yanıt ayrıca, en üst düzeyinde bu anahtarın altında bu değeri taşıyan bir JSON nesnesi olmalıdır; aksi halde gönderim başarısız sayılır. Günlüğe yalnızca denetimin sonucu yazılır, yanıtın kendisi asla."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "İstek zaman aşımı (saniye, 1-120; webhook ve Telegram)"
 
 msgid "Bot token"
 msgstr "Bot belirteci"
@@ -1032,9 +1053,6 @@ msgstr "Bellek"
 
 msgid "Storage"
 msgstr "Depolama"
-
-msgid "Battery"
-msgstr "Pil"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -1245,6 +1263,9 @@ msgstr "Dahili SIM seçildi: yeniden başlatmadan sonra kullanılır"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Dahili SIM seçildi, ancak bu cihazda desteklenmiyor: harici SIM kullanılıyor"
+
+msgid "in use"
+msgstr "kullanımda"
 
 msgid "Uptime %s"
 msgstr "Çalışma süresi %s"
@@ -2073,9 +2094,6 @@ msgstr "Modemin kendi ayarı"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "kullanımda"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d radyosunu kapat"
 
@@ -2174,6 +2192,9 @@ msgstr "Silindi (yalnızca yerel)"
 
 msgid "Enter both a number and a message."
 msgstr "Numara ve mesaj girin."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM belleği: %d / %d yuva dolu (%s itibarıyla)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaj, %d okunmamış · %d görüşme"
@@ -3396,14 +3417,14 @@ msgstr "Bilinmeyen kilit türü"
 msgid "Invalid value for this lock kind"
 msgstr "Bu kilit türü için geçersiz değer"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Bu modem bu bantların hiçbirini desteklemiyor"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Bant, mod ve hücre kilitleri SIM2 için henüz desteklenmiyor"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Çift SIM geçişi radyoyu yönetirken bant, mod ve hücre kilitleri desteklenmiyor"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Bu modem bu bantların hiçbirini desteklemiyor"
 
 msgid "Invalid page"
 msgstr "Geçersiz sayfa"
@@ -3882,6 +3903,12 @@ msgstr "Webhook gövdesi çok uzun veya bir denetim karakteri içeriyor"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Yanıt denetimi anahtar=değer biçiminde olmalı, errcode=0 veya ok=true gibi (değer bir tam sayı ya da küçük harfler, en fazla 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Geçersiz webhook gizli değeri (en çok 256 yazdırılabilir karakter, boşluksuz)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Zaman aşımı 1 ile 120 saniye arasında olmalı"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Geçersiz başlık (satır başına bir \"Ad: değer\"; Host, Content-Type, Content-Length, Transfer-Encoding ve Connection cihaz tarafından ayarlanır)"

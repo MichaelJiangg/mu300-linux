@@ -784,6 +784,9 @@ msgstr "Пішін (URL кодталған)"
 msgid "Plain text"
 msgstr "Қарапайым мәтін"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Сондай-ақ {sim} (SIM 1 немесе SIM 2) және {kind} (sms, test немесе power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Алынған хабарлар SMS пулына түскен бойда қайта жіберіледі. Сәтсіз жіберу 30 с кейін, содан кейін әр жолы екі есе ұзақ уақыттан соң (ең көбі бір сағат) қайталанады, барлығы он рет."
 
@@ -811,6 +814,15 @@ msgstr "Тек осы сөздердің бірі бар хабарлар"
 msgid "One per line; empty: every message."
 msgstr "Әр жолда біреу; бос: барлық хабарлар."
 
+msgid "Battery"
+msgstr "Батарея"
+
+msgid "Battery and charger notices"
+msgstr "Батарея мен зарядтағыш хабарламалары"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Батарея 5, 20, 40, 60, 80 немесе 100 % деңгейінен өткенде және зарядтағыш қосылғанда не ажыратылғанда әр мақсатқа хабар."
+
 msgid "Webhook"
 msgstr "Вебхук"
 
@@ -832,6 +844,12 @@ msgstr "Өзіндік дене"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Бос: стандартты өрістер (қарапайым мәтін: хабарлама). Толтырғыштар: {sender}, {time}, {text}, {device}, {message}. Әр мән таңдалған түрге сай экрандалады. Бұл дене осында қайта көрсетіледі: құпияларды мекенжайда немесе тақырыпта сақтаңыз."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Өз денедегі {secret} үшін құпия"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Токенін денеде күтетін қызмет үшін (PushPlus). Тек осы мекенжай үшін сақталады: жаңа мекенжайға қайта керек."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Қосымша тақырыптар (әр жолда бір \"Аты: мәні\")"
 
@@ -840,6 +858,9 @@ msgstr "Жауапта болуы тиіс"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Бос: кез келген HTTP 2xx жауабы жеткізілді деп саналады. кілт=мән берілсе (мысалы, errcode=0), жауап сонымен қатар жоғарғы деңгейінде осы кілттің астында осы мәні бар JSON нысаны болуы тиіс; әйтпесе жеткізу сәтсіз болады. Журналға тек тексеру нәтижесі жазылады, жауаптың өзі ешқашан жазылмайды."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Сұрау уақыты шегі (секунд, 1-120; webhook және Telegram)"
 
 msgid "Bot token"
 msgstr "Бот токені"
@@ -1032,9 +1053,6 @@ msgstr "Жад"
 
 msgid "Storage"
 msgstr "Сақтау орны"
-
-msgid "Battery"
-msgstr "Батарея"
 
 msgid "Channel"
 msgstr "Арна"
@@ -1245,6 +1263,9 @@ msgstr "Ішкі SIM таңдалды: қайта жүктегеннен кей�
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Ішкі SIM таңдалды, бірақ бұл құрылғыда қолдау көрсетілмейді: сыртқы SIM қолданылуда"
+
+msgid "in use"
+msgstr "қолданыста"
 
 msgid "Uptime %s"
 msgstr "Жұмыс уақыты %s"
@@ -2078,9 +2099,6 @@ msgstr "Модемнің әдепкі мәні"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "қолданыста"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d радиосын өшіру"
 
@@ -2179,6 +2197,9 @@ msgstr "Жойылды (тек жергілікті)"
 
 msgid "Enter both a number and a message."
 msgstr "Нөмірді де, хабарды да енгізіңіз."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM жады: %d / %d ұяшық бос емес (%s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d хабар, %d оқылмаған · %d сұхбат"
@@ -3403,14 +3424,14 @@ msgstr "Белгісіз бекіту түрі"
 msgid "Invalid value for this lock kind"
 msgstr "Бұл бекіту түрі үшін жарамсыз мән"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Жолақ, режим және ұяшық құлыптары SIM2 үшін әлі қолдау көрсетілмейді"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Қос SIM ауыстыру радионы басқарып тұрғанда жолақ, режим және ұяшық құлыптарына қолдау көрсетілмейді"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
 
 msgid "Invalid page"
 msgstr "Жарамсыз бет"
@@ -3889,6 +3910,12 @@ msgstr "Webhook денесі тым ұзын немесе басқару таң�
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Жауапты тексеру кілт=мән түрінде болуы тиіс, мысалы errcode=0 немесе ok=true (мән — бүтін сан немесе кіші әріптер, ең көбі 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Жарамсыз webhook құпиясы (256-ға дейін басылатын таңба, бос орынсыз)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Уақыт шегі 1-ден 120 секундқа дейін болуы керек"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Жарамсыз тақырып (әр жолда бір \"Аты: мәні\"; Host, Content-Type, Content-Length, Transfer-Encoding және Connection құрылғымен орнатылады)"

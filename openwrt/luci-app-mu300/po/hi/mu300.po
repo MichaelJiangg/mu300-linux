@@ -784,6 +784,9 @@ msgstr "फ़ॉर्म (URL-एन्कोडेड)"
 msgid "Plain text"
 msgstr "सादा पाठ"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "साथ ही {sim} (SIM 1 या SIM 2) और {kind} (sms, test या power)।"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "प्राप्त संदेश SMS पूल में पहुँचते ही आगे भेजे जाते हैं। विफल डिलीवरी 30 सेकंड बाद फिर आज़माई जाती है, फिर हर बार दोगुने समय बाद (अधिकतम एक घंटा), कुल दस बार।"
 
@@ -811,6 +814,15 @@ msgstr "केवल वे संदेश जिनमें इनमें �
 msgid "One per line; empty: every message."
 msgstr "प्रति पंक्ति एक; खाली: सभी संदेश।"
 
+msgid "Battery"
+msgstr "बैटरी"
+
+msgid "Battery and charger notices"
+msgstr "बैटरी और चार्जर सूचनाएँ"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "जब बैटरी 5, 20, 40, 60, 80 या 100 % पार करे और जब चार्जर लगाया या निकाला जाए, तब हर लक्ष्य को एक संदेश।"
+
 msgid "Webhook"
 msgstr "वेबहुक"
 
@@ -832,6 +844,12 @@ msgstr "कस्टम बॉडी"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "खाली: मानक फ़ील्ड (सादा पाठ: संदेश)। प्लेसहोल्डर: {sender}, {time}, {text}, {device}, {message}। हर मान चुने गए प्रकार के अनुसार एस्केप किया जाता है। यह बॉडी यहाँ फिर दिखाई जाती है: गोपनीय जानकारी पते या किसी हेडर में रखें।"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "कस्टम बॉडी में {secret} के लिए गुप्त मान"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "उस सेवा के लिए जो अपना टोकन बॉडी में चाहती है (PushPlus)। केवल इसी पते के लिए सहेजा जाता है: नए पते को इसकी फिर ज़रूरत होगी।"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "अतिरिक्त हेडर (प्रति पंक्ति एक \"Name: value\")"
 
@@ -840,6 +858,9 @@ msgstr "उत्तर में यह होना चाहिए"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "खाली: हर HTTP 2xx उत्तर डिलीवर माना जाता है। कुंजी=मान (उदाहरण के लिए errcode=0) देने पर उत्तर साथ ही ऐसा JSON ऑब्जेक्ट होना चाहिए जिसके शीर्ष स्तर पर इस कुंजी के नीचे यही मान हो; अन्यथा डिलीवरी विफल होती है। लॉग में केवल जाँच का परिणाम लिखा जाता है, उत्तर कभी नहीं।"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "अनुरोध समय-सीमा (सेकंड, 1-120; webhook और Telegram)"
 
 msgid "Bot token"
 msgstr "बॉट टोकन"
@@ -1032,9 +1053,6 @@ msgstr "मेमोरी"
 
 msgid "Storage"
 msgstr "स्टोरेज"
-
-msgid "Battery"
-msgstr "बैटरी"
 
 msgid "Channel"
 msgstr "चैनल"
@@ -1245,6 +1263,9 @@ msgstr "आंतरिक SIM चुना गया: रीबूट के �
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "आंतरिक SIM चुना गया, पर इस डिवाइस पर समर्थित नहीं है: बाहरी SIM उपयोग में है"
+
+msgid "in use"
+msgstr "उपयोग में"
 
 msgid "Uptime %s"
 msgstr "अपटाइम %s"
@@ -2078,9 +2099,6 @@ msgstr "मॉडेम का डिफ़ॉल्ट"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "उपयोग में"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d का रेडियो बंद करें"
 
@@ -2179,6 +2197,9 @@ msgstr "हटाया गया (केवल स्थानीय)"
 
 msgid "Enter both a number and a message."
 msgstr "नंबर और संदेश दोनों दर्ज करें।"
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM संग्रहण: %d में से %d स्लॉट उपयोग में (%s पर)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d संदेश, %d अपठित · %d बातचीत"
@@ -3403,14 +3424,14 @@ msgstr "अज्ञात लॉक प्रकार"
 msgid "Invalid value for this lock kind"
 msgstr "इस लॉक प्रकार के लिए अमान्य मान"
 
-msgid "None of these bands is supported by this modem"
-msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "बैंड, मोड और सेल लॉक अभी SIM2 के लिए समर्थित नहीं हैं"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "जब डुअल-SIM स्विचिंग रेडियो को नियंत्रित करती है, तब बैंड, मोड और सेल लॉक समर्थित नहीं हैं"
+
+msgid "None of these bands is supported by this modem"
+msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
 
 msgid "Invalid page"
 msgstr "अमान्य पेज"
@@ -3889,6 +3910,12 @@ msgstr "वेबहुक बॉडी बहुत लंबी है या 
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "उत्तर की जाँच कुंजी=मान के रूप में होनी चाहिए, जैसे errcode=0 या ok=true (मान एक पूर्णांक या छोटे अक्षर, अधिकतम 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "अमान्य webhook गुप्त मान (अधिकतम 256 मुद्रण योग्य वर्ण, कोई रिक्त स्थान नहीं)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "समय-सीमा 1 से 120 सेकंड होनी चाहिए"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "अमान्य हेडर (प्रति पंक्ति एक \"Name: value\"; Host, Content-Type, Content-Length, Transfer-Encoding और Connection डिवाइस सेट करता है)"

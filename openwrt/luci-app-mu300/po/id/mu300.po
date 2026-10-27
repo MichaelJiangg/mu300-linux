@@ -784,6 +784,9 @@ msgstr "Formulir (dienkode URL)"
 msgid "Plain text"
 msgstr "Teks biasa"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Juga {sim} (SIM 1 atau SIM 2) dan {kind} (sms, test, atau power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Pesan yang diterima diteruskan begitu sampai di pool SMS. Pengiriman yang gagal dicoba lagi setelah 30 dtk, lalu setiap kali setelah waktu dua kali lebih lama (paling lama satu jam), sepuluh kali seluruhnya."
 
@@ -811,6 +814,15 @@ msgstr "Hanya pesan yang memuat salah satu kata ini"
 msgid "One per line; empty: every message."
 msgstr "Satu per baris; kosong: semua pesan."
 
+msgid "Battery"
+msgstr "Baterai"
+
+msgid "Battery and charger notices"
+msgstr "Pemberitahuan baterai dan pengisi daya"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Pesan ke setiap tujuan saat baterai melewati 5, 20, 40, 60, 80, atau 100 % dan saat pengisi daya dicolok atau dicabut."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Isi kustom"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Kosong: bidang standar (teks biasa: pesannya). Placeholder: {sender}, {time}, {text}, {device}, {message}. Setiap nilai di-escape sesuai jenis yang dipilih. Isi ini ditampilkan lagi di sini: simpan rahasia di alamat atau di header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Rahasia untuk {secret} di isi khusus"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Untuk layanan yang meminta tokennya di isi (PushPlus). Disimpan hanya untuk alamat ini: alamat baru memerlukannya lagi."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Header tambahan (satu \"Nama: nilai\" per baris)"
 
@@ -840,6 +858,9 @@ msgstr "Jawaban harus memuat"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Kosong: setiap jawaban HTTP 2xx dihitung sebagai terkirim. Dengan kunci=nilai (misalnya errcode=0), jawaban juga harus berupa objek JSON yang memiliki nilai ini di bawah kunci ini pada tingkat teratasnya; jika tidak, pengiriman gagal. Hanya hasil pemeriksaan yang dicatat, jawabannya tidak pernah."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Batas waktu permintaan (detik, 1-120; webhook dan Telegram)"
 
 msgid "Bot token"
 msgstr "Token bot"
@@ -1032,9 +1053,6 @@ msgstr "Memori"
 
 msgid "Storage"
 msgstr "Penyimpanan"
-
-msgid "Battery"
-msgstr "Baterai"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -1245,6 +1263,9 @@ msgstr "SIM internal dipilih: digunakan setelah boot ulang"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM internal dipilih, tetapi tidak didukung di perangkat ini: SIM eksternal yang digunakan"
+
+msgid "in use"
+msgstr "digunakan"
 
 msgid "Uptime %s"
 msgstr "Waktu aktif %s"
@@ -2078,9 +2099,6 @@ msgstr "Bawaan modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "digunakan"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Matikan radio SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Dihapus (hanya lokal)"
 
 msgid "Enter both a number and a message."
 msgstr "Masukkan nomor dan pesan."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Penyimpanan SIM: %d dari %d slot terpakai (pukul %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d pesan, %d belum dibaca · %d percakapan"
@@ -3403,14 +3424,14 @@ msgstr "Jenis kunci tidak diketahui"
 msgid "Invalid value for this lock kind"
 msgstr "Nilai tidak valid untuk jenis kunci ini"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Modem ini tidak mendukung satu pun dari band ini"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Kunci band, mode, dan sel belum didukung untuk SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Kunci band, mode, dan sel tidak didukung selama peralihan dual-SIM mengelola radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Modem ini tidak mendukung satu pun dari band ini"
 
 msgid "Invalid page"
 msgstr "Halaman tidak valid"
@@ -3889,6 +3910,12 @@ msgstr "Isi webhook terlalu panjang atau mengandung karakter kontrol"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Pemeriksaan jawaban harus berbentuk kunci=nilai, seperti errcode=0 atau ok=true (nilainya bilangan bulat atau huruf kecil, paling banyak 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Rahasia webhook tidak valid (hingga 256 karakter cetak, tanpa spasi)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Batas waktu harus 1 sampai 120 detik"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Header tidak valid (satu \"Nama: nilai\" per baris; Host, Content-Type, Content-Length, Transfer-Encoding, dan Connection diatur oleh perangkat)"

@@ -784,6 +784,9 @@ msgstr "Formulär (URL-kodat)"
 msgid "Plain text"
 msgstr "Oformaterad text"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Även {sim} (SIM 1 eller SIM 2) och {kind} (sms, test eller power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Mottagna meddelanden vidarebefordras när de når SMS-poolen. En misslyckad leverans försöks igen efter 30 s och sedan efter dubbelt så lång tid varje gång (högst en timme), tio gånger totalt."
 
@@ -811,6 +814,15 @@ msgstr "Endast meddelanden som innehåller något av dessa ord"
 msgid "One per line; empty: every message."
 msgstr "Ett per rad; tomt: alla meddelanden."
 
+msgid "Battery"
+msgstr "Batteri"
+
+msgid "Battery and charger notices"
+msgstr "Meddelanden om batteri och laddare"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Ett meddelande till varje mål när batteriet passerar 5, 20, 40, 60, 80 eller 100 % och när laddaren ansluts eller kopplas ur."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Egen kropp"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Tomt: standardfälten (oformaterad text: meddelandet). Platshållare: {sender}, {time}, {text}, {device}, {message}. Varje värde escapas enligt den valda typen. Den här kroppen visas här igen: lägg hemligheter i adressen eller i en header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Hemlighet för {secret} i den egna kroppen"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "För en tjänst som vill ha sin token i kroppen (PushPlus). Sparas bara för den här adressen: en ny adress behöver den igen."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Extra rubriker (en \"Namn: värde\" per rad)"
 
@@ -840,6 +858,9 @@ msgstr "Svaret måste innehålla"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Tomt: varje HTTP 2xx-svar räknas som levererat. Med nyckel=värde (till exempel errcode=0) måste svaret dessutom vara ett JSON-objekt som har detta värde under denna nyckel på översta nivån; annars misslyckas leveransen. Bara resultatet av kontrollen loggas, aldrig svaret."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Tidsgräns för begäran (sekunder, 1-120; webhook och Telegram)"
 
 msgid "Bot token"
 msgstr "Bottoken"
@@ -1032,9 +1053,6 @@ msgstr "Minne"
 
 msgid "Storage"
 msgstr "Lagring"
-
-msgid "Battery"
-msgstr "Batteri"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -1245,6 +1263,9 @@ msgstr "Intern SIM vald: används efter en omstart"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Intern SIM vald, men stöds inte på den här enheten: den externa SIM:en används"
+
+msgid "in use"
+msgstr "används"
 
 msgid "Uptime %s"
 msgstr "Drifttid %s"
@@ -2078,9 +2099,6 @@ msgstr "Modemets standard"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "används"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Stäng av radion i SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Raderat (endast lokalt)"
 
 msgid "Enter both a number and a message."
 msgstr "Ange både ett nummer och ett meddelande."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-lagring: %d av %d platser används (kl. %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d meddelanden, %d olästa · %d konversationer"
@@ -3403,14 +3424,14 @@ msgstr "Okänd låstyp"
 msgid "Invalid value for this lock kind"
 msgstr "Ogiltigt värde för denna låstyp"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Det här modemet stöder inget av dessa band"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Lås av band, läge och cell stöds ännu inte för SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Lås av band, läge och cell stöds inte medan växling mellan två SIM styr radion"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Det här modemet stöder inget av dessa band"
 
 msgid "Invalid page"
 msgstr "Ogiltig sida"
@@ -3889,6 +3910,12 @@ msgstr "Webhookens kropp är för lång eller innehåller ett styrtecken"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Svarskontrollen måste vara nyckel=värde, som errcode=0 eller ok=true (värdet ett heltal eller små bokstäver, högst 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Ogiltig webhook-hemlighet (upp till 256 skrivbara tecken, inget mellanslag)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Tidsgränsen måste vara 1 till 120 sekunder"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Ogiltig rubrik (en \"Namn: värde\" per rad; Host, Content-Type, Content-Length, Transfer-Encoding och Connection sätts av enheten)"

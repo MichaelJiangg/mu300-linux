@@ -784,6 +784,9 @@ msgstr "Formulier (URL-gecodeerd)"
 msgid "Plain text"
 msgstr "Platte tekst"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Ook {sim} (SIM 1 of SIM 2) en {kind} (sms, test of power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Ontvangen berichten worden doorgestuurd zodra ze in de SMS-pool aankomen. Een mislukte levering wordt na 30 s opnieuw geprobeerd, daarna telkens na twee keer zo lang (hooguit een uur), in totaal tien keer."
 
@@ -811,6 +814,15 @@ msgstr "Alleen berichten met een van deze woorden"
 msgid "One per line; empty: every message."
 msgstr "Eén per regel; leeg: alle berichten."
 
+msgid "Battery"
+msgstr "Accu"
+
+msgid "Battery and charger notices"
+msgstr "Meldingen over accu en lader"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Een bericht naar elk doel wanneer de accu 5, 20, 40, 60, 80 of 100 % passeert en wanneer de lader wordt aangesloten of losgekoppeld."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Aangepaste body"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Leeg: de standaardvelden (platte tekst: het bericht). Plaatshouders: {sender}, {time}, {text}, {device}, {message}. Elke waarde wordt ge-escapet voor het gekozen type. Deze body wordt hier opnieuw getoond: zet geheimen in het adres of in een header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Geheim voor {secret} in de eigen body"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Voor een dienst die zijn token in de body wil (PushPlus). Alleen voor dit adres bewaard: een nieuw adres heeft het opnieuw nodig."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Extra headers (één \"Naam: waarde\" per regel)"
 
@@ -840,6 +858,9 @@ msgstr "Het antwoord moet bevatten"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Leeg: elk HTTP 2xx-antwoord telt als afgeleverd. Met sleutel=waarde (bijvoorbeeld errcode=0) moet het antwoord bovendien een JSON-object zijn dat op het hoogste niveau onder deze sleutel deze waarde heeft; anders mislukt de aflevering. Alleen de uitkomst van de controle wordt gelogd, nooit het antwoord."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Time-out van het verzoek (seconden, 1-120; webhook en Telegram)"
 
 msgid "Bot token"
 msgstr "Bot-token"
@@ -1032,9 +1053,6 @@ msgstr "Geheugen"
 
 msgid "Storage"
 msgstr "Opslag"
-
-msgid "Battery"
-msgstr "Accu"
 
 msgid "Channel"
 msgstr "Kanaal"
@@ -1245,6 +1263,9 @@ msgstr "Interne SIM gekozen: in gebruik na een herstart"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Interne SIM gekozen, maar niet ondersteund op dit apparaat: de externe SIM is in gebruik"
+
+msgid "in use"
+msgstr "in gebruik"
 
 msgid "Uptime %s"
 msgstr "Uptime %s"
@@ -2078,9 +2099,6 @@ msgstr "Standaard van de modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "in gebruik"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Radio van SIM%d uitzetten"
 
@@ -2179,6 +2197,9 @@ msgstr "Verwijderd (alleen lokaal)"
 
 msgid "Enter both a number and a message."
 msgstr "Voer zowel een nummer als een bericht in."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-opslag: %d van %d plaatsen in gebruik (om %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d berichten, %d ongelezen · %d gesprekken"
@@ -3403,14 +3424,14 @@ msgstr "Onbekend type vergrendeling"
 msgid "Invalid value for this lock kind"
 msgstr "Ongeldige waarde voor dit type vergrendeling"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Deze modem ondersteunt geen van deze banden"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Band-, modus- en celvergrendeling wordt nog niet ondersteund voor SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Band-, modus- en celvergrendeling wordt niet ondersteund zolang dubbele-SIM-wisseling de radio beheert"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Deze modem ondersteunt geen van deze banden"
 
 msgid "Invalid page"
 msgstr "Ongeldige pagina"
@@ -3889,6 +3910,12 @@ msgstr "De webhook-body is te lang of bevat een stuurteken"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "De antwoordcontrole moet sleutel=waarde zijn, zoals errcode=0 of ok=true (de waarde een geheel getal of kleine letters, hooguit 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Ongeldig webhookgeheim (tot 256 afdrukbare tekens, geen spatie)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "De time-out moet 1 tot 120 seconden zijn"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Ongeldige header (één \"Naam: waarde\" per regel; Host, Content-Type, Content-Length, Transfer-Encoding en Connection stelt het apparaat in)"

@@ -784,6 +784,9 @@ msgstr "نموذج (ترميز URL)"
 msgid "Plain text"
 msgstr "نص عادي"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "وأيضًا {sim} (SIM 1 أو SIM 2) و{kind} (sms أو test أو power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "تُعاد توجيه الرسائل المستلمة فور وصولها إلى مجمّع الرسائل القصيرة. يُعاد إرسال التسليم الفاشل بعد 30 ثانية، ثم في كل مرة بعد ضعف المدة (ساعة على الأكثر)، عشر مرات إجمالًا."
 
@@ -811,6 +814,15 @@ msgstr "الرسائل التي تحتوي إحدى هذه الكلمات فقط
 msgid "One per line; empty: every message."
 msgstr "واحدة في كل سطر؛ فارغ: كل الرسائل."
 
+msgid "Battery"
+msgstr "البطارية"
+
+msgid "Battery and charger notices"
+msgstr "إشعارات البطارية والشاحن"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "رسالة إلى كل وجهة عندما تتجاوز البطارية 5 أو 20 أو 40 أو 60 أو 80 أو 100 % وعند توصيل الشاحن أو فصله."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "نص طلب مخصص"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "فارغ: الحقول القياسية (نص عادي: الرسالة). العناصر النائبة: {sender}، {time}، {text}، {device}، {message}. تُهرَّب كل قيمة بحسب النوع المختار. يُعرض هذا النص هنا مجددًا: ضع الأسرار في العنوان أو في ترويسة."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "السر الخاص بـ {secret} في النص المخصص"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "لخدمة تريد رمزها في النص (PushPlus). يُحفظ لهذا العنوان فقط: العنوان الجديد يحتاجه مرة أخرى."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "ترويسات إضافية (واحدة \"Name: value\" في كل سطر)"
 
@@ -840,6 +858,9 @@ msgstr "يجب أن يحتوي الرد على"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "فارغ: كل رد HTTP 2xx يُعدّ تسليمًا. مع مفتاح=قيمة (مثل errcode=0) يجب أن يكون الرد أيضًا كائن JSON يحمل هذه القيمة تحت هذا المفتاح في مستواه الأعلى؛ وإلا يفشل التسليم. لا يُسجَّل سوى نتيجة الفحص، ولا يُسجَّل الرد نفسه أبدًا."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "مهلة الطلب (بالثواني، 1-120؛ webhook وTelegram)"
 
 msgid "Bot token"
 msgstr "رمز البوت"
@@ -1032,9 +1053,6 @@ msgstr "الذاكرة"
 
 msgid "Storage"
 msgstr "التخزين"
-
-msgid "Battery"
-msgstr "البطارية"
 
 msgid "Channel"
 msgstr "القناة"
@@ -1245,6 +1263,9 @@ msgstr "تم اختيار SIM الداخلية: تُستخدم بعد إعادة
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "تم اختيار SIM الداخلية لكنها غير مدعومة على هذا الجهاز: تُستخدم SIM الخارجية"
+
+msgid "in use"
+msgstr "قيد الاستخدام"
 
 msgid "Uptime %s"
 msgstr "مدة التشغيل %s"
@@ -2078,9 +2099,6 @@ msgstr "افتراضي المودم"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "قيد الاستخدام"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "إطفاء راديو SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "تم الحذف (محلياً فقط)"
 
 msgid "Enter both a number and a message."
 msgstr "أدخل رقماً ورسالة معاً."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "ذاكرة SIM: ‏%d من %d خانة مستخدمة (عند %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d رسالة، %d غير مقروءة · %d محادثة"
@@ -3403,14 +3424,14 @@ msgstr "نوع قفل غير معروف"
 msgid "Invalid value for this lock kind"
 msgstr "قيمة غير صالحة لنوع القفل هذا"
 
-msgid "None of these bands is supported by this modem"
-msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "أقفال النطاق والوضع والخلية غير مدعومة لبطاقة SIM2 بعد"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "أقفال النطاق والوضع والخلية غير مدعومة أثناء إدارة تبديل الشريحتين للراديو"
+
+msgid "None of these bands is supported by this modem"
+msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
 
 msgid "Invalid page"
 msgstr "صفحة غير صالحة"
@@ -3889,6 +3910,12 @@ msgstr "نص طلب الـ webhook طويل جدًا أو يحتوي على مح
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "يجب أن يكون فحص الرد بصيغة مفتاح=قيمة، مثل errcode=0 أو ok=true (القيمة عدد صحيح أو حروف صغيرة، 16 على الأكثر)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "سر webhook غير صالح (حتى 256 حرفًا قابلًا للطباعة، بلا مسافات)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "يجب أن تكون المهلة من 1 إلى 120 ثانية"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "ترويسة غير صالحة (واحدة \"Name: value\" في كل سطر؛ يضبط الجهاز Host وContent-Type وContent-Length وTransfer-Encoding وConnection)"

@@ -784,6 +784,9 @@ msgstr "Űrlap (URL-kódolt)"
 msgid "Plain text"
 msgstr "Egyszerű szöveg"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Továbbá {sim} (SIM 1 vagy SIM 2) és {kind} (sms, test vagy power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "A fogadott üzenetek továbbítása azonnal megtörténik, amint az SMS-tárba érnek. A sikertelen kézbesítést 30 mp után, majd minden alkalommal kétszer annyi idő után (legfeljebb egy óra) újra megpróbálja, összesen tízszer."
 
@@ -811,6 +814,15 @@ msgstr "Csak az ezen szavak egyikét tartalmazó üzenetek"
 msgid "One per line; empty: every message."
 msgstr "Soronként egy; üres: minden üzenet."
 
+msgid "Battery"
+msgstr "Akkumulátor"
+
+msgid "Battery and charger notices"
+msgstr "Akkumulátor- és töltőértesítések"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Üzenet minden célnak, amikor az akkumulátor átlépi az 5, 20, 40, 60, 80 vagy 100 % szintet, és amikor a töltőt csatlakoztatják vagy kihúzzák."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Egyéni törzs"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Üres: a szabványos mezők (egyszerű szöveg: az üzenet). Helyőrzők: {sender}, {time}, {text}, {device}, {message}. Minden érték a választott típusnak megfelelően kap escape-elést. Ez a törzs itt újra megjelenik: a titkokat a címben vagy egy fejlécben tartsa."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Titok a saját törzsben lévő {secret} helyére"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Olyan szolgáltatáshoz, amely a tokenjét a törzsben várja (PushPlus). Csak ehhez a címhez mentődik: új címhez újra meg kell adni."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "További fejlécek (soronként egy \"Név: érték\")"
 
@@ -840,6 +858,9 @@ msgstr "A válasznak tartalmaznia kell"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Üres: minden HTTP 2xx válasz kézbesítettnek számít. A kulcs=érték megadásával (például errcode=0) a válasznak ezenfelül olyan JSON-objektumnak kell lennie, amelynek legfelső szintjén e kulcs alatt ez az érték áll; különben a kézbesítés sikertelen. A naplóba csak az ellenőrzés eredménye kerül, a válasz soha."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Kérés időkorlátja (másodperc, 1-120; webhook és Telegram)"
 
 msgid "Bot token"
 msgstr "Bot token"
@@ -1032,9 +1053,6 @@ msgstr "Memória"
 
 msgid "Storage"
 msgstr "Tárhely"
-
-msgid "Battery"
-msgstr "Akkumulátor"
 
 msgid "Channel"
 msgstr "Csatorna"
@@ -1245,6 +1263,9 @@ msgstr "Belső SIM kiválasztva: újraindítás után lesz használatban"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Belső SIM kiválasztva, de ez az eszköz nem támogatja: a külső SIM van használatban"
+
+msgid "in use"
+msgstr "használatban"
 
 msgid "Uptime %s"
 msgstr "Üzemidő: %s"
@@ -2078,9 +2099,6 @@ msgstr "A modem alapértéke"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "használatban"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d rádiójának kikapcsolása"
 
@@ -2179,6 +2197,9 @@ msgstr "Törölve (csak helyi)"
 
 msgid "Enter both a number and a message."
 msgstr "Adjon meg számot és üzenetet is."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-tároló: %d / %d hely foglalt (%s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d üzenet, %d olvasatlan · %d beszélgetés"
@@ -3403,14 +3424,14 @@ msgstr "Ismeretlen zárolástípus"
 msgid "Invalid value for this lock kind"
 msgstr "Érvénytelen érték ehhez a zárolástípushoz"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "A sáv-, mód- és cellazár a SIM2-nél még nem támogatott"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "A sáv-, mód- és cellazár nem támogatott, amíg a kettős SIM váltás kezeli a rádiót"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Ez a modem ezek közül egyik sávot sem támogatja"
 
 msgid "Invalid page"
 msgstr "Érvénytelen oldal"
@@ -3889,6 +3910,12 @@ msgstr "A webhook törzse túl hosszú, vagy vezérlőkaraktert tartalmaz"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "A válasz ellenőrzésének kulcs=érték alakúnak kell lennie, például errcode=0 vagy ok=true (az érték egész szám vagy kisbetűk, legfeljebb 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Érvénytelen webhook-titok (legfeljebb 256 nyomtatható karakter, szóköz nélkül)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Az időkorlát 1 és 120 másodperc között lehet"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Érvénytelen fejléc (soronként egy \"Név: érték\"; a Host, Content-Type, Content-Length, Transfer-Encoding és Connection fejlécet az eszköz állítja be)"

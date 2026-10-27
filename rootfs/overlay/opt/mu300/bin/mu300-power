@@ -749,6 +749,18 @@ loop() {  # retries wait for a loop that changed nothing: a transition has just 
     [ -n "$_acted" ] || retry_run
     return 0
 }
+# the SMS forwarding's battery notices (mu300-sms-forward power; off unless the panel turned them on): told the
+# capacity and the charger only when either changed since the last loop, in the background (it may send)
+_fwd_last=
+forward_notice() {
+    _fw=${MU300_POWER_FORWARD:-/opt/mu300/bin/mu300-sms-forward}
+    [ -x "$_fw" ] || return 0
+    _fb=$(battery_dir) || return 0
+    _fc=$(num "$(rd "$_fb/capacity")"); plugged && _fp=1 || _fp=0
+    [ "$_fc $_fp" != "$_fwd_last" ] || return 0
+    _fwd_last="$_fc $_fp"
+    "$_fw" power "$_fc" "$_fp" </dev/null >/dev/null 2>&1 &
+}
 cmd_daemon() {
     mkdir -p "$ST"
     if [ -z "${MU300_POWER_LOOPS:-}" ] || [ "${MU300_POWER_FRESH:-}" = 1 ]; then
@@ -771,6 +783,7 @@ cmd_daemon() {
     _n=0
     while :; do
         loop
+        forward_notice
         _n=$((_n + 1))
         [ -n "${MU300_POWER_LOOPS:-}" ] && [ "$_n" -ge "$MU300_POWER_LOOPS" ] && break
         sleep "${MU300_POWER_INTERVAL:-10}" &

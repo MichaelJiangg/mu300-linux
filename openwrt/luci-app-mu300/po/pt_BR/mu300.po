@@ -784,6 +784,9 @@ msgstr "Formulário (codificado em URL)"
 msgid "Plain text"
 msgstr "Texto simples"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Também {sim} (SIM 1 ou SIM 2) e {kind} (sms, test ou power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "As mensagens recebidas são encaminhadas assim que chegam ao pool de SMS. Uma entrega com falha é repetida após 30 s e depois, a cada vez, após o dobro do tempo (no máximo uma hora), dez vezes ao todo."
 
@@ -811,6 +814,15 @@ msgstr "Somente mensagens que contenham uma destas palavras"
 msgid "One per line; empty: every message."
 msgstr "Uma por linha; vazio: todas as mensagens."
 
+msgid "Battery"
+msgstr "Bateria"
+
+msgid "Battery and charger notices"
+msgstr "Avisos de bateria e carregador"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Uma mensagem a cada destino quando a bateria passa de 5, 20, 40, 60, 80 ou 100 % e quando o carregador é ligado ou desligado."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Corpo personalizado"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Vazio: os campos padrão (texto simples: a mensagem). Marcadores: {sender}, {time}, {text}, {device}, {message}. Cada valor é escapado conforme o tipo escolhido. Este corpo é exibido aqui novamente: mantenha os segredos no endereço ou em um cabeçalho."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Segredo para {secret} no corpo personalizado"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Para um serviço que quer o token no corpo (PushPlus). Salvo só para este endereço: um endereço novo precisa dele de novo."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Cabeçalhos extras (um \"Nome: valor\" por linha)"
 
@@ -840,6 +858,9 @@ msgstr "A resposta deve conter"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Vazio: toda resposta HTTP 2xx conta como entregue. Com chave=valor (por exemplo errcode=0), a resposta também precisa ser um objeto JSON que tenha esse valor sob essa chave no nível superior; caso contrário, a entrega falha. Só o resultado da verificação é registrado, nunca a resposta."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Tempo limite da requisição (segundos, 1-120; webhook e Telegram)"
 
 msgid "Bot token"
 msgstr "Token do bot"
@@ -1032,9 +1053,6 @@ msgstr "Memória"
 
 msgid "Storage"
 msgstr "Armazenamento"
-
-msgid "Battery"
-msgstr "Bateria"
 
 msgid "Channel"
 msgstr "Canal"
@@ -1245,6 +1263,9 @@ msgstr "SIM interno selecionado: em uso após reiniciar"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM interno selecionado, mas sem suporte neste dispositivo: o SIM externo está em uso"
+
+msgid "in use"
+msgstr "em uso"
 
 msgid "Uptime %s"
 msgstr "Tempo ativo %s"
@@ -2078,9 +2099,6 @@ msgstr "Padrão do modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "em uso"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Desligar o rádio do SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Excluído (somente local)"
 
 msgid "Enter both a number and a message."
 msgstr "Informe um número e uma mensagem."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Armazenamento do SIM: %d de %d posições em uso (às %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mensagens, %d não lidas · %d conversas"
@@ -3403,14 +3424,14 @@ msgstr "Tipo de bloqueio desconhecido"
 msgid "Invalid value for this lock kind"
 msgstr "Valor inválido para este tipo de bloqueio"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Este modem não suporta nenhuma destas bandas"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Os bloqueios de banda, modo e célula ainda não são compatíveis com o SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Os bloqueios de banda, modo e célula não são compatíveis enquanto a troca de dois SIMs gerencia o rádio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Este modem não suporta nenhuma destas bandas"
 
 msgid "Invalid page"
 msgstr "Página inválida"
@@ -3889,6 +3910,12 @@ msgstr "O corpo do webhook é longo demais ou contém um caractere de controle"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "A verificação da resposta deve ser chave=valor, como errcode=0 ou ok=true (o valor, um número inteiro ou letras minúsculas, no máximo 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Segredo do webhook inválido (até 256 caracteres imprimíveis, sem espaço)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "O tempo limite deve ser de 1 a 120 segundos"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Cabeçalho inválido (um \"Nome: valor\" por linha; Host, Content-Type, Content-Length, Transfer-Encoding e Connection são definidos pelo dispositivo)"

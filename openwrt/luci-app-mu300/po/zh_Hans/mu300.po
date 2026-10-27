@@ -783,6 +783,9 @@ msgstr "表单（URL 编码）"
 msgid "Plain text"
 msgstr "纯文本"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "另有 {sim}（SIM 1 或 SIM 2）和 {kind}（sms、test 或 power）。"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "收到的短信进入短信池后即被转发。发送失败时 30 秒后重试，之后每次间隔加倍（最长一小时），共十次。"
 
@@ -810,6 +813,15 @@ msgstr "仅限包含以下任一词语的短信"
 msgid "One per line; empty: every message."
 msgstr "每行一个；留空：所有短信。"
 
+msgid "Battery"
+msgstr "电池"
+
+msgid "Battery and charger notices"
+msgstr "电量与充电提醒"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "电量经过 5、20、40、60、80 或 100 % 时，以及插上或拔下充电器时，向每个目标发送一条消息。"
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -831,6 +843,12 @@ msgstr "自定义请求体"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "留空：使用标准字段（纯文本：消息本身）。占位符：{sender}、{time}、{text}、{device}、{message}。每个值都会按所选类型转义。此请求体会在这里再次显示：请把密钥放在地址或请求头里。"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "自定义正文中 {secret} 的密钥"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "用于要求在正文中携带令牌的服务（PushPlus）。只为当前地址保存：更换地址后需重新填写。"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "附加请求头（每行一个 \"Name: value\"）"
 
@@ -839,6 +857,9 @@ msgstr "响应必须包含"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "留空：任何 HTTP 2xx 响应都算作已送达。填写 键=值（例如 errcode=0）后，响应还必须是一个 JSON 对象，并且其顶层的该键为该值；否则本次发送算作失败。日志中只记录检查结果，绝不记录响应内容。"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "请求超时（秒，1-120；Webhook 和 Telegram）"
 
 msgid "Bot token"
 msgstr "机器人令牌"
@@ -1031,9 +1052,6 @@ msgstr "内存"
 
 msgid "Storage"
 msgstr "存储"
-
-msgid "Battery"
-msgstr "电池"
 
 msgid "Channel"
 msgstr "信道"
@@ -1244,6 +1262,9 @@ msgstr "已选择内置 SIM：重启后生效"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "已选择内置 SIM，但此设备不支持：正在使用外置 SIM"
+
+msgid "in use"
+msgstr "使用中"
 
 msgid "Uptime %s"
 msgstr "已运行 %s"
@@ -2059,9 +2080,6 @@ msgstr "模组默认"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "使用中"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "关闭 SIM%d 射频"
 
@@ -2160,6 +2178,9 @@ msgstr "已删除（仅本地）"
 
 msgid "Enter both a number and a message."
 msgstr "号码和内容都要填。"
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM 存储：已用 %d / %d 条（%s）"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 条，%d 条未读 · %d 个会话"
@@ -3382,14 +3403,14 @@ msgstr "未知的锁定类型"
 msgid "Invalid value for this lock kind"
 msgstr "此锁定类型的值无效"
 
-msgid "None of these bands is supported by this modem"
-msgstr "此调制解调器不支持其中任何频段"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "SIM2 暂不支持频段、模式和小区锁定"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "双卡切换管理射频时，不支持频段、模式和小区锁定"
+
+msgid "None of these bands is supported by this modem"
+msgstr "此调制解调器不支持其中任何频段"
 
 msgid "Invalid page"
 msgstr "页码无效"
@@ -3868,6 +3889,12 @@ msgstr "Webhook 请求体过长或包含控制字符"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "响应检查必须是 键=值 的形式，例如 errcode=0 或 ok=true（值为整数或小写字母，最多 16 个字符）"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Webhook 密钥无效（最多 256 个可打印字符，不含空格）"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "超时须为 1 到 120 秒"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "无效的请求头（每行一个 \"Name: value\"；Host、Content-Type、Content-Length、Transfer-Encoding 和 Connection 由设备设置）"

@@ -9,12 +9,15 @@
 # configuration on stdin (-K -), and the body in a file; nothing of the request is ever in a command line. The files
 # are 0600 in a directory of their own under MU300_FWD_TMP (the forwarding's RAM directory), removed at the end.
 # HTTPS checks the server's certificate against the system's CA bundle; redirects are not followed (a 3xx is the
-# status); 15 s for the whole request, as the ucode helper.
+# status); MU300_FWD_TIMEOUT seconds (the caller's: 1-120, 15 when unset) for the whole request, as the ucode helper.
 set -u
 umask 077
 export LC_ALL=C
 keep=${MU300_FWD_ANSWER:-0}
 case $keep in ''|*[!0-9]*) keep=0 ;; esac
+secs=${MU300_FWD_TIMEOUT:-15}
+case $secs in [1-9]|[1-9][0-9]|1[01][0-9]|120) ;; *) secs=15 ;; esac
+conn=10; [ "$secs" -ge 10 ] || conn=$secs
 [ "$keep" -le 65536 ] || keep=65536
 base=${MU300_FWD_TMP:-/run/mu300-sms-forward}
 [ -d "$base" ] || base=${TMPDIR:-/tmp}
@@ -48,7 +51,7 @@ cq() { printf '"%s"' "$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"; }
     printf 'data-binary = %s\n' "$(cq "@$D/body")"
     printf 'output = %s\n' "$(cq "$D/answer")"
     printf 'write-out = "%%{http_code}"\n'
-    printf 'max-time = 15\nconnect-timeout = 10\nsilent\nproto = "=http,https"\n'
+    printf 'max-time = %s\nconnect-timeout = %s\nsilent\nproto = "=http,https"\n' "$secs" "$conn"
 } > "$D/conf"
 rm -f "$D/head"
 

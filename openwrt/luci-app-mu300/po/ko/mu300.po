@@ -784,6 +784,9 @@ msgstr "양식(URL 인코딩)"
 msgid "Plain text"
 msgstr "일반 텍스트"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "또한 {sim} (SIM 1 또는 SIM 2)와 {kind} (sms, test 또는 power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "받은 메시지는 SMS 풀에 도착하는 즉시 전달됩니다. 전송에 실패하면 30초 후 다시 시도하고, 이후 매번 두 배 간격(최대 1시간)으로 모두 열 번 시도합니다."
 
@@ -811,6 +814,15 @@ msgstr "다음 단어 중 하나를 포함한 메시지만"
 msgid "One per line; empty: every message."
 msgstr "한 줄에 하나씩; 비우면 모든 메시지."
 
+msgid "Battery"
+msgstr "배터리"
+
+msgid "Battery and charger notices"
+msgstr "배터리 및 충전기 알림"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "배터리가 5, 20, 40, 60, 80, 100 %를 지나거나 충전기를 꽂거나 뺄 때 모든 대상에 메시지를 보냅니다."
+
 msgid "Webhook"
 msgstr "웹훅"
 
@@ -832,6 +844,12 @@ msgstr "사용자 지정 본문"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "비어 있음: 표준 필드(일반 텍스트: 메시지). 자리 표시자: {sender}, {time}, {text}, {device}, {message}. 각 값은 선택한 형식에 맞게 이스케이프됩니다. 이 본문은 여기에 다시 표시됩니다. 비밀 값은 주소나 헤더에 넣으십시오."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "사용자 본문의 {secret}에 넣을 비밀 값"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "본문에 토큰을 요구하는 서비스(PushPlus)용. 이 주소에만 저장되며, 새 주소에는 다시 입력해야 합니다."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "추가 헤더(한 줄에 하나의 \"Name: value\")"
 
@@ -840,6 +858,9 @@ msgstr "응답에 포함되어야 하는 내용"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "비워 두면 모든 HTTP 2xx 응답을 전달된 것으로 봅니다. 키=값(예: errcode=0)을 지정하면 응답이 최상위에서 이 키에 이 값을 가진 JSON 객체여야 하며, 그렇지 않으면 전달이 실패합니다. 기록에는 확인 결과만 남고 응답 자체는 남지 않습니다."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "요청 제한 시간 (초, 1-120; webhook 및 Telegram)"
 
 msgid "Bot token"
 msgstr "봇 토큰"
@@ -1032,9 +1053,6 @@ msgstr "메모리"
 
 msgid "Storage"
 msgstr "저장소"
-
-msgid "Battery"
-msgstr "배터리"
 
 msgid "Channel"
 msgstr "채널"
@@ -1245,6 +1263,9 @@ msgstr "내장 SIM 선택됨: 재부팅 후 사용됩니다"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "내장 SIM을 선택했지만 이 기기에서는 지원되지 않습니다: 외부 SIM을 사용 중입니다"
+
+msgid "in use"
+msgstr "사용 중"
 
 msgid "Uptime %s"
 msgstr "가동 시간 %s"
@@ -2078,9 +2099,6 @@ msgstr "모뎀 기본값"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "사용 중"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d 무선 끄기"
 
@@ -2179,6 +2197,9 @@ msgstr "삭제됨 (로컬만)"
 
 msgid "Enter both a number and a message."
 msgstr "번호와 메시지를 모두 입력하십시오."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM 저장소: %d / %d칸 사용 중 (%s 기준)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· 메시지 %d개, 읽지 않음 %d개 · 대화 %d개"
@@ -3403,14 +3424,14 @@ msgstr "알 수 없는 잠금 종류"
 msgid "Invalid value for this lock kind"
 msgstr "이 잠금 종류에 대해 잘못된 값입니다"
 
-msgid "None of these bands is supported by this modem"
-msgstr "이 모뎀은 이 밴드 중 어느 것도 지원하지 않습니다"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "밴드, 모드, 셀 잠금은 아직 SIM2에서 지원되지 않습니다"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "듀얼 SIM 전환이 무선을 관리하는 동안에는 밴드, 모드, 셀 잠금이 지원되지 않습니다"
+
+msgid "None of these bands is supported by this modem"
+msgstr "이 모뎀은 이 밴드 중 어느 것도 지원하지 않습니다"
 
 msgid "Invalid page"
 msgstr "잘못된 페이지"
@@ -3889,6 +3910,12 @@ msgstr "웹훅 본문이 너무 길거나 제어 문자를 포함하고 있습�
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "응답 확인은 errcode=0 또는 ok=true처럼 키=값 형식이어야 합니다(값은 정수 또는 영문 소문자, 최대 16자)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "잘못된 webhook 비밀 값 (공백 없이 출력 가능한 문자 최대 256자)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "제한 시간은 1~120초여야 합니다"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "잘못된 헤더(한 줄에 하나의 \"Name: value\"; Host, Content-Type, Content-Length, Transfer-Encoding, Connection은 기기가 설정합니다)"

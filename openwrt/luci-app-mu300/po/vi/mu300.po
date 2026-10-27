@@ -784,6 +784,9 @@ msgstr "Biểu mẫu (mã hóa URL)"
 msgid "Plain text"
 msgstr "Văn bản thuần"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Ngoài ra {sim} (SIM 1 hoặc SIM 2) và {kind} (sms, test hoặc power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Tin nhắn nhận được sẽ được chuyển tiếp ngay khi vào kho SMS. Lần gửi thất bại được thử lại sau 30 giây, sau đó mỗi lần cách gấp đôi (tối đa một giờ), tổng cộng mười lần."
 
@@ -811,6 +814,15 @@ msgstr "Chỉ tin nhắn chứa một trong các từ này"
 msgid "One per line; empty: every message."
 msgstr "Mỗi dòng một mục; để trống: mọi tin nhắn."
 
+msgid "Battery"
+msgstr "Pin"
+
+msgid "Battery and charger notices"
+msgstr "Thông báo pin và bộ sạc"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Một tin nhắn tới mọi đích khi pin vượt qua 5, 20, 40, 60, 80 hoặc 100 % và khi cắm hoặc rút bộ sạc."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +844,12 @@ msgstr "Nội dung tùy chỉnh"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Để trống: các trường chuẩn (văn bản thuần: tin nhắn). Chỗ giữ chỗ: {sender}, {time}, {text}, {device}, {message}. Mỗi giá trị được escape theo kiểu đã chọn. Nội dung này được hiển thị lại ở đây: hãy để thông tin bí mật trong địa chỉ hoặc trong một header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Bí mật cho {secret} trong nội dung tùy chỉnh"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Cho dịch vụ cần token trong nội dung (PushPlus). Chỉ lưu cho địa chỉ này: địa chỉ mới cần nhập lại."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Tiêu đề bổ sung (mỗi dòng một \"Tên: giá trị\")"
 
@@ -840,6 +858,9 @@ msgstr "Phản hồi phải chứa"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Để trống: mọi phản hồi HTTP 2xx đều được tính là đã gửi. Với khóa=giá trị (ví dụ errcode=0), phản hồi còn phải là một đối tượng JSON có giá trị này dưới khóa này ở cấp cao nhất; nếu không, lần gửi thất bại. Chỉ kết quả kiểm tra được ghi vào nhật ký, không bao giờ ghi phản hồi."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Thời gian chờ yêu cầu (giây, 1-120; webhook và Telegram)"
 
 msgid "Bot token"
 msgstr "Token bot"
@@ -1032,9 +1053,6 @@ msgstr "Bộ nhớ"
 
 msgid "Storage"
 msgstr "Lưu trữ"
-
-msgid "Battery"
-msgstr "Pin"
 
 msgid "Channel"
 msgstr "Kênh"
@@ -1245,6 +1263,9 @@ msgstr "Đã chọn SIM trong máy: được dùng sau khi khởi động lại"
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Đã chọn SIM trong máy, nhưng thiết bị này không hỗ trợ: SIM ngoài đang được dùng"
+
+msgid "in use"
+msgstr "đang dùng"
 
 msgid "Uptime %s"
 msgstr "Thời gian hoạt động %s"
@@ -2078,9 +2099,6 @@ msgstr "Mặc định của modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "đang dùng"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Tắt radio của SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Đã xóa (chỉ cục bộ)"
 
 msgid "Enter both a number and a message."
 msgstr "Hãy nhập cả số và tin nhắn."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Bộ nhớ SIM: đã dùng %d trên %d ô (lúc %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d tin nhắn, %d chưa đọc · %d hội thoại"
@@ -3403,14 +3424,14 @@ msgstr "Loại khóa không xác định"
 msgid "Invalid value for this lock kind"
 msgstr "Giá trị không hợp lệ cho loại khóa này"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Modem này không hỗ trợ băng tần nào trong số này"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Khóa băng tần, chế độ và cell chưa được hỗ trợ cho SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Khóa băng tần, chế độ và cell không được hỗ trợ khi chuyển đổi hai SIM đang quản lý sóng"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Modem này không hỗ trợ băng tần nào trong số này"
 
 msgid "Invalid page"
 msgstr "Trang không hợp lệ"
@@ -3889,6 +3910,12 @@ msgstr "Nội dung webhook quá dài hoặc chứa ký tự điều khiển"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Kiểm tra phản hồi phải có dạng khóa=giá trị, như errcode=0 hoặc ok=true (giá trị là một số nguyên hoặc chữ thường, tối đa 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Bí mật webhook không hợp lệ (tối đa 256 ký tự in được, không có dấu cách)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Thời gian chờ phải từ 1 đến 120 giây"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Tiêu đề không hợp lệ (mỗi dòng một \"Tên: giá trị\"; Host, Content-Type, Content-Length, Transfer-Encoding và Connection do thiết bị đặt)"

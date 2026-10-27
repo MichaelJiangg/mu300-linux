@@ -784,6 +784,9 @@ msgstr "Формуляр (URL кодиран)"
 msgid "Plain text"
 msgstr "Обикновен текст"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Също {sim} (SIM 1 или SIM 2) и {kind} (sms, test или power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Получените съобщения се препращат веднага щом стигнат до SMS пула. Неуспешна доставка се повтаря след 30 s, после всеки път след двойно по-дълго време (най-много час), общо десет пъти."
 
@@ -811,6 +814,15 @@ msgstr "Само съобщения, съдържащи някоя от тези
 msgid "One per line; empty: every message."
 msgstr "По една на ред; празно: всички съобщения."
 
+msgid "Battery"
+msgstr "Батерия"
+
+msgid "Battery and charger notices"
+msgstr "Известия за батерията и зарядното"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Съобщение до всяка цел, когато батерията премине 5, 20, 40, 60, 80 или 100 % и когато зарядното се включи или изключи."
+
 msgid "Webhook"
 msgstr "Уебкука"
 
@@ -832,6 +844,12 @@ msgstr "Собствено тяло"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Празно: стандартните полета (обикновен текст: съобщението). Заместители: {sender}, {time}, {text}, {device}, {message}. Всяка стойност се екранира според избрания тип. Това тяло се показва тук отново: дръжте тайните в адреса или в заглавка."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Тайна за {secret} в собственото тяло"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "За услуга, която иска своя токен в тялото (PushPlus). Пази се само за този адрес: нов адрес го иска отново."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Допълнителни заглавки (по една \"Име: стойност\" на ред)"
 
@@ -840,6 +858,9 @@ msgstr "Отговорът трябва да съдържа"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Празно: всеки отговор HTTP 2xx се брои за доставен. С ключ=стойност (например errcode=0) отговорът трябва освен това да е JSON обект, който има тази стойност под този ключ на най-горното си ниво; иначе доставката е неуспешна. В дневника се записва само резултатът от проверката, никога отговорът."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Време за заявка (секунди, 1-120; webhook и Telegram)"
 
 msgid "Bot token"
 msgstr "Токен на бота"
@@ -1032,9 +1053,6 @@ msgstr "Памет"
 
 msgid "Storage"
 msgstr "Хранилище"
-
-msgid "Battery"
-msgstr "Батерия"
 
 msgid "Channel"
 msgstr "Канал"
@@ -1245,6 +1263,9 @@ msgstr "Избрана е вътрешната SIM: ще се използва �
 
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Избрана е вътрешната SIM, но тя не се поддържа на това устройство: използва се външната SIM"
+
+msgid "in use"
+msgstr "в употреба"
 
 msgid "Uptime %s"
 msgstr "Време на работа %s"
@@ -2078,9 +2099,6 @@ msgstr "По подразбиране на модема"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "в употреба"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Изключване на радиото на SIM%d"
 
@@ -2179,6 +2197,9 @@ msgstr "Изтрито (само локално)"
 
 msgid "Enter both a number and a message."
 msgstr "Въведете номер и съобщение."
+
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Памет на SIM: заети %d от %d места (към %s)"
 
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d съобщения, %d непрочетени · %d разговора"
@@ -3403,14 +3424,14 @@ msgstr "Неизвестен вид заключване"
 msgid "Invalid value for this lock kind"
 msgstr "Невалидна стойност за този вид заключване"
 
-msgid "None of these bands is supported by this modem"
-msgstr "Този модем не поддържа нито една от тези ленти"
-
 msgid "Band, mode and cell locks are not supported for SIM2 yet"
 msgstr "Заключването на обхват, режим и клетка все още не се поддържа за SIM2"
 
 msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
 msgstr "Заключването на обхват, режим и клетка не се поддържа, докато превключването на двойна SIM управлява радиото"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Този модем не поддържа нито една от тези ленти"
 
 msgid "Invalid page"
 msgstr "Невалидна страница"
@@ -3889,6 +3910,12 @@ msgstr "Тялото на webhook е твърде дълго или съдърж
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Проверката на отговора трябва да е ключ=стойност, например errcode=0 или ok=true (стойността е цяло число или малки букви, най-много 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Невалидна тайна за webhook (до 256 видими знака, без интервал)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Времето трябва да е от 1 до 120 секунди"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Невалидна заглавка (по една \"Име: стойност\" на ред; Host, Content-Type, Content-Length, Transfer-Encoding и Connection се задават от устройството)"

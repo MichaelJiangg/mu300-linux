@@ -1506,6 +1506,39 @@ class Incident(DaemonTest):
             self.assertNotIn('wifi up', self.calls())
 
 
+class ForwardNotice(DaemonTest):
+    """The SMS forwarding's battery notices: the daemon tells mu300-sms-forward the capacity and the charger, once per
+    change, and nothing on a board without a battery."""
+
+    def told(self):
+        import time
+        time.sleep(0.3)     # in the background
+        p = self.tmp / 'fwd'
+        return p.read_text().splitlines() if p.exists() else []
+
+    def test_told_once_per_change_and_never_without_a_battery(self):
+        fw = self.stubs / 'fwd'
+        fw.write_text('#!/bin/sh\necho "$*" >> "$STUBLOG/fwd"\n')
+        fw.chmod(0o755)
+        for shell in self.each_shell():
+            (self.tmp / 'fwd').unlink(missing_ok=True)
+            self.uptime(100)
+            self.loops(shell, 3, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), ['power 64 0'])
+            self.charger(online=1)
+            self.loops(shell, 2, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), ['power 64 0', 'power 64 1'])
+            chg = (self.root / 'sys/class/power_supply/bq256xx-charger')
+            for f in chg.iterdir():
+                f.unlink()
+            chg.rmdir()
+            (self.tmp / 'fwd').unlink()
+            self.stub('mu300-device', 'echo f50')
+            self.loops(shell, 2, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), [])
+            self.stub('mu300-device', 'echo u30air')
+
+
 class Units(unittest.TestCase):
     def test_openwrt_instance_runs_mobile_data_through_netifd(self):
         f = (TOP / 'openwrt/overlay/etc/init.d/mu300-power').read_text()
