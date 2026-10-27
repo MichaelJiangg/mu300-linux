@@ -47,8 +47,11 @@ class Static(unittest.TestCase):
         self.drv = new_file(TCPC, 'drivers/usb/typec/tcpm/ump9620-tcpc.c')
 
     def test_patch_numbers_are_unique(self):
-        nums = [p.name[:4] for p in PATCHES.glob('*.patch')] + [p.name[:4] for p in PATCHES.glob('*/*.patch')]
-        self.assertEqual(len(nums), len(set(nums)), sorted(nums))
+        # what one kernel builds with: the shared patches and its own directory's (one change may have a form for
+        # each kernel under the same number, patches/6.18, 7.2 and 7.3/0028)
+        for d in [p for p in PATCHES.iterdir() if p.is_dir()] or [PATCHES]:
+            nums = [p.name[:4] for p in PATCHES.glob('*.patch')] + [p.name[:4] for p in d.glob('*.patch') if d != PATCHES]
+            self.assertEqual(len(nums), len(set(nums)), (d.name, sorted(nums)))
 
     def test_off_unless_enabled_and_only_on_the_u30_air(self):
         probe = function(self.drv, 'ump9620_probe')
