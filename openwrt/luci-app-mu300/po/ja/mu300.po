@@ -52,6 +52,9 @@ msgstr "言語"
 msgid "Power"
 msgstr "電源"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "翻訳範囲"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI 自体の翻訳は OpenWrt によるものです。このパネルのトルコ語と中国語以外の翻訳は機械 (AI) 翻訳です。修正を歓迎します。"
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 から %d までの整数を入力してください"
+
+msgid "Network lamp"
+msgstr "ネットワークランプ"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi ランプ"
+
+msgid "Battery lamp"
+msgstr "バッテリーランプ"
+
+msgid "On"
+msgstr "オン"
+
+msgid "Brightness (%)"
+msgstr "明るさ (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "オフにしたランプは消灯したままです。高温アラームはそれでもその LED に表示されます。"
+
+msgid "Device default"
+msgstr "デバイスの既定値"
+
+msgid "LED timeout (seconds)"
+msgstr "LED のタイムアウト (秒)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "キー操作や状態の変化の後に LED が点灯し続ける時間です。0 で常に点灯します。充電器に接続中は点灯したままです。"
+
+msgid "Boot indicator"
+msgstr "起動インジケーター"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "システムの起動中、LED が色を順番に表示します"
+
+msgid "Heat alarm"
+msgstr "高温アラーム"
+
+msgid "Siren"
+msgstr "サイレン"
+
+msgid "Red blink"
+msgstr "赤色の点滅"
+
 msgid "Automatic"
 msgstr "自動"
 
@@ -1822,9 +1870,6 @@ msgstr "%s キーで復帰"
 msgid "the modem is suspended (%s)"
 msgstr "モデムは一時停止中です（%s）"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 から %d までの整数を入力してください"
-
 msgid "Power status unavailable"
 msgstr "電源の状態を取得できません"
 
@@ -1947,9 +1992,6 @@ msgstr "そのまま"
 
 msgid "LTE only (5G off)"
 msgstr "LTE のみ（5G オフ）"
-
-msgid "On"
-msgstr "オン"
 
 msgid "Full"
 msgstr "フルパワー"
@@ -3601,14 +3643,20 @@ msgstr "無効な輻輳制御です"
 msgid "The boot adapter gave no valid reply"
 msgstr "ブートアダプタから有効な応答がありません"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED アダプターから有効な応答がありませんでした"
+
+msgid "Unknown LED setting"
+msgstr "不明な LED の設定"
+
+msgid "Invalid value for this setting"
+msgstr "この設定には無効な値です"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "データ使用量アダプターが有効な応答を返しませんでした"
 
 msgid "Unknown data usage setting"
 msgstr "不明なデータ使用量の設定"
-
-msgid "Invalid value for this setting"
-msgstr "この設定には無効な値です"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "転送アダプターが有効な応答を返しませんでした"
@@ -4078,6 +4126,12 @@ msgstr "インストールはすでに実行中です"
 
 msgid "The language pack could not be removed"
 msgstr "言語パックを削除できませんでした"
+
+msgid "The LED settings could not be read"
+msgstr "LED の設定を読み取れませんでした"
+
+msgid "The LED setting could not be saved"
+msgstr "LED の設定を保存できませんでした"
 
 msgid "Lock cache unavailable"
 msgstr "ロックキャッシュを利用できません"

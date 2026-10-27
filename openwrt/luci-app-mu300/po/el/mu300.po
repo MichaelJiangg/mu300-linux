@@ -52,6 +52,9 @@ msgstr "Γλώσσες"
 msgid "Power"
 msgstr "Ισχύς"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Μεταφρασμένο"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Οι μεταφράσεις του ίδιου του LuCI προέρχονται από το OpenWrt. Οι μεταφράσεις αυτού του πίνακα εκτός των Τουρκικών και των Κινεζικών είναι αυτόματες (AI)· οι διορθώσεις είναι ευπρόσδεκτες."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Εισαγάγετε έναν ακέραιο από 0 έως %d"
+
+msgid "Network lamp"
+msgstr "Λυχνία δικτύου"
+
+msgid "Wi-Fi lamp"
+msgstr "Λυχνία Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Λυχνία μπαταρίας"
+
+msgid "On"
+msgstr "Ενεργό"
+
+msgid "Brightness (%)"
+msgstr "Φωτεινότητα (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Μια λυχνία που είναι κλειστή μένει σβηστή· ο συναγερμός θερμότητας εμφανίζεται πάντως στο LED του."
+
+msgid "Device default"
+msgstr "Προεπιλογή της συσκευής"
+
+msgid "LED timeout (seconds)"
+msgstr "Χρόνος LED (δευτερόλεπτα)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Πόσο μένουν αναμμένα τα LED μετά από πάτημα πλήκτρου ή αλλαγή· το 0 τα κρατά αναμμένα. Στον φορτιστή μένουν αναμμένα."
+
+msgid "Boot indicator"
+msgstr "Ένδειξη εκκίνησης"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Το LED δείχνει τα χρώματά του με τη σειρά όσο ξεκινά το σύστημα"
+
+msgid "Heat alarm"
+msgstr "Συναγερμός θερμότητας"
+
+msgid "Siren"
+msgstr "Σειρήνα"
+
+msgid "Red blink"
+msgstr "Κόκκινο αναβόσβημα"
+
 msgid "Automatic"
 msgstr "Αυτόματο"
 
@@ -1822,9 +1870,6 @@ msgstr "αφύπνιση με το πλήκτρο %s"
 msgid "the modem is suspended (%s)"
 msgstr "το μόντεμ έχει ανασταλεί (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Εισαγάγετε έναν ακέραιο από 0 έως %d"
-
 msgid "Power status unavailable"
 msgstr "Η κατάσταση ισχύος δεν είναι διαθέσιμη"
 
@@ -1947,9 +1992,6 @@ msgstr "Να μείνει ως έχει"
 
 msgid "LTE only (5G off)"
 msgstr "Μόνο LTE (5G κλειστό)"
-
-msgid "On"
-msgstr "Ενεργό"
 
 msgid "Full"
 msgstr "Πλήρες"
@@ -3601,14 +3643,20 @@ msgstr "Μη έγκυρος έλεγχος συμφόρησης"
 msgid "The boot adapter gave no valid reply"
 msgstr "Ο προσαρμογέας εκκίνησης δεν έδωσε έγκυρη απάντηση"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Ο προσαρμογέας LED δεν έδωσε έγκυρη απάντηση"
+
+msgid "Unknown LED setting"
+msgstr "Άγνωστη ρύθμιση LED"
+
+msgid "Invalid value for this setting"
+msgstr "Μη έγκυρη τιμή για αυτή τη ρύθμιση"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Ο προσαρμογέας χρήσης δεδομένων δεν έδωσε έγκυρη απάντηση"
 
 msgid "Unknown data usage setting"
 msgstr "Άγνωστη ρύθμιση χρήσης δεδομένων"
-
-msgid "Invalid value for this setting"
-msgstr "Μη έγκυρη τιμή για αυτή τη ρύθμιση"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Ο προσαρμογέας προώθησης δεν έδωσε έγκυρη απάντηση"
@@ -4078,6 +4126,12 @@ msgstr "Μια εγκατάσταση εκτελείται ήδη"
 
 msgid "The language pack could not be removed"
 msgstr "Δεν ήταν δυνατή η αφαίρεση του πακέτου γλωσσών"
+
+msgid "The LED settings could not be read"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων LED"
+
+msgid "The LED setting could not be saved"
+msgstr "Δεν ήταν δυνατή η αποθήκευση της ρύθμισης LED"
 
 msgid "Lock cache unavailable"
 msgstr "Η κρυφή μνήμη κλειδωμάτων δεν είναι διαθέσιμη"

@@ -52,6 +52,9 @@ msgstr "भाषाएँ"
 msgid "Power"
 msgstr "पावर"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "अनुवादित"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI के अपने अनुवाद OpenWrt से आते हैं। तुर्की और चीनी के अलावा इस पैनल के अनुवाद मशीनी (AI) अनुवाद हैं; सुधारों का स्वागत है।"
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 से %d के बीच की पूर्ण संख्या दर्ज करें"
+
+msgid "Network lamp"
+msgstr "नेटवर्क लैंप"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi लैंप"
+
+msgid "Battery lamp"
+msgstr "बैटरी लैंप"
+
+msgid "On"
+msgstr "चालू"
+
+msgid "Brightness (%)"
+msgstr "चमक (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "बंद किया गया लैंप अंधेरा रहता है; ताप अलार्म फिर भी अपने LED पर दिखता है।"
+
+msgid "Device default"
+msgstr "डिवाइस का डिफ़ॉल्ट"
+
+msgid "LED timeout (seconds)"
+msgstr "LED टाइमआउट (सेकंड)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "किसी बटन के दबने या बदलाव के बाद LED कितनी देर जले रहते हैं; 0 उन्हें जलाए रखता है। चार्जर पर वे जले रहते हैं।"
+
+msgid "Boot indicator"
+msgstr "बूट संकेतक"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "सिस्टम शुरू होते समय LED बारी-बारी से अपने रंग दिखाता है"
+
+msgid "Heat alarm"
+msgstr "ताप अलार्म"
+
+msgid "Siren"
+msgstr "सायरन"
+
+msgid "Red blink"
+msgstr "लाल झपकना"
+
 msgid "Automatic"
 msgstr "स्वचालित"
 
@@ -1822,9 +1870,6 @@ msgstr "%s बटन से जागा"
 msgid "the modem is suspended (%s)"
 msgstr "मॉडेम निलंबित है (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 से %d के बीच की पूर्ण संख्या दर्ज करें"
-
 msgid "Power status unavailable"
 msgstr "पावर स्थिति उपलब्ध नहीं है"
 
@@ -1947,9 +1992,6 @@ msgstr "जैसा है वैसा रखें"
 
 msgid "LTE only (5G off)"
 msgstr "केवल LTE (5G बंद)"
-
-msgid "On"
-msgstr "चालू"
 
 msgid "Full"
 msgstr "पूर्ण"
@@ -3601,14 +3643,20 @@ msgstr "अमान्य कंजेशन नियंत्रण"
 msgid "The boot adapter gave no valid reply"
 msgstr "बूट एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
+
+msgid "Unknown LED setting"
+msgstr "अज्ञात LED सेटिंग"
+
+msgid "Invalid value for this setting"
+msgstr "इस सेटिंग के लिए अमान्य मान"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "डेटा उपयोग एडेप्टर ने मान्य उत्तर नहीं दिया"
 
 msgid "Unknown data usage setting"
 msgstr "अज्ञात डेटा उपयोग सेटिंग"
-
-msgid "Invalid value for this setting"
-msgstr "इस सेटिंग के लिए अमान्य मान"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "अग्रेषण एडैप्टर ने कोई मान्य उत्तर नहीं दिया"
@@ -4078,6 +4126,12 @@ msgstr "एक इंस्टॉलेशन पहले से चल रह�
 
 msgid "The language pack could not be removed"
 msgstr "भाषा पैक हटाया नहीं जा सका"
+
+msgid "The LED settings could not be read"
+msgstr "LED सेटिंग्स पढ़ी नहीं जा सकीं"
+
+msgid "The LED setting could not be saved"
+msgstr "LED सेटिंग सहेजी नहीं जा सकी"
 
 msgid "Lock cache unavailable"
 msgstr "लॉक कैश उपलब्ध नहीं"

@@ -94,7 +94,7 @@ DEFAULTS = {
     'lock': '{"ok":1,"mode":{"label":"auto"}}', 'device-usb': '{"ok":1}', 'at': 'OK', 'sms': 'sent (12)',
     'languages': '{"ok":1}', 'power': '{"ok":1}', 'ttl': '{"ok":1}', 'traffic': '{"ok":1}', 'forward': '{"ok":1}',
     'packages': '{"ok":1}', 'sim': '{"ok":1,"hot":1,"available":1,"busy":0}', 'update': '{"ok":1}',
-    'cpu': '{"ok":1}', 'tcp': '{"ok":1}', 'boot': '{"ok":1,"available":0}', 'mobile-data': '{"slot":0,"slots":[{"volte":true,"vonr":null},{"volte":true,"vonr":null}]}',
+    'cpu': '{"ok":1}', 'led': '{"ok":1}', 'tcp': '{"ok":1}', 'boot': '{"ok":1,"available":0}', 'mobile-data': '{"slot":0,"slots":[{"volte":true,"vonr":null},{"volte":true,"vonr":null}]}',
 }
 
 # The methods that start something with setsid (in the background of mu300dash)
@@ -249,7 +249,7 @@ class Inventory(Mu300Dash):
     METHODS = {'sysinfo', 'status', 'signal', 'act', 'at', 'at_job', 'at_history', 'ops_log', 'lock_get', 'lock_set', 'sms_list',
                'sms_show', 'sms_send', 'sms_job', 'sms_delete', 'sms_sync', 'usb_get', 'usb_set', 'usb_net_list', 'usb_net_add',
                'lang_get', 'lang_set', 'power_get', 'power_set',
-               'ttl_get', 'ttl_set', 'tcp_get', 'tcp_set', 'boot_get', 'cpu_get', 'cpu_set', 'cpu_tune', 'cpu_voltage_get', 'cpu_voltage_set', 'forward_get',
+               'ttl_get', 'ttl_set', 'led_get', 'led_set', 'tcp_get', 'tcp_set', 'boot_get', 'cpu_get', 'cpu_set', 'cpu_tune', 'cpu_voltage_get', 'cpu_voltage_set', 'forward_get',
                'forward_set', 'forward_test',
                'forward_log_clear', 'traffic_get', 'traffic_set', 'packages_get', 'packages_act', 'sim_get', 'sim_set', 'simcard_get', 'simcard_set',
                'update_get', 'update_job', 'update_act', 'backup_export', 'backup_import', 'backup_job'}
@@ -274,7 +274,7 @@ class Inventory(Mu300Dash):
     def test_the_changed_scripts_parse(self):
         for shell in self.each_shell():
             for p in [DASH, LIB] + [ADAPTERS / n for n in ('action', 'at', 'boot-replay', 'cell', 'dashboard-info',
-                                                         'device-usb', 'lock', 'languages', 'power', 'ttl',
+                                                         'device-usb', 'lock', 'languages', 'power', 'ttl', 'led',
                                                          'tcp', 'boot', 'cpu', 'forward', 'traffic', 'packages', 'update')]:
                 with self.subTest(p=p.name):
                     r = subprocess.run(shell + ['-n', str(p)], capture_output=True, text=True)
@@ -342,6 +342,11 @@ class Refusals(Mu300Dash):
         ('usb_net_add', {}, 'iface', 'eth1'),
         ('ttl_set', {}, 'value', '64'),
         ('ttl_set', {}, 'value', 'off'),
+        ('led_set', {'key': 'network', 'value': '0'}, 'key', 'network'),
+        ('led_set', {'key': 'network', 'value': '0'}, 'value', '0'),
+        ('led_set', {'key': 'wifi_brightness', 'value': '40'}, 'value', '40'),
+        ('led_set', {'key': 'timeout', 'value': 'default'}, 'value', 'default'),
+        ('led_set', {'key': 'thermal', 'value': 'blink'}, 'value', 'blink'),
         ('tcp_set', {}, 'value', 'bbr'),
         ('tcp_set', {}, 'value', 'default'),
         ('packages_act', {}, 'op', 'retry'),
@@ -519,6 +524,18 @@ class Refusals(Mu300Dash):
             ('update confirm yes', 'update_act', {'op': 'clean', 'confirm': 'yes'}),
             ('update sizes word', 'update_get', {'sizes': 'yes'}),
             ('ttl zero', 'ttl_set', {'value': '0'}),
+            ('led key unknown', 'led_set', {'key': 'colour', 'value': '1'}),
+            ('led key empty', 'led_set', {'key': '', 'value': '1'}),
+            ('led switch 2', 'led_set', {'key': 'wifi', 'value': '2'}),
+            ('led brightness 0', 'led_set', {'key': 'battery_brightness', 'value': '0'}),
+            ('led brightness 101', 'led_set', {'key': 'network_brightness', 'value': '101'}),
+            ('led brightness leading zero', 'led_set', {'key': 'network_brightness', 'value': '050'}),
+            ('led timeout 86401', 'led_set', {'key': 'timeout', 'value': '86401'}),
+            ('led timeout six digits', 'led_set', {'key': 'timeout', 'value': '100000'}),
+            ('led timeout leading zero', 'led_set', {'key': 'timeout', 'value': '060'}),
+            ('led thermal word', 'led_set', {'key': 'thermal', 'value': 'loud'}),
+            ('led boot word', 'led_set', {'key': 'boot', 'value': 'on'}),
+            ('led missing value', 'led_set', {'key': 'boot'}),
             ('ttl 256', 'ttl_set', {'value': '256'}),
             ('ttl 999', 'ttl_set', {'value': '999'}),
             ('ttl four digits', 'ttl_set', {'value': '1000'}),
@@ -741,6 +758,12 @@ class Passthrough(Mu300Dash):
         ('ttl_set', {'value': '255'}, [['ttl', 'set', '255']]),
         ('ttl_set', {'value': '1'}, [['ttl', 'set', '1']]),
         ('ttl_set', {'value': 'off'}, [['ttl', 'set', 'off']]),
+        ('led_get', {}, [['led', 'get']]),
+        ('led_set', {'key': 'battery', 'value': '0'}, [['led', 'set', 'battery', '0']]),
+        ('led_set', {'key': 'wifi_brightness', 'value': 1}, [['led', 'set', 'wifi_brightness', '1']]),
+        ('led_set', {'key': 'timeout', 'value': '86400'}, [['led', 'set', 'timeout', '86400']]),
+        ('led_set', {'key': 'timeout', 'value': 'default'}, [['led', 'set', 'timeout', 'default']]),
+        ('led_set', {'key': 'thermal', 'value': 'siren'}, [['led', 'set', 'thermal', 'siren']]),
         ('tcp_set', {'value': 'bbr'}, [['tcp', 'set', 'bbr']]),
         ('tcp_set', {'value': 'cubic'}, [['tcp', 'set', 'cubic']]),
         ('tcp_set', {'value': 'default'}, [['tcp', 'set', 'default']]),
@@ -1223,6 +1246,70 @@ class BootAdapter(ShellTest):
             self.assertEqual(json.loads(r.stdout)['ok'], 0)
 
 
+class LedAdapter(ShellTest):
+    """unisoc-modem/led: mu300-led's settings as JSON for the LED page, and one setting at a time, checked again"""
+
+    def setUp(self):
+        super().setUp()
+        self.settings = self.tmp / 'settings'
+        self.settings.write_text('{"device":"u30air","lamps":["network","wifi","battery"],"dimmable":["battery"],'
+                                 '"timeout":60,"network":true,"battery_brightness":100,"thermal":"siren"}\n')
+        self.stub('mu300-led', 'echo "$*" >> "$STUBLOG/led.log"\n'
+                               'case $1 in settings) cat "$STUBLOG/settings" ;;\n'
+                               '  *) [ -e "$STUBLOG/fail" ] && { cat "$STUBLOG/fail" >&2; exit 2; } ;; esac\n'
+                               'exit 0')
+
+    def run_ad(self, shell, *args):
+        r = self.script(shell, ADAPTERS / 'led', *args, MU300_LED_CMD=self.stubs / 'mu300-led')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads(r.stdout)
+
+    def log(self):
+        p = self.tmp / 'led.log'
+        t = p.read_text() if p.exists() else ''
+        p.unlink(missing_ok=True)
+        return t
+
+    def test_get(self):
+        good = self.settings.read_text()
+        for shell in self.each_shell():
+            self.settings.write_text(good)
+            o = self.run_ad(shell, 'get')
+            self.assertEqual((o['ok'], o['device'], o['lamps'], o['dimmable'], o['timeout']),
+                             (1, 'u30air', ['network', 'wifi', 'battery'], ['battery'], 60))
+            self.settings.write_text('mu300-led: not JSON\n')
+            self.assertEqual(self.run_ad(shell, 'get'), {'ok': 0, 'error': 'The LED settings could not be read'})
+
+    def test_set(self):
+        for shell in self.each_shell():
+            self.log()
+            for k, v in (('network', '0'), ('wifi', '1'), ('battery_brightness', '1'), ('network_brightness', '100'),
+                         ('timeout', '0'), ('timeout', '86400'), ('timeout', 'default'), ('boot', '1'),
+                         ('thermal', 'off')):
+                self.assertEqual(self.run_ad(shell, 'set', k, v), {'ok': 1}, (k, v))
+                self.assertEqual(self.log(), f'set {k} {v}\n')
+
+    def test_bad_values_run_nothing(self):
+        for shell in self.each_shell():
+            self.log()
+            for k, v in (('network', '2'), ('wifi', ''), ('battery_brightness', '0'), ('wifi_brightness', '101'),
+                         ('timeout', '86401'), ('timeout', '060'), ('timeout', '-1'), ('boot', 'on'),
+                         ('thermal', 'siren;reboot'), ('network', '$(id)'), ('colour', '1'), ('', ''), ('--help', '1')):
+                with self.subTest(k=k, v=v):
+                    r = self.run_ad(shell, 'set', k, v)
+                    self.assertEqual(r['ok'], 0)
+                    self.assertEqual(self.log(), '')
+            self.assertEqual(self.run_ad(shell, 'rm')['ok'], 0)
+            self.assertEqual(self.log(), '')
+
+    def test_a_failure_says_why(self):
+        (self.tmp / 'fail').write_text('mu300-led set: could not write "/etc/mu300/led.conf"\n')
+        for shell in self.each_shell():
+            self.assertEqual(self.run_ad(shell, 'set', 'boot', '1'),
+                             {'ok': 0, 'error': 'The LED setting could not be saved',
+                              'detail': 'mu300-led set: could not write "/etc/mu300/led.conf"'})
+
+
 class TrafficAdapter(ShellTest):
     """unisoc-modem/traffic: the Data usage page's adapter over mu300-traffic (a stub that records its arguments)."""
 
@@ -1304,10 +1391,10 @@ class Backup(Mu300Dash):
 
 class Acl(unittest.TestCase):
     # SMS bodies (one-time codes) and the AT history (AT+CPIN PINs) are not for read-only users (ruling R14)
-    READ = {'sysinfo', 'status', 'signal', 'lock_get', 'usb_get', 'usb_net_list', 'lang_get', 'power_get', 'ttl_get',
+    READ = {'sysinfo', 'status', 'signal', 'lock_get', 'usb_get', 'usb_net_list', 'lang_get', 'power_get', 'ttl_get', 'led_get',
             'tcp_get', 'boot_get', 'cpu_get', 'cpu_voltage_get', 'traffic_get', 'ops_log', 'packages_get', 'sim_get', 'simcard_get', 'update_get', 'update_job'}
     WRITE = {'act', 'at', 'at_job', 'at_history', 'lock_set', 'sms_list', 'sms_show', 'sms_send', 'sms_job', 'sms_delete', 'sms_sync',
-             'usb_set', 'usb_net_add', 'lang_set', 'power_set', 'ttl_set', 'tcp_set', 'cpu_set', 'cpu_tune', 'cpu_voltage_set', 'forward_get',
+             'usb_set', 'usb_net_add', 'lang_set', 'power_set', 'ttl_set', 'led_set', 'tcp_set', 'cpu_set', 'cpu_tune', 'cpu_voltage_set', 'forward_get',
              'forward_set', 'forward_test', 'forward_log_clear', 'traffic_set', 'packages_act', 'sim_set', 'simcard_set',
              'update_act', 'backup_export', 'backup_import', 'backup_job'}
 

@@ -1409,8 +1409,41 @@ msgstr "按键或发生变化后 LED 保持点亮的时长；0 表示常亮。"
 msgid "Seconds (empty: the device's default)"
 msgstr "秒（留空：设备默认值）"
 
+msgid "Network lamp"
+msgstr "信号灯"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi 热点灯"
+
+msgid "Battery lamp"
+msgstr "电池灯"
+
+msgid "Brightness (%)"
+msgstr "亮度（%）"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "关闭的灯保持熄灭；温度告警仍会在其指示灯上显示。"
+
+msgid "Boot indicator"
+msgstr "开机指示"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "系统启动期间指示灯依次显示各颜色"
+
+msgid "Siren"
+msgstr "警灯轮闪"
+
+msgid "Red blink"
+msgstr "红色闪烁"
+
+msgid "Heat alarm"
+msgstr "温度告警"
+
 msgid "A whole number of seconds, 0 or more."
 msgstr "秒数，0 或以上的整数。"
+
+msgid "A brightness is a whole number from 1 to 100."
+msgstr "亮度为 1 到 100 之间的整数。"
 
 msgid "Light each LED in turn"
 msgstr "依次点亮各 LED"

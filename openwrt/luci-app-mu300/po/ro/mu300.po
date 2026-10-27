@@ -52,6 +52,9 @@ msgstr "Limbi"
 msgid "Power"
 msgstr "Alimentare"
 
+msgid "LEDs"
+msgstr "LED-uri"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Tradus"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Traducerile proprii ale LuCI provin din OpenWrt. Traducerile acestui panou, cu excepția turcei și chinezei, sunt traduceri automate (AI); corecturile sunt binevenite."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Introduceți un număr întreg de la 0 la %d"
+
+msgid "Network lamp"
+msgstr "Lampa de rețea"
+
+msgid "Wi-Fi lamp"
+msgstr "Lampa Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Lampa bateriei"
+
+msgid "On"
+msgstr "Pornit"
+
+msgid "Brightness (%)"
+msgstr "Luminozitate (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "O lampă oprită rămâne stinsă; alarma de căldură apare totuși pe LED-ul ei."
+
+msgid "Device default"
+msgstr "Implicit pentru dispozitiv"
+
+msgid "LED timeout (seconds)"
+msgstr "Timp LED-uri (secunde)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Cât timp rămân aprinse LED-urile după apăsarea unei taste sau o schimbare; 0 le ține aprinse. Pe încărcător rămân aprinse."
+
+msgid "Boot indicator"
+msgstr "Indicator de pornire"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED-ul își arată culorile pe rând cât timp sistemul pornește"
+
+msgid "Heat alarm"
+msgstr "Alarmă de căldură"
+
+msgid "Siren"
+msgstr "Sirenă"
+
+msgid "Red blink"
+msgstr "Clipire roșie"
+
 msgid "Automatic"
 msgstr "Automat"
 
@@ -1822,9 +1870,6 @@ msgstr "trezit de tasta %s"
 msgid "the modem is suspended (%s)"
 msgstr "modemul este suspendat (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Introduceți un număr întreg de la 0 la %d"
-
 msgid "Power status unavailable"
 msgstr "Starea alimentării nu este disponibilă"
 
@@ -1947,9 +1992,6 @@ msgstr "Lasă neschimbat"
 
 msgid "LTE only (5G off)"
 msgstr "Doar LTE (5G oprit)"
-
-msgid "On"
-msgstr "Pornit"
 
 msgid "Full"
 msgstr "Complet"
@@ -3601,14 +3643,20 @@ msgstr "Control al congestiei nevalid"
 msgid "The boot adapter gave no valid reply"
 msgstr "Adaptorul de pornire nu a dat un răspuns valid"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptorul LED nu a dat un răspuns valid"
+
+msgid "Unknown LED setting"
+msgstr "Setare LED necunoscută"
+
+msgid "Invalid value for this setting"
+msgstr "Valoare invalidă pentru această setare"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptorul de consum de date nu a dat un răspuns valid"
 
 msgid "Unknown data usage setting"
 msgstr "Setare de consum de date necunoscută"
-
-msgid "Invalid value for this setting"
-msgstr "Valoare invalidă pentru această setare"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptorul de redirecționare nu a dat un răspuns valid"
@@ -4078,6 +4126,12 @@ msgstr "O instalare rulează deja"
 
 msgid "The language pack could not be removed"
 msgstr "Pachetul de limbi nu a putut fi eliminat"
+
+msgid "The LED settings could not be read"
+msgstr "Setările LED-urilor nu au putut fi citite"
+
+msgid "The LED setting could not be saved"
+msgstr "Setarea LED-ului nu a putut fi salvată"
 
 msgid "Lock cache unavailable"
 msgstr "Cache-ul blocărilor nu este disponibil"

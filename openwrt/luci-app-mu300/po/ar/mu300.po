@@ -52,6 +52,9 @@ msgstr "اللغات"
 msgid "Power"
 msgstr "الطاقة"
 
+msgid "LEDs"
+msgstr "مصابيح LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "مترجَم"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "ترجمات LuCI نفسها مصدرها OpenWrt. ترجمات هذه اللوحة، باستثناء التركية والصينية، ترجمات آلية (بالذكاء الاصطناعي)؛ نرحب بالتصحيحات."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "أدخل عددًا صحيحًا من 0 إلى %d"
+
+msgid "Network lamp"
+msgstr "مصباح الشبكة"
+
+msgid "Wi-Fi lamp"
+msgstr "مصباح Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "مصباح البطارية"
+
+msgid "On"
+msgstr "يعمل"
+
+msgid "Brightness (%)"
+msgstr "السطوع (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "المصباح المُطفأ يبقى مظلمًا؛ ويظهر إنذار الحرارة على مصباحه رغم ذلك."
+
+msgid "Device default"
+msgstr "الإعداد الافتراضي للجهاز"
+
+msgid "LED timeout (seconds)"
+msgstr "مهلة مصابيح LED (ثوانٍ)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "المدة التي تبقى فيها المصابيح مضاءة بعد ضغطة زر أو تغيير؛ القيمة 0 تبقيها مضاءة. وعلى الشاحن تبقى مضاءة."
+
+msgid "Boot indicator"
+msgstr "مؤشر الإقلاع"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "يعرض المصباح ألوانه بالتناوب أثناء بدء تشغيل النظام"
+
+msgid "Heat alarm"
+msgstr "إنذار الحرارة"
+
+msgid "Siren"
+msgstr "صفارة"
+
+msgid "Red blink"
+msgstr "وميض أحمر"
+
 msgid "Automatic"
 msgstr "تلقائي"
 
@@ -1822,9 +1870,6 @@ msgstr "استيقظ بزر %s"
 msgid "the modem is suspended (%s)"
 msgstr "المودم معلّق (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "أدخل عددًا صحيحًا من 0 إلى %d"
-
 msgid "Power status unavailable"
 msgstr "حالة الطاقة غير متاحة"
 
@@ -1947,9 +1992,6 @@ msgstr "بدون تغيير"
 
 msgid "LTE only (5G off)"
 msgstr "LTE فقط (5G متوقف)"
-
-msgid "On"
-msgstr "يعمل"
 
 msgid "Full"
 msgstr "كامل"
@@ -3601,14 +3643,20 @@ msgstr "تحكم ازدحام غير صالح"
 msgid "The boot adapter gave no valid reply"
 msgstr "لم يُرجع محوّل الإقلاع ردًا صالحًا"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "لم يُرجع محول LED ردًا صالحًا"
+
+msgid "Unknown LED setting"
+msgstr "إعداد LED غير معروف"
+
+msgid "Invalid value for this setting"
+msgstr "قيمة غير صالحة لهذا الإعداد"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "لم يُرجع محوّل استهلاك البيانات رداً صالحاً"
 
 msgid "Unknown data usage setting"
 msgstr "إعداد استهلاك بيانات غير معروف"
-
-msgid "Invalid value for this setting"
-msgstr "قيمة غير صالحة لهذا الإعداد"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "لم يُعطِ محوّل إعادة التوجيه ردًا صالحًا"
@@ -4078,6 +4126,12 @@ msgstr "هناك عملية تثبيت قيد التشغيل بالفعل"
 
 msgid "The language pack could not be removed"
 msgstr "تعذّرت إزالة حزمة اللغات"
+
+msgid "The LED settings could not be read"
+msgstr "تعذّرت قراءة إعدادات LED"
+
+msgid "The LED setting could not be saved"
+msgstr "تعذّر حفظ إعداد LED"
 
 msgid "Lock cache unavailable"
 msgstr "ذاكرة التخزين المؤقت للأقفال غير متاحة"

@@ -52,6 +52,9 @@ msgstr "Sprog"
 msgid "Power"
 msgstr "Strøm"
 
+msgid "LEDs"
+msgstr "LED'er"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Oversat"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI's egne oversættelser kommer fra OpenWrt. Dette panels oversættelser ud over tyrkisk og kinesisk er maskinoversættelser (AI); rettelser er velkomne."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Angiv et helt tal fra 0 til %d"
+
+msgid "Network lamp"
+msgstr "Netværkslampe"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-lampe"
+
+msgid "Battery lamp"
+msgstr "Batterilampe"
+
+msgid "On"
+msgstr "Til"
+
+msgid "Brightness (%)"
+msgstr "Lysstyrke (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "En slukket lampe forbliver mørk; varmealarmen vises stadig på sin LED."
+
+msgid "Device default"
+msgstr "Enhedens standard"
+
+msgid "LED timeout (seconds)"
+msgstr "LED-timeout (sekunder)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Hvor længe LED'erne lyser efter et tastetryk eller en ændring; 0 holder dem tændt. På en oplader forbliver de tændt."
+
+msgid "Boot indicator"
+msgstr "Opstartsindikator"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED'en viser sine farver efter tur, mens systemet starter"
+
+msgid "Heat alarm"
+msgstr "Varmealarm"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Rødt blink"
+
 msgid "Automatic"
 msgstr "Automatisk"
 
@@ -1822,9 +1870,6 @@ msgstr "vækket af %s-knappen"
 msgid "the modem is suspended (%s)"
 msgstr "modemmet er sat på pause (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Angiv et helt tal fra 0 til %d"
-
 msgid "Power status unavailable"
 msgstr "Strømstatus ikke tilgængelig"
 
@@ -1947,9 +1992,6 @@ msgstr "Lad være som det er"
 
 msgid "LTE only (5G off)"
 msgstr "Kun LTE (5G fra)"
-
-msgid "On"
-msgstr "Til"
 
 msgid "Full"
 msgstr "Fuld"
@@ -3601,14 +3643,20 @@ msgstr "Ugyldig overbelastningskontrol"
 msgid "The boot adapter gave no valid reply"
 msgstr "Opstartsadapteren gav intet gyldigt svar"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED-adapteren gav intet gyldigt svar"
+
+msgid "Unknown LED setting"
+msgstr "Ukendt LED-indstilling"
+
+msgid "Invalid value for this setting"
+msgstr "Ugyldig værdi for denne indstilling"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adapteren til dataforbrug gav intet gyldigt svar"
 
 msgid "Unknown data usage setting"
 msgstr "Ukendt indstilling for dataforbrug"
-
-msgid "Invalid value for this setting"
-msgstr "Ugyldig værdi for denne indstilling"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Videresendelsesadapteren gav intet gyldigt svar"
@@ -4078,6 +4126,12 @@ msgstr "En installation kører allerede"
 
 msgid "The language pack could not be removed"
 msgstr "Sprogpakken kunne ikke fjernes"
+
+msgid "The LED settings could not be read"
+msgstr "LED-indstillingerne kunne ikke læses"
+
+msgid "The LED setting could not be saved"
+msgstr "LED-indstillingen kunne ikke gemmes"
 
 msgid "Lock cache unavailable"
 msgstr "Låsecache utilgængelig"

@@ -12020,6 +12020,26 @@ source must offer first is logged (rate-limited) as a frame read wrong. PD stays
 behaves as before. With `mu300-usb pd on`, a PD charger and the dock from FINDINGS 150 negotiate, and the log has
 no "source capabilities without 5 V first".
 
+### 227. LED brightness: which lamps dim, and what the U30 Air's PMIC reads back
+
+**Status: kanoqwq's readings on his U30 Air (7.2.8, 2026-10-16, his `docs/U30AIR-LEDS-20261016.zh-CN.md`) and the
+drivers in this tree; nothing measured here.** Behind `mu300-led`'s per-lamp brightness (LED_*_BRIGHTNESS, ported from
+kanoqwq's `f6b0668d`, `2af101f8`, `c1293746`).
+
+* **They dim:** the PMIC's RGB channels (`sc27xx:red|green|blue`, 0-255: the F50's network lamp, the U30 Air's battery
+  lamp); the F50's keypad sink (`keyboard-backlight`, 0-127; ZTE lights it at 48); the V50's AW9523B lamps, whose DIM
+  registers take 0 up to each lamp's `max_brightness` from the device tree (FINDINGS 95).
+* **They only switch:** the U30 Air's network and Wi-Fi lamps: LDOs VDDCAMA0-2 (`zte-ldo0..2`, 5.4's `vddcamaN_status`)
+  and the GPIO `net_blue`, `max_brightness` 1. The network lamp's red is the keypad sink, but dimming it alone would
+  make one colour of that lamp darker than the others, so the lamp is on or off (kanoqwq's page offers the same).
+* **The breathing peak follows the level written.** kanoqwq wrote the pattern `0 625 255 750 0 625 0 250` to the U30
+  Air's battery channel and read the PMIC back: peak register `0xffff`, curve registers `0x0505` / `0x0206`. A peak
+  of 255 is the PMIC's full scale, so a lower level in `hw_pattern` (ZTE's 120/200/150, scaled by the setting) is a
+  dimmer breath with the same curve; the curve here stays ZTE's (FINDINGS 151), not his faster one.
+
+**Device check:** on each board `mu300-led set network_brightness 20` (U30 Air: `battery_brightness`) visibly dims
+that lamp, a breathing battery lamp too, and `mu300-led set network 0` darkens it until `... network 1`.
+
 ### 229. The V50's NFC tag: the same FM11NT08, its reset line from ZTE's device tree node
 
 **Status: from kanoqwq's `f6b0668d`, run on his V50. No V50 here; not run on a device by us.**

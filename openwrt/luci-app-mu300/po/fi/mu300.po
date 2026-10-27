@@ -52,6 +52,9 @@ msgstr "Kielet"
 msgid "Power"
 msgstr "Virta"
 
+msgid "LEDs"
+msgstr "Merkkivalot"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Käännetty"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCIn omat käännökset tulevat OpenWrt:stä. Tämän paneelin käännökset turkkia ja kiinaa lukuun ottamatta ovat konekäännöksiä (tekoäly); korjaukset ovat tervetulleita."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Anna kokonaisluku väliltä 0–%d"
+
+msgid "Network lamp"
+msgstr "Verkon merkkivalo"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-merkkivalo"
+
+msgid "Battery lamp"
+msgstr "Akun merkkivalo"
+
+msgid "On"
+msgstr "Päällä"
+
+msgid "Brightness (%)"
+msgstr "Kirkkaus (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Pois kytketty merkkivalo pysyy pimeänä; lämpöhälytys näkyy silti omassa ledissään."
+
+msgid "Device default"
+msgstr "Laitteen oletus"
+
+msgid "LED timeout (seconds)"
+msgstr "Merkkivalojen aikakatkaisu (sekuntia)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Kuinka kauan merkkivalot palavat näppäimen painalluksen tai muutoksen jälkeen; 0 pitää ne päällä. Laturissa ne palavat."
+
+msgid "Boot indicator"
+msgstr "Käynnistyksen ilmaisin"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Ledi näyttää värinsä vuorotellen järjestelmän käynnistyessä"
+
+msgid "Heat alarm"
+msgstr "Lämpöhälytys"
+
+msgid "Siren"
+msgstr "Sireeni"
+
+msgid "Red blink"
+msgstr "Punainen vilkkuminen"
+
 msgid "Automatic"
 msgstr "Automaattinen"
 
@@ -1822,9 +1870,6 @@ msgstr "herätetty %s-painikkeella"
 msgid "the modem is suspended (%s)"
 msgstr "modeemi on keskeytetty (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Anna kokonaisluku väliltä 0–%d"
-
 msgid "Power status unavailable"
 msgstr "Virran tila ei ole saatavilla"
 
@@ -1947,9 +1992,6 @@ msgstr "Jätä ennalleen"
 
 msgid "LTE only (5G off)"
 msgstr "Vain LTE (5G pois)"
-
-msgid "On"
-msgstr "Päällä"
 
 msgid "Full"
 msgstr "Täysi"
@@ -3601,14 +3643,20 @@ msgstr "Virheellinen ruuhkanhallinta"
 msgid "The boot adapter gave no valid reply"
 msgstr "Käynnistyssovitin ei antanut kelvollista vastausta"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED-sovitin ei antanut kelvollista vastausta"
+
+msgid "Unknown LED setting"
+msgstr "Tuntematon merkkivaloasetus"
+
+msgid "Invalid value for this setting"
+msgstr "Virheellinen arvo tälle asetukselle"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Datan käytön sovitin ei antanut kelvollista vastausta"
 
 msgid "Unknown data usage setting"
 msgstr "Tuntematon datan käytön asetus"
-
-msgid "Invalid value for this setting"
-msgstr "Virheellinen arvo tälle asetukselle"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Edelleenlähetyksen sovitin ei antanut kelvollista vastausta"
@@ -4078,6 +4126,12 @@ msgstr "Asennus on jo käynnissä"
 
 msgid "The language pack could not be removed"
 msgstr "Kielipakettia ei voitu poistaa"
+
+msgid "The LED settings could not be read"
+msgstr "Merkkivaloasetuksia ei voitu lukea"
+
+msgid "The LED setting could not be saved"
+msgstr "Merkkivaloasetusta ei voitu tallentaa"
 
 msgid "Lock cache unavailable"
 msgstr "Lukitusvälimuisti ei käytettävissä"

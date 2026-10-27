@@ -14,6 +14,8 @@ service_triggers() {
 }
 
 start_service() {
+	# the boot is done: the boot indicator (04_mu300_early_leds, LED_BOOT=1) ends and the LEDs show the states
+	/opt/mu300/bin/mu300-led boot off </dev/null >/dev/null 2>&1
 	# the commands on the PATH (/usr/bin): new ones on a system installed before they existed, and the extras'
 	/opt/mu300/bin/mu300-extra link >/dev/null 2>&1
 

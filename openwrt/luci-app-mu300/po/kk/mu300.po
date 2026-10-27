@@ -52,6 +52,9 @@ msgstr "Тілдер"
 msgid "Power"
 msgstr "Қуат"
 
+msgid "LEDs"
+msgstr "Жарық диодтары"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Аударылған"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI-дің өз аудармалары OpenWrt-тен алынады. Бұл панельдің түрік және қытай тілдерінен басқа аудармалары машиналық (ЖИ) аударма; түзетулер қабылданады."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0-ден %d-ге дейінгі бүтін санды енгізіңіз"
+
+msgid "Network lamp"
+msgstr "Желі шамы"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi шамы"
+
+msgid "Battery lamp"
+msgstr "Батарея шамы"
+
+msgid "On"
+msgstr "Қосулы"
+
+msgid "Brightness (%)"
+msgstr "Жарықтық (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Сөндірілген шам қараңғы қалады; қызу дабылы бәрібір өз жарық диодында көрсетіледі."
+
+msgid "Device default"
+msgstr "Құрылғының әдепкі мәні"
+
+msgid "LED timeout (seconds)"
+msgstr "Жарық диодтарының күту уақыты (секунд)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Түйме басылғаннан немесе өзгерістен кейін жарық диодтары қанша уақыт жанып тұрады; 0 оларды үнемі жандырады. Зарядтағышта жанып тұрады."
+
+msgid "Boot indicator"
+msgstr "Жүктелу көрсеткіші"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Жүйе іске қосылып жатқанда жарық диоды түстерін кезекпен көрсетеді"
+
+msgid "Heat alarm"
+msgstr "Қызу дабылы"
+
+msgid "Siren"
+msgstr "Сирена"
+
+msgid "Red blink"
+msgstr "Қызыл жыпылықтау"
+
 msgid "Automatic"
 msgstr "Автоматты"
 
@@ -1822,9 +1870,6 @@ msgstr "%s пернесімен оянды"
 msgid "the modem is suspended (%s)"
 msgstr "модем тоқтатылған (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0-ден %d-ге дейінгі бүтін санды енгізіңіз"
-
 msgid "Power status unavailable"
 msgstr "Қуат күйі қолжетімсіз"
 
@@ -1947,9 +1992,6 @@ msgstr "Өзгеріссіз қалдыру"
 
 msgid "LTE only (5G off)"
 msgstr "Тек LTE (5G өшірулі)"
-
-msgid "On"
-msgstr "Қосулы"
 
 msgid "Full"
 msgstr "Толық"
@@ -3601,14 +3643,20 @@ msgstr "Жарамсыз кептелісті басқару"
 msgid "The boot adapter gave no valid reply"
 msgstr "Жүктеу адаптері жарамды жауап бермеді"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED адаптері жарамды жауап бермеді"
+
+msgid "Unknown LED setting"
+msgstr "Белгісіз жарық диоды баптауы"
+
+msgid "Invalid value for this setting"
+msgstr "Бұл параметр үшін жарамсыз мән"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Деректер шығыны адаптері дұрыс жауап бермеді"
 
 msgid "Unknown data usage setting"
 msgstr "Белгісіз деректер шығыны параметрі"
-
-msgid "Invalid value for this setting"
-msgstr "Бұл параметр үшін жарамсыз мән"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Қайта жіберу адаптері дұрыс жауап бермеді"
@@ -4078,6 +4126,12 @@ msgstr "Орнату әлдеқашан орындалуда"
 
 msgid "The language pack could not be removed"
 msgstr "Тіл бумасын жою мүмкін болмады"
+
+msgid "The LED settings could not be read"
+msgstr "Жарық диоды баптауларын оқу мүмкін болмады"
+
+msgid "The LED setting could not be saved"
+msgstr "Жарық диоды баптауын сақтау мүмкін болмады"
 
 msgid "Lock cache unavailable"
 msgstr "Бекіту кэші қолжетімсіз"

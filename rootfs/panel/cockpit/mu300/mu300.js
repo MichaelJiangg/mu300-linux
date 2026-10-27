@@ -1452,10 +1452,45 @@
                 var t = input('mu-led-timeout', { type: 'number', min: '0', max: '86400', value: o.timeout === null ? '' : String(o.timeout),
                     placeholder: o.device === 'u30air' ? '60' : '0' });
                 b.appendChild(field(_('Seconds (empty: the device\'s default)'), t));
+                /* mu300-led's settings (kanoqwq's): each lamp on or off and, where it dims, its brightness; the boot
+                 * indicator; how the heat alarm shows */
+                var st = o.settings, names = { network: _('Network lamp'), wifi: _('Wi-Fi lamp'), battery: _('Battery lamp') };
+                var onoff = [ [ 1, _('On') ], [ 0, _('Off') ] ], lamps = [];
+                if (st && Array.isArray(st.lamps)) {
+                    st.lamps.forEach(function (l) {
+                        if (!names[l]) return;
+                        var sw = select('mu-led-' + l, onoff, st[l] ? 1 : 0), br = null;
+                        b.appendChild(field(names[l], sw));
+                        if ((st.dimmable || []).indexOf(l) >= 0) {
+                            br = input('mu-led-' + l + '-brightness', { type: 'number', min: '1', max: '100',
+                                value: String(st[l + '_brightness']) });
+                            b.appendChild(field(names[l] + ': ' + _('Brightness (%)'), br));
+                        }
+                        lamps.push([ l, sw, br ]);
+                    });
+                    b.appendChild(note(_('A lamp switched off stays dark; the heat alarm still shows on its LED.')));
+                    var boot = select('mu-led-boot', onoff, st.boot ? 1 : 0);
+                    b.appendChild(field(_('Boot indicator'), boot));
+                    b.appendChild(note(_('The LED shows its colours in turn while the system starts')));
+                    var heat = select('mu-led-thermal', [ [ 'siren', _('Siren') ], [ 'blink', _('Red blink') ], [ 'off', _('Off') ] ],
+                        st.thermal || 'siren');
+                    b.appendChild(field(_('Heat alarm'), heat));
+                }
                 var s = button(_('Save'), function () {
-                    var n = Number(t.value);
-                    if (t.value === '' || !(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
-                    act(s, 'led.set', { timeout: n }, { done: refresh });
+                    var n = Number(t.value), req = {};
+                    if (t.value === '') req.timeout_default = true;
+                    else if (!(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
+                    else req.timeout = n;
+                    for (var i = 0; i < lamps.length; i++) {
+                        req[lamps[i][0]] = lamps[i][1].value === '1';
+                        if (lamps[i][2]) {
+                            var p = Number(lamps[i][2].value);
+                            if (!(p >= 1 && p <= 100 && Math.floor(p) === p)) { toast(_('A brightness is a whole number from 1 to 100.'), 'error'); return; }
+                            req[lamps[i][0] + '_brightness'] = p;
+                        }
+                    }
+                    if (boot) { req.boot = boot.value === '1'; req.thermal = heat.value; }
+                    act(s, 'led.set', req, { done: refresh });
                 }, 'primary');
                 var tb = button(_('Light each LED in turn'), function () { act(tb, 'led.set', { test: true }, { ok: _('Each LED lights for 2 seconds, one after the other.') }); });
                 b.appendChild(actions([ s, tb ]));

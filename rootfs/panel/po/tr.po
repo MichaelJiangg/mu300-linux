@@ -1409,8 +1409,41 @@ msgstr "Bir tuşa basıldıktan veya bir değişiklikten sonra LED'lerin ne kada
 msgid "Seconds (empty: the device's default)"
 msgstr "Saniye (boş: cihazın varsayılanı)"
 
+msgid "Network lamp"
+msgstr "Ağ ışığı"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi ışığı"
+
+msgid "Battery lamp"
+msgstr "Pil ışığı"
+
+msgid "Brightness (%)"
+msgstr "Parlaklık (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Kapatılan bir ışık karanlık kalır; ısı alarmı yine de kendi LED'inde görünür."
+
+msgid "Boot indicator"
+msgstr "Açılış göstergesi"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Sistem açılırken LED renklerini sırayla gösterir"
+
+msgid "Siren"
+msgstr "Siren"
+
+msgid "Red blink"
+msgstr "Kırmızı yanıp sönme"
+
+msgid "Heat alarm"
+msgstr "Isı alarmı"
+
 msgid "A whole number of seconds, 0 or more."
 msgstr "0 veya daha büyük, tam sayı olarak saniye."
+
+msgid "A brightness is a whole number from 1 to 100."
+msgstr "Parlaklık 1 ile 100 arasında bir tam sayıdır."
 
 msgid "Light each LED in turn"
 msgstr "Her LED'i sırayla yak"

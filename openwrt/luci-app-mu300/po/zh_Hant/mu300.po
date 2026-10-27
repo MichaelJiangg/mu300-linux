@@ -52,6 +52,9 @@ msgstr "語言"
 msgid "Power"
 msgstr "電源"
 
+msgid "LEDs"
+msgstr "狀態燈"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "翻譯範圍"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI 本身的翻譯來自 OpenWrt。本面板除土耳其文與中文外的翻譯皆為機器（AI）翻譯，歡迎指正。"
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "請輸入 0 到 %d 之間的整數"
+
+msgid "Network lamp"
+msgstr "訊號燈"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi 熱點燈"
+
+msgid "Battery lamp"
+msgstr "電池燈"
+
+msgid "On"
+msgstr "開"
+
+msgid "Brightness (%)"
+msgstr "亮度（%）"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "關閉的燈保持熄滅；溫度警報仍會在其指示燈上顯示。"
+
+msgid "Device default"
+msgstr "裝置預設值"
+
+msgid "LED timeout (seconds)"
+msgstr "狀態燈自動熄滅（秒）"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "按鍵或狀態變化後指示燈保持點亮的時間；0 表示常亮。連接充電器時保持點亮。"
+
+msgid "Boot indicator"
+msgstr "開機指示"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "系統啟動期間指示燈依序顯示各顏色"
+
+msgid "Heat alarm"
+msgstr "溫度警報"
+
+msgid "Siren"
+msgstr "警燈輪閃"
+
+msgid "Red blink"
+msgstr "紅色閃爍"
+
 msgid "Automatic"
 msgstr "自動"
 
@@ -1822,9 +1870,6 @@ msgstr "%s 鍵喚醒"
 msgid "the modem is suspended (%s)"
 msgstr "數據機已暫停（%s）"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "請輸入 0 到 %d 之間的整數"
-
 msgid "Power status unavailable"
 msgstr "無法取得電源狀態"
 
@@ -1947,9 +1992,6 @@ msgstr "維持不變"
 
 msgid "LTE only (5G off)"
 msgstr "僅 LTE（關閉 5G）"
-
-msgid "On"
-msgstr "開"
 
 msgid "Full"
 msgstr "全速"
@@ -3594,14 +3636,20 @@ msgstr "壅塞控制演算法無效"
 msgid "The boot adapter gave no valid reply"
 msgstr "啟動介接程式未傳回有效回應"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED 介面卡未傳回有效回覆"
+
+msgid "Unknown LED setting"
+msgstr "未知的狀態燈設定"
+
+msgid "Invalid value for this setting"
+msgstr "此設定的值無效"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "流量統計介面卡沒有回傳有效的回覆"
 
 msgid "Unknown data usage setting"
 msgstr "未知的流量統計設定"
-
-msgid "Invalid value for this setting"
-msgstr "此設定的值無效"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "轉寄配接器沒有傳回有效的回覆"
@@ -4071,6 +4119,12 @@ msgstr "已有安裝作業正在進行"
 
 msgid "The language pack could not be removed"
 msgstr "無法移除語言套件"
+
+msgid "The LED settings could not be read"
+msgstr "無法讀取狀態燈設定"
+
+msgid "The LED setting could not be saved"
+msgstr "無法儲存狀態燈設定"
 
 msgid "Lock cache unavailable"
 msgstr "鎖定快取無法使用"

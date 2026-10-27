@@ -52,6 +52,9 @@ msgstr "Språk"
 msgid "Power"
 msgstr "Ström"
 
+msgid "LEDs"
+msgstr "Lysdioder"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Översatt"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI:s egna översättningar kommer från OpenWrt. Denna panels översättningar utöver turkiska och kinesiska är maskinöversättningar (AI); rättelser är välkomna."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Ange ett heltal från 0 till %d"
+
+msgid "Network lamp"
+msgstr "Nätverkslampa"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-lampa"
+
+msgid "Battery lamp"
+msgstr "Batterilampa"
+
+msgid "On"
+msgstr "På"
+
+msgid "Brightness (%)"
+msgstr "Ljusstyrka (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "En avstängd lampa förblir mörk; värmelarmet visas ändå på sin lysdiod."
+
+msgid "Device default"
+msgstr "Enhetens standard"
+
+msgid "LED timeout (seconds)"
+msgstr "Tidsgräns för lysdioder (sekunder)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Hur länge lysdioderna lyser efter en knapptryckning eller en ändring; 0 håller dem tända. På en laddare förblir de tända."
+
+msgid "Boot indicator"
+msgstr "Startindikator"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Lysdioden visar sina färger i tur och ordning medan systemet startar"
+
+msgid "Heat alarm"
+msgstr "Värmelarm"
+
+msgid "Siren"
+msgstr "Siren"
+
+msgid "Red blink"
+msgstr "Rött blinkande"
+
 msgid "Automatic"
 msgstr "Automatiskt"
 
@@ -1822,9 +1870,6 @@ msgstr "väckt av %s-knappen"
 msgid "the modem is suspended (%s)"
 msgstr "modemet är pausat (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Ange ett heltal från 0 till %d"
-
 msgid "Power status unavailable"
 msgstr "Strömstatus otillgänglig"
 
@@ -1947,9 +1992,6 @@ msgstr "Lämna som det är"
 
 msgid "LTE only (5G off)"
 msgstr "Endast LTE (5G av)"
-
-msgid "On"
-msgstr "På"
 
 msgid "Full"
 msgstr "Full"
@@ -3601,14 +3643,20 @@ msgstr "Ogiltig överbelastningskontroll"
 msgid "The boot adapter gave no valid reply"
 msgstr "Startadaptern gav inget giltigt svar"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED-adaptern gav inget giltigt svar"
+
+msgid "Unknown LED setting"
+msgstr "Okänd lysdiodsinställning"
+
+msgid "Invalid value for this setting"
+msgstr "Ogiltigt värde för denna inställning"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptern för dataförbrukning gav inget giltigt svar"
 
 msgid "Unknown data usage setting"
 msgstr "Okänd inställning för dataförbrukning"
-
-msgid "Invalid value for this setting"
-msgstr "Ogiltigt värde för denna inställning"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Vidarebefordringsadaptern gav inget giltigt svar"
@@ -4078,6 +4126,12 @@ msgstr "En installation pågår redan"
 
 msgid "The language pack could not be removed"
 msgstr "Språkpaketet kunde inte tas bort"
+
+msgid "The LED settings could not be read"
+msgstr "Lysdiodsinställningarna kunde inte läsas"
+
+msgid "The LED setting could not be saved"
+msgstr "Lysdiodsinställningen kunde inte sparas"
 
 msgid "Lock cache unavailable"
 msgstr "Låscache inte tillgänglig"
