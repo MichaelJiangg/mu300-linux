@@ -1,0 +1,75 @@
+From: kanoqwq <kanoqwq@qq.com>
+Subject: [PATCH] power: supply: bq256xx: the U30 Air's battery CV in the stock driver's encoding (REG04 0x70)
+
+Ported from kanoqwq/mu300-linux b4748534 (his upstream/patches/0027, on top of his 0023 = our 0024).
+
+0024 bounded the battery's declared CV (4.3 V) and let the generic path round it down: register code 13, REG04
+0x68, 4.272 V. The stock driver does not round down. sqc_bq2560x.ko (SHA256 ce42c87c42f9..., sqc_mp_set_cv
++0x28..+0x5c) and the matching sqc_v8 source program floor((mV - 3856) / 32) + 1: code 14, REG04 0x70, 4.304 V.
+kanoqwq read REG04 0x70 back under Linux (7.2.8) with this patch, and 0x70 under stock Android on the same U30 Air;
+the 0x68 he reported first came from the round-down.
+
+Only for the vendor "ti,bq2560x_chg" node with a battery CV from the device tree: no battery info still means the
+chip default, every other board is unchanged, and the chip's maximum still bounds it. Code 0xf is the chip's special
+4.352 V (not 3.856 V + 15 x 32 mV), on the way in and when it is read back, as the stock driver does.
+
+--- a/drivers/power/supply/bq256xx_charger.c
++++ b/drivers/power/supply/bq256xx_charger.c
+@@ -164,6 +164,8 @@
+ #define BQ2560X_CHG_ICHG_MAX_uA		1980000	/* what Android charges the U30 Air's 4050 mAh cell with */
+ #define BQ2560X_CHG_ICHG_3A_uA		3000000	/* u30air_3a: still bounded by the battery node and the chip */
+ #define BQ2560X_CHG_EN_TIMER		BIT(3)	/* REG05: stock driver disables the hardware safety timer */
++#define BQ2560X_CHG_VBATREG_SPECIAL	0xf	/* REG04 VREG code 01111: 4.352 V, not 3.856 V + 15 x 32 mV */
++#define BQ2560X_CHG_VBATREG_SPECIAL_uV	4352000
+ 
+ /*
+  * The U30 Air at up to 3 A (kanoqwq's 627cacea): the fast-charge current from the battery node (its 3 A), not the
+@@ -649,6 +651,9 @@
+ 	vbatreg_reg_code = (battery_volt_lim & BQ256XX_VBATREG_MASK) >>
+ 						BQ256XX_VBATREG_BIT_SHIFT;
+ 
++	/* "ti,bq2560x_chg": code 0xf is the chip's special 4.352 V, as the stock driver reads it */
++	if (bq->bq2560x_chg && vbatreg_reg_code == BQ2560X_CHG_VBATREG_SPECIAL)
++		return BQ2560X_CHG_VBATREG_SPECIAL_uV;
+ 	return (vbatreg_reg_code * BQ2560X_VBATREG_STEP_uV)
+ 					+ BQ2560X_VBATREG_OFFSET_uV;
+ }
+@@ -1992,6 +1997,25 @@
+ 		return PTR_ERR(bq->battery);
+ 	}
+ 	return 0;
++}
++
++/*
++ * The CV the stock driver programs for the battery's declared one (sqc_bq2560x.ko sqc_mp_set_cv, and the matching
++ * sqc_v8 source): register code floor((uV - 3.856 V) / 32 mV) + 1, one step above the generic round-down, at most the
++ * chip's maximum. A 4.3 V battery is code 0xe, REG04 0x70, 4.304 V; stock Android reads 0x70 on the same unit.
++ * Returned in uV so that the generic path (bq2560x_set_chrg_volt, which rounds down) writes exactly that code.
++ */
++static int bq2560x_chg_stock_cv(int requested, int maximum)
++{
++	unsigned int code, max_code;
++
++	if (requested < BQ2560X_VBATREG_MIN_uV)
++		return BQ2560X_VBATREG_MIN_uV;
++	max_code = (maximum - BQ2560X_VBATREG_OFFSET_uV) / BQ2560X_VBATREG_STEP_uV;
++	code = min_t(unsigned int, (requested - BQ2560X_VBATREG_OFFSET_uV) / BQ2560X_VBATREG_STEP_uV + 1, max_code);
++	if (code == BQ2560X_CHG_VBATREG_SPECIAL)
++		return BQ2560X_CHG_VBATREG_SPECIAL_uV;
++	return BQ2560X_VBATREG_OFFSET_uV + code * BQ2560X_VBATREG_STEP_uV;
+ }
+ 
+ static int bq256xx_hw_init(struct bq256xx_device *bq)
+@@ -2063,9 +2087,9 @@
+ 		 * Use this battery's declared CV, bounded by the charger capability;
+ 		 * fall back to the chip default only when no valid value was supplied.
+ 		 */
+-		bq->init_data.vbatreg_max = bat_info->constant_charge_voltage_max_uv > 0 ?
+-			min_t(u32, bat_info->constant_charge_voltage_max_uv,
+-			      bq->chip_info->bq256xx_max_vbatreg) :
++		bq->init_data.vbatreg_max = !ret && bat_info->constant_charge_voltage_max_uv > 0 ?
++			bq2560x_chg_stock_cv(bat_info->constant_charge_voltage_max_uv,
++					     bq->chip_info->bq256xx_max_vbatreg) :
+ 			bq->chip_info->bq256xx_def_vbatreg;
+ 		/* Stock sqc_bq2560x probe clears REG05 EN_TIMER (0x1b08).
+ 		 * Keep termination enabled; this does not disable TS/NTC protection.

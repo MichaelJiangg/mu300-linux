@@ -302,12 +302,25 @@ static struct platform_driver sprd_ipc_driver = {
 
 static int __init sprd_ipc_init(void)
 {
+	int ret;
+
 	smsg_init_wakeup();
 	smsg_init_channel2index();
 #if IS_ENABLED(CONFIG_SPRD_SIPC)
 	atomic_notifier_chain_register(&panic_notifier_list, &senddie_panic_nb);
 #endif
-	return platform_driver_register(&sprd_ipc_driver);
+	ret = platform_driver_register(&sprd_ipc_driver);
+	if (ret) {
+		/*
+		 * MU300 (kanoqwq f59a2968): a module that fails to load is freed, so nothing of it may stay registered:
+		 * the panic notifier would call into freed code at the next panic, and the wakeup source would stay.
+		 */
+#if IS_ENABLED(CONFIG_SPRD_SIPC)
+		atomic_notifier_chain_unregister(&panic_notifier_list, &senddie_panic_nb);
+#endif
+		smsg_remove_wakeup();
+	}
+	return ret;
 }
 
 static void __exit sprd_ipc_exit(void)
