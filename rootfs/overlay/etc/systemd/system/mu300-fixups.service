@@ -8,6 +8,8 @@ Before=sysinit.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/opt/mu300/bin/rootfs-fixups
+# the boot indicator (LED_BOOT=1 in /etc/mu300/led.conf, off by default) from here until mu300-boot-ok
+ExecStartPost=-/opt/mu300/bin/mu300-led boot on
 # the power LED (U30 Air): on from here, off when the system goes down
 ExecStartPost=-/opt/mu300/bin/mu300-led power on
 # the U30 Air's charger keeps an OTG boost on across a reboot (mu300-usb)

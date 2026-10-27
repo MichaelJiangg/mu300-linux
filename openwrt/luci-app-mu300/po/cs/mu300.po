@@ -52,6 +52,9 @@ msgstr "Jazyky"
 msgid "Power"
 msgstr "Napájení"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Přeloženo"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Vlastní překlady LuCI pocházejí z OpenWrt. Překlady tohoto panelu kromě turečtiny a čínštiny jsou strojové (AI); opravy jsou vítány."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Zadejte celé číslo od 0 do %d"
+
+msgid "Network lamp"
+msgstr "Kontrolka sítě"
+
+msgid "Wi-Fi lamp"
+msgstr "Kontrolka Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Kontrolka baterie"
+
+msgid "On"
+msgstr "Zapnuto"
+
+msgid "Brightness (%)"
+msgstr "Jas (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Vypnutá kontrolka zůstane tmavá; tepelný alarm se přesto ukáže na své LED."
+
+msgid "Device default"
+msgstr "Výchozí hodnota zařízení"
+
+msgid "LED timeout (seconds)"
+msgstr "Doba svícení LED (sekundy)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Jak dlouho LED svítí po stisku tlačítka nebo změně; 0 je nechá svítit. Na nabíječce svítí."
+
+msgid "Boot indicator"
+msgstr "Indikace spouštění"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED během startu systému postupně ukazuje své barvy"
+
+msgid "Heat alarm"
+msgstr "Tepelný alarm"
+
+msgid "Siren"
+msgstr "Siréna"
+
+msgid "Red blink"
+msgstr "Červené blikání"
+
 msgid "Automatic"
 msgstr "Automaticky"
 
@@ -1822,9 +1870,6 @@ msgstr "probuzeno tlačítkem %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem je pozastaven (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Zadejte celé číslo od 0 do %d"
-
 msgid "Power status unavailable"
 msgstr "Stav napájení není dostupný"
 
@@ -1947,9 +1992,6 @@ msgstr "Ponechat beze změny"
 
 msgid "LTE only (5G off)"
 msgstr "Pouze LTE (5G vypnuto)"
-
-msgid "On"
-msgstr "Zapnuto"
 
 msgid "Full"
 msgstr "Plný"
@@ -3646,14 +3688,20 @@ msgstr "Neplatné řízení zahlcení"
 msgid "The boot adapter gave no valid reply"
 msgstr "Adaptér spouštění nevrátil platnou odpověď"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptér LED nevrátil platnou odpověď"
+
+msgid "Unknown LED setting"
+msgstr "Neznámé nastavení LED"
+
+msgid "Invalid value for this setting"
+msgstr "Neplatná hodnota pro toto nastavení"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptér spotřeby dat nedal platnou odpověď"
 
 msgid "Unknown data usage setting"
 msgstr "Neznámé nastavení spotřeby dat"
-
-msgid "Invalid value for this setting"
-msgstr "Neplatná hodnota pro toto nastavení"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptér přeposílání nedal platnou odpověď"
@@ -4123,6 +4171,12 @@ msgstr "Instalace již probíhá"
 
 msgid "The language pack could not be removed"
 msgstr "Jazykový balíček se nepodařilo odebrat"
+
+msgid "The LED settings could not be read"
+msgstr "Nastavení LED nelze přečíst"
+
+msgid "The LED setting could not be saved"
+msgstr "Nastavení LED nelze uložit"
 
 msgid "Lock cache unavailable"
 msgstr "Mezipaměť zámků není dostupná"

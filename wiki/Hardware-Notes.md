@@ -107,6 +107,9 @@ the device lands in Android about 20 minutes later. The cause is still open.
   2.4 GHz, as ZTE's firmware and its guide, §152). `sudo mu300-led test` shows which is which.
 * **Heat alarm:** the battery LED flashes red, white, blue in turn when the chip reaches 85 °C or the battery 50 °C
   (`thermal-guard`). On the F50 the network LED does this.
+* **LED settings (every board):** each lamp on or off, the dimmable ones' brightness (§227), the timeout, a boot
+  indicator (the RGB LED's colours in turn while the system starts) and the heat alarm as the siren, a red blink or
+  nothing: `mu300-led set ...`, System -> LEDs on `openwrt-luci`, the panel's LEDs card on Ubuntu. Off by default.
 * **Buttons:** power: a short press wakes the LEDs, held 3 s shuts down. Wi-Fi key: switches 2.4 / 5 GHz, held 3 s turns
   the hotspot off or on.
 * **NFC (§33g):** a phone held to the device can join the hotspot: `sudo mu300-nfc wifi` writes the hotspot's name and

@@ -52,6 +52,9 @@ msgstr "Talen"
 msgid "Power"
 msgstr "Voeding"
 
+msgid "LEDs"
+msgstr "Leds"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Vertaald"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "De eigen vertalingen van LuCI komen van OpenWrt. De vertalingen van dit paneel, behalve Turks en Chinees, zijn machinevertalingen (AI); correcties zijn welkom."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Voer een geheel getal van 0 tot %d in"
+
+msgid "Network lamp"
+msgstr "Netwerklampje"
+
+msgid "Wi-Fi lamp"
+msgstr "Wifi-lampje"
+
+msgid "Battery lamp"
+msgstr "Batterijlampje"
+
+msgid "On"
+msgstr "Aan"
+
+msgid "Brightness (%)"
+msgstr "Helderheid (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Een uitgeschakeld lampje blijft donker; het hittealarm verschijnt toch op zijn led."
+
+msgid "Device default"
+msgstr "Standaard van het apparaat"
+
+msgid "LED timeout (seconds)"
+msgstr "Led-time-out (seconden)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Hoe lang de leds blijven branden na een toetsdruk of een wijziging; 0 houdt ze aan. Aan de lader blijven ze aan."
+
+msgid "Boot indicator"
+msgstr "Opstartindicator"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "De led toont zijn kleuren om de beurt terwijl het systeem opstart"
+
+msgid "Heat alarm"
+msgstr "Hittealarm"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Rood knipperen"
+
 msgid "Automatic"
 msgstr "Automatisch"
 
@@ -1822,9 +1870,6 @@ msgstr "gewekt door de %s-toets"
 msgid "the modem is suspended (%s)"
 msgstr "de modem is gepauzeerd (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Voer een geheel getal van 0 tot %d in"
-
 msgid "Power status unavailable"
 msgstr "Voedingsstatus niet beschikbaar"
 
@@ -1947,9 +1992,6 @@ msgstr "Ongewijzigd laten"
 
 msgid "LTE only (5G off)"
 msgstr "Alleen LTE (5G uit)"
-
-msgid "On"
-msgstr "Aan"
 
 msgid "Full"
 msgstr "Volledig"
@@ -3646,14 +3688,20 @@ msgstr "Ongeldige congestiecontrole"
 msgid "The boot adapter gave no valid reply"
 msgstr "De opstartadapter gaf geen geldig antwoord"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "De LED-adapter gaf geen geldig antwoord"
+
+msgid "Unknown LED setting"
+msgstr "Onbekende led-instelling"
+
+msgid "Invalid value for this setting"
+msgstr "Ongeldige waarde voor deze instelling"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "De dataverbruik-adapter gaf geen geldig antwoord"
 
 msgid "Unknown data usage setting"
 msgstr "Onbekende instelling voor dataverbruik"
-
-msgid "Invalid value for this setting"
-msgstr "Ongeldige waarde voor deze instelling"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "De doorstuuradapter gaf geen geldig antwoord"
@@ -4123,6 +4171,12 @@ msgstr "Er loopt al een installatie"
 
 msgid "The language pack could not be removed"
 msgstr "Het taalpakket kon niet worden verwijderd"
+
+msgid "The LED settings could not be read"
+msgstr "De led-instellingen konden niet worden gelezen"
+
+msgid "The LED setting could not be saved"
+msgstr "De led-instelling kon niet worden opgeslagen"
 
 msgid "Lock cache unavailable"
 msgstr "Vergrendelingscache niet beschikbaar"

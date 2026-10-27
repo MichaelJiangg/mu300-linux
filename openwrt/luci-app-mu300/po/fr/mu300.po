@@ -52,6 +52,9 @@ msgstr "Langues"
 msgid "Power"
 msgstr "Alimentation"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Traduit"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Les traductions propres à LuCI proviennent d'OpenWrt. Les traductions de ce panneau, hors turc et chinois, sont des traductions automatiques (IA) ; les corrections sont les bienvenues."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Saisissez un nombre entier de 0 à %d"
+
+msgid "Network lamp"
+msgstr "Voyant réseau"
+
+msgid "Wi-Fi lamp"
+msgstr "Voyant Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Voyant batterie"
+
+msgid "On"
+msgstr "Activé"
+
+msgid "Brightness (%)"
+msgstr "Luminosité (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Un voyant éteint reste sombre ; l'alarme de chaleur s'affiche quand même sur sa LED."
+
+msgid "Device default"
+msgstr "Valeur par défaut de l'appareil"
+
+msgid "LED timeout (seconds)"
+msgstr "Délai des LED (secondes)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Durée pendant laquelle les LED restent allumées après un appui sur une touche ou un changement ; 0 les laisse allumées. Sur un chargeur, elles restent allumées."
+
+msgid "Boot indicator"
+msgstr "Indicateur de démarrage"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "La LED affiche ses couleurs à tour de rôle pendant le démarrage du système"
+
+msgid "Heat alarm"
+msgstr "Alarme de chaleur"
+
+msgid "Siren"
+msgstr "Sirène"
+
+msgid "Red blink"
+msgstr "Clignotement rouge"
+
 msgid "Automatic"
 msgstr "Automatique"
 
@@ -1822,9 +1870,6 @@ msgstr "réveillé par la touche %s"
 msgid "the modem is suspended (%s)"
 msgstr "le modem est suspendu (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Saisissez un nombre entier de 0 à %d"
-
 msgid "Power status unavailable"
 msgstr "État de l'alimentation indisponible"
 
@@ -1947,9 +1992,6 @@ msgstr "Laisser tel quel"
 
 msgid "LTE only (5G off)"
 msgstr "LTE seul (5G désactivée)"
-
-msgid "On"
-msgstr "Activé"
 
 msgid "Full"
 msgstr "Complet"
@@ -3646,14 +3688,20 @@ msgstr "Contrôle de congestion non valide"
 msgid "The boot adapter gave no valid reply"
 msgstr "L'adaptateur de démarrage n'a pas donné de réponse valide"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "L'adaptateur LED n'a pas donné de réponse valide"
+
+msgid "Unknown LED setting"
+msgstr "Réglage de LED inconnu"
+
+msgid "Invalid value for this setting"
+msgstr "Valeur invalide pour ce réglage"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "L'adaptateur de consommation de données n'a pas donné de réponse valide"
 
 msgid "Unknown data usage setting"
 msgstr "Réglage de consommation de données inconnu"
-
-msgid "Invalid value for this setting"
-msgstr "Valeur invalide pour ce réglage"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "L'adaptateur de transfert n'a pas donné de réponse valide"
@@ -4123,6 +4171,12 @@ msgstr "Une installation est déjà en cours"
 
 msgid "The language pack could not be removed"
 msgstr "Impossible de supprimer le pack de langues"
+
+msgid "The LED settings could not be read"
+msgstr "Les réglages des LED n'ont pas pu être lus"
+
+msgid "The LED setting could not be saved"
+msgstr "Le réglage de LED n'a pas pu être enregistré"
 
 msgid "Lock cache unavailable"
 msgstr "Cache des verrouillages indisponible"

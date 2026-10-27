@@ -52,6 +52,9 @@ msgstr "Мови"
 msgid "Power"
 msgstr "Живлення"
 
+msgid "LEDs"
+msgstr "Індикатори"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Перекладено"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Власні переклади LuCI взято з OpenWrt. Переклади цієї панелі, окрім турецького та китайського, машинні (ШІ); виправлення вітаються."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Введіть ціле число від 0 до %d"
+
+msgid "Network lamp"
+msgstr "Індикатор мережі"
+
+msgid "Wi-Fi lamp"
+msgstr "Індикатор Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Індикатор батареї"
+
+msgid "On"
+msgstr "Увімк."
+
+msgid "Brightness (%)"
+msgstr "Яскравість (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Вимкнений індикатор лишається темним; теплова тривога все одно показується на своєму світлодіоді."
+
+msgid "Device default"
+msgstr "Типове для пристрою"
+
+msgid "LED timeout (seconds)"
+msgstr "Тайм-аут індикаторів (секунди)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Скільки індикатори світяться після натискання кнопки або зміни; 0 — світяться завжди. На зарядці вони світяться."
+
+msgid "Boot indicator"
+msgstr "Індикація завантаження"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Світлодіод по черзі показує свої кольори, поки система завантажується"
+
+msgid "Heat alarm"
+msgstr "Теплова тривога"
+
+msgid "Siren"
+msgstr "Сирена"
+
+msgid "Red blink"
+msgstr "Блимання червоним"
+
 msgid "Automatic"
 msgstr "Автоматично"
 
@@ -1822,9 +1870,6 @@ msgstr "пробудження кнопкою %s"
 msgid "the modem is suspended (%s)"
 msgstr "модем призупинено (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Введіть ціле число від 0 до %d"
-
 msgid "Power status unavailable"
 msgstr "Стан живлення недоступний"
 
@@ -1947,9 +1992,6 @@ msgstr "Не змінювати"
 
 msgid "LTE only (5G off)"
 msgstr "Лише LTE (5G вимкнено)"
-
-msgid "On"
-msgstr "Увімк."
 
 msgid "Full"
 msgstr "Повна"
@@ -3646,14 +3688,20 @@ msgstr "Неприпустиме керування перевантаження
 msgid "The boot adapter gave no valid reply"
 msgstr "Адаптер завантаження не дав коректної відповіді"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Адаптер LED не дав коректної відповіді"
+
+msgid "Unknown LED setting"
+msgstr "Невідоме налаштування індикаторів"
+
+msgid "Invalid value for this setting"
+msgstr "Неприпустиме значення для цього параметра"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Адаптер використання даних не дав коректної відповіді"
 
 msgid "Unknown data usage setting"
 msgstr "Невідомий параметр використання даних"
-
-msgid "Invalid value for this setting"
-msgstr "Неприпустиме значення для цього параметра"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Адаптер пересилання не дав коректної відповіді"
@@ -4123,6 +4171,12 @@ msgstr "Встановлення вже виконується"
 
 msgid "The language pack could not be removed"
 msgstr "Не вдалося видалити мовний пакет"
+
+msgid "The LED settings could not be read"
+msgstr "Не вдалося прочитати налаштування індикаторів"
+
+msgid "The LED setting could not be saved"
+msgstr "Не вдалося зберегти налаштування індикаторів"
 
 msgid "Lock cache unavailable"
 msgstr "Кеш фіксації недоступний"

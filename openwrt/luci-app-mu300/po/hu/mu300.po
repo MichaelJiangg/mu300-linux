@@ -52,6 +52,9 @@ msgstr "Nyelvek"
 msgid "Power"
 msgstr "Energia"
 
+msgid "LEDs"
+msgstr "LED-ek"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Lefordítva"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "A LuCI saját fordításai az OpenWrt-ből származnak. Ennek a panelnek a török és kínai kivételével minden fordítása gépi (AI) fordítás; a javításokat szívesen fogadjuk."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Adjon meg egy egész számot 0 és %d között"
+
+msgid "Network lamp"
+msgstr "Hálózati lámpa"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-lámpa"
+
+msgid "Battery lamp"
+msgstr "Akkumulátorlámpa"
+
+msgid "On"
+msgstr "Be"
+
+msgid "Brightness (%)"
+msgstr "Fényerő (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "A kikapcsolt lámpa sötét marad; a hőriasztás ettől még megjelenik a saját LED-jén."
+
+msgid "Device default"
+msgstr "Eszköz alapértéke"
+
+msgid "LED timeout (seconds)"
+msgstr "LED-ek időkorlátja (másodperc)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Meddig világítanak a LED-ek egy gombnyomás vagy változás után; 0 esetén folyamatosan. Töltőn világítanak."
+
+msgid "Boot indicator"
+msgstr "Indításjelző"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "A LED sorban mutatja a színeit, amíg a rendszer elindul"
+
+msgid "Heat alarm"
+msgstr "Hőriasztás"
+
+msgid "Siren"
+msgstr "Sziréna"
+
+msgid "Red blink"
+msgstr "Piros villogás"
+
 msgid "Automatic"
 msgstr "Automatikus"
 
@@ -1822,9 +1870,6 @@ msgstr "a(z) %s gomb ébresztette"
 msgid "the modem is suspended (%s)"
 msgstr "a modem fel van függesztve (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Adjon meg egy egész számot 0 és %d között"
-
 msgid "Power status unavailable"
 msgstr "Az energiaállapot nem érhető el"
 
@@ -1947,9 +1992,6 @@ msgstr "Változatlanul hagyás"
 
 msgid "LTE only (5G off)"
 msgstr "Csak LTE (5G kikapcsolva)"
-
-msgid "On"
-msgstr "Be"
 
 msgid "Full"
 msgstr "Teljes"
@@ -3646,14 +3688,20 @@ msgstr "Érvénytelen torlódásvezérlés"
 msgid "The boot adapter gave no valid reply"
 msgstr "Az indítási adapter nem adott érvényes választ"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "A LED-adapter nem adott érvényes választ"
+
+msgid "Unknown LED setting"
+msgstr "Ismeretlen LED-beállítás"
+
+msgid "Invalid value for this setting"
+msgstr "Érvénytelen érték ehhez a beállításhoz"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Az adatforgalom-adapter nem adott érvényes választ"
 
 msgid "Unknown data usage setting"
 msgstr "Ismeretlen adatforgalom-beállítás"
-
-msgid "Invalid value for this setting"
-msgstr "Érvénytelen érték ehhez a beállításhoz"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "A továbbító adapter nem adott érvényes választ"
@@ -4123,6 +4171,12 @@ msgstr "Egy telepítés már folyamatban van"
 
 msgid "The language pack could not be removed"
 msgstr "A nyelvi csomagot nem sikerült eltávolítani"
+
+msgid "The LED settings could not be read"
+msgstr "A LED-beállítások nem olvashatók"
+
+msgid "The LED setting could not be saved"
+msgstr "A LED-beállítás nem menthető"
 
 msgid "Lock cache unavailable"
 msgstr "A zárolási gyorsítótár nem érhető el"

@@ -52,6 +52,9 @@ msgstr "Ngôn ngữ"
 msgid "Power"
 msgstr "Nguồn"
 
+msgid "LEDs"
+msgstr "Đèn LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Đã dịch"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Bản dịch riêng của LuCI đến từ OpenWrt. Các bản dịch của bảng điều khiển này, trừ tiếng Thổ Nhĩ Kỳ và tiếng Trung, là bản dịch máy (AI); rất hoan nghênh các góp ý sửa lỗi."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Nhập số nguyên từ 0 đến %d"
+
+msgid "Network lamp"
+msgstr "Đèn mạng"
+
+msgid "Wi-Fi lamp"
+msgstr "Đèn Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Đèn pin"
+
+msgid "On"
+msgstr "Bật"
+
+msgid "Brightness (%)"
+msgstr "Độ sáng (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Đèn bị tắt vẫn tối; cảnh báo nhiệt vẫn hiện trên đèn LED của nó."
+
+msgid "Device default"
+msgstr "Mặc định của thiết bị"
+
+msgid "LED timeout (seconds)"
+msgstr "Thời gian sáng của LED (giây)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Thời gian các đèn LED sáng sau khi nhấn phím hoặc có thay đổi; 0 giữ chúng luôn sáng. Khi cắm sạc chúng vẫn sáng."
+
+msgid "Boot indicator"
+msgstr "Chỉ báo khởi động"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Đèn LED lần lượt hiện các màu của nó trong khi hệ thống khởi động"
+
+msgid "Heat alarm"
+msgstr "Cảnh báo nhiệt"
+
+msgid "Siren"
+msgstr "Còi báo"
+
+msgid "Red blink"
+msgstr "Nháy đỏ"
+
 msgid "Automatic"
 msgstr "Tự động"
 
@@ -1822,9 +1870,6 @@ msgstr "được đánh thức bằng phím %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem đang tạm ngưng (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Nhập số nguyên từ 0 đến %d"
-
 msgid "Power status unavailable"
 msgstr "Không có trạng thái nguồn"
 
@@ -1947,9 +1992,6 @@ msgstr "Giữ nguyên"
 
 msgid "LTE only (5G off)"
 msgstr "Chỉ LTE (tắt 5G)"
-
-msgid "On"
-msgstr "Bật"
 
 msgid "Full"
 msgstr "Đầy đủ"
@@ -3646,14 +3688,20 @@ msgstr "Kiểm soát tắc nghẽn không hợp lệ"
 msgid "The boot adapter gave no valid reply"
 msgstr "Bộ điều hợp khởi động không trả lời hợp lệ"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Bộ điều hợp LED không trả lời hợp lệ"
+
+msgid "Unknown LED setting"
+msgstr "Thiết lập LED không xác định"
+
+msgid "Invalid value for this setting"
+msgstr "Giá trị không hợp lệ cho thiết lập này"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Bộ điều hợp lưu lượng dữ liệu không trả lời hợp lệ"
 
 msgid "Unknown data usage setting"
 msgstr "Thiết lập lưu lượng dữ liệu không xác định"
-
-msgid "Invalid value for this setting"
-msgstr "Giá trị không hợp lệ cho thiết lập này"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Bộ điều hợp chuyển tiếp không trả lời hợp lệ"
@@ -4123,6 +4171,12 @@ msgstr "Đang có một quá trình cài đặt khác chạy"
 
 msgid "The language pack could not be removed"
 msgstr "Không thể gỡ gói ngôn ngữ"
+
+msgid "The LED settings could not be read"
+msgstr "Không đọc được thiết lập LED"
+
+msgid "The LED setting could not be saved"
+msgstr "Không lưu được thiết lập LED"
 
 msgid "Lock cache unavailable"
 msgstr "Bộ đệm khóa không khả dụng"

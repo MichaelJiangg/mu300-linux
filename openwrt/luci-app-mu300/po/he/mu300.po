@@ -52,6 +52,9 @@ msgstr "שפות"
 msgid "Power"
 msgstr "צריכת חשמל"
 
+msgid "LEDs"
+msgstr "נוריות"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "מתורגם"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "התרגומים של LuCI עצמו מגיעים מ-OpenWrt. התרגומים של לוח זה, למעט טורקית וסינית, הם תרגומי מכונה (בינה מלאכותית); תיקונים יתקבלו בברכה."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "הזינו מספר שלם בין 0 ל-%d"
+
+msgid "Network lamp"
+msgstr "נורית רשת"
+
+msgid "Wi-Fi lamp"
+msgstr "נורית Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "נורית סוללה"
+
+msgid "On"
+msgstr "פועל"
+
+msgid "Brightness (%)"
+msgstr "בהירות (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "נורית כבויה נשארת חשוכה; התראת החום עדיין מוצגת בנורית שלה."
+
+msgid "Device default"
+msgstr "ברירת המחדל של המכשיר"
+
+msgid "LED timeout (seconds)"
+msgstr "זמן הדלקת הנוריות (שניות)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "כמה זמן הנוריות נשארות דולקות אחרי לחיצה על מקש או שינוי; 0 משאיר אותן דולקות. על מטען הן נשארות דולקות."
+
+msgid "Boot indicator"
+msgstr "מחוון אתחול"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "הנורית מציגה את צבעיה בזה אחר זה בזמן שהמערכת עולה"
+
+msgid "Heat alarm"
+msgstr "התראת חום"
+
+msgid "Siren"
+msgstr "צופר"
+
+msgid "Red blink"
+msgstr "הבהוב אדום"
+
 msgid "Automatic"
 msgstr "אוטומטי"
 
@@ -1822,9 +1870,6 @@ msgstr "התעורר מלחצן %s"
 msgid "the modem is suspended (%s)"
 msgstr "המודם מושהה (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "הזינו מספר שלם בין 0 ל-%d"
-
 msgid "Power status unavailable"
 msgstr "מצב החשמל אינו זמין"
 
@@ -1947,9 +1992,6 @@ msgstr "ללא שינוי"
 
 msgid "LTE only (5G off)"
 msgstr "LTE בלבד (5G כבוי)"
-
-msgid "On"
-msgstr "פועל"
 
 msgid "Full"
 msgstr "מלא"
@@ -3646,14 +3688,20 @@ msgstr "בקרת עומס לא תקינה"
 msgid "The boot adapter gave no valid reply"
 msgstr "מתאם האתחול לא החזיר תשובה תקינה"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "מתאם ה-LED לא החזיר תשובה תקינה"
+
+msgid "Unknown LED setting"
+msgstr "הגדרת נוריות לא מוכרת"
+
+msgid "Invalid value for this setting"
+msgstr "ערך לא תקין להגדרה זו"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "מתאם השימוש בנתונים לא החזיר תשובה תקינה"
 
 msgid "Unknown data usage setting"
 msgstr "הגדרת שימוש בנתונים לא ידועה"
-
-msgid "Invalid value for this setting"
-msgstr "ערך לא תקין להגדרה זו"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "מתאם ההעברה לא החזיר תשובה תקינה"
@@ -4123,6 +4171,12 @@ msgstr "התקנה כבר מתבצעת"
 
 msgid "The language pack could not be removed"
 msgstr "לא ניתן היה להסיר את חבילת השפות"
+
+msgid "The LED settings could not be read"
+msgstr "לא ניתן לקרוא את הגדרות הנוריות"
+
+msgid "The LED setting could not be saved"
+msgstr "לא ניתן לשמור את הגדרת הנוריות"
 
 msgid "Lock cache unavailable"
 msgstr "מטמון הנעילות אינו זמין"

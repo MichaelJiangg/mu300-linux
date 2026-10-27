@@ -52,6 +52,9 @@ msgstr "Diller"
 msgid "Power"
 msgstr "Güç"
 
+msgid "LEDs"
+msgstr "LED'ler"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Çeviri"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI’nin kendi çevirileri OpenWrt’den gelir. Bu panelin Türkçe ve Çince dışındaki çevirileri makine (yapay zekâ) çevirisidir; düzeltmeler memnuniyetle karşılanır."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 ile %d arasında bir tam sayı girin"
+
+msgid "Network lamp"
+msgstr "Ağ ışığı"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi ışığı"
+
+msgid "Battery lamp"
+msgstr "Pil ışığı"
+
+msgid "On"
+msgstr "Açık"
+
+msgid "Brightness (%)"
+msgstr "Parlaklık (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Kapatılan bir ışık karanlık kalır; ısı alarmı yine de kendi LED'inde görünür."
+
+msgid "Device default"
+msgstr "Cihaz varsayılanı"
+
+msgid "LED timeout (seconds)"
+msgstr "LED kapanma süresi (saniye)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Bir tuşa basıldıktan veya bir değişiklikten sonra LED'lerin ne kadar yanık kalacağı; 0 onları sürekli açık tutar. Şarj cihazındayken yanık kalırlar."
+
+msgid "Boot indicator"
+msgstr "Açılış göstergesi"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Sistem açılırken LED renklerini sırayla gösterir"
+
+msgid "Heat alarm"
+msgstr "Isı alarmı"
+
+msgid "Siren"
+msgstr "Siren"
+
+msgid "Red blink"
+msgstr "Kırmızı yanıp sönme"
+
 msgid "Automatic"
 msgstr "Otomatik"
 
@@ -1822,9 +1870,6 @@ msgstr "%s tuşuyla uyandı"
 msgid "the modem is suspended (%s)"
 msgstr "modem askıda (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 ile %d arasında bir tam sayı girin"
-
 msgid "Power status unavailable"
 msgstr "Güç durumu alınamadı"
 
@@ -1947,9 +1992,6 @@ msgstr "Olduğu gibi bırak"
 
 msgid "LTE only (5G off)"
 msgstr "Yalnızca LTE (5G kapalı)"
-
-msgid "On"
-msgstr "Açık"
 
 msgid "Full"
 msgstr "Tam"
@@ -3639,14 +3681,20 @@ msgstr "Geçersiz tıkanıklık denetimi"
 msgid "The boot adapter gave no valid reply"
 msgstr "Açılış bağdaştırıcısı geçerli yanıt vermedi"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED bağdaştırıcısı geçerli bir yanıt vermedi"
+
+msgid "Unknown LED setting"
+msgstr "Bilinmeyen LED ayarı"
+
+msgid "Invalid value for this setting"
+msgstr "Bu ayar için geçersiz değer"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Veri kullanımı bağdaştırıcısı geçerli bir yanıt vermedi"
 
 msgid "Unknown data usage setting"
 msgstr "Bilinmeyen veri kullanımı ayarı"
-
-msgid "Invalid value for this setting"
-msgstr "Bu ayar için geçersiz değer"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Yönlendirme bağdaştırıcısı geçerli bir yanıt vermedi"
@@ -4116,6 +4164,12 @@ msgstr "Zaten bir kurulum sürüyor"
 
 msgid "The language pack could not be removed"
 msgstr "Dil paketi kaldırılamadı"
+
+msgid "The LED settings could not be read"
+msgstr "LED ayarları okunamadı"
+
+msgid "The LED setting could not be saved"
+msgstr "LED ayarı kaydedilemedi"
 
 msgid "Lock cache unavailable"
 msgstr "Kilit önbelleği kullanılamıyor"

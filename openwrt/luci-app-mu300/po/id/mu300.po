@@ -52,6 +52,9 @@ msgstr "Bahasa"
 msgid "Power"
 msgstr "Daya"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Diterjemahkan"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Terjemahan LuCI sendiri berasal dari OpenWrt. Terjemahan panel ini selain bahasa Turki dan Mandarin adalah terjemahan mesin (AI); koreksi dipersilakan."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Masukkan bilangan bulat dari 0 hingga %d"
+
+msgid "Network lamp"
+msgstr "Lampu jaringan"
+
+msgid "Wi-Fi lamp"
+msgstr "Lampu Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Lampu baterai"
+
+msgid "On"
+msgstr "Hidup"
+
+msgid "Brightness (%)"
+msgstr "Kecerahan (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Lampu yang dimatikan tetap gelap; alarm panas tetap tampil pada LED-nya."
+
+msgid "Device default"
+msgstr "Bawaan perangkat"
+
+msgid "LED timeout (seconds)"
+msgstr "Batas waktu LED (detik)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Berapa lama LED tetap menyala setelah tombol ditekan atau ada perubahan; 0 membuatnya tetap menyala. Saat di pengisi daya LED tetap menyala."
+
+msgid "Boot indicator"
+msgstr "Indikator boot"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED menampilkan warnanya bergantian selama sistem dimulai"
+
+msgid "Heat alarm"
+msgstr "Alarm panas"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Kedip merah"
+
 msgid "Automatic"
 msgstr "Otomatis"
 
@@ -1822,9 +1870,6 @@ msgstr "dibangunkan oleh tombol %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem ditangguhkan (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Masukkan bilangan bulat dari 0 hingga %d"
-
 msgid "Power status unavailable"
 msgstr "Status daya tidak tersedia"
 
@@ -1947,9 +1992,6 @@ msgstr "Biarkan apa adanya"
 
 msgid "LTE only (5G off)"
 msgstr "Hanya LTE (5G mati)"
-
-msgid "On"
-msgstr "Hidup"
 
 msgid "Full"
 msgstr "Penuh"
@@ -3646,14 +3688,20 @@ msgstr "Kontrol kemacetan tidak valid"
 msgid "The boot adapter gave no valid reply"
 msgstr "Adaptor boot tidak memberi balasan yang valid"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptor LED tidak memberi balasan yang valid"
+
+msgid "Unknown LED setting"
+msgstr "Pengaturan LED tidak dikenal"
+
+msgid "Invalid value for this setting"
+msgstr "Nilai tidak valid untuk pengaturan ini"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptor penggunaan data tidak memberi balasan yang valid"
 
 msgid "Unknown data usage setting"
 msgstr "Pengaturan penggunaan data tidak dikenal"
-
-msgid "Invalid value for this setting"
-msgstr "Nilai tidak valid untuk pengaturan ini"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptor penerusan tidak memberi balasan yang valid"
@@ -4123,6 +4171,12 @@ msgstr "Instalasi sudah berjalan"
 
 msgid "The language pack could not be removed"
 msgstr "Paket bahasa tidak dapat dihapus"
+
+msgid "The LED settings could not be read"
+msgstr "Pengaturan LED tidak dapat dibaca"
+
+msgid "The LED setting could not be saved"
+msgstr "Pengaturan LED tidak dapat disimpan"
 
 msgid "Lock cache unavailable"
 msgstr "Cache kunci tidak tersedia"

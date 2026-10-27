@@ -52,6 +52,9 @@ msgstr "Jazyky"
 msgid "Power"
 msgstr "Napájanie"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Preložené"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Vlastné preklady LuCI pochádzajú z OpenWrt. Preklady tohto panelu okrem turečtiny a čínštiny sú strojové (AI); opravy sú vítané."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Zadajte celé číslo od 0 do %d"
+
+msgid "Network lamp"
+msgstr "Kontrolka siete"
+
+msgid "Wi-Fi lamp"
+msgstr "Kontrolka Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Kontrolka batérie"
+
+msgid "On"
+msgstr "Zapnuté"
+
+msgid "Brightness (%)"
+msgstr "Jas (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Vypnutá kontrolka zostane tmavá; tepelný alarm sa aj tak ukáže na svojej LED."
+
+msgid "Device default"
+msgstr "Predvolená hodnota zariadenia"
+
+msgid "LED timeout (seconds)"
+msgstr "Doba svietenia LED (sekundy)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Ako dlho LED svietia po stlačení tlačidla alebo zmene; 0 ich nechá svietiť. Na nabíjačke svietia."
+
+msgid "Boot indicator"
+msgstr "Indikácia spúšťania"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED počas štartu systému postupne ukazuje svoje farby"
+
+msgid "Heat alarm"
+msgstr "Tepelný alarm"
+
+msgid "Siren"
+msgstr "Siréna"
+
+msgid "Red blink"
+msgstr "Červené blikanie"
+
 msgid "Automatic"
 msgstr "Automaticky"
 
@@ -1822,9 +1870,6 @@ msgstr "prebudené tlačidlom %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem je pozastavený (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Zadajte celé číslo od 0 do %d"
-
 msgid "Power status unavailable"
 msgstr "Stav napájania nie je dostupný"
 
@@ -1947,9 +1992,6 @@ msgstr "Ponechať bez zmeny"
 
 msgid "LTE only (5G off)"
 msgstr "Iba LTE (5G vypnuté)"
-
-msgid "On"
-msgstr "Zapnuté"
 
 msgid "Full"
 msgstr "Plný"
@@ -3646,14 +3688,20 @@ msgstr "Neplatné riadenie zahltenia"
 msgid "The boot adapter gave no valid reply"
 msgstr "Adaptér spúšťania nevrátil platnú odpoveď"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptér LED nevrátil platnú odpoveď"
+
+msgid "Unknown LED setting"
+msgstr "Neznáme nastavenie LED"
+
+msgid "Invalid value for this setting"
+msgstr "Neplatná hodnota pre toto nastavenie"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptér spotreby dát nedal platnú odpoveď"
 
 msgid "Unknown data usage setting"
 msgstr "Neznáme nastavenie spotreby dát"
-
-msgid "Invalid value for this setting"
-msgstr "Neplatná hodnota pre toto nastavenie"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptér preposielania nedal platnú odpoveď"
@@ -4123,6 +4171,12 @@ msgstr "Inštalácia už prebieha"
 
 msgid "The language pack could not be removed"
 msgstr "Jazykový balík sa nepodarilo odstrániť"
+
+msgid "The LED settings could not be read"
+msgstr "Nastavenia LED sa nedajú prečítať"
+
+msgid "The LED setting could not be saved"
+msgstr "Nastavenie LED sa nedá uložiť"
 
 msgid "Lock cache unavailable"
 msgstr "Vyrovnávacia pamäť zámkov nie je dostupná"

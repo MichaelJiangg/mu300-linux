@@ -52,6 +52,9 @@ msgstr "Езици"
 msgid "Power"
 msgstr "Захранване"
 
+msgid "LEDs"
+msgstr "Светодиоди"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Преведено"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Собствените преводи на LuCI идват от OpenWrt. Преводите на този панел, освен турския и китайския, са машинни (AI); корекциите са добре дошли."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Въведете цяло число от 0 до %d"
+
+msgid "Network lamp"
+msgstr "Лампа на мрежата"
+
+msgid "Wi-Fi lamp"
+msgstr "Лампа на Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Лампа на батерията"
+
+msgid "On"
+msgstr "Вкл."
+
+msgid "Brightness (%)"
+msgstr "Яркост (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Изключена лампа остава тъмна; топлинната аларма пак се показва на своя светодиод."
+
+msgid "Device default"
+msgstr "По подразбиране за устройството"
+
+msgid "LED timeout (seconds)"
+msgstr "Време на светодиодите (секунди)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Колко дълго светодиодите светят след натискане на бутон или промяна; 0 ги оставя да светят. На зарядно светят."
+
+msgid "Boot indicator"
+msgstr "Индикатор при зареждане на системата"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Светодиодът показва цветовете си последователно, докато системата стартира"
+
+msgid "Heat alarm"
+msgstr "Топлинна аларма"
+
+msgid "Siren"
+msgstr "Сирена"
+
+msgid "Red blink"
+msgstr "Червено мигане"
+
 msgid "Automatic"
 msgstr "Автоматично"
 
@@ -1822,9 +1870,6 @@ msgstr "събуждане с бутона %s"
 msgid "the modem is suspended (%s)"
 msgstr "модемът е спрян временно (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Въведете цяло число от 0 до %d"
-
 msgid "Power status unavailable"
 msgstr "Състоянието на захранването не е налично"
 
@@ -1947,9 +1992,6 @@ msgstr "Без промяна"
 
 msgid "LTE only (5G off)"
 msgstr "Само LTE (5G изключен)"
-
-msgid "On"
-msgstr "Вкл."
 
 msgid "Full"
 msgstr "Пълна"
@@ -3646,14 +3688,20 @@ msgstr "Невалиден контрол на задръстванията"
 msgid "The boot adapter gave no valid reply"
 msgstr "Адаптерът за зареждане не върна валиден отговор"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "Адаптерът за LED не върна валиден отговор"
+
+msgid "Unknown LED setting"
+msgstr "Непозната настройка на светодиодите"
+
+msgid "Invalid value for this setting"
+msgstr "Невалидна стойност за тази настройка"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Адаптерът за използване на данни не върна валиден отговор"
 
 msgid "Unknown data usage setting"
 msgstr "Неизвестна настройка за използване на данни"
-
-msgid "Invalid value for this setting"
-msgstr "Невалидна стойност за тази настройка"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Адаптерът за препращане не даде валиден отговор"
@@ -4123,6 +4171,12 @@ msgstr "Вече се изпълнява инсталация"
 
 msgid "The language pack could not be removed"
 msgstr "Езиковият пакет не можа да бъде премахнат"
+
+msgid "The LED settings could not be read"
+msgstr "Настройките на светодиодите не можаха да бъдат прочетени"
+
+msgid "The LED setting could not be saved"
+msgstr "Настройката на светодиода не можа да бъде запазена"
 
 msgid "Lock cache unavailable"
 msgstr "Кешът на заключванията е недостъпен"

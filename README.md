@@ -478,6 +478,7 @@ the archive once online). `mu300-panel status` says where it is.
 | Save battery: profiles, radios that go idle when nobody is connected, a charge limit | `mu300-power status`, `sudo mu300-power profile battery` (`plugged`, `saver`, `auto`), `sudo mu300-power set battery.WIFI_IDLE 10`, `mu300-power log 5 /tmp/power.csv`; on `openwrt-luci` the page System -> Power. A boot that started from a charger stays a charging boot (LED blinking, hotspot and modem down) until the Wi-Fi key is pressed; see FINDINGS 36 |
 | Language of the web interface (OpenWrt) | System -> System -> Language and Style; more languages: see Languages below |
 | Find out which LED is which | `sudo mu300-led test` |
+| LEDs: a lamp off, dimmer, how long they stay lit, a boot indicator, how the heat alarm shows | `mu300-led settings`, `sudo mu300-led set network 0` (`wifi`, `battery`; `network_brightness 30`, `timeout 120`, `boot 1`, `thermal blink` or `off`); on `openwrt-luci` the page System -> LEDs, on Ubuntu the panel's LEDs card. By default nothing changes: every lamp on at its usual level, no boot indicator, the siren |
 | `adb shell`, `adb push`/`pull`, `adb forward` to Linux from a computer, as with Android | on by default, for every computer (a root shell without a password for anyone with a cable); only your own computers: `sudo mu300-usb adb key adbkey.pub`, then `sudo mu300-usb adb auth keys`; not at all: `sudo mu300-usb adb off`; see [adb to Linux](#adb-to-linux) |
 
 ### CPU voltage offset (EXPERIMENTAL)

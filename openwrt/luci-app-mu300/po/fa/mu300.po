@@ -52,6 +52,9 @@ msgstr "زبان‌ها"
 msgid "Power"
 msgstr "توان"
 
+msgid "LEDs"
+msgstr "چراغ‌های LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "ترجمه‌شده"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "ترجمه‌های خود LuCI از OpenWrt می‌آیند. ترجمه‌های این پنل به‌جز ترکی و چینی، ترجمهٔ ماشینی (هوش مصنوعی) هستند؛ از اصلاحات استقبال می‌شود."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "یک عدد صحیح از 0 تا %d وارد کنید"
+
+msgid "Network lamp"
+msgstr "چراغ شبکه"
+
+msgid "Wi-Fi lamp"
+msgstr "چراغ Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "چراغ باتری"
+
+msgid "On"
+msgstr "روشن"
+
+msgid "Brightness (%)"
+msgstr "روشنایی (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "چراغی که خاموش شده تاریک می‌ماند؛ هشدار دما همچنان روی LED خودش نشان داده می‌شود."
+
+msgid "Device default"
+msgstr "پیش‌فرض دستگاه"
+
+msgid "LED timeout (seconds)"
+msgstr "زمان روشن ماندن LEDها (ثانیه)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "مدتی که LEDها پس از فشردن یک کلید یا یک تغییر روشن می‌مانند؛ 0 آن‌ها را روشن نگه می‌دارد. روی شارژر روشن می‌مانند."
+
+msgid "Boot indicator"
+msgstr "نشانگر راه‌اندازی"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED هنگام راه‌اندازی سیستم رنگ‌هایش را به نوبت نشان می‌دهد"
+
+msgid "Heat alarm"
+msgstr "هشدار دما"
+
+msgid "Siren"
+msgstr "آژیر"
+
+msgid "Red blink"
+msgstr "چشمک قرمز"
+
 msgid "Automatic"
 msgstr "خودکار"
 
@@ -1822,9 +1870,6 @@ msgstr "با کلید %s بیدار شد"
 msgid "the modem is suspended (%s)"
 msgstr "مودم معلق است (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "یک عدد صحیح از 0 تا %d وارد کنید"
-
 msgid "Power status unavailable"
 msgstr "وضعیت توان در دسترس نیست"
 
@@ -1947,9 +1992,6 @@ msgstr "بدون تغییر"
 
 msgid "LTE only (5G off)"
 msgstr "فقط LTE (5G خاموش)"
-
-msgid "On"
-msgstr "روشن"
 
 msgid "Full"
 msgstr "کامل"
@@ -3646,14 +3688,20 @@ msgstr "کنترل ازدحام نامعتبر"
 msgid "The boot adapter gave no valid reply"
 msgstr "آداپتور بوت پاسخ معتبری نداد"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "آداپتور LED پاسخ معتبری نداد"
+
+msgid "Unknown LED setting"
+msgstr "تنظیم LED ناشناخته"
+
+msgid "Invalid value for this setting"
+msgstr "مقدار نامعتبر برای این تنظیم"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "آداپتور مصرف داده پاسخ معتبری نداد"
 
 msgid "Unknown data usage setting"
 msgstr "تنظیم ناشناخته مصرف داده"
-
-msgid "Invalid value for this setting"
-msgstr "مقدار نامعتبر برای این تنظیم"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "آداپتور بازارسال پاسخ معتبری نداد"
@@ -4123,6 +4171,12 @@ msgstr "یک نصب از قبل در حال اجراست"
 
 msgid "The language pack could not be removed"
 msgstr "حذف بستهٔ زبان ممکن نشد"
+
+msgid "The LED settings could not be read"
+msgstr "تنظیمات LED خوانده نشد"
+
+msgid "The LED setting could not be saved"
+msgstr "تنظیم LED ذخیره نشد"
 
 msgid "Lock cache unavailable"
 msgstr "حافظهٔ نهان قفل در دسترس نیست"

@@ -52,6 +52,9 @@ msgstr "Dillər"
 msgid "Power"
 msgstr "Enerji"
 
+msgid "LEDs"
+msgstr "LED-lər"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -1525,6 +1528,51 @@ msgstr "Tərcümə olunub"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI-nin öz tərcümələri OpenWrt-dən gəlir. Bu panelin türk və Çin dillərindən başqa tərcümələri maşın (AI) tərcümələridir; düzəlişlər məmnuniyyətlə qəbul edilir."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 ilə %d arasında tam ədəd daxil edin"
+
+msgid "Network lamp"
+msgstr "Şəbəkə lampası"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi lampası"
+
+msgid "Battery lamp"
+msgstr "Batareya lampası"
+
+msgid "On"
+msgstr "Aktiv"
+
+msgid "Brightness (%)"
+msgstr "Parlaqlıq (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Söndürülmüş lampa qaranlıq qalır; istilik siqnalı yenə də öz LED-ində görünür."
+
+msgid "Device default"
+msgstr "Cihazın standartı"
+
+msgid "LED timeout (seconds)"
+msgstr "LED vaxt həddi (saniyə)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Düymə basıldıqdan və ya dəyişiklikdən sonra LED-lərin nə qədər yanılı qaldığı; 0 onları həmişə yanılı saxlayır. Şarj cihazında yanılı qalırlar."
+
+msgid "Boot indicator"
+msgstr "Yükləmə göstəricisi"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Sistem başlayarkən LED rənglərini növbə ilə göstərir"
+
+msgid "Heat alarm"
+msgstr "İstilik siqnalı"
+
+msgid "Siren"
+msgstr "Sirena"
+
+msgid "Red blink"
+msgstr "Qırmızı yanıb-sönmə"
+
 msgid "Automatic"
 msgstr "Avtomatik"
 
@@ -1822,9 +1870,6 @@ msgstr "%s düyməsi ilə oyandı"
 msgid "the modem is suspended (%s)"
 msgstr "modem dayandırılıb (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 ilə %d arasında tam ədəd daxil edin"
-
 msgid "Power status unavailable"
 msgstr "Enerji vəziyyəti əlçatan deyil"
 
@@ -1947,9 +1992,6 @@ msgstr "Olduğu kimi saxla"
 
 msgid "LTE only (5G off)"
 msgstr "Yalnız LTE (5G söndürülüb)"
-
-msgid "On"
-msgstr "Aktiv"
 
 msgid "Full"
 msgstr "Tam"
@@ -3646,14 +3688,20 @@ msgstr "Yanlış sıxlıq idarəsi"
 msgid "The boot adapter gave no valid reply"
 msgstr "Açılış adapteri etibarlı cavab vermədi"
 
+msgid "The LED adapter gave no valid reply"
+msgstr "LED adapteri etibarlı cavab vermədi"
+
+msgid "Unknown LED setting"
+msgstr "Naməlum LED ayarı"
+
+msgid "Invalid value for this setting"
+msgstr "Bu ayar üçün yanlış dəyər"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Məlumat istifadəsi adapteri etibarlı cavab vermədi"
 
 msgid "Unknown data usage setting"
 msgstr "Naməlum məlumat istifadəsi ayarı"
-
-msgid "Invalid value for this setting"
-msgstr "Bu ayar üçün yanlış dəyər"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Yönləndirmə adapteri etibarlı cavab vermədi"
@@ -4123,6 +4171,12 @@ msgstr "Artıq bir quraşdırma icra olunur"
 
 msgid "The language pack could not be removed"
 msgstr "Dil paketini silmək mümkün olmadı"
+
+msgid "The LED settings could not be read"
+msgstr "LED ayarları oxuna bilmədi"
+
+msgid "The LED setting could not be saved"
+msgstr "LED ayarı saxlanıla bilmədi"
 
 msgid "Lock cache unavailable"
 msgstr "Kilid keşi əlçatan deyil"
