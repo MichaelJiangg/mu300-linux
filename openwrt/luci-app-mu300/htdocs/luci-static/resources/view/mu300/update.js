@@ -230,8 +230,10 @@ return view.extend({
 			E('div', { 'class': 'mud-note' }, _('It was started outside this page (a terminal, the toolkit). Nothing can be started here until it has finished.'))
 		]));
 
-		if (st.restart_pending && !(job.state === 'done' && job.changed)) {
-			var prb = E('button', { 'class': 'mud-btn on', 'id': 'mud-upd-pending-restart', 'disabled': off ? '' : null }, _('Restart now'));
+		/* not while an update still runs: the system is switched before the kernel step, and a restart then cuts that
+		   step short (#422) */
+		if (st.restart_pending && !off && !(job.state === 'done' && job.changed)) {
+			var prb = E('button', { 'class': 'mud-btn on', 'id': 'mud-upd-pending-restart' }, _('Restart now'));
 			prb.addEventListener('click', function() { self.restart(prb); });
 			cards.push(E('section', { 'class': 'mud-card', 'id': 'mud-upd-pending', 'style': 'margin-bottom:14px' }, [
 				E('h3', {}, _('Restart needed')),

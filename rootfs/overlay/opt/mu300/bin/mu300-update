@@ -3304,6 +3304,63 @@ boot_room() {
     return 1
 }
 
+# A restart in the middle of the kernel step (#422, docs/FINDINGS.md 235): the systems' set of the bundle's release is
+# replaced before the image is written, and the two belong together - a module of one build in the kernel of another
+# reads the wrong offsets (sprd_wlan_combo's probe: an Oops 25 s into the boot, and the fallback went to Android). And
+# what was unpacked last had not reached the disk yet: 307 modules came back as empty files. So the unpacked set is
+# checked and on the disk (sync) before any system gets it, and from the moment the systems' set is touched until the
+# image is written, $BOOTDIR/modules.pending says so: the release and the banner of the new kernel. Whoever finds it
+# next - the ramdisk's init before the system starts (boot/init, modules_settle), or the next mu300-update - puts in
+# the set of the image in the slot: the unpacked bundle's when that is the new kernel, else the set kept with the
+# image before (prev_modules_restore).
+kernel_banner() { grep -a -o -m 1 'Linux version [0-9][^[:cntrl:]]*' | head -n 1; }
+image_banner() {  # image_banner IMAGE: the banner of the kernel in a boot image (a partition, or a kept image)
+    _iz=$(u32 "$1" 8)
+    case $_iz in ''|0|*[!0-9]*) return 1 ;; esac
+    dd if="$1" bs=4096 skip=1 count=$(( (_iz + 4095) / 4096 )) 2>/dev/null | kernel_banner
+}
+# modules_complete BUNDLE_DIR LIST: every module the bundle lists is unpacked, none of them empty
+modules_complete() {
+    _mn=$(grep -c '^\./modules/[^/]*\.ko$' "$2")
+    [ "$(ls "$1/modules" 2>/dev/null | grep -c '\.ko$')" = "$_mn" ] || return 1
+    [ "$_mn" = 0 ] && return 0
+    for _mf in "$1"/modules/*.ko; do [ -s "$_mf" ] || return 1; done
+}
+# modules_pending KREL BANNER: written down, and on the disk, before the systems' set changes
+modules_pending() {
+    printf '%s\n%s\n' "$1" "$2" > "$BOOTDIR/modules.pending.new" &&
+        mv -f "$BOOTDIR/modules.pending.new" "$BOOTDIR/modules.pending" && sync
+}
+modules_done() { rm -f "$BOOTDIR/modules.pending"; sync; }
+# modules_settle: the set a kernel step that stopped left in the systems, made the one of the image in the slot
+modules_settle() {
+    [ -f "$BOOTDIR/modules.pending" ] || return 0
+    _sk=$(sed -n 1p "$BOOTDIR/modules.pending"); _sb=$(sed -n 2p "$BOOTDIR/modules.pending")
+    case $_sk in ''|*/*|.*) modules_done; return 0 ;; esac
+    # (an image whose banner cannot be read is not the new kernel: that one's was read)
+    _sd=$(boot_dev "boot_$(linux_slot)" 2>/dev/null) && [ -r "$_sd" ] ||
+        { echo "boot: a kernel step stopped half-way and the boot image cannot be read to settle its modules; the next start does" >&2; return 1; }
+    _ss=$(image_banner "$_sd")
+    if [ -n "$_sb" ] && [ "$_ss" = "$_sb" ]; then
+        echo "boot: the last kernel step stopped after writing its image: its modules go in again"
+        ls "$STAGE/boot/modules"/*.ko >/dev/null 2>&1 && [ "$(cat "$STAGE/boot/kernel.release" 2>/dev/null)" = "$_sk" ] ||
+            { echo "boot: the unpacked modules of that step are gone; run mu300-update boot before restarting" >&2; modules_done; return 1; }
+        kernel_modules_into_systems "$STAGE/boot" || return 1
+    else
+        echo "boot: the last kernel step stopped before writing its image: the modules of the image in place go back"
+        for _sp in "$BOOTDIR/prev.modules.new" "$BOOTDIR/prev.modules" ''; do
+            [ "$(cat "$_sp/kernel.release" 2>/dev/null)" != "$_sk" ] || break
+        done
+        if [ -n "$_sp" ]; then
+            prev_modules_restore "$_sp" || return 1
+        else
+            # nothing was kept: the systems had no set of this release
+            for _os in $(installed_systems); do rm -f "$(modules_dir "$_os" "$_sk")"/*.ko; done
+        fi
+    fi
+    modules_done
+}
+
 # boot_update TAG: the kernel step. However it ends, nothing of it stays on the partition but what it put in place:
 # the unpacked bundle and the images being made go, a set of modules kept for an image that was not written goes, and
 # so does the bundle it downloaded when it did not finish (a kernel update that failed for want of room left 200 MB of
@@ -3311,6 +3368,8 @@ boot_room() {
 boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu300-kernel.tar.gz instead)
     BOOT_BUNDLE=
     boot_update_run "$@"; _bur=$?
+    # (a step that ended with its modules half-way: put right before what it unpacked goes)
+    modules_settle || _bur=1
     rm -rf "${STAGE:?}/boot" "${BOOTDIR:?}/prev.modules.new"
     [ "$_bur" = 0 ] || [ -z "$BOOT_BUNDLE" ] || [ -n "${MU300_KERNEL_BUNDLE:-}" ] || rm -f "$BOOT_BUNDLE"
     BOOT_MODS_PENDING=
@@ -3319,8 +3378,11 @@ boot_update() {  # boot_update TAG   (MU300_KERNEL_BUNDLE=FILE uses a local mu30
 # (from the EXIT trap, unpack_abort: a run stopped between the new modules and the image puts the set in place back)
 BOOT_MODS_PENDING=
 boot_abort() {
-    [ -n "${BOOT_MODS_PENDING:-}" ] && [ -d "${BOOTDIR:?}/prev.modules.new" ] &&
+    if [ -f "${BOOTDIR:?}/modules.pending" ]; then
+        modules_settle >/dev/null 2>&1
+    elif [ -n "${BOOT_MODS_PENDING:-}" ] && [ -d "$BOOTDIR/prev.modules.new" ]; then
         prev_modules_restore "$BOOTDIR/prev.modules.new" >/dev/null 2>&1
+    fi
     BOOT_MODS_PENDING=
     rm -rf "${STAGE:?}/boot" "${BOOTDIR:?}/prev.modules.new" 2>/dev/null
     return 0
@@ -3331,6 +3393,7 @@ boot_update_run() {
     dev=$(boot_dev "$bp") || { echo "boot: the boot image was not updated" >&2; return 1; }
     psize=$(part_bytes "$dev")
     tmp=${STAGE:?}/boot
+    modules_settle || return 1
     rm -rf "$tmp" "${BOOTDIR:?}/prev.modules.new"; mkdir -p "$tmp" "$BOOTDIR"
 
     say "boot: kernel and boot image"
@@ -3398,7 +3461,11 @@ boot_update_run() {
     fi
     untar -xzf "$bundle" -C "$tmp" $_bx || { echo "boot: unpacking $bundle failed; nothing was changed" >&2; return 1; }
     [ -s "$tmp/Image" ] && [ -s "$tmp/ramdisk-generic.lz4" ] || { echo "boot: no kernel in the bundle" >&2; return 1; }
-    [ -z "$mods" ] || [ -s "$tmp/kernel.release" ] || { echo "boot: unpacking the modules failed; nothing was changed" >&2; return 1; }
+    { [ -z "$mods" ] || { [ -s "$tmp/kernel.release" ] && modules_complete "$tmp" "$tmp/list"; }; } ||
+        { echo "boot: unpacking the modules failed; nothing was changed" >&2; return 1; }
+    # what was unpacked is on the disk before a system gets it as second names (#422: empty files after a restart)
+    kbanner=
+    if [ -n "$mods" ]; then sync; kbanner=$(kernel_banner < "$tmp/Image"); fi
     # unpacked and checked: the download has done its part (a bundle of the caller's stays)
     [ -n "${MU300_KERNEL_BUNDLE:-}" ] || rm -f "$bundle"
     id=$(cat "$tmp/Image" "$tmp/ramdisk-generic.lz4" | sha256sum | cut -d' ' -f1)
@@ -3407,7 +3474,11 @@ boot_update_run() {
     dd if="$dev" bs=4096 skip=$((osize / 4096)) count=$(( (vbs + 4095) / 4096 )) 2>/dev/null | head -c "$vbs" > "$tmp/vbmeta"
     cur=$(sha256sum < "$tmp/body" | cut -d' ' -f1)
     if [ "$cur" = "$(cat "$BOOTDIR/written.sha256" 2>/dev/null)" ] && [ "$id" = "$(cat "$BOOTDIR/installed.id" 2>/dev/null)" ]; then
-        [ -z "$mods" ] || kernel_modules_into_systems "$tmp" || return 1
+        if [ -n "$mods" ]; then
+            [ -z "$kbanner" ] || modules_pending "$(cat "$tmp/kernel.release")" "$kbanner"
+            kernel_modules_into_systems "$tmp" || return 1
+            modules_done
+        fi
         # the image in place is this release's as well (the same kernel and ramdisk): written down, or check and the
         # Update page offer this release again after every update that did not change the kernel (seen on the U30
         # Air: v2026.10.30 installed, its boot image still called v2026.10.27)
@@ -3439,8 +3510,10 @@ boot_update_run() {
     retire_call_audio || { echo "boot: legacy call audio could not be removed" >&2; return 1; }
     prev_modules_save "$tmp" || { echo "boot: keeping the modules in place failed; nothing was changed" >&2; return 1; }
     BOOT_MODS_PENDING=1
+    # (the kept set on the disk first: it is what a restart before the image is written puts back)
+    [ -z "$mods" ] || [ -z "$kbanner" ] || { sync; modules_pending "$(cat "$tmp/kernel.release")" "$kbanner"; }
     if [ -n "$mods" ] && ! kernel_modules_into_systems "$tmp"; then
-        prev_modules_restore "$BOOTDIR/prev.modules.new" >/dev/null; BOOT_MODS_PENDING=
+        prev_modules_restore "$BOOTDIR/prev.modules.new" >/dev/null; BOOT_MODS_PENDING=; modules_done
         echo "boot: the boot image is unchanged" >&2; return 1
     fi
     # the image read from the slot is the one kept: moved, not copied
@@ -3456,13 +3529,14 @@ boot_update_run() {
         echo "boot: writing $bp failed verification; restoring the previous image" >&2
         write_boot "$dev" "$psize" "$BOOTDIR/prev.body" "$BOOTDIR/prev.vbmeta" "$BOOTDIR/prev.footer" ||
             echo "boot: RESTORE FAILED - do not reboot into Linux; reinstall with ./install.sh from a computer" >&2
-        prev_modules_restore >&2
+        prev_modules_restore >&2 && modules_done
         return 1
     fi
     sha256sum < "$tmp/new" | cut -d' ' -f1 > "$BOOTDIR/written.sha256"
     echo "$id" > "$BOOTDIR/installed.id"
     echo "$tag" > "$BOOTDIR/installed.tag"
     kernel_choice > "$BOOTDIR/installed.kernel"
+    modules_done
     # the image that was in the slot is the kept one now: the sets neither image needs go (the one the image kept
     # until now ran with, unless it is still needed)
     BOOT_KEPT_KREL=$BOOT_SLOT_KREL BOOT_SLOT_KREL=$(cat "$tmp/kernel.release" 2>/dev/null || image_krel "$dev")
@@ -4621,7 +4695,8 @@ esac
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
 case ${1:-check} in
     apply|boot|kernel|rollback|rollback-boot|clean|accounts)
-        lock_take; trap 'unpack_abort; keepalive_stop; resume_data; lock_drop' EXIT; trap 'exit 130' INT TERM HUP ;;
+        lock_take; trap 'unpack_abort; keepalive_stop; resume_data; lock_drop' EXIT; trap 'exit 130' INT TERM HUP
+        modules_settle ;;
 esac
 source_conf
 case ${1:-check} in apply|boot|kernel) keepalive_start ;; esac

@@ -888,6 +888,47 @@ boot_tries_exceeded() {
     log "stage=boot-tries-exceeded count=$tries (booting Android instead)"
 }
 # --- boot-tries end
+# --- modules-settle begin
+# A kernel step of mu300-update that a restart stopped (#422, docs/FINDINGS.md 235) leaves .mu300's boot/modules.pending:
+# the release and banner of the kernel it was installing. Its module set is in the systems already, and with the image
+# before still in the slot the two builds did not match (an Oops in the Wi-Fi driver's probe 25 s in, then Android).
+# Before any module of the system loads, the set that goes with the kernel running now is put in: the unpacked
+# bundle's (on the disk before the step began) when this is the new kernel, else the one kept with the image before.
+# modules_settle DISK: DISK is the mounted Linux disk; always true
+modules_settle() {
+    _mp=$1/boot/modules.pending
+    [ -f "$_mp" ] || return 0
+    _mk=$(sed -n 1p "$_mp"); _mb=$(sed -n 2p "$_mp")
+    case $_mk in ''|*/*|.*) rm -f "$_mp"; sync; return 0 ;; esac
+    _mv=$(uname -v)
+    if [ "$(uname -r)" = "$_mk" ] && [ -n "$_mv" ] && [ "${_mb%" $_mv"}" != "$_mb" ]; then
+        _mw=new _ms=$1/.mu300-update/boot/modules
+        ls "$_ms"/*.ko >/dev/null 2>&1 || { log "stage=modules-settle-missing (the unpacked set is gone)"; rm -f "$_mp"; sync; return 0; }
+    else
+        _mw=kept _ms=
+        for _mc in "$1/boot/prev.modules.new" "$1/boot/prev.modules"; do
+            [ "$(cat "$_mc/kernel.release" 2>/dev/null)" = "$_mk" ] && { _ms=$_mc; break; }
+        done
+    fi
+    for _mo in ubuntu openwrt openwrt-luci; do
+        [ -d "$1/$_mo" ] || continue
+        _md=$1/$_mo/lib/modules/$_mk
+        [ "$_mo" = ubuntu ] && _md=$_md/extra
+        _mf=$_ms
+        [ "$_mw" = new ] || _mf=${_ms:+$_ms/$_mo}
+        [ -d "$_md" ] || [ "$_mw" = new ] || continue
+        mkdir -p "$_md" && rm -f "$_md"/*.ko
+        if [ -n "$_mf" ] && ls "$_mf"/*.ko >/dev/null 2>&1; then
+            ln "$_mf"/*.ko "$_md/" 2>/dev/null || cp "$_mf"/*.ko "$_md/"
+        fi
+        # Ubuntu's index of them (best effort: its own depmod)
+        [ "$_mo" != ubuntu ] || chroot "$1/ubuntu" /usr/sbin/depmod "$_mk" >/dev/null 2>&1 ||
+            chroot "$1/ubuntu" /sbin/depmod "$_mk" >/dev/null 2>&1 || true
+    done
+    rm -f "$_mp"; sync
+    log "stage=modules-settled release=$_mk set=$_mw"
+}
+# --- modules-settle end
 if [ "$root_mounted" = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
     if boot_tries_exceeded "$rootdir" /disk; then
         restore_android
@@ -896,6 +937,7 @@ if [ "$root_mounted" = 1 ] && rootdir=$(pick_root) && [ -n "$rootdir" ]; then
         reboot -f
         sleep 30
     fi
+    modules_settle /disk
     # The system's modules into the page cache, beside the rest of the bring-up: OpenWrt's procd runs kmodloader before
     # anything else, and its scan of every module (~2950 files, a few pages of each) cold off the eMMC held the boot
     # 1.7 s. One cat of them all, from inside their directory so that it goes on after switch_root (the kill loop below
