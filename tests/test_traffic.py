@@ -153,6 +153,83 @@ class Counting(TrafficBase):
             self.assertEqual(self.days(shell, self.now + 120), {'2026-10-10': (60, 10)})
 
 
+class LiveDevice(TrafficBase):
+    """DEVICE=auto (the default; issue #369): the interface mobile data uses now - netifd's WAN device on OpenWrt,
+    else the sipa_eth that is up (sipa_eth8 with the internal SIM), else the one counted last."""
+
+    def oper(self, dev, state):
+        d = self.root / 'sys/class/net' / dev
+        d.mkdir(parents=True, exist_ok=True)
+        (d / 'operstate').write_text(state + '\n')
+
+    def setUp(self):
+        super().setUp()
+        self.stub('mu300-sim', 'echo 0')
+
+    def test_the_internal_sims_bearer_is_counted(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.counters(0, 0, 50, dev='sipa_eth0', idx=5)
+            self.oper('sipa_eth0', 'down')
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.sample(shell, 6000, 600, 160, self.now + 60, dev='sipa_eth8', idx=9)
+            v = self.view(shell, self.now + 60)
+            self.assertEqual((v['device'], v['available']), ('sipa_eth8', 1))
+            self.assertEqual(self.days(shell, self.now + 60), {'2026-10-10': (5000, 500)})
+
+    def test_the_old_default_in_the_file_means_auto(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.set(shell, 'cap', '50G')       # writes every setting, DEVICE included
+            self.store.joinpath('conf').write_text(
+                self.store.joinpath('conf').read_text().replace('DEVICE=auto', 'DEVICE=sipa_eth0'))
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth8')
+            self.set(shell, 'device', 'auto')
+            self.assertIn('DEVICE=auto', self.store.joinpath('conf').read_text())
+
+    def test_an_explicit_device_wins(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.oper('sipa_eth8', 'up')
+            self.set(shell, 'device', 'wwan0')
+            self.sample(shell, 1000, 100, 100, self.now, dev='wwan0')
+            self.assertEqual(self.view(shell, self.now)['device'], 'wwan0')
+
+    def test_data_down_for_a_moment_keeps_the_device_counted_last(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.oper('sipa_eth8', 'down')                  # no sipa_eth is up now
+            self.sample(shell, 3000, 300, 160, self.now + 60, dev='sipa_eth8', idx=9)
+            v = self.view(shell, self.now + 60)
+            self.assertEqual((v['device'], v['available']), ('sipa_eth8', 0))
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 4000, 400, 220, self.now + 120, dev='sipa_eth8', idx=9)
+            self.assertEqual(self.days(shell, self.now + 120), {'2026-10-10': (3000, 300)})
+
+    def test_nothing_known_falls_back_to_the_active_slots_bearer(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.stub('mu300-sim', 'echo 1')
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth8')
+
+    def test_openwrt_follows_netifds_wan_device(self):
+        for shell in self.each_shell():
+            self.fresh()
+            (self.root / 'etc').mkdir(exist_ok=True)
+            (self.root / 'etc/openwrt_release').write_text("DISTRIB_ID='OpenWrt'\n")
+            self.stub('uci', 'exit 1')
+            self.stub('ubus', 'echo "$*" >> "$STUBLOG/ubus"; printf \'{\\n\\t"up": true,\\n\\t"l3_device": "sipa_eth9",\\n\\t"device": "sipa_eth9"\\n}\\n\'')
+            self.oper('sipa_eth0', 'up')                    # up, but not the WAN's
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth9', idx=11)
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth9')
+            self.assertIn('call network.interface.wan status', (self.tmp / 'ubus').read_text())
+
+
 class Days(TrafficBase):
     def test_an_interval_over_midnight_is_split_by_time(self):
         for shell in self.each_shell():
