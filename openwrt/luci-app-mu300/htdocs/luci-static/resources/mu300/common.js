@@ -442,6 +442,16 @@ function injectCss() {
 	st.textContent = CSS;
 	document.head.appendChild(st);
 }
+/* cellIdentity(snapshot): the serving cell's TAC and cell ID in decimal, or null. AT+C5GREG's while registered on 5G SA
+ * (stat 1 or 5 there), else AT+CEREG's; both give them as hex strings: a TAC of up to 6 digits, a cell ID of up to 9
+ * (NR's 36-bit NCI). Anything else (no registration, a value that is not plain hex) gives null. */
+function cellIdentity(c) {
+	var r = c && c.reg5g && (c.reg5g.stat == 1 || c.reg5g.stat == 5) ? c.reg5g : null, nr = !!r;
+	if (!r) r = c && c.reg && (c.reg.stat == 1 || c.reg.stat == 5) ? c.reg : null;
+	if (!r || typeof r.tac != 'string' || typeof r.cid != 'string' ||
+	    !/^[0-9A-Fa-f]{1,6}$/.test(r.tac) || !/^[0-9A-Fa-f]{1,9}$/.test(r.cid)) return null;
+	return { tac: parseInt(r.tac, 16), cid: parseInt(r.cid, 16), nr: nr };
+}
 function v(id) { return document.getElementById('mud-' + id); }
 function set(id, text, color) {
 	var e = v(id);
@@ -774,7 +784,7 @@ return baseclass.extend({
 	callTermToken: callTermToken,
 	carrierName: carrierName, qLevel: qLevel, qLevelLabel: qLevelLabel, qLabel: qLabel, qCol: qCol, qScore: qScore,
 	esc: esc, fmtBytes: fmtBytes, fmtRate: fmtRate, fmtUptime: fmtUptime, PLMN_CN: PLMN_CN,
-	injectCss: injectCss, v: v, set: set, spark: spark, neighborRows: neighborRows,
+	injectCss: injectCss, v: v, set: set, cellIdentity: cellIdentity, spark: spark, neighborRows: neighborRows,
 	errText: errText, toast: toast, busy: busy, confirmBox: confirmBox, alertBox: alertBox, choiceBox: choiceBox,
 	notify: notify, watchSms: watchSms
 });

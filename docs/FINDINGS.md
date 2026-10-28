@@ -3791,8 +3791,15 @@ channel 149 works.
   `mu300-wifi-band` with a stub `uci`, and again with the real `uci` and ash of the v2026.10.18 `openwrt-luci`
   rootfs; and, with `MU300_WRT_IMAGE` naming an OpenWrt 25.12 image, the patch applied to the feed's wifi-scripts
   (OpenWrt 25.12.5, ImmortalWrt 25.12.2 and the v2026.10.18 rootfs) and the hostapd configuration they generate for
-  a fake wiphy with and without radar detection. Not yet on a device: the hotspot on 36 after LuCI was set to 60,
-  and ACS (`auto` in LuCI) on this driver.
+  a fake wiphy with and without radar detection. Not yet on a device: the hotspot on 36 after LuCI was set to 60.
+* **ACS on this driver, and a channel list off its band** (#424, U30 Air, v2026.10.28.1, 6.18.59): ACS works
+  (`auto`: `ACS-COMPLETED freq=2412 channel=1` within 2 s on 2.4 GHz, HT20 and HT40; 36 on 5 GHz with the list). But
+  the `channels` list `openwrt-wifi-config` writes for 5 GHz stayed when LuCI changed the band to 2.4 GHz with
+  `auto`: hostapd got `chanlist=36 40 44 48` with `hw_mode=g`, said `ACS: No available channels found` and the
+  access point never came up. The same patch now drops list entries that are not on the radio's band
+  (`device_chanlist_band()`, a range when either end is off it), with one `wifi-scripts: channel list: ... not on
+  the 2g band, left out` line, and the whole list when nothing is left, so ACS uses the band. Tested in the 25.12.6
+  feed's scripts for a fake wiphy (`tests/test_wifi_channels.py`) and on the device.
 
 ### 43. adb over USB to Linux: adbd in the gadget, and what FunctionFS does to the rest of it
 
