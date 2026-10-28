@@ -1094,7 +1094,7 @@ class Rules(unittest.TestCase):
         # one argument: the build's own `set --` statement is run with spaces in every path
         text = (TOP / 'openwrt' / 'build-rootfs.sh').read_text()
         self.assertNotIn('$LUCI', text)
-        m = re.search(r'\n    (set -- -v "\$THEME_APK:.*?:/in/catalogs:ro")\n', text, re.S)
+        m = re.search(r'\n    (set -- -v "\$THEME_APK:.*?:/in/luci-lexical-translator.sh:ro")\n', text, re.S)
         self.assertTrue(m, 'the luci mounts are not one set -- statement')
         self.assertRegex(text, r'-v "\$REGDB":/in/regdb:ro "\$@" \\\n')
         for sh in shells():
@@ -1102,7 +1102,8 @@ class Rules(unittest.TestCase):
                                env=dict(os.environ, THEME_APK='/a b/theme.apk', TOP='/my repo', CAT='/t m/cat'))
             self.assertEqual(r.stdout.splitlines(), [
                 '-v', '/a b/theme.apk:/in/luci-theme-aurora.apk:ro', '-v', '/my repo/openwrt/luci-app-mu300:/in/luci-plugin:ro',
-                '-v', '/my repo/openwrt/luci-overlay:/in/luci-overlay:ro', '-v', '/t m/cat:/in/catalogs:ro'], sh)
+                '-v', '/my repo/openwrt/luci-overlay:/in/luci-overlay:ro', '-v', '/t m/cat:/in/catalogs:ro',
+                '-v', '/my repo/openwrt/patches/luci-lexical-translator.sh:/in/luci-lexical-translator.sh:ro'], sh)
 
     def test_openwrt_luci_starts_ndp_learn(self):
         # K37: init.d/mu300-ndp is enabled in openwrt-luci's image (it does nothing unless wan is in relay mode) and
