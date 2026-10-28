@@ -101,4 +101,7 @@ docker run --rm -v "$W":/work mu300-kbuild chown -R "$(id -u):$(id -g)" /work/ou
 mkdir -p "$OUT"
 rm -rf "$OUT/modules" "$OUT/modules-u30air"
 cp -R "$W/out/." "$OUT/"
+# the parity rule (upstream/parity-5.4.txt): record this build's modules and built-in objects in
+# upstream/parity/5.4-build.list and check that the file says what stands on mainline for each of them
+python3 "$TOP/upstream/check-parity.py" --5.4 "$OUT"
 echo "kernel outputs in $OUT"
