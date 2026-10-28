@@ -84,7 +84,7 @@ LTE_TABLE_F50=1,3,5,8,34,38,39,40,41
 LTE_TABLE_U30AIR=1,2,3,4,5,7,8,12,17,20,28,34,38,39,40,41,42,43,66
 LTE_TABLE_U30AIR_W25135=1,3,5,8,34,39,40,41
 # modem_fw: the modem's firmware line, for the U30 Air table that differs between firmware builds. The identity
-# cache is tried first (a boot replay then needs no AT round trip); the AT query is cached in RUNDIR (tmpfs).
+# cache is tried first (a boot replay then needs no AT round trip); the AT answer is cached in RUNDIR (tmpfs).
 modem_fw() {
     local cache=$RUNDIR/modem-fw f out
     if [ -s "$cache" ]; then cat "$cache"; return 0; fi
@@ -94,8 +94,9 @@ modem_fw() {
         [ -n "$out" ] || out=$(jfilter -i "$f" -e '@.ident.fw' 2>/dev/null || true)
         [ -n "$out" ] && { printf '%s\n' "$out"; return 0; }
     done
-    out=$(at 'AT+CGMR' 2 2>/dev/null | sed -n '1p' | tr -d '\r')
-    case $out in *W25.*) ;; *) return 1 ;; esac
+    # the first line that names a version; any firmware's is cached (one AT round per boot), none is retried
+    out=$(at 'AT+CGMR' 2 2>/dev/null | grep -m1 -i 'version')
+    [ -n "$out" ] || return 1
     mkdir -p "${cache%/*}" 2>/dev/null
     printf '%s\n' "$out" > "$cache" 2>/dev/null
     printf '%s\n' "$out"
