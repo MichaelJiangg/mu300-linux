@@ -198,9 +198,9 @@ builtin fixed na # the fixed regulator: the boards' device tree has no regulator
 
 # ---------------------------------------------------------------------------------------------------------------------
 # random numbers
-builtin sprd_trng missing group:rng boards:f50,u30air,v50 # the SoC's TRNG (rng@e0000, sprd,sprd-trng): /dev/hwrng on 5.4; mainline has no driver and the firmware no SMCCC TRNG (FINDINGS: the random pool waits)
-driver platform/sprd_trng missing group:rng boards:f50,u30air,v50 # see sprd_trng
-hwrng 202e0000.rng missing group:rng boards:f50,u30air,v50 # see sprd_trng
+builtin sprd_trng ok = cfg:HW_RANDOM_SPRD bind:platform/sprd_trng # the SoC's TRNG (rng@e0000, sprd,sprd-trng), ported: upstream/port/drivers/char/hw_random/sprd_trng.c, built in as on 5.4 (FINDINGS 234)
+driver platform/sprd_trng ok cfg:HW_RANDOM_SPRD bind:platform/sprd_trng
+hwrng 202e0000.rng ok cfg:HW_RANDOM_SPRD has:hwrng/202e0000.rng # /dev/hwrng, the same name as on 5.4
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DDR, modem and multimedia DVFS (power)
