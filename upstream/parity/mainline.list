@@ -51,6 +51,7 @@ cfg TYPEC_UMP9620 6.18 7.2 7.3
 cfg UNIX 6.18 7.2 7.3
 cfg USB_CONFIGFS_ECM_SUBSET 6.18 7.2 7.3
 cfg USB_CONFIGFS_F_HID 6.18 7.2 7.3
+cfg USB_CONFIGFS_F_MIDI 6.18 7.2 7.3
 cfg USB_CONFIGFS_SERIAL 6.18 7.2 7.3
 cfg USB_DWC3 6.18 7.2 7.3
 cfg USB_DWC3_DUAL_ROLE 6.18 7.2 7.3
@@ -607,6 +608,7 @@ ko usb_f_ecm_subset 6.18 7.2 7.3
 ko usb_f_fs 6.18 7.2 7.3
 ko usb_f_hid 6.18 7.2 7.3
 ko usb_f_mass_storage 6.18 7.2 7.3
+ko usb_f_midi 6.18 7.2 7.3
 ko usb_f_ncm 6.18 7.2 7.3
 ko usb_f_rndis 6.18 7.2 7.3
 ko usb_f_serial 6.18 7.2 7.3

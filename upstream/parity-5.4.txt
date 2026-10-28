@@ -95,7 +95,7 @@ builtin regmap_hook na # Unisoc's regmap debug hook (vendor debugfs), not upstre
 builtin usb_f_serial ok cfg:USB_CONFIGFS_SERIAL
 builtin usb_f_ecm_subset ok cfg:USB_CONFIGFS_ECM_SUBSET
 builtin usb_f_hid ok cfg:USB_CONFIGFS_F_HID
-builtin usb_f_midi missing group:usb-gadget boards:f50,u30air,v50 # USB_CONFIGFS_F_MIDI needs ALSA rawmidi built in (SND_RAWMIDI is a module on mainline)
+builtin usb_f_midi ok = cfg:USB_CONFIGFS_F_MIDI # the gadget's MIDI function (configfs midi.*), built in with SND and SND_RAWMIDI as on 5.4; mu300-audio's modules build and load against it
 builtin usb_f_accessory na # Android Open Accessory, Android-only (not upstream)
 builtin usb_f_audio_source na # Android's audio source function, Android-only (not upstream)
 module usb_f_vser na # Unisoc's vendor serial function for Android's USB diag modes; mu300-usb's console is the standard ACM function
