@@ -44,8 +44,9 @@ class Repository(unittest.TestCase):
         for e in entries.values():
             if e.status == 'missing':
                 groups.setdefault(e.field('group'), []).append(e.name)
-        self.assertIn('rng', groups)
-        self.assertIn('typec', groups)
+        # groups nobody has ported yet (the porting list shrinks group by group)
+        self.assertIn('dvfs', groups)
+        self.assertIn('debug', groups)
 
 
 class Rule(unittest.TestCase):

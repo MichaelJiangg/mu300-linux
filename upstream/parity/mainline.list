@@ -43,6 +43,7 @@ cfg POWER_SUPPLY 6.18 7.2 7.3
 cfg REGULATOR 6.18 7.2 7.3
 cfg SERIAL_CORE 6.18 7.2 7.3
 cfg SPI_SPRD_ADI 6.18 7.2 7.3
+cfg SPRD_SOC_ID 6.18 7.2 7.3
 cfg SPRD_THERMAL_R5P0 6.18 7.2 7.3
 cfg SPRD_TIMER 6.18 7.2 7.3
 cfg SPRD_UMS9620_IPA_PD 6.18 7.2 7.3
@@ -554,6 +555,7 @@ ko sprd_serial 6.18 7.2 7.3
 ko sprd_shm 6.18 7.2 7.3
 ko sprd_sip_svc 6.18 7.2 7.3
 ko sprd_sipc_virt_bus 6.18 7.2 7.3
+ko sprd_soc_id 6.18 7.2 7.3
 ko sprd_systimer 6.18 7.2 7.3
 ko sprd_thermal_r5p0 6.18 7.2 7.3
 ko sprd_time_sync 6.18 7.2 7.3

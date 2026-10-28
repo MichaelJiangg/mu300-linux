@@ -263,6 +263,22 @@ if 'qogirn6pro' not in t:
     t = t.replace('static int sprd_efuse_write(', 'static int __maybe_unused sprd_efuse_write(')
     open(ep, 'w').write(t)
 assert 'reg_write' not in open(ep).read()
+# the SoC's identity, as the vendor 5.4 drivers sprd_soc_id and sprd_manufacturer_model gave it: /proc/socid/socid_inf,
+# sprd_get_soc_id() and /sys/devices/soc0 (soc_model, soc_manufacturer and the standard SoC device attributes)
+append_once('drivers/soc/Makefile', 'sprd/', 'obj-y\t\t\t\t+= sprd/\n')
+open(os.path.join(tree, 'drivers/soc/sprd/Makefile'), 'a').close()
+append_once('drivers/soc/sprd/Makefile', 'sprd_soc_id.o', 'obj-$(CONFIG_SPRD_SOC_ID) += sprd_soc_id.o\n')
+append_once('drivers/soc/Kconfig', 'config SPRD_SOC_ID', '''
+menu "Unisoc SoC drivers (MU300 port)"
+config SPRD_SOC_ID
+	tristate "Unisoc SoC ID and model"
+	depends on (ARCH_SPRD && OF && MFD_SYSCON) || COMPILE_TEST
+	select SOC_BUS
+	help
+	  The chip ID registers (sprd,soc-id) and the SoC model the device tree names: /proc/socid/socid_inf and
+	  /sys/devices/soc0, as the Unisoc 5.4 kernel's sprd_soc_id and sprd_manufacturer_model gave them.
+endmenu
+''')
 # cpufreq: UMS9620 apcpu DVFS is done by ATF through Unisoc SIP calls (vendor sprd_sip_svc + sprd-cpufreq-v2)
 append_once('drivers/firmware/Makefile', 'sprd_sip_svc.o', 'obj-$(CONFIG_SPRD_SIP_SVC) += sprd_sip_svc.o\n')
 append_once('drivers/firmware/Kconfig', 'SPRD_SIP_SVC', '''
