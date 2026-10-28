@@ -228,6 +228,7 @@ return view.extend({
     <div class="mud-rat" id="mud-rat">--<span class="mud-bars" id="mud-bars"><i style="height:25%"></i><i style="height:45%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></span></div>
     <div class="mud-op" id="mud-op">--</div>
     <div class="mud-cellline" id="mud-cellline"></div>
+    <div class="mud-note" id="mud-cellid" style="margin-top:4px"></div>
     <div class="mud-note" id="mud-stale" style="display:none;margin:4px 0 0;color:var(--warning,#f59e0b)"></div>
     <a class="mud-note" id="mud-update" href="${L.url('admin/system/mu300-update')}" style="display:none;margin:4px 0 0;color:var(--brand,var(--primary,#2f7bf6))"></a>
   </div>
@@ -741,6 +742,10 @@ return view.extend({
 		if (c && c.lte && c.lte.band) cl.push(_('Anchor B%s').format(c.lte.band) + ' · PCI ' + c.lte.pci + ' · EARFCN ' + c.lte.earfcn +
 			(c.lte.sinr != null ? ' · SINR ' + c.lte.sinr.toFixed(1) + ' dB' : ''));
 		M.v('cellline').innerHTML = cl.map(M.esc).join('<br>') || '<span style="color:var(--text-muted,var(--text-light,#777))">' + _('No serving cell') + '</span>';
+		/* The serving cell's identity in decimal, as cell databases list it (#398, from gonav8): read from the snapshot
+		 * already in hand (AT+C5GREG while registered on 5G SA, else AT+CEREG), so it costs no RPC and no AT command */
+		var ci = M.cellIdentity(c);
+		M.v('cellid').textContent = ci ? 'TAC ' + ci.tac + ' · Cell ID ' + ci.cid + (ci.nr ? ' (5G)' : '') : '';
 
 		M.set('rsrp', '--');
 		if (rsrp != null) M.v('rsrp').innerHTML = rsrp.toFixed(1) + '<small> dBm</small>';
