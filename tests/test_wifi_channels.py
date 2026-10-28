@@ -355,6 +355,7 @@ class WifiScriptsPatch(unittest.TestCase):
         self.assertIn('c.radar_detect_widths', added)
         self.assertIn('config.acs_exclude_dfs = true;', added)
         self.assertIn('device_no_dfs(config);', added)
+        self.assertIn('device_chanlist_band(config);', added)
 
 
 @unittest.skipUnless(os.environ.get('MU300_WRT_IMAGE') and shutil.which('docker'),
@@ -373,7 +374,8 @@ class WifiScriptsInOpenWrt(unittest.TestCase):
             e.update(flags.get(c, {'radar': True, 'no_ir': True} if 52 <= c <= 144 else {}))
             freqs.append(e)
         return {'extended_features': [0] * 16, 'cipher_suites': [], 'interface_combinations': [comb],
-                'wiphy_bands': [{'freqs': [{'freq': 2412}]}, {'freqs': freqs, 'ht_capa': 0x1fe,
+                'wiphy_bands': [{'freqs': [{'freq': 2407 + 5 * c} for c in range(1, 14)], 'ht_capa': 0x1fe},
+                                {'freqs': freqs, 'ht_capa': 0x1fe,
                                                                'vht_capa': 0x339071b2}]}
 
     @staticmethod
@@ -400,6 +402,10 @@ class WifiScriptsInOpenWrt(unittest.TestCase):
             'auto-list': (False, {}, 'auto', 'VHT80', {'channels': '36 40 44 48 149 153 157 161 165'}),
             'no36-60': (False, no36, 60, 'VHT80', None),
             'no5g-60': (False, {c: {'disabled': True} for c in FIVE if not 52 <= c <= 144}, 60, 'VHT80', None),
+            # #424: LuCI changed the band to 2.4 GHz and left the 5 GHz list openwrt-wifi-config wrote for auto
+            '2g-auto-5glist': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': '36 40 44 48'}),
+            '2g-auto-mixed': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': ['1 6', '36', '1-11', '1-36']}),
+            '2g-auto-list': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': '1 6 11'}),
         }
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
@@ -459,6 +465,18 @@ done
             # 36-48 not allowed: 149
             _, c = conf('no36-60')
             self.assertEqual((c['channel'], c['vht_oper_centr_freq_seg0_idx']), ('149', '155'))
+            # a channel list off the radio's band is dropped (#424): ACS over the whole band instead of no channel
+            text, c = conf('2g-auto-5glist')
+            self.assertEqual((c['hw_mode'], c['channel']), ('g', '0'))
+            self.assertNotIn('chanlist', c)
+            self.assertIn('channel list: 36 40 44 48 not on the 2g band, left out; automatic channel selection uses '
+                          'the whole band', text)
+            text, c = conf('2g-auto-mixed')
+            self.assertEqual(c['chanlist'], '1 6 1-11')
+            self.assertIn('channel list: 36 1-36 not on the 2g band, left out\n', text + '\n')
+            text, c = conf('2g-auto-list')
+            self.assertEqual(c['chanlist'], '1 6 11')
+            self.assertNotIn('channel list', text)
             # nothing to go to: left as it was, and said
             text, c = conf('no5g-60')
             self.assertEqual(c['channel'], '60')
