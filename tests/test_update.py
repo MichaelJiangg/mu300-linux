@@ -526,6 +526,52 @@ class Update(UpdateBase):
 # Update's setUp, device() and up() live in UpdateBase, which has no tests; Update and FromStock both derive from it
 # (deriving from Update would run its tests twice).
 @unittest.skipIf(not HAVE_LZ4, 'neither the lz4 command nor the lz4 Python module is installed')
+class ApkFeeds(UpdateBase):
+    """#420: a distfeeds.list the user changed (another mirror) is theirs, and kept the release it was written for -
+    25.12.5 on a 25.12.6 image, whose kmods are another kernel's. Its OpenWrt feeds follow the new image's release."""
+    NEW = ('https://downloads.openwrt.org/releases/25.12.6/targets/armsr/armv8/packages/packages.adb\n'
+           'https://downloads.openwrt.org/releases/25.12.6/packages/aarch64_generic/base/packages.adb\n'
+           'https://downloads.openwrt.org/releases/25.12.6/targets/armsr/armv8/kmods/6.12.112-1-67e205f26d0458c4d12f1fd315216398/packages.adb\n')
+    USER = ('https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/25.12.5/targets/armsr/armv8/packages/packages.adb\n'
+            'https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/25.12.5/packages/aarch64_generic/base/packages.adb\n'
+            'https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/25.12.5/targets/armsr/armv8/kmods/6.12.94-1-ba5ca7f3e73618aeece9cc1c14e512c2/packages.adb\n'
+            '# https://example.org/releases/1.0/packages/mine.adb\n'
+            'https://example.org/releases/2.1.3/mine/packages.adb\n'
+            'https://example.org/my/feed/packages.adb\n')
+
+    def test_the_users_feeds_follow_the_new_release(self):
+        f = self.disk / 'openwrt/etc/apk/repositories.d/distfeeds.list'
+        f.parent.mkdir(parents=True)
+        for shell in self.each_shell():
+            f.write_text(self.NEW)
+            r = self.up(shell, f'v=$(apk_feeds_of "{self.disk}/openwrt"); echo "[$v]"')
+            self.assertEqual(r.stdout, '[25.12.6 6.12.112-1-67e205f26d0458c4d12f1fd315216398]\n', r.stderr)
+            f.write_text(self.USER)
+            f.chmod(0o640)
+            ino = f.stat().st_ino
+            r = self.up(shell, f'apk_feeds_follow "{self.disk}/openwrt" $v; echo "rc=$?"'.replace('$v', '25.12.6 6.12.112-1-67e205f26d0458c4d12f1fd315216398'))
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertIn('follow the new release, 25.12.6', r.stdout)
+            self.assertEqual(f.read_text(), self.USER.replace('/25.12.5/', '/25.12.6/').replace(
+                '6.12.94-1-ba5ca7f3e73618aeece9cc1c14e512c2', '6.12.112-1-67e205f26d0458c4d12f1fd315216398'))
+            # a new file (never written into: it may be a second name of the old system's), with the user's mode
+            self.assertNotEqual(f.stat().st_ino, ino)
+            self.assertEqual(f.stat().st_mode & 0o777, 0o640)
+            self.assertFalse(f.with_name('distfeeds.list.mu300').exists())
+            # already on the release: nothing said, nothing written
+            ino = f.stat().st_ino
+            r = self.up(shell, f'apk_feeds_follow "{self.disk}/openwrt" 25.12.6 6.12.112-1-67e205f26d0458c4d12f1fd315216398')
+            self.assertEqual((r.returncode, r.stdout), (0, ''), r.stderr)
+            self.assertEqual(f.stat().st_ino, ino)
+
+    def test_the_carry_runs_it_for_openwrt(self):
+        src = (BIN / 'mu300-update').read_text()
+        cs = src[src.index('carry_system() {'):src.index('\n}\n', src.index('carry_system() {'))]
+        self.assertIn('_cfeeds=$(apk_feeds_of "$_cn")', cs)
+        self.assertLess(cs.index('apk_feeds_of'), cs.index('carry_plan'))
+        self.assertIn('apk_feeds_follow "$_cn" $_cfeeds', cs)
+
+
 class FromStock(UpdateBase):
     """bootimg_from_stock gives the bytes boot/build-boot-image.py gives, from the same stock image, kernel and
     ramdisk: the header page of Android's image with the new sizes, loglevel=5 and no signature, its vbmeta, its

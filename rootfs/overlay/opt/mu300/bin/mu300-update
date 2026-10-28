@@ -1496,6 +1496,32 @@ carry_report() {
     # the note at the next login, until "mu300-update report" has shown it (notice, and OpenWrt's profile.d)
     if grep -q "^r$CARRY_TAB" "$CARRY_T/plan" || [ -n "$CARRY_FALLBACK" ]; then : > "$_cr.new"; else rm -f "$_cr.new"; fi
 }
+# The feeds of the OpenWrt release (#420): distfeeds.list names the release and the kmods directory of its kernel. One
+# the user changed (another mirror, most often) wins like any setting, and kept the release it was written for: the
+# feeds of 25.12.5 on an image of 25.12.6, whose kmods are another kernel's, and every package that needs a kmod
+# "breaks" the kernel. The user's lines follow the release of the new image: in each line of an OpenWrt release feed
+# its version and kmods directory; the host, the scheme and any line of their own stay theirs.
+# apk_feeds_of NEW: "VERSION KMODS" of the image's distfeeds.list (KMODS - when it has none), before the carry
+apk_feeds_of() {
+    _af=$1/etc/apk/repositories.d/distfeeds.list
+    [ -f "$_af" ] && [ ! -L "$_af" ] || return 0
+    _av=$(sed -n 's|.*/releases/\([0-9][0-9A-Za-z.-]*\)/targets/.*|\1|p' "$_af" | head -n 1)
+    _ak=$(sed -n 's|.*/releases/[^/]*/targets/.*/kmods/\([0-9A-Za-z._-]*\)/.*|\1|p' "$_af" | head -n 1)
+    [ -z "$_av" ] || echo "$_av ${_ak:--}"
+}
+# apk_feeds_follow NEW VERSION KMODS: the distfeeds.list in NEW (the user's, after the carry) on that release
+apk_feeds_follow() {
+    _af=$1/etc/apk/repositories.d/distfeeds.list
+    [ -f "$_af" ] && [ ! -L "$_af" ] && [ -n "$2" ] || return 0
+    # (a release feed of OpenWrt: /releases/X.Y.Z[-rcN]/ and then targets/T/S/ or packages/ARCH/)
+    _ar='/releases/[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?/(targets/[^/]+/[^/]+/|packages/[^/]+/)'
+    _ae="\\#$_ar#s#/releases/[^/]+/#/releases/$2/#"
+    [ "${3:--}" = - ] || _ae="$_ae;\\#$_ar#s#/kmods/[^/]+/#/kmods/$3/#"
+    # (a copy first: the file itself may be a second name of the old system's, which is never written to)
+    cp -p "$_af" "$_af.mu300" && sed -E -e "$_ae" "$_af" > "$_af.mu300" || { rm -f "$_af.mu300"; return 0; }
+    if [ "$(cat "$_af")" = "$(cat "$_af.mu300")" ]; then rm -f "$_af.mu300"; return 0; fi
+    mv -f "$_af.mu300" "$_af" && echo "  /etc/apk/repositories.d/distfeeds.list (yours): its OpenWrt feeds follow the new release, $2"
+}
 # carry_system OLD NEW OS MODE: all of it, between the unpacking of NEW and the switch: the files, the accounts, the
 # packages to install again (upk_record). Status 3: not enough room, and nothing but NEW was touched.
 carry_system() {
@@ -1503,6 +1529,7 @@ carry_system() {
     case $_cmode in copy|link) ;; *) return 1 ;; esac
     [ -d "$_co" ] && [ -d "$_cn" ] || return 1
     CARRY_KIND=$(os_kind "$_cos") || return 1
+    _cfeeds=; [ "$CARRY_KIND" != openwrt ] || _cfeeds=$(apk_feeds_of "$_cn")
     CARRY_BIN=${MU300_CARRY:-$_cn/opt/mu300/bin/mu300-carry}
     CARRY_T=$_cn/.mu300-carry
     _cfrom=$(cat "$_co/etc/mu300/image-version" 2>/dev/null) || _cfrom=
@@ -1593,7 +1620,11 @@ carry_system() {
         set -- $_cl
         [ -L "$_cp" ] || { chown "$2:$3" "$_cp" && chmod "$1" "$_cp"; } || exit 1
     done || return 1
-    if [ "$CARRY_KIND" = openwrt ]; then stale_config_clean "$_cn"; fi
+    if [ "$CARRY_KIND" = openwrt ]; then
+        stale_config_clean "$_cn"
+        # shellcheck disable=SC2086
+        [ -z "$_cfeeds" ] || apk_feeds_follow "$_cn" $_cfeeds
+    fi
     merge_accounts "$_co" "$_cn" && carry_accounts "$_co" "$_cn" || { echo "  could not carry the accounts over" >&2; return 1; }
     image_own_restore "$_cn" || return 1
     # the packages installed on the device: written down, their settings set aside, put back at the first boot
