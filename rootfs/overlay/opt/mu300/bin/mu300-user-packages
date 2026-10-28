@@ -3,6 +3,8 @@
 # (mu300-update apply, or an installer's update: they write them down, see upk_record in mu300-update).
 #   mu300-user-packages status    what was written down, what is back, what failed and why, the settings set aside
 #   mu300-user-packages retry     try again now (also after skip, a failure or no internet)
+#   mu300-user-packages retry --dns   the same, with dnsmasq asking the connection's resolvers too for that run (when
+#                                   its only DNS server is a package that waits to be installed again)
 #   mu300-user-packages skip      do not install them again; their settings stay set aside
 #   mu300-user-packages dismiss   drop the note shown at login
 #   mu300-user-packages run       the service at boot (OpenWrt: init.d/mu300-user-packages; Ubuntu: systemd)
@@ -20,6 +22,9 @@
 # own on 127.0.0.1 while it runs, and an update took that over with /etc/config/dhcp - without the proxy there was no
 # DNS at all (#116). It never weakens DNS privacy by itself (see dns_check): a forwarder of a package that is gone for
 # good is removed only when another server stays; an only one is reported, and repair-dns removes it on request.
+# DNS that only a package still to come back answered (AdGuardHome on 127.0.0.1#8858, #421): no package list can be
+# fetched, not even that package's. That is said at once (status, the note at login), and retry --dns installs them
+# through the connection's resolvers for that one run; dnsmasq is as it was afterwards.
 # A LuCI theme whose files are not there is taken off LuCI's list (the default goes back to one that is there).
 export PATH="$PATH:/opt/mu300/bin:/usr/sbin:/sbin"
 R=${MU300_SYSROOT:-}
@@ -139,15 +144,70 @@ dns_orphans() {
         done
     done
 }
+# dns_dead: "SECTION VALUE..." for each dnsmasq section with nothing to ask: no resolv file (noresolv), and every
+# server a loopback forwarder nothing listens on
+dns_dead() {
+    [ "$KIND" = openwrt ] && have uci || return 0
+    for _s in $(uci -q show dhcp | sed -n 's/^dhcp\.\([^.=]*\)=dnsmasq$/\1/p'); do
+        [ "$(uci -q get "dhcp.$_s.noresolv")" = 1 ] || continue
+        _all=$(uci -q get "dhcp.$_s.server")
+        [ -n "$_all" ] || continue
+        _dead=
+        for _v in $_all; do
+            case $_v in 127.*'#'[0-9]*|'::1#'[0-9]*) ;; *) continue 2 ;; esac
+            _port=${_v##*#}
+            case $_port in *[!0-9]*) continue 2 ;; esac
+            ! port_bound "$_port" || continue 2
+            _dead="$_dead $_v"
+        done
+        echo "$_s$_dead"
+    done
+}
+# dns_dead_note: said when packages wait and DNS has nowhere to go (true then)
+dns_dead_note() {
+    [ -n "$(upk_pending "$D")" ] || return 1
+    _dd=$(dns_dead)
+    [ -n "$_dd" ] || return 1
+    _dv=$(printf '%s\n' "$_dd" | cut -d' ' -f2- | tr '\n' ' ' | sed 's/ *$//')
+    grep -qF "DNS goes only to $_dv" "$DNS_NOTE" 2>/dev/null && return 0
+    [ -n "${DNS_DEAD_SAID:-}" ] || log "DNS: dnsmasq forwards only to $_dv and nothing answers there (a package that waits to be installed again?): no package list can be fetched. To install them through the connection's resolvers this once: mu300-user-packages retry --dns"
+    DNS_DEAD_SAID=1
+    echo "DNS goes only to $_dv, where nothing answers: no package can be downloaded. To install them through the connection's resolvers this once: mu300-user-packages retry --dns" >> "$DNS_NOTE"
+}
+# retry --dns: for the run, dnsmasq asks the connection's resolvers too (noresolv 0) in the sections dns_dead names;
+# dns_bridge_end puts noresolv back as it was, at the end of the run however it ends, or at the next run after a
+# restart in the middle. Its forwarders stay: the package that answers there takes over once it is back.
+DNS_BRIDGE=$D/dns-bridge
+dns_bridge() {
+    _dd=$(dns_dead)
+    [ -n "$_dd" ] || return 0
+    printf '%s\n' "$_dd" | while read -r _s _r; do echo "$_s 1"; done > "$DNS_BRIDGE" || return 1
+    while read -r _s _n; do uci -q set "dhcp.$_s.noresolv=0"; done < "$DNS_BRIDGE"
+    uci -q commit dhcp
+    [ ! -x "$R/etc/init.d/dnsmasq" ] || "$R/etc/init.d/dnsmasq" restart </dev/null >/dev/null 2>&1 || :
+    log "DNS: for this run dnsmasq asks the connection's resolvers too (retry --dns)"
+    ${MU300_DNS_WAIT:-sleep} 2
+}
+dns_bridge_end() {
+    [ -f "$DNS_BRIDGE" ] || return 0
+    while read -r _s _n; do
+        case $_n in 0|1) uci -q set "dhcp.$_s.noresolv=$_n" ;; esac
+    done < "$DNS_BRIDGE"
+    uci -q commit dhcp
+    rm -f "$DNS_BRIDGE"
+    [ ! -x "$R/etc/init.d/dnsmasq" ] || "$R/etc/init.d/dnsmasq" restart </dev/null >/dev/null 2>&1 || :
+    log "DNS: dnsmasq asks only its own servers again, as before retry --dns"
+}
 # dns_check [manual]: after the reinstall step (and by repair-dns: manual); see above
 dns_check() {
     rm -f "$DNS_NOTE"
     [ "$KIND" = openwrt ] && have uci || return 0
+    dns_dead_note
     _c=$(dns_orphans)
     [ -n "$_c" ] || return 0
     if vpn_on; then
         log "DNS: dnsmasq forwards to a port of a package that is not installed, and the VPN is on: nothing is changed (uci show dhcp)"
-        echo "dnsmasq forwards to a port of a package that is not installed; the VPN is on, so nothing was changed: uci show dhcp" > "$DNS_NOTE"
+        echo "dnsmasq forwards to a port of a package that is not installed; the VPN is on, so nothing was changed: uci show dhcp" >> "$DNS_NOTE"
         return 0
     fi
     # seen again over the window: one that comes up meanwhile was starting, not gone
@@ -344,8 +404,10 @@ run() {  # run [now]: now (retry) does not wait for the system to settle and doe
     [ -s "$D/wanted" ] || return 0
     mkdir -p "$RUNDIR"
     mkdir "$RUNDIR/mu300-user-packages.lock" 2>/dev/null || { echo "mu300-user-packages is running already" >&2; return 1; }
-    trap 'rmdir "$RUNDIR/mu300-user-packages.lock" 2>/dev/null' EXIT
+    trap 'dns_bridge_end; rmdir "$RUNDIR/mu300-user-packages.lock" 2>/dev/null' EXIT
     trap 'exit 130' INT TERM HUP
+    # (a retry --dns that a restart stopped: dnsmasq as it was first)
+    if [ "${1:-}" = bridge ]; then dns_bridge || return 1; else dns_bridge_end; fi
     _left=$(upk_pending "$D")
     if [ -z "$_left" ]; then
         # nothing left: a state that still waits (an older retry left pending) is over
@@ -375,6 +437,8 @@ run() {  # run [now]: now (retry) does not wait for the system to settle and doe
     if [ -n "$_todo" ]; then
         _i=1
         until _o=$(pm_update 2>&1) || apt_sources_check; do
+            # no DNS to fetch them with: said at once, not after the hour of tries
+            [ "$_i" != 1 ] || ! dns_dead_note || note
             if [ "$_i" -ge "$TRIES" ]; then
                 set_state offline
                 log "no internet (the package lists could not be fetched): tries again at the next boot, or: mu300-user-packages retry"
@@ -440,11 +504,16 @@ case ${1:-status} in
     run) run ;;
     retry)
         [ -s "$D/wanted" ] || { echo "nothing to install again"; exit 0; }
+        case ${2:-} in
+            '') _how=now ;;
+            --dns) [ "$KIND" = openwrt ] || { echo "retry --dns is for OpenWrt's dnsmasq" >&2; exit 2; }; _how=bridge ;;
+            *) echo "usage: mu300-user-packages retry [--dns]" >&2; exit 2 ;;
+        esac
         # a failure is tried again too: the feed may have it now
         : > "$D/failed"; rm -f "$D/boots"
         # pending only with something to install: with everything back already it is done (was: pending for good)
         if [ -n "$(upk_pending "$D")" ]; then set_state pending; else set_state done; fi
-        run now; status ;;
+        run "$_how"; dns_bridge_end; status ;;
     skip)
         [ -s "$D/wanted" ] || { echo "nothing to skip"; exit 0; }
         set_state skipped; note
@@ -455,6 +524,6 @@ case ${1:-status} in
     dismiss) rm -f "$D/note" "$APT_NOTE" "$MOTD"; echo "the note is gone (mu300-user-packages status still shows everything)" ;;
     status) status ;;
     brief) summary ;;
-    -h|--help|help) sed -n '2,11s/^# \{0,1\}//p' "$0" ;;
-    *) echo "usage: mu300-user-packages status|retry|skip|repair-dns|dismiss|run|brief" >&2; exit 2 ;;
+    -h|--help|help) sed -n '2,13s/^# \{0,1\}//p' "$0" ;;
+    *) echo "usage: mu300-user-packages status|retry [--dns]|skip|repair-dns|dismiss|run|brief" >&2; exit 2 ;;
 esac
