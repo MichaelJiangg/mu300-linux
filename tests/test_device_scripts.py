@@ -4089,6 +4089,77 @@ class Buttons(ShellTest):
                                         calls.index('systemctl start mu300-hotspot'))
                 self.assertEqual(marker.exists(), event == '116 long', event)
 
+    def test_a_tick_starts_mu300_led_only_when_it_has_something_to_do(self):
+        """FINDINGS 235: the tick every 5 s starts mu300-led only when a file its hint names changed, its due time
+        came (a timeout running out; a minute at the latest) or there is no hint - the LEDs still time out on time and
+        the battery LED still follows the charger"""
+        root = self.tmp / 'root'
+        for n in ('sc27xx:red', 'sc27xx:green', 'sc27xx:blue', 'zte-ldo0'):   # zte-ldo0: SIM 1's network LED
+            d = root / 'sys/class/leds' / n
+            d.mkdir(parents=True, exist_ok=True)
+            (d / 'brightness').write_text('0\n'); (d / 'max_brightness').write_text('255\n')
+            (d / 'trigger').write_text('[none] timer\n')
+        ps = root / 'sys/class/power_supply'
+        for d, files in (('sc27xx-fgu', {'capacity': 80, 'status': 'Discharging'}), ('bq256xx-charger', {'online': 0})):
+            (ps / d).mkdir(parents=True, exist_ok=True)
+            for k, v in files.items():
+                (ps / d / k).write_text(f'{v}\n')
+        (root / 'proc').mkdir(parents=True, exist_ok=True)
+        (root / 'run/mu300').mkdir(parents=True, exist_ok=True)
+        (root / 'run/mu300/device').write_text('u30air\n')
+        self.stub('mu300-keys', 'echo "0 tick"')
+        self.stub('mu300-led', f'echo "mu300-led $*" >> "$STUBLOG/calls"; exec "{BIN}/mu300-led" "$@"')
+        env = dict(MU300_RUN=self.tmp / 'run', MU300_SYSROOT=root, MU300_BIN=BIN, MU300_LED_CONF=self.tmp / 'none')
+
+        def uptime(s):
+            (root / 'proc/uptime').write_text(f'{s}.50 0.00\n')
+
+        def ticks(shell):
+            (self.tmp / 'calls').unlink(missing_ok=True)
+            r = self.script(shell, BIN / 'mu300-buttons', **env)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            calls = (self.tmp / 'calls').read_text().splitlines() if (self.tmp / 'calls').exists() else []
+            return calls.count('mu300-led tick')
+
+        def lit():
+            return (root / 'sys/class/leds/zte-ldo0/brightness').read_text().strip()
+
+        for shell in self.each_shell():
+            for f in (root / 'run/mu300/led').glob('.*'):
+                f.unlink()
+            (ps / 'bq256xx-charger/online').write_text('0\n')
+            uptime(100)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'data', 'on', **env).returncode, 0)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'wake', **env).returncode, 0)   # lit until 160
+            self.assertEqual(lit(), '255')
+            self.assertEqual(ticks(shell), 1)          # no hint yet
+            uptime(101)
+            self.assertEqual(ticks(shell), 0)          # nothing changed, nothing due
+            uptime(160)
+            self.assertEqual(ticks(shell), 1)          # the timeout ran out: dark
+            self.assertEqual(lit(), '0')
+            uptime(170)
+            self.assertEqual(ticks(shell), 0)
+            (ps / 'bq256xx-charger/online').write_text('1\n')
+            self.assertEqual(ticks(shell), 1)          # plugged in: lit at once
+            self.assertEqual(lit(), '255')
+            uptime(200)
+            self.assertEqual(ticks(shell), 0)
+            uptime(230)
+            self.assertEqual(ticks(shell), 1)          # a minute without one: a tick all the same
+            (ps / 'bq256xx-charger/online').write_text('0\n')
+            self.assertEqual(ticks(shell), 1)          # unplugged: the timeout starts again (until 290)
+            uptime(250)
+            self.assertEqual(ticks(shell), 0)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'wake', **env).returncode, 0)   # a key: until 310
+            self.assertEqual(ticks(shell), 1)          # .awake-until changed
+            uptime(300)
+            self.assertEqual(ticks(shell), 0)
+            self.assertEqual(lit(), '255')
+            uptime(310)
+            self.assertEqual(ticks(shell), 1)
+            self.assertEqual(lit(), '0')
+
     def test_held_power_in_the_charging_boot_starts(self):
         # the stock charger mode: hold power to switch the device on (FINDINGS 196); no shutdown, no marker
         self.stub('mu300-keys', 'cat "$STUBLOG/keys.in"')
@@ -5906,6 +5977,15 @@ class EarlyRecorderCpus(ShellTest):
                              '0,1,2,3')
             self.assertEqual(self.little(shell, {0: 1024, 1: 512, 2: None, 3: 512}), '1,3')
             self.assertEqual(self.little(shell, {0: None}), '')       # nothing known: no pinning
+
+    def test_a_round_reads_little(self):
+        """FINDINGS 235: logd's last 300 lines and the kernel's last MB, not their whole logs through a pipe; 30 s
+        rounds after the first 90 s"""
+        s = (BIN / 'early-recorder').read_text()
+        self.assertIn('logread -l 300 2>/dev/null | grep -v PR_CAPBSET;', s)
+        self.assertNotIn('logread 2>/dev/null |', s)
+        self.assertIn('dmesg -s 1000000 2>/dev/null || dmesg | tail -c 1000000', s)
+        self.assertIn('if [ "$(cut -d. -f1 /proc/uptime)" -lt 90 ]; then sleep 2; else sleep 30; fi', s)
 
 
 class EarlyRecorderNode(ShellTest):
