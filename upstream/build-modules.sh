@@ -64,4 +64,10 @@ for m in $mods; do
     done
 done
 cp "$O/modules.in-tree" "$OUT/modules.in-tree"
+# nothing the 5.4 kernel has may be missing here unsaid (parity-5.4.txt): every mainline equivalent it names, and every
+# 5.4 module it does not name, must be in this build. Not on a partial run (some vendor modules only) nor for the
+# fragment alone (MU300_ALL_MODULES=0), which leave out what the full build has.
+if [ $# -eq 0 ] && [ "${MU300_ALL_MODULES:-1}" != 0 ]; then
+    python3 /work/check-parity.py --mainline $OUT --builtin $O/modules.builtin --config $O/.config
+fi
 ls -la $OUT/modules/*.ko
