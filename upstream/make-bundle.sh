@@ -26,6 +26,8 @@ REF=${2:-$(ls -t "$TOP"/release/*/mu300-kernel.tar.gz 2>/dev/null | head -1)}
 case_sensitive "$UO/modules" || exit 1
 
 python3 "$U/audit-bundle.py" "$UO" "$U/mu300-mainline.config"
+# nothing of the 5.4 kernel missing unsaid (parity-5.4.txt; audit-bundle.py wrote kernel.config)
+python3 "$U/check-parity.py" --mainline "$UO"
 # the modules the devices' guard keeps from on-demand loading, against this build (FINDINGS 163)
 python3 "$U/check-autoload-blocked.py" "$UO" "$TOP/rootfs/overlay/opt/mu300/lib/autoload-blocked" \
     "$TOP/rootfs/overlay/opt/mu300/bin/mu300-modprobe-guard"

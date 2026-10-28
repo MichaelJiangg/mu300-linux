@@ -12249,3 +12249,38 @@ replay (C10b) and the voice-switch receipts. The Ubuntu panel (mu300-api) still 
 (stack restart, radio back in 7 s) and ended `done`, the band job waited for it and ended `error` "None of these bands
 is supported by this modem"; an LTE lock on every supported band and back to automatic both ended `done`, the modem
 read back automatic, data came back; an unknown id answered "no longer known".
+
+### 234. Parity with 5.4: every vendor item on mainline, or said why not
+
+**Status: `upstream/parity-5.4.txt` and `upstream/check-parity.py`, run by `build-modules.sh`, `make-bundle.sh`,
+`kernel/build-all.sh` and the Tests workflow (`tests/test_parity.py`). Inventories from F50-B (v2026.10.28.1, 5.4.254
+and 7.3.0, 2026-10-28) and the U30 Air (6.18.59).**
+
+The rule: nothing the 5.4 kernel has may be missing from mainline without a line that says so. What 5.4 has is three
+lists - the modules of the 5.4 build (F50 and U30 Air sets, 198 names) and its built-in objects (630), recorded by
+`kernel/build-all.sh` in `upstream/parity/5.4-build.list` with a hash of the build's inputs; the three modules of the
+display experiment (`kernel/build-display.sh`); and what a board shows at run time, from `upstream/parity-inventory.sh`
+(drivers with a bound device, thermal zones, cooling devices, devfreq, cpufreq, power supplies, Type-C ports, extcon,
+LEDs, regulators, misc and input devices, hwrng, UDCs, classes). An item mainline has under the same name - a module or
+built-in object of that name in every shipped series, the same inventory line on the same board - needs no line;
+every other one is `ok` with what stands for it (a module or config symbol the mainline build must have, and where it
+binds on 7.3), `missing` with its porting group and boards, or `na` with the reason.
+
+How the claims were checked: the boards' device tree (`/sys/firmware/fdt` of F50-B: `ufs@2000000` disabled,
+`spi@60000` without a device, `pwm@30000` referenced by no node, no EHCI, SCPI, SCMI, SPMI, fixed regulator or
+touchscreen node); `i2cdetect` under 5.4 on F50-B and under 6.18 on the U30 Air (nothing at the AW883xx amplifier's
+0x34, the PTN38003A redriver's 0x30 or the AW9610x SAR sensor's 0x12 on either; the U30 Air's STK501xx SAR sensor
+answers at 0x28, its NFC tag at 0x57; the F50 has nothing at the charger's 0x6b); what 5.4 binds and what it only
+loads (`sprd-apdu`, `sprd-thermal`, the NPU and the rpmsg drivers load and bind nothing).
+
+Found missing (the porting list, by group): the SoC's TRNG (5.4 has `/dev/hwrng` from `rng@e0000`; mainline has no
+driver, so the pool waits); the PMIC's Type-C port, extcon and BC1.2 by default (mainline's `ump9620_tcpc` is opt-in,
+§150); the UMP9621 and UMP9622 (pmic@1, pmic@2: six regulators, the `osctsen`/`outtsen` zones), the vibrator, the
+7-second reset settings and the PMIC syscons; DDR and modem DVFS; CPU hotplug cooling; MUSB and its USB 2.0 PHY;
+IPA's fast path and USB offload; GNSS; the display stack; the DMA engine and the ASoC core (config only, but a module
+of each name ships from elsewhere); the soc ID; ZTE's SIM tray detection and board state, the U30 Air's SAR sensor and
+charge policy; CoreSight, the PMU and Unisoc's debug drivers (§31p keeps `PERF_EVENTS` off).
+
+Taken with this change, config only: `GENERIC_ADC_THERMAL` (the board's NTC zones `board-`, `chg-`, `nr-` and
+`pa-thmzone`, which have no trips in the vendor tree), `CPU_FREQ_GOV_CONSERVATIVE`, and the gadget functions
+`USB_CONFIGFS_SERIAL`, `USB_CONFIGFS_ECM_SUBSET` and `USB_CONFIGFS_F_HID`.

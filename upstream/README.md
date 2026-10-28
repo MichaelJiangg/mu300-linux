@@ -48,6 +48,18 @@ node of the vendor device tree (`dt-compatibles.txt`) by itself. `MU300_ALL_MODU
 On the devices `mu300-modprobe-guard` (the kernel's module helper from boot on; FINDINGS 163) keeps the modules of
 `/opt/mu300/lib/autoload-blocked` (rare protocols, filesystems, line disciplines) from being loaded on demand;
 root loads them with `modprobe NAME`.
+
+**Parity with 5.4 (FINDINGS 234).** Nothing the vendor 5.4 kernel has may be missing from mainline without saying so.
+`parity-5.4.txt` names, for every 5.4 module, built-in object and run-time item (bound driver, thermal zone, devfreq,
+power supply, Type-C port, regulator, LED, ...) that mainline does not have under the same name, what stands for it
+(`ok` with the module or config symbol), or that it is `missing` (with its porting group and boards) or `na` (with
+the reason). `check-parity.py` enforces it: `build-modules.sh` and `make-bundle.sh` fail when an equivalent the file
+names, or a same-named 5.4 module, is not in the mainline build; `kernel/build-all.sh` records the 5.4 build in
+`parity/5.4-build.list` and fails on a 5.4 module or built-in the file does not cover; the Tests workflow
+(`tests/test_parity.py`) checks the file against those records, `parity/mainline.list` (what each mainline series
+has, `check-parity.py --mainline OUT --record`) and the boards' inventories (`parity/BOARD-KERNEL.inv`, from
+`parity-inventory.sh` run on a board). A change to the 5.4 build's inputs needs a new 5.4 record; a new 5.4 item
+needs a line.
 In the fragment, what the board and the boot need is built in, along with
 KVM (`/dev/kvm`; the CPUs start at EL2); what only matters once used - netfilter extras, tunnels, IPsec, tc,
 filesystems, USB modems/adapters/Wi-Fi sticks, device mapper - is a module. `build-modules.sh` installs the

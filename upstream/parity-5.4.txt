@@ -1,0 +1,370 @@
+# What stands on mainline for every module, built-in object and run-time item of the vendor 5.4 kernel that mainline
+# does not have under the same name. Rule (check-parity.py, run by build-modules.sh, make-bundle.sh, kernel/build-all.sh
+# and tests/test_parity.py): nothing 5.4 has may be missing from mainline without a line here.
+#   KIND NAME ok REF...                          covered (ko:/cfg:/= checked against every mainline build;
+#                                                bind:/has: against the mainline inventories in parity/)
+#   KIND NAME missing group:G boards:B # why     not on mainline yet - the porting list, by group
+#   KIND NAME na [boards:B] # why                not applicable, with the reason
+# Evidence: parity/f50b-5.4.inv and parity/f50b-7.3.inv (F50-B, v2026.10.28.1, 2026-10-28), parity/u30air-6.18.inv,
+# the boards' device tree (/sys/firmware/fdt of F50-B), i2cdetect on F50-B (5.4) and the U30 Air (6.18).
+# FINDINGS numbers are docs/FINDINGS.md.
+
+# ---------------------------------------------------------------------------------------------------------------------
+# SoC basics that are covered under another name (bound on F50-B under 7.3)
+module sprd_cpufreq_v2 ok cfg:ARM_SPRD_CPUFREQ_V2 bind:platform/sprd-cpufreq-v2 # upstream/port/drivers/cpufreq
+module sprd_cpufreq_public ok cfg:ARM_SPRD_CPUFREQ_V2 # the vendor cpufreq's shared part, folded into the port
+module sprd_cpu_cooling ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu0 # cpufreq cooling of the three clusters
+module sprd_gpu_cooling ok cfg:DEVFREQ_THERMAL has:cooling/devfreq-23140000.gpu # Mali's devfreq cooling
+module sprd_soc_thm ok ko:mu300_thermal bind:platform/mu300-virtual-thermal # the stock virtual soc zone (upstream/modules/mu300_thermal)
+module sprd_thermal ok cfg:SPRD_THERMAL_R5P0 bind:platform/sprd-thermal-r5p0 # the r5p0 sensors; 5.4's sprd-thermal driver itself binds nothing
+driver platform/virtual_thermal ok ko:mu300_thermal bind:platform/mu300-virtual-thermal
+module dwc3_sprd ok cfg:USB_DWC3_OF_SIMPLE bind:platform/dwc3-of-simple # glue of 25100000.usb3
+module dwc3_sprd_core ok cfg:USB_DWC3 bind:platform/dwc3
+driver platform/dwc3-sprd ok cfg:USB_DWC3_OF_SIMPLE bind:platform/dwc3-of-simple
+driver platform/dwc3-unisoc ok cfg:USB_DWC3 bind:platform/dwc3
+module phy_sprd_usb31_qogirn6pro ok cfg:USB_SPRD_UMS9620_SSPHY bind:platform/sprd-ssphy # upstream/port/drivers/usb/phy
+module phy_sprd_commonphy ok cfg:USB_SPRD_UMS9620_SSPHY # the vendor PHYs' shared code
+module pcie_sprd_misc ok cfg:PCIE_SPRD bind:platform/sprd-pcie # helpers of pcie-sprd, folded into the port
+module mmc_swcq ok cfg:MMC_HSQ bind:platform/sdhci_sprd_r11 # the eMMC's software queue: mainline sdhci-sprd uses the host software queue
+module sc27xx_poweroff ok cfg:SPI_SPRD_ADI bind:platform/sprd-adi # power-off through the PMIC, in spi-sprd-adi (patch 0001, FINDINGS 31h)
+driver platform/sc27xx-poweroff ok cfg:SPI_SPRD_ADI bind:platform/sprd-adi
+module leds_sc27xx_keypad ok cfg:LEDS_SC27XX_KPLED bind:platform/sc27xx-keypad-led # upstream/port/drivers/leds
+module sprd_ump96xx_spi ok cfg:MFD_SC27XX_PMIC bind:spi/sc27xx-pmic # the UMP9620 MFD; its UMP9621/UMP9622 siblings: see the pmic group
+driver spi/ump96xx-pmic ok cfg:MFD_SC27XX_PMIC bind:spi/sc27xx-pmic # pmic@0; pmic@1/@2 below (driver platform/ump9621-regulator, ...)
+driver platform/sprd-pmic-wdt ok cfg:MFD_SC27XX_PMIC bind:platform/ump9620-wdt # upstream/port/drivers/watchdog (built with the MFD)
+driver platform/sprd-sipa-sys ok cfg:SPRD_UMS9620_IPA_PD bind:platform/ums9620-ipa-sys-pd # upstream/port/drivers/pmdomain
+driver platform/sc27xx-fgu ok cfg:FUEL_GAUGE_SC27XX bind:platform/sc27xx-fgu # U30 Air; the F50 has no battery (patch 0030)
+driver platform/reg-dummy ok cfg:REGULATOR bind:faux/faux_driver # the dummy regulator is a faux device on 7.x
+driver platform/snd-soc-dummy na # an ASoC helper device; the kernel builds carry no sound card (see snd_soc_core)
+driver usb/usb ok cfg:USB_DWC3_DUAL_ROLE # USB host: 5.4 had MUSB's root hub up at the time of the inventory; mainline's host is DWC3's xHCI in host mode (mu300-usb host)
+driver usb/hub ok cfg:USB_DWC3_DUAL_ROLE # as usb/usb
+
+# ---------------------------------------------------------------------------------------------------------------------
+# generic kernel code that mainline has under another name or symbol (merged, renamed or moved to lib/crypto)
+builtin aes_arm64 ok cfg:CRYPTO_LIB_AES # AES moved into lib/crypto with its arm64 code (CRYPTO_LIB_AES_ARCH)
+builtin aes_ce_cipher ok cfg:CRYPTO_LIB_AES ko:aes_ce_blk
+builtin aes_generic ok cfg:CRYPTO_AES
+builtin ansi_cprng ok cfg:CRYPTO_DRBG # the X9.31 generator is gone upstream; DRBG is the crypto API's RNG
+builtin bitrev ok cfg:BITREVERSE
+builtin blake2b_generic ok cfg:CRYPTO_BLAKE2B
+builtin chacha_generic ok cfg:CRYPTO_CHACHA20
+builtin chacha_neon ok cfg:CRYPTO_LIB_CHACHA_ARCH
+builtin crc32_generic ok cfg:CRC32
+builtin crc32c_generic ok cfg:CRYPTO_CRC32C
+builtin libcrc32c ok cfg:CRC32 # crc32c is part of lib/crc on 6.x/7.x
+builtin crypto_blkcipher ok cfg:CRYPTO_SKCIPHER # renamed
+builtin crypto_simd ok cfg:CRYPTO_SKCIPHER ko:aes_ce_blk # the arm64 ciphers no longer need the SIMD wrapper
+builtin ghash_generic ok cfg:CRYPTO_GHASH|cfg:CRYPTO_LIB_GF128HASH ko:ghash_ce
+builtin nhpoly1305 ok cfg:CRYPTO_NHPOLY1305|cfg:CRYPTO_LIB_NH
+builtin poly1305_generic ok cfg:CRYPTO_LIB_POLY1305
+builtin poly1305_neon ok cfg:CRYPTO_LIB_POLY1305_ARCH
+builtin libcurve25519_generic ok cfg:CRYPTO_LIB_CURVE25519
+builtin sha1_generic ok cfg:CRYPTO_SHA1
+builtin sha256_generic ok cfg:CRYPTO_SHA256
+builtin sha512_generic ok cfg:CRYPTO_SHA512
+builtin sha256_arm64 ok cfg:CRYPTO_LIB_SHA256_ARCH
+builtin sha2_ce ok cfg:CRYPTO_LIB_SHA256_ARCH
+module sha1_ce ok cfg:CRYPTO_LIB_SHA1_ARCH
+builtin xor_neon ok cfg:XOR_BLOCKS
+builtin ipv6 ok cfg:IPV6 # a bool on 7.x
+builtin inet6_hashtables ok cfg:IPV6
+builtin unix ok cfg:UNIX
+builtin serial_core ok cfg:SERIAL_CORE
+builtin vlan_core ok cfg:VLAN_8021Q
+builtin nfnetlink ok cfg:NETFILTER_NETLINK
+builtin nf_tables_set ok cfg:NF_TABLES # the set types, counter and objref expressions are part of nf_tables now
+builtin nft_counter ok cfg:NF_TABLES
+builtin nft_objref ok cfg:NF_TABLES
+builtin ntfs ok =|ko:ntfs3 # 6.18 has ntfs3 only; 7.x brought the old ntfs back as well
+builtin diag ok ko:tipc_diag # net/tipc/diag.o
+builtin timer_sprd ok cfg:SPRD_TIMER
+builtin ion_sys_heap ok cfg:DMABUF_HEAPS # ION became dma-buf heaps upstream
+class mdio_bus ok cfg:FIXED_PHY # the fixed MDIO bus (fixed-0) is a virtual device on mainline, not a platform one
+class power_supply ok cfg:POWER_SUPPLY has:psy/sc27xx-fgu # U30 Air (the F50 has no supply on mainline: no battery, no charger)
+class i2c-adapter na # the i2c-adapter compatibility class is gone upstream (I2C_COMPAT); adapters are under /sys/bus/i2c
+class firmware na # the user-helper fallback class (FW_LOADER_USER_HELPER); mainline loads firmware from the file system only
+builtin p8022 na # the 802.2 SAP helper of IPX, removed upstream with IPX
+builtin ucs2_string na # UCS-2 strings for EFI variables; these boards have no EFI
+builtin font na # console fonts; no display console on these boards (5.4 has no VT either)
+builtin blk_mq_virtio na # virtio-blk's helper; the boards have no virtio block device (virtio is only Trusty's IPC)
+builtin vsoc na # Android emulator (Cuttlefish) shared memory; not hardware
+builtin regmap_hook na # Unisoc's regmap debug hook (vendor debugfs), not upstream
+
+# ---------------------------------------------------------------------------------------------------------------------
+# USB gadget functions (5.4 built in; the boards' gadget is mu300-usb over configfs)
+builtin usb_f_serial ok cfg:USB_CONFIGFS_SERIAL
+builtin usb_f_ecm_subset ok cfg:USB_CONFIGFS_ECM_SUBSET
+builtin usb_f_hid ok cfg:USB_CONFIGFS_F_HID
+builtin usb_f_midi missing group:usb-gadget boards:f50,u30air,v50 # USB_CONFIGFS_F_MIDI needs ALSA rawmidi built in (SND_RAWMIDI is a module on mainline)
+builtin usb_f_accessory na # Android Open Accessory, Android-only (not upstream)
+builtin usb_f_audio_source na # Android's audio source function, Android-only (not upstream)
+module usb_f_vser na # Unisoc's vendor serial function for Android's USB diag modes; mu300-usb's console is the standard ACM function
+module sprd_u_ether na # the vendor RNDIS/ether gadget core for IPA offload (sipa_usb); not loaded on 5.4 (boot/module-order.txt): mu300-usb uses the standard u_ether
+module sprd_usb_f_rndis na # as sprd_u_ether: the vendor RNDIS function, not loaded on 5.4; the standard f_rndis is built in on mainline
+class usb_notify na # Unisoc's USB event class for Android's USB HAL
+builtin dummy_hcd na # test gadget controller; all-modules.exclude keeps it out (mu300-usb takes the first UDC)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# USB 2.0 (MUSB) and the controller switch: 5.4 runs the USB 2.0 MUSB next to DWC3 (FINDINGS 4); mainline drives the
+# only port with DWC3 in both roles
+module musb_hdrc missing group:usb-musb boards:f50,u30air,v50 # mainline has the MUSB core but no Unisoc glue (sprd,qogirn6pro-musb at usb@a00000)
+module musb_sprd missing group:usb-musb boards:f50,u30air,v50 # Unisoc's MUSB glue
+module phy_sprd_qogirn6pro missing group:usb-musb boards:f50,u30air,v50 # the USB 2.0 PHY (hsphy@300000) MUSB uses
+module sprd_usbm missing group:usb-musb boards:f50,u30air,v50 # switches between DWC3 (main) and MUSB (slave)
+driver platform/musb-sprd missing group:usb-musb boards:f50,u30air,v50 # see musb_sprd
+driver platform/musb-hdrc missing group:usb-musb boards:f50,u30air,v50 # see musb_hdrc
+driver platform/sprd-hsphy missing group:usb-musb boards:f50,u30air,v50 # see phy_sprd_qogirn6pro
+udc musb-hdrc.1.auto missing group:usb-musb boards:f50,u30air,v50 # MUSB's gadget side
+builtin ehci_hcd na # there is no EHCI controller on the SoC (USB is DWC3 and MUSB)
+builtin ehci_pci na # as ehci_hcd
+builtin ehci_platform na # as ehci_hcd
+
+# ---------------------------------------------------------------------------------------------------------------------
+# USB Type-C and USB PD: 5.4 has the port class by default (sc27xx_typec, sprd_tcpm); mainline has patch 0020's
+# ump9620_tcpc, which binds only when asked (enable=1, mu300-usb pd on, FINDINGS 150)
+module sprd_tcpm ok cfg:TYPEC_TCPM # the TCPM framework itself is there (module tcpm)
+module sc27xx_pd ok cfg:TYPEC_UMP9620 # the PMIC's PD PHY as a TCPC: ump9620_tcpc (patch 0020), opt-in
+extra sc27xx_pd ok cfg:TYPEC_UMP9620 # build-display.sh's variant of the same driver
+module sc27xx_typec missing group:typec boards:f50,u30air,v50 # the PMIC's Type-C detection (typec@380): 5.4 reports roles, partner and CC orientation always; mainline only with ump9620_tcpc enabled by hand
+driver platform/sc27xx-typec missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
+typec port0 missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
+typec port0-partner missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
+class typec missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
+extcon extcon1 missing group:typec boards:f50,u30air,v50 # sc27xx-typec's extcon (the USB PHYs' cable state on 5.4); mainline has extcon-usb-gpio only
+module sprd_bc1p2 missing group:typec boards:f50,u30air,v50 # BC1.2 charger-port detection (bc1p2@239c); mainline reads the PMIC's BC1.2 result only inside the MFD for the charger (FINDINGS 2581)
+driver platform/sprd-bc1p2 missing group:typec boards:f50,u30air,v50 # see sprd_bc1p2
+builtin typec_ucsi na # UCSI is a firmware interface (ACPI/EC); these boards have none
+module ptn38003a_i2c na # the PTN38003A redriver at i2c-6 0x30: nothing answers there on F50-B or the U30 Air (i2cdetect 2026-10-28)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# battery and charger (the U30 Air; the F50 has none: nothing at the charger's 0x6b, FINDINGS 33d, i2cdetect under 5.4)
+module bq2560x_charger ok cfg:CHARGER_BQ256XX bind:i2c/bq256xx-charger # patches 0009-0029 (U30 Air)
+driver i2c/bq2560x_chg ok cfg:CHARGER_BQ256XX bind:i2c/bq256xx-charger # on the F50 5.4 binds it without a chip
+module sqc_bq2560x ok cfg:CHARGER_BQ256XX bind:i2c/bq256xx-charger # ZTE's SQC charger stack (U30 Air) is replaced by bq256xx + sc27xx-fgu
+module sqc_charger ok cfg:CHARGER_BQ256XX bind:i2c/bq256xx-charger
+module sqc_netlink ok cfg:CHARGER_BQ256XX # SQC's netlink channel to its daemon; no daemon on Linux, the driver decides itself
+module zte_power_supply ok cfg:POWER_SUPPLY has:psy/bq256xx-charger # ZTE's power_supply wrapper of the SQC stack
+module zte_misc ok cfg:CHARGER_BQ256XX # ZTE's charge-control knobs of the SQC stack (patches 0024/0025 set what it set)
+module sprd_charger_manager ok cfg:FUEL_GAUGE_SC27XX cfg:CHARGER_BQ256XX has:psy/sc27xx-fgu # U30 Air; on the F50 it invents a battery
+module sprd_battery_info ok cfg:FUEL_GAUGE_SC27XX # the battery's data (simple-battery) is read by sc27xx-fgu
+builtin pmic_voter ok cfg:CHARGER_BQ256XX # the vendor's vote between charge-current requests; bq256xx sets them directly
+driver platform/charger-manager ok cfg:FUEL_GAUGE_SC27XX has:psy/sc27xx-fgu # U30 Air; F50: none (no battery)
+psy sc27xx-fgu ok cfg:FUEL_GAUGE_SC27XX has:psy/sc27xx-fgu # U30 Air
+psy battery ok cfg:FUEL_GAUGE_SC27XX has:psy/sc27xx-fgu # U30 Air: the gauge is the battery; the F50's was charger-manager's invention
+psy bq2560x_charger ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger # U30 Air
+psy usb ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger # charger-manager's virtual supplies; bq256xx reports input online itself
+psy ac ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger
+psy wireless na # no wireless charging on these boards (a charger-manager placeholder)
+module charger_policy_service missing group:charger boards:u30air # ZTE's charge policy (expired mode etc., FINDINGS 33, 11556): partly in patches 0024/0025, the rest not ported
+cooling battery missing group:charger boards:u30air # charger-manager's cooling device: charge current lowered by temperature (chg-thmzone)
+regulator vddvbus ok cfg:CHARGER_BQ256XX has:regulator/vddvbus # the charger's OTG boost (patch 0019; U30 Air)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# thermal (the board's NTC zones board-, chg-, nr- and pa-thmzone and thermal_generic_adc match by name since this file
+# enabled GENERIC_ADC_THERMAL)
+cooling thermal-cpufreq-0 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu0 # named after the policy's first CPU on mainline
+cooling thermal-cpufreq-1 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu4
+cooling thermal-cpufreq-2 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu7
+cooling thermal-devfreq-0 ok cfg:DEVFREQ_THERMAL has:cooling/devfreq-23140000.gpu
+cooling thermal-cpu-0 missing group:thermal boards:f50,u30air,v50 # Unisoc's CPU hotplug cooling (cores taken offline when hot); mainline has none
+cooling thermal-cpu-1 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
+cooling thermal-cpu-2 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
+tz osctsen-thmzone missing group:pmic boards:f50,u30air,v50 # the UMP9622's sensors (tsensor@20f8 on pmic@2): needs the UMP9622 MFD
+tz outtsen-thmzone missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
+module sprd_ump96xx_tsensor missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
+driver platform/ump96xx-tsensor missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
+module sprd_npu_cooling na # NPU cooling: there is no NPU driver on either kernel (npu@27100000 binds nothing on 5.4)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# the PMIC's other parts
+module sc27xx_vibra missing group:pmic boards:f50,u30air,v50 # mainline sc27xx-vibra knows sc2721/2730/2731, not the UMP9620 (vibrator@2390): compatible and registers to add. Whether a motor is fitted is not known
+driver platform/sc27xx-vibrator missing group:pmic boards:f50,u30air,v50 # see sc27xx_vibra
+input sc27xx:vibrator missing group:pmic boards:f50,u30air,v50 # see sc27xx_vibra
+module sprd_7sreset missing group:pmic boards:f50,u30air,v50 # the PMIC's long-press hardware reset settings (hw_reset@23c0)
+driver platform/sc27xx-7sreset missing group:pmic boards:f50,u30air,v50 # see sprd_7sreset
+module sprd_pmic_smpl na # SMPL (restart after a short power loss); not loaded on 5.4 (boot/module-order.txt), the bootloader's setting stands
+module sprd_pmic_syscon missing group:pmic boards:f50,u30air,v50 # the PMICs' global register blocks (syscon@2000 of pmic@0..2) as syscon devices
+driver platform/sprd-pmic-glb missing group:pmic boards:f50,u30air,v50 # see sprd_pmic_syscon
+module ump9621_regulator missing group:pmic boards:f50,u30air,v50 # the UMP9621 (pmic@1): vddcpu0, vddsram1/2, vddmm, vddai, DCDC_MODEM; mainline's MFD matches the UMP9620 only
+driver platform/ump9621-regulator missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator DCDC_MODEM missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator vddai missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator vddcpu0 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator vddmm missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator vddsram1 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+regulator vddsram2 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+builtin act8945a na # Active-semi PMIC MFD; not on these boards (its i2c driver binds nothing on 5.4)
+builtin fixed na # the fixed regulator: the boards' device tree has no regulator-fixed node (reg-fixed-voltage binds nothing on 5.4)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# random numbers
+builtin sprd_trng missing group:rng boards:f50,u30air,v50 # the SoC's TRNG (rng@e0000, sprd,sprd-trng): /dev/hwrng on 5.4; mainline has no driver and the firmware no SMCCC TRNG (FINDINGS: the random pool waits)
+driver platform/sprd_trng missing group:rng boards:f50,u30air,v50 # see sprd_trng
+hwrng 202e0000.rng missing group:rng boards:f50,u30air,v50 # see sprd_trng
+
+# ---------------------------------------------------------------------------------------------------------------------
+# DDR, modem and multimedia DVFS (power)
+module sprd_ddr_dvfs missing group:dvfs boards:f50,u30air,v50 # DDR frequency scaling (scene-frequency devfreq, sprd,ddr-dvfs); mainline leaves DDR at the bootloader's frequency
+driver platform/sprd-ddr-dvfs missing group:dvfs boards:f50,u30air,v50 # see sprd_ddr_dvfs
+devfreq scene-frequency missing group:dvfs boards:f50,u30air,v50 # see sprd_ddr_dvfs
+class dvfs missing group:dvfs boards:f50,u30air,v50 # the vendor dvfs class of the DDR scaling
+builtin governor_passive missing group:dvfs boards:f50,u30air,v50 # DEVFREQ_GOV_PASSIVE: the devfreq governor the vendor scaling uses (config only, of no use without it)
+builtin dmc_drv missing group:dvfs boards:f50,u30air,v50 # the DDR controller driver (dmc-controller@60050000: bandwidth statistics for the scaling)
+driver platform/sprd-dmc missing group:dvfs boards:f50,u30air,v50 # see dmc_drv
+module sprd_cp_dvfs missing group:dvfs boards:f50,u30air,v50 # the modem subsystems' DVFS interface (dvfs_pscp, dvfs_phycp)
+driver platform/sprd-cp-dvfs missing group:dvfs boards:f50,u30air,v50 # see sprd_cp_dvfs
+module sprd_top_dvfs missing group:dvfs boards:f50,u30air,v50 # the top-level DVFS controller the others share (not loaded on 5.4 by itself; used by them)
+module apsys_dvfs missing group:display boards:f50,u30air,v50 # DVFS of the display/video power domain (apsys-dvfs@30114000)
+driver platform/apsys-dvfs missing group:display boards:f50,u30air,v50 # see apsys_dvfs
+driver platform/dpu-dvfs missing group:display boards:f50,u30air,v50 # the display controller's DVFS
+devfreq dpu missing group:display boards:f50,u30air,v50 # see platform/dpu-dvfs
+driver platform/gsp-dvfs na # DVFS of the GSP 2D engine; no GSP driver runs on either kernel
+devfreq gsp na # see platform/gsp-dvfs
+driver platform/vsp-dvfs na # DVFS of the video codec; no codec driver runs on either kernel
+devfreq vpudec-dvfs na # see platform/vsp-dvfs
+devfreq vpuenc-dvfs na # see platform/vsp-dvfs
+
+# ---------------------------------------------------------------------------------------------------------------------
+# display (5.4: kernel/build-display.sh's experimental USB-C DisplayPort, tools/display/README.md; never got a picture)
+extra sprd_drm missing group:display boards:f50,u30air,v50 # Unisoc DRM (DPU1 + DPTX)
+extra mu300_dp_enable missing group:display boards:f50,u30air,v50 # turns the disabled PD and DPTX nodes on at runtime
+module unisoc_iommu missing group:display boards:f50,u30air,v50 # the display/video IOMMUs (unisoc,iommuvaul6p-*)
+module sprd_typec_displayport missing group:display boards:f50,u30air,v50 # DP alternate mode; mainline has TYPEC_DP_ALTMODE but nothing to drive
+module sprd_disp_pm_domain_sharkl3 missing group:display boards:f50,u30air,v50 # the display power domain
+module pwm_bl na # PWM backlight: no panel on these boards (pwm@30000 is referenced by no node)
+builtin generic_bl na # backlight class driver; no panel
+builtin cec na # HDMI CEC; the DP output has no CEC
+builtin ttm na # DRM's memory manager for discrete GPUs; no TTM driver (Mali is not DRM)
+module trusty_tui na # Trusty's trusted UI needs a display; none
+driver platform/sprd-trusty-tui na # see trusty_tui
+builtin videobuf2_dma_contig na # V4L2 buffers for SoC camera/codec drivers; neither runs on these boards
+builtin of_touchscreen na # touchscreen helpers; no touchscreen
+
+# ---------------------------------------------------------------------------------------------------------------------
+# networking offload and modem extras
+module sfp_core missing group:net-offload boards:f50,u30air,v50 # Unisoc's software fast path (conntrack fast path for IPA, sfp-unisoc)
+driver platform/sfp missing group:net-offload boards:f50,u30air,v50 # see sfp_core
+module sipa_usb missing group:net-offload boards:f50,u30air,v50 # IPA's USB path (RNDIS offload, sipa-usb)
+driver platform/sipa_usb missing group:net-offload boards:f50,u30air,v50 # see sipa_usb
+module sprd_pamu3 missing group:net-offload boards:f50,u30air,v50 # the USB3-IPA bridge (pamu3@25210000) sipa_usb uses
+driver platform/sprd-pamu3 missing group:net-offload boards:f50,u30air,v50 # see sprd_pamu3
+module sprd_net_helper na # Android helper that reports IPv6 addresses to the modem daemons; not loaded on 5.4
+module ims_bridge na # the IMS (VoLTE/VoWiFi) packet bridge for Android's IMS stack; not loaded on 5.4, nothing on Linux talks to it
+module ims_bridge_t na # as ims_bridge
+module gnss_common_ctl_all missing group:gnss boards:f50,u30air,v50 # the Marlin3's GNSS control (sprd-marlin3/gnss_common_ctl); not loaded on 5.4 either; whether the boards wire a GNSS antenna is not known
+module gnss_dbg missing group:gnss boards:f50,u30air,v50 # see gnss_common_ctl_all
+module gnss_pmnotify_ctl missing group:gnss boards:f50,u30air,v50 # see gnss_common_ctl_all
+module sc2355_sdio_wlan na # the SDIO build of the Wi-Fi driver; these boards' SC2355 is on PCIe (sprd_wlan_combo); the sdio_wifi host stays unprobed (FINDINGS 31j)
+module sprd_wlan na # the separate Unisoc Wi-Fi core of the SDIO driver; not loaded on 5.4 (sprd_wlan_combo is the PCIe driver both kernels use)
+led mmc2:: na # the empty sdio_wifi host's activity LED (see sc2355_sdio_wlan)
+builtin btqca na # Qualcomm Bluetooth helpers; Bluetooth is the Marlin3 (sprdbt_tty)
+builtin serdev na # serial device bus; no serdev child in the device tree (Bluetooth is on PCIe)
+builtin rpmsg_char na # no rpmsg provider on these boards (rpmsg binds nothing on 5.4)
+builtin rpmsg_core na # as rpmsg_char
+
+# ---------------------------------------------------------------------------------------------------------------------
+# DMA
+module sprd_dma missing group:dma boards:f50,u30air,v50 # mainline's sprd-dma matches (sprd,sc9860-dma), config only (SPRD_DMA); nothing in the kernel builds uses the DMA engines, and a module of this name from elsewhere must not be shadowed
+module virt_dma missing group:dma boards:f50,u30air,v50 # comes with sprd_dma (DMA_VIRTUAL_CHANNELS)
+driver platform/sprd-dma missing group:dma boards:f50,u30air,v50 # see sprd_dma
+class dma missing group:dma boards:f50,u30air,v50 # see sprd_dma
+
+# ---------------------------------------------------------------------------------------------------------------------
+# sound core (5.4 built in; ASoC is left out of the mainline builds: all-modules.exclude ^SND_SOC)
+builtin snd_soc_core missing group:sound boards:f50,u30air,v50 # ASoC core; no sound card driver is part of the kernel builds
+builtin snd_compress missing group:sound boards:f50,u30air,v50 # compressed audio API (SND_COMPRESS_OFFLOAD)
+builtin snd_pcm_dmaengine missing group:sound boards:f50,u30air,v50 # PCM over dmaengine (SND_DMAENGINE_PCM)
+module smartpa_stat na # statistics of the AW883xx smart amplifier, which is not fitted (see snd_soc_aw883xx)
+module snd_soc_aw883xx na # AW883xx amplifier at i2c-6 0x34: nothing answers there on F50-B or the U30 Air (i2cdetect 2026-10-28)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# SoC identity and ZTE board extras
+module sprd_soc_id missing group:soc-info boards:f50,u30air,v50 # the chip's ID registers (socid, /sys/devices/soc0 details)
+driver platform/sprd-soc-id missing group:soc-info boards:f50,u30air,v50 # see sprd_soc_id
+module sprd_manufacturer_model missing group:soc-info boards:f50,u30air,v50 # soc0's machine/manufacturer attributes
+module misc_sprd_uid na # the chip UID as /sys/class/misc/sprd_uid; not loaded on 5.4, nothing reads it
+module zte_card_holder_det missing group:zte boards:f50,u30air,v50 # SIM tray detection, /sys/zcard_det (loaded on 5.4, FINDINGS 18)
+module zte_bootreason na # ZTE's boot reason for Android's property service; not loaded on 5.4 (boot/init reads the reason itself)
+module zte_stats_info na # ZTE's usage statistics for Android; not loaded on 5.4
+builtin board_state missing group:zte boards:f50,u30air,v50 # ZTE's board state (/dev/zte_board_state)
+module zte_sar na boards:f50,u30air # the AW9610x SAR sensor at i2c-2 0x12 is not fitted (i2cdetect on both; FINDINGS 18)
+module zte_sar_stk missing group:zte boards:u30air # the U30 Air's STK501xx SAR sensor answers at i2c-2 0x28 (i2cdetect 2026-10-28); no driver on mainline
+module fm11tag ok cfg:I2C_CHARDEV # the U30 Air's NFC tag: mu300-nfc drives it over i2c-dev and GPIO 190 (FINDINGS 33g)
+module sprd_apdu_r3p0 na # the integrated secure element's APDU interface: loads on 5.4 but binds nothing (sprd,qogirn6pro-apdu stays unbound)
+module rpmb na # the vendor RPMB char device for Android's Trusty storage proxy; the partition is /dev/mmcblk0rpmb on both kernels (RPMB=y would make MMC_BLOCK a module, all-modules.exclude)
+module i2c_sprd_hw na # the vendor's other I2C controller driver (IP r9p0+); no node of the boards' tree matches it (their I2C binds sprd-i2c on both kernels)
+module gpio na # Unisoc factory autotest helper (drivers/soc/sprd/autotest)
+module pinctrl na # Unisoc factory autotest helper (drivers/soc/sprd/autotest)
+module spi_sprd na # the SPI controller spi@60000 has no device on it in the boards' tree; the module would bind by itself (check-dt-modules caught it, FINDINGS 163)
+driver platform/sprd-spi na # see spi_sprd
+module pwm_sprd na # pwm@30000 is referenced by no node of the boards' tree (no backlight, no PWM LED)
+driver platform/sprd-pwm na # see pwm_sprd
+class pwm na # see pwm_sprd
+module sprd_map na # Unisoc's memory-map debug helper (sprd_map), not loaded on 5.4
+module ufs_sprd_qogirn6pro na # ufs@2000000 is disabled in the boards' tree; they boot from eMMC
+builtin ufshcd_core na # see ufs_sprd_qogirn6pro
+builtin ufshcd_dwc na # see ufs_sprd_qogirn6pro
+builtin ufshcd_pci na # see ufs_sprd_qogirn6pro
+builtin ufshcd_pltfrm na # see ufs_sprd_qogirn6pro
+builtin tc_dwc_g210 na # see ufs_sprd_qogirn6pro
+builtin tc_dwc_g210_pltfrm na # see ufs_sprd_qogirn6pro
+builtin arm_scpi na # SCPI: the boards' firmware and tree have none (cpufreq is Unisoc's SIP interface)
+builtin clk_scpi na # see arm_scpi
+builtin scpi_cpufreq na # see arm_scpi
+builtin scmi_cpufreq na # SCMI: no node in the boards' tree
+builtin reset_scmi na # see scmi_cpufreq
+builtin pinctrl_amd na # AMD pin controller; not on this SoC
+builtin pinctrl_single na # pinctrl-single; the SoC's pins are sprd,qogirn6pro-pinctrl
+builtin rtc_pl030 na # ARM PL030 RTC; not on this SoC (the RTC is the PMIC's)
+builtin rtc_pl031 na # ARM PL031 RTC; not on this SoC
+builtin spmi na # no SPMI bus; the PMIC is on ADI
+builtin icc_core na # interconnect framework; no provider for this SoC
+builtin edac_core na # no EDAC driver exists for this SoC's memory controller
+builtin dm_bow na # Android's checkpoint target (not upstream)
+builtin dm_default_key na # Android's metadata encryption target (not upstream)
+builtin dm_user na # Android's userspace block target for snapuserd (not upstream)
+builtin incrementalfs na # Android's incremental file system (not upstream)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# rebootescrow (pmem): Android's resume-on-reboot escrow region (rebootescrow@0, pmem-region); nothing on Linux uses it
+builtin libnvdimm na # see this block
+builtin nd_btt na # see this block
+builtin nd_pmem na # see this block
+builtin of_pmem na # see this block
+builtin dax na # see this block
+driver platform/of_pmem na # see this block
+driver nd/nd_bus na # see this block
+driver nd/nd_pmem na # see this block
+driver nd/nd_region na # see this block
+class nd na # see this block
+
+# ---------------------------------------------------------------------------------------------------------------------
+# debug and trace (CoreSight, the PMU, Unisoc's debug drivers)
+driver platform/armv8-pmu missing group:debug boards:f50,u30air,v50 # perf counters: ARM_PMUV3 needs PERF_EVENTS, kept off since it cost 2 of 36 boots (FINDINGS 31p)
+driver amba/coresight-etm4x missing group:debug boards:f50,u30air,v50 # CoreSight trace: mainline has it, all-modules.exclude keeps it off (it pulls in PERF_EVENTS, FINDINGS 31p)
+driver amba/coresight-dynamic-funnel missing group:debug boards:f50,u30air,v50 # see coresight-etm4x
+driver amba/coresight-tmc missing group:debug boards:f50,u30air,v50 # see coresight-etm4x
+driver platform/coresight-tmc_ex missing group:debug boards:f50,u30air,v50 # Unisoc's TMC group (arm,coresight-tmc_group); not upstream
+driver platform/ap-etb missing group:debug boards:f50,u30air,v50 # Unisoc's AP ETB dump (sprd,apetb); not upstream
+class apetb missing group:debug boards:f50,u30air,v50 # see platform/ap-etb
+builtin phy_sprd_sharkl6pro missing group:debug boards:f50,u30air,v50 # CoreSight's PHY (Unisoc)
+builtin stm_core missing group:debug boards:f50,u30air,v50 # System Trace Module core (CoreSight)
+builtin sprd_cp_dump missing group:debug boards:f50,u30air,v50 # modem crash dumps to user space (/dev/cp_dump)
+driver platform/sprd-cp_dump missing group:debug boards:f50,u30air,v50 # see sprd_cp_dump
+module sprd_wdt_fiq missing group:debug boards:f50,u30air,v50 # the AP watchdog's FIQ (watchdog@1e0000) that dumps a hung CPU; the PMIC watchdog resets on both kernels
+driver platform/sprd-wdt-fiq missing group:debug boards:f50,u30air,v50 # see sprd_wdt_fiq
+module sprd_wdf missing group:debug boards:f50,u30air,v50 # the watchdog feeder of Unisoc's hang debug
+module sprd_pdbg missing group:debug boards:f50,u30air,v50 # power debug: wakeup sources and sleep blockers
+module sprd_power_stat missing group:debug boards:f50,u30air,v50 # power statistics
+driver platform/sprd-powerdebug missing group:debug boards:f50,u30air,v50 # see sprd_pdbg
+driver platform/sprd-debugstat missing group:debug boards:f50,u30air,v50 # see sprd_power_stat
+module mipi_driver na # modem log over the MIPI port to a lab analyzer; needs Unisoc's probe hardware
+module sprd_mipi na # see mipi_driver
+
+# ---------------------------------------------------------------------------------------------------------------------
+# the rest
+builtin cpufreq_conservative ok cfg:CPU_FREQ_GOV_CONSERVATIVE # enabled with this file
+module zte_ldo_leds ok cfg:LEDS_ZTE_LDO bind:platform/zte-ldo-leds # upstream/port/drivers/leds (U30 Air, FINDINGS 33)
+builtin xt_SECMARK na # packet security marks for SELinux policies (Android); NETWORK_SECMARK is off, the systems label no packets
+builtin xt_CONNSECMARK na # see xt_SECMARK
+builtin xt_quota2 na # Android's quota2 match, not upstream; the standard xt_quota is built
