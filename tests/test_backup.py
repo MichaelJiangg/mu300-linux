@@ -584,6 +584,11 @@ class ApiMethods(BackupCase):
             sealed = o['file']
             self.refused(shell, 'backup.export', {'passphrase': 'short'}, 'bad-value', 'passphrase')
             self.refused(shell, 'backup.export', {'path': '/etc/shadow'}, 'unknown-field', 'path')
+            # LuCI's way in: ubus over HTTP adds the session to the request (#383)
+            o = self.ok(shell, 'backup.export', {'passphrase': 'correct horse battery', 'with_password': False,
+                                                 'ubus_rpc_session': '0123456789abcdef0123456789abcdef'})
+            self.assertTrue(o['encrypted'])
+            self.refused(shell, 'backup.export', {'ubus_rpc_session': 'x', 'path': '/etc/shadow'}, 'unknown-field', 'path')
             # the dry run: what would change, nothing changed
             (self.root / 'etc/mu300/hotspot.conf').write_text('SSID=Changed\nPSK=othersecret1\nBAND=5\nCHANNEL=auto\nCOUNTRY=TR\n')
             o = self.ok(shell, 'backup.import', {'file': sealed, 'passphrase': 'correct horse battery', 'dry_run': True,
