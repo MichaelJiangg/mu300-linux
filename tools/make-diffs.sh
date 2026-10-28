@@ -36,14 +36,21 @@ else
 fi
 older=$(for t in $tags; do tag_ok "$t" && newer "$TAG" "$t" && printf '%s %s\n' "$(tag_key "$t")" "$t"; done | sort -rn | cut -d' ' -f2)
 
-# base_ok TAG DIR: DIR/SHA256SUMS is TAG's and as trusted as an update trusts it (signed, where the tree has the key)
+# the signatures are checked with mu300-update's own code, which calls "openssl": the one the release is signed with
+# (MU300_OPENSSL, tools/sign-release.sh) comes first, since macOS's own (LibreSSL) cannot check Ed25519
+case ${MU300_OPENSSL:-} in */*) PATH=${MU300_OPENSSL%/*}:$PATH; export PATH ;; esac
+# base_ok TAG DIR: DIR/SHA256SUMS is TAG's and as trusted as an update trusts it (signed, where the tree has the key).
+# Status 2 when nothing here can check a signature: then no base is trusted, and a release would go out without
+# diffs only because of this machine, so make-release stops
 base_ok() (
     set +eu
     MU300_LIB=1 MU300_RELEASE_PUB=$W/release.pub
     [ -s "$W/release.pub" ] || MU300_RELEASE_PUB=$W/none
     export MU300_LIB MU300_RELEASE_PUB
     . "$TOP/rootfs/overlay/opt/mu300/bin/mu300-update"
-    sums_verdict "$1" "$(sig_state "$2/SHA256SUMS" "$2/SHA256SUMS.sig")" "release $1" "$2/SHA256SUMS" >/dev/null
+    _bs=$(sig_state "$2/SHA256SUMS" "$2/SHA256SUMS.sig")
+    [ "$_bs" != notool ] || [ ! -s "$W/release.pub" ] || return 2
+    sums_verdict "$1" "$_bs" "release $1" "$2/SHA256SUMS" >/dev/null
 )
 
 sha() { { sha256sum "$1" 2>/dev/null || shasum -a 256 "$1"; } | cut -d' ' -f1; }
@@ -58,7 +65,9 @@ for b in $older; do
         gh release download "$b" -R "$REPO" -D "$B" -p SHA256SUMS -p SHA256SUMS.sig -p 'mu300-*-rootfs.manifest.gz' 2>/dev/null || :
     fi
     ls "$B"/mu300-*-rootfs.manifest.gz >/dev/null 2>&1 && [ -s "$B/SHA256SUMS" ] || { echo "$b: no manifests, no diffs from it"; continue; }
-    base_ok "$b" "$B" || { echo "$b: its SHA256SUMS is not signed with the release key, no diffs from it" >&2; continue; }
+    _ok=0; base_ok "$b" "$B" || _ok=$?
+    [ "$_ok" != 2 ] || { echo "no openssl here checks Ed25519 signatures (OpenSSL 3: MU300_OPENSSL=/path/to/openssl): no base can be trusted" >&2; exit 1; }
+    [ "$_ok" = 0 ] || { echo "$b: its SHA256SUMS is not signed with the release key, no diffs from it" >&2; continue; }
     bases=$((bases + 1))
     for img in "$D"/mu300-*-rootfs.tar.gz; do
         a=${img##*/}; s=${a%.tar.gz}; m=$B/$s.manifest.gz

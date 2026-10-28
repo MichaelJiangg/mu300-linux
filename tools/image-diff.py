@@ -36,6 +36,10 @@ HEAD = '.mu300-diff'
 # never left out: what the device changes or keeps as its own, and what the update runs from the new image
 OMIT_NOT = ('etc/', 'var/', 'root/', 'home/', 'srv/', 'tmp/', 'run/', 'usr/local/', 'lib/apk/', 'usr/lib/opkg/')
 TOOLS = {'opt/mu300/bin/mu300-carry', 'opt/mu300/bin/mu300-update', 'usr/bin/busybox', 'opt/mu300/bin/busybox'}
+# ... and what the device changes itself: rootfs-fixups gives these a file capability at every boot (an xattr the image
+# does not have), so the installed copy is never as the image had it and mu300-carry same refuses it: left out, it
+# made every Ubuntu device download the whole image instead (v2026.10.27.3 on an F50). The list is rootfs-fixups's own.
+FIXED_UP = {'usr/bin/ping', 'usr/bin/mtr-packet', 'usr/bin/arping'}
 
 
 def name(ti):
@@ -71,7 +75,7 @@ def has_attrs(ti):
 
 def omissible(ti, path, line, base, linked):
     return (ti.type in (tarfile.REGTYPE, tarfile.AREGTYPE) and path not in linked and not has_attrs(ti) and
-            not path.startswith(OMIT_NOT) and path not in TOOLS and path != im.SELF and base.get(path) == line)
+            not path.startswith(OMIT_NOT) and path not in TOOLS and path not in FIXED_UP and path != im.SELF and base.get(path) == line)
 
 
 def make(base_gz, new, out):

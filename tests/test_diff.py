@@ -5,13 +5,16 @@ system only when the result is the release's signed manifest of the image entry 
 downloaded. The user's files, the VPN module and its kill switch are what they are after a whole-image update."""
 import gzip
 import hashlib
+import importlib.util
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tarfile
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -350,6 +353,36 @@ class Diff(ShellTest):
                 self.assertEqual((o['diffs'], o['download']), want, r.stdout)
 
 
+class FixedUp(unittest.TestCase):
+    """the files rootfs-fixups changes on the device are never left out of a diff"""
+
+    def test_the_list_is_rootfs_fixups_own(self):
+        spec = importlib.util.spec_from_file_location('image_diff', TOP / 'tools/image-diff.py')
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        fix = (TOP / 'rootfs/overlay/opt/mu300/bin/rootfs-fixups').read_text()
+        loop = re.search(r'^for f in (.*); do\n(.*\n){1,2}.*setcap', fix, re.M)
+        self.assertIsNotNone(loop, 'rootfs-fixups no longer sets file capabilities in a "for f in" loop')
+        self.assertEqual({f.lstrip('/') for f in loop.group(1).split()}, mod.FIXED_UP)
+
+    @unittest.skipUnless(CC and LINUX and BUSYBOX, 'needs a C compiler and busybox on Linux')
+    def test_ping_is_in_the_diff_although_it_did_not_change(self):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        tmp = Path(d.name)
+        ping = ('f', elf('ping'), 0o755)
+        base = image(tmp / 'base.tar.gz', dict(OLD, **{'usr/bin/ping': ping}), tmp, BASE)
+        new = image(tmp / 'new.tar.gz', dict(NEW, **{'usr/bin/ping': ping}), tmp, TAG)
+        bm = tmp / 'base.manifest.gz'
+        bm.write_bytes(subprocess.run(['tar', '-xzOf', str(base), './etc/mu300/image-manifest.gz'],
+                                      capture_output=True, check=True).stdout)
+        r = tool('make', bm, new, tmp / 'diff.tar.gz')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        got = members(tmp / 'diff.tar.gz')
+        self.assertIn('usr/bin/ping', got)
+        self.assertNotIn('usr/lib/libhuge.so', got)
+
+
 @unittest.skipUnless(CC and LINUX and BUSYBOX and OPENSSL, 'needs a C compiler, busybox and OpenSSL 3 on Linux')
 class MakeDiffs(ShellTest):
     """tools/make-diffs.sh: the bases a release is diffed from, and only signed ones"""
@@ -407,6 +440,19 @@ class MakeDiffs(ShellTest):
             r = self.run_it(shell)
             self.assertNotEqual(r.returncode, 0)
             self.assertIn('does not match its SHA256SUMS', r.stderr)
+
+    def test_an_openssl_that_cannot_check_stops_it_and_MU300_OPENSSL_is_used(self):
+        # macOS's openssl (LibreSSL) has no -rawin: every base came out unsigned and a release went out without diffs
+        self.stub('openssl', 'case $1 in pkeyutl) echo "usage: pkeyutl [options]" >&2; exit 1 ;; esac\n'
+                             f'exec "{OPENSSL}" "$@"')
+        for shell in list(self.each_shell())[:1]:
+            r = self.run_it(shell)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn('no openssl here checks Ed25519 signatures', r.stderr)
+            self.assertEqual(self.made(), [])
+            r = self.run_it(shell, MU300_OPENSSL=OPENSSL)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertEqual(self.made(), ['v2026.10.13.1', 'v2026.10.14.1', 'v2026.10.15.1', 'v2026.10.16.1', BASE])
 
     def test_make_release_lists_the_diffs_in_the_signed_sums(self):
         rel = (TOP / 'tools/make-release.sh').read_text()
