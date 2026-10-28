@@ -297,6 +297,23 @@ return {
     sms: notes.map((n) => n.querySelector('b').textContent)
 };'''
 
+    def test_cell_identity_is_decimal_from_the_snapshot(self):
+        # #398: the home page shows the serving cell's TAC and cell ID in decimal, from the status snapshot it already
+        # has (no RPC, no AT command): 5G SA's C5GREG while registered there (a 9-digit NCI too), else CEREG
+        r = self.run_js(None, '''return [
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '081C1879' }, reg5g: { stat: 4, tac: null, cid: null } }),
+    M.cellIdentity({ reg: { stat: 5, tac: 'd920', cid: '1' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '081C1879' }, reg5g: { stat: 1, tac: '00D920', cid: '123456789' } }),
+    M.cellIdentity({ reg: { stat: 2, tac: 'D920', cid: '081C1879' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '0x81C' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: '1234567', cid: '1' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '1234567890' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 55584, cid: '1' } }),
+    M.cellIdentity({ error: 'x' }), M.cellIdentity(null) ];''')['result']
+        self.assertEqual(r, [
+            {'tac': 55584, 'cid': 136059001, 'nr': False}, {'tac': 55584, 'cid': 1, 'nr': False},
+            {'tac': 55584, 'cid': 4886718345, 'nr': True}, None, None, None, None, None, None, None])
+
     def test_three_languages(self):
         # The fork's case was a sentence assembled from fragments ('Link & traffic' + ' · ' + 'No response', a pair
         # that exists only in its test). common.js's own assembled sentence was the new-SMS banner, ('new SMS · ' in
