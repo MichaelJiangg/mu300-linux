@@ -239,7 +239,7 @@ class EarlyUsbOpenWrt(ShellTest):
 
     # --- hotplug iface/10-mu300-usb (K9; K10 rejected: the re-enumeration stays)
     def hotplug(self, shell, stamp_age=None, bridge='10.1.2.1/24', port='10.1.2.1/24', rndis_port='yes',
-                rndis_addr='', usb0_port='yes', skip_rebind=False):
+                rndis_addr='', usb0_port='yes', skip_rebind=False, adb=None, sleep_code=':'):
         (self.tmp / 'run' / 'mu300-early-udhcpd.pid').write_text('4242\n')
         (self.tmp / 'uptime').write_text('100.50 90.00\n')
         (self.tmp / 'mounts').write_text(f'configfs {self.tmp}/cfg configfs rw 0 0\n')
@@ -262,10 +262,20 @@ class EarlyUsbOpenWrt(ShellTest):
                         f'"-4 -o addr show dev usb0") echo "7: usb0    inet {port} scope global usb0" ;;\n'
                         f'"-4 -o addr show dev rndis0") [ -n "{rndis_addr}" ] && echo "8: rndis0    inet {rndis_addr} scope global rndis0" ;;\n'
                         'esac\nexit 0')
+        # adb: None is a system without adbd; 'on'/'off' one with adbd and that setting (FINDINGS 237)
+        (self.tmp / 'adbd').unlink(missing_ok=True)
+        if adb is not None:
+            (self.tmp / 'adbd').write_text('#!/bin/sh\n')
+            (self.tmp / 'adbd').chmod(0o755)
+            (self.tmp / 'adb').write_text(adb + '\n')
+        (self.tmp / 'role').write_text('device\n')
         body = self.text('etc/hotplug.d/iface/10-mu300-usb', **{
             '/run/': f'{self.tmp}/run/', '/sys/class/net/': f'{self.tmp}/net/', '/tmp/mu300-usb-rebound': f'{self.tmp}/stamp',
-            '/sys/kernel/config': f'{self.tmp}/cfg', '/proc/uptime': f'{self.tmp}/uptime', '/proc/mounts': f'{self.tmp}/mounts'})
-        code = ('kill() { echo "kill $*" >> "$STUBLOG/kill.log"; }; sleep() { :; }; logger() { :; }; mount() { :; }\n'
+            '/sys/kernel/config': f'{self.tmp}/cfg', '/proc/uptime': f'{self.tmp}/uptime', '/proc/mounts': f'{self.tmp}/mounts',
+            '/opt/mu300/bin/adbd': f'{self.tmp}/adbd', '/etc/mu300/adb': f'{self.tmp}/adb',
+            '/sys/class/usb_role/25100000.dwc3-role-switch/role': f'{self.tmp}/role'})
+        code = ('kill() { echo "kill $*" >> "$STUBLOG/kill.log"; }; logger() { echo "$*" >> "$STUBLOG/logger.log"; }; mount() { :; }\n'
+                f'sleep() {{ {sleep_code}; }}\n'
                 f'ACTION=ifup INTERFACE=lan MU300_USB_SKIP_REBIND={int(skip_rebind)}\n' + body)
         r = self.sh(shell, code)
         self.assertEqual('', r.stderr)
@@ -285,6 +295,71 @@ class EarlyUsbOpenWrt(ShellTest):
             # the macOS re-enumeration still runs (K10 rejected until its gate)
             self.assertEqual('100', (self.tmp / 'stamp').read_text().strip())
             self.assertEqual('25100000.dwc3', (g / 'UDC').read_text().strip())
+            self.tearDown(); self.setUp()
+
+    def udc_writes(self, g):
+        # the UDC file is plain: an unbind leaves it empty until the bind; the log tells who re-enumerated
+        log = self.tmp / 'logger.log'
+        return log.read_text() if log.exists() else ''
+
+    def test_lan_up_leaves_the_boot_re_enumeration_to_adbd(self):
+        # FINDINGS 237: adb about to join the gadget (on, adbd there, f3 not linked yet) -> mu300-adbd's rebind is the
+        # re-enumeration; the hook waits for it (here the second sleep is when adbd links f3) and makes none of its own
+        for shell in self.each_shell():
+            self.netdevs('usb0', 'rndis0')
+            f3 = self.tmp / 'cfg' / 'usb_gadget' / 'linux' / 'configs' / 'c.1' / 'f3'
+            g = self.hotplug(shell, adb='on', sleep_code=f'mkdir -p "{f3.parent}"; [ -e "{self.tmp}/slept" ] && '
+                                                         f'ln -sf /dev/null "{f3}"; : > "{self.tmp}/slept"')
+            log = self.udc_writes(g)
+            self.assertIn('re-enumerated by mu300-adbd', log)
+            self.assertNotIn('re-enumerated on', log)
+            self.assertEqual('25100000.dwc3', (g / 'UDC').read_text().strip())
+            self.assertFalse((self.tmp / 'run' / 'mu300-usb-rebind.lock').exists())
+            self.tearDown(); self.setUp()
+
+    def test_lan_up_rebinds_itself_when_adbd_never_comes(self):
+        # adb on but adbd never links f3 (no FunctionFS, a failing adbd): after its wait the hook re-enumerates
+        for shell in self.each_shell():
+            self.netdevs('usb0', 'rndis0')
+            g = self.hotplug(shell, adb='on', sleep_code=f'echo x >> "{self.tmp}/sleeps"')
+            log = self.udc_writes(g)
+            self.assertIn('re-enumerated on 25100000.dwc3', log)
+            # sleep 2, twelve 1 s looks for adbd, sleep 1 (unbound), sleep 1 (ports)
+            self.assertEqual(15, len((self.tmp / 'sleeps').read_text().split()))
+            self.assertEqual('25100000.dwc3', (g / 'UDC').read_text().strip())
+            self.assertFalse((self.tmp / 'run' / 'mu300-usb-rebind.lock').exists())
+            self.tearDown(); self.setUp()
+
+    def test_lan_up_with_adb_off_or_in_already_rebinds_at_once(self):
+        for shell in self.each_shell():
+            for adb, linked in (('off', False), ('on', True), (None, False)):
+                self.netdevs('usb0', 'rndis0')
+                f3 = self.tmp / 'cfg' / 'usb_gadget' / 'linux' / 'configs' / 'c.1' / 'f3'
+                if linked:
+                    f3.parent.mkdir(parents=True, exist_ok=True)
+                    f3.symlink_to('/dev/null')
+                g = self.hotplug(shell, adb=adb, sleep_code=f'echo x >> "{self.tmp}/sleeps"')
+                self.assertIn('re-enumerated on 25100000.dwc3', self.udc_writes(g), (adb, linked))
+                # sleep 2, sleep 1 (unbound), sleep 1 (ports): no wait for adbd
+                self.assertEqual(3, len((self.tmp / 'sleeps').read_text().split()), (adb, linked))
+                self.tearDown(); self.setUp()
+
+    def test_lan_up_waits_for_a_rebind_under_way(self):
+        # a rebind of mu300-adbd's holds the lock: the hook's own unbind waits until it is dropped
+        for shell in self.each_shell():
+            self.netdevs('usb0', 'rndis0')
+            lock = self.tmp / 'run' / 'mu300-usb-rebind.lock'
+            lock.mkdir(parents=True)
+            holder = subprocess.Popen(['sleep', '30'])
+            try:
+                (lock / 'pid').write_text(f'{holder.pid}\n')
+                g = self.hotplug(shell, adb='off', sleep_code=f'n=$(cat "{self.tmp}/n" 2>/dev/null || echo 0); '
+                                                              f'echo $((n + 1)) > "{self.tmp}/n"; '
+                                                              f'[ $n -lt 3 ] || rm -rf "{lock}"')
+            finally:
+                holder.kill(); holder.wait()
+            self.assertIn('re-enumerated on 25100000.dwc3', self.udc_writes(g))
+            self.assertFalse(lock.exists())
             self.tearDown(); self.setUp()
 
     def test_rebind_recovery_hands_off_lan_without_scheduling_another_rebind(self):

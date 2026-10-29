@@ -5169,6 +5169,35 @@ class UsbReset(ShellTest):
             self.assertEqual(0, r.returncode, r.stderr)
             self.assertEqual('5e100000.usb\n', (self.gadget / 'UDC').read_text())
 
+    def lease_check(self, shell, leases):
+        # the gadget's network function with the USB host's MAC (configs/c.1/f1 -> functions/ncm.usb0)
+        f = self.gadget / 'functions' / 'ncm.usb0'
+        f.mkdir(parents=True, exist_ok=True)
+        (f / 'host_addr').write_bytes(b'02:50:BB:7E:78:02\x00\n')   # as the kernel prints it
+        c = self.gadget / 'configs' / 'c.1'
+        c.mkdir(parents=True, exist_ok=True)
+        if not (c / 'f1').is_symlink():
+            (c / 'f1').symlink_to(f)
+        lease = self.tmp / 'leases'
+        lease.write_text(leases)
+        self.stub('setsid', 'echo "setsid $*" >> "$STUBLOG/calls"')
+        (self.tmp / 'calls').unlink(missing_ok=True)
+        return self.reset(shell, '--if-no-lease', '0', MU300_LEASES=lease)
+
+    def test_lease_check_wants_the_usb_hosts_lease(self):
+        # FINDINGS 237: a phone's lease on the hotspot is not the USB host's; the Mac on 169.254 gets its re-enumeration
+        for shell in self.each_shell():
+            r = self.lease_check(shell, '1 d6:e0:4a:37:0b:4c 192.168.78.100 phone *\n')
+            self.assertEqual(0, r.returncode, r.stderr)
+            self.assertIn('re-enumerating', r.stdout)   # the detached rebind was started
+
+    def test_lease_check_leaves_a_usb_host_with_its_lease_alone(self):
+        for shell in self.each_shell():
+            r = self.lease_check(shell, '1 d6:e0:4a:37:0b:4c 192.168.78.100 phone *\n'
+                                        '1 02:50:bb:7e:78:02 192.168.78.200 mac *\n')
+            self.assertEqual(0, r.returncode, r.stderr)
+            self.assertNotIn('re-enumerating', r.stdout)
+
 
 class Usb(ShellTest):
     """mu300-usb against a fake charger (busybox i2cget/i2cset on files) and a fake role switch."""

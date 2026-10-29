@@ -193,6 +193,7 @@ class Gadget(ShellTest):
                          MU300_PROC_MOUNTS=self.mounts, MU300_PROC_FILESYSTEMS=self.tmp / 'nofs',
                          MU300_MODULES_BUILTIN=self.builtin, MU300_UDC_CLASS=udc, MU300_USB_ROLE=self.role,
                          MU300_USB_HOOK=self.tmp / 'nohook', MU300_ADBD_TICK='0.1', MU300_ADBD_GRACE='3',
+                         MU300_USB_LOCK=self.tmp / 'rebind.lock',
                          # no waiting for a FunctionFS that comes late, except in the test of that
                          MU300_ADB_WAIT='0')
 
@@ -305,6 +306,30 @@ class Gadget(ShellTest):
             self.assertIn('auth open: every computer on the USB cable gets a root shell', out)
             (self.tmp / 'adbd.log').unlink()
             (self.tmp / 'calls').unlink()
+
+    def test_waits_while_the_lan_hook_rebinds(self):
+        # FINDINGS 237: the LAN hook holds the rebind lock while it unbinds and binds; adb joins only after it is
+        # dropped, and adbd's own rebind holds it and drops it again
+        lock = self.tmp / 'rebind.lock'
+        for shell in self.each_shell():
+            holder = subprocess.Popen(['sleep', '30'])
+            lock.mkdir()
+            (lock / 'pid').write_text(f'{holder.pid}\n')
+            p = self.start(shell)
+            try:
+                self.assertTrue(self.until(lambda: (self.ffs / 'ep1').exists()))
+                time.sleep(1.5)   # fifteen looks of 0.1 s
+                self.assertFalse(self.linked(), 'adb joined the gadget while the hook was rebinding it')
+                holder.kill(); holder.wait()   # a holder that is gone: its lock is taken over
+                self.assertTrue(self.until(self.linked), 'adb never joined the gadget')
+                self.assertTrue(self.until(lambda: not lock.exists()))
+                self.assertEqual(self.UDC, self.read('UDC'))
+            finally:
+                if holder.poll() is None:
+                    holder.kill(); holder.wait()
+                rc, out = self.stop(p)
+            self.assertEqual(0, rc, out)
+            self.assertFalse(lock.exists())
 
     def test_lan_recovery_hook_does_not_queue_a_second_rebind(self):
         hook = self.tmp / 'hook'

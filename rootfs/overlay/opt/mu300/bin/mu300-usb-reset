@@ -36,11 +36,22 @@ if [ "${1:-}" = --ready ]; then
 fi
 
 # "--if-no-lease": used at the end of the boot. If the host took an address, leave it alone; if it is still
-# waiting (it gave up while the device was booting), re-enumerate once.
+# waiting (it gave up while the device was booting), re-enumerate once. The host is the one with the gadget's
+# host_addr: a lease of a Wi-Fi client is not one (until 2026-10-29 any lease was, and a phone on the hotspot kept
+# a Mac whose NCM link had stalled at boot on 169.254 for good, FINDINGS 237). A gadget whose host MAC cannot be
+# read falls back to any lease.
 if [ "${1:-}" = --if-no-lease ]; then
     sleep "${2:-20}"
+    mac=
+    for f in "$G"/configs/c.1/f1 "$G"/functions/ncm.* "$G"/functions/ecm.* "$G"/functions/rndis.*; do
+        [ -r "$f/host_addr" ] || continue
+        # the kernel ends it with a NUL and a newline
+        mac=$(tr -d '\000\n ' < "$f/host_addr" 2>/dev/null | tr 'A-F' 'a-f'); [ -n "$mac" ] && break
+    done
     for f in ${MU300_LEASES:-} /tmp/dhcp.leases /var/lib/misc/dnsmasq.leases /var/lib/dnsmasq/dnsmasq.leases; do
-        [ -n "$f" ] && [ -s "$f" ] && exit 0
+        [ -n "$f" ] && [ -s "$f" ] || continue
+        [ -z "$mac" ] && exit 0
+        tr 'A-F' 'a-f' < "$f" | grep -q " $mac " && exit 0
     done
     set -- --detach
 fi

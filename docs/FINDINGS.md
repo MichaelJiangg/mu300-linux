@@ -12393,3 +12393,60 @@ Oops 25 s into the boot, and the fallback went to Android. Both halves looked co
 
 The init part works from the next image on: a device restarted in the middle of the step that installs this image
 still boots the image before, whose init does not know the file; the next mu300-update settles it then.
+
+### 237. One gadget rebind at boot: the LAN hook waits for adbd's, and the lease check asks for the USB host's
+
+**Status: in `openwrt/overlay/etc/hotplug.d/iface/10-mu300-usb`, `mu300-adbd` and `mu300-usb-reset`; tested in
+tests/test_early_dhcp.py, tests/test_adb.py (`Gadget.test_waits_while_the_lan_hook_rebinds`) and
+tests/test_device_scripts.py (`UsbReset`); on the U30 Air (OpenWrt, 6.18.59) 22 soft reboots and on F50-B
+(Ubuntu, 7.3) 10, Mac mini host, 2026-10-29.**
+
+On the U30 Air under OpenWrt (v2026.10.29.1), 2 soft reboots in 13 left the Mac's NCM interface on a self-assigned
+169.254 address: the device side looked fine (usb0 up, in br-lan and forwarding, the UDC `configured`, adb working
+over the same cable), but `usb0`'s `rx_packets` stayed at 34-35 for good and dnsmasq never saw a DHCP request from
+the gadget's host MAC. Unbinding and binding the gadget by hand brought it back at once. The owner's own reboot that
+morning was a third such boot (rx frozen at 35 for over an hour).
+
+**Why.** Two things re-enumerated the gadget at the same moment of every OpenWrt boot. The LAN hook (K10) unbinds 2 s
+after `lan` comes up (at about 4.4 s after the kernel started), sleeps 1 s and binds again; `mu300-adbd` (S19) adds adb
+with a rebind of its own as soon as adbd has written its descriptors, at about 6.5 s. On every boot measured, both
+fell within the same 200 ms: adbd unbound and bound (6.51 s), the hook unbound (6.70 s; FunctionFS saw
+`FUNCTIONFS_UNBIND` and dwc3 logged `request ... was not queued to ep0out`), adbd's bind retry bound it again (6.71 s),
+FunctionFS took it off once more when adbd closed its endpoints (`ffs_closed()`), and the hook bound it (7.70 s): four
+enumerations in about 1.2 s. The device-side log of the failing boots is the same as that of the good ones; what
+differs is the Mac, whose NCM driver came out of some of these bursts with an OUT path that sent nothing (the Mac
+kept the interface "active", the device kept transmitting to it). The F50 on Ubuntu has no LAN hook: one rebind
+(adbd's) and every boot was clean, before and after.
+
+The safety net did not catch it either: `mu300-usb-reset --if-no-lease 25` (mu300-post) left the gadget alone when any
+lease file was not empty, and a phone on the hotspot had a lease (the owner's boot: a DHCPACK for the phone at
+08:38:12, none for the Mac).
+
+**Now.**
+
+* The hook decides at the LAN's ifup whether adb is about to join the gadget (adbd installed, `/etc/mu300/adb` not
+  `off`, not the USB host role, `configs/c.1/f3` not linked yet). If so it waits up to 12 s for that link; once
+  `mu300-adbd` has made it, its rebind is the re-enumeration after the LAN came up and the hook makes none of its own
+  (`usb gadget re-enumerated by mu300-adbd (adb joined it)` in the log). Otherwise (adb off, adb already in, adbd that
+  never comes) it rebinds as before.
+* Both hold `/run/mu300-usb-rebind.lock` (a directory, with the holder's pid) from the unbind to the bind, and
+  `mu300-adbd`'s loop does nothing while somebody else holds it. A lock whose holder is gone is taken over, and
+  neither waits more than 15 s for it: the gadget is always bound again. `mu300-adbd` honours only a lock that is
+  root's alone (F50-B's `/run` is world-writable).
+* `--if-no-lease` looks for a lease of the gadget's `host_addr` (the network function's host MAC); a gadget whose MAC
+  cannot be read falls back to any lease, as before. The kernel ends `host_addr` with a NUL and a newline; both are
+  taken off.
+
+**Measured** (one reboot every ~2.5 min, the Mac's en16/en17 address, a ping over it, `usb0` counters and the boot's
+log): before, U30 Air 2 of 13 boots without a lease (boots 10 and 11); after, 22 of 22 with the Mac on its lease (192.168.78.200, ping over en16, `usb0` rx 218-5093). In the fixed boots
+`mu300-adbd` binds once (about 5.4 s), the hook logs that it left it to adbd, no `not queued` line, and the Mac's
+DHCPACK comes about 7 s after the kernel started. F50-B (7.3, the new `mu300-adbd` and `mu300-usb-reset`): 10 of 10, one rebind each, the Mac on its lease
+about 10 s after the kernel started, as before the change.
+
+In one of the 22 (boot 116) the Mac had no lease yet when the lease check looked (about 32 s): the check, now asking
+for the host's MAC, re-enumerated the gadget and the Mac had its lease 5 s later. A phone on the hotspot had a lease
+then, so before this change that boot would have been left without one. Whether the Mac's OUT path had stalled there
+is not known (the counters were read only at the end).
+
+Not covered: the other rebinders (`mu300-usb-reset`, `mu300-usb` mode changes, the U30 Air's role switch) do not take
+the lock; they run on request or 25 s after boot, not in the window above.
