@@ -1035,7 +1035,8 @@ class KernelStep(UpdateBase):
 
     def make_bundle(self, mods, krel=None):
         p = self.src / 'mu300-kernel-6.18.tar.gz'
-        files = [('./Image', b'N' * 100 + f'Linux version {krel or self.KREL} (b@h)'.encode() + b'N' * 8000), ('./ramdisk-generic.lz4', b'\x02\x21\x4c\x18generic'),
+        files = [('./Image', b'N' * 100 + f'Linux version {krel or self.KREL} (b@h) # SMP \n\0'.encode() +
+                  f'Linux version {krel or self.KREL} (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026\n\0'.encode() + b'N' * 8000), ('./ramdisk-generic.lz4', b'\x02\x21\x4c\x18generic'),
                  ('./devices', b'f50 u30air\n'), ('./features', b'sdcard\nlinux-slot\n'),
                  ('./kernel.release', ((krel or self.KREL) + '\n').encode()), ('./modules.builtin', b'kernel/x.ko\n'),
                  ('./kernel.config', b'CONFIG_X=y\n' * 100)]
@@ -1146,7 +1147,8 @@ class KernelStep(UpdateBase):
             self.assertEqual(self.part.read_bytes(), img)
             pend = (self.disk / 'boot/modules.pending').read_text().splitlines()
             self.assertEqual(pend[0], self.KREL)
-            self.assertTrue(pend[1].startswith(f'Linux version {self.KREL} (b@h)'))
+            # the banner of the final link, not init/version.o's without build number and time
+            self.assertEqual(pend[1], f'Linux version {self.KREL} (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026')
             r = self.up(shell, (self.STUBS % self.PSIZE) + 'modules_settle; echo "rc=$?"', PART=self.part,
                         MU300_NO_DEPMOD=1, **self.busybox_applets(shell))
             self.assertIn('rc=0', r.stdout, r.stderr)
@@ -1181,7 +1183,7 @@ class KernelStep(UpdateBase):
             for n, data in new.items():
                 (st / 'modules' / n).write_bytes(data)
             (st / 'kernel.release').write_text(self.KREL + '\n')
-            banner = 'Linux version 6.18.57 (b@h)' + 'N' * 8000
+            banner = 'Linux version 6.18.57 (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026'
             (self.disk / 'boot/modules.pending').write_text(f'{self.KREL}\n{banner}\n')
             self.systems({'a.ko': b'', 'b.ko': b''})
             r = self.up(shell, (self.STUBS % self.PSIZE) + 'modules_settle; echo "rc=$?"', PART=self.part,

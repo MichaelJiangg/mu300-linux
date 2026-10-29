@@ -3313,7 +3313,10 @@ boot_room() {
 # next - the ramdisk's init before the system starts (boot/init, modules_settle), or the next mu300-update - puts in
 # the set of the image in the slot: the unpacked bundle's when that is the new kernel, else the set kept with the
 # image before (prev_modules_restore).
-kernel_banner() { grep -a -o -m 1 'Linux version [0-9][^[:cntrl:]]*' | head -n 1; }
+# kernel_banner < KERNEL: the banner /proc/version shows. An Image holds two: the one of init/version.o, whose build
+# number and time are left out ("# SMP "), and the one put in at the final link ("#1 SMP Tue Oct 27 ...", seen on
+# 6.18.59) - only that one tells two builds of a release apart
+kernel_banner() { grep -a -o 'Linux version [0-9][^[:cntrl:]]* #[0-9][^[:cntrl:]]*' | head -n 1; }
 image_banner() {  # image_banner IMAGE: the banner of the kernel in a boot image (a partition, or a kept image)
     _iz=$(u32 "$1" 8)
     case $_iz in ''|0|*[!0-9]*) return 1 ;; esac
