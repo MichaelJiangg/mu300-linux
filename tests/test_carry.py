@@ -620,7 +620,7 @@ class Carry(CarryCase):
 
         def check(old, new, report, r):
             self.assertTrue((new / 'etc/motd').exists())
-            self.assertIn('Packages you had removed are part of the image, and back (their services are not enabled):\n  extra\n', report)
+            self.assertIn('Packages you had removed are part of the image, and back (their services are as the previous system had them):\n  extra\n', report)
             self.assertNotIn('Deleted again', report)
         self.each(user, check, new_image=new_image)
 
@@ -1114,8 +1114,59 @@ class NeverLessProtected(CarryCase):
         def check(old, new, report, r):
             self.assertTrue((new / 'usr/lib/systemd/system/telnet.service').exists())
             self.assertFalse(os.path.lexists(new / 'etc/systemd/system/multi-user.target.wants/telnet.service'))
-            self.assertRegex(report, r'Packages you had removed are part of the image, and back \(their services are not enabled\):\n  telnetd\n')
+            self.assertRegex(report, r'Packages you had removed are part of the image, and back \(their services are as the previous system had them\):\n  telnetd\n')
         self.each(user, check, old_image=SEC_OLD, new_image=new_image)
+
+    def replaced(self, enabled):
+        """(what the device did, the old image, the new image) of the case dnsmasq-full for dnsmasq: the image's
+        package was replaced by another one of the device that provides the same service, its service is enabled
+        (or the user had it off), and the file the other package does not have went with the package it replaced"""
+        old_image = dict(SEC_OLD)
+        old_image.update({'usr/share/extra/notes': 'the notes of the package\n'})
+        new_image = dict(SEC_NEW)
+        new_image.update({'usr/share/extra/notes': 'the notes of the package\n',
+                          'var/lib/dpkg/info/extra.list': '/.\n/usr/lib/systemd/system/telnet.service\n/usr/share/extra/notes\n',
+                          'var/lib/dpkg/status': 'Package: base\nStatus: install ok installed\n\nPackage: extra\nStatus: install ok installed\n'})
+
+        def user(old):
+            # the package the image had is not installed: another one of the device provides its service (and the
+            # service is enabled); the file the other package does not have went with the package it replaced
+            build(old, {'var/lib/dpkg/info/extra-alt.list': '/.\n/usr/lib/systemd/system/telnet.service\n',
+                        'var/lib/apt/extended_states': 'Package: extra-alt\nArchitecture: amd64\nAuto-Installed: 1\n',
+                        'var/lib/dpkg/status': 'Package: base\nStatus: install ok installed\n\n'
+                                               'Package: extra-alt\nStatus: install ok installed\n'})
+            (old / 'usr/share/extra/notes').unlink()
+            if not enabled:
+                (old / 'etc/systemd/system/multi-user.target.wants/telnet.service').unlink()
+        return user, old_image, new_image
+
+    def test_a_replaced_package_keeps_its_service_enabled(self):
+        # the previous system ran the service of the package the image had (from the package that replaced it): the
+        # update must keep it enabled, or the device boot has no DHCP and no DNS on its bridges
+        user, old_image, new_image = self.replaced(True)
+
+        def check(old, new, report, r):
+            self.assertTrue((new / 'usr/lib/systemd/system/telnet.service').exists())
+            link = new / 'etc/systemd/system/multi-user.target.wants/telnet.service'
+            self.assertTrue(os.path.lexists(link))
+            self.assertEqual(os.readlink(link), '/usr/lib/systemd/system/telnet.service')
+            self.assertTrue((new / 'usr/share/extra/notes').exists())       # the package is back with its files
+            self.assertIn('Packages you had removed are part of the image, and back (their services are as the '
+                          'previous system had them):\n  extra\n', report)
+            self.assertNotIn('Deleted again', report)
+        self.each(user, check, old_image=old_image, new_image=new_image)
+
+    def test_a_replaced_package_keeps_its_service_disabled(self):
+        # the same, but the user had the service off in the previous system: it stays off, though the image enables it
+        user, old_image, new_image = self.replaced(False)
+
+        def check(old, new, report, r):
+            self.assertFalse(os.path.lexists(new / 'etc/systemd/system/multi-user.target.wants/telnet.service'))
+            self.assertIn('Packages you had removed are part of the image, and back (their services are as the '
+                          'previous system had them):\n  extra\n', report)
+            self.assertRegex(report, r'Deleted again, as you had deleted them:\n(  /.*\n)*  '
+                                     r'/etc/systemd/system/multi-user\.target\.wants/telnet\.service\n')
+        self.each(user, check, old_image=old_image, new_image=new_image)
 
 
 @unittest.skipUnless(CC and LINUX, 'needs a C compiler on Linux')
