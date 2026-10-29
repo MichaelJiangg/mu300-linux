@@ -292,6 +292,17 @@ t = open(rp).read()
 if 'ump96xx-rtc' not in t:
     t = t.replace('\t{ .compatible = "sprd,sc2731-rtc", },\n', '\t{ .compatible = "sprd,sc2731-rtc", },\n\t{ .compatible = "sprd,ump96xx-rtc", },\n', 1)
     open(rp, 'w').write(t)
+# the SoC's TRNG (rng@e0000, sprd,sprd-trng): /dev/hwrng and the random pool's hardware source, as on 5.4 (FINDINGS 234)
+append_once('drivers/char/hw_random/Makefile', 'sprd_trng.o', 'obj-$(CONFIG_HW_RANDOM_SPRD) += sprd_trng.o\n')
+hk = os.path.join(tree, 'drivers/char/hw_random/Kconfig')
+h = open(hk).read()
+if 'config HW_RANDOM_SPRD\n' not in h:
+    i = h.rindex('endif # HW_RANDOM')
+    h = h[:i] + ('config HW_RANDOM_SPRD\n\ttristate "Unisoc UMS9620 true random number generator"\n'
+                 '\tdepends on ARCH_SPRD || COMPILE_TEST\n\tdepends on HAS_IOMEM && OF && COMMON_CLK\n'
+                 '\thelp\n\t  The TRNG of the UMS9620\'s crypto engine (sprd,sprd-trng), ported from the Unisoc 5.4\n'
+                 '\t  kernel. The module is called sprd_trng.\n\n') + h[i:]
+    open(hk, 'w').write(h)
 # The ZTE U30 Air's charger (SGM41511, a bq25601): its vendor DT compatible in bq256xx's OF and I2C tables; the
 # driver's handling of that node (no IRQ, no input current in the DT, the chip as Android left it) is patch 0009. The
 # I2C table is an edit rather than part of the patch: 6.18 writes its entries positionally, 7.x with .name/.driver_data.

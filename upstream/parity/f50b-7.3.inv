@@ -83,6 +83,7 @@ driver platform/sprd-trusty-virtio
 driver platform/sprd_hwspinlock
 driver platform/sprd_serial
 driver platform/sprd_time_sync
+driver platform/sprd_trng
 driver platform/sprd_wcn
 driver platform/tshm
 driver platform/ump9620-wdt
@@ -97,6 +98,7 @@ driver serial-base/port
 driver spi/sc27xx-pmic
 driver virtio/sprd-trusty-ipc
 extcon extcon0
+hwrng 202e0000.rng
 hwrng none
 input gpio-keys
 led keyboard-backlight

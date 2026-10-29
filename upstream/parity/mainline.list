@@ -30,6 +30,7 @@ cfg DEVFREQ_THERMAL 6.18 7.2 7.3
 cfg DMABUF_HEAPS 6.18 7.2 7.3
 cfg FIXED_PHY 6.18 7.2 7.3
 cfg FUEL_GAUGE_SC27XX 6.18 7.2 7.3
+cfg HW_RANDOM_SPRD 6.18 7.2 7.3
 cfg I2C_CHARDEV 6.18 7.2 7.3
 cfg IPV6 6.18 7.2 7.3
 cfg LEDS_SC27XX_KPLED 6.18 7.2 7.3
@@ -558,6 +559,7 @@ ko sprd_systimer 6.18 7.2 7.3
 ko sprd_thermal_r5p0 6.18 7.2 7.3
 ko sprd_time_sync 6.18 7.2 7.3
 ko sprd_time_sync_cp 6.18 7.2 7.3
+ko sprd_trng 6.18 7.2 7.3
 ko sprd_wlan_combo 6.18 7.2 7.3
 ko sprdbt_tty 6.18 7.2 7.3
 ko squashfs 6.18 7.2 7.3
