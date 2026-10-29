@@ -614,6 +614,7 @@ accounts() {
 # hold the two to one text. It runs on Android too: sh, awk, sed, grep, sort - nothing else, and safe under set -e.
 UPK_DIR=etc/mu300/user-packages
 UPK_ORPH=etc/mu300/orphaned-config
+UPK_APKS=etc/mu300/user-apks
 # what is never installed again: kernel modules (the feed's are for another kernel), and what the images take out on
 # purpose (sysupgrade would flash the eMMC; ujail crash-loops services on 5.4)
 upk_skip() {
@@ -809,6 +810,10 @@ upk_record() {
     fi
     if [ "${MU300_KEEP_PACKAGES:-1}" = 0 ]; then echo skipped > "$_ud/state"; else echo pending > "$_ud/state"; fi
     echo "  $(tr '\n' ' ' < "$_ud/wanted")"
+    # a package the feeds do not have, coming back from the file kept for it before the update (mu300-user-packages keep)
+    [ ! -f "$_uo/$UPK_APKS/index" ] || while read -r _kp _kv _kf; do
+        [ ! -f "$_uo/$UPK_APKS/$_kf" ] || ! grep -qxF "$_kp" "$_ud/wanted" || echo "  from a kept file: /$UPK_APKS/$_kf"
+    done < "$_uo/$UPK_APKS/index"
     if [ "$(cat "$_ud/state")" = skipped ]; then
         echo "  The new system does not have them, and they are not installed again (MU300_KEEP_PACKAGES=0 or"
         echo "  --no-reinstall; later: mu300-user-packages retry)."
@@ -869,9 +874,10 @@ stale_config_clean() {
 #       an enable link that is gone stays gone (also of the project's own services, and without a manifest: a link
 #       of the new image for a service the old system had and did not enable), and a mask (a link to /dev/null) is
 #       the user's even over the project's own unit. A mode the user narrowed is put on the new image's file even
-#       where the release's content is used. A package the user removed is back with the image, but its services
-#       are not enabled. An account of the image that the old system did not have (the user deleted it, or the
-#       release added it) is locked.
+#       where the release's content is used. A package the user removed is back with the image, and its services are
+#       as the old system had them: a service it did not run is not enabled, while one another package provided (and
+#       the old system ran) stays on. An account of the image that the old system did not have (the user deleted it,
+#       or the release added it) is locked.
 #   the image's, deleted by the user
 #       under /etc /home /root /srv /usr/local /opt /mnt /media it stays deleted, and so does a service's enable link
 #       (rc.d, *.wants) - unless it is one of the project's own programs, a script in /etc/init.d or /etc/hotplug.d,
@@ -1311,16 +1317,22 @@ carry_plan() {
                 print "R\t" p; note("d", p)
             } else note("k", p)
         }
-        # a package the user removed is part of the image and back: its services are not enabled
+        # a package the user removed is part of the image and back: a service the old system did not have is not
+        # enabled; one it had, from another package (dnsmasq-full for dnsmasq), is as the old system had it
         nback = 0
         for (a in back) { note("p", a); nback++ }
-        if (nback) for (p in nown) if ((nown[p] in back) && service_file(p)) { b = p; sub(/.*\//, "", b); svc[b] = 1 }
+        if (nback) for (p in nown) if ((nown[p] in back) && service_file(p)) {
+            b = p; sub(/.*\//, "", b)
+            if (p in seen) svcold[b] = 1
+            else svc[b] = 1
+        }
         # without a manifest: a service the old system had and did not enable stays off
         if (fb) for (p in had) if (service_file(p)) { b = p; sub(/.*\//, "", b); known[b] = 1 }
         for (p in ns) {
             if (!enable_link(p)) continue
             b = service_of(p)
             if (nback && (b in svc)) print "R\t" p
+            else if (nback && (b in svcold) && !(p in seen)) print "R\t" p
             else if (fb && !(p in had) && (b in known)) { print "R\t" p; note("e", p) }
         }
         # ... and a grant of sudo that the old system did not have is not taken from the new image
@@ -1472,7 +1484,7 @@ carry_report() {
                 list("x", "The release has a file or a link where this directory was; what you had in it: " kept "/user:", "/")
                 list("d", "Deleted again, as you had deleted them:", "/")
                 list("k", "Back, though you had deleted them (the system needs them, or it cannot be told):", "/")
-                list("p", "Packages you had removed are part of the image, and back (their services are not enabled):", "")
+                list("p", "Packages you had removed are part of the image, and back (their services are as the previous system had them):", "")
                 list("e", "Left off, as in the previous system (the new release enables them):", "/")
                 list("s", "Not taken from the new release, as the previous system did not have them (rules of sudo):", "/")
                 list("l", "Accounts of the release that the previous system did not have are locked (passwd NAME sets a password):", "")

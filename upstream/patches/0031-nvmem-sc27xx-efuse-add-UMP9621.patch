@@ -1,0 +1,42 @@
+nvmem: sc27xx-efuse: add the UMP9621 (the UMS9620's second PMIC)
+
+The UMP9621 (pmic@1) has the UMP9620's eFuse controller in its own register space, with 12 blocks (Unisoc's 5.4
+driver: UMP9621_EFUSE_BLOCK_MAX). Its parent MFD (upstream/port/drivers/mfd/ump962x-pmic.c) adds the PMIC's
+register offset, so the UMP9620 code path reads it as it is. With two of them, each nvmem device takes the number
+of its pmic_efuse alias (sc27xx-efuse0 and sc27xx-efuse1, as on 5.4); without an alias the id stays 0 as before.
+
+--- a/drivers/nvmem/sc27xx-efuse.c
++++ b/drivers/nvmem/sc27xx-efuse.c
+@@ -90,6 +90,13 @@
+ static const struct sc27xx_efuse_variant_data ump9620_edata = {
+ 	.module_en = UMP9620_MODULE_EN,
+ 	.block_max = UMP9620_EFUSE_BLOCK_MAX,
++	.ump96xx = true,
++};
++
++/* its companion PMIC (pmic@1): the same controller in its own register space, 12 blocks */
++static const struct sc27xx_efuse_variant_data ump9621_edata = {
++	.module_en = UMP9620_MODULE_EN,
++	.block_max = 12,
+ 	.ump96xx = true,
+ };
+ 
+@@ -277,6 +284,10 @@
+ 	econfig.word_size = 1;
+ 	econfig.read_only = true;
+ 	econfig.name = "sc27xx-efuse";
++	/* two of them on the UMS9620 (pmic_efuse0, pmic_efuse1): each keeps its alias' number, as on 5.4 */
++	ret = of_alias_get_id(np, "pmic_efuse");
++	if (ret >= 0)
++		econfig.id = ret;
+ 	econfig.size = efuse->var_data->block_max * SC27XX_EFUSE_BLOCK_WIDTH;
+ 	econfig.reg_read = sc27xx_efuse_read;
+ 	econfig.priv = efuse;
+@@ -295,6 +306,7 @@
+ 	{ .compatible = "sprd,sc2731-efuse", .data = &sc2731_edata},
+ 	{ .compatible = "sprd,sc2730-efuse", .data = &sc2730_edata},
+ 	{ .compatible = "sprd,ump9620-efuse", .data = &ump9620_edata},
++	{ .compatible = "sprd,ump9621-efuse", .data = &ump9621_edata},
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, sc27xx_efuse_of_match);

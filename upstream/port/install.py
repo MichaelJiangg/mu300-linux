@@ -113,6 +113,61 @@ if 'REGULATOR_UMP9620' not in r:
     r = r[:i] + ('config REGULATOR_UMP9620\n\ttristate "Unisoc UMP9620 PMIC regulators"\n\tdepends on MFD_SC27XX_PMIC || COMPILE_TEST\n'
                  '\thelp\n\t  Regulators of the UMP9620 PMIC (ported from the Unisoc 5.4 kernel).\n\n') + r[i:]
     open(rk, 'w').write(r)
+# The UMS9620's other two PMICs and the UMP9620's remaining parts, as on 5.4 (FINDINGS 234): the UMP9621 and
+# UMP9622 on the ADI bus (ump962x-pmic.c), the UMP9621's regulators (vddcpu0, vddsram1/2, vddai, vddmm, DCDC_MODEM)
+# and eFuse (patches/0031), the UMP9622's temperature sensors (osctsen/outtsen zones), the PMICs' global register
+# blocks, the 7-second reset settings and the UMP9620's vibrator
+append_once('drivers/mfd/Makefile', 'ump962x-pmic.o', 'obj-$(CONFIG_MFD_UMP962X_PMIC) += ump962x-pmic.o\n')
+append_once('drivers/mfd/Kconfig', 'config MFD_UMP962X_PMIC', '''
+config MFD_UMP962X_PMIC
+	tristate "Unisoc UMP9621/UMP9622 companion PMICs"
+	depends on (ARCH_SPRD && SPI_SPRD_ADI && OF) || COMPILE_TEST
+	select REGMAP
+	help
+	  The UMS9620's second and third PMICs (pmic@1, pmic@2), at their register offsets on the ADI bus.
+''')
+append_once('drivers/regulator/Makefile', 'ump9621-regulator.o', 'obj-$(CONFIG_REGULATOR_UMP9621) += ump9621-regulator.o\n')
+r = open(rk).read()
+if 'REGULATOR_UMP9621' not in r:
+    i = r.rindex('endif')
+    r = r[:i] + ('config REGULATOR_UMP9621\n\ttristate "Unisoc UMP9621 PMIC regulators"\n'
+                 '\tdepends on MFD_UMP962X_PMIC || COMPILE_TEST\n'
+                 '\thelp\n\t  Regulators of the UMP9621 PMIC (ported from the Unisoc 5.4 kernel).\n\n') + r[i:]
+    open(rk, 'w').write(r)
+append_once('drivers/thermal/Makefile', 'sprd_ump96xx_tsensor.o',
+            'obj-$(CONFIG_SPRD_UMP96XX_TSENSOR) += sprd_ump96xx_tsensor.o\n')
+append_once('drivers/thermal/Kconfig', 'config SPRD_UMP96XX_TSENSOR', '''
+config SPRD_UMP96XX_TSENSOR
+	tristate "Unisoc UMP9622 temperature sensors"
+	depends on MFD_UMP962X_PMIC && THERMAL_OF
+	help
+	  The UMP9622's crystal and PMIC temperature sensors; read in factory calibration mode only, as on 5.4.
+''')
+append_once('drivers/soc/Makefile', 'sprd/', 'obj-y\t\t\t\t+= sprd/\n')
+open(os.path.join(tree, 'drivers/soc/sprd/Makefile'), 'a').close()
+append_once('drivers/soc/sprd/Makefile', 'sprd_pmic_syscon.o', 'obj-$(CONFIG_SPRD_PMIC_SYSCON) += sprd_pmic_syscon.o\n')
+append_once('drivers/soc/sprd/Makefile', 'sprd_7sreset.o', 'obj-$(CONFIG_SPRD_7SRESET) += sprd_7sreset.o\n')
+append_once('drivers/soc/Kconfig', 'config SPRD_PMIC_SYSCON', '''
+config SPRD_PMIC_SYSCON
+	tristate "Unisoc PMIC global registers in sysfs"
+	depends on (MFD_SC27XX_PMIC || MFD_UMP962X_PMIC) && OF
+	help
+	  pmic_reg and pmic_value of each PMIC's global register block, as the Unisoc 5.4 kernel's sprd_pmic_syscon.
+config SPRD_7SRESET
+	tristate "Unisoc PMIC 7-second reset settings"
+	depends on MFD_SC27XX_PMIC && OF
+	help
+	  The PMIC's long-press hardware reset settings in sysfs, as the Unisoc 5.4 kernel's sprd_7sreset.
+''')
+vp = os.path.join(tree, 'drivers/input/misc/sc27xx-vibra.c')
+v = open(vp).read()
+if '"sprd,ump9620-vibrator"' not in v:
+    a = '\t{ .compatible = "sprd,sc2730-vibrator", .data = &sc2730_data },\n'
+    if a not in v:
+        sys.exit('port: sc27xx-vibra match table anchor changed')
+    # the UMP9620's vibrator LDO has the SC2730's bits (Unisoc's 5.4 driver: UMP9620_* = SC2730_*)
+    v = v.replace(a, a + '\t{ .compatible = "sprd,ump9620-vibrator", .data = &sc2730_data },\n', 1)
+    open(vp, 'w').write(v)
 
 # the PMIC's Type-C detection (sc27xx_typec: port0, partner, extcon) and BC1.2 detection (sprd-bc1p2), as on 5.4
 append_once('drivers/usb/typec/Makefile', 'sc27xx_typec.o', 'obj-$(CONFIG_TYPEC_SC27XX)\t+= sc27xx_typec.o\n')
@@ -312,6 +367,17 @@ config SPRD_SOC_ID
 	  /sys/devices/soc0, as the Unisoc 5.4 kernel's sprd_soc_id and sprd_manufacturer_model gave them.
 endmenu
 ''')
+# CPU hotplug cooling (thermal-cpu-0/1/2, the vendor DT's /cooling-devices), as 5.4's sprd_cpu_cooling (FINDINGS 234)
+append_once('drivers/thermal/Makefile', 'sprd_cpu_hotplug_cooling.o',
+            'obj-$(CONFIG_SPRD_CPU_HOTPLUG_COOLING) += sprd_cpu_hotplug_cooling.o\n')
+append_once('drivers/thermal/Kconfig', 'config SPRD_CPU_HOTPLUG_COOLING', '''
+config SPRD_CPU_HOTPLUG_COOLING
+	tristate "Unisoc CPU hotplug cooling"
+	depends on THERMAL_OF && HOTPLUG_CPU && CPU_FREQ && OF
+	help
+	  Cooling devices that take a cluster's cores offline when it is hot (thermal-cpu-N), as the Unisoc 5.4
+	  kernel's sprd_cpu_cooling; bound to the zones by the device tree's cooling maps.
+''')
 # cpufreq: UMS9620 apcpu DVFS is done by ATF through Unisoc SIP calls (vendor sprd_sip_svc + sprd-cpufreq-v2)
 append_once('drivers/firmware/Makefile', 'sprd_sip_svc.o', 'obj-$(CONFIG_SPRD_SIP_SVC) += sprd_sip_svc.o\n')
 append_once('drivers/firmware/Kconfig', 'SPRD_SIP_SVC', '''
@@ -352,6 +418,18 @@ if 'config HW_RANDOM_SPRD\n' not in h:
                  '\thelp\n\t  The TRNG of the UMS9620\'s crypto engine (sprd,sprd-trng), ported from the Unisoc 5.4\n'
                  '\t  kernel. The module is called sprd_trng.\n\n') + h[i:]
     open(hk, 'w').write(h)
+# ZTE's charge policy of the U30 Air (expired mode) and the battery cooling device, as on 5.4 (FINDINGS 234)
+append_once('drivers/power/supply/Makefile', 'charger_policy_service.o',
+            'obj-$(CONFIG_CHARGER_POLICY_SERVICE) += charger_policy_service.o\n')
+sk = os.path.join(tree, 'drivers/power/supply/Kconfig')
+k = open(sk).read()
+if 'config CHARGER_POLICY_SERVICE\n' not in k:
+    i = k.rindex('endif # POWER_SUPPLY')
+    k = k[:i] + ('config CHARGER_POLICY_SERVICE\n\ttristate "ZTE charge policy (U30 Air) and battery cooling device"\n'
+                 '\tdepends on OF && THERMAL\n\thelp\n'
+                 '\t  ZTE\'s expired mode (zte,charger-policy-service): after a long time on the charger the battery is\n'
+                 '\t  kept between two capacities; and the "battery" cooling device of the 5.4 charger-manager.\n\n') + k[i:]
+    open(sk, 'w').write(k)
 # The ZTE U30 Air's charger (SGM41511, a bq25601): its vendor DT compatible in bq256xx's OF and I2C tables; the
 # driver's handling of that node (no IRQ, no input current in the DT, the chip as Android left it) is patch 0009. The
 # I2C table is an edit rather than part of the patch: 6.18 writes its entries positionally, 7.x with .name/.driver_data.

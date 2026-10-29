@@ -28,6 +28,9 @@ cooling cpufreq-cpu0
 cooling cpufreq-cpu4
 cooling cpufreq-cpu7
 cooling devfreq-23140000.gpu
+cooling thermal-cpu-0
+cooling thermal-cpu-1
+cooling thermal-cpu-2
 cpufreq sprd-cpufreq-v2
 cpuidle WFI
 cpuidle cluster-pd
@@ -51,10 +54,12 @@ driver platform/mtty
 driver platform/mu300-virtual-thermal
 driver platform/psci-cpuidle
 driver platform/ramoops
+driver platform/sc27xx-7sreset
 driver platform/sc27xx-adc
 driver platform/sc27xx-efuse
 driver platform/sc27xx-keypad-led
 driver platform/sc27xx-typec
+driver platform/sc27xx-vibrator
 driver platform/sdhci_sprd_r11
 driver platform/simple-pm-bus
 driver platform/sipa
@@ -73,6 +78,7 @@ driver platform/sprd-i2c
 driver platform/sprd-pcie
 driver platform/sprd-pinctrl
 driver platform/sprd-pmic-eic
+driver platform/sprd-pmic-glb
 driver platform/sprd-rtc
 driver platform/sprd-sipc
 driver platform/sprd-soc-id
@@ -91,7 +97,9 @@ driver platform/sprd_trng
 driver platform/sprd_wcn
 driver platform/tshm
 driver platform/ump9620-wdt
+driver platform/ump9621-regulator
 driver platform/ump962x-regulator
+driver platform/ump96xx-tsensor
 driver platform/ums9620-clk
 driver platform/ums9620-ipa-sys-pd
 driver platform/unisoc-mailbox
@@ -100,12 +108,14 @@ driver platform/wlan
 driver serial-base/ctrl
 driver serial-base/port
 driver spi/sc27xx-pmic
+driver spi/ump96xx-pmic
 driver virtio/sprd-trusty-ipc
 extcon extcon0
 extcon extcon1
 hwrng 202e0000.rng
 hwrng none
 input gpio-keys
+input sc27xx:vibrator
 led keyboard-backlight
 led mmc0::
 led mmc1::
@@ -114,6 +124,7 @@ led sc27xx:green
 led sc27xx:red
 misc mali0
 misc watchdog
+regulator DCDC_MODEM
 regulator DCDC_WPA
 regulator LDO_VDDLDO0
 regulator LDO_VDDLDO4
@@ -127,6 +138,7 @@ regulator avdd18
 regulator regulator-dummy
 regulator vdd18_dcxo
 regulator vdd28
+regulator vddai
 regulator vddcama0
 regulator vddcama1
 regulator vddcama2
@@ -137,6 +149,7 @@ regulator vddcamio
 regulator vddcammot0
 regulator vddcammot1
 regulator vddcore
+regulator vddcpu0
 regulator vddcpu1
 regulator vddcpu2
 regulator vddemmccore
@@ -149,11 +162,14 @@ regulator vddldo2
 regulator vddldo3
 regulator vddmem
 regulator vddmemq
+regulator vddmm
 regulator vddpub
 regulator vddsdcore
 regulator vddsdio
 regulator vddsim2
 regulator vddsram0
+regulator vddsram1
+regulator vddsram2
 regulator vddufs1v2
 regulator vddusb33
 regulator vddvib
@@ -183,6 +199,8 @@ tz mm-thmzone
 tz nr-thmzone
 tz nr0-thmzone
 tz nr1-thmzone
+tz osctsen-thmzone
+tz outtsen-thmzone
 tz pa-thmzone
 tz soc-thmzone
 udc 25100000.dwc3

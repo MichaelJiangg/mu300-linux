@@ -543,6 +543,7 @@ fi
 # hold the two to one text. It runs on Android too: sh, awk, sed, grep, sort - nothing else, and safe under set -e.
 UPK_DIR=etc/mu300/user-packages
 UPK_ORPH=etc/mu300/orphaned-config
+UPK_APKS=etc/mu300/user-apks
 # what is never installed again: kernel modules (the feed's are for another kernel), and what the images take out on
 # purpose (sysupgrade would flash the eMMC; ujail crash-loops services on 5.4)
 upk_skip() {
@@ -738,6 +739,10 @@ upk_record() {
     fi
     if [ "${MU300_KEEP_PACKAGES:-1}" = 0 ]; then echo skipped > "$_ud/state"; else echo pending > "$_ud/state"; fi
     echo "  $(tr '\n' ' ' < "$_ud/wanted")"
+    # a package the feeds do not have, coming back from the file kept for it before the update (mu300-user-packages keep)
+    [ ! -f "$_uo/$UPK_APKS/index" ] || while read -r _kp _kv _kf; do
+        [ ! -f "$_uo/$UPK_APKS/$_kf" ] || ! grep -qxF "$_kp" "$_ud/wanted" || echo "  from a kept file: /$UPK_APKS/$_kf"
+    done < "$_uo/$UPK_APKS/index"
     if [ "$(cat "$_ud/state")" = skipped ]; then
         echo "  The new system does not have them, and they are not installed again (MU300_KEEP_PACKAGES=0 or"
         echo "  --no-reinstall; later: mu300-user-packages retry)."

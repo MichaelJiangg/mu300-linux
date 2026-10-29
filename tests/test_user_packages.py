@@ -157,6 +157,21 @@ class Record(ShellTest):
             self.assertEqual(self.rec('wanted'), 'luci-theme-argon\n')
             self.assertEqual((self.new / 'etc/config/openclash').read_text(), "config openclash 'config'\n\toption enable '1'\n")
 
+    def test_a_wanted_package_kept_from_its_file_is_named_in_the_report(self):
+        for shell in self.each_shell():
+            self.fresh()
+            write(self.old, {'etc/mu300/user-apks/index':
+                             'luci-app-openclash 0.48.002 luci-app-openclash-0.48.002.apk\n'
+                             'luci-theme-argon 2.0 luci-theme-argon-2.0.apk\n'   # wanted, but its file is gone
+                             'nano 8.0 nano-8.0.apk\n',                         # not wanted: not installed again
+                             'etc/mu300/user-apks/luci-app-openclash-0.48.002.apk': 'x\n',
+                             'etc/mu300/user-apks/nano-8.0.apk': 'x\n'})
+            r = self.record(shell)
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertIn('  from a kept file: /etc/mu300/user-apks/luci-app-openclash-0.48.002.apk', r.stdout)
+            self.assertNotIn('luci-theme-argon-2.0.apk', r.stdout)
+            self.assertNotIn('nano-8.0.apk', r.stdout)
+
     def test_without_the_old_images_list_the_new_ones_and_packages_txt_stand_in(self):
         for shell in self.each_shell():
             self.fresh(image_list=False)
@@ -479,14 +494,35 @@ class Service(ShellTest):
         self.stub('id', 'echo 0')
         self.stub('logger', ':')
         # apk: "update" works when $STUBLOG/online exists; "add" fails for a name in $STUBLOG/missing (the whole
-        # transaction, as apk does); "info -e" says installed for a name in $STUBLOG/installed
+        # transaction, as apk does) and installs a package file given by path (a kept .apk: a text file that says its
+        # name, version and "depends:" lines), which fails while $STUBLOG/keptfail exists; "add --virtual NAME" installs
+        # NAME too and "del" takes a name off; "adbdump" prints that file's info block; "info -e" says installed for a
+        # name in $STUBLOG/installed
         self.stub('apk', 'echo "apk $*" >> "$STUBLOG/pm.log"\n'
                          'case $1 in\n'
                          '  update) n=$(cat "$MU300_SYSROOT"/etc/apk/repositories "$MU300_SYSROOT"/etc/apk/repositories.d/*.list 2>/dev/null | grep -c .)\n'
                          '          [ -e "$STUBLOG/online" ] || { echo "ERROR: unable to fetch index"; echo "$n unavailable, 0 stale; 0 distinct packages available"; exit 1; }\n'
                          '          [ ! -e "$STUBLOG/deadfeed" ] || { echo " [https://example.invalid/packages.adb]"; echo "1 unavailable, 0 stale; 11141 distinct packages available"; exit 1; } ;;\n'
-                         '  add) shift; for p; do grep -qx "$p" "$STUBLOG/missing" 2>/dev/null && { echo "ERROR: unable to select packages:"; echo "  $p (no such package)"; exit 1; }; done\n'
-                         '       for p; do echo "$p" >> "$STUBLOG/installed"; done ;;\n'
+                         '  adbdump) n=$(sed -n "s/^name:[[:space:]]*//p" "$2" 2>/dev/null | head -n 1)\n'
+                         '           v=$(sed -n "s/^version:[[:space:]]*//p" "$2" 2>/dev/null | head -n 1)\n'
+                         '           [ -n "$n" ] && [ -n "$v" ] || { echo "ERROR: $2: not an apk package" >&2; exit 1; }\n'
+                         '           printf "info:\\n  name: %s\\n  version: %s\\n" "$n" "$v"\n'
+                         '           d=$(sed -n "s/^depends:[[:space:]]*//p" "$2")\n'
+                         '           [ -z "$d" ] || { echo "  depends: # some items"; printf "%s\\n" "$d" | sed "s/^/    - /"; }\n'
+                         '           echo "paths: # 1 items"; echo "  - name: etc" ;;\n'
+                         '  del) shift; grep -vx "$1" "$STUBLOG/installed" > "$STUBLOG/installed.new"; mv "$STUBLOG/installed.new" "$STUBLOG/installed" ;;\n'
+                         '  add) shift\n'
+                         '       if [ "$1" = --virtual ]; then echo "$2" >> "$STUBLOG/installed"; shift 2; fi\n'
+                         '       for p; do case $p in -*) continue ;; esac\n'
+                         '           grep -qx "$p" "$STUBLOG/missing" 2>/dev/null && { echo "ERROR: unable to select packages:"; echo "  $p (no such package)"; exit 1; }\n'
+                         '       done\n'
+                         '       for p; do case $p in -*) continue ;; esac\n'
+                         '           case $p in\n'
+                         '               /*) [ ! -e "$STUBLOG/keptfail" ] || { echo "ERROR: $p: UNTRUSTED signature"; exit 1; }\n'
+                         '                   sed -n "s/^name:[[:space:]]*//p" "$p" | head -n 1 >> "$STUBLOG/installed" ;;\n'
+                         '               *) echo "$p" >> "$STUBLOG/installed" ;;\n'
+                         '           esac\n'
+                         '       done ;;\n'
                          '  info) grep -qx "$3" "$STUBLOG/installed" 2>/dev/null ;;\n'
                          'esac')
         self.stub('apt-get', 'echo "apt-get $*" >> "$STUBLOG/pm.log"\n'
@@ -499,7 +535,7 @@ class Service(ShellTest):
 
     def setup_openwrt(self, server='127.0.0.1#7874', listening=False):
         shutil.rmtree(self.R, ignore_errors=True)
-        for f in ('online', 'missing', 'installed', 'pm.log', 'uci.db', 'uci.log', 'init.log'):
+        for f in ('online', 'missing', 'installed', 'keptfail', 'pm.log', 'uci.db', 'uci.log', 'init.log'):
             (self.tmp / f).unlink(missing_ok=True)
         d = 'etc/mu300/user-packages'
         write(self.R, {'etc/openwrt_release': 'DISTRIB_ID=OpenWrt\n',
@@ -535,6 +571,20 @@ class Service(ShellTest):
                  MU300_RUN=self.tmp / 'run', MU300_MOTD_DIR=self.tmp / 'motd')
         e.update(env)
         return self.script(shell, UPK, *args, **e)
+
+    def fake_apk(self, name, version):
+        """A package file the apk stub's adbdump reads: its name and version (the store keeps the file's bytes)."""
+        p = self.tmp / f'{name}-{version}.apk'
+        p.write_text(f'name: {name}\nversion: {version}\n')
+        return p
+
+    def kept(self, name='luci-app-openclash', version='0.48.002', depends=(), says=None, file=None):
+        """The store `mu300-user-packages keep` writes: /etc/mu300/user-apks with its index and the file (whose own
+        name is `says`, and its dependencies `depends`)."""
+        file = file or f'{name}-{version}.apk'
+        write(self.R, {'etc/mu300/user-apks/index': f'{name} {version} {file}\n',
+                       f'etc/mu300/user-apks/{name}-{version}.apk':
+                           f'name: {says or name}\nversion: {version}\n' + ''.join(f'depends: {d}\n' for d in depends)})
 
     def rec(self, name):
         p = self.R / 'etc/mu300/user-packages' / name
@@ -578,6 +628,170 @@ class Service(ShellTest):
             (self.tmp / 'pm.log').unlink()
             self.assertEqual(self.run_upk(shell, 'run').returncode, 0)
             self.assertFalse((self.tmp / 'pm.log').exists())
+
+    # a package installed from a file (not in the feeds): its file is kept, and an update installs it from that one
+    def test_keep_keeps_a_package_file_and_lists_and_forgets_it(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            src = self.fake_apk('luci-app-openclash', '0.48.002')
+            r = self.run_upk(shell, 'keep', src)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            store = self.R / 'etc/mu300/user-apks'
+            self.assertEqual((store / 'index').read_text(), 'luci-app-openclash 0.48.002 luci-app-openclash-0.48.002.apk\n')
+            self.assertEqual((store / 'luci-app-openclash-0.48.002.apk').read_text(), src.read_text())
+            self.assertIn('kept, /etc/mu300/user-apks/luci-app-openclash-0.48.002.apk', r.stdout)
+            # alone: what is kept; status has the same list
+            self.assertIn('luci-app-openclash 0.48.002 /etc/mu300/user-apks/luci-app-openclash-0.48.002.apk',
+                          self.run_upk(shell, 'keep').stdout)
+            self.assertIn('luci-app-openclash 0.48.002 /etc/mu300/user-apks/luci-app-openclash-0.48.002.apk',
+                          self.run_upk(shell, 'status').stdout)
+            # the file of a newer version replaces the entry and the older file
+            newer = self.fake_apk('luci-app-openclash', '0.48.003')
+            self.assertEqual(self.run_upk(shell, 'keep', newer).returncode, 0)
+            self.assertEqual((store / 'index').read_text(), 'luci-app-openclash 0.48.003 luci-app-openclash-0.48.003.apk\n')
+            self.assertFalse((store / 'luci-app-openclash-0.48.002.apk').exists())
+            self.assertTrue((store / 'luci-app-openclash-0.48.003.apk').exists())
+            # --forget: the file goes, the feeds are asked for the package again
+            r = self.run_upk(shell, 'keep', '--forget', 'luci-app-openclash')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual((store / 'index').read_text(), '')
+            self.assertFalse((store / 'luci-app-openclash-0.48.003.apk').exists())
+            self.assertIn('no .apk files kept', self.run_upk(shell, 'keep').stdout)
+            self.assertNotEqual(self.run_upk(shell, 'keep', '--forget', 'luci-app-openclash').returncode, 0)
+
+    def test_keep_refuses_what_it_cannot_read_and_is_for_openwrt_only(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            junk = self.tmp / 'junk.apk'
+            junk.write_text('not an apk\n')
+            r = self.run_upk(shell, 'keep', junk)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn('not a package file', r.stderr)
+            self.assertFalse((self.R / 'etc/mu300/user-apks/index').exists())
+            self.assertNotEqual(self.run_upk(shell, 'keep', self.tmp / 'gone.apk').returncode, 0)
+            # Ubuntu installs a package file with apt-get install ./FILE: the store is OpenWrt's
+            (self.R / 'etc/openwrt_release').unlink()
+            r = self.run_upk(shell, 'keep', self.fake_apk('htop', '3.3'))
+            self.assertEqual(r.returncode, 2)
+            self.assertIn('OpenWrt', r.stderr)
+            self.assertFalse((self.R / 'etc/mu300/user-apks/index').exists())
+
+    def test_a_package_the_feeds_do_not_have_comes_back_from_its_kept_file(self):
+        for shell in self.each_shell():
+            self.setup_openwrt(listening=True)
+            self.init_scripts()
+            (self.tmp / 'online').write_text('')
+            (self.tmp / 'missing').write_text('luci-app-openclash\n')   # from a file: not in the feeds
+            self.kept()
+            r = self.run_upk(shell, 'run')
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            self.assertEqual(self.rec('state'), 'done\n')
+            self.assertEqual(self.rec('done'), 'luci-app-openclash\nluci-theme-argon\n')
+            self.assertEqual(self.rec('failed'), '')
+            self.assertIn('luci-app-openclash: installed again from its kept file '
+                          '(/etc/mu300/user-apks/luci-app-openclash-0.48.002.apk)', self.rec('log'))
+            # its settings back, its services as they were
+            self.assertEqual((self.R / 'etc/config/openclash').read_text(), "config openclash 'config'\n\toption dns_port '7874'\n")
+            self.assertIn('openclash enable\nopenclash restart\n', (self.tmp / 'init.log').read_text())
+            self.assertFalse((self.R / 'etc/mu300/orphaned-config/etc/config/openclash').exists())
+            # by name first (the feed's failure), then the file it was kept from without the project's signature to
+            # check it against
+            pm = (self.tmp / 'pm.log').read_text()
+            self.assertEqual(pm.count('apk add luci-app-openclash\n'), 1)
+            self.assertIn(f'apk add --no-network --allow-untrusted {self.R}/etc/mu300/user-apks/luci-app-openclash-0.48.002.apk', pm)
+            self.assertIn('kept .apk files', self.run_upk(shell, 'status').stdout)
+
+    def test_a_kept_file_that_fails_too_says_both_why(self):
+        for shell in self.each_shell():
+            self.setup_openwrt(listening=True)
+            self.init_scripts()
+            (self.tmp / 'online').write_text('')
+            (self.tmp / 'missing').write_text('luci-app-openclash\n')
+            (self.tmp / 'keptfail').write_text('')
+            self.kept()
+            r = self.run_upk(shell, 'run')
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            self.assertEqual(self.rec('state'), 'failed\n')
+            failed = self.rec('failed')
+            self.assertIn('unable to select', failed)       # what the feed said
+            self.assertIn('from its kept file (/etc/mu300/user-apks/luci-app-openclash-0.48.002.apk)', failed)
+            self.assertIn('UNTRUSTED signature', failed)    # what the kept file said
+            # status shows both, and the settings stay aside for when it is back
+            self.assertIn('from its kept file', self.run_upk(shell, 'status').stdout)
+            self.assertEqual(self.rec('done'), 'luci-theme-argon\n')
+            self.assertTrue((self.R / 'etc/mu300/orphaned-config/etc/config/openclash').exists())
+
+    def kept_run(self, shell, **kept):
+        self.setup_openwrt(listening=True)
+        self.init_scripts()
+        (self.tmp / 'online').write_text('')
+        (self.tmp / 'missing').write_text('luci-app-openclash\n')
+        self.kept(**kept)
+        r = self.run_upk(shell, 'run')
+        self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+        return (self.tmp / 'pm.log').read_text()
+
+    def test_a_kept_file_gets_its_dependencies_from_the_feeds_first(self):
+        # --allow-untrusted would let an unsigned index through too: the dependencies come from the feeds, checked as
+        # always, and the file alone after them without the network
+        for shell in self.each_shell():
+            pm = self.kept_run(shell, depends=('dnsmasq-full', 'ruby>=3.3', '!dnsmasq'))
+            store = f'{self.R}/etc/mu300/user-apks/luci-app-openclash-0.48.002.apk'
+            deps = pm.index('apk add --virtual .mu300-kept-deps dnsmasq-full ruby>=3.3\n')     # the conflict is apk's
+            alone = pm.index(f'apk add --no-network --allow-untrusted {store}\n')
+            self.assertLess(deps, alone)
+            self.assertLess(alone, pm.index('apk del .mu300-kept-deps\n'))
+            self.assertEqual(pm.count('--allow-untrusted'), 1)
+            self.assertEqual(self.rec('state'), 'done\n')
+            installed = (self.tmp / 'installed').read_text().split()
+            self.assertIn('dnsmasq-full', installed)
+            self.assertIn('luci-app-openclash', installed)
+            self.assertNotIn('.mu300-kept-deps', installed)
+
+    def test_a_kept_file_whose_dependencies_fail_is_not_installed_untrusted(self):
+        for shell in self.each_shell():
+            self.setup_openwrt(listening=True)
+            self.init_scripts()
+            (self.tmp / 'online').write_text('')
+            (self.tmp / 'missing').write_text('luci-app-openclash\nruby-gone\n')
+            self.kept(depends=('ruby-gone',))
+            self.assertEqual(self.run_upk(shell, 'run').returncode, 0)
+            pm = (self.tmp / 'pm.log').read_text()
+            self.assertNotIn('--allow-untrusted', pm)
+            self.assertIn('apk del .mu300-kept-deps', pm)
+            self.assertEqual(self.rec('state'), 'failed\n')
+            self.assertIn('ruby-gone', self.rec('failed'))
+
+    def test_a_kept_file_that_is_another_package_is_not_installed(self):
+        for shell in self.each_shell():
+            pm = self.kept_run(shell, says='something-else')
+            self.assertNotIn('--allow-untrusted', pm)
+            self.assertEqual(self.rec('state'), 'failed\n')
+            self.assertIn('is something-else, not luci-app-openclash', self.rec('failed'))
+
+    def test_an_index_line_that_is_not_a_file_name_of_the_store_is_not_used(self):
+        for shell in self.each_shell():
+            pm = self.kept_run(shell, file='../user-packages/x.apk')
+            self.assertNotIn('--allow-untrusted', pm)
+            self.assertNotIn('from its kept file', self.rec('failed'))
+            self.assertEqual(self.rec('state'), 'failed\n')
+
+    def test_keep_keeps_the_store_roots_alone_and_refuses_a_name_unfit_for_a_file(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            self.assertEqual(self.run_upk(shell, 'keep', self.fake_apk('luci-app-openclash', '0.48.002')).returncode, 0)
+            store = self.R / 'etc/mu300/user-apks'
+            self.assertEqual(store.stat().st_mode & 0o777, 0o700)
+            self.assertEqual((store / 'index').stat().st_mode & 0o777, 0o600)
+            self.assertEqual((store / 'luci-app-openclash-0.48.002.apk').stat().st_mode & 0o777, 0o600)
+            for name, version in (('../evil', '1'), ('.hidden', '1'), ('-opt', '1'), ('ok', '1 2'), ('ok', '1/2')):
+                bad = self.tmp / 'bad.apk'
+                bad.write_text(f'name: {name}\nversion: {version}\n')
+                r = self.run_upk(shell, 'keep', bad)
+                self.assertNotEqual(r.returncode, 0, (name, version))
+                self.assertIn('not a package file', r.stderr)
+            self.assertEqual((store / 'index').read_text(), 'luci-app-openclash 0.48.002 luci-app-openclash-0.48.002.apk\n')
+            self.assertEqual(sorted(x.name for x in store.iterdir()), ['index', 'luci-app-openclash-0.48.002.apk'])
 
     # the DNS left by a proxy (dns_check): never weakened by itself, only a provably orphaned forwarder is touched
     def dhcp(self):

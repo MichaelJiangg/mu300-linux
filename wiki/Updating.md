@@ -160,14 +160,15 @@ It is the same whichever way you update: `mu300-update apply`, the computer inst
 | A settings file of the system that you changed (under `/etc`, `/var`, `/home`, `/root`, `/srv`, `/usr/local`, `/opt`) | **Yours is used.** When the new release changed that file too, its version is saved in `/etc/mu300/update-kept/<old release>/image/`, so you can compare |
 | A program file you edited (`/usr`, `/bin`, `/lib`, `/www`), one of the project's own files (`/opt/mu300`, the `mu300-*` services), a package's script under `/etc` (`init.d`, `hotplug.d`) | The release's is used, so that the device works. **Yours is saved** in `/etc/mu300/update-kept/<old release>/user/` |
 | A file of the release that you deleted | Stays deleted under `/etc`, `/home`, `/root`, `/srv`, `/usr/local`, `/opt`, and so does a service you disabled. One of the project's own files, or a program file, is back |
-| A package of the release that you removed | It is back: it is part of the release's image |
+| A package of the release that you removed | It is back: it is part of the release's image, and its services are as the previous system had them (one another package provided, `dnsmasq-full` for `dnsmasq`, keeps running) |
 | Packages you installed | Not copied file by file: installed again at the first boot (below). Their settings and their data are carried over at once |
 | `/tmp`, `/var/tmp`, `/var/cache`, sockets, what is on another disk (an SD card, a USB stick: the mount point stays), Ubuntu's kernel modules | Not carried: they are made again, or are not part of this system |
 
 **An update never opens what you closed.** adb turned off or limited to keys, your SSH settings and keys, the
 firewall, the VPN's kill switch, sudo rules and sysctl settings stay as you set them, with their file modes. A
 service you disabled or masked stays off, also one of the project's own; a package you removed comes back with the
-release but its service is not started; an account you deleted does not come back with the release's password
+release but its service is started only if the previous system was running it (from another package that provided
+it, `dnsmasq-full` for `dnsmasq`); an account you deleted does not come back with the release's password
 (it is locked). Where the release's version of a file had to be used, the report names it.
 
 **Nothing is dropped without a word.** Whatever was set aside or put back is listed in `/etc/mu300/update-report`.
@@ -220,8 +221,12 @@ system installs them again at its first boot, once it is online (an hour of trie
 at most). Their data (`/var/lib/<name>`) and their settings are in the new system from the start, like every file of
 yours. Only their OpenWrt UCI settings (`/etc/config/<name>`) wait in `/etc/mu300/orphaned-config/` until they are back:
 settings without their program used to stay active - OpenClash's left the device without DNS. A package the feeds do
-not have (installed from a `.apk` file) cannot come back by itself; its settings stay aside. Services come back
-enabled or disabled as they were (OpenWrt's init scripts, Ubuntu's systemd units).
+not have (installed from a `.apk` file) cannot come back by itself: keep its file before the update
+(`mu300-user-packages keep FILE.apk`, in `/etc/mu300/user-apks/`, which an update carries over) and the first boot
+installs it from there; without a kept file its settings stay aside. Only root can read or change that store, and
+whatever you keep there is installed as root, so keep only files you trust. Its dependencies come from the feeds,
+signature-checked as usual. Only the kept file itself is installed without a signature check, as you installed it. Services come back enabled or disabled as they
+were (OpenWrt's init scripts, Ubuntu's systemd units).
 
 On Ubuntu the apt sources you added (`/etc/apt/sources.list.d`, a PPA, with the keys they name, and your pinning in
 `/etc/apt/preferences.d`) are kept, so their
@@ -235,6 +240,7 @@ goes to the carrier) and Dismiss the note.
 ```sh
 mu300-user-packages status    # what came back, what failed and why, how to put settings back
 mu300-user-packages retry     # try again now
+mu300-user-packages keep FILE.apk   # a package the feeds do not have: keep it for the next update
 mu300-user-packages repair-dns  # a proxy that is gone left dnsmasq pointing at it: remove that (never done by itself)
 mu300-update apply --no-reinstall   # update without installing them again (MU300_KEEP_PACKAGES=0 does the same)
 ```
