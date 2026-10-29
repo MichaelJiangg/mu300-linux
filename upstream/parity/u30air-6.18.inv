@@ -19,6 +19,7 @@ class sound
 class spi_master
 class sprd-trusty-ipc
 class tty
+class typec
 class udc
 class usb_role
 class wakeup
@@ -58,6 +59,7 @@ driver platform/sc27xx-adc
 driver platform/sc27xx-efuse
 driver platform/sc27xx-fgu
 driver platform/sc27xx-keypad-led
+driver platform/sc27xx-typec
 driver platform/sdhci_sprd_r11
 driver platform/simple-pm-bus
 driver platform/sipa
@@ -66,6 +68,7 @@ driver platform/sipa_eth
 driver platform/slog_bridge
 driver platform/snd_aloop
 driver platform/sprd-adi
+driver platform/sprd-bc1p2
 driver platform/sprd-bltc
 driver platform/sprd-cpufreq-v2
 driver platform/sprd-efuse
@@ -103,6 +106,7 @@ driver serial-base/port
 driver spi/sc27xx-pmic
 driver virtio/sprd-trusty-ipc
 extcon extcon0
+extcon extcon1
 hwrng none
 input gpio-keys
 input sar_sensor
@@ -171,6 +175,8 @@ regulator vddvbus
 regulator vddvib
 regulator vddwcn
 regulator vddwifipa
+typec port0
+typec port0-partner
 tz ai0-thmzone
 tz ai1-thmzone
 tz apcpu0-thmzone

@@ -44,10 +44,12 @@ cfg POWER_SUPPLY 6.18 7.2 7.3
 cfg REGULATOR 6.18 7.2 7.3
 cfg SERIAL_CORE 6.18 7.2 7.3
 cfg SPI_SPRD_ADI 6.18 7.2 7.3
+cfg SPRD_BC1P2 6.18 7.2 7.3
 cfg SPRD_SOC_ID 6.18 7.2 7.3
 cfg SPRD_THERMAL_R5P0 6.18 7.2 7.3
 cfg SPRD_TIMER 6.18 7.2 7.3
 cfg SPRD_UMS9620_IPA_PD 6.18 7.2 7.3
+cfg TYPEC_SC27XX 6.18 7.2 7.3
 cfg TYPEC_TCPM 6.18 7.2 7.3
 cfg TYPEC_UMP9620 6.18 7.2 7.3
 cfg UNIX 6.18 7.2 7.3
@@ -511,6 +513,7 @@ ko sblock_bridge 6.18 7.2 7.3
 ko sbuf_bridge 6.18 7.2 7.3
 ko sc27xx_adc 6.18 7.2 7.3
 ko sc27xx_fuel_gauge 6.18 7.2 7.3
+ko sc27xx_typec 6.18 7.2 7.3
 ko sch_cake 6.18 7.2 7.3
 ko sch_fq_codel 6.18 7.2 7.3
 ko sch_htb 6.18 7.2 7.3
@@ -552,6 +555,7 @@ ko spi_sprd_adi 6.18 7.2 7.3
 ko spidev 6.18 7.2 7.3
 ko spipe 6.18 7.2 7.3
 ko spool 6.18 7.2 7.3
+ko sprd_bc1p2 6.18 7.2 7.3
 ko sprd_hwspinlock 6.18 7.2 7.3
 ko sprd_modem_loader 6.18 7.2 7.3
 ko sprd_pmic_wdt 6.18 7.2 7.3
