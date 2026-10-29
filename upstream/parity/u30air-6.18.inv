@@ -14,6 +14,7 @@ class power_supply
 class regulator
 class rfkill
 class rtc
+class sarsensor
 class sound
 class spi_master
 class sprd-trusty-ipc
@@ -36,6 +37,7 @@ driver faux/faux_driver
 driver gadget/configfs-gadget.linux
 driver genpd_provider/genpd_provider
 driver i2c/bq256xx-charger
+driver i2c/stk501xx_sar
 driver mmc/mmcblk
 driver pci/pcieport
 driver pci/wcn_pcie
@@ -103,6 +105,7 @@ driver virtio/sprd-trusty-ipc
 extcon extcon0
 hwrng none
 input gpio-keys
+input sar_sensor
 led keyboard-backlight
 led mmc0::
 led net_blue

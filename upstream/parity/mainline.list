@@ -58,6 +58,8 @@ cfg USB_DWC3_OF_SIMPLE 6.18 7.2 7.3
 cfg USB_SPRD_UMS9620_SSPHY 6.18 7.2 7.3
 cfg VLAN_8021Q 6.18 7.2 7.3
 cfg XOR_BLOCKS 6.18 7.2 7.3
+cfg ZTE_BOARD_STATE 6.18 7.2 7.3
+cfg ZTE_CARD_HOLDER_DET 6.18 7.2 7.3
 ko 8021q 6.18 7.2 7.3
 ko 8250 6.18 7.2 7.3
 ko 8250_base 6.18 7.2 7.3
@@ -104,6 +106,7 @@ ko binfmt_misc 6.18 7.2 7.3
 ko binfmt_script 6.18 7.2 7.3
 ko blake2b_generic 6.18
 ko bluetooth 6.18 7.2 7.3
+ko board_state 6.18 7.2 7.3
 ko brd 6.18 7.2 7.3
 ko bridge 6.18 7.2 7.3
 ko bsd_comp 6.18 7.2 7.3
@@ -704,3 +707,5 @@ ko zsmalloc 6.18 7.2 7.3
 ko zstd 6.18 7.2 7.3
 ko zstd_compress 6.18 7.2 7.3
 ko zstd_decompress 6.18 7.2 7.3
+ko zte_card_holder_det 6.18 7.2 7.3
+ko zte_sar_stk 6.18 7.2 7.3

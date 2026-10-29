@@ -8,8 +8,9 @@ K=/src/linux-$KV
 O=/src/out-$KV
 OUT=/work/${OUTDIR:-out}   # as in build.sh
 # every out-of-tree module, in dependency order (wlan/bt use wcn_bsp, the PMIC watchdog and Mali the modem's headers;
-# mu300_thermal, the stock virtual thermal zone, and ums9620_lpintc need only the kernel.
-mods=${*:-wcn_bsp sprd_wlan_combo sprdbt_tty sprd_modem sprd_pmic_wdt mali mu300_thermal ums9620_lpintc}
+# mu300_thermal, the stock virtual thermal zone, ums9620_lpintc and zte_sar_stk (the U30 Air's SAR sensor) need only
+# the kernel.
+mods=${*:-wcn_bsp sprd_wlan_combo sprdbt_tty sprd_modem sprd_pmic_wdt mali mu300_thermal ums9620_lpintc zte_sar_stk}
 mkdir -p $OUT/modules
 # xt_HL.ko and xt_hl.ko (and three more pairs) must stay two files: not on a host directory that ignores case
 . /work/case-sensitive.sh
