@@ -221,8 +221,12 @@ system installs them again at its first boot, once it is online (an hour of trie
 at most). Their data (`/var/lib/<name>`) and their settings are in the new system from the start, like every file of
 yours. Only their OpenWrt UCI settings (`/etc/config/<name>`) wait in `/etc/mu300/orphaned-config/` until they are back:
 settings without their program used to stay active - OpenClash's left the device without DNS. A package the feeds do
-not have (installed from a `.apk` file) cannot come back by itself; its settings stay aside. Services come back
-enabled or disabled as they were (OpenWrt's init scripts, Ubuntu's systemd units).
+not have (installed from a `.apk` file) cannot come back by itself: keep its file before the update
+(`mu300-user-packages keep FILE.apk`, in `/etc/mu300/user-apks/`, which an update carries over) and the first boot
+installs it from there; without a kept file its settings stay aside. Only root can read or change that store, and
+whatever you keep there is installed as root, so keep only files you trust. Its dependencies come from the feeds,
+signature-checked as usual. Only the kept file itself is installed without a signature check, as you installed it. Services come back enabled or disabled as they
+were (OpenWrt's init scripts, Ubuntu's systemd units).
 
 On Ubuntu the apt sources you added (`/etc/apt/sources.list.d`, a PPA, with the keys they name, and your pinning in
 `/etc/apt/preferences.d`) are kept, so their
@@ -236,6 +240,7 @@ goes to the carrier) and Dismiss the note.
 ```sh
 mu300-user-packages status    # what came back, what failed and why, how to put settings back
 mu300-user-packages retry     # try again now
+mu300-user-packages keep FILE.apk   # a package the feeds do not have: keep it for the next update
 mu300-user-packages repair-dns  # a proxy that is gone left dnsmasq pointing at it: remove that (never done by itself)
 mu300-update apply --no-reinstall   # update without installing them again (MU300_KEEP_PACKAGES=0 does the same)
 ```
