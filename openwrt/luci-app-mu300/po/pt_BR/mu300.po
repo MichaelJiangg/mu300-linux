@@ -1057,23 +1057,32 @@ msgstr "Gravável"
 msgid "This boot image cannot change the boot"
 msgstr "Esta imagem de boot não pode alterar a inicialização"
 
+msgid "Remaining this year"
+msgstr "Restante este ano"
+
+msgid "Remaining this cycle"
+msgstr "Restante neste ciclo"
+
 msgid "%s of %s"
 msgstr "%s de %s"
-
-msgid "The monthly cap is reached"
-msgstr "O limite mensal foi atingido"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% do limite mensal usado"
-
-msgid "Used this cycle"
-msgstr "Usado neste ciclo"
 
 msgid "The yearly cap is reached"
 msgstr "O limite anual foi atingido"
 
-msgid "Remaining this year"
-msgstr "Restante este ano"
+msgid "The monthly cap is reached"
+msgstr "O limite mensal foi atingido"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% do limite anual usado"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% do limite mensal usado"
+
+msgid "Used this year"
+msgstr "Usado neste ano"
+
+msgid "Used this cycle"
+msgstr "Usado neste ciclo"
 
 msgid "Link & traffic"
 msgstr "Link e tráfego"
@@ -1092,9 +1101,6 @@ msgstr "Total enviado"
 
 msgid "Today"
 msgstr "Hoje"
-
-msgid "Remaining this cycle"
-msgstr "Restante neste ciclo"
 
 msgid "SIM source"
 msgstr "Origem do SIM"
@@ -2399,8 +2405,17 @@ msgstr "Esta página foi aberta por HTTPS, e o terminal é servido por HTTP na L
 msgid "The data usage could not be read"
 msgstr "Não foi possível ler o uso de dados"
 
+msgid "Year"
+msgstr "Ano"
+
+msgid "Month"
+msgstr "Mês"
+
 msgid "Used"
 msgstr "Usado"
+
+msgid "Days left this year"
+msgstr "Dias restantes este ano"
 
 msgid "Days left in this cycle"
 msgstr "Dias restantes neste ciclo"
@@ -2431,9 +2446,6 @@ msgstr "O limite mensal foi atingido: os dados móveis foram desligados. Eles vo
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "O limite anual foi atingido: os dados móveis foram desligados. Eles voltam quando o próximo ano começar."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% do limite anual usado"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "A cota diária foi atingida: os dados móveis foram desligados. Voltam à meia-noite."

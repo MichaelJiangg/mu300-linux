@@ -1057,23 +1057,32 @@ msgstr "Може да се записва"
 msgid "This boot image cannot change the boot"
 msgstr "Този образ за зареждане не може да променя зареждането"
 
+msgid "Remaining this year"
+msgstr "Остава тази година"
+
+msgid "Remaining this cycle"
+msgstr "Остава в този период"
+
 msgid "%s of %s"
 msgstr "%s от %s"
-
-msgid "The monthly cap is reached"
-msgstr "Месечният лимит е достигнат"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Използвани %d%% от месечния лимит"
-
-msgid "Used this cycle"
-msgstr "Използвано в този период"
 
 msgid "The yearly cap is reached"
 msgstr "Годишният лимит е достигнат"
 
-msgid "Remaining this year"
-msgstr "Остава тази година"
+msgid "The monthly cap is reached"
+msgstr "Месечният лимит е достигнат"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Използвани %d%% от годишния лимит"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Използвани %d%% от месечния лимит"
+
+msgid "Used this year"
+msgstr "Използвано тази година"
+
+msgid "Used this cycle"
+msgstr "Използвано в този период"
 
 msgid "Link & traffic"
 msgstr "Връзка и трафик"
@@ -1092,9 +1101,6 @@ msgstr "Общо изпратени"
 
 msgid "Today"
 msgstr "Днес"
-
-msgid "Remaining this cycle"
-msgstr "Остава в този период"
 
 msgid "SIM source"
 msgstr "Източник на SIM"
@@ -2399,8 +2405,17 @@ msgstr "Тази страница е отворена през HTTPS, а тер�
 msgid "The data usage could not be read"
 msgstr "Използването на данни не можа да бъде прочетено"
 
+msgid "Year"
+msgstr "Година"
+
+msgid "Month"
+msgstr "Месец"
+
 msgid "Used"
 msgstr "Използвано"
+
+msgid "Days left this year"
+msgstr "Оставащи дни тази година"
 
 msgid "Days left in this cycle"
 msgstr "Оставащи дни в периода"
@@ -2431,9 +2446,6 @@ msgstr "Месечният лимит е достигнат: мобилните 
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Годишният лимит е достигнат: мобилните данни бяха изключени. Ще се включат отново в началото на следващата година."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Използвани %d%% от годишния лимит"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Дневната квота е достигната: мобилните данни са изключени. Включват се отново в полунощ."

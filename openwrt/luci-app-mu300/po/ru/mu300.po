@@ -1057,23 +1057,32 @@ msgstr "Доступно для записи"
 msgid "This boot image cannot change the boot"
 msgstr "Этот загрузочный образ не может менять загрузку"
 
+msgid "Remaining this year"
+msgstr "Осталось в этом году"
+
+msgid "Remaining this cycle"
+msgstr "Осталось в этом периоде"
+
 msgid "%s of %s"
 msgstr "%s из %s"
-
-msgid "The monthly cap is reached"
-msgstr "Месячный лимит исчерпан"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Использовано %d%% месячного лимита"
-
-msgid "Used this cycle"
-msgstr "Использовано в этом периоде"
 
 msgid "The yearly cap is reached"
 msgstr "Годовой лимит исчерпан"
 
-msgid "Remaining this year"
-msgstr "Осталось в этом году"
+msgid "The monthly cap is reached"
+msgstr "Месячный лимит исчерпан"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Использовано %d%% годового лимита"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Использовано %d%% месячного лимита"
+
+msgid "Used this year"
+msgstr "Использовано в этом году"
+
+msgid "Used this cycle"
+msgstr "Использовано в этом периоде"
 
 msgid "Link & traffic"
 msgstr "Канал и трафик"
@@ -1092,9 +1101,6 @@ msgstr "Всего отправлено"
 
 msgid "Today"
 msgstr "Сегодня"
-
-msgid "Remaining this cycle"
-msgstr "Осталось в этом периоде"
 
 msgid "SIM source"
 msgstr "Источник SIM"
@@ -2399,8 +2405,17 @@ msgstr "Эта страница открыта по HTTPS, а терминал �
 msgid "The data usage could not be read"
 msgstr "Не удалось прочитать расход трафика"
 
+msgid "Year"
+msgstr "Год"
+
+msgid "Month"
+msgstr "Месяц"
+
 msgid "Used"
 msgstr "Использовано"
+
+msgid "Days left this year"
+msgstr "Осталось дней в этом году"
 
 msgid "Days left in this cycle"
 msgstr "Осталось дней в периоде"
@@ -2431,9 +2446,6 @@ msgstr "Месячный лимит исчерпан: мобильные дан�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Годовой лимит исчерпан: мобильные данные отключены. Они включатся снова с началом следующего года."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Использовано %d%% годового лимита"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Дневная квота исчерпана: мобильные данные отключены. Они включатся в полночь."

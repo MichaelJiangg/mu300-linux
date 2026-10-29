@@ -1057,23 +1057,32 @@ msgstr "Kirjoitettavissa"
 msgid "This boot image cannot change the boot"
 msgstr "Tämä käynnistyskuva ei voi muuttaa käynnistystä"
 
+msgid "Remaining this year"
+msgstr "Jäljellä tänä vuonna"
+
+msgid "Remaining this cycle"
+msgstr "Jäljellä tässä jaksossa"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "Kuukausiraja on täynnä"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% kuukausirajasta käytetty"
-
-msgid "Used this cycle"
-msgstr "Käytetty tässä jaksossa"
 
 msgid "The yearly cap is reached"
 msgstr "Vuosiraja on täynnä"
 
-msgid "Remaining this year"
-msgstr "Jäljellä tänä vuonna"
+msgid "The monthly cap is reached"
+msgstr "Kuukausiraja on täynnä"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% vuosirajasta käytetty"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% kuukausirajasta käytetty"
+
+msgid "Used this year"
+msgstr "Käytetty tänä vuonna"
+
+msgid "Used this cycle"
+msgstr "Käytetty tässä jaksossa"
 
 msgid "Link & traffic"
 msgstr "Linkki ja liikenne"
@@ -1092,9 +1101,6 @@ msgstr "Lähetetty yhteensä"
 
 msgid "Today"
 msgstr "Tänään"
-
-msgid "Remaining this cycle"
-msgstr "Jäljellä tässä jaksossa"
 
 msgid "SIM source"
 msgstr "SIM-lähde"
@@ -2399,8 +2405,17 @@ msgstr "Tämä sivu avattiin HTTPS:n kautta, ja pääte toimii lähiverkossa HTT
 msgid "The data usage could not be read"
 msgstr "Datan käyttöä ei voitu lukea"
 
+msgid "Year"
+msgstr "Vuosi"
+
+msgid "Month"
+msgstr "Kuukausi"
+
 msgid "Used"
 msgstr "Käytetty"
+
+msgid "Days left this year"
+msgstr "Päiviä jäljellä tänä vuonna"
 
 msgid "Days left in this cycle"
 msgstr "Päiviä jäljellä jaksossa"
@@ -2431,9 +2446,6 @@ msgstr "Kuukausiraja on täynnä: mobiilidata kytkettiin pois. Se kytkeytyy taka
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Vuosiraja on täynnä: mobiilidata kytkettiin pois. Se kytkeytyy takaisin, kun seuraava vuosi alkaa."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% vuosirajasta käytetty"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Päiväkiintiö on täynnä: mobiilidata kytkettiin pois. Se palaa keskiyöllä."

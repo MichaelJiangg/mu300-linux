@@ -1057,23 +1057,32 @@ msgstr "قابل للكتابة"
 msgid "This boot image cannot change the boot"
 msgstr "لا تستطيع صورة الإقلاع هذه تغيير الإقلاع"
 
+msgid "Remaining this year"
+msgstr "المتبقي هذا العام"
+
+msgid "Remaining this cycle"
+msgstr "المتبقي في هذه الدورة"
+
 msgid "%s of %s"
 msgstr "%s من %s"
-
-msgid "The monthly cap is reached"
-msgstr "تم بلوغ الحد الشهري"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "تم استخدام %d%% من الحد الشهري"
-
-msgid "Used this cycle"
-msgstr "المستخدم في هذه الدورة"
 
 msgid "The yearly cap is reached"
 msgstr "تم بلوغ الحد السنوي"
 
-msgid "Remaining this year"
-msgstr "المتبقي هذا العام"
+msgid "The monthly cap is reached"
+msgstr "تم بلوغ الحد الشهري"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "تم استخدام %d%% من الحد السنوي"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "تم استخدام %d%% من الحد الشهري"
+
+msgid "Used this year"
+msgstr "المستخدم هذا العام"
+
+msgid "Used this cycle"
+msgstr "المستخدم في هذه الدورة"
 
 msgid "Link & traffic"
 msgstr "الرابط وحركة المرور"
@@ -1092,9 +1101,6 @@ msgstr "إجمالي المرسَل"
 
 msgid "Today"
 msgstr "اليوم"
-
-msgid "Remaining this cycle"
-msgstr "المتبقي في هذه الدورة"
 
 msgid "SIM source"
 msgstr "مصدر SIM"
@@ -2399,8 +2405,17 @@ msgstr "فُتحت هذه الصفحة عبر HTTPS، والطرفية تُقد�
 msgid "The data usage could not be read"
 msgstr "تعذرت قراءة استهلاك البيانات"
 
+msgid "Year"
+msgstr "سنة"
+
+msgid "Month"
+msgstr "شهر"
+
 msgid "Used"
 msgstr "المستخدم"
+
+msgid "Days left this year"
+msgstr "الأيام المتبقية هذا العام"
 
 msgid "Days left in this cycle"
 msgstr "الأيام المتبقية في الدورة"
@@ -2431,9 +2446,6 @@ msgstr "تم بلوغ الحد الشهري: أُوقفت بيانات الجو�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "تم بلوغ الحد السنوي: أُوقفت بيانات الجوال. ستعود عند بدء العام التالي."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "تم استخدام %d%% من الحد السنوي"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "تم بلوغ الحصة اليومية: أُوقفت بيانات الجوال. تعود عند منتصف الليل."

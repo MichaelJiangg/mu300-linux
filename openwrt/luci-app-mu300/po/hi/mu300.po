@@ -1057,23 +1057,32 @@ msgstr "लिखने योग्य"
 msgid "This boot image cannot change the boot"
 msgstr "यह बूट इमेज बूट नहीं बदल सकती"
 
+msgid "Remaining this year"
+msgstr "इस वर्ष शेष"
+
+msgid "Remaining this cycle"
+msgstr "इस चक्र में शेष"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "मासिक सीमा पूरी हो गई"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "मासिक सीमा का %d%% उपयोग हुआ"
-
-msgid "Used this cycle"
-msgstr "इस चक्र में उपयोग"
 
 msgid "The yearly cap is reached"
 msgstr "वार्षिक सीमा पूरी हो गई"
 
-msgid "Remaining this year"
-msgstr "इस वर्ष शेष"
+msgid "The monthly cap is reached"
+msgstr "मासिक सीमा पूरी हो गई"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "वार्षिक सीमा का %d%% उपयोग हुआ"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "मासिक सीमा का %d%% उपयोग हुआ"
+
+msgid "Used this year"
+msgstr "इस वर्ष उपयोग"
+
+msgid "Used this cycle"
+msgstr "इस चक्र में उपयोग"
 
 msgid "Link & traffic"
 msgstr "लिंक और ट्रैफ़िक"
@@ -1092,9 +1101,6 @@ msgstr "कुल भेजा गया"
 
 msgid "Today"
 msgstr "आज"
-
-msgid "Remaining this cycle"
-msgstr "इस चक्र में शेष"
 
 msgid "SIM source"
 msgstr "SIM स्रोत"
@@ -2399,8 +2405,17 @@ msgstr "यह पेज HTTPS से खोला गया है, और ट�
 msgid "The data usage could not be read"
 msgstr "डेटा उपयोग पढ़ा नहीं जा सका"
 
+msgid "Year"
+msgstr "वर्ष"
+
+msgid "Month"
+msgstr "माह"
+
 msgid "Used"
 msgstr "उपयोग"
+
+msgid "Days left this year"
+msgstr "इस वर्ष शेष दिन"
 
 msgid "Days left in this cycle"
 msgstr "चक्र में शेष दिन"
@@ -2431,9 +2446,6 @@ msgstr "मासिक सीमा पूरी हो गई: मोबाइ
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "वार्षिक सीमा पूरी हो गई: मोबाइल डेटा बंद कर दिया गया। अगला वर्ष शुरू होने पर यह फिर चालू होगा।"
-
-msgid "%d%% of the yearly cap is used"
-msgstr "वार्षिक सीमा का %d%% उपयोग हुआ"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "दैनिक कोटा पूरा हो गया: मोबाइल डेटा बंद कर दिया गया। यह आधी रात को फिर चालू होगा।"

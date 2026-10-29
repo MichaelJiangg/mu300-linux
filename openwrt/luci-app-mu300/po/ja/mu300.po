@@ -1057,23 +1057,32 @@ msgstr "書き込み可能"
 msgid "This boot image cannot change the boot"
 msgstr "このブートイメージでは起動先を変更できません"
 
+msgid "Remaining this year"
+msgstr "今年の残り"
+
+msgid "Remaining this cycle"
+msgstr "今回の期間の残り"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "月間上限に達しました"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "月間上限の %d%% を使用"
-
-msgid "Used this cycle"
-msgstr "今回の期間の使用量"
 
 msgid "The yearly cap is reached"
 msgstr "年間上限に達しました"
 
-msgid "Remaining this year"
-msgstr "今年の残り"
+msgid "The monthly cap is reached"
+msgstr "月間上限に達しました"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "年間上限の %d%% を使用"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "月間上限の %d%% を使用"
+
+msgid "Used this year"
+msgstr "今年の使用量"
+
+msgid "Used this cycle"
+msgstr "今回の期間の使用量"
 
 msgid "Link & traffic"
 msgstr "リンクとトラフィック"
@@ -1092,9 +1101,6 @@ msgstr "送信合計"
 
 msgid "Today"
 msgstr "今日"
-
-msgid "Remaining this cycle"
-msgstr "今回の期間の残り"
 
 msgid "SIM source"
 msgstr "SIM の選択"
@@ -2399,8 +2405,17 @@ msgstr "このページは HTTPS で開かれていますが、ターミナル�
 msgid "The data usage could not be read"
 msgstr "データ使用量を読み取れませんでした"
 
+msgid "Year"
+msgstr "年"
+
+msgid "Month"
+msgstr "月"
+
 msgid "Used"
 msgstr "使用量"
+
+msgid "Days left this year"
+msgstr "今年の残り日数"
 
 msgid "Days left in this cycle"
 msgstr "期間の残り日数"
@@ -2431,9 +2446,6 @@ msgstr "月間上限に達しました: モバイルデータをオフにしま�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "年間上限に達しました: モバイルデータをオフにしました。次の年度が始まるとオンに戻ります。"
-
-msgid "%d%% of the yearly cap is used"
-msgstr "年間上限の %d%% を使用"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "1日の上限に達しました: モバイルデータをオフにしました。午前0時に再びオンになります。"

@@ -1057,23 +1057,32 @@ msgstr "Modifiable"
 msgid "This boot image cannot change the boot"
 msgstr "Cette image de démarrage ne peut pas changer le démarrage"
 
+msgid "Remaining this year"
+msgstr "Restant cette année"
+
+msgid "Remaining this cycle"
+msgstr "Restant sur cette période"
+
 msgid "%s of %s"
 msgstr "%s sur %s"
-
-msgid "The monthly cap is reached"
-msgstr "Le plafond mensuel est atteint"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% du plafond mensuel utilisé"
-
-msgid "Used this cycle"
-msgstr "Utilisé dans cette période"
 
 msgid "The yearly cap is reached"
 msgstr "Le plafond annuel est atteint"
 
-msgid "Remaining this year"
-msgstr "Restant cette année"
+msgid "The monthly cap is reached"
+msgstr "Le plafond mensuel est atteint"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% du plafond annuel utilisé"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% du plafond mensuel utilisé"
+
+msgid "Used this year"
+msgstr "Utilisé cette année"
+
+msgid "Used this cycle"
+msgstr "Utilisé dans cette période"
 
 msgid "Link & traffic"
 msgstr "Liaison et trafic"
@@ -1092,9 +1101,6 @@ msgstr "Total envoyé"
 
 msgid "Today"
 msgstr "Aujourd'hui"
-
-msgid "Remaining this cycle"
-msgstr "Restant sur cette période"
 
 msgid "SIM source"
 msgstr "Source SIM"
@@ -2399,8 +2405,17 @@ msgstr "Cette page a été ouverte en HTTPS, et le terminal est servi en HTTP su
 msgid "The data usage could not be read"
 msgstr "La consommation de données n'a pas pu être lue"
 
+msgid "Year"
+msgstr "Année"
+
+msgid "Month"
+msgstr "Mois"
+
 msgid "Used"
 msgstr "Utilisé"
+
+msgid "Days left this year"
+msgstr "Jours restants cette année"
 
 msgid "Days left in this cycle"
 msgstr "Jours restants dans cette période"
@@ -2431,9 +2446,6 @@ msgstr "Le plafond mensuel est atteint : les données mobiles ont été coupées
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Le plafond annuel est atteint : les données mobiles ont été coupées. Elles reviennent au début de l'année suivante."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% du plafond annuel utilisé"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Le quota journalier est atteint : les données mobiles ont été coupées. Elles reviennent à minuit."

@@ -1057,23 +1057,32 @@ msgstr "Inscriptibil"
 msgid "This boot image cannot change the boot"
 msgstr "Această imagine de pornire nu poate schimba pornirea"
 
+msgid "Remaining this year"
+msgstr "Rămas în acest an"
+
+msgid "Remaining this cycle"
+msgstr "Rămas în acest ciclu"
+
 msgid "%s of %s"
 msgstr "%s din %s"
-
-msgid "The monthly cap is reached"
-msgstr "Limita lunară a fost atinsă"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% din limita lunară folosit"
-
-msgid "Used this cycle"
-msgstr "Folosit în acest ciclu"
 
 msgid "The yearly cap is reached"
 msgstr "Limita anuală a fost atinsă"
 
-msgid "Remaining this year"
-msgstr "Rămas în acest an"
+msgid "The monthly cap is reached"
+msgstr "Limita lunară a fost atinsă"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% din limita anuală folosit"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% din limita lunară folosit"
+
+msgid "Used this year"
+msgstr "Folosit în acest an"
+
+msgid "Used this cycle"
+msgstr "Folosit în acest ciclu"
 
 msgid "Link & traffic"
 msgstr "Legătură și trafic"
@@ -1092,9 +1101,6 @@ msgstr "Total trimis"
 
 msgid "Today"
 msgstr "Azi"
-
-msgid "Remaining this cycle"
-msgstr "Rămas în acest ciclu"
 
 msgid "SIM source"
 msgstr "Sursă SIM"
@@ -2399,8 +2405,17 @@ msgstr "Această pagină a fost deschisă prin HTTPS, iar terminalul este servit
 msgid "The data usage could not be read"
 msgstr "Consumul de date nu a putut fi citit"
 
+msgid "Year"
+msgstr "An"
+
+msgid "Month"
+msgstr "Lună"
+
 msgid "Used"
 msgstr "Folosit"
+
+msgid "Days left this year"
+msgstr "Zile rămase în acest an"
 
 msgid "Days left in this cycle"
 msgstr "Zile rămase în ciclu"
@@ -2431,9 +2446,6 @@ msgstr "Limita lunară a fost atinsă: datele mobile au fost oprite. Revin când
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Limita anuală a fost atinsă: datele mobile au fost oprite. Revin când începe anul următor."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% din limita anuală folosit"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Cota zilnică a fost atinsă: datele mobile au fost oprite. Revin la miezul nopții."

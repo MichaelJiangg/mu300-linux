@@ -1057,23 +1057,32 @@ msgstr "Zapisywalne"
 msgid "This boot image cannot change the boot"
 msgstr "Ten obraz rozruchowy nie może zmienić rozruchu"
 
+msgid "Remaining this year"
+msgstr "Pozostało w tym roku"
+
+msgid "Remaining this cycle"
+msgstr "Pozostało w tym okresie"
+
 msgid "%s of %s"
 msgstr "%s z %s"
-
-msgid "The monthly cap is reached"
-msgstr "Osiągnięto miesięczny limit"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Wykorzystano %d%% miesięcznego limitu"
-
-msgid "Used this cycle"
-msgstr "Zużyte w tym okresie"
 
 msgid "The yearly cap is reached"
 msgstr "Osiągnięto roczny limit"
 
-msgid "Remaining this year"
-msgstr "Pozostało w tym roku"
+msgid "The monthly cap is reached"
+msgstr "Osiągnięto miesięczny limit"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Wykorzystano %d%% rocznego limitu"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Wykorzystano %d%% miesięcznego limitu"
+
+msgid "Used this year"
+msgstr "Zużyte w tym roku"
+
+msgid "Used this cycle"
+msgstr "Zużyte w tym okresie"
 
 msgid "Link & traffic"
 msgstr "Łącze i ruch"
@@ -1092,9 +1101,6 @@ msgstr "Wysłano łącznie"
 
 msgid "Today"
 msgstr "Dziś"
-
-msgid "Remaining this cycle"
-msgstr "Pozostało w tym okresie"
 
 msgid "SIM source"
 msgstr "Źródło SIM"
@@ -2399,8 +2405,17 @@ msgstr "Ta strona została otwarta przez HTTPS, a terminal działa w sieci LAN p
 msgid "The data usage could not be read"
 msgstr "Nie udało się odczytać zużycia danych"
 
+msgid "Year"
+msgstr "Rok"
+
+msgid "Month"
+msgstr "Miesiąc"
+
 msgid "Used"
 msgstr "Zużyte"
+
+msgid "Days left this year"
+msgstr "Pozostałe dni w tym roku"
 
 msgid "Days left in this cycle"
 msgstr "Pozostałe dni w okresie"
@@ -2431,9 +2446,6 @@ msgstr "Osiągnięto miesięczny limit: dane komórkowe zostały wyłączone. W�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Osiągnięto roczny limit: dane komórkowe zostały wyłączone. Włączą się ponownie z początkiem następnego roku."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Wykorzystano %d%% rocznego limitu"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Osiągnięto limit dzienny: dane komórkowe zostały wyłączone. Włączą się ponownie o północy."

@@ -965,14 +965,32 @@ msgstr "历史"
 msgid "Plan"
 msgstr "套餐"
 
-msgid "Remaining this cycle"
-msgstr "本周期剩余"
+msgid "Remaining"
+msgstr "剩余"
+
+msgid "Month"
+msgstr "月"
+
+msgid "Year"
+msgstr "年"
+
+msgid "Used this year"
+msgstr "今年已用"
 
 msgid "$0 days left"
 msgstr "剩余 $0 天"
 
 msgid "Of the cap"
 msgstr "占上限"
+
+msgid "Yearly cap"
+msgstr "每年上限"
+
+msgid "Month remaining $0"
+msgstr "本月剩余 $0"
+
+msgid "Year remaining $0"
+msgstr "本年剩余 $0"
 
 msgid "The cap is reached: mobile data is off until the next cycle."
 msgstr "已达到上限：移动数据将关闭至下一周期。"
@@ -991,15 +1009,6 @@ msgstr "已达每日额度。"
 
 msgid "Close to the daily quota."
 msgstr "接近每日额度。"
-
-msgid "Yearly cap"
-msgstr "每年上限"
-
-msgid "Remaining this year"
-msgstr "今年剩余"
-
-msgid "Used this year"
-msgstr "今年已用"
 
 msgid "The yearly cap is reached: mobile data is off until the next year."
 msgstr "已达到每年上限：移动数据将关闭至下一年。"

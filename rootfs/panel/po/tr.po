@@ -965,14 +965,32 @@ msgstr "Geçmiş"
 msgid "Plan"
 msgstr "Tarife"
 
-msgid "Remaining this cycle"
-msgstr "Bu dönemde kalan"
+msgid "Remaining"
+msgstr "Kalan"
+
+msgid "Month"
+msgstr "Ay"
+
+msgid "Year"
+msgstr "Yıl"
+
+msgid "Used this year"
+msgstr "Bu yıl kullanılan"
 
 msgid "$0 days left"
 msgstr "$0 gün kaldı"
 
 msgid "Of the cap"
 msgstr "Kotanın"
+
+msgid "Yearly cap"
+msgstr "Yıllık kota"
+
+msgid "Month remaining $0"
+msgstr "Bu aydan kalan $0"
+
+msgid "Year remaining $0"
+msgstr "Bu yıldan kalan $0"
 
 msgid "The cap is reached: mobile data is off until the next cycle."
 msgstr "Kotaya ulaşıldı: mobil veri sonraki döneme kadar kapalı."
@@ -991,15 +1009,6 @@ msgstr "Günlük kotaya ulaşıldı."
 
 msgid "Close to the daily quota."
 msgstr "Günlük kotaya yaklaşıldı."
-
-msgid "Yearly cap"
-msgstr "Yıllık kota"
-
-msgid "Remaining this year"
-msgstr "Bu yıl kalan"
-
-msgid "Used this year"
-msgstr "Bu yıl kullanılan"
 
 msgid "The yearly cap is reached: mobile data is off until the next year."
 msgstr "Yıllık kotaya ulaşıldı: mobil veri gelecek yıla kadar kapalı."

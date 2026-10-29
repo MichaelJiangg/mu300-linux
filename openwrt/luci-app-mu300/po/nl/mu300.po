@@ -1057,23 +1057,32 @@ msgstr "Beschrijfbaar"
 msgid "This boot image cannot change the boot"
 msgstr "Deze boot-image kan het opstarten niet wijzigen"
 
+msgid "Remaining this year"
+msgstr "Resterend dit jaar"
+
+msgid "Remaining this cycle"
+msgstr "Resterend in deze periode"
+
 msgid "%s of %s"
 msgstr "%s van %s"
-
-msgid "The monthly cap is reached"
-msgstr "De maandlimiet is bereikt"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% van de maandlimiet gebruikt"
-
-msgid "Used this cycle"
-msgstr "Gebruikt in deze periode"
 
 msgid "The yearly cap is reached"
 msgstr "De jaarlimiet is bereikt"
 
-msgid "Remaining this year"
-msgstr "Resterend dit jaar"
+msgid "The monthly cap is reached"
+msgstr "De maandlimiet is bereikt"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% van de jaarlimiet gebruikt"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% van de maandlimiet gebruikt"
+
+msgid "Used this year"
+msgstr "Gebruikt dit jaar"
+
+msgid "Used this cycle"
+msgstr "Gebruikt in deze periode"
 
 msgid "Link & traffic"
 msgstr "Verbinding & verkeer"
@@ -1092,9 +1101,6 @@ msgstr "Totaal verzonden"
 
 msgid "Today"
 msgstr "Vandaag"
-
-msgid "Remaining this cycle"
-msgstr "Resterend in deze periode"
 
 msgid "SIM source"
 msgstr "SIM-bron"
@@ -2399,8 +2405,17 @@ msgstr "Deze pagina is via HTTPS geopend en de terminal wordt via HTTP op het LA
 msgid "The data usage could not be read"
 msgstr "Het dataverbruik kon niet worden gelezen"
 
+msgid "Year"
+msgstr "Jaar"
+
+msgid "Month"
+msgstr "Maand"
+
 msgid "Used"
 msgstr "Gebruikt"
+
+msgid "Days left this year"
+msgstr "Resterende dagen dit jaar"
 
 msgid "Days left in this cycle"
 msgstr "Resterende dagen in deze periode"
@@ -2431,9 +2446,6 @@ msgstr "De maandlimiet is bereikt: mobiele data is uitgeschakeld. Die gaat weer 
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "De jaarlimiet is bereikt: mobiele data is uitgeschakeld. Die gaat weer aan als het volgende jaar begint."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% van de jaarlimiet gebruikt"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "De daglimiet is bereikt: mobiele data is uitgezet. Om middernacht gaat het weer aan."

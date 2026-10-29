@@ -1057,23 +1057,32 @@ msgstr "Yazılabilir"
 msgid "This boot image cannot change the boot"
 msgstr "Bu açılış imajı açılışı değiştiremez"
 
+msgid "Remaining this year"
+msgstr "Bu yıl kalan"
+
+msgid "Remaining this cycle"
+msgstr "Bu dönemde kalan"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "Aylık kotaya ulaşıldı"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Aylık kotanın %d%% kadarı kullanıldı"
-
-msgid "Used this cycle"
-msgstr "Bu dönemde kullanılan"
 
 msgid "The yearly cap is reached"
 msgstr "Yıllık kotaya ulaşıldı"
 
-msgid "Remaining this year"
-msgstr "Bu yıl kalan"
+msgid "The monthly cap is reached"
+msgstr "Aylık kotaya ulaşıldı"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Yıllık kotanın %d%% kadarı kullanıldı"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Aylık kotanın %d%% kadarı kullanıldı"
+
+msgid "Used this year"
+msgstr "Bu yılda kullanılan"
+
+msgid "Used this cycle"
+msgstr "Bu dönemde kullanılan"
 
 msgid "Link & traffic"
 msgstr "Bağlantı ve trafik"
@@ -1092,9 +1101,6 @@ msgstr "Toplam gönderilen"
 
 msgid "Today"
 msgstr "Bugün"
-
-msgid "Remaining this cycle"
-msgstr "Bu dönemde kalan"
 
 msgid "SIM source"
 msgstr "SIM kaynağı"
@@ -2394,8 +2400,17 @@ msgstr "Bu sayfa HTTPS ile açıldı, terminal ise LAN'da HTTP ile sunuluyor: bu
 msgid "The data usage could not be read"
 msgstr "Veri kullanımı okunamadı"
 
+msgid "Year"
+msgstr "Yıl"
+
+msgid "Month"
+msgstr "Ay"
+
 msgid "Used"
 msgstr "Kullanılan"
+
+msgid "Days left this year"
+msgstr "Bu yılda kalan gün"
 
 msgid "Days left in this cycle"
 msgstr "Bu dönemde kalan gün"
@@ -2426,9 +2441,6 @@ msgstr "Aylık kotaya ulaşıldı: mobil veri kapatıldı. Bir sonraki dönem ba
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Yıllık kotaya ulaşıldı: mobil veri kapatıldı. Bir sonraki yıl başlayınca yeniden açılır."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Yıllık kotanın %d%% kadarı kullanıldı"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Günlük kotaya ulaşıldı: mobil veri kapatıldı. Gece yarısı yeniden açılır."

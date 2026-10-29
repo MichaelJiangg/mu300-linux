@@ -1057,23 +1057,32 @@ msgstr "可寫入"
 msgid "This boot image cannot change the boot"
 msgstr "目前開機映像不支援變更開機設定"
 
+msgid "Remaining this year"
+msgstr "本年度剩餘"
+
+msgid "Remaining this cycle"
+msgstr "本週期剩餘"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "已達到每月流量上限"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "已用每月上限的 %d%%"
-
-msgid "Used this cycle"
-msgstr "本週期已用"
 
 msgid "The yearly cap is reached"
 msgstr "已達到年度流量上限"
 
-msgid "Remaining this year"
-msgstr "本年度剩餘"
+msgid "The monthly cap is reached"
+msgstr "已達到每月流量上限"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "已用年度上限的 %d%%"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "已用每月上限的 %d%%"
+
+msgid "Used this year"
+msgstr "本年度已用"
+
+msgid "Used this cycle"
+msgstr "本週期已用"
 
 msgid "Link & traffic"
 msgstr "連結與流量"
@@ -1092,9 +1101,6 @@ msgstr "累計傳送"
 
 msgid "Today"
 msgstr "今天"
-
-msgid "Remaining this cycle"
-msgstr "本週期剩餘"
 
 msgid "SIM source"
 msgstr "SIM 來源"
@@ -2394,8 +2400,17 @@ msgstr "此頁面透過 HTTPS 開啟，而終端機在區域網路上透過 HTTP
 msgid "The data usage could not be read"
 msgstr "無法讀取流量統計"
 
+msgid "Year"
+msgstr "年"
+
+msgid "Month"
+msgstr "月"
+
 msgid "Used"
 msgstr "已用"
+
+msgid "Days left this year"
+msgstr "本年度剩餘天數"
 
 msgid "Days left in this cycle"
 msgstr "本週期剩餘天數"
@@ -2426,9 +2441,6 @@ msgstr "已達到每月流量上限：行動數據已關閉，下一個週期開
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "已達到年度流量上限：行動數據已關閉，下一個計費年度開始時自動恢復。"
-
-msgid "%d%% of the yearly cap is used"
-msgstr "已用年度上限的 %d%%"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "已達每日額度：行動數據已關閉，午夜後自動恢復。"

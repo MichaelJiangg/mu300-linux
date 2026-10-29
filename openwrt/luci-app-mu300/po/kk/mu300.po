@@ -1057,23 +1057,32 @@ msgstr "Жазуға болады"
 msgid "This boot image cannot change the boot"
 msgstr "Бұл жүктеу бейнесі жүктеуді өзгерте алмайды"
 
+msgid "Remaining this year"
+msgstr "Осы жылы қалғаны"
+
+msgid "Remaining this cycle"
+msgstr "Осы кезеңде қалғаны"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "Айлық лимитке жетті"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Айлық лимиттің %d%% пайдаланылды"
-
-msgid "Used this cycle"
-msgstr "Осы кезеңде пайдаланылған"
 
 msgid "The yearly cap is reached"
 msgstr "Жылдық лимитке жетті"
 
-msgid "Remaining this year"
-msgstr "Осы жылы қалғаны"
+msgid "The monthly cap is reached"
+msgstr "Айлық лимитке жетті"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Жылдық лимиттің %d%% пайдаланылды"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Айлық лимиттің %d%% пайдаланылды"
+
+msgid "Used this year"
+msgstr "Осы жылы пайдаланылған"
+
+msgid "Used this cycle"
+msgstr "Осы кезеңде пайдаланылған"
 
 msgid "Link & traffic"
 msgstr "Байланыс және трафик"
@@ -1092,9 +1101,6 @@ msgstr "Барлығы жіберілді"
 
 msgid "Today"
 msgstr "Бүгін"
-
-msgid "Remaining this cycle"
-msgstr "Осы кезеңде қалғаны"
 
 msgid "SIM source"
 msgstr "SIM көзі"
@@ -2399,8 +2405,17 @@ msgstr "Бұл бет HTTPS арқылы ашылған, ал терминал L
 msgid "The data usage could not be read"
 msgstr "Деректер шығынын оқу мүмкін болмады"
 
+msgid "Year"
+msgstr "Жыл"
+
+msgid "Month"
+msgstr "Ай"
+
 msgid "Used"
 msgstr "Пайдаланылды"
+
+msgid "Days left this year"
+msgstr "Осы жылы қалған күндер"
 
 msgid "Days left in this cycle"
 msgstr "Кезеңде қалған күндер"
@@ -2431,9 +2446,6 @@ msgstr "Айлық лимитке жетті: мобильді деректер 
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Жылдық лимитке жетті: мобильді деректер өшірілді. Келесі жыл басталғанда қайта қосылады."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Жылдық лимиттің %d%% пайдаланылды"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Күндік квотаға жетті: мобильді деректер өшірілді. Түн ортасында қайта қосылады."

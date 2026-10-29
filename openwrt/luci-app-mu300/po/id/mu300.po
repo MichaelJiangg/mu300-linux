@@ -1057,23 +1057,32 @@ msgstr "Dapat ditulis"
 msgid "This boot image cannot change the boot"
 msgstr "Image boot ini tidak dapat mengubah boot"
 
+msgid "Remaining this year"
+msgstr "Sisa tahun ini"
+
+msgid "Remaining this cycle"
+msgstr "Sisa siklus ini"
+
 msgid "%s of %s"
 msgstr "%s dari %s"
-
-msgid "The monthly cap is reached"
-msgstr "Batas bulanan tercapai"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% dari batas bulanan terpakai"
-
-msgid "Used this cycle"
-msgstr "Terpakai dalam siklus ini"
 
 msgid "The yearly cap is reached"
 msgstr "Batas tahunan tercapai"
 
-msgid "Remaining this year"
-msgstr "Sisa tahun ini"
+msgid "The monthly cap is reached"
+msgstr "Batas bulanan tercapai"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% dari batas tahunan terpakai"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% dari batas bulanan terpakai"
+
+msgid "Used this year"
+msgstr "Terpakai tahun ini"
+
+msgid "Used this cycle"
+msgstr "Terpakai dalam siklus ini"
 
 msgid "Link & traffic"
 msgstr "Link & lalu lintas"
@@ -1092,9 +1101,6 @@ msgstr "Total dikirim"
 
 msgid "Today"
 msgstr "Hari ini"
-
-msgid "Remaining this cycle"
-msgstr "Sisa siklus ini"
 
 msgid "SIM source"
 msgstr "Sumber SIM"
@@ -2399,8 +2405,17 @@ msgstr "Halaman ini dibuka lewat HTTPS, dan terminal disajikan lewat HTTP di LAN
 msgid "The data usage could not be read"
 msgstr "Penggunaan data tidak dapat dibaca"
 
+msgid "Year"
+msgstr "Tahun"
+
+msgid "Month"
+msgstr "Bulan"
+
 msgid "Used"
 msgstr "Terpakai"
+
+msgid "Days left this year"
+msgstr "Sisa hari tahun ini"
 
 msgid "Days left in this cycle"
 msgstr "Sisa hari dalam siklus"
@@ -2431,9 +2446,6 @@ msgstr "Batas bulanan tercapai: data seluler dimatikan. Data akan menyala lagi s
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Batas tahunan tercapai: data seluler dimatikan. Data akan menyala lagi saat tahun berikutnya dimulai."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% dari batas tahunan terpakai"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Kuota harian tercapai: data seluler dimatikan. Data akan aktif lagi tengah malam."

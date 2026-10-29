@@ -811,7 +811,8 @@ class Yearly(CapBase):
             self.round(shell, 0, 100)
             self.round(shell, 900, 160)
             v = self.view(shell, self.now + 160)
-            self.assertEqual(v['yearly'], {'start': '01-01', 'bytes': 0, 'used': 900, 'remaining': 0, 'cut': 0,
+            self.assertEqual(v['yearly'], {'start_day': '01-01', 'start': '2026-01-01', 'last': '2026-12-31',
+                                           'days_left': 83, 'bytes': 0, 'used': 900, 'remaining': 0, 'cut': 0,
                                            'level': 'none', 'cut_active': 0})
             for line in ('yadj ', 'ycut ', 'yalert '):
                 self.assertNotIn('\n' + line, self.ledger())
@@ -887,12 +888,15 @@ class Yearly(CapBase):
             self.set(shell, 'yearly-start', '10-01')
             self.set(shell, 'yearly', '1000')
             v = self.view(shell, at(2027, 9, 30, 12))
-            self.assertEqual((v['yearly']['start'], v['yearly']['used'], v['yearly']['remaining']), ('10-01', 500, 500))
+            self.assertEqual((v['yearly']['start_day'], v['yearly']['used'], v['yearly']['remaining']), ('10-01', 500, 500))
+            self.assertEqual((v['yearly']['start'], v['yearly']['last'], v['yearly']['days_left']),
+                             ('2026-10-01', '2027-09-30', 1))
             # the correction of a year ends with it
             self.run_tool(shell, 'yearly-used', '700', now=at(2027, 9, 30, 12))
             self.assertEqual(self.view(shell, at(2027, 9, 30, 12))['yearly']['used'], 700)
             v = self.view(shell, at(2027, 10, 1, 12))
             self.assertEqual((v['yearly']['used'], v['yearly']['remaining']), (400, 600))
+            self.assertEqual((v['yearly']['start'], v['yearly']['last']), ('2027-10-01', '2028-09-30'))
             self.assertEqual(v['cycle']['adj'], 0)
 
     def test_the_anniversary_of_29_february(self):
@@ -905,9 +909,12 @@ class Yearly(CapBase):
             self.set(shell, 'yearly-start', '02-29')
             self.set(shell, 'yearly', '1000')
             # 2027 has no 29 February: the billing year that starts in 2027 starts on 28 February
-            self.assertEqual(self.view(shell, at(2027, 3, 1, 12))['yearly']['used'], 200)
-            self.assertEqual(self.view(shell, at(2028, 2, 28, 12))['yearly']['used'], 200)
-            self.assertEqual(self.view(shell, at(2028, 2, 29, 12))['yearly']['used'], 0)
+            v = self.view(shell, at(2027, 3, 1, 12))['yearly']
+            self.assertEqual((v['used'], v['start'], v['last']), (200, '2027-02-28', '2028-02-28'))
+            v = self.view(shell, at(2028, 2, 28, 12))['yearly']
+            self.assertEqual((v['used'], v['start']), (200, '2027-02-28'))
+            v = self.view(shell, at(2028, 2, 29, 12))['yearly']
+            self.assertEqual((v['used'], v['start'], v['last']), (0, '2028-02-29', '2029-02-27'))
 
     def test_yearly_used_corrects_the_year(self):
         for shell in self.each_shell():
@@ -980,7 +987,7 @@ class Yearly(CapBase):
             # a file edited by hand with a day no month has: the default
             (self.store / 'conf').write_text('YEARLY=0\nYEARLY_START=02-30\n')
             self.counters(0, 0, 100)
-            self.assertEqual(self.view(shell)['yearly']['start'], '01-01')
+            self.assertEqual(self.view(shell)['yearly']['start_day'], '01-01')
 
     def test_old_conf_and_old_ledger_still_read(self):
         for shell in self.each_shell():

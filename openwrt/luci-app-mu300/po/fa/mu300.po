@@ -1057,23 +1057,32 @@ msgstr "قابل نوشتن"
 msgid "This boot image cannot change the boot"
 msgstr "این ایمیج بوت نمی‌تواند بوت را تغییر دهد"
 
+msgid "Remaining this year"
+msgstr "باقی‌مانده امسال"
+
+msgid "Remaining this cycle"
+msgstr "باقی‌مانده این دوره"
+
 msgid "%s of %s"
 msgstr "%s از %s"
-
-msgid "The monthly cap is reached"
-msgstr "سقف ماهانه پر شد"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% از سقف ماهانه مصرف شده"
-
-msgid "Used this cycle"
-msgstr "مصرف‌شده در این دوره"
 
 msgid "The yearly cap is reached"
 msgstr "سقف سالانه پر شد"
 
-msgid "Remaining this year"
-msgstr "باقی‌مانده امسال"
+msgid "The monthly cap is reached"
+msgstr "سقف ماهانه پر شد"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% از سقف سالانه مصرف شده"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% از سقف ماهانه مصرف شده"
+
+msgid "Used this year"
+msgstr "مصرف‌شده امسال"
+
+msgid "Used this cycle"
+msgstr "مصرف‌شده در این دوره"
 
 msgid "Link & traffic"
 msgstr "لینک و ترافیک"
@@ -1092,9 +1101,6 @@ msgstr "کل ارسالی"
 
 msgid "Today"
 msgstr "امروز"
-
-msgid "Remaining this cycle"
-msgstr "باقی‌مانده این دوره"
 
 msgid "SIM source"
 msgstr "منبع سیم‌کارت"
@@ -2399,8 +2405,17 @@ msgstr "این صفحه با HTTPS باز شده و ترمینال روی LAN ب
 msgid "The data usage could not be read"
 msgstr "مصرف داده خوانده نشد"
 
+msgid "Year"
+msgstr "سال"
+
+msgid "Month"
+msgstr "ماه"
+
 msgid "Used"
 msgstr "مصرف‌شده"
+
+msgid "Days left this year"
+msgstr "روزهای باقی‌مانده امسال"
 
 msgid "Days left in this cycle"
 msgstr "روزهای باقی‌مانده دوره"
@@ -2431,9 +2446,6 @@ msgstr "سقف ماهانه پر شد: داده همراه خاموش شد. با
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "سقف سالانه پر شد: داده همراه خاموش شد. با شروع سال بعد دوباره روشن می‌شود."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% از سقف سالانه مصرف شده"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "سهمیه روزانه تمام شد: داده همراه خاموش شد. نیمه‌شب دوباره روشن می‌شود."

@@ -1057,23 +1057,32 @@ msgstr "Zapisovateľné"
 msgid "This boot image cannot change the boot"
 msgstr "Tento zavádzací obraz nemôže zmeniť spúšťanie"
 
+msgid "Remaining this year"
+msgstr "Zostáva tento rok"
+
+msgid "Remaining this cycle"
+msgstr "Zostáva v tomto období"
+
 msgid "%s of %s"
 msgstr "%s z %s"
-
-msgid "The monthly cap is reached"
-msgstr "Mesačný limit je vyčerpaný"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Využitých %d%% mesačného limitu"
-
-msgid "Used this cycle"
-msgstr "Využité v tomto období"
 
 msgid "The yearly cap is reached"
 msgstr "Ročný limit je vyčerpaný"
 
-msgid "Remaining this year"
-msgstr "Zostáva tento rok"
+msgid "The monthly cap is reached"
+msgstr "Mesačný limit je vyčerpaný"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Využitých %d%% ročného limitu"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Využitých %d%% mesačného limitu"
+
+msgid "Used this year"
+msgstr "Využité v tomto roku"
+
+msgid "Used this cycle"
+msgstr "Využité v tomto období"
 
 msgid "Link & traffic"
 msgstr "Linka a prevádzka"
@@ -1092,9 +1101,6 @@ msgstr "Celkom odoslané"
 
 msgid "Today"
 msgstr "Dnes"
-
-msgid "Remaining this cycle"
-msgstr "Zostáva v tomto období"
 
 msgid "SIM source"
 msgstr "Zdroj SIM"
@@ -2399,8 +2405,17 @@ msgstr "Táto stránka bola otvorená cez HTTPS a terminál beží v LAN cez HTT
 msgid "The data usage could not be read"
 msgstr "Spotrebu dát nemožno načítať"
 
+msgid "Year"
+msgstr "Rok"
+
+msgid "Month"
+msgstr "Mesiac"
+
 msgid "Used"
 msgstr "Využité"
+
+msgid "Days left this year"
+msgstr "Zostávajúce dni v tomto roku"
 
 msgid "Days left in this cycle"
 msgstr "Zostávajúce dni v období"
@@ -2431,9 +2446,6 @@ msgstr "Mesačný limit je vyčerpaný: mobilné dáta boli vypnuté. Znova sa z
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Ročný limit je vyčerpaný: mobilné dáta boli vypnuté. Znova sa zapnú na začiatku ďalšieho roka."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Využitých %d%% ročného limitu"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Denná kvóta je vyčerpaná: mobilné dáta boli vypnuté. Znova sa zapnú o polnoci."

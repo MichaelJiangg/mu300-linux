@@ -1057,23 +1057,32 @@ msgstr "Có thể ghi"
 msgid "This boot image cannot change the boot"
 msgstr "Ảnh khởi động này không thể thay đổi khởi động"
 
+msgid "Remaining this year"
+msgstr "Còn lại năm nay"
+
+msgid "Remaining this cycle"
+msgstr "Còn lại trong chu kỳ này"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "Đã đạt hạn mức hằng tháng"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Đã dùng %d%% hạn mức hằng tháng"
-
-msgid "Used this cycle"
-msgstr "Đã dùng trong chu kỳ này"
 
 msgid "The yearly cap is reached"
 msgstr "Đã đạt hạn mức hằng năm"
 
-msgid "Remaining this year"
-msgstr "Còn lại năm nay"
+msgid "The monthly cap is reached"
+msgstr "Đã đạt hạn mức hằng tháng"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Đã dùng %d%% hạn mức hằng năm"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Đã dùng %d%% hạn mức hằng tháng"
+
+msgid "Used this year"
+msgstr "Đã dùng trong năm nay"
+
+msgid "Used this cycle"
+msgstr "Đã dùng trong chu kỳ này"
 
 msgid "Link & traffic"
 msgstr "Liên kết & lưu lượng"
@@ -1092,9 +1101,6 @@ msgstr "Tổng đã gửi"
 
 msgid "Today"
 msgstr "Hôm nay"
-
-msgid "Remaining this cycle"
-msgstr "Còn lại trong chu kỳ này"
 
 msgid "SIM source"
 msgstr "Nguồn SIM"
@@ -2399,8 +2405,17 @@ msgstr "Trang này được mở qua HTTPS, còn terminal được phục vụ q
 msgid "The data usage could not be read"
 msgstr "Không đọc được lưu lượng dữ liệu"
 
+msgid "Year"
+msgstr "Năm"
+
+msgid "Month"
+msgstr "Tháng"
+
 msgid "Used"
 msgstr "Đã dùng"
+
+msgid "Days left this year"
+msgstr "Số ngày còn lại trong năm nay"
 
 msgid "Days left in this cycle"
 msgstr "Số ngày còn lại trong chu kỳ"
@@ -2431,9 +2446,6 @@ msgstr "Đã đạt hạn mức hằng tháng: dữ liệu di động đã bị 
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Đã đạt hạn mức hằng năm: dữ liệu di động đã bị tắt. Nó sẽ bật lại khi năm tiếp theo bắt đầu."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Đã dùng %d%% hạn mức hằng năm"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Đã đạt hạn mức hằng ngày: dữ liệu di động đã bị tắt. Sẽ bật lại lúc nửa đêm."

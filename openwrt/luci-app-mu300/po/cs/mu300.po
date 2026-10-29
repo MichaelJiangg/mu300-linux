@@ -1057,23 +1057,32 @@ msgstr "Zapisovatelné"
 msgid "This boot image cannot change the boot"
 msgstr "Tento zaváděcí obraz nemůže změnit spouštění"
 
+msgid "Remaining this year"
+msgstr "Zbývá letos"
+
+msgid "Remaining this cycle"
+msgstr "Zbývá v tomto období"
+
 msgid "%s of %s"
 msgstr "%s z %s"
-
-msgid "The monthly cap is reached"
-msgstr "Měsíční limit je vyčerpán"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Využito %d%% měsíčního limitu"
-
-msgid "Used this cycle"
-msgstr "Využito v tomto období"
 
 msgid "The yearly cap is reached"
 msgstr "Roční limit je vyčerpán"
 
-msgid "Remaining this year"
-msgstr "Zbývá letos"
+msgid "The monthly cap is reached"
+msgstr "Měsíční limit je vyčerpán"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Využito %d%% ročního limitu"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Využito %d%% měsíčního limitu"
+
+msgid "Used this year"
+msgstr "Využito v tomto roce"
+
+msgid "Used this cycle"
+msgstr "Využito v tomto období"
 
 msgid "Link & traffic"
 msgstr "Linka a provoz"
@@ -1092,9 +1101,6 @@ msgstr "Celkem odesláno"
 
 msgid "Today"
 msgstr "Dnes"
-
-msgid "Remaining this cycle"
-msgstr "Zbývá v tomto období"
 
 msgid "SIM source"
 msgstr "Zdroj SIM"
@@ -2399,8 +2405,17 @@ msgstr "Tato stránka byla otevřena přes HTTPS a terminál běží v LAN přes
 msgid "The data usage could not be read"
 msgstr "Spotřebu dat nelze načíst"
 
+msgid "Year"
+msgstr "Rok"
+
+msgid "Month"
+msgstr "Měsíc"
+
 msgid "Used"
 msgstr "Využito"
+
+msgid "Days left this year"
+msgstr "Zbývající dny v tomto roce"
 
 msgid "Days left in this cycle"
 msgstr "Zbývající dny v období"
@@ -2431,9 +2446,6 @@ msgstr "Měsíční limit je vyčerpán: mobilní data byla vypnuta. Znovu se za
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Roční limit je vyčerpán: mobilní data byla vypnuta. Znovu se zapnou na začátku dalšího roku."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Využito %d%% ročního limitu"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Denní kvóta je vyčerpána: mobilní data byla vypnuta. Znovu se zapnou o půlnoci."

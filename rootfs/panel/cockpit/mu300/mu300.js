@@ -1036,8 +1036,9 @@
         history();
     };
 
-    /* Data usage: mu300-traffic's count (per day, per billing cycle, per billing year), the monthly cap, the yearly
-     * cap, the daily quota, the count mode and the plan's name */
+    /* Data usage: mu300-traffic's count (per day, per billing cycle, per billing year), what is left of one cap at a
+     * time (this cycle or this year, switched by the operator), the monthly and the yearly cap, the daily quota, the
+     * count mode and the plan's name */
     pages.usage = function (root) {
         var sc = root.appendChild(card(_('Data usage'), 'mu-traffic'));
         var sb = sc.appendChild(el('div'));
@@ -1046,6 +1047,8 @@
         var hc = root.appendChild(card(_('History'), 'mu-traffic-days'));
         var hb = hc.appendChild(el('div'));
         var GIB = 1073741824;
+        /* the period the remaining number is about: null until the first answer picks one */
+        var period = null;
         function set(btn, key, value, conf) { act(btn, 'traffic.set', { key: key, value: value }, { done: refresh, confirm: conf }); }
         /* a billing year starts on a day a year really has (MM-DD; 02-29 counts, a leap year has it) */
         function yearStartOk(s) {
@@ -1059,29 +1062,59 @@
             return Math.max(0, limit.remaining !== undefined && limit.remaining !== null
                 ? Number(limit.remaining) : Number(limit.bytes || 0) - Number(used || 0));
         }
+        /* the period the page starts on when both caps are set: the worse one (over > warn > ok), a tie to the year */
+        function worsePeriod(monthLevel, yearLevel) {
+            var rank = { over: 2, warn: 1, ok: 0 };
+            return (rank[yearLevel] || 0) >= (rank[monthLevel] || 0) ? 'year' : 'month';
+        }
         function refresh() {
             return load(sb, 'traffic.get', {}, function (o) {
                 var t = o.traffic || {}, daily = t.daily || {}, cap = t.cap || {}, yearly = t.yearly || {};
+                var monthCap = Number(cap.bytes) > 0, yearCap = Number(yearly.bytes) > 0;
+                /* one number at a time: the cycle, or the year when both caps are set; the switch picks it and the
+                 * worse period is the one the page opens on */
+                if (!yearCap) period = 'month';
+                else if (!monthCap) period = 'year';
+                else if (period !== 'month' && period !== 'year') period = worsePeriod(cap.level, yearly.level);
+                var monthLeft = remaining(cap, t.cycle ? t.cycle.used : 0), yearLeft = remaining(yearly, yearly.used);
+                var used = period === 'year' ? yearly.used : (t.cycle ? t.cycle.used : undefined);
+                var capBytes = period === 'year' ? Number(yearly.bytes) : Number(cap.bytes);
                 if (t.plan) sb.appendChild(row(_('Plan'), t.plan));
                 if (t.today) sb.appendChild(row(_('Today'), fmtBytes(Number(t.today.rx) + Number(t.today.tx)) + '  (↓ ' + fmtBytes(t.today.rx) + ', ↑ ' + fmtBytes(t.today.tx) + ')'));
-                /* the number the page is opened for; without a cap nothing is left, so there is no row */
-                if (cap.bytes) sb.appendChild(row(_('Remaining this cycle'), fmtBytes(remaining(cap, t.cycle ? t.cycle.used : 0))));
-                if (t.cycle) {
+                if (monthCap || yearCap) {
+                    var rr = sb.appendChild(el('div', { 'class': 'mu-row' }));
+                    var rk = rr.appendChild(el('span', { 'class': 'mu-k' }));
+                    rk.appendChild(document.createTextNode(_('Remaining')));
+                    if (monthCap && yearCap) {
+                        [ [ 'month', _('Month') ], [ 'year', _('Year') ] ].forEach(function (p) {
+                            rk.appendChild(button(p[1], function () { period = p[0]; refresh(); }, period === p[0] ? 'primary' : null));
+                        });
+                    }
+                    rr.appendChild(el('span', { 'class': 'mu-v', text: fmtBytes(period === 'year' ? yearLeft : monthLeft) }));
+                }
+                /* what was used, and the period that count is for, follow the same choice */
+                if (period === 'year') {
+                    if (yearly.used !== undefined && yearly.used !== null) sb.appendChild(row(_('Used this year'), fmtBytes(yearly.used)));
+                    if (yearly.start && yearly.last)
+                        sb.appendChild(row(_('Year'), yearly.start + ' - ' + yearly.last + ' (' + cockpit.format(_('$0 days left'), show(yearly.days_left)) + ')'));
+                } else if (t.cycle) {
                     sb.appendChild(row(_('This billing cycle'), fmtBytes(t.cycle.used)));
                     sb.appendChild(row(_('Cycle'), t.cycle.start + ' - ' + t.cycle.last + ' (' + cockpit.format(_('$0 days left'), show(t.cycle.days_left)) + ')'));
                 }
+                if (capBytes && used !== undefined && used !== null) sb.appendChild(row(_('Of the cap'), Math.round(100 * Number(used) / capBytes) + ' %'));
                 sb.appendChild(row(_('Monthly cap'), cap.bytes ? fmtBytes(cap.bytes) : _('none')));
-                if (cap.bytes && t.cycle) sb.appendChild(row(_('Of the cap'), Math.round(100 * t.cycle.used / cap.bytes) + ' %'));
+                if (yearCap) sb.appendChild(row(_('Yearly cap'), fmtBytes(yearly.bytes)));
+                /* the other period is one small line: never a second number of the same weight */
+                if (monthCap && yearCap) sb.appendChild(note(period === 'year'
+                    ? cockpit.format(_('Month remaining $0'), fmtBytes(monthLeft))
+                    : cockpit.format(_('Year remaining $0'), fmtBytes(yearLeft))));
                 if (cap.cut_active) sb.appendChild(note(_('The cap is reached: mobile data is off until the next cycle.'), 'warn'));
                 else if (cap.level === 'warn') sb.appendChild(note(_('Close to the monthly cap.'), 'warn'));
                 if (daily.bytes) sb.appendChild(row(_('Daily quota'), fmtBytes(daily.used) + ' / ' + fmtBytes(daily.bytes)));
                 if (daily.cut_active) sb.appendChild(note(_('The daily quota is reached: mobile data is off until midnight.'), 'warn'));
                 else if (daily.level === 'over') sb.appendChild(note(_('The daily quota is reached.'), 'warn'));
                 else if (daily.level === 'warn') sb.appendChild(note(_('Close to the daily quota.'), 'warn'));
-                if (yearly.bytes) {
-                    sb.appendChild(row(_('Yearly cap'), fmtBytes(yearly.bytes)));
-                    sb.appendChild(row(_('Remaining this year'), fmtBytes(remaining(yearly, yearly.used))));
-                    sb.appendChild(row(_('Used this year'), fmtBytes(yearly.used)));
+                if (yearCap) {
                     if (yearly.cut_active) sb.appendChild(note(_('The yearly cap is reached: mobile data is off until the next year.'), 'warn'));
                     else if (yearly.level === 'over') sb.appendChild(note(_('The yearly cap is reached.'), 'warn'));
                     else if (yearly.level === 'warn') sb.appendChild(note(_('Close to the yearly cap.'), 'warn'));
@@ -1099,7 +1132,11 @@
                 var dIn = input('mu-tr-daily', { type: 'number', min: '0', step: '0.1', value: daily.bytes ? String(+(daily.bytes / GIB).toFixed(2)) : '0' });
                 var dcut = check('mu-tr-dcut', _('Turn mobile data off at the daily quota until midnight'), !!daily.cut);
                 var yIn = input('mu-tr-yearly', { type: 'number', min: '0', step: '0.5', value: yearly.bytes ? String(+(yearly.bytes / GIB).toFixed(2)) : '0' });
-                var ystart = input('mu-tr-ystart', { maxlength: '5', value: yearly.start ? String(yearly.start) : '01-01' });
+                /* the day the year starts: `start_day` (MM-DD); an answer from before that field carries the day in
+                 * `start` (an older `yearly.start` was the MM-DD day; the newer one is a date) */
+                var startDay = yearStartOk(yearly.start_day) ? String(yearly.start_day)
+                    : yearStartOk(yearly.start) ? String(yearly.start) : '01-01';
+                var ystart = input('mu-tr-ystart', { maxlength: '5', value: startDay });
                 var ycut = check('mu-tr-ycut', _('Turn mobile data off at the yearly cap until the next year'), !!yearly.cut);
                 var count = select('mu-tr-count', [ [ 'total', _('Both ways') ], [ 'rx', _('Downloads only') ], [ 'tx', _('Uploads only') ] ], t.count || 'total');
                 var plan = input('mu-tr-plan', { maxlength: '32', value: t.plan || '' });

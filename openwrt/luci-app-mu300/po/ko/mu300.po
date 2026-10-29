@@ -1057,23 +1057,32 @@ msgstr "쓰기 가능"
 msgid "This boot image cannot change the boot"
 msgstr "이 부트 이미지로는 부팅 설정을 바꿀 수 없습니다"
 
+msgid "Remaining this year"
+msgstr "올해 남은 양"
+
+msgid "Remaining this cycle"
+msgstr "이번 기간 남은 양"
+
 msgid "%s of %s"
 msgstr "%s / %s"
-
-msgid "The monthly cap is reached"
-msgstr "월 한도에 도달했습니다"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "월 한도의 %d%% 사용"
-
-msgid "Used this cycle"
-msgstr "이번 기간 사용량"
 
 msgid "The yearly cap is reached"
 msgstr "연간 한도에 도달했습니다"
 
-msgid "Remaining this year"
-msgstr "올해 남은 양"
+msgid "The monthly cap is reached"
+msgstr "월 한도에 도달했습니다"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "연간 한도의 %d%% 사용"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "월 한도의 %d%% 사용"
+
+msgid "Used this year"
+msgstr "올해 사용량"
+
+msgid "Used this cycle"
+msgstr "이번 기간 사용량"
 
 msgid "Link & traffic"
 msgstr "링크 및 트래픽"
@@ -1092,9 +1101,6 @@ msgstr "총 송신량"
 
 msgid "Today"
 msgstr "오늘"
-
-msgid "Remaining this cycle"
-msgstr "이번 기간 남은 양"
 
 msgid "SIM source"
 msgstr "SIM 소스"
@@ -2399,8 +2405,17 @@ msgstr "이 페이지는 HTTPS로 열렸고 터미널은 LAN에서 HTTP로 제�
 msgid "The data usage could not be read"
 msgstr "데이터 사용량을 읽을 수 없습니다"
 
+msgid "Year"
+msgstr "연도"
+
+msgid "Month"
+msgstr "월"
+
 msgid "Used"
 msgstr "사용량"
+
+msgid "Days left this year"
+msgstr "올해 남은 일수"
 
 msgid "Days left in this cycle"
 msgstr "이번 기간 남은 일수"
@@ -2431,9 +2446,6 @@ msgstr "월 한도에 도달했습니다: 모바일 데이터를 껐습니다. �
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "연간 한도에 도달했습니다: 모바일 데이터를 껐습니다. 다음 연도가 시작되면 다시 켜집니다."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "연간 한도의 %d%% 사용"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "일일 한도에 도달했습니다: 모바일 데이터를 껐습니다. 자정에 다시 켜집니다."

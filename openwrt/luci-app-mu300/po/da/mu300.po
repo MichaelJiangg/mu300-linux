@@ -1057,23 +1057,32 @@ msgstr "Skrivbar"
 msgid "This boot image cannot change the boot"
 msgstr "Dette boot-image kan ikke ændre opstarten"
 
+msgid "Remaining this year"
+msgstr "Tilbage i år"
+
+msgid "Remaining this cycle"
+msgstr "Tilbage i denne periode"
+
 msgid "%s of %s"
 msgstr "%s af %s"
-
-msgid "The monthly cap is reached"
-msgstr "Månedsgrænsen er nået"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% af månedsgrænsen brugt"
-
-msgid "Used this cycle"
-msgstr "Brugt i denne periode"
 
 msgid "The yearly cap is reached"
 msgstr "Årsgrænsen er nået"
 
-msgid "Remaining this year"
-msgstr "Tilbage i år"
+msgid "The monthly cap is reached"
+msgstr "Månedsgrænsen er nået"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% af årsgrænsen brugt"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% af månedsgrænsen brugt"
+
+msgid "Used this year"
+msgstr "Brugt i år"
+
+msgid "Used this cycle"
+msgstr "Brugt i denne periode"
 
 msgid "Link & traffic"
 msgstr "Link og trafik"
@@ -1092,9 +1101,6 @@ msgstr "Sendt i alt"
 
 msgid "Today"
 msgstr "I dag"
-
-msgid "Remaining this cycle"
-msgstr "Tilbage i denne periode"
 
 msgid "SIM source"
 msgstr "SIM-kilde"
@@ -2399,8 +2405,17 @@ msgstr "Denne side blev åbnet via HTTPS, og terminalen leveres via HTTP på LAN
 msgid "The data usage could not be read"
 msgstr "Dataforbruget kunne ikke læses"
 
+msgid "Year"
+msgstr "År"
+
+msgid "Month"
+msgstr "Måned"
+
 msgid "Used"
 msgstr "Brugt"
+
+msgid "Days left this year"
+msgstr "Dage tilbage i år"
 
 msgid "Days left in this cycle"
 msgstr "Dage tilbage i perioden"
@@ -2431,9 +2446,6 @@ msgstr "Månedsgrænsen er nået: mobildata blev slået fra. Det tændes igen, n
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Årsgrænsen er nået: mobildata blev slået fra. Det tændes igen, når næste år begynder."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% af årsgrænsen brugt"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Den daglige kvote er nået: mobildata blev slået fra. De slås til igen ved midnat."

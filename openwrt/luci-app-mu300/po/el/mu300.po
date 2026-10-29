@@ -1057,23 +1057,32 @@ msgstr "Εγγράψιμο"
 msgid "This boot image cannot change the boot"
 msgstr "Αυτή η εικόνα εκκίνησης δεν μπορεί να αλλάξει την εκκίνηση"
 
+msgid "Remaining this year"
+msgstr "Απομένει φέτος"
+
+msgid "Remaining this cycle"
+msgstr "Απομένει σε αυτή την περίοδο"
+
 msgid "%s of %s"
 msgstr "%s από %s"
-
-msgid "The monthly cap is reached"
-msgstr "Το μηνιαίο όριο εξαντλήθηκε"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Χρησιμοποιήθηκε το %d%% του μηνιαίου ορίου"
-
-msgid "Used this cycle"
-msgstr "Χρήση σε αυτή την περίοδο"
 
 msgid "The yearly cap is reached"
 msgstr "Το ετήσιο όριο εξαντλήθηκε"
 
-msgid "Remaining this year"
-msgstr "Απομένει φέτος"
+msgid "The monthly cap is reached"
+msgstr "Το μηνιαίο όριο εξαντλήθηκε"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Χρησιμοποιήθηκε το %d%% του ετήσιου ορίου"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Χρησιμοποιήθηκε το %d%% του μηνιαίου ορίου"
+
+msgid "Used this year"
+msgstr "Χρήση φέτος"
+
+msgid "Used this cycle"
+msgstr "Χρήση σε αυτή την περίοδο"
 
 msgid "Link & traffic"
 msgstr "Ζεύξη και κίνηση"
@@ -1092,9 +1101,6 @@ msgstr "Σύνολο απεσταλμένων"
 
 msgid "Today"
 msgstr "Σήμερα"
-
-msgid "Remaining this cycle"
-msgstr "Απομένει σε αυτή την περίοδο"
 
 msgid "SIM source"
 msgstr "Πηγή SIM"
@@ -2399,8 +2405,17 @@ msgstr "Αυτή η σελίδα άνοιξε μέσω HTTPS και το τερ�
 msgid "The data usage could not be read"
 msgstr "Η χρήση δεδομένων δεν μπόρεσε να διαβαστεί"
 
+msgid "Year"
+msgstr "Έτος"
+
+msgid "Month"
+msgstr "Μήνας"
+
 msgid "Used"
 msgstr "Χρήση"
+
+msgid "Days left this year"
+msgstr "Ημέρες που απομένουν φέτος"
 
 msgid "Days left in this cycle"
 msgstr "Ημέρες που απομένουν στην περίοδο"
@@ -2431,9 +2446,6 @@ msgstr "Το μηνιαίο όριο εξαντλήθηκε: τα δεδομέν
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Το ετήσιο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά όταν αρχίσει το επόμενο έτος."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Χρησιμοποιήθηκε το %d%% του ετήσιου ορίου"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Το ημερήσιο όριο εξαντλήθηκε: τα δεδομένα κινητής απενεργοποιήθηκαν. Ενεργοποιούνται ξανά τα μεσάνυχτα."

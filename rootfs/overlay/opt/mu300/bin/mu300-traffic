@@ -486,8 +486,8 @@ END {
             cs, last, left, n(crx_c), n(ctx_c), n(adj), n(used)
         printf "\"cap\":{\"bytes\":%s,\"remaining\":%s,\"warn\":%d,\"cut\":%d,\"level\":\"%s\",\"cut_active\":%d},", \
             n(cap), n(cap > 0 ? cap - used : 0), warn, cut, (cap > 0 ? level : "none"), (ck[1] == cs && !co[1])
-        printf "\"yearly\":{\"start\":%s,\"bytes\":%s,\"used\":%s,\"remaining\":%s,\"cut\":%d,\"level\":\"%s\",\"cut_active\":%d},", \
-            jstr(ystart), n(yearly), n(yused), n(yearly > 0 ? yearly - yused : 0), ycut, (yearly > 0 ? ylevel : "none"), (ck[3] == ys && !co[3])
+        printf "\"yearly\":{\"start_day\":%s,\"start\":\"%s\",\"last\":\"%s\",\"days_left\":%d,\"bytes\":%s,\"used\":%s,\"remaining\":%s,\"cut\":%d,\"level\":\"%s\",\"cut_active\":%d},", \
+            jstr(ystart), ys, ylast, yleft, n(yearly), n(yused), n(yearly > 0 ? yearly - yused : 0), ycut, (yearly > 0 ? ylevel : "none"), (ck[3] == ys && !co[3])
         printf "\"daily\":{\"bytes\":%s,\"used\":%s,\"cut\":%d,\"level\":\"%s\",\"cut_active\":%d},", \
             n(daily), n(dused), dcut, dlevel, (ck[2] == today && !co[2])
         printf "\"days\":["

@@ -1057,23 +1057,32 @@ msgstr "Доступне для запису"
 msgid "This boot image cannot change the boot"
 msgstr "Цей завантажувальний образ не може змінювати завантаження"
 
+msgid "Remaining this year"
+msgstr "Залишилося цього року"
+
+msgid "Remaining this cycle"
+msgstr "Залишилося в цьому періоді"
+
 msgid "%s of %s"
 msgstr "%s з %s"
-
-msgid "The monthly cap is reached"
-msgstr "Місячний ліміт вичерпано"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "Використано %d%% місячного ліміту"
-
-msgid "Used this cycle"
-msgstr "Використано в цьому періоді"
 
 msgid "The yearly cap is reached"
 msgstr "Річний ліміт вичерпано"
 
-msgid "Remaining this year"
-msgstr "Залишилося цього року"
+msgid "The monthly cap is reached"
+msgstr "Місячний ліміт вичерпано"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "Використано %d%% річного ліміту"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "Використано %d%% місячного ліміту"
+
+msgid "Used this year"
+msgstr "Використано цього року"
+
+msgid "Used this cycle"
+msgstr "Використано в цьому періоді"
 
 msgid "Link & traffic"
 msgstr "Канал і трафік"
@@ -1092,9 +1101,6 @@ msgstr "Усього надіслано"
 
 msgid "Today"
 msgstr "Сьогодні"
-
-msgid "Remaining this cycle"
-msgstr "Залишилося в цьому періоді"
 
 msgid "SIM source"
 msgstr "Джерело SIM"
@@ -2399,8 +2405,17 @@ msgstr "Цю сторінку відкрито через HTTPS, а термін
 msgid "The data usage could not be read"
 msgstr "Не вдалося прочитати використання даних"
 
+msgid "Year"
+msgstr "Рік"
+
+msgid "Month"
+msgstr "Місяць"
+
 msgid "Used"
 msgstr "Використано"
+
+msgid "Days left this year"
+msgstr "Залишилося днів цього року"
 
 msgid "Days left in this cycle"
 msgstr "Залишилося днів у періоді"
@@ -2431,9 +2446,6 @@ msgstr "Місячний ліміт вичерпано: мобільні дан�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Річний ліміт вичерпано: мобільні дані вимкнено. Вони ввімкнуться знову на початку наступного року."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "Використано %d%% річного ліміту"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Денну квоту вичерпано: мобільні дані вимкнено. Вони ввімкнуться опівночі."

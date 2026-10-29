@@ -1057,23 +1057,32 @@ msgstr "Skrivbar"
 msgid "This boot image cannot change the boot"
 msgstr "Den här startavbildningen kan inte ändra starten"
 
+msgid "Remaining this year"
+msgstr "Kvar i år"
+
+msgid "Remaining this cycle"
+msgstr "Kvar i denna period"
+
 msgid "%s of %s"
 msgstr "%s av %s"
-
-msgid "The monthly cap is reached"
-msgstr "Månadsgränsen är nådd"
-
-msgid "%d%% of the monthly cap is used"
-msgstr "%d%% av månadsgränsen använt"
-
-msgid "Used this cycle"
-msgstr "Använt i denna period"
 
 msgid "The yearly cap is reached"
 msgstr "Årsgränsen är nådd"
 
-msgid "Remaining this year"
-msgstr "Kvar i år"
+msgid "The monthly cap is reached"
+msgstr "Månadsgränsen är nådd"
+
+msgid "%d%% of the yearly cap is used"
+msgstr "%d%% av årsgränsen använt"
+
+msgid "%d%% of the monthly cap is used"
+msgstr "%d%% av månadsgränsen använt"
+
+msgid "Used this year"
+msgstr "Använt i år"
+
+msgid "Used this cycle"
+msgstr "Använt i denna period"
 
 msgid "Link & traffic"
 msgstr "Länk & trafik"
@@ -1092,9 +1101,6 @@ msgstr "Totalt skickat"
 
 msgid "Today"
 msgstr "I dag"
-
-msgid "Remaining this cycle"
-msgstr "Kvar i denna period"
 
 msgid "SIM source"
 msgstr "SIM-källa"
@@ -2399,8 +2405,17 @@ msgstr "Den här sidan öppnades via HTTPS, och terminalen levereras via HTTP p�
 msgid "The data usage could not be read"
 msgstr "Dataförbrukningen kunde inte läsas"
 
+msgid "Year"
+msgstr "År"
+
+msgid "Month"
+msgstr "Månad"
+
 msgid "Used"
 msgstr "Använt"
+
+msgid "Days left this year"
+msgstr "Dagar kvar i år"
 
 msgid "Days left in this cycle"
 msgstr "Dagar kvar i perioden"
@@ -2431,9 +2446,6 @@ msgstr "Månadsgränsen är nådd: mobildata stängdes av. Den slås på igen n�
 
 msgid "The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts."
 msgstr "Årsgränsen är nådd: mobildata stängdes av. Den slås på igen när nästa år börjar."
-
-msgid "%d%% of the yearly cap is used"
-msgstr "%d%% av årsgränsen använt"
 
 msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
 msgstr "Den dagliga kvoten är nådd: mobildata stängdes av. Den slås på igen vid midnatt."
