@@ -128,6 +128,7 @@ int register_gpio_irq(stk_gpio_info *gpio_info)
     if (err < 0)
     {
         printk(KERN_ERR "%s: gpio_request, err=%d", __func__, err);
+        linux_gpio_mgr[gpio_idx].gpio_info = NULL;   /* MU300: no slot left behind */
         return err;
     }
 
@@ -147,7 +148,8 @@ int register_gpio_irq(stk_gpio_info *gpio_info)
     if (irq < 0)
     {
         printk(KERN_ERR "irq number is not specified, irq # = %d, int pin=%d\n", irq, linux_gpio_mgr[gpio_idx].gpio_info->int_pin);
-        return irq;
+        err = irq;
+        goto err_request_any_context_irq;
     }
 
     linux_gpio_mgr[gpio_idx].gpio_info->irq = irq;
@@ -184,6 +186,11 @@ int register_gpio_irq(stk_gpio_info *gpio_info)
     return 0;
 err_request_any_context_irq:
     gpio_free(linux_gpio_mgr[gpio_idx].gpio_info->int_pin);
+    /* MU300: the workqueue and the slot go too, so a later probe starts clean */
+    if (linux_gpio_mgr[gpio_idx].stk_wq)
+        destroy_workqueue(linux_gpio_mgr[gpio_idx].stk_wq);
+    linux_gpio_mgr[gpio_idx].stk_wq = NULL;
+    linux_gpio_mgr[gpio_idx].gpio_info = NULL;
     return err;
 }
 
@@ -233,27 +240,35 @@ int stop_gpio_irq(stk_gpio_info *gpio_info)
     return -1;
 }
 
+/*
+ * MU300: the interrupt off and its work finished before the interrupt is freed (the work enables it again, and uses
+ * the driver's data, which the caller frees next), the workqueue destroyed and the slot cleared, so that the driver
+ * can be unbound and bound again
+ */
 int remove_gpio_irq(stk_gpio_info *gpio_info)
 {
     int gpio_idx = 0;
 
     for (gpio_idx = 0; gpio_idx < MAX_LINUX_GPIO_MANAGER_NUM; gpio_idx ++)
     {
-        if (linux_gpio_mgr[gpio_idx].gpio_info == gpio_info)
-        {
-            if (linux_gpio_mgr[gpio_idx].gpio_info->is_exist)
-            {
-                if (linux_gpio_mgr[gpio_idx].gpio_info->is_active)
-                {
-                    linux_gpio_mgr[gpio_idx].gpio_info->is_active = false;
-                    free_irq(linux_gpio_mgr[gpio_idx].gpio_info->irq, &linux_gpio_mgr[gpio_idx]);
-                    gpio_free(linux_gpio_mgr[gpio_idx].gpio_info->int_pin);
-                    cancel_work_sync(&linux_gpio_mgr[gpio_idx].stk_work);
-                }
-            }
+        gpio_manager *m = &linux_gpio_mgr[gpio_idx];
 
-            return 0;
+        if (m->gpio_info != gpio_info)
+            continue;
+        if (gpio_info->is_exist)
+        {
+            disable_irq(gpio_info->irq);
+            cancel_work_sync(&m->stk_work);
+            free_irq(gpio_info->irq, m);
+            gpio_free(gpio_info->int_pin);
+            gpio_info->is_exist = false;
+            gpio_info->is_active = false;
         }
+        if (m->stk_wq)
+            destroy_workqueue(m->stk_wq);
+        m->stk_wq = NULL;
+        m->gpio_info = NULL;
+        return 0;
     }
 
     return -1;

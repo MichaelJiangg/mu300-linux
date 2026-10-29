@@ -54,6 +54,8 @@ static struct zte_misc_ops is_sar1_exist_node = {
 /* zte boardtest interface end */
 
 struct stk501xx_wrapper *stk501xx_wrapper_ptr;
+/* MU300: the class files reach the device through stk501xx_wrapper_ptr: set and cleared under this lock */
+static DEFINE_MUTEX(stk_class_lock);
 static char chip_info[20];
 
 /**
@@ -104,11 +106,9 @@ static ssize_t stk_enable_store(struct device *dev,
 
     STK_SAR_ERR("stk_enable_store, data=%d", data);
 
-    if ((1 == data) || (0 == data))
-        stk501xx_set_enable(stk, data);
-    else
-        STK_SAR_ERR("invalid argument, en=%d", data);
-
+    if (data > 1)
+        return -EINVAL;
+    stk501xx_set_enable(stk, data);
     return count;
 }
 
@@ -174,7 +174,7 @@ static ssize_t stk_flag_show(struct device *dev,
  *
  * @return: ssize_t
  */
-static ssize_t stk_send_store(struct device *dev,
+static ssize_t __maybe_unused stk_send_store(struct device *dev,
                               struct device_attribute *attr, const char *buf, size_t count)
 {
     stk501xx_wrapper *stk_wrapper = dev_get_drvdata(dev);
@@ -292,20 +292,18 @@ static ssize_t stk_phase_cali(struct device *dev,
     return (ssize_t)result;
 }
 
-static DEVICE_ATTR(enable, 0664, stk_enable_show, stk_enable_store);
+static DEVICE_ATTR(enable, 0644, stk_enable_show, stk_enable_store);
 static DEVICE_ATTR(value, 0444, stk_value_show, NULL);
-static DEVICE_ATTR(send, 0220, NULL, stk_send_store);
 static DEVICE_ATTR(temp, 0444, stk_temp_show, NULL);
 static DEVICE_ATTR(flag, 0444, stk_flag_show, NULL);
-static DEVICE_ATTR(allreg, 0444, stk_allreg_show, NULL);
+static DEVICE_ATTR(allreg, 0400, stk_allreg_show, NULL);
 static DEVICE_ATTR(chipinfo, 0444, stk_chipinfo_show, NULL);
-static DEVICE_ATTR(phcali, 0444, stk_phase_cali, NULL);
+static DEVICE_ATTR(phcali, 0400, stk_phase_cali, NULL);
 
 static struct attribute *stk_attribute_sar[] =
 {
     &dev_attr_enable.attr,
     &dev_attr_value.attr,
-    &dev_attr_send.attr,
     &dev_attr_temp.attr,
     &dev_attr_flag.attr,
     &dev_attr_allreg.attr,
@@ -509,8 +507,8 @@ static int stk_init_qualcomm(stk501xx_wrapper *stk_wrapper)
 err_sensors_classdev_register:
     sysfs_remove_group(&stk_wrapper->i2c_mgr.client->dev.kobj, &stk_attribute_sar_group);
 err_sysfs_creat_group:
-    input_free_device(stk_wrapper->input_dev);
-    input_unregister_device(stk_wrapper->input_dev);
+    input_unregister_device(stk_wrapper->input_dev);   /* MU300: registered, so unregistered (it frees it) */
+    stk_wrapper->input_dev = NULL;
     return -1;
 }
 
@@ -526,8 +524,8 @@ static void stk_exit_qualcomm(struct stk501xx_wrapper *stk_wrapper)
 #endif // STK_SENSORS_DEV
     sysfs_remove_group(&stk_wrapper->i2c_mgr.client->dev.kobj,
                        &stk_attribute_sar_group);
-    input_unregister_device(stk_wrapper->input_dev);
-    input_free_device(stk_wrapper->input_dev);
+    input_unregister_device(stk_wrapper->input_dev);   /* MU300: it frees it; no input_free_device() after */
+    stk_wrapper->input_dev = NULL;
 }
 
 #if defined STK_INTERRUPT_MODE || defined STK_POLLING_MODE
@@ -698,36 +696,35 @@ static ssize_t enable_show(const struct class *class,
         const struct class_attribute *attr,
         char *buf)
 {
-    stk_data *stk = &stk501xx_wrapper_ptr->stk;
-    char en;
+    ssize_t ret = -ENODEV;
 
-    en = stk->enabled;
-    STK_SAR_ERR("enable_show in ");
-
-    return scnprintf(buf, PAGE_SIZE, "enable = %d\n", en);
+    /* MU300: the device only while it is there (stk_i2c_remove() clears the pointer before it frees it) */
+    mutex_lock(&stk_class_lock);
+    if (stk501xx_wrapper_ptr)
+        ret = scnprintf(buf, PAGE_SIZE, "enable = %d\n", stk501xx_wrapper_ptr->stk.enabled);
+    mutex_unlock(&stk_class_lock);
+    return ret;
 }
 
 static ssize_t enable_store(const struct class *class,
         const struct class_attribute *attr,
         const char *buf, size_t count)
 {
-    stk_data *stk = &stk501xx_wrapper_ptr->stk;
     unsigned int data;
     int error;
 
     error = kstrtouint(buf, 10, &data);
-    if (error) {
-        STK_SAR_ERR("kstrtoul failed, error=%d", error);
+    if (error)
         return error;
+    if (data > 1)
+        return -EINVAL;
+    mutex_lock(&stk_class_lock);
+    if (!stk501xx_wrapper_ptr) {
+        mutex_unlock(&stk_class_lock);
+        return -ENODEV;
     }
-
-    STK_SAR_ERR("stk_enable_store, data=%d", data);
-
-    if ((1 == data) || (0 == data))
-        stk501xx_set_enable(stk, data);
-    else
-        STK_SAR_ERR("invalid argument, en=%d", data);
-
+    stk501xx_set_enable(&stk501xx_wrapper_ptr->stk, data);
+    mutex_unlock(&stk_class_lock);
     return count;
 }
 static CLASS_ATTR_RW(enable);
@@ -745,19 +742,18 @@ static ssize_t status_show(const struct class *class,
         const struct class_attribute *attr,
         char *buf)
 {
-    int i = 0;
     uint32_t prox_flag = 0;
-    stk_data *stk = &stk501xx_wrapper_ptr->stk;
+    stk_data *stk;
 
-    //read prox flag
+    mutex_lock(&stk_class_lock);
+    if (!stk501xx_wrapper_ptr) {
+        mutex_unlock(&stk_class_lock);
+        return -ENODEV;
+    }
+    stk = &stk501xx_wrapper_ptr->stk;
     stk_read_prox_flag(stk, &prox_flag);
     stk501xx_read_sar_data(stk, prox_flag);
-
-    for ( i = 0; i < 8; i++) {
-        STK_SAR_ERR("ph[%d] prox flag=%d", i, stk->last_nearby[i]);
-    }
-
-    STK_SAR_ERR("status_show,status = %d\n", prox_flag);
+    mutex_unlock(&stk_class_lock);
     return scnprintf(buf, PAGE_SIZE, "flag=0x%x\n", prox_flag);
 }
 static CLASS_ATTR_RO(status);
@@ -863,89 +859,68 @@ int stk_i2c_probe(struct i2c_client *client, struct common_function *common_fn)
 
     if (get_platform_data(stk_wrapper)){
         err = -ENOMEM;
-        goto err_free_mem;
+        goto err_bus;
     }
 
+    /* registers the interrupt (stk_register_queue()) */
     err = stk501xx_init_client(stk);
     if (err < 0) {
         STK_SAR_ERR("stk501xx_init_client failed\n");
         err = -ENOMEM;
-        goto err_exit;
+        goto err_irq;
     }
 
     if (stk_init_qualcomm(stk_wrapper)) {
         STK_SAR_ERR("stk_init_qualcomm failed");
         err = -ENOMEM;
-        goto err_exit;
+        goto err_irq;
     }
 
-    /* add boardtest interface start */
-#ifdef CONFIG_VENDOR_ZTE_MISC_COMMON
-    zte_misc_register_callback(&is_sar1_exist_node, NULL);
-#endif
-    /* add boardtest interface end */
-
-    stk501xx_wrapper_ptr = stk_wrapper;
-
-    /*add class sysfs*/
+    /*
+     * MU300: ZTE's boardtest hook (CONFIG_VENDOR_ZTE_MISC_COMMON, is_sar1_exist) is not built: there is no zte_misc
+     * on mainline. The class (one sensor: one class) and its files, the device reached through
+     * stk501xx_wrapper_ptr, set here and cleared before the device goes.
+     */
     err = class_register(&sar_sensor_class);
     if (err < 0) {
         STK_SAR_ERR("Create fsys class failed  err = %d", err);
-        return err;
+        goto err_qualcomm;
     }
+    {
+        const struct class_attribute *attrs[] = {
+            &class_attr_delay, &class_attr_enable, &class_attr_chip_info,
+            &class_attr_batch, &class_attr_flush, &class_attr_status,
+        };
+        int a;
 
-    /*ZTE add sys common status node*/
-    err = class_create_file(&sar_sensor_class, &class_attr_delay);
-    if (err < 0) {
-        STK_SAR_ERR("Create delay file failed  err = %d", err);
-        goto err_class_creat;
+        for (a = 0; a < ARRAY_SIZE(attrs); a++) {
+            err = class_create_file(&sar_sensor_class, attrs[a]);
+            if (err < 0) {
+                STK_SAR_ERR("Create class file failed  err = %d", err);
+                goto err_class;
+            }
+        }
     }
-
-    err = class_create_file(&sar_sensor_class, &class_attr_enable);
-    if (err < 0) {
-        STK_SAR_ERR("Create enable file failed  err = %d", err);
-        goto err_class_creat;
-    }
-
-    err = class_create_file(&sar_sensor_class, &class_attr_chip_info);
-    if (err < 0) {
-        STK_SAR_ERR("Create chip_info file  err = %d", err);
-        goto err_class_creat;
-    }
-
-    err = class_create_file(&sar_sensor_class, &class_attr_batch);
-    if (err < 0) {
-        STK_SAR_ERR("Create batch file failed  err = %d", err);
-        goto err_class_creat;
-    }
-
-    err = class_create_file(&sar_sensor_class, &class_attr_flush);
-    if (err < 0) {
-        STK_SAR_ERR("Create flush file failed  err = %d", err);
-        goto err_class_creat;
-    }
-
-    err = class_create_file(&sar_sensor_class, &class_attr_status);
-    if (err < 0) {
-        STK_SAR_ERR("Create status file failed  err = %d", err);
-        goto err_class_creat;
-    }
+    mutex_lock(&stk_class_lock);
+    stk501xx_wrapper_ptr = stk_wrapper;
+    mutex_unlock(&stk_class_lock);
 
     STK_SAR_LOG("Success");
     return 0;
 
-err_class_creat:
-    dev_info(&client->dev, "unregister sar_sensor_class.\n");
+err_class:
+    /* (its files go with it) */
     class_unregister(&sar_sensor_class);
-err_exit:
+err_qualcomm:
+    stk_exit_qualcomm(stk_wrapper);
+err_irq:
 #ifdef STK_INTERRUPT_MODE
     STK_GPIO_IRQ_REMOVE(stk, &stk->gpio_info);
 #elif defined STK_POLLING_MODE
     STK_TIMER_REMOVE(stk, &stk->stk_timer_info);
 #endif /* STK_INTERRUPT_MODE, STK_POLLING_MODE */
-#ifdef STK_SENSING_WATCHDOG
-    STK_TIMER_REMOVE(stk, &stk->sensing_watchdog_timer_info);
-#endif // STK_SENSING_WATCHDOG
+err_bus:
+    stk->bops->remove(&stk_wrapper->i2c_mgr);
 err_free_mem:
     STK_SAR_ERR("err_free_mem err = %d", err);
     mutex_destroy(&stk_wrapper->i2c_mgr.lock);
@@ -965,12 +940,18 @@ int stk_i2c_remove(struct i2c_client *client)
     stk501xx_wrapper *stk_wrapper = i2c_get_clientdata(client);
     struct stk_data *stk = &stk_wrapper->stk;
 
-    stk_exit_qualcomm(stk_wrapper);
+    /* MU300: in the reverse order of probe - the interrupt and its work first (they use the input device and the
+     * data), then the class files (cleared pointer, files gone), then the device's files and input device */
 #ifdef STK_INTERRUPT_MODE
     STK_GPIO_IRQ_REMOVE(stk, &stk->gpio_info);
 #elif defined STK_POLLING_MODE
     STK_TIMER_REMOVE(stk, &stk->stk_timer_info);
 #endif /* STK_INTERRUPT_MODE, STK_POLLING_MODE */
+    mutex_lock(&stk_class_lock);
+    stk501xx_wrapper_ptr = NULL;
+    mutex_unlock(&stk_class_lock);
+    class_unregister(&sar_sensor_class);
+    stk_exit_qualcomm(stk_wrapper);
     stk->bops->remove(&stk_wrapper->i2c_mgr);
     mutex_destroy(&stk_wrapper->i2c_mgr.lock);
     kfree(stk_wrapper);
