@@ -114,6 +114,26 @@ if 'REGULATOR_UMP9620' not in r:
                  '\thelp\n\t  Regulators of the UMP9620 PMIC (ported from the Unisoc 5.4 kernel).\n\n') + r[i:]
     open(rk, 'w').write(r)
 
+# the PMIC's Type-C detection (sc27xx_typec: port0, partner, extcon) and BC1.2 detection (sprd-bc1p2), as on 5.4
+append_once('drivers/usb/typec/Makefile', 'sc27xx_typec.o', 'obj-$(CONFIG_TYPEC_SC27XX)\t+= sc27xx_typec.o\n')
+tk = os.path.join(tree, 'drivers/usb/typec/Kconfig')
+k = open(tk).read()
+if 'config TYPEC_SC27XX\n' not in k:
+    i = k.rindex('endif # TYPEC')
+    k = k[:i] + ('config TYPEC_SC27XX\n\ttristate "Unisoc UMP9620 USB Type-C detection"\n'
+                 '\tdepends on MFD_SC27XX_PMIC && EXTCON && NVMEM && OF\n\thelp\n'
+                 '\t  The PMIC Type-C block\'s attach/detach detection as a Type-C port with extcon, as the\n'
+                 '\t  Unisoc 5.4 kernel\'s sc27xx_typec (no power delivery).\n\n') + k[i:]
+    open(tk, 'w').write(k)
+append_once('drivers/usb/phy/Makefile', 'sprd-bc1p2.o', 'obj-$(CONFIG_SPRD_BC1P2) += sprd-bc1p2.o\n')
+pk = os.path.join(tree, 'drivers/usb/phy/Kconfig')
+k = open(pk).read()
+if 'config SPRD_BC1P2\n' not in k:
+    i = k.rindex('endmenu')
+    k = k[:i] + ('config SPRD_BC1P2\n\ttristate "Unisoc UMP9620 BC1.2 charger detection"\n'
+                 '\tdepends on MFD_SC27XX_PMIC && OF\n\thelp\n'
+                 '\t  The PMIC\'s BC1.2 charger-port detection result, as the Unisoc 5.4 kernel\'s sprd_bc1p2.\n\n') + k[i:]
+    open(pk, 'w').write(k)
 append_once('drivers/usb/phy/Makefile', 'phy-sprd-ums9620-ssphy.o', 'obj-$(CONFIG_USB_SPRD_UMS9620_SSPHY) += phy-sprd-ums9620-ssphy.o\n')
 pk = os.path.join(tree, 'drivers/usb/phy/Kconfig')
 k = open(pk).read()

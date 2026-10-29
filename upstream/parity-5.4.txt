@@ -125,14 +125,14 @@ builtin ehci_platform na # as ehci_hcd
 module sprd_tcpm ok cfg:TYPEC_TCPM # the TCPM framework itself is there (module tcpm)
 module sc27xx_pd ok cfg:TYPEC_UMP9620 # the PMIC's PD PHY as a TCPC: ump9620_tcpc (patch 0020), opt-in
 extra sc27xx_pd ok cfg:TYPEC_UMP9620 # build-display.sh's variant of the same driver
-module sc27xx_typec missing group:typec boards:f50,u30air,v50 # the PMIC's Type-C detection (typec@380): 5.4 reports roles, partner and CC orientation always; mainline only with ump9620_tcpc enabled by hand
-driver platform/sc27xx-typec missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
-typec port0 missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
-typec port0-partner missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
-class typec missing group:typec boards:f50,u30air,v50 # see sc27xx_typec
-extcon extcon1 missing group:typec boards:f50,u30air,v50 # sc27xx-typec's extcon (the USB PHYs' cable state on 5.4); mainline has extcon-usb-gpio only
-module sprd_bc1p2 missing group:typec boards:f50,u30air,v50 # BC1.2 charger-port detection (bc1p2@239c); mainline reads the PMIC's BC1.2 result only inside the MFD for the charger (FINDINGS 2581)
-driver platform/sprd-bc1p2 missing group:typec boards:f50,u30air,v50 # see sprd_bc1p2
+module sc27xx_typec ok = cfg:TYPEC_SC27XX bind:platform/sc27xx-typec # the PMIC's Type-C detection (typec@380), on by default as on 5.4: upstream/port/drivers/usb/typec/sc27xx_typec.c; mu300-usb hands the block to ump9620_tcpc when that is enabled
+driver platform/sc27xx-typec ok cfg:TYPEC_SC27XX bind:platform/sc27xx-typec
+typec port0 ok cfg:TYPEC_SC27XX has:typec/port0
+typec port0-partner ok cfg:TYPEC_SC27XX has:typec/port0-partner
+class typec ok cfg:TYPEC_SC27XX has:class/typec
+extcon extcon1 ok cfg:TYPEC_SC27XX has:extcon/extcon1 # sc27xx-typec's extcon (USB, USB-HOST, HEADPHONE); no mainline driver takes it (VBUS stays extcon-usb-gpio's)
+module sprd_bc1p2 ok = cfg:SPRD_BC1P2 bind:platform/sprd-bc1p2 # BC1.2 charger-port detection (bc1p2@239c): upstream/port/drivers/usb/phy/sprd-bc1p2.c, charger_type in sysfs; the U30 Air's charger reads the same result itself (patch 0009)
+driver platform/sprd-bc1p2 ok cfg:SPRD_BC1P2 bind:platform/sprd-bc1p2
 builtin typec_ucsi na # UCSI is a firmware interface (ACPI/EC); these boards have none
 module ptn38003a_i2c na # the PTN38003A redriver at i2c-6 0x30: nothing answers there on F50-B or the U30 Air (i2cdetect 2026-10-28)
 
