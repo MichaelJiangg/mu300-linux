@@ -121,6 +121,20 @@ hotspot_set() {
 }
 band_toggle() { mu300-wifi-band toggle | logger -t mu300-buttons 2>/dev/null; }
 
+# The key reader runs in the background and this shell waits for it: a shell sits out a trap while a foreground
+# pipeline runs, and procd stops a service by signalling this shell alone (its children share init's process group).
+# Before, /etc/init.d/mu300-buttons restart left the old mu300-keys and its loop running beside the new ones, and
+# every press was handled twice. A stop now takes this shell's own children with it.
+stop_children() {
+    trap '' TERM INT HUP
+    pkill -TERM -P $$ 2>/dev/null && return 0
+    for _s in /proc/[0-9]*/stat; do   # no pkill: the children by their parent's pid
+        { read -r _p _c _st _pp _r < "$_s"; } 2>/dev/null || continue
+        [ "$_pp" = "$$" ] && kill "$_p" 2>/dev/null
+    done
+    return 0
+}
+trap 'stop_children; exit 143' TERM INT HUP
 mu300-keys -l 3000 -t 5 | { while read -r code kind; do
     # the tick every 5 s is no press: it lets the LEDs time out, and the U30 Air's battery LED follow the charge
     # (plugged in, unplugged, the 60 % and 10 % marks) - when there is something to do (tick_due)
@@ -155,4 +169,5 @@ mu300-keys -l 3000 -t 5 | { while read -r code kind; do
         "$KEY_WIFI short") [ "$was_idle" = 1 ] || in_background "$DEADLINE" band_toggle ;;
         "$KEY_WIFI long") [ -z "$dir" ] || in_background "$DEADLINE" hotspot_set "$dir" ;;
     esac
-done; wait; }
+done; wait; } &
+wait $!

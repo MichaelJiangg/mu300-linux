@@ -4054,6 +4054,46 @@ class WifiBand(ShellTest):
 
 
 class Buttons(ShellTest):
+    def test_a_stop_takes_the_key_reader_with_it(self):
+        """procd stops a service by signalling its main process alone (its children share init's process group): the
+        old mu300-keys and its loop outlived /etc/init.d/mu300-buttons restart, and every press was handled twice."""
+        import signal, time
+        self.stub('mu300-keys', 'echo $$ > "$STUBLOG/keys.pid"; exec sleep 300')
+        for shell in self.each_shell():
+            pidf = self.tmp / 'keys.pid'
+            pidf.unlink(missing_ok=True)
+            env = self.env(MU300_RUN=self.tmp / 'run')
+            env['PATH'] = f'{self.stubs}{os.pathsep}{env["PATH"]}'
+            p = subprocess.Popen(shell + [str(BIN / 'mu300-buttons')], env=env, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            for _ in range(100):
+                if pidf.exists() and pidf.read_text().strip():
+                    break
+                time.sleep(0.05)
+            keys = int(pidf.read_text())
+            time.sleep(0.3)
+            p.send_signal(signal.SIGTERM)
+            p.communicate(timeout=10)
+            self.assertEqual(p.returncode, 143)
+            gone = False
+            for _ in range(100):
+                try:
+                    os.kill(keys, 0)
+                except ProcessLookupError:
+                    gone = True
+                    break
+                time.sleep(0.05)
+            if not gone:
+                os.kill(keys, signal.SIGKILL)
+            self.assertTrue(gone, 'mu300-keys outlived the stop')
+
+    def test_procd_respawns_the_thermal_guard(self):
+        post = (TOP / 'openwrt/overlay/etc/init.d/mu300-post').read_text()
+        inst = post[post.index('procd_open_instance thermalguard'):]
+        inst = inst[:inst.index('procd_close_instance')]
+        self.assertIn('procd_set_param command /opt/mu300/bin/thermal-guard', inst)
+        self.assertIn('procd_set_param respawn', inst)
+
     def test_actions(self):
         self.stub('mu300-keys', 'cat "$STUBLOG/keys.in"')
         for name in ('mu300-led', 'mu300-wifi-band', 'systemctl', 'logger', 'poweroff', 'mu300-power'):
