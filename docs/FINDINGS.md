@@ -11136,9 +11136,8 @@ modem_control`, sha256 `43a3bc8c…819a3`; the F50's copy is the same file):
 - Only when every one of these holds: `mu300-device` says `u30air`; the command line has `androidboot.mode=charger`
   (or `sprdboot.mode=`) and `modem=shutdown`; `/dev/stty_nr1` answers ENODEV or is missing (the CP down; a second
   start of the vendor service in the same boot finds it up); the device's file has the stock sha256 (the loader
-  kanoqwq checked); and `/etc/mu300/modem-coldboot` exists. **Off by default**: kanoqwq's notes say the charger-boot
-  start itself was not run on a device, so it is opt-in (`touch /etc/mu300/modem-coldboot`) until a U30 Air has
-  shown it. Anything else, including any failure on the way, gives the stock modem_control as
+  kanoqwq checked); and `/etc/mu300/no-modem-coldboot` does not exist. It was opt-in until a U30 Air had shown it
+  (below); now **on by default**, off with `touch /etc/mu300/no-modem-coldboot`. Anything else, including any failure on the way, gives the stock modem_control as
   before. It cannot stop a boot or the modem: the worst case is today's behaviour. kanoqwq's version stopped the
   vendor service (`exit 5`) when the copy could not be made; ours does not. F50, V50, normal boots: untouched.
 
@@ -11158,9 +11157,15 @@ than his (an early init stage that waits with the services not started):
   daemon's 10 s loop and mu300-buttons cover it. His `mu300-charge-mode` early stage and its `poweroff -f` after a
   read-only remount: our poweroff goes through procd / systemd.
 
-Not run on a device yet (needs a flat or switched-off U30 Air on a charger). What to look at:
-`cat /run/mu300/boot-mode` (charger), `dmesg | grep mu300-modem-coldboot` (the copy chosen),
-`ls -l /run/mu300/coldboot/modem_control`, `/dev/stty_nr1` opening, `mu300-at ATI`, then the Wi-Fi key and a dial.
+**Run on a device** (2026-10-29, the test U30 Air, OpenWrt v2026.10.28.1, 6.18.59, modem W25.30.2; a `poweroff`
+with the Mac's USB port attached, so LK starts it again for the charger, `/run/mu300/boot-mode` = `charger`):
+* without the copy (the release's default): `/dev/stty_nr1` answers `No such device` in the charging boot and after
+  `mu300-power wake wifi` too; `mu300-at: no answer from the daemon`, the WAN stays down. Issue #253 exactly.
+* with it: `mu300-modem-coldboot: charger boot with the CP down: loading the CP and CH images` at 2.7 s,
+  `SEC_KBC_START_CP() ret = 0` and `modem run = 1` at 5.1 s, `/dev/stty_nr1` opens in the charging boot; after the
+  wake `AT+CPIN?` READY, the WAN up on `sipa_eth0`, the VPN and its kill switch back, HTTPS through the tunnel.
+* a normal reboot with it on: no `mu300-modem-coldboot` line, no copy, the stock loader.
+So it is on by default since; `/etc/mu300/no-modem-coldboot` turns it off.
 
 ### 197. The U30 Air's battery while awake: the fuel gauge's interrupts, and a low-battery poweroff in every state
 
