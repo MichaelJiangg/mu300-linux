@@ -12291,3 +12291,75 @@ charge policy; CoreSight, the PMU and Unisoc's debug drivers (§31p keeps `PERF_
 Taken with this change, config only: `GENERIC_ADC_THERMAL` (the board's NTC zones `board-`, `chg-`, `nr-` and
 `pa-thmzone`, which have no trips in the vendor tree), `CPU_FREQ_GOV_CONSERVATIVE`, and the gadget functions
 `USB_CONFIGFS_SERIAL`, `USB_CONFIGFS_ECM_SUBSET` and `USB_CONFIGFS_F_HID`.
+
+### 235. Idle CPU of the shell daemons: a look that finds nothing new starts no process (liuwang97's #372, part A)
+
+liuwang97 measured a U30 Air on the charger, idle (5G SA, the hotspot up with two clients): the userspace daemons
+together used about 5 % of one core, 300-odd ticks a minute (USER_HZ 100) summed over every process, counted per
+process over 60 s as utime+stime+cutime+cstime from two `/proc/PID/stat` snapshots. mu300-power 52-56 ticks a minute,
+mu300-buttons 29-40, thermal-guard 26-29, mu300-adbd 27-32, ndp-learn 11-13, mu300-traffic 6-8. The sys time was
+about three times the user time: the cost is processes, not work. On this SoC a fork and exec of a small binary
+(`cat`, `date`, busybox `sleep`) is 0.7-1 ms, a `$( )` 0.5 ms more, and the helpers that are scripts cost more
+(`mu300-device` 2 ms).
+
+#372 did this and much more (the panel's status inside rpcd, an event-driven modem daemon, a system daemon on kernel
+uevents) in 10.5k lines. This entry is its low-risk part, taken in by itself: the same behaviour, fewer processes. The
+rest stays in #372 as the reference for later work.
+
+The rule for every daemon loop now: a look that finds nothing changed starts no process. Files are read with the
+shell's own `read` (`read -r v < file`, `read -r up _ < /proc/uptime` for the time), values travel in variables rather
+than through `$( )`, and the wait is `read -t N` on a fifo nobody writes to, opened read-write (it never reaches end
+of file), where the shell has `read -t` (busybox ash, bash; OpenWrt's busybox takes whole seconds only), else
+`sleep` (dash). A signal still ends that wait at once. During the wait the daemon's timer slack is 500 ms
+(`/proc/$$/timerslack_ns`, set around the wait only, so what the loop starts keeps the default): the kernel can serve
+the wakeups of several daemons with one.
+
+- **mu300-power**: one loop started about forty processes (`cat`, `sed | tail` per setting, `mu300-device` several
+  times, `$( )` around every helper, `rm -f` of files that were not there). The loop now reads with builtins (`rv`,
+  `nv`, `conf_load`/`conf_v` over the file read once a loop, `psy_scan`, `battery_v`, `plugged_v`...; the echo
+  helpers stay for `status` and the other commands), finds the charge switch and the device once, and asks iw for the
+  stations and hostapd (ubus) for the hotspot only every sixth loop (`MU300_POWER_SAMPLE_EVERY`, a minute), at once
+  when wlan0 is gone, and always before the idle timer runs out (a client that came since the last look keeps the
+  hotspot up, as before). The loop stays every 10 s: the low battery checks, the charge guard (kanoqwq's resume
+  level, pause and full-once included), the plug edge, a computer on USB and the wake flag are looked at as before.
+  What is slower: a station that wakes an idle device is seen within a minute (in idle the hotspot is normally down),
+  a hotspot that went down by itself while it should stay up is restored up to a minute later. #372's longer waits
+  between loops (30 s on the charger, 60 s on a battery) are not taken here.
+- **mu300-buttons / mu300-led**: the tick every 5 s ran `mu300-led tick`, which ran `mu300-device` and then itself
+  again (`exec "$0" sleep --if-due`). The tick now leaves `$STATE/.tick-hint`: the files it depends on (the battery's
+  and the charger's readings, its own state files, the siren's pid file) with what each held, and the uptime from
+  which it has something to do anyway (a timeout that runs out; a minute at the latest). mu300-buttons starts
+  `mu300-led tick` only when one of those files changed or that time came. Keys never waited for the tick.
+- **thermal-guard**: `$(hottest)`, `$(battery)` (a `cat` per power supply) and `$(native_cpu_cooling)` (a `cat` per
+  trip point) around reads that were builtins already. Now no process at all in a round, still every 5 s (#372 also
+  stretched the interval far from the thresholds; that waits for a stress test). kanoqwq's rule stays: a round
+  without a reading lifts no cap and turns no alarm off.
+- **mu300-adbd**: `cat` of the role and of UDC and a `sleep 1` every second. Now builtins, and a look every 3 s while
+  the gadget is bound with adb in it (`MU300_ADBD_IDLE_TICK`), every second otherwise; an unbound gadget (an adb
+  connection that ended) is bound again up to 2 s later than before.
+- **ndp-learn**: `awk | sort`, two `ip` calls per prefix, `ip | awk` and `ip | grep` every 10 s. A round now reads
+  `/proc/net/if_inet6` itself and greps the routing table's lines of the bearer's /64s; `learn_once` runs only when
+  one of them changed or a withdrawal has rounds to go. With iproute2's monitor (OpenWrt's ip-full) `ip -o -6 monitor
+  address route` runs as a child and a line starts a round, so a new prefix is routed at once and a route someone
+  removed comes back at once; a safety round every 300 s looks at the routes whatever the monitor says, and while
+  the bearer has no global address it solicits after 10 s, then at doubling intervals up to 300 s. Without a monitor
+  (busybox's ip, dash) the rounds come every 10 s as before, the routes every third round.
+- **mu300-traffic**: the settings file is read again only when it changed, one `date '+%s %z'` gives the time and the
+  offset (two dates and an awk before), the summary is read by the shell (a `sed` per value before).
+- **early-recorder** (already on the little CPUs since kanoqwq's f0b5ad43): `logread -l 300` instead of all of logd's
+  lines through `tail`, `dmesg -s 1000000` instead of the whole kernel log through `tail -c`, and a round every 30 s
+  after the first 90 s (was 10 s).
+- **mu300-cpu services [little|all]**: `little` puts procd's service tree (`/sys/fs/cgroup/services`, every service
+  and what it starts) on the CPUs of the lowest capacity through the cpuset. The default is `all`, which changes
+  nothing: the VPN engines are procd services, and on these boards all traffic goes through them.
+
+Measured by liuwang97 on the device, the same work in one shell, old against new: thermal-guard's round 2.6 ticks ->
+0.4; ndp-learn's round 1.95 -> 0.15; a traffic round 7.1 -> 1.35; mu300-power, 60 loops against a fake root, 546 ->
+17.
+
+Tests: `tests/test_power.py` (the stations and the hotspot every sixth loop and every loop without wlan0, the stations
+asked before the idle timer runs out, four loops start no more `cat`/`sed`/`grep`/`rm`... than one),
+`tests/test_device_scripts.py` (`Buttons`: mu300-led started only when its hint says so - timeouts, the plug, a
+minute, a key; early-recorder's reads), `tests/test_adb.py` (an idle gadget is looked at without `cat`, and without
+`sleep` where read has a timeout), `tests/test_mu300cell.py` (ndp-learn's daemon calls ip only when the addresses or
+the routes changed, its rounds on the monitor's word, its rounds without a monitor, its solicitations).
