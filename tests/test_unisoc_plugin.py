@@ -8,6 +8,7 @@ directory; the allow-list itself is tested on the unmodified lib.sh."""
 import json
 import shutil
 import threading
+from pathlib import Path
 
 from helpers import ShellTest, TOP
 
@@ -276,6 +277,9 @@ esac
     #   refuse              a command prefix the modem answers with ERROR
     #   silent-mode         AT+SPTESTMODE? answers nothing
     #   revert-after-sfun   once AT+SFUN=4 was sent, the LTE bands read back as locked again
+    #   u30air              a cleared LTE mask reads back as the U30 Air's table (0,2018,2057,2271,2)
+    #   lte-raw             the LTE masks the last non-zero AT+SPLBAND=1 wrote (a test may write it: a lock set
+    #                       outside the panel); it is what AT+SPLBAND=0 answers until a zero mask clears it
     MODEM = r"""#!/bin/sh
 M=$STUBLOG/modem; mkdir -p "$M"
 printf "%s\n" "$*" >> "$STUBLOG/at.commands"
@@ -285,7 +289,8 @@ case "$cmd" in
   'AT+SPTESTMODE=134,'*) touch "$M/mode" ;;
   'AT+SP5GRAN=1') touch "$M/gran" ;;
   'AT+SPENDC=1') touch "$M/endc" ;;
-  'AT+SPLBAND=1,0,0,0,0,0') touch "$M/lte" ;;
+  'AT+SPLBAND=1,0,0,0,0,0') rm -f "$M/lte-raw"; touch "$M/lte" ;;
+  'AT+SPLBAND=1,'*) printf '%s\n' "${cmd#AT+SPLBAND=1,}" > "$M/lte-raw" ;;
   'AT+SPLBAND=2,0,0,0,0') touch "$M/nr" ;;
   'AT+SPFORCEFRQ=12,4') touch "$M/cell12" ;;
   'AT+SPFORCEFRQ=16,4') touch "$M/cell16" ;;
@@ -296,8 +301,12 @@ case "$cmd" in
       if [ -f "$M/mode" ]; then printf '+SPTESTMODE: 134,134,0,19,3,1\n'; else printf '+SPTESTMODE: 3,134,0,19,3,1\n'; fi ;;
   'AT+SP5GRAN?') if [ -f "$M/gran" ]; then printf '+SP5GRAN: 1\n'; else printf '+SP5GRAN: 0\n'; fi ;;
   'AT+SPENDC?') if [ -f "$M/endc" ]; then printf '+ENDC: 1\n'; else printf '+ENDC: 2\n'; fi ;;
+  'AT+CGMR') if [ -f "$M/w25135" ]; then printf 'Platform Version: MOCORTM_V2_23A_W25.13.5_Debug\nOK\n'; else printf 'Platform Version: MOCORTM_V2_23A_W25.30.2_Debug\nOK\n'; fi ;;
   'AT+SPLBAND=0')
-      if [ -f "$M/lte" ] && ! { [ -f "$M/revert-after-sfun" ] && [ -f "$M/sfun" ]; }; then printf '+SPLBAND: 0,482,0,149,0\n'
+      if [ -f "$M/lte-raw" ]; then printf '+SPLBAND: %s\n' "$(cat "$M/lte-raw")"
+      elif [ -f "$M/lte" ] && [ -f "$M/w25135" ]; then printf '+SPLBAND: 0,450,0,149,0\n'
+      elif [ -f "$M/lte" ] && [ -f "$M/u30air" ]; then printf '+SPLBAND: 0,2018,2057,2271,2\n'
+      elif [ -f "$M/lte" ] && ! { [ -f "$M/revert-after-sfun" ] && [ -f "$M/sfun" ]; }; then printf '+SPLBAND: 0,482,0,149,0\n'
       else printf '+SPLBAND: 0,0,0,4,0\n'; fi ;;
   'AT+SPLBAND=3') if [ -f "$M/nr" ]; then printf '+SPLBAND: 553,0,272\n'; else printf '+SPLBAND: 0,0,256\n'; fi ;;
   'AT+SPFORCEFRQ=12,3') if [ -f "$M/cell12" ]; then printf '+SPFORCEFRQ: 12,3\n'; else printf '+SPFORCEFRQ: 12,3,1650,211\n'; fi ;;
@@ -310,9 +319,11 @@ printf 'OK\n'
     RESET_WRITES = ['AT+SP5GRAN=1', 'AT+SPTESTMODE=134,134,0', 'AT+SPENDC=1', 'AT+SPLBAND=1,0,0,0,0,0',
                     'AT+SPLBAND=2,0,0,0,0', 'AT+SPFORCEFRQ=12,4', 'AT+SPFORCEFRQ=16,4']
 
-    def reset_setup(self, knobs=''):
+    def reset_setup(self, knobs='', device='f50'):
         """The lock tool on the fake modem with every lock saved and set: (lock, state dir, run dir, at). KNOBS is
-        shell code the uci stub runs (the first command the tool runs) to set the fake modem's knobs."""
+        shell code the uci stub runs (the first command the tool runs) to set the fake modem's knobs; DEVICE is what
+        mu300-device answers (the board picks the LTE table)."""
+        self.stub('mu300-device', f'echo {device}')
         _, _, lock, state = self.tree()
         at = self.tmp / 'at'
         at.write_text(self.MODEM)
@@ -330,20 +341,22 @@ printf 'OK\n'
         self.stub('setsid', 'exit 0')
         return lock, state, self.tmp / 'run', at
 
-    def reset_run(self, shell, lock, state, run, at, *args):
-        """One `lock reset` (or ARGS) from the saved-and-set starting point: (result, [AT commands sent])."""
+    def reset_run(self, shell, lock, state, run, at, *args, cache=None, saved=None):
+        """One `lock reset` (or ARGS) from the saved-and-set starting point: (result, [AT commands sent]). CACHE is the
+        lock cache to start from (a short one by default); SAVED replaces the default saved locks (a test that starts
+        with no LTE lock, for example)."""
         shutil.rmtree(state, ignore_errors=True)
         state.mkdir(parents=True)
-        for k, v in self.SAVED:
+        for k, v in (self.SAVED if saved is None else saved):
             (state / k).write_text(v)
         shutil.rmtree(self.tmp / 'modem', ignore_errors=True)
         (self.tmp / 'at.commands').unlink(missing_ok=True)
         shutil.rmtree(run, ignore_errors=True)
         run.mkdir(mode=0o700)
-        (run / 'lock.json').write_text('{"ts":1,"mode":{"label":"4g"},"cell":"lte:1650,211",'
+        (run / 'lock.json').write_text(cache or '{"ts":1,"mode":{"label":"4g"},"cell":"lte:1650,211",'
                                        '"cells":["lte:1650,211"],"caps":{"nr":"1,5,6,8,28,41,78","lte":"1,3,5,8,34,38,39,40,41"}}\n')
         r = self.script(shell, lock, *(args or ('reset',)), MU300_AT=at, MU300_MOBILE_DATA=self.tmp / 'mobile-data',
-                        MU300_DASH_DIR=run, UNISOC_APPLY_DIR=self.tmp / 'apply')
+                        MU300_DASH_DIR=run, UNISOC_APPLY_DIR=self.tmp / 'apply', MU300_SIM_RUN=self.tmp / 'sim-run')
         return r, self.sent()
 
     def sent(self):
@@ -358,6 +371,164 @@ printf 'OK\n'
 
     def reset_result(self, run):
         return json.loads((run / 'lock-reset.json').read_text())
+
+    def test_a_refused_band_write_is_reported_not_saved(self):
+        """#356: the band write's answer was thrown away, so a modem's ERROR was saved, replayed and reported as
+        applied. Now: logged with the answer, an error on stdout, nothing saved, no stack restart."""
+        lock, state, run, at = self.reset_setup('printf "AT+SPLBAND=2," > "$STUBLOG/modem/refuse"')
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '41')
+            self.assertEqual(r.returncode, 1, r.stderr)
+            self.assertEqual(json.loads(r.stdout), {'ok': 0, 'error': 'The modem refused a write',
+                                                    'detail': 'AT+SPLBAND=2,0,0,16,0'})
+            self.assertIn('AT+SPLBAND=2,0,0,16,0', sent)
+            self.assertEqual([c for c in sent if c.startswith('AT+SFUN')], [])
+            self.assertEqual((state / 'nr').read_text(), '78')
+            self.assertIn('the modem refused AT+SPLBAND=2,0,0,16,0: ERROR', (run / 'lock.log').read_text())
+
+    def test_bands_the_modem_does_not_support_are_refused_not_written_as_automatic(self):
+        """None of the bands supported: the filter left nothing, which was written as automatic (AT+SPLBAND=2,0,0,0,0)
+        and saved. Now refused with nothing sent; a partly supported list locks the supported ones and logs the rest."""
+        lock, state, run, at = self.reset_setup()
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '999')
+            self.assertEqual(r.returncode, 1, r.stderr)
+            self.assertEqual(json.loads(r.stdout), {'ok': 0, 'error': 'None of these bands is supported by this modem',
+                                                    'detail': '999'})
+            self.assertEqual(self.writes(sent), [])
+            self.assertEqual([c for c in sent if c.startswith('AT+SFUN')], [])
+            self.assertEqual((state / 'nr').read_text(), '78')
+            self.assertIn('apply nr refused: the modem supports none of the bands 999', (run / 'lock.log').read_text())
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'lte', '7')
+            self.assertEqual(r.returncode, 1, r.stderr)
+            self.assertEqual(self.writes(sent), [])
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '41,999')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('AT+SPLBAND=2,0,0,16,0', sent)
+            self.assertEqual((state / 'nr').read_text(), '41')
+            self.assertIn('left out of 41,999 (locking 41)', (run / 'lock.log').read_text())
+
+    def test_an_accepted_band_write_is_saved_and_restarts_the_stack(self):
+        lock, state, run, at = self.reset_setup()
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '41')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('AT+SPLBAND=2,0,0,16,0', sent)
+            self.assertEqual([c for c in sent if c.startswith('AT+SFUN')][:2], ['AT+SFUN=5', 'AT+SFUN=4'])
+            self.assertEqual((state / 'nr').read_text(), '41')
+
+    def test_a_refused_mode_or_cell_write_ends_the_apply(self):
+        """The mode, EN-DC and cell writes are checked like the band ones (kanoqwq's lock-apply write_setting): an
+        explicit ERROR ends the apply with nothing saved and no stack restart, so a lock job can say so."""
+        lock, state, run, at = self.reset_setup('cp "$STUBLOG/want-refuse" "$STUBLOG/modem/refuse" 2>/dev/null')
+        for refuse, args, key, old in (('AT+SPTESTMODE=', ('mode', 'sa'), 'mode', '4g'),
+                                       ('AT+SPFORCEFRQ=16,6', ('cell', 'nr:627264,393'), 'cell', 'lte:1650,211\n')):
+            (self.tmp / 'want-refuse').write_text(refuse)
+            for shell in self.each_shell():
+                with self.subTest(kind=key):
+                    r, sent = self.reset_run(shell, lock, state, run, at, 'apply', *args)
+                    self.assertEqual(r.returncode, 1, r.stderr)
+                    self.assertEqual(json.loads(r.stdout)['error'], 'The modem refused a write')
+                    self.assertEqual([c for c in sent if c.startswith('AT+SFUN')], [])
+                    self.assertEqual((state / key).read_text(), old)
+
+    def job_env(self, run):
+        return dict(MU300_AT=self.tmp / 'at', MU300_MOBILE_DATA=self.tmp / 'mobile-data', MU300_DASH_DIR=run,
+                    UNISOC_APPLY_DIR=self.tmp / 'apply', MU300_SIM_RUN=self.tmp / 'sim-run')
+
+    def test_a_lock_job_says_how_its_apply_ended(self):
+        """kanoqwq's job queue: start answers at once with an id (the worker is detached: setsid is a stub here, the
+        test runs the worker itself), status reads the result without AT."""
+        lock, state, run, at = self.reset_setup('[ -f "$STUBLOG/refuse-nr" ] && printf "AT+SPLBAND=2," > "$STUBLOG/modem/refuse"')
+        for shell in self.each_shell():
+            for refused in (True, False):
+                with self.subTest(refused=refused):
+                    marker = self.tmp / 'refuse-nr'
+                    if refused:
+                        marker.write_text('')
+                    else:
+                        marker.unlink(missing_ok=True)
+                    r, _ = self.reset_run(shell, lock, state, run, at, 'start', 'nr', '41')
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                    started = json.loads(r.stdout)
+                    self.assertEqual((started['ok'], started['kind']), (1, 'nr'))
+                    jid = started['id']
+                    self.assertRegex(jid, r'^[A-Za-z0-9]{10}$')
+                    st = json.loads(self.script(shell, lock, 'status', jid, **self.job_env(run)).stdout)
+                    self.assertEqual((st['state'], st['ok']), ('queued', 0))
+                    (self.tmp / 'at.commands').unlink(missing_ok=True)
+                    w = self.script(shell, lock, 'job', jid, 'nr', '41', **self.job_env(run))
+                    self.assertEqual(w.returncode, 0, w.stderr)
+                    st = json.loads(self.script(shell, lock, 'status', jid, **self.job_env(run)).stdout)
+                    sfun = [c for c in self.sent() if c.startswith('AT+SFUN')]
+                    if refused:
+                        self.assertEqual((st['state'], st['ok'], st['error']), ('error', 0, 'The modem refused a write'))
+                        self.assertEqual(sfun, [])
+                        self.assertEqual((state / 'nr').read_text(), '78')
+                    else:
+                        self.assertEqual((st['state'], st['ok'], st['error']), ('done', 1, None))
+                        self.assertEqual(sfun[:2], ['AT+SFUN=5', 'AT+SFUN=4'])
+                        self.assertEqual((state / 'nr').read_text(), '41')
+            # what the page may ask that is no job: refused without a look at the file system beyond the name
+            for bad in ('nosuchjob1', '../../etc', 'short', ''):
+                st = json.loads(self.script(shell, lock, 'status', bad, **self.job_env(run)).stdout)
+                self.assertEqual((st['state'], st['error']), ('error', 'The result of this lock change is no longer known'))
+            r = self.script(shell, lock, 'start', 'nr', '4x1', **self.job_env(run))
+            self.assertEqual(json.loads(r.stdout), {'ok': 0, 'error': 'Invalid value for this lock kind'})
+
+    def test_a_lock_job_whose_worker_is_gone_is_interrupted_and_the_queue_is_bounded(self):
+        lock, state, run, at = self.reset_setup()
+        for shell in self.each_shell():
+            r, _ = self.reset_run(shell, lock, state, run, at, 'start', 'mode', 'sa')
+            jid = json.loads(r.stdout)['id']
+            job = run / 'lock-jobs' / jid
+            # started a minute ago, its worker gone (a pid that is not the lock tool's)
+            up = int(float(Path('/proc/uptime').read_text().split()[0]))
+            (job / 'started').write_text(f'{max(up - 60, 0)}\n')
+            (job / 'pid').write_text('1\n')
+            st = json.loads(self.script(shell, lock, 'status', jid, **self.job_env(run)).stdout)
+            self.assertEqual(st['state'], 'error')
+            self.assertIn('interrupted', st['error'])
+            # an old one past the limit: timed out, whatever its worker does
+            (job / 'result').write_text('{"state":"running"}\n')
+            # (more than ten minutes ago, also on a machine up for less than that, as a fresh CI runner is: the
+            # uptime clock then gives a start before the boot)
+            (job / 'started').write_text(f'{up - 700}\n')
+            st = json.loads(self.script(shell, lock, 'status', jid, MU300_JOB_TIMEOUT='5', **self.job_env(run)).stdout)
+            self.assertIn('took too long', st['error'])
+            # four that have not ended: the fifth is refused, nothing started
+            for _ in range(4):
+                self.assertEqual(json.loads(self.script(shell, lock, 'start', 'endc', 'on', **self.job_env(run)).stdout)['ok'], 1)
+            r = self.script(shell, lock, 'start', 'endc', 'on', **self.job_env(run))
+            self.assertEqual(json.loads(r.stdout)['busy'], 1)
+            # (the timed-out one ended more than ten minutes after its start: a start removes it)
+            self.assertEqual(len(list((run / 'lock-jobs').glob('??????????'))), 4)
+            self.assertFalse(job.exists())
+
+    def test_sim2_and_the_dual_sim_manager_refuse_with_a_log_line(self):
+        """#356: these refusals were only on the stderr of a detached process; the log says them now, and the boot
+        replay says why it skipped."""
+        lock, state, run, at = self.reset_setup()
+        sim = self.tmp / 'sim-run'
+        for marker, line in (('sim-managed', 'apply nr refused: the dual-SIM manager runs the radio'),
+                             ('sim-slot', 'apply nr refused: SIM2 lock writes')):
+            shutil.rmtree(sim, ignore_errors=True)
+            sim.mkdir()
+            (sim / marker).write_text('1\n')
+            for shell in self.each_shell():
+                with self.subTest(marker=marker):
+                    r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'nr', '41')
+                    self.assertEqual(r.returncode, 1)
+                    self.assertEqual(sent, [])
+                    self.assertEqual((state / 'nr').read_text(), '78')
+                    self.assertIn(line, (run / 'lock.log').read_text())
+            marker_file = self.tmp / 'replayed'
+            marker_file.unlink(missing_ok=True)
+            for shell in self.each_shell():
+                r = self.script(shell, lock, 'replay', MU300_AT=at, MU300_DASH_DIR=run, MU300_SIM_RUN=sim,
+                                UNISOC_APPLY_DIR=self.tmp / 'apply', UNISOC_REPLAY_MARKER=marker_file)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertIn('replay skipped', (run / 'lock.log').read_text())
 
     def test_reset_sends_the_automatic_values_with_one_restart_and_clears_the_saved_state(self):
         """#96: mode and band locks live in the modem's NV and stay in force in Android. reset puts every lock back
@@ -394,6 +565,173 @@ printf 'OK\n'
             self.assertEqual(json.loads(r.stdout)['state'], 'ok')
             got = self.script(shell, lock, 'get', 'cached', MU300_DASH_DIR=run)
             self.assertEqual(json.loads(got.stdout)['reset']['state'], 'ok')
+
+    def test_reset_rewrites_the_cached_locks_to_automatic_before_it_says_ok(self):
+        """The page paints the cache the moment the reset's result is new; the background re-read comes later (and is
+        stubbed off here). The cache held the pre-reset reading, so the page kept showing "1 locked: B3" after a
+        verified reset until a reload (U30 Air, v2026.10.27.2): the reset rewrites the cache's lock fields to the
+        automatic state its read-back verified, with a new ts, before the result says ok."""
+        lock, state, run, at = self.reset_setup()
+        before = ('{"ts":1,"mode":{"label":"4g","work":"3","gran":"0","m1":"134","prim":"0"},"endc":"2",'
+                  '"lte":{"locked":"3","raw":"0,0,0,4,0"},"nr":{"locked":"78","raw":"0,0,256"},'
+                  '"cell":"lte:1650,211","cells":["lte:1650,211","nr:627264,393"],'
+                  '"caps":{"nr":"1,5,6,8,28,41,78","lte":"1,3,5,8,34,38,39,40,41"}}\n')
+        for shell in self.each_shell():
+            r, _ = self.reset_run(shell, lock, state, run, at, cache=before)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            res = self.reset_result(run)
+            self.assertEqual(res['state'], 'ok')
+            got = json.loads(self.script(shell, lock, 'get', 'cached', MU300_DASH_DIR=run).stdout)
+            self.assertEqual(got['mode'], {'label': 'auto', 'work': '134', 'gran': '1', 'm1': '134', 'prim': '0'})
+            self.assertEqual(got['endc'], '1')
+            self.assertEqual(got['lte'], {'locked': '', 'raw': '0,482,0,149,0'})
+            self.assertEqual(got['nr'], {'locked': '', 'raw': '553,0,272'})
+            self.assertEqual((got['cell'], got['cells']), ('', []))
+            self.assertEqual(got['caps'], {'nr': '1,5,6,8,28,41,78', 'lte': '1,3,5,8,34,38,39,40,41'})
+            # a reading from after the reset started: the page waits for one before it paints an ok reset
+            self.assertGreaterEqual(got['ts'], res['ts'])
+            self.assertEqual(got['reset']['state'], 'ok')
+
+    def test_reset_on_the_u30_air_takes_its_modems_full_lte_table_as_automatic(self):
+        """The U30 Air's modem reads a cleared LTE mask back as its own table (0,2018,2057,2271,2: bands 1,2,3,4,5,
+        7,8,12,17,20,28,34,38-43,66), more than the F50's table here: an exact match failed every reset there
+        ("lte read back as '0,2018,2057,2271,2'", seen on the U30 Air on 6.18.58)."""
+        lock, state, run, at = self.reset_setup(': > "$STUBLOG/modem/u30air"')
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout + (run / 'lock.log').read_text())
+            self.assertEqual(self.reset_result(run)['state'], 'ok')
+            self.assertEqual(sorted(p.name for p in state.iterdir()), ['auto_apply'])
+
+    U30_TABLE = '1,2,3,4,5,7,8,12,17,20,28,34,38,39,40,41,42,43,66'
+
+    def lock_get(self, shell, lock, run, at):
+        r = self.script(shell, lock, 'get', 'fresh', MU300_AT=at, MU300_DASH_DIR=run)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads((run / 'lock.json').read_text())
+
+    def fresh_modem(self, run, raw=None):
+        """The fake modem with nothing written yet, the LTE mask RAW in it (None: cleared)."""
+        m = self.tmp / 'modem'
+        shutil.rmtree(m, ignore_errors=True)
+        m.mkdir()
+        (m / 'lte').touch()
+        if raw is not None:
+            (m / 'lte-raw').write_text(raw + '\n')
+        shutil.rmtree(run, ignore_errors=True)
+        run.mkdir(mode=0o700)
+
+    def test_the_u30_air_offers_its_own_lte_table_and_automatic_reads_as_nothing_locked(self):
+        """The LTE candidates were the F50's table on every board, so B2/B4/B7/B12/B17/B20/B28/B42/B43/B66 could not
+        be locked on the U30 Air; and a cleared mask (the modem's whole table) was reported as all 19 bands locked.
+        Now the board's table is the candidate list, and a read-back that holds all of it is nothing locked."""
+        lock, state, run, at = self.reset_setup(device='u30air')
+        for shell in self.each_shell():
+            self.fresh_modem(run)
+            (self.tmp / 'modem' / 'u30air').touch()
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['caps']['lte'], self.U30_TABLE)
+            self.assertEqual(data['lte']['raw'], '0,2018,2057,2271,2')
+            self.assertEqual(data['lte']['locked'], '')
+            self.assertFalse(state.exists() and any(p.name.startswith('lte') for p in state.iterdir()),
+                             'a read writes nothing to the state directory')
+
+    def test_the_u30_air_w25135_table_is_its_cleared_read_back(self):
+        """W25.13.5's cleared mask is 0,450,0,149,0 (B1 B3 B5 B8 B34 B39 B40 B41); B38 is not carried, so a write
+        of 0,482,... reads back without it. The table is selected from AT+CGMR, not learned from a read-back: the
+        cleared read-back is automatic on that firmware, and a lock on any subset still shows as that lock."""
+        lock, state, run, at = self.reset_setup(device='u30air')
+        for shell in self.each_shell():
+            self.fresh_modem(run)
+            (self.tmp / 'modem' / 'w25135').touch()
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['caps']['lte'], '1,3,5,8,34,39,40,41')
+            self.assertEqual(data['lte']['raw'], '0,450,0,149,0')
+            self.assertEqual(data['lte']['locked'], '')
+            # a real lock on this firmware still shows
+            self.fresh_modem(run, '0,0,0,1,0')
+            (self.tmp / 'modem' / 'w25135').touch()
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['lte']['locked'], '1')
+
+    def test_reset_with_the_w25135_table_succeeds(self):
+        """The reset's read-back test accepts 0,450,0,149,0 as automatic on W25.13.5 (the 8-band table), while the
+        same read-back remains a lock on W25.30.2's 19-band table."""
+        lock, state, run, at = self.reset_setup(device='u30air', knobs=': > "$STUBLOG/modem/w25135"')
+        saved = [(k, v) for k, v in self.SAVED if k != 'lte']
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'reset', saved=saved)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout + (run / 'lock.log').read_text())
+            self.assertEqual(self.reset_result(run)['state'], 'ok')
+            self.assertEqual(sorted(p.name for p in state.iterdir()), ['auto_apply'])
+
+    def test_a_lock_the_panel_did_not_save_still_shows_as_that_lock(self):
+        """#387's review: with no saved lock, the read-back 0,450,0,149,0 (a lock on the F50's list less B38, sent by
+        hand) must show as that lock on the U30 Air, not as automatic, and must not become the table."""
+        lock, state, run, at = self.reset_setup(device='u30air')
+        for shell in self.each_shell():
+            self.fresh_modem(run, '0,450,0,149,0')
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(sorted(map(int, data['lte']['locked'].split(','))), [1, 3, 5, 8, 34, 39, 40, 41])
+            self.assertEqual(data['caps']['lte'], self.U30_TABLE)
+            # a lock on every band of the F50's table is a lock on the U30 Air, not automatic
+            self.fresh_modem(run, '0,482,0,149,0')
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(sorted(map(int, data['lte']['locked'].split(','))), [1, 3, 5, 8, 34, 38, 39, 40, 41])
+
+    def test_the_f50_keeps_its_table_and_its_cleared_mask_reads_as_automatic(self):
+        lock, state, run, at = self.reset_setup()
+        for shell in self.each_shell():
+            self.fresh_modem(run)
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['caps']['lte'], '1,3,5,8,34,38,39,40,41')
+            self.assertEqual(data['lte']['raw'], '0,482,0,149,0')
+            self.assertEqual(data['lte']['locked'], '')
+            self.fresh_modem(run, '0,0,0,4,0')
+            self.assertEqual(self.lock_get(shell, lock, run, at)['lte']['locked'], '3')
+
+    def test_u30_air_bands_lock_and_replay_verify(self):
+        """B20 and B7 lock on the U30 Air (masks 0,0,8,64,0), are saved, and the boot replay's read-back accepts
+        them; the same bands stay refused on the F50."""
+        lock, state, run, at = self.reset_setup(device='u30air')
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'lte', '20,7')
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout + (run / 'lock.log').read_text())
+            self.assertIn('AT+SPLBAND=1,0,0,8,64,0', sent)
+            self.assertEqual((state / 'lte').read_text(), '20,7')
+            self.assertEqual([c for c in sent if c.startswith('AT+SFUN')][:2], ['AT+SFUN=5', 'AT+SFUN=4'])
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(sorted(map(int, data['lte']['locked'].split(','))), [7, 20])
+            # the replay's read-back: only the saved fields are read
+            for k in ('mode', 'endc', 'nr', 'cell'):
+                (state / k).unlink(missing_ok=True)
+            r = self.script(shell, lock, 'verify', MU300_AT=at, MU300_DASH_DIR=run)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            # a modem that lost the lock fails the check
+            (self.tmp / 'modem' / 'lte-raw').write_text('0,0,0,4,0\n')
+            r = self.script(shell, lock, 'verify', MU300_AT=at, MU300_DASH_DIR=run)
+            self.assertEqual(r.returncode, 1)
+        self.stub('mu300-device', 'echo f50')
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'apply', 'lte', '20,7')
+            self.assertEqual(r.returncode, 1)
+            self.assertEqual(self.writes(sent), [])
+
+    def test_replay_verify_of_automatic_needs_the_whole_table(self):
+        """A saved automatic is verified: the read-back must hold every band of the board's table (or be empty), so
+        a lock left in the modem fails the check on either board."""
+        lock, state, run, at = self.reset_setup()
+        for device, full in (('u30air', '0,2018,2057,2271,2'), ('f50', '0,482,0,149,0')):
+            self.stub('mu300-device', f'echo {device}')
+            for shell in self.each_shell():
+                with self.subTest(device=device):
+                    shutil.rmtree(state, ignore_errors=True)
+                    state.mkdir(parents=True)
+                    (state / 'lte').write_text('')
+                    for raw, rc in ((full, 0), ('0,0,0,0,0', 0), ('0,450,0,149,0', 1), ('0,0,8,64,0', 1)):
+                        self.fresh_modem(run, raw)
+                        r = self.script(shell, lock, 'verify', MU300_AT=at, MU300_DASH_DIR=run)
+                        self.assertEqual(r.returncode, rc, (device, raw, r.stderr))
 
     def test_a_refused_write_keeps_the_saved_locks_and_restarts_nothing(self):
         lock, state, run, at = self.reset_setup('printf "AT+SPLBAND=2," > "$STUBLOG/modem/refuse"')

@@ -52,6 +52,9 @@ msgstr "Langues"
 msgid "Power"
 msgstr "Alimentation"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Le mode hôte coupe le réseau USB et la liaison série sur ce port. Le 
 msgid "USB network mode"
 msgstr "Mode réseau USB"
 
+msgid "Current sharing protocol"
+msgstr "Protocole de partage actuel"
+
 msgid "Network protocol"
 msgstr "Protocole réseau"
 
@@ -658,6 +664,27 @@ msgstr "Actualiser"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Disponible uniquement en mode hôte. « Actualiser » active les adaptateurs USB détectés ; l'ajout au LAN enregistre le pont et recharge le réseau."
 
+msgid "Network performance"
+msgstr "Performances réseau"
+
+msgid "Active congestion control"
+msgstr "Contrôle de congestion actif"
+
+msgid "Default queue"
+msgstr "File d'attente par défaut"
+
+msgid "TCP congestion control"
+msgstr "Contrôle de congestion TCP"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Concerne surtout les nouvelles connexions TCP de cet appareil. Les connexions relayées des clients du point d'accès et USB n'utilisent pas BBR automatiquement."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR choisit FQ comme file par défaut des nouvelles interfaces. Les connexions, interfaces et QoS existantes sont conservées. Le réglage persiste après redémarrage."
+
 msgid "Recent modem operations"
 msgstr "Opérations récentes du modem"
 
@@ -670,6 +697,12 @@ msgstr "Les appels récents du panneau de contrôle, de ce démarrage et du pré
 msgid "Unavailable"
 msgstr "Indisponible"
 
+msgid "Mixed"
+msgstr "Mixte"
+
+msgid "None"
+msgstr "Aucune"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Le mode réseau USB est indisponible en mode hôte ; le démarrage automatique en mode hôte désactive aussi le démarrage automatique du réseau USB."
 
@@ -681,9 +714,6 @@ msgstr "Le réseau USB et la liaison série seront ré-énumérés en mode péri
 
 msgid "Switch USB role?"
 msgstr "Changer le rôle USB ?"
-
-msgid "Apply"
-msgstr "Appliquer"
 
 msgid "Switching USB role…"
 msgstr "Changement du rôle USB…"
@@ -721,6 +751,21 @@ msgstr "Paramètres enregistrés"
 msgid "Save failed: %s"
 msgstr "Échec de l'enregistrement : %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Impossible de lire les réglages de performances réseau ; actualisez pour réessayer"
+
+msgid "This kernel does not provide this setting"
+msgstr "Ce noyau ne propose pas ce réglage"
+
+msgid "System default"
+msgstr "Valeur par défaut du système"
+
+msgid "Applied and saved for future boots."
+msgstr "Appliqué et enregistré pour les prochains démarrages."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Le noyau n'a pas accepté les réglages réseau"
+
 msgid "This boot"
 msgstr "Ce démarrage"
 
@@ -739,6 +784,9 @@ msgstr "Recherche des adaptateurs USB…"
 msgid "No USB adapters found."
 msgstr "Aucun adaptateur USB trouvé."
 
+msgid "In use by another network"
+msgstr "Utilisé par un autre réseau"
+
 msgid "Link connected"
 msgstr "Lien connecté"
 
@@ -747,6 +795,9 @@ msgstr "Pas de lien ; activation tentée"
 
 msgid "Added to LAN"
 msgstr "Ajouté au LAN"
+
+msgid "Cannot add"
+msgstr "Ajout impossible"
 
 msgid "Add to LAN"
 msgstr "Ajouter au LAN"
@@ -784,6 +835,9 @@ msgstr "Formulaire (encodé URL)"
 msgid "Plain text"
 msgstr "Texte brut"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Aussi {sim} (SIM 1 ou SIM 2) et {kind} (sms, test ou power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Les messages reçus sont transférés dès qu'ils arrivent dans le pool SMS. Un envoi échoué est réessayé après 30 s, puis après un délai deux fois plus long à chaque fois (une heure au plus), dix fois en tout."
 
@@ -811,6 +865,15 @@ msgstr "Seulement les messages contenant l'un de ces mots"
 msgid "One per line; empty: every message."
 msgstr "Un par ligne ; vide : tous les messages."
 
+msgid "Battery"
+msgstr "Batterie"
+
+msgid "Battery and charger notices"
+msgstr "Avis de batterie et de chargeur"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Un message à chaque cible quand la batterie passe 5, 20, 40, 60, 80 ou 100 % et quand le chargeur est branché ou débranché."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Corps personnalisé"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Vide : les champs standard (texte brut : le message). Variables : {sender}, {time}, {text}, {device}, {message}. Chaque valeur est échappée selon le type choisi. Ce corps est réaffiché ici : mettez les secrets dans l'adresse ou dans un en-tête."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Secret pour {secret} dans le corps personnalisé"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pour un service qui veut son jeton dans le corps (PushPlus). Enregistré pour cette adresse seulement : une nouvelle adresse en a de nouveau besoin."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "En-têtes supplémentaires (un \"Nom: valeur\" par ligne)"
 
@@ -840,6 +909,9 @@ msgstr "La réponse doit contenir"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Vide : toute réponse HTTP 2xx compte comme un envoi réussi. Avec clé=valeur (par exemple errcode=0), la réponse doit en plus être un objet JSON qui porte cette valeur sous cette clé à son premier niveau ; sinon l’envoi échoue. Seul le résultat de la vérification est journalisé, jamais la réponse."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Délai de la requête (secondes, 1-120 ; webhook et Telegram)"
 
 msgid "Bot token"
 msgstr "Jeton du bot"
@@ -861,9 +933,6 @@ msgstr "Port"
 
 msgid "Security"
 msgstr "Sécurité"
-
-msgid "None"
-msgstr "Aucune"
 
 msgid "User name"
 msgstr "Nom d'utilisateur"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux verrouillé"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Oui : le prochain redémarrage lance Android"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Writable"
+msgstr "Modifiable"
+
+msgid "This boot image cannot change the boot"
+msgstr "Cette image de démarrage ne peut pas changer le démarrage"
+
 msgid "%s of %s"
 msgstr "%s sur %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Mémoire"
 
 msgid "Storage"
 msgstr "Stockage"
-
-msgid "Battery"
-msgstr "Batterie"
 
 msgid "Channel"
 msgstr "Canal"
@@ -1105,14 +1186,23 @@ msgstr "Point d'accès Wi-Fi"
 msgid "Restart modem"
 msgstr "Redémarrer le modem"
 
-msgid "Restart device"
-msgstr "Redémarrer l'appareil"
+msgid "Power off or restart"
+msgstr "Éteindre ou redémarrer"
 
 msgid "Switch to Android"
 msgstr "Basculer vers Android"
 
 msgid "Lock Linux"
 msgstr "Verrouiller Linux"
+
+msgid "Default boot"
+msgstr "Démarrage par défaut"
+
+msgid "One-time boot"
+msgstr "Démarrage unique"
+
+msgid "Boot control"
+msgstr "Contrôle du démarrage"
 
 msgid "Neighbor cells"
 msgstr "Cellules voisines"
@@ -1125,6 +1215,9 @@ msgstr "Fréquence"
 
 msgid "Running %s…"
 msgstr "Exécution de %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Réglages du point d'accès enregistrés ; application en cours"
 
 msgid "Started in background: %s"
 msgstr "Lancé en arrière-plan : %s"
@@ -1165,11 +1258,14 @@ msgstr "Les données mobiles sont aussi utilisées sur les réseaux en itinéran
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "La connectivité cellulaire peut s'interrompre pendant 1 à 2 minutes."
 
-msgid "Restart the entire device"
-msgstr "Redémarrer l'appareil entier"
-
 msgid "All connections will be interrupted."
 msgstr "Toutes les connexions seront interrompues."
+
+msgid "Power off"
+msgstr "Éteindre"
+
+msgid "Restart"
+msgstr "Redémarrer"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Le prochain démarrage se fera sous Android et l'appareil redémarre maintenant. Cette page de gestion et le partage cellulaire seront déconnectés."
@@ -1243,6 +1339,9 @@ msgstr "SIM interne sélectionnée : utilisée après un redémarrage"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM interne sélectionnée, mais non prise en charge sur cet appareil : la SIM externe est utilisée"
 
+msgid "in use"
+msgstr "utilisée"
+
 msgid "Uptime %s"
 msgstr "Disponibilité %s"
 
@@ -1309,9 +1408,6 @@ msgstr "Liaison LTE"
 msgid "Hidden"
 msgstr "Masqué"
 
-msgid "No"
-msgstr "Non"
-
 msgid "Running"
 msgstr "En cours d'exécution"
 
@@ -1371,9 +1467,6 @@ msgstr "En ligne"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptateur AT indisponible"
-
-msgid "Linux locked"
-msgstr "Linux verrouillé"
 
 msgid "Installing the language pack…"
 msgstr "Installation du pack de langues…"
@@ -1453,6 +1546,51 @@ msgstr "Traduit"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Les traductions propres à LuCI proviennent d'OpenWrt. Les traductions de ce panneau, hors turc et chinois, sont des traductions automatiques (IA) ; les corrections sont les bienvenues."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Saisissez un nombre entier de 0 à %d"
+
+msgid "Network lamp"
+msgstr "Voyant réseau"
+
+msgid "Wi-Fi lamp"
+msgstr "Voyant Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Voyant batterie"
+
+msgid "On"
+msgstr "Activé"
+
+msgid "Brightness (%)"
+msgstr "Luminosité (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Un voyant éteint reste sombre ; l'alarme de chaleur s'affiche quand même sur sa LED."
+
+msgid "Device default"
+msgstr "Valeur par défaut de l'appareil"
+
+msgid "LED timeout (seconds)"
+msgstr "Délai des LED (secondes)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Durée pendant laquelle les LED restent allumées après un appui sur une touche ou un changement ; 0 les laisse allumées. Sur un chargeur, elles restent allumées."
+
+msgid "Boot indicator"
+msgstr "Indicateur de démarrage"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "La LED affiche ses couleurs à tour de rôle pendant le démarrage du système"
+
+msgid "Heat alarm"
+msgstr "Alarme de chaleur"
+
+msgid "Siren"
+msgstr "Sirène"
+
+msgid "Red blink"
+msgstr "Clignotement rouge"
+
 msgid "Automatic"
 msgstr "Automatique"
 
@@ -1494,6 +1632,21 @@ msgstr "Verrouiller la cellule de service actuelle"
 
 msgid "Unlock cell"
 msgstr "Déverrouiller la cellule"
+
+msgid "Enter a cell"
+msgstr "Saisir une cellule"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Numéro de canal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Verrouiller cette cellule"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Un numéro de canal, pas une fréquence en MHz ; la cellule n’a pas besoin de figurer dans la liste des voisines."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "L'application redémarre la pile radio (SFUN) et interrompt brièvement le service cellulaire. Les réglages sont enregistrés et réappliqués par le plugin une fois AT prêt lorsque « Appliquer au démarrage » est activé. Un hook de plateforme exécuté avant la radio peut les réappliquer sans redémarrage. Appliquer sans aucune bande sélectionnée rétablit le mode automatique."
@@ -1582,17 +1735,20 @@ msgstr "Verrouillage de %s en arrière-plan…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s verrouillée en arrière-plan (redémarrage SFUN, environ 30 secondes) ; relecture de l'état…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Saisissez un numéro de canal et un PCI dans les plages ci-dessous"
+
 msgid "No serving-network data"
 msgstr "Aucune donnée de réseau de service"
 
 msgid "NR serving cell"
 msgstr "Cellule de service NR"
 
-msgid "Status confirmed"
-msgstr "État confirmé"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Délai de relecture dépassé ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "Status confirmed"
+msgstr "État confirmé"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Réinitialisation vérifiée : mode réseau automatique, EN-DC activé, toutes les bandes, aucun verrouillage de cellule ; les réglages de verrouillage enregistrés sont effacés"
@@ -1732,9 +1888,6 @@ msgstr "réveillé par la touche %s"
 msgid "the modem is suspended (%s)"
 msgstr "le modem est suspendu (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Saisissez un nombre entier de 0 à %d"
-
 msgid "Power status unavailable"
 msgstr "État de l'alimentation indisponible"
 
@@ -1792,6 +1945,12 @@ msgstr "Charge suspendue : température de la batterie"
 msgid "Charging paused: charge limit"
 msgstr "Charge suspendue : limite de charge"
 
+msgid "Charging paused: by hand"
+msgstr "Charge en pause : manuellement"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Charge complète une fois, puis retour à la limite"
+
 msgid "Sleep now"
 msgstr "Mettre en veille"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % ne charge jamais la batterie (l'appareil fonctionne sur le chargeur)
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % préservent mieux la batterie d'un appareil qui reste branché."
 
+msgid "Start charging again under"
+msgstr "Reprendre la charge sous"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 reprend 5 points sous le niveau d’arrêt. Une valeur plus basse ne reprend la charge que sous elle ; avec 100 %, une batterie pleine attend de passer dessous."
+
+msgid "Resume charging"
+msgstr "Reprendre la charge"
+
+msgid "Pause charging"
+msgstr "Mettre la charge en pause"
+
+msgid "Cancel the full charge"
+msgstr "Annuler la charge complète"
+
+msgid "Charge to full once"
+msgstr "Charger complètement une fois"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "En pause, la batterie n’est pas chargée et l’appareil fonctionne sur le chargeur ; sous 5 % elle charge quand même, et la protection thermique s’applique toujours."
+
 msgid "When the charger switches the device on"
 msgstr "Quand le chargeur allume l'appareil"
 
@@ -1830,9 +2010,6 @@ msgstr "Laisser tel quel"
 
 msgid "LTE only (5G off)"
 msgstr "LTE seul (5G désactivée)"
-
-msgid "On"
-msgstr "Activé"
 
 msgid "Full"
 msgstr "Complet"
@@ -2057,9 +2234,6 @@ msgstr "Valeur du modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "utilisée"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Éteindre la radio de la SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Supprimé (local uniquement)"
 msgid "Enter both a number and a message."
 msgstr "Saisissez un numéro et un message."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Mémoire SIM : %d emplacements sur %d utilisés (à %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d messages, %d non lus · %d conversations"
 
@@ -2234,8 +2411,26 @@ msgstr "Plafond mensuel"
 msgid "%s, warning at %d%%"
 msgstr "%s, alerte à %d%%"
 
+msgid "Daily quota"
+msgstr "Quota journalier"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Le plafond mensuel est atteint : les données mobiles ont été coupées. Elles reviennent au début de la prochaine période."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Le quota journalier est atteint : les données mobiles ont été coupées. Elles reviennent à minuit."
+
+msgid "The daily quota is reached"
+msgstr "Le quota journalier est atteint"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% du quota journalier est utilisé"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Le plafond et le quota journalier ne comptent que les téléchargements."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Le plafond et le quota journalier ne comptent que les envois."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s attend l'horloge : elle n'a pas encore été réglée par le réseau. Cela compte déjà dans cette période et ira à son jour une fois l'horloge réglée."
@@ -2267,6 +2462,9 @@ msgstr "Par période de facturation"
 msgid "Billing cycle"
 msgstr "Période de facturation"
 
+msgid "Counted"
+msgstr "Compté"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Saisissez une taille en Go, par exemple 50 ou 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Couper les données mobiles au plafond"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Quand cette période atteint le plafond, les données mobiles sont coupées : pas d'internet via l'opérateur jusqu'au début de la prochaine période, au relèvement du plafond ou à la désactivation de cette option. Les données mobiles réactivées à la main restent actives jusqu'au prochain redémarrage."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Couper les données mobiles au quota journalier"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Quand la consommation du jour atteint le quota journalier, les données mobiles sont coupées jusqu'à minuit, jusqu'à ce que le quota soit relevé ou que ceci soit désactivé. Les rallumer à la main les garde actives jusqu'au prochain redémarrage."
+
+msgid "Both ways"
+msgstr "Dans les deux sens"
+
+msgid "Downloads only"
+msgstr "Téléchargements seulement"
+
+msgid "Uploads only"
+msgstr "Envois seulement"
 
 msgid "Set"
 msgstr "Définir"
@@ -2302,6 +2515,15 @@ msgstr "Plafond mensuel (Go, 0 : aucun)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Alerte à ce pourcentage du plafond"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Quota journalier (Go, 0 : aucun)"
+
+msgid "The cap and the daily quota count"
+msgstr "Ce que comptent le plafond et le quota journalier"
+
+msgid "Plan name"
+msgstr "Nom du forfait"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Déjà utilisé dans cette période (Go)"
@@ -2399,9 +2621,6 @@ msgstr "L'appareil redémarre maintenant. Le démarrage par défaut est Android,
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "L'appareil redémarre maintenant et s'absente environ une minute. Si le nouveau système ne démarre pas, l'appareil revient de lui-même à Android après les tentatives échouées."
 
-msgid "Restart"
-msgstr "Redémarrer"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Redémarrage… rouvrez cette page dans environ une minute."
 
@@ -2468,9 +2687,6 @@ msgstr "Image de démarrage"
 msgid "from the installer"
 msgstr "depuis l'installateur"
 
-msgid "Default boot"
-msgstr "Démarrage par défaut"
-
 msgid "Free space"
 msgstr "Espace libre"
 
@@ -2527,6 +2743,9 @@ msgstr "Notes de version"
 
 msgid "Download"
 msgstr "Téléchargement"
+
+msgid "only what changed since the installed release"
+msgstr "seulement ce qui a changé depuis la version installée"
 
 msgid "Free space needed"
 msgstr "Espace libre nécessaire"
@@ -3056,9 +3275,6 @@ msgstr "Détecter"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "L'URL peut contenir un jeton : elle va à l'appareil séparément, jamais dans une ligne de commande ni dans un journal."
 
-msgid "Type"
-msgstr "Type"
-
 msgid "Share link"
 msgstr "Lien de partage"
 
@@ -3388,6 +3604,21 @@ msgstr "Type de verrouillage inconnu"
 msgid "Invalid value for this lock kind"
 msgstr "Valeur invalide pour ce type de verrouillage"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Les verrous de bande, de mode et de cellule ne sont pas encore pris en charge pour la SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Les verrous de bande, de mode et de cellule ne sont pas pris en charge tant que la bascule double SIM gère la radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Ce modem ne prend en charge aucune de ces bandes"
+
+msgid "Lock change failed"
+msgstr "Échec de la modification du verrouillage"
+
+msgid "Invalid job id"
+msgstr "Identifiant de tâche non valide"
+
 msgid "Invalid page"
 msgstr "Page invalide"
 
@@ -3478,14 +3709,29 @@ msgstr "L'adaptateur TTL n'a pas donné de réponse valide"
 msgid "Invalid TTL"
 msgstr "TTL invalide"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "L'adaptateur TCP n'a pas donné de réponse valide"
+
+msgid "Invalid congestion control"
+msgstr "Contrôle de congestion non valide"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "L'adaptateur de démarrage n'a pas donné de réponse valide"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "L'adaptateur LED n'a pas donné de réponse valide"
+
+msgid "Unknown LED setting"
+msgstr "Réglage de LED inconnu"
+
+msgid "Invalid value for this setting"
+msgstr "Valeur invalide pour ce réglage"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "L'adaptateur de consommation de données n'a pas donné de réponse valide"
 
 msgid "Unknown data usage setting"
 msgstr "Réglage de consommation de données inconnu"
-
-msgid "Invalid value for this setting"
-msgstr "Valeur invalide pour ce réglage"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "L'adaptateur de transfert n'a pas donné de réponse valide"
@@ -3731,8 +3977,29 @@ msgstr "La radio n'a pas suivi son réglage"
 msgid "The data roaming setting could not be saved"
 msgstr "Le réglage de l'itinérance des données n'a pas pu être enregistré"
 
-msgid "Expected on or off"
-msgstr "Valeur attendue : on ou off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Le réglage du point d'accès est enregistré, mais le rechargement du sans-fil a échoué"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Les réglages sans fil ont des modifications non enregistrées : enregistrez-les ou annulez-les d'abord"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Le point d'accès est déjà en cours de basculement ; réessayez sous peu"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Aucun point d'accès n'est configuré"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Activer cette radio affecterait une autre interface ; utilisez la page Sans fil"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "La radio est utilisée par le client Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Impossible d'écrire le réglage du point d'accès"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Cette plateforme ne fournit pas le contrôle du point d'accès"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "L'intégration VPN n'est pas fournie par cette plateforme"
@@ -3833,6 +4100,15 @@ msgstr "Ce n'est pas une interface réseau USB"
 msgid "LAN bridge device section was not found"
 msgstr "Section du périphérique du pont LAN introuvable"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Impossible de déterminer à qui appartient l'adaptateur ; réessayez plus tard"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "L'adaptateur appartient à un autre réseau et ne peut pas rejoindre le LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Les réglages réseau ont des modifications non enregistrées : enregistrez-les ou annulez-les d'abord"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Impossible d'activer l'interface réseau USB"
 
@@ -3865,6 +4141,12 @@ msgstr "Le corps du webhook est trop long ou contient un caractère de contrôle
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "La vérification de la réponse doit être de la forme clé=valeur, comme errcode=0 ou ok=true (la valeur : un nombre entier ou des lettres minuscules, 16 au plus)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Secret du webhook non valide (jusqu'à 256 caractères imprimables, sans espace)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Le délai doit être de 1 à 120 secondes"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "En-tête invalide (un \"Nom: valeur\" par ligne ; Host, Content-Type, Content-Length, Transfer-Encoding et Connection sont définis par l'appareil)"
@@ -3926,8 +4208,17 @@ msgstr "Une installation est déjà en cours"
 msgid "The language pack could not be removed"
 msgstr "Impossible de supprimer le pack de langues"
 
+msgid "The LED settings could not be read"
+msgstr "Les réglages des LED n'ont pas pu être lus"
+
+msgid "The LED setting could not be saved"
+msgstr "Le réglage de LED n'a pas pu être enregistré"
+
 msgid "Lock cache unavailable"
 msgstr "Cache des verrouillages indisponible"
+
+msgid "The modem refused a write"
+msgstr "Le modem a refusé une écriture"
 
 msgid "The saved locks could not be cleared"
 msgstr "Les verrouillages enregistrés n'ont pas pu être effacés"
@@ -3938,9 +4229,6 @@ msgstr "Aucune cellule de service à verrouiller"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Le modem n'a pas répondu à la requête de mode ; rien n'a été envoyé"
 
-msgid "The modem refused a write"
-msgstr "Le modem a refusé une écriture"
-
 msgid "The read-back does not match the automatic values"
 msgstr "La relecture ne correspond pas aux valeurs automatiques"
 
@@ -3949,6 +4237,21 @@ msgstr "La relecture après le redémarrage de la pile ne correspond pas aux val
 
 msgid "The reset was interrupted"
 msgstr "La réinitialisation a été interrompue"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Le résultat de cette modification du verrouillage n'est plus connu"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "La modification du verrouillage a pris trop de temps ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "La modification du verrouillage a été interrompue ; sélectionnez « Actualiser l'état des verrouillages »"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Une autre modification du verrouillage est en cours de lancement ; réessayez dans un instant"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Trop de modifications du verrouillage en attente ; réessayez lorsqu'elles seront terminées"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "La réinstallation des paquets n'est pas disponible sur ce système"
@@ -3967,6 +4270,12 @@ msgstr "Opération sur les paquets inconnue"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Cette plateforme ne fournit pas le contrôle de congestion TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Impossible de lire les réglages TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "La consommation de données n'est pas disponible sur ce système"

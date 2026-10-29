@@ -1,11 +1,11 @@
 # Mainline (LTS) kernel on the MU300
 
-Mainline **Linux 6.18.57** (the current longterm series) runs Ubuntu 24.04 and OpenWrt 25.12 on the ZTE F50 /
+Mainline **Linux 6.18.59** (the current longterm series) runs Ubuntu 24.04 and OpenWrt 25.12 on the ZTE F50 /
 MU300 (Unisoc UMS9620): all 8 CPUs (4×A55, 4×A76), eMMC, USB NCM + ACM, the 5 GHz hotspot, Bluetooth, the modem
 with mobile data (downlink and uplink), SMS, the VPN, the Mali GPU, thermal/cpufreq, the PMIC watchdog and
 reboot. `docs/FINDINGS.md` 31-31f has what it took and what is still open.
 
-On a device: `sudo mu300-update kernel 6.18` (or `7.2`, the newest stable release), and `sudo mu300-update kernel
+On a device: `sudo mu300-update kernel 6.18` (or `7.2`, the stable release, or `7.3`, the newest mainline release), and `sudo mu300-update kernel
 5.4` back; the installer offers all three. Every kernel's modules stay installed.
 
 Reference: Unisoc's UMS9620 DT series (LKML, 2023-12-15, "arm64: dts: sprd: Add support for Unisoc's UMS9620", not
@@ -27,7 +27,7 @@ merged) describes the same GIC/UART/timer layout; this device is derived from th
 ## Build and test
 ```sh
 docker build -t mu300-mainline-build upstream/
-docker volume create mu300-mainline   # build.sh fetches linux-$KV (default 6.18.57) into it, signatures checked (keys/)
+docker volume create mu300-mainline   # build.sh fetches linux-$KV (default 6.18.59) into it, signatures checked (keys/)
 docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build.sh
 docker run --rm -v mu300-mainline:/src -v "$PWD/upstream":/work mu300-mainline-build bash /work/build-modules.sh
 upstream/make-bundle.sh mu300-kernel-6.18.tar.gz        # Image for LK, generic ramdisk segment, modules
@@ -48,6 +48,18 @@ node of the vendor device tree (`dt-compatibles.txt`) by itself. `MU300_ALL_MODU
 On the devices `mu300-modprobe-guard` (the kernel's module helper from boot on; FINDINGS 163) keeps the modules of
 `/opt/mu300/lib/autoload-blocked` (rare protocols, filesystems, line disciplines) from being loaded on demand;
 root loads them with `modprobe NAME`.
+
+**Parity with 5.4 (FINDINGS 234).** Nothing the vendor 5.4 kernel has may be missing from mainline without saying so.
+`parity-5.4.txt` names, for every 5.4 module, built-in object and run-time item (bound driver, thermal zone, devfreq,
+power supply, Type-C port, regulator, LED, ...) that mainline does not have under the same name, what stands for it
+(`ok` with the module or config symbol), or that it is `missing` (with its porting group and boards) or `na` (with
+the reason). `check-parity.py` enforces it: `build-modules.sh` and `make-bundle.sh` fail when an equivalent the file
+names, or a same-named 5.4 module, is not in the mainline build; `kernel/build-all.sh` records the 5.4 build in
+`parity/5.4-build.list` and fails on a 5.4 module or built-in the file does not cover; the Tests workflow
+(`tests/test_parity.py`) checks the file against those records, `parity/mainline.list` (what each mainline series
+has, `check-parity.py --mainline OUT --record`) and the boards' inventories (`parity/BOARD-KERNEL.inv`, from
+`parity-inventory.sh` run on a board). A change to the 5.4 build's inputs needs a new 5.4 record; a new 5.4 item
+needs a line.
 In the fragment, what the board and the boot need is built in, along with
 KVM (`/dev/kvm`; the CPUs start at EL2); what only matters once used - netfilter extras, tunnels, IPsec, tc,
 filesystems, USB modems/adapters/Wi-Fi sticks, device mapper - is a module. `build-modules.sh` installs the
@@ -73,8 +85,8 @@ boot/flash-trial.sh boot-mainline.img      # slot b only, falls back to Android
 
 ## Newer kernels (7.x)
 
-The whole port - kernel and all its out-of-tree modules - also builds against **7.2.11**, the newest stable release
-(2026-10-15), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
+The whole port - kernel and all its out-of-tree modules - also builds against **7.2.13**, the newest stable release
+(2026-10-26), from the same sources as 6.18, and runs on the device: four boots out of four (2026-09-27) with the
 Wi-Fi access point, mobile data (18.7 MB/s), Bluetooth, the Mali GPU, cpufreq and the modem's AT channel working,
 and no warning or oops in the log. (7.2 is a stable, not a longterm release: 6.18 stays the base, 7.x is how the
 next jump is kept small.) One source serves both:
@@ -85,12 +97,20 @@ next jump is kept small.) One source serves both:
   `strncpy`, alarmtimer, `linux/hex.h`) and `linux/of_gpio.h`, a shim kbuild only finds when the kernel has no
   such header. API changes that need more than a shim are under `LINUX_VERSION_CODE` (the cfg80211 ops taking a
   `wireless_dev`, `dma_fence_signal()` returning nothing).
-* `.github/workflows/mainline.yml` builds the port every week against the current longterm and the newest stable
-  release, so the next break shows up as a red run rather than at the next jump.
+* `.github/workflows/mainline.yml` builds the port every week against the current longterm, the newest stable and
+  the newest mainline release (and the newest of each series the releases ship), so the next break shows up as a red
+  run rather than at the next jump.
 
 Releases carry it as `mu300-kernel-7.2.tar.gz`: `sudo mu300-update kernel 7.2` on the device, or choice 3 in the
-installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.11` for `build.sh` and `build-modules.sh`, and
-`MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs both.
+installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.13` for `build.sh` and `build-modules.sh`, and
+`MU300_UPSTREAM_OUT=upstream/out-7.2` for `make-bundle.sh`; `tools/make-release.sh` packs them all.
+
+**7.3** (mainline, 2026-10-18) is the fourth kernel, from the release after v2026.10.19.2 on: `mu300-kernel-7.3.tar.gz`,
+`sudo mu300-update kernel 7.3`, choice 4 in the installer; `OUTDIR=out-7.3 KV=7.3` (its kernel release is `7.3.0`).
+Every patch applies unchanged; what 7.3 changed is in FINDINGS 206: `PROC_SYSCTL` folded into `SYSCTL`
+(`config-ignored.txt`), the cfg80211 cookie of remain-on-channel and management frames handed to the driver by
+value, `dma_capable()` taking DMA attributes, and the IIO consumer API in a symbol namespace (used by the audio
+extra).
 
 ## Remaining mainline work (as of 2026-09-26)
 
@@ -102,10 +122,6 @@ installer. It is built next to 6.18: `OUTDIR=out-7.2 KV=7.2.11` for `build.sh` a
   Ubuntu boot that died early before the crash capture existed (31d) is unexplained, and has not recurred in the
   reboot loops since (Ubuntu 6/6, OpenWrt 4/4).
 - Power-off works through the PMIC (FINDINGS 31h); on a powered USB port the battery-less F50 starts again.
-- Audio: call audio is ported (FINDINGS 188): the Unisoc AGDSP stack of 5.4 for 6.18 and 7.2. Since FINDINGS 194 it
-  is the audio extra's ([mu300-audio](https://github.com/dikeckaan/mu300-audio), `mu300-extra install audio`): its
-  drivers are built there against each kernel's build kit; what stays here is the DSP's memory reservation
-  (`patches/0022`) and the ASoC/ALSA core options of `mu300-mainline.config`.
 
 ## Earlier status notes
 Clocks, pinctrl, power domains, USB 3.1 gadget, eMMC, PCIe, thermal, cpufreq, watchdog, LEDs and Wi-Fi/BT are
@@ -116,7 +132,6 @@ working (see the status below). What is still missing:
 - **PM co-processor**: without Android's `modem_control` the board powers off after ~290 s, so the vendor chroot is
   still required.
 - ~~**GPU**~~: works since 2026-09-19 (DDK r40p0 ported to 6.18, OpenCL verified on the device).
-- **Audio**: ported 2026-10-17 (FINDINGS 188).
 - **Bluetooth**: built as an out-of-tree module, untested on 6.18.
 
 ## Modem on 6.18: working (2026-09-19)
@@ -196,7 +211,7 @@ Still open: audio is untouched.
 
 ## Status (2026-09-17): OpenWrt runs on 6.18.52
 
-The installed OpenWrt 25.12.5 boots on the mainline kernel through the normal `boot/init`
+The installed OpenWrt 25.12.6 boots on the mainline kernel through the normal `boot/init`
 (multi-OS switch_root): SSH, LuCI, `br-lan` over the USB 3.1 gadget, fw4/nftables, zram.
 
 Fixes needed on top of the port:
@@ -216,7 +231,9 @@ Fixes needed on top of the port:
 - Thermal: vendor `sprd_thermal_r5p0` (19 on-die zones) with calibration from the UMS9620 eFuse; the eFuse
   provider is built read-only.
 - cpufreq: vendor `sprd_sip_svc` + `sprd-cpufreq-v2`; ATF does the DVFS, the kernel asks through SIP SMC calls
-  (3 policies: 4 little / 3 mid / 1 big, schedutil). PSCI cpuidle (WFI, core sleep, cluster power-down).
+  (3 policies: 4 little / 3 mid / 1 big, schedutil). PSCI cpuidle (WFI, core sleep, cluster power-down);
+  `modules/ums9620_lpintc` makes the interrupts the kernel enabled wake sources of the cluster power-down, which TF-A
+  left at its own list without USB, IPA and PCIe (docs/FINDINGS.md 218).
   Idle temperature dropped from ~54 C to ~48 C.
 - The stock DT has trip points only on the vendor virtual zone (`soc-thmzone`: passive 70/85 C, critical 110 C,
   cooling maps to the three clusters), whose sensor driver mainline lacks: `modules/mu300_thermal` brings it back

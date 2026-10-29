@@ -23,10 +23,10 @@ NAME=${1:?usage: tools/make-extra.sh NAME OUT.tar.gz [TAG]}
 OUT=${2:?usage: tools/make-extra.sh NAME OUT.tar.gz [TAG]}
 TAG=${3:-dev}
 TOP=$(cd "$(dirname "$0")/.." && pwd)
-tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/mu300-extra.XXXXXX"); trap 'rm -rf "$tmp"' EXIT
 case $NAME in
     lang)
-        IMG=mu300-openwrt-base:${MU300_WRT_VER:-25.12.5}
+        IMG=mu300-openwrt-base:${MU300_WRT_VER:-25.12.6}
         docker image inspect "$IMG" >/dev/null 2>&1 || {
             echo "$IMG missing: openwrt/build-rootfs.sh imports it (build an OpenWrt image first)" >&2; exit 1; }
         mkdir -p "$tmp/x/i18n" "$tmp/feed"

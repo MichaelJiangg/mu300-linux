@@ -27,7 +27,7 @@ case $TAG in v[0-9]*) ;; *) tag_ok= ;; esac
 case $TAG in *[!0-9A-Za-z._-]*|*..*) tag_ok= ;; esac
 [ -n "$tag_ok" ] || { echo "the tag '$TAG' is not one the installer accepts: v[0-9] and then letters, digits, . _ - (no ..)" >&2; exit 1; }
 sha() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | cut -d' ' -f1; }
-for f in mu300-kernel.tar.gz mu300-kernel-6.18.tar.gz mu300-kernel-7.2.tar.gz mu300-openwrt-rootfs.tar.gz \
+for f in mu300-kernel.tar.gz mu300-kernel-6.18.tar.gz mu300-kernel-7.2.tar.gz mu300-kernel-7.3.tar.gz mu300-openwrt-rootfs.tar.gz \
          mu300-openwrt-luci-rootfs.tar.gz mu300-ubuntu-rootfs.tar.gz mu300-ubuntu-26.04-rootfs.tar.gz; do
     want=$(awk -v f="$f" '$2 == f || $2 == "*" f {print $1}' "$R/SHA256SUMS")
     [ -n "$want" ] && [ -f "$R/$f" ] && [ "$(sha "$R/$f")" = "$want" ] ||
@@ -44,7 +44,7 @@ case $code in
     1*) code=${code#1}; code=${code%00} ;;
     *) code=$(printf '%s' "$TAG" | tr -cd 0-9 | cut -c1-9); [ -n "$code" ] || code=1 ;;
 esac
-W=$(mktemp -d); trap 'rm -rf "$W"' EXIT
+W=$(mktemp -d "${TMPDIR:-/tmp}/mu300-magisk.XXXXXX"); trap 'rm -rf "$W"' EXIT
 tar -xzOf "$R/mu300-kernel.tar.gz" ./busybox > "$W/busybox"
 [ -s "$W/busybox" ] || { echo "mu300-kernel.tar.gz has no busybox" >&2; exit 1; }
 # the installer's password checker (tools/pwcheck, FINDINGS 126), in the bundles of the releases that have it: without
@@ -127,7 +127,7 @@ for s in openwrt:mu300-openwrt-rootfs.tar.gz:openwrt: \
          ubuntu-24.04:mu300-ubuntu-rootfs.tar.gz:ubuntu:24.04 \
          ubuntu-26.04:mu300-ubuntu-26.04-rootfs.tar.gz:ubuntu:26.04; do
     name=${s%%:*}; rest=${s#*:}; rootfs=${rest%%:*}; rest=${rest#*:}; os=${rest%%:*}; ubuntu=${rest#*:}
-    for k in 5.4:mu300-kernel.tar.gz 6.18:mu300-kernel-6.18.tar.gz 7.2:mu300-kernel-7.2.tar.gz; do
+    for k in 5.4:mu300-kernel.tar.gz 6.18:mu300-kernel-6.18.tar.gz 7.2:mu300-kernel-7.2.tar.gz 7.3:mu300-kernel-7.3.tar.gz; do
         kv=${k%%:*}; kasset=${k#*:}
         # Ubuntu 26.04's programs need system calls 5.4 does not have (install.sh refuses the pair too)
         [ "$ubuntu" = 26.04 ] && [ "$kv" = 5.4 ] && continue

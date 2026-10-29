@@ -52,6 +52,9 @@ msgstr "Языки"
 msgid "Power"
 msgstr "Питание"
 
+msgid "LEDs"
+msgstr "Индикаторы"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Режим хоста отключает USB-сеть и последо�
 msgid "USB network mode"
 msgstr "Режим USB-сети"
 
+msgid "Current sharing protocol"
+msgstr "Текущий протокол раздачи"
+
 msgid "Network protocol"
 msgstr "Сетевой протокол"
 
@@ -658,6 +664,27 @@ msgstr "Обновить"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Доступно только в режиме хоста. «Обновить» поднимает найденные USB-адаптеры; добавление в LAN сохраняет мост и перезагружает сеть."
 
+msgid "Network performance"
+msgstr "Производительность сети"
+
+msgid "Active congestion control"
+msgstr "Текущее управление перегрузкой"
+
+msgid "Default queue"
+msgstr "Очередь по умолчанию"
+
+msgid "TCP congestion control"
+msgstr "Управление перегрузкой TCP"
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Влияет в основном на новые TCP-соединения самого устройства. Пересылаемые соединения клиентов точки доступа и USB не переходят на BBR автоматически."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR выбирает FQ очередью по умолчанию для новых интерфейсов. Существующие соединения, интерфейсы и QoS сохраняются. Настройка сохраняется после перезагрузки."
+
 msgid "Recent modem operations"
 msgstr "Последние операции модема"
 
@@ -670,6 +697,12 @@ msgstr "Последние вызовы панели управления в э�
 msgid "Unavailable"
 msgstr "Недоступно"
 
+msgid "Mixed"
+msgstr "Смешанный"
+
+msgid "None"
+msgstr "Нет"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Режим USB-сети недоступен в режиме хоста; автозапуск режима хоста также отключает автозапуск USB-сети."
 
@@ -681,9 +714,6 @@ msgstr "USB-сеть и последовательный порт будут з�
 
 msgid "Switch USB role?"
 msgstr "Сменить роль USB?"
-
-msgid "Apply"
-msgstr "Применить"
 
 msgid "Switching USB role…"
 msgstr "Смена роли USB…"
@@ -721,6 +751,21 @@ msgstr "Настройки сохранены"
 msgid "Save failed: %s"
 msgstr "Ошибка сохранения: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Не удалось прочитать настройки производительности сети; обновите, чтобы повторить"
+
+msgid "This kernel does not provide this setting"
+msgstr "Это ядро не поддерживает эту настройку"
+
+msgid "System default"
+msgstr "Системное по умолчанию"
+
+msgid "Applied and saved for future boots."
+msgstr "Применено и сохранено для следующих загрузок."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ядро не приняло сетевые настройки"
+
 msgid "This boot"
 msgstr "Эта загрузка"
 
@@ -739,6 +784,9 @@ msgstr "Поиск USB-адаптеров…"
 msgid "No USB adapters found."
 msgstr "USB-адаптеры не найдены."
 
+msgid "In use by another network"
+msgstr "Используется другой сетью"
+
 msgid "Link connected"
 msgstr "Канал подключён"
 
@@ -747,6 +795,9 @@ msgstr "Нет канала; выполнена попытка включени�
 
 msgid "Added to LAN"
 msgstr "Добавлено в LAN"
+
+msgid "Cannot add"
+msgstr "Нельзя добавить"
 
 msgid "Add to LAN"
 msgstr "Добавить в LAN"
@@ -784,6 +835,9 @@ msgstr "Форма (URL-кодирование)"
 msgid "Plain text"
 msgstr "Простой текст"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Также {sim} (SIM 1 или SIM 2) и {kind} (sms, test или power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Полученные сообщения пересылаются, как только попадают в пул SMS. Неудачная отправка повторяется через 30 с, затем каждый раз через вдвое больший интервал (не более часа), всего десять раз."
 
@@ -811,6 +865,15 @@ msgstr "Только сообщения, содержащие одно из эт
 msgid "One per line; empty: every message."
 msgstr "По одному в строке; пусто: все сообщения."
 
+msgid "Battery"
+msgstr "Батарея"
+
+msgid "Battery and charger notices"
+msgstr "Уведомления о батарее и зарядке"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Сообщение каждому получателю, когда заряд проходит 5, 20, 40, 60, 80 или 100 % и когда зарядка подключается или отключается."
+
 msgid "Webhook"
 msgstr "Вебхук"
 
@@ -832,6 +895,12 @@ msgstr "Своё тело запроса"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Пусто: стандартные поля (простой текст: сообщение). Подстановки: {sender}, {time}, {text}, {device}, {message}. Каждое значение экранируется под выбранный тип. Это тело снова показывается здесь: секреты держите в адресе или в заголовке."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Секрет для {secret} в своём теле запроса"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Для сервиса, которому нужен токен в теле запроса (PushPlus). Хранится только для этого адреса: для нового адреса его нужно ввести снова."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Дополнительные заголовки (по одному \"Имя: значение\" в строке)"
 
@@ -840,6 +909,9 @@ msgstr "Ответ должен содержать"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Пусто: любой ответ HTTP 2xx считается доставкой. Если задано ключ=значение (например, errcode=0), ответ должен также быть объектом JSON, у которого на верхнем уровне под этим ключом стоит это значение; иначе доставка считается неудачной. В журнал попадает только результат проверки, сам ответ — никогда."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Тайм-аут запроса (секунды, 1-120; webhook и Telegram)"
 
 msgid "Bot token"
 msgstr "Токен бота"
@@ -861,9 +933,6 @@ msgstr "Порт"
 
 msgid "Security"
 msgstr "Защита"
-
-msgid "None"
-msgstr "Нет"
 
 msgid "User name"
 msgstr "Имя пользователя"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux закреплён"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Да: следующая перезагрузка запустит Android"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "Writable"
+msgstr "Доступно для записи"
+
+msgid "This boot image cannot change the boot"
+msgstr "Этот загрузочный образ не может менять загрузку"
+
 msgid "%s of %s"
 msgstr "%s из %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Память"
 
 msgid "Storage"
 msgstr "Хранилище"
-
-msgid "Battery"
-msgstr "Батарея"
 
 msgid "Channel"
 msgstr "Канал"
@@ -1105,14 +1186,23 @@ msgstr "Точка доступа Wi-Fi"
 msgid "Restart modem"
 msgstr "Перезапустить модем"
 
-msgid "Restart device"
-msgstr "Перезагрузить устройство"
+msgid "Power off or restart"
+msgstr "Выключить или перезагрузить"
 
 msgid "Switch to Android"
 msgstr "Переключиться на Android"
 
 msgid "Lock Linux"
 msgstr "Закрепить Linux"
+
+msgid "Default boot"
+msgstr "Загрузка по умолчанию"
+
+msgid "One-time boot"
+msgstr "Однократная загрузка"
+
+msgid "Boot control"
+msgstr "Управление загрузкой"
 
 msgid "Neighbor cells"
 msgstr "Соседние соты"
@@ -1125,6 +1215,9 @@ msgstr "Частота"
 
 msgid "Running %s…"
 msgstr "Выполняется %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Настройки точки доступа сохранены; изменения применяются"
 
 msgid "Started in background: %s"
 msgstr "Запущено в фоне: %s"
@@ -1165,11 +1258,14 @@ msgstr "Мобильные данные используются и в роум�
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Сотовая связь может прерваться на 1–2 минуты."
 
-msgid "Restart the entire device"
-msgstr "Перезагрузить всё устройство"
-
 msgid "All connections will be interrupted."
 msgstr "Все соединения будут прерваны."
+
+msgid "Power off"
+msgstr "Выключить"
+
+msgid "Restart"
+msgstr "Перезапустить"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Следующая загрузка будет в Android, перезагрузка произойдёт сейчас. Эта страница управления и раздача сотовой связи отключатся."
@@ -1243,6 +1339,9 @@ msgstr "Выбрана встроенная SIM: будет использова
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Выбрана встроенная SIM, но на этом устройстве она не поддерживается: используется внешняя SIM"
 
+msgid "in use"
+msgstr "используется"
+
 msgid "Uptime %s"
 msgstr "Время работы %s"
 
@@ -1309,9 +1408,6 @@ msgstr "Канал LTE"
 msgid "Hidden"
 msgstr "Скрыт"
 
-msgid "No"
-msgstr "Нет"
-
 msgid "Running"
 msgstr "Работает"
 
@@ -1371,9 +1467,6 @@ msgstr "В сети"
 
 msgid "AT adapter unavailable"
 msgstr "AT-адаптер недоступен"
-
-msgid "Linux locked"
-msgstr "Linux закреплён"
 
 msgid "Installing the language pack…"
 msgstr "Установка языкового пакета…"
@@ -1453,6 +1546,51 @@ msgstr "Переведено"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Собственные переводы LuCI взяты из OpenWrt. Переводы этой панели, кроме турецкого и китайского, машинные (ИИ); исправления приветствуются."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Введите целое число от 0 до %d"
+
+msgid "Network lamp"
+msgstr "Индикатор сети"
+
+msgid "Wi-Fi lamp"
+msgstr "Индикатор Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Индикатор батареи"
+
+msgid "On"
+msgstr "Вкл."
+
+msgid "Brightness (%)"
+msgstr "Яркость (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Выключенный индикатор остаётся тёмным; тепловая тревога всё равно отображается на своём светодиоде."
+
+msgid "Device default"
+msgstr "По умолчанию для устройства"
+
+msgid "LED timeout (seconds)"
+msgstr "Тайм-аут индикаторов (секунды)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Сколько индикаторы горят после нажатия кнопки или изменения; 0 — горят всегда. На зарядке они горят."
+
+msgid "Boot indicator"
+msgstr "Индикация загрузки"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Светодиод поочерёдно показывает свои цвета, пока система загружается"
+
+msgid "Heat alarm"
+msgstr "Тепловая тревога"
+
+msgid "Siren"
+msgstr "Сирена"
+
+msgid "Red blink"
+msgstr "Мигание красным"
+
 msgid "Automatic"
 msgstr "Автоматически"
 
@@ -1494,6 +1632,21 @@ msgstr "Зафиксировать текущую обслуживающую с�
 
 msgid "Unlock cell"
 msgstr "Снять фиксацию соты"
+
+msgid "Enter a cell"
+msgstr "Ввести соту"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Номер канала (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Заблокировать эту соту"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Номер канала, а не частота в МГц; сота не обязана быть в списке соседних."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Применение перезапускает радиостек (SFUN) и ненадолго прерывает сотовую связь. Настройки сохраняются и, если включено «Применять при запуске», повторно применяются плагином после готовности AT. Предрадиохук платформы может применить их без перезапуска. Чтобы вернуть автоматический режим, примените без выбранных диапазонов."
@@ -1582,17 +1735,20 @@ msgstr "Фиксация %s в фоне…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s зафиксировано в фоне (перезапуск SFUN, около 30 секунд); считывание состояния…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Введите номер канала и PCI в диапазонах ниже"
+
 msgid "No serving-network data"
 msgstr "Нет данных об обслуживающей сети"
 
 msgid "NR serving cell"
 msgstr "Обслуживающая сота NR"
 
-msgid "Status confirmed"
-msgstr "Состояние подтверждено"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Истекло время считывания; нажмите «Обновить состояние фиксации»"
+
+msgid "Status confirmed"
+msgstr "Состояние подтверждено"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Сброс подтверждён: режим сети автоматический, EN-DC включён, все диапазоны, без блокировки соты; сохранённые настройки блокировок удалены"
@@ -1732,9 +1888,6 @@ msgstr "пробуждение кнопкой %s"
 msgid "the modem is suspended (%s)"
 msgstr "модем приостановлен (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Введите целое число от 0 до %d"
-
 msgid "Power status unavailable"
 msgstr "Состояние питания недоступно"
 
@@ -1792,6 +1945,12 @@ msgstr "Зарядка приостановлена: температура ба
 msgid "Charging paused: charge limit"
 msgstr "Зарядка приостановлена: предел заряда"
 
+msgid "Charging paused: by hand"
+msgstr "Зарядка приостановлена: вручную"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Однократная зарядка до полной, затем возврат к пределу"
+
 msgid "Sleep now"
 msgstr "Усыпить сейчас"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % никогда не заряжает батарею (устройс�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % берегут батарею устройства, которое постоянно включено в сеть."
 
+msgid "Start charging again under"
+msgstr "Возобновлять зарядку ниже"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 возобновляет на 5 пунктов ниже уровня остановки. Меньшее значение возобновляет зарядку только ниже него; при 100 % полная батарея ждёт, пока не опустится ниже."
+
+msgid "Resume charging"
+msgstr "Возобновить зарядку"
+
+msgid "Pause charging"
+msgstr "Приостановить зарядку"
+
+msgid "Cancel the full charge"
+msgstr "Отменить полную зарядку"
+
+msgid "Charge to full once"
+msgstr "Зарядить до полной один раз"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "На паузе батарея не заряжается, а устройство работает от зарядного; ниже 5 % она всё равно заряжается, а температурная защита действует всегда."
+
 msgid "When the charger switches the device on"
 msgstr "Когда зарядное устройство включает устройство"
 
@@ -1830,9 +2010,6 @@ msgstr "Не менять"
 
 msgid "LTE only (5G off)"
 msgstr "Только LTE (5G выключен)"
-
-msgid "On"
-msgstr "Вкл."
 
 msgid "Full"
 msgstr "Полная"
@@ -2057,9 +2234,6 @@ msgstr "По умолчанию модема"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "используется"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Выключить радио SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Удалено (только локально)"
 msgid "Enter both a number and a message."
 msgstr "Введите номер и сообщение."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Память SIM: занято %d из %d ячеек (на %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· сообщений: %d, непрочитанных: %d · диалогов: %d"
 
@@ -2234,8 +2411,26 @@ msgstr "Месячный лимит"
 msgid "%s, warning at %d%%"
 msgstr "%s, предупреждение при %d%%"
 
+msgid "Daily quota"
+msgstr "Дневная квота"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Месячный лимит исчерпан: мобильные данные отключены. Они включатся снова с началом следующего периода."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Дневная квота исчерпана: мобильные данные отключены. Они включатся в полночь."
+
+msgid "The daily quota is reached"
+msgstr "Дневная квота исчерпана"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Использовано %d%% дневной квоты"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Лимит и дневная квота учитывают только загрузку."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Лимит и дневная квота учитывают только отдачу."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s ждёт часов: время ещё не установлено по сети. Этот трафик уже учтён в текущем периоде и попадёт в свой день, когда часы будут установлены."
@@ -2267,6 +2462,9 @@ msgstr "По расчётным периодам"
 msgid "Billing cycle"
 msgstr "Расчётный период"
 
+msgid "Counted"
+msgstr "Учтено"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Введите размер в ГБ, например 50 или 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Отключать мобильные данные при достиже
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Когда в этом периоде будет достигнут лимит, мобильные данные отключатся: интернета через оператора не будет, пока не начнётся следующий период, не будет увеличен лимит или не будет выключена эта настройка. Если включить мобильные данные вручную, они останутся включёнными до следующей перезагрузки."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Отключать мобильные данные при дневной квоте"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Когда сегодняшний трафик достигает дневной квоты, мобильные данные отключаются до полуночи, пока квоту не увеличат или пока это не отключат. Если включить мобильные данные вручную, они останутся включёнными до следующей перезагрузки."
+
+msgid "Both ways"
+msgstr "В обе стороны"
+
+msgid "Downloads only"
+msgstr "Только загрузка"
+
+msgid "Uploads only"
+msgstr "Только отдача"
 
 msgid "Set"
 msgstr "Задать"
@@ -2302,6 +2515,15 @@ msgstr "Месячный лимит (ГБ, 0: нет)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Предупреждать при этом проценте лимита"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Дневная квота (ГБ, 0: нет)"
+
+msgid "The cap and the daily quota count"
+msgstr "Что учитывают лимит и дневная квота"
+
+msgid "Plan name"
+msgstr "Название тарифа"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Уже использовано в этом периоде (ГБ)"
@@ -2399,9 +2621,6 @@ msgstr "Устройство сейчас перезагрузится. По у�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Устройство сейчас перезагрузится и будет недоступно около минуты. Если новая система не запустится, после неудачных попыток устройство само вернётся в Android."
 
-msgid "Restart"
-msgstr "Перезапустить"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Перезагрузка… откройте эту страницу снова примерно через минуту."
 
@@ -2468,9 +2687,6 @@ msgstr "Загрузочный образ"
 msgid "from the installer"
 msgstr "от установщика"
 
-msgid "Default boot"
-msgstr "Загрузка по умолчанию"
-
 msgid "Free space"
 msgstr "Свободное место"
 
@@ -2527,6 +2743,9 @@ msgstr "Примечания к релизу"
 
 msgid "Download"
 msgstr "Скачивание"
+
+msgid "only what changed since the installed release"
+msgstr "только то, что изменилось с установленного выпуска"
 
 msgid "Free space needed"
 msgstr "Нужно свободного места"
@@ -3056,9 +3275,6 @@ msgstr "Определить"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL может содержать токен: он передаётся на устройство отдельно и никогда не попадает в командную строку или журнал."
 
-msgid "Type"
-msgstr "Тип"
-
 msgid "Share link"
 msgstr "Ссылка для обмена"
 
@@ -3388,6 +3604,21 @@ msgstr "Неизвестный тип фиксации"
 msgid "Invalid value for this lock kind"
 msgstr "Недопустимое значение для этого типа фиксации"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Блокировка диапазонов, режима и соты пока не поддерживается для SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Блокировка диапазонов, режима и соты не поддерживается, пока переключение двух SIM управляет радиомодулем"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Этот модем не поддерживает ни один из этих диапазонов"
+
+msgid "Lock change failed"
+msgstr "Не удалось изменить фиксацию"
+
+msgid "Invalid job id"
+msgstr "Неверный идентификатор задания"
+
 msgid "Invalid page"
 msgstr "Недопустимая страница"
 
@@ -3478,14 +3709,29 @@ msgstr "Адаптер TTL не дал корректного ответа"
 msgid "Invalid TTL"
 msgstr "Недопустимый TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Адаптер TCP не дал корректного ответа"
+
+msgid "Invalid congestion control"
+msgstr "Недопустимое управление перегрузкой"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Адаптер загрузки не дал корректного ответа"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Адаптер LED не дал корректного ответа"
+
+msgid "Unknown LED setting"
+msgstr "Неизвестная настройка индикаторов"
+
+msgid "Invalid value for this setting"
+msgstr "Недопустимое значение для этой настройки"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Адаптер расхода трафика не дал корректного ответа"
 
 msgid "Unknown data usage setting"
 msgstr "Неизвестная настройка расхода трафика"
-
-msgid "Invalid value for this setting"
-msgstr "Недопустимое значение для этой настройки"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Адаптер пересылки не дал корректного ответа"
@@ -3731,8 +3977,29 @@ msgstr "Радио не последовало своей настройке"
 msgid "The data roaming setting could not be saved"
 msgstr "Не удалось сохранить настройку роуминга данных"
 
-msgid "Expected on or off"
-msgstr "Ожидается on или off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Настройка точки доступа сохранена, но перезагрузка беспроводной сети не удалась"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "В настройках беспроводной сети есть несохранённые изменения: сначала сохраните или отмените их"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Точка доступа уже переключается; повторите чуть позже"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Точка доступа не настроена"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Включение этого радио затронет другой интерфейс; используйте страницу «Беспроводная сеть»"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Радио занято Wi-Fi-клиентом"
+
+msgid "The hotspot setting could not be written"
+msgstr "Не удалось записать настройку точки доступа"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Эта платформа не поддерживает управление точкой доступа"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Интеграция VPN не предоставляется этой платформой"
@@ -3833,6 +4100,15 @@ msgstr "Не является сетевым интерфейсом USB"
 msgid "LAN bridge device section was not found"
 msgstr "Секция устройства моста LAN не найдена"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Не удалось определить, какой сети принадлежит адаптер; повторите позже"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Адаптер принадлежит другой сети и не может войти в LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "В сетевых настройках есть несохранённые изменения: сначала сохраните или отмените их"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Не удаётся поднять сетевой интерфейс USB"
 
@@ -3865,6 +4141,12 @@ msgstr "Тело webhook слишком длинное или содержит �
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Проверка ответа должна иметь вид ключ=значение, например errcode=0 или ok=true (значение — целое число или строчные буквы, не более 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Неверный секрет webhook (до 256 печатных символов, без пробелов)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Тайм-аут должен быть от 1 до 120 секунд"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Неверный заголовок (по одному \"Имя: значение\" в строке; Host, Content-Type, Content-Length, Transfer-Encoding и Connection задаёт устройство)"
@@ -3926,8 +4208,17 @@ msgstr "Установка уже выполняется"
 msgid "The language pack could not be removed"
 msgstr "Не удалось удалить языковой пакет"
 
+msgid "The LED settings could not be read"
+msgstr "Не удалось прочитать настройки индикаторов"
+
+msgid "The LED setting could not be saved"
+msgstr "Не удалось сохранить настройку индикаторов"
+
 msgid "Lock cache unavailable"
 msgstr "Кэш фиксации недоступен"
+
+msgid "The modem refused a write"
+msgstr "Модем отклонил запись"
 
 msgid "The saved locks could not be cleared"
 msgstr "Не удалось удалить сохранённые блокировки"
@@ -3938,9 +4229,6 @@ msgstr "Нет обслуживающей соты для фиксации"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модем не ответил на запрос режима; ничего не отправлено"
 
-msgid "The modem refused a write"
-msgstr "Модем отклонил запись"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Обратное чтение не совпадает с автоматическими значениями"
 
@@ -3949,6 +4237,21 @@ msgstr "Обратное чтение после перезапуска стек
 
 msgid "The reset was interrupted"
 msgstr "Сброс был прерван"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Результат этого изменения фиксации больше не известен"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Изменение фиксации заняло слишком много времени; нажмите «Обновить состояние фиксации»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Изменение фиксации было прервано; нажмите «Обновить состояние фиксации»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Запускается другое изменение фиксации; повторите попытку через мгновение"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Ожидает слишком много изменений фиксации; повторите попытку, когда они завершатся"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Повторная установка пакетов недоступна в этой системе"
@@ -3967,6 +4270,12 @@ msgstr "Неизвестная операция с пакетами"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Эта платформа не поддерживает управление перегрузкой TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Не удалось прочитать настройки TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "Учёт трафика недоступен в этой системе"

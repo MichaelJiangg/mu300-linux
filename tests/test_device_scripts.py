@@ -568,7 +568,7 @@ class Atd(ShellTest):
             self.assertIn('malformed request', self.err.read_text())
 
     def test_the_urc_logs_are_roots_alone(self):
-        """What the modem says unasked is the owner's to read and nobody else's: with caller id on (mu300-voice
+        """What the modem says unasked is the owner's to read and nobody else's: with caller id enabled (an AT client
         watch) every ring puts the caller's number into this log."""
         for shell in self.shells:
             logs, m = self.start(shell)
@@ -738,6 +738,7 @@ class Atd(ShellTest):
     def test_a_cmt_frame_while_idle_is_spooled_before_the_next_command(self):
         for shell in self.each_shell():
             m, _nr0 = self.start_spooling(shell, nr0=False)
+            time.sleep(1.3)                                          # past the daemon's startup drain (a quiet second)
             os.write(m, f'\r\n+CMT: "ADANA BLD",27\r\n{self.PDU}\r\n'.encode())
             time.sleep(0.3)
             self.assertEqual(self.spooled(timeout=0.1), [])        # nobody reads an idle command channel
@@ -2276,9 +2277,13 @@ class SimState(ShellTest):
             self.assertIn('notify_proto {"action":5,"available":true}', (self.tmp / 'ubus').read_text())
 
     def test_event_filter(self):
-        hint = ['+ECIND: 3,0', '+ECIND: 3,2,5', '+ECIND:3,100', '+ECIND: 3,1,34', '+ECIND: 3,4,0']
-        other = ['+ECIND: 1,0', '+ECIND: 3,1,3', '+ECIND: 3,0,x', '+ECIND: 3,0,1,2', '+ECIND: 3,9', '+CEREG: 1',
-                 '+ECIND: 3,0;reboot']
+        # numbers after the cause are the RIL's to ignore: a card coming up says 3,100 and then 3,0,0,1 (kanoqwq's
+        # b8d4f222); a field that is not a 32-bit decimal number, or an empty one, is not a hint
+        hint = ['+ECIND: 3,0', '+ECIND: 3,2,5', '+ECIND:3,100', '+ECIND: 3,1,34', '+ECIND: 3,4,0', '+ECIND: 3,0,0,1',
+                '+ECIND: 3,1,2,0,1', '+ECIND: 3,0,1,2']
+        other = ['+ECIND: 1,0', '+ECIND: 3,1,3', '+ECIND: 3,0,x', '+ECIND: 3,9', '+CEREG: 1',
+                 '+ECIND: 3,0;reboot', '+ECIND: 3,1,2,7junk', '+ECIND: 3,0,0,-1', '+ECIND: 3,0,0,4294967296',
+                 '+ECIND: 3,0,0,', '+ECIND: 3,0,,1', '+ECIND: 3,1,3,0']
         self.shell = self.shells[0]   # the event's check waits 2 s: one shell is enough
         if True:
             for urc in hint + other:
@@ -2729,31 +2734,33 @@ class SipaDele(ShellTest):
                 self.assertNotIn('sipa-dele', calls.replace('sipa-dele-start', ''))
             ko.unlink()
 
-    def test_extra_modules_loads_the_stock_thermal_zone_module_when_the_kernel_has_one(self):
-        """mu300_thermal (the stock virtual thermal zone, mainline only): loaded once, by name where depmod indexed it
-        and by path where not (Ubuntu's extra/ before depmod ran); the vendor 5.4 kernel has no such module."""
-        for shell in self.each_shell():
-            r, calls = self.run_script(shell, 'extra-modules')                       # 5.4: no module, nothing tried
-            self.assertEqual(r.returncode, 0, r.stderr)
-            self.assertNotIn('mu300_thermal', calls)
-            for sub in ('', 'extra'):
-                ko = self.mods / sub / 'mu300_thermal.ko'
-                ko.parent.mkdir(exist_ok=True)
-                ko.write_text('')
-                r, calls = self.run_script(shell, 'extra-modules')
+    def test_extra_modules_loads_the_mainline_only_modules_when_the_kernel_has_them(self):
+        """mu300_thermal (the stock virtual thermal zone) and ums9620_lpintc (the cluster power-down's wake sources,
+        FINDINGS 218), mainline only: each loaded once, by name where depmod indexed it and by path where not
+        (Ubuntu's extra/ before depmod ran); the vendor 5.4 kernel has no such modules."""
+        for m in ('mu300_thermal', 'ums9620_lpintc'):
+            for shell in self.each_shell():
+                r, calls = self.run_script(shell, 'extra-modules')                   # 5.4: no module, nothing tried
                 self.assertEqual(r.returncode, 0, r.stderr)
-                self.assertIn('modprobe mu300_thermal', calls)
-                self.assertNotIn(f'insmod {ko}', calls)
-                self.assertIn('loaded mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1)   # no index yet: by path
-                self.assertIn(f'insmod {ko}', calls)
-                self.assertIn('loaded mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1, INSMOD_RC=1)
-                self.assertEqual(r.returncode, 0, r.stderr)                          # a failure is logged, not fatal
-                self.assertIn('FAILED mu300_thermal', r.stdout)
-                r, calls = self.run_script(shell, 'extra-modules', 'mu300_thermal 12288 0 - Live 0x0 (O)\n')
-                self.assertNotIn('mu300_thermal', calls)                             # loaded already
-                ko.unlink()
+                self.assertNotIn(m, calls)
+                for sub in ('', 'extra'):
+                    ko = self.mods / sub / f'{m}.ko'
+                    ko.parent.mkdir(exist_ok=True)
+                    ko.write_text('')
+                    r, calls = self.run_script(shell, 'extra-modules')
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                    self.assertIn(f'modprobe {m}', calls)
+                    self.assertNotIn(f'insmod {ko}', calls)
+                    self.assertIn(f'loaded {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1)   # no index yet: by path
+                    self.assertIn(f'insmod {ko}', calls)
+                    self.assertIn(f'loaded {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', MODPROBE_RC=1, INSMOD_RC=1)
+                    self.assertEqual(r.returncode, 0, r.stderr)                      # a failure is logged, not fatal
+                    self.assertIn(f'FAILED {m}', r.stdout)
+                    r, calls = self.run_script(shell, 'extra-modules', f'{m} 12288 0 - Live 0x0 (O)\n')
+                    self.assertNotIn(m, calls)                                       # loaded already
+                    ko.unlink()
 
     def test_refuses_after_the_wait(self):
         """K46: the packet domain never comes up: exit 1 after MU300_DELE_WAIT s, the module is not inserted."""
@@ -3304,6 +3311,28 @@ class Led(ShellTest):
             self.led(shell, 'u30air', 'sleep', '--if-due')
             self.assertEqual(self.state()['sc27xx:green'], '0')
 
+    def test_sleep_darkens_lamps_it_has_no_state_for(self):
+        """kanoqwq dbd6bf1e: a lamp lit without a state file here (the boot's hand-off, a late driver, a run cut
+        short) stayed lit past the timeout; the battery LED is written again, not taken as last written."""
+        for shell in self.each_shell():
+            self.reset()
+            self.sim(0)
+            self.uptime(100)
+            self.led(shell, 'u30air', 'power', 'on')
+            self.led(shell, 'u30air', 'data', 'on')
+            for n in ('zte-ldo1', 'zte-ldo2', 'net_blue'):    # lit behind this script's back
+                (self.root / 'sys/class/leds' / n / 'brightness').write_text('255\n')
+            self.uptime(161)
+            self.led(shell, 'u30air', 'sleep', '--if-due')
+            self.assertEqual({v for v in self.state().values()}, {'0'})
+            self.assertFalse((self.root / 'run/mu300/led/zte-ldo1').exists())   # no state made up for them
+            # dark already, and the battery channel lit again by something else: idle on puts it out too
+            (self.root / 'sys/class/leds/sc27xx:green/brightness').write_text('120\n')
+            (self.root / 'sys/class/leds/zte-ldo2/brightness').write_text('255\n')
+            self.led(shell, 'u30air', 'idle', 'on')
+            self.assertEqual({v for v in self.state().values()}, {'0'})
+            self.led(shell, 'u30air', 'idle', 'off')
+
     def test_idle_darkens_everything_but_a_key_still_shows_them(self):
         """2026-10-07: under the idle flag a key press lit nothing, and the device looked powered off for hours. A
         key's wake now shows the LEDs for LED_TIMEOUT (a minute when it is 0) in idle too; then dark again."""
@@ -3406,6 +3435,32 @@ class Led(ShellTest):
             self.assertEqual(self.rgb(), ('0', '0', '200'))
             self.assertEqual((blue / 'trigger').read_text().strip(), 'none')
             (blue / 'trigger').write_text('[none] timer\n')
+
+    def test_breathing_after_a_steady_light_stops_the_steady_output_first(self):
+        # the SC27xx's pattern_set leaves the steady TYPE bit set: kanoqwq read 0x300 (RUN and steady) on a U30 Air
+        # whose LED went from steady to the pattern trigger; brightness 0 first clears it (edcdeb27). A channel
+        # already on the pattern trigger is not stopped again.
+        for shell in self.each_shell():
+            self.reset()
+            self.conf.write_text('LED_TIMEOUT=0\n')
+            blue = self.root / 'sys/class/leds/sc27xx:blue'
+            (blue / 'trigger').write_text('[none] timer pattern\n')
+            self.battery(40, 'Not charging', 1)
+            self.led(shell, 'u30air', 'battery')
+            self.assertEqual((blue / 'brightness').read_text().strip(), '200')          # steady blue
+            (blue / 'trigger').write_text('[none] timer pattern\n')                  # as sysfs lists them
+            self.battery(40, 'Charging', 1)
+            self.led(shell, 'u30air', 'battery')
+            self.assertEqual((blue / 'brightness').read_text().strip(), '0')
+            self.assertEqual((blue / 'trigger').read_text().strip(), 'pattern')
+            self.assertEqual((blue / 'hw_pattern').read_text().strip(), '200 320 200 480 200 480 200 720')
+            # already breathing (the trigger shows [pattern]) when it is shown again: no brightness write
+            (blue / 'trigger').write_text('none timer [pattern]\n')
+            (blue / 'brightness').write_text('77\n')
+            (self.root / 'run/mu300/led/.battery-shown').unlink()
+            self.led(shell, 'u30air', 'battery')
+            self.assertEqual((blue / 'brightness').read_text().strip(), '77')
+            self.assertEqual((blue / 'trigger').read_text().strip(), 'none timer [pattern]')
 
     def test_outside_power_keeps_the_leds_lit_and_an_unplug_restarts_the_timeout(self):
         for shell in self.each_shell():
@@ -3727,6 +3782,232 @@ esac''')
                 self.assertEqual(s['sc27xx:green'], '120' if device == 'u30air' else '0', device)
                 self.assertEqual(self.led(shell, device, 'alarm', 'off').returncode, 0)   # off twice
 
+    # --- the LED settings (kanoqwq's, ported into mu300-led): lamp switches, brightness, boot indicator, heat alarm
+
+    def stop(self, name):
+        """the background worker of that pid file (led-siren, led-boot) killed, the file gone"""
+        pid = self.root / f'run/mu300/{name}.pid'
+        try:
+            os.kill(int(pid.read_text()), 15)
+        except (FileNotFoundError, ValueError, ProcessLookupError):
+            pass
+        pid.unlink(missing_ok=True)
+
+    def test_settings_by_default_change_nothing(self):
+        # without a led.conf every lamp is on at its usual level, no boot indicator, the siren: as before the settings
+        want = {'f50': ('["network","wifi"]', '["network","wifi"]', 0), 'v50': ('["network","wifi"]', '["network","wifi"]', 0),
+                'u30air': ('["network","wifi","battery"]', '["battery"]', 60)}
+        for shell in self.each_shell():
+            self.reset()
+            for device, (lamps, dims, timeout) in want.items():
+                r = self.led(shell, device, 'settings')
+                self.assertEqual(r.returncode, 0, r.stderr)
+                o = json.loads(r.stdout)
+                self.assertEqual((json.dumps(o['lamps'], separators=(',', ':')), json.dumps(o['dimmable'], separators=(',', ':'))),
+                                 (lamps, dims), device)
+                self.assertEqual({k: o[k] for k in ('device', 'timeout', 'timeout_default', 'network', 'wifi', 'battery',
+                                                    'network_brightness', 'wifi_brightness', 'battery_brightness', 'boot',
+                                                    'thermal')},
+                                 {'device': device, 'timeout': timeout, 'timeout_default': True, 'network': True,
+                                  'wifi': True, 'battery': True, 'network_brightness': 100, 'wifi_brightness': 100,
+                                  'battery_brightness': 100, 'boot': False, 'thermal': 'siren'})
+            self.led(shell, 'f50', 'boot', 'on')
+            self.assertFalse((self.root / 'run/mu300/led-boot.pid').exists())   # LED_BOOT=0: no boot indicator
+
+    def test_set_writes_led_conf_and_refuses_bad_values(self):
+        for shell in self.each_shell():
+            self.reset()
+            self.conf.write_text('# mine\nLED_TIMEOUT=30\n')
+            for args in (('network', '0'), ('wifi_brightness', '40'), ('boot', '1'), ('thermal', 'blink'),
+                         ('timeout', '120')):
+                r = self.led(shell, 'f50', 'set', *args)
+                self.assertEqual(r.returncode, 0, (args, r.stderr))
+            self.assertEqual(self.conf.read_text(), '# mine\nLED_NETWORK=0\nLED_WIFI_BRIGHTNESS=40\nLED_BOOT=1\n'
+                                                    'LED_THERMAL=blink\nLED_TIMEOUT=120\n')
+            o = json.loads(self.led(shell, 'f50', 'settings').stdout)
+            self.assertEqual((o['network'], o['wifi_brightness'], o['boot'], o['thermal'], o['timeout'], o['timeout_default']),
+                             (False, 40, True, 'blink', 120, False))
+            self.led(shell, 'f50', 'set', 'timeout', 'default')                  # the device's own again
+            self.assertNotIn('LED_TIMEOUT', self.conf.read_text())
+            for args in (('network', '2'), ('network_brightness', '0'), ('battery_brightness', '101'), ('timeout', '-1'),
+                         ('timeout', '86401'), ('timeout', '060'), ('thermal', 'loud'), ('boot', 'yes'), ('color', 'red'),
+                         ('wifi', '1;reboot'), ('network',)):
+                r = self.led(shell, 'f50', 'set', *args)
+                self.assertEqual(r.returncode, 2, args)
+            self.assertNotIn('reboot', self.conf.read_text())
+            self.stop('led-boot')
+
+    def test_a_lamp_switched_off_stays_dark_and_comes_back(self):
+        rgb = ('sc27xx:red', 'sc27xx:green', 'sc27xx:blue')
+        for shell in self.each_shell():
+            self.reset()
+            self.conf.write_text('LED_NETWORK=0\nLED_WIFI=0\n')
+            (self.tmp / 'iw.out').write_text('Interface wlan0\n\tssid F50\n\ttype AP\n\tchannel 36 (5180 MHz)\n')
+            self.led(shell, 'f50', 'data', 'on')
+            self.led(shell, 'f50', 'wifi', 'on')
+            self.assertEqual(set(self.state().values()), {'0'})
+            self.led(shell, 'f50', 'set', 'network', '1')                       # on again at once, as it should be
+            self.led(shell, 'f50', 'set', 'wifi', '1')
+            s = self.state()
+            self.assertEqual(({n: s[n] for n in rgb}, s['keyboard-backlight']),
+                             ({'sc27xx:red': '0', 'sc27xx:green': '0', 'sc27xx:blue': '255'}, '48'))
+            self.led(shell, 'f50', 'set', 'network', '0')
+            self.assertEqual({self.state()[n] for n in rgb}, {'0'})
+            # the U30 Air: the battery lamp off is dark, below 10 % on the battery too; network and Wi-Fi off
+            self.reset()
+            self.sim(0)
+            self.conf.write_text('LED_TIMEOUT=0\nLED_BATTERY=0\nLED_NETWORK=0\n')
+            self.battery(5)
+            self.led(shell, 'u30air', 'power', 'on')
+            self.led(shell, 'u30air', 'data', 'on')
+            self.assertEqual((self.rgb(), self.state()['zte-ldo0']), (('0', '0', '0'), '0'))
+            self.led(shell, 'u30air', 'set', 'battery', '1')
+            self.assertEqual(self.rgb(), ('150', '0', '0'))
+            self.led(shell, 'u30air', 'set', 'network', '1')
+            self.assertEqual(self.state()['zte-ldo0'], '255')
+
+    def test_brightness_dims_the_lamps_that_dim(self):
+        for shell in self.each_shell():
+            self.reset()
+            self.conf.write_text('LED_NETWORK_BRIGHTNESS=50\nLED_WIFI_BRIGHTNESS=25\n')
+            (self.tmp / 'iw.out').write_text('Interface wlan0\n\tssid F50\n\ttype AP\n\tchannel 6 (2437 MHz)\n')
+            self.led(shell, 'f50', 'data', '5g')
+            self.led(shell, 'f50', 'wifi', 'on')
+            s = self.state()
+            self.assertEqual((s['sc27xx:green'], s['keyboard-backlight']), ('128', '12'))   # 255 and ZTE's 48, scaled
+            self.led(shell, 'f50', 'set', 'network_brightness', '1')
+            self.assertEqual(self.state()['sc27xx:green'], '3')
+            # the U30 Air: the battery lamp at ZTE's levels scaled; its network lamp only switches (LDOs, a GPIO)
+            self.reset()
+            self.sim(0)
+            self.conf.write_text('LED_TIMEOUT=0\nLED_BATTERY_BRIGHTNESS=50\nLED_NETWORK_BRIGHTNESS=10\n')
+            self.led(shell, 'u30air', 'power', 'on')
+            self.led(shell, 'u30air', 'data', 'error')
+            self.assertEqual((self.rgb(), self.state()['keyboard-backlight']), (('0', '60', '0'), '255'))
+            self.battery(40, 'Charging', 1)
+            for n in self.LEDS:
+                if n.startswith('sc27xx:'):
+                    (self.root / 'sys/class/leds' / n / 'trigger').write_text('[none] timer pattern\n')
+            self.led(shell, 'u30air', 'battery')
+            self.assertEqual((self.root / 'sys/class/leds/sc27xx:blue/hw_pattern').read_text().strip(),
+                             '100 320 100 480 100 480 100 720')   # ZTE's 200, breathing at half
+            for n in self.LEDS:
+                if n.startswith('sc27xx:'):
+                    (self.root / 'sys/class/leds' / n / 'trigger').write_text('[none] timer\n')
+                    (self.root / 'sys/class/leds' / n / 'hw_pattern').unlink(missing_ok=True)
+
+    def test_heat_alarm_as_a_red_blink_or_not_at_all(self):
+        rgb = ('sc27xx:red', 'sc27xx:green', 'sc27xx:blue')
+        leds = self.root / 'sys/class/leds'
+        for shell in self.each_shell():
+            self.reset()
+            self.conf.write_text('LED_THERMAL=blink\n')
+            self.led(shell, 'f50', 'data', 'on')
+            self.led(shell, 'f50', 'alarm', 'on')
+            s = self.state()
+            self.assertEqual({n: s[n] for n in rgb if n != 'sc27xx:red'}, {'sc27xx:green': '0', 'sc27xx:blue': '0'})
+            self.assertEqual(((leds / 'sc27xx:red/trigger').read_text().strip(),
+                              (leds / 'sc27xx:red/delay_on').read_text().strip()), ('timer', '200'))
+            self.assertFalse((self.root / 'run/mu300/led-siren.pid').exists())    # the kernel blinks: no process
+            self.led(shell, 'f50', 'data', '5g')                                  # the alarm's LED meanwhile: untouched
+            self.assertEqual(self.state()['sc27xx:green'], '0')
+            self.led(shell, 'f50', 'alarm', 'off')
+            s = self.state()
+            self.assertEqual({n: s[n] for n in rgb}, {'sc27xx:red': '0', 'sc27xx:green': '255', 'sc27xx:blue': '0'})
+            (leds / 'sc27xx:red/trigger').write_text('[none] timer\n')
+            # off: thermal-guard's alarm shows nothing (it still decides when it is hot; this only does the light)
+            self.reset()
+            self.conf.write_text('LED_THERMAL=off\n')
+            self.led(shell, 'f50', 'data', 'on')
+            self.led(shell, 'f50', 'alarm', 'on')
+            self.assertFalse((self.root / 'run/mu300/led-siren.pid').exists())
+            self.assertEqual(self.state()['sc27xx:blue'], '255')
+            self.led(shell, 'f50', 'alarm', 'off')
+            self.assertEqual(self.state()['sc27xx:blue'], '255')
+
+    def test_refresh_shows_thermal_guards_alarm_the_new_way(self):
+        # the alarm on (thermal-guard's file) and the setting changed from the siren to the blink: refresh changes how
+        # it shows, it only reads thermal-guard's file
+        leds = self.root / 'sys/class/leds'
+        flag = self.root / 'run/mu300/thermal-alarm'
+        for shell in self.each_shell():
+            self.reset()
+            try:
+                flag.write_text('')
+                self.led(shell, 'f50', 'alarm', 'on')
+                self.assertTrue((self.root / 'run/mu300/led-siren.pid').exists())
+                self.led(shell, 'f50', 'set', 'thermal', 'blink')
+                self.assertFalse((self.root / 'run/mu300/led-siren.pid').exists())
+                time.sleep(0.4)
+                self.assertEqual((leds / 'sc27xx:red/trigger').read_text().strip(), 'timer')
+                self.assertTrue(flag.exists())
+                flag.unlink()
+                self.led(shell, 'f50', 'alarm', 'off')
+            finally:
+                self.stop('led-siren')
+                flag.unlink(missing_ok=True)
+            (leds / 'sc27xx:red/trigger').write_text('[none] timer\n')
+
+    def test_boot_indicator(self):
+        # LED_BOOT=1: the siren's LED takes its colours in turn until boot off; what the services said meanwhile is
+        # kept and shown then; a lamp switched off stays dark; the heat alarm ends it
+        rgb = ('sc27xx:red', 'sc27xx:green', 'sc27xx:blue')
+        pid = self.root / 'run/mu300/led-boot.pid'
+        for shell in self.each_shell():
+            for device in ('f50', 'u30air'):
+                self.reset()
+                self.conf.write_text('LED_BOOT=1\nLED_TIMEOUT=0\n')
+                try:
+                    self.assertEqual(self.led(shell, device, 'boot', 'on').returncode, 0)
+                    self.assertTrue(pid.exists())
+                    first = pid.read_text()
+                    self.led(shell, device, 'boot', 'on')                       # a second one starts no second one
+                    self.assertEqual(pid.read_text(), first)
+                    self.led(shell, device, 'power', 'on')
+                    self.led(shell, device, 'data', 'on')
+                    want = {('255', '0', '0'), ('0', '255', '0'), ('0', '0', '255')}
+                    seen = set()
+                    deadline = time.time() + 4
+                    while time.time() < deadline and not want <= seen:
+                        s = self.state()
+                        seen.add(tuple(s[n] for n in rgb))
+                        time.sleep(0.02)
+                    self.assertLessEqual(want, seen, device)
+                finally:
+                    self.led(shell, device, 'boot', 'off')
+                self.assertFalse(pid.exists())
+                time.sleep(0.4)
+                # the F50's RGB LED is its network light again (4G: blue); the U30 Air's its battery (80 %: white)
+                self.assertEqual(self.rgb(), ('0', '0', '255') if device == 'f50' else ('0', '120', '0'), device)
+            # the network lamp switched off: the F50's boot indicator is dark
+            self.reset()
+            self.conf.write_text('LED_BOOT=1\nLED_NETWORK=0\n')
+            try:
+                self.led(shell, 'f50', 'boot', 'on')
+                for _ in range(20):
+                    self.assertEqual(set(self.rgb()), {'0'})
+                    time.sleep(0.03)
+                # the heat alarm takes over at once
+                self.led(shell, 'f50', 'alarm', 'on')
+                self.assertFalse(pid.exists())
+                self.assertTrue((self.root / 'run/mu300/led-siren.pid').exists())
+            finally:
+                self.led(shell, 'f50', 'alarm', 'off')
+                self.stop('led-boot')
+                self.stop('led-siren')
+
+    def test_boot_indicator_hooks(self):
+        # started as early as the system allows, ended when the boot is done, on both systems
+        hook = (TOP / 'openwrt/overlay/lib/preinit/04_mu300_early_leds').read_text()
+        self.assertIn('boot_hook_add preinit_essential mu300_early_leds', hook)
+        self.assertIn('/opt/mu300/bin/mu300-led boot on', hook)
+        self.assertIn('/opt/mu300/bin/mu300-led boot off', (TOP / 'openwrt/overlay/etc/init.d/mu300-post').read_text())
+        units = TOP / 'rootfs/overlay/etc/systemd/system'
+        fixups = (units / 'mu300-fixups.service').read_text()
+        self.assertLess(fixups.index('mu300-led boot on'), fixups.index('mu300-led power on'))
+        ok = (units / 'mu300-boot-ok.service').read_text()
+        self.assertLess(ok.index('mu300-led boot off'), ok.index('/bin/sleep 30'))
+
     def test_missing_leds_and_bad_usage(self):
         for shell in self.each_shell():
             empty = self.tmp / 'empty'
@@ -3773,6 +4054,46 @@ class WifiBand(ShellTest):
 
 
 class Buttons(ShellTest):
+    def test_a_stop_takes_the_key_reader_with_it(self):
+        """procd stops a service by signalling its main process alone (its children share init's process group): the
+        old mu300-keys and its loop outlived /etc/init.d/mu300-buttons restart, and every press was handled twice."""
+        import signal, time
+        self.stub('mu300-keys', 'echo $$ > "$STUBLOG/keys.pid"; exec sleep 300')
+        for shell in self.each_shell():
+            pidf = self.tmp / 'keys.pid'
+            pidf.unlink(missing_ok=True)
+            env = self.env(MU300_RUN=self.tmp / 'run')
+            env['PATH'] = f'{self.stubs}{os.pathsep}{env["PATH"]}'
+            p = subprocess.Popen(shell + [str(BIN / 'mu300-buttons')], env=env, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            for _ in range(100):
+                if pidf.exists() and pidf.read_text().strip():
+                    break
+                time.sleep(0.05)
+            keys = int(pidf.read_text())
+            time.sleep(0.3)
+            p.send_signal(signal.SIGTERM)
+            p.communicate(timeout=10)
+            self.assertEqual(p.returncode, 143)
+            gone = False
+            for _ in range(100):
+                try:
+                    os.kill(keys, 0)
+                except ProcessLookupError:
+                    gone = True
+                    break
+                time.sleep(0.05)
+            if not gone:
+                os.kill(keys, signal.SIGKILL)
+            self.assertTrue(gone, 'mu300-keys outlived the stop')
+
+    def test_procd_respawns_the_thermal_guard(self):
+        post = (TOP / 'openwrt/overlay/etc/init.d/mu300-post').read_text()
+        inst = post[post.index('procd_open_instance thermalguard'):]
+        inst = inst[:inst.index('procd_close_instance')]
+        self.assertIn('procd_set_param command /opt/mu300/bin/thermal-guard', inst)
+        self.assertIn('procd_set_param respawn', inst)
+
     def test_actions(self):
         self.stub('mu300-keys', 'cat "$STUBLOG/keys.in"')
         for name in ('mu300-led', 'mu300-wifi-band', 'systemctl', 'logger', 'poweroff', 'mu300-power'):
@@ -3807,6 +4128,77 @@ class Buttons(ShellTest):
                         self.assertLess(calls.index('systemctl is-active --quiet mu300-hotspot'),
                                         calls.index('systemctl start mu300-hotspot'))
                 self.assertEqual(marker.exists(), event == '116 long', event)
+
+    def test_a_tick_starts_mu300_led_only_when_it_has_something_to_do(self):
+        """FINDINGS 235: the tick every 5 s starts mu300-led only when a file its hint names changed, its due time
+        came (a timeout running out; a minute at the latest) or there is no hint - the LEDs still time out on time and
+        the battery LED still follows the charger"""
+        root = self.tmp / 'root'
+        for n in ('sc27xx:red', 'sc27xx:green', 'sc27xx:blue', 'zte-ldo0'):   # zte-ldo0: SIM 1's network LED
+            d = root / 'sys/class/leds' / n
+            d.mkdir(parents=True, exist_ok=True)
+            (d / 'brightness').write_text('0\n'); (d / 'max_brightness').write_text('255\n')
+            (d / 'trigger').write_text('[none] timer\n')
+        ps = root / 'sys/class/power_supply'
+        for d, files in (('sc27xx-fgu', {'capacity': 80, 'status': 'Discharging'}), ('bq256xx-charger', {'online': 0})):
+            (ps / d).mkdir(parents=True, exist_ok=True)
+            for k, v in files.items():
+                (ps / d / k).write_text(f'{v}\n')
+        (root / 'proc').mkdir(parents=True, exist_ok=True)
+        (root / 'run/mu300').mkdir(parents=True, exist_ok=True)
+        (root / 'run/mu300/device').write_text('u30air\n')
+        self.stub('mu300-keys', 'echo "0 tick"')
+        self.stub('mu300-led', f'echo "mu300-led $*" >> "$STUBLOG/calls"; exec "{BIN}/mu300-led" "$@"')
+        env = dict(MU300_RUN=self.tmp / 'run', MU300_SYSROOT=root, MU300_BIN=BIN, MU300_LED_CONF=self.tmp / 'none')
+
+        def uptime(s):
+            (root / 'proc/uptime').write_text(f'{s}.50 0.00\n')
+
+        def ticks(shell):
+            (self.tmp / 'calls').unlink(missing_ok=True)
+            r = self.script(shell, BIN / 'mu300-buttons', **env)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            calls = (self.tmp / 'calls').read_text().splitlines() if (self.tmp / 'calls').exists() else []
+            return calls.count('mu300-led tick')
+
+        def lit():
+            return (root / 'sys/class/leds/zte-ldo0/brightness').read_text().strip()
+
+        for shell in self.each_shell():
+            for f in (root / 'run/mu300/led').glob('.*'):
+                f.unlink()
+            (ps / 'bq256xx-charger/online').write_text('0\n')
+            uptime(100)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'data', 'on', **env).returncode, 0)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'wake', **env).returncode, 0)   # lit until 160
+            self.assertEqual(lit(), '255')
+            self.assertEqual(ticks(shell), 1)          # no hint yet
+            uptime(101)
+            self.assertEqual(ticks(shell), 0)          # nothing changed, nothing due
+            uptime(160)
+            self.assertEqual(ticks(shell), 1)          # the timeout ran out: dark
+            self.assertEqual(lit(), '0')
+            uptime(170)
+            self.assertEqual(ticks(shell), 0)
+            (ps / 'bq256xx-charger/online').write_text('1\n')
+            self.assertEqual(ticks(shell), 1)          # plugged in: lit at once
+            self.assertEqual(lit(), '255')
+            uptime(200)
+            self.assertEqual(ticks(shell), 0)
+            uptime(230)
+            self.assertEqual(ticks(shell), 1)          # a minute without one: a tick all the same
+            (ps / 'bq256xx-charger/online').write_text('0\n')
+            self.assertEqual(ticks(shell), 1)          # unplugged: the timeout starts again (until 290)
+            uptime(250)
+            self.assertEqual(ticks(shell), 0)
+            self.assertEqual(self.script(shell, BIN / 'mu300-led', 'wake', **env).returncode, 0)   # a key: until 310
+            self.assertEqual(ticks(shell), 1)          # .awake-until changed
+            uptime(300)
+            self.assertEqual(ticks(shell), 0)
+            self.assertEqual(lit(), '255')
+            uptime(310)
+            self.assertEqual(ticks(shell), 1)
+            self.assertEqual(lit(), '0')
 
     def test_held_power_in_the_charging_boot_starts(self):
         # the stock charger mode: hold power to switch the device on (FINDINGS 196); no shutdown, no marker
@@ -3928,22 +4320,25 @@ class Buttons(ShellTest):
             self.script(shell, BIN / 'mu300-buttons', MU300_RUN=self.tmp / 'run')
             self.assertFalse(marker.exists())
 
-    def test_first_wifi_press_while_asleep_only_wakes(self):
+    def test_wifi_hold_while_asleep_wakes_and_toggles(self):
         self.stub('mu300-keys', 'cat "$STUBLOG/keys.in"')
         for name in ('mu300-led', 'mu300-wifi-band', 'systemctl', 'logger', 'mu300-power'):
             self.stub(name, f'echo "{name} $*" >> "$STUBLOG/calls"')
         (self.tmp / 'run/mu300/power').mkdir(parents=True)
-        for state, acts in (('idle', False), ('charging-boot', False), ('active', True)):
+        # asleep (state idle): a short press only wakes, a hold wakes and toggles the hotspot too; the charging boot
+        # has no services to toggle, so both only wake; awake, both act.
+        for state, short_acts, long_acts in (('idle', False, True), ('charging-boot', False, False), ('active', True, True)):
             (self.tmp / 'run/mu300/power/state').write_text(state + '\n')
             for shell in self.each_shell():
-                for event in ('138 short', '138 long'):
+                for event, acts in (('138 short', short_acts), ('138 long', long_acts)):
                     (self.tmp / 'keys.in').write_text(event + '\n')
                     (self.tmp / 'calls').unlink(missing_ok=True)
                     r = self.script(shell, BIN / 'mu300-buttons', MU300_RUN=self.tmp / 'run')
                     self.assertEqual(r.returncode, 0, r.stderr)
                     calls = (self.tmp / 'calls').read_text()
                     self.assertIn('mu300-power wake', calls, (state, event))
-                    self.assertEqual(acts, ('mu300-wifi-band toggle' in calls or 'systemctl start' in calls or 'systemctl is-active' in calls), (state, event))
+                    self.assertEqual(acts, ('mu300-wifi-band toggle' in calls or 'systemctl start' in calls
+                                            or 'systemctl stop' in calls or 'systemctl is-active' in calls), (state, event))
 
 
 class TreeKill(ShellTest):
@@ -4409,10 +4804,29 @@ class ThermalGuard(ShellTest):
                 self.round(shell, 60000)
             self.assertEqual((p / 'scaling_max_freq').read_text().strip(), '2002000')
 
+    def test_a_round_without_a_reading_lifts_no_cap_and_keeps_the_alarm(self):
+        # every zone failing (no number this round) reads as 0: that is not a cool SoC, so no cap goes and the alarm
+        # stays on until a real reading is cool (after kanoqwq cc0ecce7)
+        freqs = [614400, 936000, 1105000, 2002000]
+        self.stub('logger', 'echo "$*" >> "$STUBLOG/log"')
+        for shell in self.each_shell():
+            shutil.rmtree(self.root, ignore_errors=True)
+            self.device('u30air')
+            p = self.policy('policy0', freqs, 936000)
+            self.assertEqual(self.round(shell, 90000), ['mu300-led alarm on'])
+            capped = (p / 'scaling_max_freq').read_text().strip()
+            for bad in ('', 'error', '-'):
+                (self.tmp / 'log').unlink(missing_ok=True)
+                self.assertEqual(self.round(shell, bad), [], repr(bad))
+                self.assertEqual((p / 'scaling_max_freq').read_text().strip(), capped, repr(bad))
+                self.assertIn('no thermal zone gave a temperature', self.log())
+            self.assertEqual(self.round(shell, 60000), ['mu300-led alarm off'])
+            self.assertNotEqual((p / 'scaling_max_freq').read_text().strip(), capped)
+
 
 class Nfc(ShellTest):
     """mu300-nfc against a fake FM11NT08: 1 KiB behind a stub i2ctransfer, which answers only while a stub gpioset
-    holds line 190 low, as the tag does."""
+    holds the tag's reset line low (190 on the U30 Air, 189 on the V50, in $STUBLOG/line), as the tag does."""
     EEPROM = r'''
 import os, sys
 mem = os.path.join(os.environ['STUBLOG'], 'tag.bin')
@@ -4448,10 +4862,19 @@ elif op.startswith('w'):
         self.stub('i2ctransfer', 'exec python3 "$STUBLOG/eeprom.py" "$@"')
         # libgpiod 2: holds the line until killed
         self.stub('gpioset', '[ "$1" = --help ] && { echo "  -c, --chip"; exit 0; }; '
-                             '[ "$*" = "-c gpiochip4 190=0" ] || exit 1; touch "$STUBLOG/held"; '
+                             '[ "$*" = "-c gpiochip4 $(cat "$STUBLOG/line")=0" ] || exit 1; touch "$STUBLOG/held"; '
                              'trap \'rm -f "$STUBLOG/held"; exit 0\' TERM; while :; do sleep 0.05; done')
+        (self.tmp / 'line').write_text('190')
         self.conf = self.tmp / 'hotspot.conf'
         self.conf.write_text('SSID=U30 AIR\nPSK=secret pass!\nBAND=5\n')
+
+    def v50_tree(self, pin):
+        # ZTE's node in the V50's device tree: the reset line as <phandle pin flags>, big-endian
+        node = self.root / 'proc/device-tree/ntag_fm11_gpio'
+        node.mkdir(parents=True, exist_ok=True)
+        # (with a device tree there, mu300-device believes a v50 label only on the V50's AW9523B node)
+        (self.root / 'proc/device-tree/soc/ap-ahb/i2c@2270000/aw9523b_led@5b').mkdir(parents=True, exist_ok=True)
+        (node / 'ntag-reset-gpio').write_bytes((0x8f).to_bytes(4, 'big') + pin.to_bytes(4, 'big') + bytes(4))
 
     def blank(self, ndef=b'\x03\x00\xfe'):
         (self.tmp / 'tag.bin').write_bytes(self.ZTE + ndef + bytes(1024 - 16 - len(ndef)))
@@ -4554,11 +4977,14 @@ elif op.startswith('w'):
             self.blank()
             r = self.nfc(shell, 'wifi', device='f50')
             self.assertEqual(r.returncode, 1)
-            self.assertIn('only the U30 Air', r.stderr)
-            # the V50's tag is on another reset line: not driven, and the tag is not touched (FINDINGS 95)
+            self.assertIn('this device has no NFC tag', r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='f50').returncode, 1)
+            self.assertEqual(self.nfc(shell, 'supported').returncode, 0)
+            # a V50 whose device tree has no reset line for the tag: not driven, the tag not touched
             r = self.nfc(shell, 'wifi', device='v50')
             self.assertEqual(r.returncode, 1)
-            self.assertIn("the V50's NFC tag is not supported yet", r.stderr)
+            self.assertIn("the V50's NFC reset line is not in the device tree", r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 1)
             self.assertEqual(self.writes(), [])
             self.assertEqual(self.nfc(shell, 'blink').returncode, 2)
             self.assertEqual(self.nfc(shell, 'url').returncode, 1)
@@ -4567,6 +4993,35 @@ elif op.startswith('w'):
             r = self.nfc(shell, 'url', 'https://example.com/')
             self.assertEqual(r.returncode, 1)
             self.assertIn('capability container', r.stderr)
+            self.assertEqual(self.writes(), [])
+
+
+    def test_v50(self):
+        # the V50's tag: the same chip on reset line 189, from ZTE's node in the device tree (kano's V50, FINDINGS 95)
+        (self.tmp / 'line').write_text('189')
+        for shell in self.each_shell():
+            self.blank()
+            self.v50_tree(189)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 0)
+            r = self.nfc(shell, 'wifi', device='v50')
+            self.assertEqual((r.returncode, r.stdout.strip()), (0, 'wifi: U30 AIR (with its password)'), r.stderr)
+            # a line other than the one tested on: left alone
+            self.blank()
+            self.v50_tree(190)
+            r = self.nfc(shell, 'wifi', device='v50')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('GPIO 190, not the 189', r.stderr)
+            self.assertEqual(self.nfc(shell, 'supported', device='v50').returncode, 1)
+            self.assertEqual(self.writes(), [])
+
+    def test_line_held_elsewhere(self):
+        # gpioset cannot take the line (someone holds it): said so, and the tag is not touched
+        (self.tmp / 'line').write_text('77')
+        for shell in self.each_shell():
+            self.blank()
+            r = self.nfc(shell, 'wifi')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('cannot hold the tag', r.stderr)
             self.assertEqual(self.writes(), [])
 
 
@@ -4648,7 +5103,8 @@ class UsbReset(ShellTest):
         self.role = self.tmp / 'role'
         self.role.write_text('device\n')
         self.hook = self.tmp / 'hook'
-        self.hook.write_text('#!/bin/sh\necho "hook $ACTION $INTERFACE" >> "$STUBLOG/calls"\n')
+        self.hook.write_text('#!/bin/sh\necho "hook $ACTION $INTERFACE" >> "$STUBLOG/calls"\n'
+                             '[ "$MU300_USB_SKIP_REBIND" = 1 ] || echo queued-rebind >> "$STUBLOG/calls"\n')
         self.hook.chmod(0o755)
         self.run_dir = self.tmp / 'run'
         self.run_dir.mkdir()
@@ -4686,6 +5142,7 @@ class UsbReset(ShellTest):
             self.assertIn('usleep 100000\n', calls)
             self.assertNotIn('sleep 2', calls.replace('usleep', ''))
             self.assertIn('hook ifup lan\n', calls)
+            self.assertNotIn('queued-rebind', calls, 'USB reset recovery queued another rebind')
             self.assertIn('mu300-usb', calls)       # logger tag
             self.assertTrue(float((self.run_dir / 'mu300-usb-rebind-done').read_text().split()[0]) >= 0)
 
@@ -5122,18 +5579,25 @@ class VpnUplink(ShellTest):
 
     def test_a_vpn_started_before_the_bearer_is_restarted(self):
         import time
-        now = int(time.time())
+        # the seconds in the message are counted from the script's own clock reading (state/uplink-up), which can be a
+        # second or more after the test's: the expected text is taken from it, not from the test's clock
+        def up():
+            return int((self.tmp / 'state' / 'uplink-up').read_text())
         for shell in self.each_shell():
-            r, calls = self.run_uplink(shell, now - 2)
+            since = int(time.time()) - 2
+            r, calls = self.run_uplink(shell, since)
             self.assertIn('vpn restart', calls, (shell, r.stderr))
-            self.assertIn('the VPN started before sipa_eth0 was up (2 s): restarting it', calls)
+            self.assertGreaterEqual(up() - since, 2)
+            self.assertIn(f'the VPN started before sipa_eth0 was up ({up() - since} s): restarting it', calls)
             # the same second counts as before
             r, calls = self.run_uplink(shell, int(time.time()))
             self.assertIn('vpn restart', calls, (shell, r.stderr))
             # a run that began before the bearer (its engine file) and reached its engine after it: restarted too
-            r, calls = self.run_uplink(shell, int(time.time()) + 20, began=int(time.time()) - 3)
+            began = int(time.time()) - 3
+            r, calls = self.run_uplink(shell, began + 23, began=began)
             self.assertIn('vpn restart', calls, (shell, r.stderr))
-            self.assertIn('(3 s)', calls)
+            self.assertGreaterEqual(up() - began, 3)
+            self.assertIn(f'({up() - began} s)', calls)
             self.assertTrue((self.tmp / 'state' / 'uplink-up').exists())
             self.assertFalse((self.tmp / 'state' / 'vpn-uplink.lock').exists())
 
@@ -5344,6 +5808,29 @@ class NextBoot(ShellTest):
         self.assertEqual((self.bc()[14], conf.read_text()), (0x6f, 'linux\n'))
         self.assertEqual([p.name for p in self.tmp.glob('.default-boot.*')], [])
 
+    def test_misc_put_back_when_the_default_boot_cannot_be_written(self):
+        # kanoqwq f6b0668d: misc written and read back, then the file fails: misc gets its previous block back, so
+        # the file and misc never disagree (here: misc on Android's block with the file still saying linux)
+        android_a, _ = self.slot_b_blocks()
+        conf = self.tmp / 'default-boot'
+        self.assertEqual(self.nb('--rearm').returncode, 0)
+        before = self.misc.read_bytes()
+        self.assertNotEqual(self.bc(), android_a)
+        os.chmod(self.tmp, 0o555)                   # the file's directory cannot take the new file
+        try:
+            if os.access(self.tmp, os.W_OK):
+                self.skipTest('running as root: a read-only directory is still writable')
+            r = self.nb('android')
+        finally:
+            os.chmod(self.tmp, 0o755)
+        self.assertEqual(r.returncode, 1, r.stderr)
+        self.assertIn('misc put back as it was', r.stderr)
+        self.assertEqual(self.misc.read_bytes(), before)
+        self.assertEqual(conf.read_text(), 'linux\n')
+        r = self.nb('android')                       # and once it can be written, as usual
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual((self.bc(), conf.read_text()), (android_a, 'android\n'))
+
     def test_the_degraded_arm_still_records_linux(self):
         # FINDINGS 32: a slot block that cannot be rebuilt here gets the initramfs' one-shot block - written and read
         # back, so "linux" is recorded with it as before (exit 1 says the arm is degraded)
@@ -5427,6 +5914,60 @@ class NextBoot(ShellTest):
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(self.bc(), android_a)
 
+    def test_without_the_slot_file_the_published_block_names_the_slot(self):
+        # no linux-slot, but the initramfs' Linux block (its first bytes are the suffix LK reads): that slot, before
+        # the command line and before the b of old images (kanoqwq's b8d4f222)
+        android_a, linux_b, android_b, linux_a = self.blocks
+        (self.run_dir / 'misc-bc-android.bin').write_bytes(android_b)
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_a)
+        (self.tmp / 'cmdline').write_text('console=x androidboot.slot_suffix=_b\n')
+        r = self.nb('--rearm')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('slot a armed', r.stdout)
+        self.assertEqual(self.bc()[12], 0x0f | (6 << 4))
+        self.assertEqual(self.nb('android').returncode, 0)
+        self.assertEqual(self.bc(), android_b)
+
+    def test_blocks_that_name_another_slot_are_never_written(self):
+        # the slot file says one thing, a block another: nothing is written, whatever the command (kanoqwq's b8d4f222)
+        android_a, linux_b, android_b, linux_a = self.blocks
+        before = self.misc.read_bytes()
+        for slot, android, linux in (('a', android_b, linux_b),     # Linux's block names b
+                                     ('a', android_a, linux_a),     # Android's block names a, Linux's slot
+                                     ('b', android_a, linux_a),
+                                     ('b', android_b, linux_b)):
+            (self.run_dir / 'linux-slot').write_text(slot + '\n')
+            (self.run_dir / 'misc-bc-android.bin').write_bytes(android)
+            (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux)
+            for cmd in (('android',), ('--rearm',), ('--trial',), ('linux',), ('lock',)):
+                (self.tmp / 'default-boot').write_text('linux\n')
+                r = self.nb(*cmd)
+                self.assertEqual(r.returncode, 1, (slot, cmd, r.stdout))
+                self.assertIn('do not match', r.stderr)
+                self.assertEqual(self.misc.read_bytes(), before)
+            self.assertEqual(self.nb('status').returncode, 0)          # reading is still allowed
+        # a matching pair still works
+        (self.run_dir / 'linux-slot').write_text('a\n')
+        (self.run_dir / 'misc-bc-android.bin').write_bytes(android_b)
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_a)
+        self.assertEqual(self.nb('android').returncode, 0)
+        self.assertEqual(self.bc(), android_b)
+
+    def test_status_says_whether_boot_control_can_be_written(self):
+        """The panel's boot card (unisoc-modem/boot, kanoqwq's f6b0668d) reads this line."""
+        android_a, linux_b, android_b, linux_a = self.blocks
+        line = lambda: [l for l in self.nb('status').stdout.splitlines() if l.startswith('boot control:')]
+        (self.run_dir / 'linux-slot').write_text('b\n')
+        self.assertEqual(line(), ['boot control: not writable'])            # no blocks published
+        (self.run_dir / 'misc-bc-android.bin').write_bytes(android_a)
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_b)
+        self.assertEqual(line(), ['boot control: writable'])
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_a)       # the pair of another slot
+        self.assertEqual(line(), ['boot control: not writable'])
+        (self.run_dir / 'misc-bc-linux-trial.bin').write_bytes(linux_b)
+        (self.run_dir / 'misc-dev').write_text(str(self.tmp / 'no-misc'))
+        self.assertEqual(line(), ['boot control: not writable'])
+
 
 class EarlyRecorder(ShellTest):
     """early-recorder's choice of boot partition: the Linux slot's, never Android's."""
@@ -5448,6 +5989,43 @@ class EarlyRecorder(ShellTest):
                         p.write_text(data)
                 r = self.sh(shell, m.group(1) + '\necho "$PART"', MU300_RUN=run, MU300_CMDLINE_SRC=cmdline)
                 self.assertEqual((r.stdout.strip(), r.stderr), (f'boot_{want}', ''), (v, cl))
+
+
+class EarlyRecorderCpus(ShellTest):
+    """early-recorder pins itself to the CPUs of the lowest cpu_capacity (kanoqwq f0b5ad43, after liuwang97)."""
+
+    def little(self, shell, caps):
+        import re
+        m = re.search(r'# --- cpus begin\n(.*?)# --- cpus end', (BIN / 'early-recorder').read_text(), re.S)
+        self.assertIsNotNone(m, 'early-recorder has no cpus block')
+        cpus = self.tmp / 'cpu'
+        shutil.rmtree(cpus, ignore_errors=True)
+        for n, cap in caps.items():
+            d = cpus / f'cpu{n}'
+            d.mkdir(parents=True)
+            if cap is not None:
+                (d / 'cpu_capacity').write_text(f'{cap}\n')
+        (cpus / 'cpufreq').mkdir(parents=True, exist_ok=True)
+        r = self.sh(shell, f'MU300_CPUDIR="{cpus}"\n' + m.group(1) + '\nlittle_cpus')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def test_lowest_capacity(self):
+        for shell in self.each_shell():
+            # three clusters, as cpufreq's policy0, policy4 and policy7 have them here
+            self.assertEqual(self.little(shell, {0: 436, 1: 436, 2: 436, 3: 436, 4: 943, 5: 943, 6: 943, 7: 1024}),
+                             '0,1,2,3')
+            self.assertEqual(self.little(shell, {0: 1024, 1: 512, 2: None, 3: 512}), '1,3')
+            self.assertEqual(self.little(shell, {0: None}), '')       # nothing known: no pinning
+
+    def test_a_round_reads_little(self):
+        """FINDINGS 235: logd's last 300 lines and the kernel's last MB, not their whole logs through a pipe; 30 s
+        rounds after the first 90 s"""
+        s = (BIN / 'early-recorder').read_text()
+        self.assertIn('logread -l 300 2>/dev/null | grep -v PR_CAPBSET;', s)
+        self.assertNotIn('logread 2>/dev/null |', s)
+        self.assertIn('dmesg -s 1000000 2>/dev/null || dmesg | tail -c 1000000', s)
+        self.assertIn('if [ "$(cut -d. -f1 /proc/uptime)" -lt 90 ]; then sleep 2; else sleep 30; fi', s)
 
 
 class EarlyRecorderNode(ShellTest):
@@ -5537,3 +6115,37 @@ class ToolkitStress(ShellTest):
             self.assertIn('the SoC reached 91 C, the limit is 90 C', r.stdout)
             for f in logs.glob('mu300-stress-*.txt'):
                 f.unlink()
+
+
+class SysupgradeWrapper(ShellTest):
+    """OpenWrt's /sbin/sysupgrade here: a firmware image is refused, the configuration backup tools pass (kanoqwq's
+    b8d4f222 added restore: LuCI's System > Backup "Upload archive" runs sysupgrade --restore-backup)."""
+    WRAP = TOP / 'openwrt/overlay/usr/libexec/mu300-sysupgrade'
+
+    def run_it(self, shell, *args):
+        real = self.stubs / 'sysupgrade.openwrt'
+        real.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "$STUBLOG/real"\n')
+        real.chmod(0o755)
+        (self.tmp / 'real').unlink(missing_ok=True)
+        r = self.script(shell, self.WRAP, *args, MU300_SYSUPGRADE=real)
+        called = (self.tmp / 'real').read_text() if (self.tmp / 'real').exists() else None
+        return r, called
+
+    def test_backup_restore_and_list_pass(self):
+        for shell in self.each_shell():
+            for args in (['-b', '/tmp/backup.tar.gz'], ['--create-backup', '-'], ['-k', '-b', '/tmp/x.tgz'],
+                         ['--restore-backup', '/tmp/backup.tar.gz'], ['-r', '/tmp/backup.tar.gz'],
+                         ['-l'], ['--list-backup'], ['-u', '-c', '-l'], ['-v', '-b', 'x'], ['-q', '-r', 'x']):
+                r, called = self.run_it(shell, *args)
+                self.assertEqual(r.returncode, 0, (args, r.stderr))
+                self.assertEqual(called, ' '.join(args) + '\n')
+
+    def test_firmware_and_mixed_or_incomplete_requests_are_refused(self):
+        for shell in self.each_shell():
+            for args in ([], ['firmware.bin'], ['-n', 'firmware.bin'], ['-F', 'firmware.bin'], ['-T', 'image'],
+                         ['-b'], ['-r'], ['-b', ''], ['-b', 'x', '-r', 'y'], ['-l', '-b', 'x'], ['-b', 'x', 'image'],
+                         ['-l', 'image'], ['--test', 'image'], ['-r', 'x', '-n']):
+                r, called = self.run_it(shell, *args)
+                self.assertEqual(r.returncode, 1, args)
+                self.assertIsNone(called, args)
+                self.assertIn('sysupgrade is disabled', r.stderr)

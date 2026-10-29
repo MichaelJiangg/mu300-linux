@@ -8,10 +8,13 @@ sipa_eth0's disable_ipv6 and accept_ra are files there, so what the script write
 Relay mode (K35-K37, K30, D9; openwrt-luci only) has its files in openwrt/luci-overlay: the event monitor
 mu300cell-v6.sh, ndp-learn, init.d/mu300-ndp and the first-boot settings in 91-mu300-luci (class Relay).
 """
+import errno
 import os
 import re
 import shutil
+import signal
 import subprocess
+import time
 import unittest
 from pathlib import Path
 
@@ -22,6 +25,45 @@ LUCI = TOP / 'openwrt' / 'luci-overlay'
 MONITOR = LUCI / 'lib' / 'netifd' / 'proto' / 'mu300cell-v6.sh'
 NDP_LEARN = LUCI / 'opt' / 'mu300' / 'bin' / 'ndp-learn'
 NDP_INIT = LUCI / 'etc' / 'init.d' / 'mu300-ndp'
+
+
+# ndp-learn waits on ip's monitor (FINDINGS 235) with read -t, which dash has not: there it looks on its timer as before.
+def timed_read(shell):
+    """SHELL's read takes a timeout and the daemons use it (bash 4 and later, busybox ash; not dash, not bash 3)."""
+    r = subprocess.run(shell + ['-c', 'case ${BASH_VERSION:-} in [123].*) exit 1 ;; esac; read -t 1 x < /dev/null; [ $? = 1 ]'],
+                       capture_output=True, timeout=10)
+    return r.returncode == 0
+
+
+def fifo_writer(path, timeout=10):
+    """The write end of the fifo PATH once a reader (a stand-in listener's cat) has opened it; None after TIMEOUT."""
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        try:
+            return os.open(path, os.O_WRONLY | os.O_NONBLOCK)
+        except OSError as e:
+            if e.errno != errno.ENXIO:
+                raise
+        time.sleep(0.05)
+    return None
+
+
+def alive(pid):
+    """PID is a process that has not ended (a zombie has)."""
+    try:
+        with open(f'/proc/{pid}/stat') as f:
+            return f.read().rsplit(')', 1)[1].split()[0] != 'Z'
+    except (OSError, IndexError):
+        return False
+
+
+def wakeups(pid):
+    """How often PID has gone to sleep and been woken (voluntary context switches)."""
+    with open(f'/proc/{pid}/status') as f:
+        for line in f:
+            if line.startswith('voluntary_ctxt_switches:'):
+                return int(line.split()[1])
+    return 0
 LUCI_DEFAULTS = LUCI / 'etc' / 'uci-defaults' / '91-mu300-luci'
 
 HARNESS = r'''
@@ -42,7 +84,7 @@ proto_set_available() { rec proto_set_available "$@"; }
 proto_setup_failed() { rec proto_setup_failed "$@"; }
 proto_add_dynamic_defaults() { rec proto_add_dynamic_defaults; }
 json_get_vars() { apn=$T_APN; pdptype=$T_PDPTYPE; peerdns=$T_PEERDNS; ipv6=$T_IPV6; apn_internal=${T_APN_INTERNAL:-}; pdptype_internal=${T_PDPTYPE_INTERNAL:-}
-    auth=${T_AUTH:-}; username=${T_USERNAME:-}; password=${T_PASSWORD:-}; }
+    auth=${T_AUTH:-}; username=${T_USERNAME:-}; password=${T_PASSWORD:-}; iccid=${T_ICCID:-}; }
 json_init() { rec json_init; }
 json_add_string() { rec json_add_string "$@"; }
 json_add_boolean() { rec json_add_boolean "$@"; }
@@ -91,6 +133,7 @@ exit 0''')
     def set_mobile(self, out, rc, err=''):
         self.mobile.write_text('#!/bin/sh\necho "mobile-data $* env:$MU300_NETIFD:$MU300_PDP_TYPE:$MU300_IPV6" >> "$STUBLOG/calls"\n'
                                'echo "$1 $#:${MU300_APN_AUTH-unset}:${MU300_APN_USER-unset}:${MU300_APN_PASSWORD-unset}" >> "$STUBLOG/creds"\n'
+                               'echo "${MU300_APN_ICCID-unset}" >> "$STUBLOG/iccid"\n'
                                f'[ "$1" = up ] || exit 0\nprintf \'{out}\'\necho \'{err}\' >&2\nexit {rc}\n')
         self.mobile.chmod(0o755)
 
@@ -129,6 +172,11 @@ exit 0''')
             self.assertIn('mobile-data up cmnet env:1:IPV4V6:', calls)
             # the internal card dials its own APN: the external card's credentials are not offered to its carrier
             self.assertEqual((self.tmp / 'creds').read_text().splitlines()[0], 'up 2:::')
+            # nor is the external card's binding (FINDINGS 231) applied to the internal card's own APN
+            (self.tmp / 'iccid').unlink(missing_ok=True)
+            self.run_proto(shell, 'proto_mu300cell_setup', out=UP_V4.replace('sipa_eth0', 'sipa_eth8'),
+                           T_APN='ctnet', T_APN_INTERNAL='cmnet', T_ICCID='89900000000000000001')
+            self.assertEqual((self.tmp / 'iccid').read_text().splitlines()[0], '')
             self.assertIn('proto_init_update sipa_eth8 1 1', calls)
             self.assertIn('ip -4 route replace default dev sipa_eth8', calls)
             calls = self.run_proto(shell, 'proto_mu300cell_teardown')
@@ -154,8 +202,13 @@ exit 0''')
             (self.tmp / 'creds').unlink()
             self.run_proto(shell, 'proto_mu300cell_setup')
             self.assertEqual((self.tmp / 'creds').read_text().splitlines()[0], 'up 2:::')
+            # the card they are bound to (FINDINGS 231), in the environment too; none set: empty
+            (self.tmp / 'iccid').unlink(missing_ok=True)
+            self.run_proto(shell, 'proto_mu300cell_setup', T_ICCID='89900000000000000001')
+            self.run_proto(shell, 'proto_mu300cell_setup')
+            self.assertEqual((self.tmp / 'iccid').read_text().splitlines(), ['89900000000000000001', ''])
             calls = self.run_proto(shell, 'proto_mu300cell_init_config')
-            for name in ('auth', 'username', 'password'):
+            for name in ('auth', 'username', 'password', 'iccid'):
                 self.assertIn(f'proto_config_add_string {name}', calls)
 
     def test_setup_installs_v4_address_and_route_itself(self):
@@ -575,6 +628,232 @@ exit 0''')
             self.assertIn('ip -6 route replace 240e:388:a:9999::/64 dev br-lan metric 128', rounds[2], shell)
             self.assertNotIn('replace', rounds[3], shell)
 
+    def test_ndp_learn_daemon_routes_again_only_when_something_changed(self):
+        """FINDINGS 235: the daemon's round reads if_inet6 itself and looks at the routing table's lines of the /64
+        every ROUTE_EVERY rounds; ip runs only when the addresses or those lines changed (a route removed by someone
+        comes back), never every round of an unchanged bearer. Without a global address accept_ra is flipped."""
+        import time
+        fake = self.tmp / 'if_inet6'
+        fake.write_text('240e0388000a12340000000000000001 05 40 00 00 sipa_eth0\n')
+        routes = self.tmp / 'ipv6_route'
+        ours = ('240e0388000a12340000000000000000 40 00000000000000000000000000000000 00 '
+                '00000000000000000000000000000000 00000080 00000001 00000000 00000001   br-lan\n')
+        routes.write_text(ours)
+        self.stub('ip', 'echo "ip $*" >> "$STUBLOG/ipcalls"; exit 0')
+        self.stub('logger', 'exit 0')
+
+        def replaces():
+            p = self.tmp / 'ipcalls'
+            return [c for c in p.read_text().splitlines() if ' replace ' in c] if p.exists() else []
+
+        def until(cond, timeout=10):
+            end = time.monotonic() + timeout
+            while time.monotonic() < end:
+                if cond():
+                    return True
+                time.sleep(0.05)
+            return False
+
+        for shell in self.each_shell():
+            (self.tmp / 'ipcalls').unlink(missing_ok=True)
+            fake.write_text('240e0388000a12340000000000000001 05 40 00 00 sipa_eth0\n')
+            routes.write_text(ours)
+            d = subprocess.Popen(shell + [str(NDP_LEARN)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                 env=self.env(MU300_IF_INET6=fake, MU300_IPV6_ROUTE=routes, MU300_NDP_INTERVAL='0.2',
+                                              MU300_NDP_ROUTE_EVERY='3', MU300_RA_DEPRECATE='true'))
+            try:
+                self.assertTrue(until(lambda: len(replaces()) == 1), (shell, replaces()))
+                time.sleep(2)                                    # ten rounds of an unchanged bearer
+                self.assertEqual(replaces(), ['ip -6 route replace 240e:388:a:1234::/64 dev br-lan metric 128'])
+                routes.write_text('')                            # someone took the route away
+                self.assertTrue(until(lambda: len(replaces()) == 2), (shell, replaces()))
+                routes.write_text(ours)
+                time.sleep(1)
+                n = len(replaces())
+                fake.write_text('240e0388000a99990000000000000002 05 40 00 00 sipa_eth0\n')   # renumbered
+                self.assertTrue(until(lambda: 'ip -6 route replace 240e:388:a:9999::/64 dev br-lan metric 128'
+                                      in replaces()[n:]), (shell, replaces()))
+            finally:
+                d.kill()
+                d.communicate(timeout=10)
+
+    # FINDINGS 235: with ip's monitor the daemon's rounds come with the kernel's word. The stand-in ip records every
+    # call in ipcalls; a `route replace` puts our route into the routing table file (as the kernel would), and
+    # `monitor` (pid in mon.pid) passes on what the test writes into the fifo $STUBLOG/mon, one line a change, as
+    # `ip -o -6 monitor address route` prints them.
+    BEARER_A = '240e0388000a12340000000000000001 05 40 00 00 sipa_eth0\n'
+    BEARER_B = '240e0388000a99990000000000000002 05 40 00 00 sipa_eth0\n'
+    OUR_ROUTE = ('240e0388000a12340000000000000000 40 00000000000000000000000000000000 00 '
+                 '00000000000000000000000000000000 00000080 00000001 00000000 00000001   br-lan\n')
+
+    def monitor_ip(self, monitor=True):
+        if monitor:
+            os.mkfifo(self.tmp / 'mon')
+        cat = shutil.which('cat')
+        (self.tmp / 'ours').write_text(self.OUR_ROUTE)
+        self.stub('ip', 'echo "ip $*" >> "$STUBLOG/ipcalls"\n'
+                        'case "$*" in\n'
+                        '  *" route replace "*) cp "$STUBLOG/ours" "$STUBLOG/ipv6_route" ;;\n'
+                        + (f'  *" monitor "*) echo $$ > "$STUBLOG/mon.pid"; exec {cat} "$STUBLOG/mon" ;;\n' if monitor
+                           else '  *" monitor "*) echo "Usage: ip [OPTIONS] address|route|link" >&2; exit 1 ;;\n') +
+                        'esac\n'
+                        'exit 0')
+        self.stub('logger', 'echo "logger $*" >> "$STUBLOG/logged"; exit 0')
+
+    def ndp_daemon(self, shell, **env):
+        (self.tmp / 'if_inet6').write_text(env.pop('bearer', self.BEARER_A))
+        (self.tmp / 'ipv6_route').write_text(self.OUR_ROUTE)
+        for f in ('ipcalls', 'mon.pid', 'logged', 'greps', 'sleeps'):
+            (self.tmp / f).unlink(missing_ok=True)
+        e = dict(MU300_IF_INET6=self.tmp / 'if_inet6', MU300_IPV6_ROUTE=self.tmp / 'ipv6_route',
+                 MU300_NDP_INTERVAL='1', MU300_NDP_SAFETY='600', MU300_RA_DEPRECATE='true')
+        e.update(env)
+        return subprocess.Popen(shell + [str(NDP_LEARN)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                env=self.env(**e))
+
+    def lines(self, name):
+        p = self.tmp / name
+        return p.read_text().splitlines() if p.exists() else []
+
+    def replaces(self):
+        return [c for c in self.lines('ipcalls') if ' replace ' in c]
+
+    def until(self, cond, what, timeout=10):
+        end = time.monotonic() + timeout
+        while time.monotonic() < end:
+            if cond():
+                return
+            time.sleep(0.05)
+        self.fail(what)
+
+    @staticmethod
+    def send(fd, *lines):
+        os.write(fd, ''.join(l + '\n' for l in lines).encode())
+
+    def test_ndp_learn_daemon_does_its_rounds_on_the_monitors_word(self):
+        """A route of br-lan or the bearer that changed, or any address: a round at once (a removed route back at
+        once, was within 30 s; a renumbered bearer routed at once, was within 10 s). In between nothing at all: no ip,
+        no grep, not even a wakeup; a line about anything else is no round. The monitor goes with the daemon."""
+        self.monitor_ip()
+        grep = shutil.which('grep')
+        self.stub('grep', f'echo grep >> "$STUBLOG/greps"; exec {grep} "$@"')
+        ran = False
+        for shell in self.each_shell():
+            if not timed_read(shell):
+                continue
+            ran = True
+            d = self.ndp_daemon(shell)
+            fd = None
+            try:
+                fd = fifo_writer(self.tmp / 'mon')
+                self.assertIsNotNone(fd, 'no monitor')
+                self.until(lambda: len(self.replaces()) == 1, 'the first round did not route the prefix')
+                time.sleep(1)
+                n, g, w = len(self.lines('ipcalls')), len(self.lines('greps')), wakeups(d.pid)
+                time.sleep(3)
+                self.assertEqual(self.lines('ipcalls')[n:], [])
+                self.assertEqual(len(self.lines('greps')), g)
+                self.assertLessEqual(wakeups(d.pid) - w, 1)
+                # another interface's route, a multicast route: no round
+                self.send(fd, 'ff00::/8 dev wlan0 table local proto kernel metric 256 pref medium',
+                          'Deleted fe80::/64 dev docker0 proto kernel metric 256 pref medium')
+                time.sleep(2.5)
+                self.assertEqual(self.lines('ipcalls')[n:], [])
+                self.assertEqual(len(self.lines('greps')), g)
+                # someone took our route away: back at once
+                (self.tmp / 'ipv6_route').write_text('')
+                t0 = time.monotonic()
+                self.send(fd, 'Deleted 240e:388:a:1234::/64 dev br-lan metric 128 pref medium')
+                self.until(lambda: len(self.replaces()) == 2, 'the removed route did not come back')
+                self.assertLess(time.monotonic() - t0, 5)
+                # the route that replace put back comes as a line too: a look, nothing changed, no ip
+                n = len(self.lines('ipcalls'))
+                self.send(fd, '240e:388:a:1234::/64 dev br-lan metric 128 pref medium')
+                time.sleep(2.5)
+                self.assertEqual(self.lines('ipcalls')[n:], [])
+                # the bearer renumbered: routed at once
+                (self.tmp / 'if_inet6').write_text(self.BEARER_B)
+                t0 = time.monotonic()
+                self.send(fd, '5: sipa_eth0    inet6 240e:388:a:9999::2/64 scope global \\       '
+                              'valid_lft forever preferred_lft forever')
+                self.until(lambda: 'ip -6 route replace 240e:388:a:9999::/64 dev br-lan metric 128' in self.replaces(),
+                           'the new prefix was not routed')
+                self.assertLess(time.monotonic() - t0, 5)
+            finally:
+                d.send_signal(signal.SIGTERM)
+                d.communicate(timeout=10)
+                if fd is not None:
+                    os.close(fd)
+            self.assertEqual(d.returncode, 0)
+            pid = int((self.tmp / 'mon.pid').read_text())
+            self.until(lambda: not alive(pid), 'the monitor outlived its daemon', timeout=5)
+            self.assertEqual([c for c in self.lines('ipcalls') if 'monitor' in c], ['ip -o -6 monitor address route'])
+        if not ran:
+            self.skipTest('no shell with read -t')
+
+    def test_ndp_learn_daemon_without_a_monitor_keeps_its_rounds(self):
+        """An ip without monitor (busybox's: usage, exit 1) or a shell without read -t (dash): a round every INTERVAL,
+        a removed route back within ROUTE_EVERY rounds, as before; the monitor is asked once, never again."""
+        self.monitor_ip(monitor=False)
+        for shell in self.each_shell():
+            d = self.ndp_daemon(shell, MU300_NDP_ROUTE_EVERY='2')
+            try:
+                self.until(lambda: len(self.replaces()) == 1, 'the first round did not route the prefix')
+                time.sleep(0.5)   # (the round reads the routes it left just after its replace: then they go)
+                (self.tmp / 'ipv6_route').write_text('')
+                self.until(lambda: len(self.replaces()) == 2, 'the removed route did not come back')
+                time.sleep(2.5)
+            finally:
+                d.send_signal(signal.SIGTERM)
+                d.communicate(timeout=10)
+            asked = [c for c in self.lines('ipcalls') if 'monitor' in c]
+            if timed_read(shell):
+                self.assertEqual(asked, ['ip -o -6 monitor address route'])
+                self.assertEqual([l for l in self.lines('logged') if 'monitor' in l],
+                                 ['logger -t ndp-learn no address and route monitor (ip -6 monitor); '
+                                  'a round every 1 s'])
+            else:
+                self.assertEqual(asked, [])
+
+    def test_ndp_learn_daemon_solicits_less_often_while_the_bearer_has_no_global_address(self):
+        """With the monitor the self-heal's router solicitations (accept_ra flipped, a `sleep 1` between) come after
+        INTERVAL, then twice as long each time; a change of the addresses starts them over at once."""
+        self.monitor_ip()
+        real = shutil.which('sleep')
+        self.stub('sleep', f'read -r up _ < /proc/uptime; echo "$up" >> "$STUBLOG/sleeps"; exec {real} "$@"')
+        link_local = 'fe800000000000000000000000000001 05 40 20 80 sipa_eth0\n'
+        ran = False
+        for shell in self.each_shell():
+            # the solicitations are seen through the sleep stub: a shell whose sleep is its own (busybox ash built
+            # with its applets preferred, as Ubuntu's) never runs it
+            if not timed_read(shell) or subprocess.run(shell + ['-c', 'command -v sleep'], capture_output=True,
+                                                       text=True, env=self.env()).stdout.strip() == 'sleep':
+                continue
+            ran = True
+            d = self.ndp_daemon(shell, bearer=link_local)
+            fd = None
+            try:
+                fd = fifo_writer(self.tmp / 'mon')
+                self.assertIsNotNone(fd, 'no monitor')
+                self.until(lambda: len(self.lines('sleeps')) >= 4, 'four solicitations', timeout=20)
+                t = [float(x) for x in self.lines('sleeps')[:4]]
+                self.assertGreaterEqual(t[2] - t[1], 1.5, t)
+                self.assertGreaterEqual(t[3] - t[2], 3, t)
+                # the next is 8 s away; the bearer's addresses change (it came up again): one at once
+                (self.tmp / 'if_inet6').write_text(link_local +
+                                                    '2a0200000db800010000000000000001 03 40 00 80    br-lan\n')
+                n = len(self.lines('sleeps'))
+                self.send(fd, '3: br-lan    inet6 2a02:0:db8:1::1/64 scope global \\       '
+                              'valid_lft forever preferred_lft forever')
+                self.until(lambda: len(self.lines('sleeps')) > n, 'no solicitation after the change', timeout=3)
+            finally:
+                d.send_signal(signal.SIGTERM)
+                d.communicate(timeout=10)
+                if fd is not None:
+                    os.close(fd)
+        if not ran:
+            self.skipTest('no shell with read -t and an outside sleep')
+
     def withdraw_rounds(self, shell, *states):
         """Rounds of one ndp-learn over bearer STATES ('a', 'b', 'ab', ''), returning per round the ra-deprecate
         calls (a stub) and the ndp-learn log lines."""
@@ -825,6 +1104,7 @@ if [ "$cmd" = - ]; then IFS= read -r cmd; printf 'stdin: %s\n' "$cmd" >> "$STUBL
 case $cmd in
     AT+CGPCO=0,\"\",\"\",*) cat "$STUBLOG/cgpco-clear" 2>/dev/null || echo OK ;;
     AT+CGPCO*) cat "$STUBLOG/cgpco" 2>/dev/null || echo OK ;;
+    AT+CCID) cat "$STUBLOG/ccid" 2>/dev/null || printf '+CCID: 89900000000000000001\nOK\n' ;;
     *) echo OK ;;
 esac
 """
@@ -848,7 +1128,7 @@ esac
         """define_context APN with the settings in the environment (DROP: names left out of it altogether, so that
         the settings file says them). -> (CompletedProcess, the stub's log lines)."""
         (self.tmp / 'at.log').unlink(missing_ok=True)
-        e = dict(MU300_APN_USER='', MU300_APN_PASSWORD='', MU300_APN_AUTH='', MU300_PDP_TYPE='', MU300_NETIFD='',
+        e = dict(MU300_APN_USER='', MU300_APN_PASSWORD='', MU300_APN_AUTH='', MU300_APN_ICCID='', MU300_PDP_TYPE='', MU300_NETIFD='',
                  MU300_APN_AUTH_MARK=self.mark.with_suffix(''), MU300_CONF=self.conf, MU300_NETWORK_CONF=self.netconf, APN=apn)
         e.update(env)
         full = self.env(**e)
@@ -932,6 +1212,47 @@ esac
         self.assertEqual(self.sent(log)[1], ('stdin', 'AT+CGPCO=0,"u","",1,3'))
         r, log = self.define('a', MU300_APN_PASSWORD=self.SECRET)
         self.assertEqual(self.sent(log)[1], ('stdin', f'AT+CGPCO=0,"","{self.SECRET}",1,3'))
+
+    def test_settings_bound_to_a_card_are_that_cards_alone(self):
+        """FINDINGS 231 (kanoqwq's APN profiles bound to an ICCID, in the one form FINDINGS 65 left room for): the APN,
+        its PDP type and its credentials go to the card of MU300_APN_ICCID only; another card dials with its own
+        context, and gets back nothing given to the modem earlier; a card that does not say its ICCID gets no dial."""
+        creds = dict(MU300_APN_USER='u', MU300_APN_PASSWORD=self.SECRET)
+        # the card of the settings (the stub's card), its ICCID in any case: as without a binding
+        for iccid in ('89900000000000000001', '89900000000000000001'.lower()):
+            r, log = self.define('private.apn', MU300_APN_ICCID=iccid, **creds)
+            self.assertEqual(r.stdout.strip(), 'rc=0', r.stderr)
+            self.assertEqual(self.sent(log), [('argv', 'AT+CCID'), ('argv', 'AT+CGDCONT=1,"IP","private.apn"'),
+                                              ('stdin', f'AT+CGPCO=0,"u","{self.SECRET}",1,3')])
+        # another card (quoted, as some firmware answers): no APN, no credentials; those of the last dial taken back
+        (self.tmp / 'ccid').write_text('+CCID: "8990000000000000009F"\nOK\n')
+        r, log = self.define('private.apn', MU300_APN_ICCID='89900000000000000001', **creds)
+        self.assertEqual(r.stdout.strip(), 'rc=0', r.stderr)
+        self.assertEqual(self.sent(log), [('argv', 'AT+CCID'), ('argv', 'AT+CGPCO=0,"","",1,0')])
+        self.assertFalse(self.mark.exists())
+        r, log = self.define('private.apn', MU300_APN_ICCID='89900000000000000001', **creds)
+        self.assertEqual(self.sent(log), [('argv', 'AT+CCID')])
+        # the alphanumeric one is matched as it is (FINDINGS 174)
+        r, log = self.define('private.apn', MU300_APN_ICCID='8990000000000000009f')
+        self.assertEqual(self.sent(log), [('argv', 'AT+CCID'), ('argv', 'AT+CGDCONT=1,"IP","private.apn"')])
+        # no ICCID from the card, or a setting that is no ICCID: no dial, and no ICCID in what is said
+        for answer in ('ERROR\n', '', 'OK\n'):
+            (self.tmp / 'ccid').write_text(answer)
+            r, log = self.define('private.apn', MU300_APN_ICCID='89900000000000000001', **creds)
+            self.assertEqual((r.stdout.strip(), self.sent(log)), ('rc=1', [('argv', 'AT+CCID')]), answer)
+            self.assertIn('did not say its ICCID', r.stderr)
+            self.assertNotIn('8990', r.stderr)
+        for bad in ('8990', '89900000000000000001;AT', '8990000000000000000"1', 'x' * 23):
+            r, log = self.define('private.apn', MU300_APN_ICCID=bad)
+            self.assertEqual((r.stdout.strip(), log), ('rc=1', []), bad)
+        # unset: the card is not even asked
+        r, log = self.define('private.apn')
+        self.assertEqual(self.sent(log), [('argv', 'AT+CGDCONT=1,"IP","private.apn"')])
+        # Ubuntu's settings file says it too
+        (self.tmp / 'ccid').write_text('+CCID: 89900000000000000002\nOK\n')
+        self.conf.write_text('MU300_APN=private.apn\nMU300_APN_ICCID=89900000000000000001\n')
+        r, log = self.define('', drop=('MU300_APN_ICCID',))
+        self.assertEqual((r.stdout.strip(), self.sent(log)), ('rc=0', [('argv', 'AT+CCID')]))
 
     def test_a_trace_does_not_hold_the_password(self):
         # bash -x mobile-data, as somebody looking for a fault would run it
@@ -1081,8 +1402,9 @@ esac
         for v in ("o.value('pap'", "o.value('chap'", "o.value('both'", "o.value('none'"):
             self.assertIn(v, js)
         example = (TOP / 'rootfs/overlay/etc/mu300/mobile-data.conf.example').read_text()
-        for name in ('MU300_APN_USER', 'MU300_APN_PASSWORD', 'MU300_APN_AUTH', 'install -m 600'):
+        for name in ('MU300_APN_USER', 'MU300_APN_PASSWORD', 'MU300_APN_AUTH', 'MU300_APN_ICCID', 'install -m 600'):
             self.assertIn(name, example)
+        self.assertIn("form.Value, 'iccid'", js)
         # the settings file never goes into a release, and OpenWrt's network settings are private from the first boot
         self.assertIn('(hotspot|vpn|toolkit|mobile-data)', (TOP / 'tools/make-release.sh').read_text())
         self.assertIn('chmod 600 /etc/config/network', (TOP / 'openwrt/overlay/etc/uci-defaults/90-mu300').read_text())

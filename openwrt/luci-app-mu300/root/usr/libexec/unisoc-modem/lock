@@ -4,6 +4,8 @@
 #   mu300-dash-lock get cached          the last reading only, no AT (the panel's request path)
 #   mu300-dash-lock refresh             a fresh reading into the cache, one at a time (started detached)
 #   mu300-dash-lock apply KIND VALUE    write one setting, then restart the protocol stack
+#   mu300-dash-lock start KIND VALUE    the same as a job of its own, detached: prints {"ok":1,"id":...} at once
+#   mu300-dash-lock status ID           that job: queued, running, done or error (with why); no AT
 #   mu300-dash-lock replay [early]      boot hook: re-apply every enabled saved setting
 #   mu300-dash-lock reset               everything back to automatic, verified: every write's answer checked, the
 #                                       settings read back before and after the one stack restart, and only then
@@ -55,6 +57,8 @@ STATE_DIR=$(safe_state_dir "$(uci_get state_dir)" /etc/unisoc-modem/lock-state.d
 DATA_IFACE=$(safe_iface "$(uci_get data_interface)" wan)
 RUNDIR=${MU300_DASH_DIR:-$RUN_DIR}
 APPLY_DIR=${UNISOC_APPLY_DIR:-/run/unisoc-modem-lock-apply}
+# the SIM manager's runtime state (sim-slot, sim-managed); the tests point it elsewhere
+SIM_RUN=${MU300_SIM_RUN:-/run/mu300}
 REPLAY_MARKER=${UNISOC_REPLAY_MARKER:-/run/unisoc-modem-lock-replay-done}
 LOG=$RUNDIR/lock.log
 # The lock state only changes when somebody applies one - a real read costs seven
@@ -68,9 +72,46 @@ mkdir -p "$STATE_DIR" 2>/dev/null
 at() { "$AT" -t "${2:-6}" "$1" 2>/dev/null | tr -d '\r'; }
 # Never WRITE bands the module does not support - the n79 lock (from the old
 # wrong capability decode) left the CP searching until it wedged. Supported
-# sets: NR from the cached SP5GCMDS caps (refreshed by every get), LTE fixed.
+# sets: NR from the cached SP5GCMDS caps (refreshed by every get), LTE per board.
 NR_SUP_FALLBACK=1,5,6,8,28,41,78
-LTE_SUP=1,3,5,8,34,38,39,40,41
+# LTE has no capability query: a cleared mask (AT+SPLBAND=1,0,0,0,0,0) reads back as the modem's own full table,
+# measured once per board and fixed here. F50 (and the V50, unmeasured): 0,482,0,149,0. U30 Air W25.30.2:
+# 0,2018,2057,2271,2. U30 Air W25.13.5: 0,450,0,149,0 (that firmware does not carry B38; a write of 0,482,...
+# reads back without it). Fixed per board and not learned from a read-back: a read-back taken while a lock is in the
+# modem's NV (one left by Android, by the stock UI, or by a wiped state directory) would become "the table" and that
+# lock "automatic", and a learned file on the SD card would follow the card to the other board. Nothing is written.
+LTE_TABLE_F50=1,3,5,8,34,38,39,40,41
+LTE_TABLE_U30AIR=1,2,3,4,5,7,8,12,17,20,28,34,38,39,40,41,42,43,66
+LTE_TABLE_U30AIR_W25135=1,3,5,8,34,39,40,41
+# modem_fw: the modem's firmware line, for the U30 Air table that differs between firmware builds. The identity
+# cache is tried first (a boot replay then needs no AT round trip); the AT answer is cached in RUNDIR (tmpfs).
+modem_fw() {
+    local cache=$RUNDIR/modem-fw f out
+    if [ -s "$cache" ]; then cat "$cache"; return 0; fi
+    for f in /etc/unisoc-modem/sim.json "$RUNDIR/cell.json"; do
+        [ -s "$f" ] || continue
+        out=$(jfilter -i "$f" -e '@.fw' 2>/dev/null || true)
+        [ -n "$out" ] || out=$(jfilter -i "$f" -e '@.ident.fw' 2>/dev/null || true)
+        [ -n "$out" ] && { printf '%s\n' "$out"; return 0; }
+    done
+    # the first line that names a version; any firmware's is cached (one AT round per boot), none is retried
+    out=$(at 'AT+CGMR' 2 2>/dev/null | grep -m1 -i 'version')
+    [ -n "$out" ] || return 1
+    mkdir -p "${cache%/*}" 2>/dev/null
+    printf '%s\n' "$out" > "$cache" 2>/dev/null
+    printf '%s\n' "$out"
+}
+lte_table() {
+    case $(mu300-device 2>/dev/null) in
+        u30air)
+            case "$(modem_fw 2>/dev/null)" in
+                *W25.13.5*) printf '%s' "$LTE_TABLE_U30AIR_W25135" ;;
+                *) printf '%s' "$LTE_TABLE_U30AIR" ;;
+            esac ;;
+        *) printf '%s' "$LTE_TABLE_F50" ;;
+    esac
+}
+LTE_SUP=$(lte_table)
 filter_bands() {  # filter_bands "1,5,79" "1,5,6,..." -> "1,5"
     local b out=
     for b in $(printf '%s' "$1" | tr ',' ' '); do
@@ -227,6 +268,10 @@ do_get() {
     # super-table slot and decoded as nonsense bands like n82.
     nr3=$(echo "$nrm" | awk -F',' 'NF>=4 {print $1","$3","$4; exit} NF==3 {print $1","$3",0"; exit} {print "0,0,0"}')
     lte_b=$(lte_bands "$ltem")
+    # the read-back as it is: a lock the panel did not save shows as that lock. Only a read-back holding every band
+    # of the table is automatic (it is what a cleared mask reads back as), and it is reported as nothing locked
+    # (it listed all 19 bands as locked on the U30 Air)
+    [ -n "$lte_b" ] && lte_full "$lte_b" && lte_b=
     nr_b=$(nr_bands "$nr3")
 
     # cell locks: "12,3" alone = none; (freq,pci) pairs follow - and there can
@@ -251,12 +296,12 @@ do_get() {
 
     # "auto" for bands = nothing locked (empty masks or the full supported set)
     # caps = what the module can do: NR = the SP5GCMDS list (sorted), LTE = the
-    # fixed table (there is no LTE capability command; ufi_tools uses the same
-    # fixed list). Both with a measured fallback for a silent firmware.
+    # board's table (there is no LTE capability command; see lte_table). NR with
+    # a measured fallback for a silent firmware.
     nrcap=$(printf '%s' "$nrcapm" | tr ',' '\n' | tr -d ' \t"' | grep -xE '[0-9]+' |
         sort -n | awk 'NR>1{printf ","}{printf "%s", $1}')
     [ -n "$nrcap" ] || nrcap=1,5,6,8,28,41,78
-    ltecap=1,3,5,8,34,38,39,40,41
+    ltecap=$LTE_SUP
     # every modem-derived value goes through json_str; cells is built above
     # from digits matched by a regex only
     printf '{"ts":%d,"mode":{"label":%s,"work":%s,"gran":%s,"m1":%s,"prim":%s},"endc":%s,"lte":{"locked":%s,"raw":%s},"nr":{"locked":%s,"raw":%s},"cell":%s,"cells":%s,"caps":{"nr":%s,"lte":%s}}\n' \
@@ -377,6 +422,35 @@ emit_state() {
     sed 's/^{//' "$LOCKCACHE"
 }
 
+# apply_write CMD: one write of an apply. An explicit ERROR answer is a refusal: logged with the answer, nothing saved,
+# no stack restart (#356: the answer used to be thrown away, and a refused write was saved and replayed as applied).
+# No answer at all is not taken as a refusal: some vendor setters apply the value and omit the final OK. Band masks
+# since #356; the mode, EN-DC and cell writes since the job queue below (kanoqwq's lock-apply write_setting), so that
+# a job's result says what the modem said.
+apply_write() {
+    local r
+    r=$(at "$1" 6)
+    case $r in
+        *ERROR*)
+            say "the modem refused $1: $(printf '%s\n' "$r" | sed -n '/ERROR/{p;q;}')"
+            printf '{"ok":0,"error":"The modem refused a write","detail":"%s"}\n' "$1"
+            exit 1 ;;
+    esac
+}
+
+# bands_kept KIND REQUESTED KEPT: a band lock whose bands the modem supports none of is refused (the filter left
+# nothing, which used to be written as "automatic": a lock on n999 cleared the NR lock and was reported done); bands
+# left out of a partly supported list are logged
+bands_kept() {
+    [ -n "$2" ] || return 0
+    if [ -z "$3" ]; then
+        say "apply $1 refused: the modem supports none of the bands $2"
+        printf '{"ok":0,"error":"None of these bands is supported by this modem","detail":"%s"}\n' "$2"
+        exit 1
+    fi
+    [ "$2" = "$3" ] || say "apply $1: bands the modem does not support left out of $2 (locking $3)"
+}
+
 do_apply() {  # do_apply KIND VALUE
     _t0=$(date +%s)
     valid_value "$1" "$2" || { echo "invalid lock setting" >&2; exit 2; }
@@ -388,11 +462,18 @@ do_apply() {  # do_apply KIND VALUE
         say "boot auto-apply -> $2"
         return 0
     fi
-    [ "${MU300_SIM_SLOT:-$(cat /run/mu300/sim-slot 2>/dev/null || echo 0)}" != 1 ] || {
+    # #356: these refusals ran detached and said nothing anywhere; the rpcd backend now refuses the same two cases
+    # before it starts us (the page shows why), and the log says it for every other caller
+    [ "${MU300_SIM_SLOT:-$(cat "$SIM_RUN/sim-slot" 2>/dev/null || echo 0)}" != 1 ] || {
+        say "apply $1 refused: SIM2 lock writes and live radio restart are not supported yet"
         echo "SIM2 lock writes and live radio restart are not supported yet" >&2
         return 1
     }
-    [ ! -e /run/mu300/sim-managed ] || { echo "Managed dual-SIM network lock restart is not supported" >&2; return 1; }
+    [ ! -e "$SIM_RUN/sim-managed" ] || {
+        say "apply $1 refused: the dual-SIM manager runs the radio (managed dual-SIM network lock restart is not supported)"
+        echo "Managed dual-SIM network lock restart is not supported" >&2
+        return 1
+    }
     apply_lock
     trap 'rm -rf "$APPLY_DIR" 2>/dev/null' EXIT INT TERM
     # a reset that committed and was interrupted before its saved settings were all gone: finish it first, or the
@@ -410,13 +491,13 @@ do_apply() {  # do_apply KIND VALUE
             tm=$(at 'AT+SPTESTMODE?' | sed -n 's/^+SPTESTMODE: *//p' | head -n1)
             m1=$(echo "$tm" | cut -d, -f2); prim=$(echo "$tm" | cut -d, -f3)
             [ -n "$m1" ] || m1=134; [ -n "$prim" ] || prim=0
-            [ -n "$gran" ] && at "AT+SP5GRAN=$gran" 6 >/dev/null
-            at "AT+SPTESTMODE=$m0,$m1,$prim" 6 >/dev/null
+            [ -z "$gran" ] || apply_write "AT+SP5GRAN=$gran"
+            apply_write "AT+SPTESTMODE=$m0,$m1,$prim"
             say "network mode -> $val (SPTESTMODE $m0, SP5GRAN ${gran:-kept})"
             ;;
         endc)
             case $val in on) v=1 ;; off) v=2 ;; esac   # OFF is 2 here, not 0 (measured)
-            at "AT+SPENDC=$v" 6 >/dev/null
+            apply_write "AT+SPENDC=$v"
             say "EN-DC -> $val (SPENDC=$v, no stack restart needed)"
             save_state "$kind" "$val"
             # Reflect the new state in the cache at once: the page re-reads it
@@ -430,19 +511,21 @@ do_apply() {  # do_apply KIND VALUE
             ;;
         lte)
             val=$(filter_bands "$val" "$LTE_SUP")
+            bands_kept lte "$2" "$val"
             if [ -n "$val" ]; then
-                at "AT+SPLBAND=1,$(lte_masks "$val")" 6 >/dev/null
+                apply_write "AT+SPLBAND=1,$(lte_masks "$val")"
             else
-                at 'AT+SPLBAND=1,0,0,0,0,0' 6 >/dev/null
+                apply_write 'AT+SPLBAND=1,0,0,0,0,0'
             fi
             say "LTE bands -> ${val:-automatic}"
             ;;
         nr)
             val=$(filter_bands "$val" "$(nr_sup)")
+            bands_kept nr "$2" "$val"
             if [ -n "$val" ]; then
-                at "AT+SPLBAND=2,$(nr_masks "$val" | awk -F, '{print $1",0,"$2","$3}')" 6 >/dev/null
+                apply_write "AT+SPLBAND=2,$(nr_masks "$val" | awk -F, '{print $1",0,"$2","$3}')"
             else
-                at 'AT+SPLBAND=2,0,0,0,0' 6 >/dev/null
+                apply_write 'AT+SPLBAND=2,0,0,0,0'
             fi
             say "NR bands -> ${val:-automatic}"
             ;;
@@ -450,18 +533,18 @@ do_apply() {  # do_apply KIND VALUE
             state_saved=1
             case $val in
                 off)
-                    at 'AT+SPFORCEFRQ=12,4' 6 >/dev/null
-                    at 'AT+SPFORCEFRQ=16,4' 6 >/dev/null
+                    apply_write 'AT+SPFORCEFRQ=12,4'
+                    apply_write 'AT+SPFORCEFRQ=16,4'
                     say "cell lock removed"
                     cell_state_remove
                     ;;
                 off-nr)
-                    at 'AT+SPFORCEFRQ=16,4' 6 >/dev/null
+                    apply_write 'AT+SPFORCEFRQ=16,4'
                     say "NR cell lock removed"
                     cell_state_remove nr
                     ;;
                 off-lte)
-                    at 'AT+SPFORCEFRQ=12,4' 6 >/dev/null
+                    apply_write 'AT+SPFORCEFRQ=12,4'
                     say "LTE cell lock removed"
                     cell_state_remove lte
                     ;;
@@ -490,14 +573,14 @@ do_apply() {  # do_apply KIND VALUE
                     }
                     rat=${val%%:*}; pair=${val#*:}; fr=${pair%,*}; pc=${pair#*,}
                     case $rat in nr) p=16 ;; *) p=12 ;; esac
-                    at "AT+SPFORCEFRQ=$p,6,$fr,$pc" 6 >/dev/null
+                    apply_write "AT+SPFORCEFRQ=$p,6,$fr,$pc"
                     say "cell lock -> $val (SPFORCEFRQ=$p,6,$fr,$pc)"
                     cell_state_add "$val"
                     ;;
                 *:*)
                     rat=${val%%:*}; pair=${val#*:}; fr=${pair%,*}; pc=${pair#*,}
                     case $rat in nr) p=16 ;; *) p=12 ;; esac
-                    at "AT+SPFORCEFRQ=$p,6,$fr,$pc" 6 >/dev/null
+                    apply_write "AT+SPFORCEFRQ=$p,6,$fr,$pc"
                     say "cell lock -> $val"
                     cell_state_add "$val"
                     ;;
@@ -586,13 +669,22 @@ write_setting() {
 }
 # read_field CMD PREFIX: the +PREFIX: line's value, blanks removed
 read_field() { at "$1" 4 | sed -n "s/^+$2: *//p" | head -n1 | tr -d ' \t'; }
+# lte_full BANDS: BANDS holds every band of the board's LTE table (lte_table): what a cleared LTE mask reads back as.
+# A superset, not an exact match: a firmware whose table is larger than the one here is still automatic (before the
+# U30 Air had its own table, an exact match against the F50's failed every reset and boot replay there).
+lte_full() {
+    local b
+    for b in $(printf '%s' "$LTE_SUP" | tr ',' ' '); do
+        case ",$1," in *",$b,"*) ;; *) return 1 ;; esac
+    done
+}
 # verify_automatic: every setting reads back as automatic; else status 1 with VERIFY_STEP naming the first that
 # does not (mode, gran, endc, lte, nr, cell-lte, cell-nr) and VERIFY_GOT its raw answer. A silent read fails too.
 # "Automatic" bands: an empty mask, or the full supported set the modem reads a cleared mask back as (the LTE
 # table, or the NR bands SP5GCMDS lists that the SPLBAND codec can carry: n6 is supported and not encodable).
 verify_automatic() {
     local raw got nr3 want
-    VERIFY_STEP=; VERIFY_GOT=
+    VERIFY_STEP=; VERIFY_GOT=; VERIFY_LTE_RAW=; VERIFY_NR_RAW=
     raw=$(read_field 'AT+SPTESTMODE?' SPTESTMODE)
     [ "${raw%%,*}" = 134 ] || { VERIFY_STEP=mode; VERIFY_GOT=$raw; return 1; }
     raw=$(read_field 'AT+SP5GRAN?' SP5GRAN)
@@ -601,10 +693,12 @@ verify_automatic() {
     [ "$raw" = 1 ] || { VERIFY_STEP=endc; VERIFY_GOT=$raw; return 1; }
     raw=$(read_field 'AT+SPLBAND=0' SPLBAND)
     printf '%s\n' "$raw" | grep -Eq '^[0-9]+(,[0-9]+){4}$' || { VERIFY_STEP=lte; VERIFY_GOT=$raw; return 1; }
+    VERIFY_LTE_RAW=$raw
     got=$(canonical_bands "$(lte_bands "$raw")")
-    [ -z "$got" ] || [ "$got" = "$(canonical_bands "$LTE_SUP")" ] || { VERIFY_STEP=lte; VERIFY_GOT=$raw; return 1; }
+    [ -z "$got" ] || lte_full "$got" || { VERIFY_STEP=lte; VERIFY_GOT=$raw; return 1; }
     raw=$(read_field 'AT+SPLBAND=3' SPLBAND)
     printf '%s\n' "$raw" | grep -Eq '^[0-9]+(,[0-9]+){2,3}$' || { VERIFY_STEP=nr; VERIFY_GOT=$raw; return 1; }
+    VERIFY_NR_RAW=$raw
     nr3=$(printf '%s\n' "$raw" | awk -F, 'NF>=4 {print $1","$3","$4; exit} NF==3 {print $1","$3",0"; exit}')
     got=$(canonical_bands "$(nr_bands "$nr3")")
     want=$(canonical_bands "$(nr_bands "$(nr_masks "$(nr_sup)")")")
@@ -643,6 +737,22 @@ reset_fail() {
     refresh_cache_soon
     return 1
 }
+# reset_cache_automatic M1 PRIM: the cache rewritten to the automatic state the read-back after the restart has just
+# verified, before the result says ok: the page paints the cache the moment it sees the new result, and the
+# background re-read (refresh_cache_soon) comes later - painting the pre-reset reading kept "1 locked: B3" on the
+# page until a reload. Mode auto (134, NR mode 1, the slot1/primary fields the reset kept), EN-DC on, no band
+# locked (the raw masks the read-back got), no cell lock - and no cell file means "seed from the cache" at the next
+# cell lock, so the cache must not offer the cells just removed. ts is now: the modem was read a moment ago.
+reset_cache_automatic() {
+    [ -s "$LOCKCACHE" ] || return 0
+    sed -e "s/\"ts\":[0-9]*/\"ts\":$(date +%s)/" \
+        -e "s/\"mode\":{[^}]*}/\"mode\":{\"label\":\"auto\",\"work\":\"134\",\"gran\":\"1\",\"m1\":\"$1\",\"prim\":\"$2\"}/" \
+        -e 's/"endc":"[^"]*"/"endc":"1"/' \
+        -e "s/\"lte\":{\"locked\":\"[^\"]*\",\"raw\":\"[^\"]*\"/\"lte\":{\"locked\":\"\",\"raw\":\"$VERIFY_LTE_RAW\"/" \
+        -e "s/\"nr\":{\"locked\":\"[^\"]*\",\"raw\":\"[^\"]*\"/\"nr\":{\"locked\":\"\",\"raw\":\"$VERIFY_NR_RAW\"/" \
+        -e 's/"cell":"[^"]*"/"cell":""/; s/"cells":\[[^]]*\]/"cells":[]/' \
+        "$LOCKCACHE" > "$LOCKCACHE.part" 2>/dev/null && mv "$LOCKCACHE.part" "$LOCKCACHE"
+}
 do_reset() {
     local tm m1 prim cmd
     _t0=$(date +%s)
@@ -671,11 +781,7 @@ do_reset() {
     # two is finished by the next apply or replay
     save_state reset_pending 1
     finish_reset_state commit || { reset_fail 'The saved locks could not be cleared'; return 1; }
-    # no cell file means "seed from the cache" at the next cell lock: the cache
-    # must not offer the cells just removed (the fresh read below rewrites it all)
-    [ -s "$LOCKCACHE" ] &&
-        sed 's/"cell":"[^"]*"/"cell":""/; s/"cells":\[[^]]*\]/"cells":[]/' "$LOCKCACHE" > "$LOCKCACHE.part" 2>/dev/null &&
-        mv "$LOCKCACHE.part" "$LOCKCACHE"
+    reset_cache_automatic "$m1" "$prim"
     reset_result ok
     say "reset verified ($(( $(date +%s) - _t0 ))s); saved settings cleared"
     refresh_cache_soon
@@ -710,7 +816,7 @@ verify_replay() {
         raw=$(at_boot 'AT+SPLBAND=0' | sed -n 's/^+SPLBAND: *//p' | head -n1)
         [ -n "$raw" ] || return 1
         got=$(canonical_bands "$(lte_bands "$raw")")
-        [ "$got" = "$want" ] || { [ -z "$want" ] && [ "$got" = "$(canonical_bands "$LTE_SUP")" ]; } || return 1
+        [ "$got" = "$want" ] || { [ -z "$want" ] && lte_full "$got"; } || return 1
     fi
     if [ -f "$d/nr" ]; then
         val=$(cat "$d/nr")
@@ -745,9 +851,9 @@ verify_replay() {
     return 0
 }
 do_replay() {
-    [ ! -e /run/mu300/sim-managed ] || return 0
+    [ ! -e "$SIM_RUN/sim-managed" ] || { say "replay skipped: the dual-SIM manager runs the radio"; return 0; }
     # SIM2 has a different cold-start sequence. Its band/cell replay and restart are not validated.
-    [ "${MU300_SIM_SLOT:-$(cat /run/mu300/sim-slot 2>/dev/null || echo 0)}" != 1 ] || return 0
+    [ "${MU300_SIM_SLOT:-$(cat "$SIM_RUN/sim-slot" 2>/dev/null || echo 0)}" != 1 ] || { say "replay skipped: SIM2 is in use"; return 0; }
     local phase=${1:-late} marker=$REPLAY_MARKER
     [ -e "$marker" ] && return 0
     if ! auto_apply_enabled; then
@@ -835,6 +941,104 @@ do_apply_quiet() {
     esac
 }
 
+# ------------------------------------------------------------------ jobs
+# Ported from kanoqwq/mu300-linux (lock-jobs.sh, db4e5d2a..b8d4f222; FINDINGS 233): an apply as a job of its own,
+# so the page can learn how it ended. "apply" itself runs detached from the rpcd call (half a minute of SFUN, more while another apply
+# or the dial holds the radio), so the page saw only the read-back afterwards, and a refused write looked like a lock
+# that "did not take". "start" checks the value, makes $JOBS/<id> (ten random characters, mode 700 under the private
+# runtime directory), starts "job ID KIND VALUE" detached and answers at once; "status ID" reads its result, without
+# AT. The worker runs "apply" and keeps its exit status and its reason. Results live in RAM: a reboot forgets them.
+# Bounded: four jobs not yet ended and 64 in all; one that ended ten minutes ago is removed by the next start. A job
+# that has not ended after JOB_TIMEOUT, or whose worker is gone, is reported as such, never as running for ever.
+JOBS=$RUNDIR/lock-jobs
+JOB_TIMEOUT=${MU300_JOB_TIMEOUT:-420}   # apply_lock's 180 s wait + the radio lock's 120 s + the restart and its check
+job_now() { local n rest; read -r n rest < /proc/uptime; printf '%s\n' "${n%%.*}"; }
+job_dir() {  # job_dir ID: JOB set to that job's directory; 1 when ID is no job's
+    case $1 in ''|*[!A-Za-z0-9]*) return 1 ;; esac
+    [ ${#1} = 10 ] || return 1
+    JOB=$JOBS/$1
+    [ -d "$JOB" ] && [ ! -L "$JOB" ]
+}
+job_ended() { grep -q '"state":"\(done\|error\)"' "$1/result" 2>/dev/null; }
+# job_write STATE OK [ERROR]: ERROR is one of this script's fixed messages, the ones named here and at the callers
+job_write() {
+    # i18n: The modem refused a write
+    # i18n: None of these bands is supported by this modem
+    # i18n: No serving cell to lock to
+    # i18n: The saved locks could not be cleared
+    # i18n: Lock change failed
+    printf '{"id":%s,"state":%s,"ok":%d,"kind":%s,"error":%s}\n' "$(json_str "${JOB##*/}")" "$(json_str "$1")" "$2" \
+        "$(json_str "$(cat "$JOB/kind" 2>/dev/null)")" "$(json_str_or_null "${3:-}")" > "$JOB/result.part" &&
+        mv "$JOB/result.part" "$JOB/result"
+}
+job_status() {
+    local age pid
+    # i18n: The result of this lock change is no longer known
+    job_dir "${1:-}" || { printf '{"ok":0,"state":"error","error":"The result of this lock change is no longer known"}\n'; return 1; }
+    if ! job_ended "$JOB"; then
+        age=$(( $(job_now) - $(cat "$JOB/started" 2>/dev/null || echo 0) ))
+        pid=$(cat "$JOB/pid" 2>/dev/null)
+        if [ "$age" -gt "$JOB_TIMEOUT" ]; then
+            # i18n: The lock change took too long; select “Refresh lock status”
+            job_write error 0 'The lock change took too long; select “Refresh lock status”'
+        elif [ "$age" -gt 2 ] && { [ -z "$pid" ] || ! { tr '\0' ' ' < "/proc/$pid/cmdline"; } 2>/dev/null | grep -q '/unisoc-modem/lock'; }; then
+            # i18n: The lock change was interrupted; select “Refresh lock status”
+            job_write error 0 'The lock change was interrupted; select “Refresh lock status”'
+        fi
+    fi
+    cat "$JOB/result"
+}
+job_start() {
+    local d n=0 open=0 id
+    valid_value "$1" "$2" || { printf '{"ok":0,"error":"Invalid value for this lock kind"}\n'; return 2; }
+    ( umask 077; mkdir -p "$JOBS" ) && [ ! -L "$JOBS" ] || { printf '{"ok":0,"error":"Lock change failed"}\n'; return 1; }
+    # one start at a time: the count below and the new directory are one step
+    # i18n: Another lock change is being started; try again in a moment
+    mkdir "$JOBS/.start" 2>/dev/null ||
+        { printf '{"ok":0,"busy":1,"error":"Another lock change is being started; try again in a moment"}\n'; return 1; }
+    trap 'rmdir "$JOBS/.start" 2>/dev/null' EXIT INT TERM
+    for d in "$JOBS"/??????????; do
+        [ -d "$d" ] || continue
+        job_status "${d##*/}" >/dev/null
+        if job_ended "$d"; then
+            if [ $(( $(job_now) - $(cat "$d/started" 2>/dev/null || echo 0) )) -gt 600 ]; then
+                rm -f "$d/result" "$d/started" "$d/pid" "$d/kind" "$d/out" "$d/err"
+                rmdir "$d" 2>/dev/null && continue
+            fi
+        else
+            open=$((open + 1))
+        fi
+        n=$((n + 1))
+    done
+    # i18n: Too many lock changes are waiting; try again when they have ended
+    [ "$open" -lt 4 ] && [ "$n" -lt 64 ] ||
+        { printf '{"ok":0,"busy":1,"error":"Too many lock changes are waiting; try again when they have ended"}\n'; return 1; }
+    JOB=$(mktemp -d "$JOBS/XXXXXXXXXX") || { printf '{"ok":0,"error":"Lock change failed"}\n'; return 1; }
+    id=${JOB##*/}
+    job_now > "$JOB/started"
+    printf '%s\n' "$1" > "$JOB/kind"
+    job_write queued 0 || return 1
+    setsid "$0" job "$id" "$1" "$2" </dev/null >/dev/null 2>&1 &
+    printf '{"ok":1,"started":1,"id":%s,"kind":%s}\n' "$(json_str "$id")" "$(json_str "$1")"
+}
+# job_worker ID KIND VALUE: "apply" and how it ended. Its reason: the error of the JSON line it printed (a fixed
+# message of this script, which the page translates); a refusal on stderr only (a value, SIM2: the rpcd backend
+# refuses those before it starts a job) is the general one, and the log has the line
+job_worker() {
+    local rc=0 why
+    job_dir "$1" || return 1
+    echo $$ > "$JOB/pid"
+    job_write running 0 || return 1
+    "$0" apply "$2" "$3" > "$JOB/out" 2> "$JOB/err" || rc=$?
+    if [ "$rc" = 0 ]; then
+        job_write done 1
+        return 0
+    fi
+    why=$(jfilter -i "$JOB/out" -e '@.error' 2>/dev/null | head -n 1)
+    # i18n: Lock change failed
+    job_write error 0 "${why:-Lock change failed}"
+}
+
 # refresh: "get fresh" for the background, one at a time. The panel never reads the locks inside a request any more
 # (eight AT round trips, and on a busy or silent channel each waited out its whole budget, far past rpcd's 30 s); it
 # starts this and serves the cache. A second refresh while one runs has nothing to add, so it leaves at once.
@@ -871,9 +1075,13 @@ case "${1:-}" in
         emit_state
         ;;
     apply)  do_apply "${2:-}" "${3:-}" ;;
+    start)  job_start "${2:-}" "${3:-}" ;;
+    status) job_status "${2:-}" ;;
+    # run by job_start, detached
+    job)    job_worker "${2:-}" "${3:-}" "${4:-}" ;;
     reset)  do_reset; rc=$?; reset_status; exit "$rc" ;;
     replay) do_replay "${2:-late}" ;;
     # run by sfun_restart_locked, under the radio lock
     sfun-restart) sfun_restart "${2:-late}" ;;
-    *)      echo "usage: $0 get [fresh|cached] | refresh | apply KIND VALUE | reset | replay [early]" >&2; exit 2 ;;
+    *)      echo "usage: $0 get [fresh|cached] | refresh | apply KIND VALUE | start KIND VALUE | status ID | reset | replay [early]" >&2; exit 2 ;;
 esac

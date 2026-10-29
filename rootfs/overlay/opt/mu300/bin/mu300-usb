@@ -83,7 +83,21 @@ pd_wanted() { [ "$(sed -n 1p "$PD_CONF" 2>/dev/null)" = on ]; }
 chosen() { sed -n 's/.*\[\([a-z]*\)\].*/\1/p' "$1" 2>/dev/null; }   # "[host] device" -> host
 # the module of this kernel, by either spelling, in the flat directory mu300-update keeps them in
 pd_module() { [ -d "$R/sys/module/$PD_MOD" ] || find "$R/lib/modules/$(uname -r)" -name 'ump9620[-_]tcpc.ko*' 2>/dev/null | grep -q .; }
+# The PMIC's Type-C block has a detection driver by default, sc27xx-typec (port0, extcon; FINDINGS 234). The port
+# controller needs the block's interrupt and registers for itself: the detection driver is unbound before it loads
+# and bound again when it goes. (Not from the port controller's probe: the device link from its node to the Type-C
+# block's makes a release of the block's driver from there wait for ever.)
+TYPEC_DRV=$R/sys/bus/platform/drivers/sc27xx-typec
+typec_dev() { for d in "$R"/sys/bus/platform/devices/*typec@380; do [ -e "$d" ] && { echo "${d##*/}"; return 0; }; done; return 1; }
+typec_release() { _t=$(typec_dev) || return 0; [ -e "$TYPEC_DRV/$_t" ] || return 0; echo "$_t" > "$TYPEC_DRV/unbind" 2>/dev/null || :; }
+typec_back() {
+    _t=$(typec_dev) || return 0
+    [ -e "$TYPEC_DRV/$_t" ] && return 0
+    [ -d "$TYPEC_DRV" ] || modprobe sc27xx_typec 2>/dev/null || :
+    [ -d "$TYPEC_DRV" ] && echo "$_t" > "$TYPEC_DRV/bind" 2>/dev/null || :
+}
 pd_load() {  # the module with enable=1 (reloaded when it is there without), and a few seconds for it to bind
+    typec_release
     rmmod "$PD_MOD" 2>/dev/null
     modprobe "$PD_MOD" enable=1 || return 1
     # OpenWrt's modprobe (kmodloader) loads the dependencies but drops the options: the module came up with enable=N
@@ -248,7 +262,7 @@ if [ "${1:-}" = boot ]; then
     fi
     if pd_wanted && ! pd_port >/dev/null && pd_module; then
         pd_load && echo "mu300-usb: USB-C power delivery on (experimental)" ||
-            echo "mu300-usb: USB-C power delivery did not start (dmesg | grep ump9620)" >&2
+            { typec_back; echo "mu300-usb: USB-C power delivery did not start (dmesg | grep ump9620)" >&2; }
     fi
     exit 0
 fi
@@ -261,7 +275,7 @@ if [ "${1:-}" = pd ]; then
             # out of the manual host mode first: its boost would be the port controller's to switch off
             if ! pd_port >/dev/null && [ "$(cat "$(role_switch)" 2>/dev/null)" = host ]; then "$0" device >/dev/null || :; fi
             mkdir -p "${PD_CONF%/*}" && echo on > "$PD_CONF" || die "cannot write $PD_CONF"
-            pd_port >/dev/null || pd_load || die "the port controller did not bind (dmesg | grep -e ump9620 -e tcpm); off again: sudo mu300-usb pd off"
+            pd_port >/dev/null || pd_load || { typec_back; die "the port controller did not bind (dmesg | grep -e ump9620 -e tcpm); off again: sudo mu300-usb pd off"; }
             echo "USB-C power delivery on (EXPERIMENTAL; also after a reboot): a computer: device; an OTG adapter or a USB device: host with 5 V out; a PD dock with its charger: charging, then \"sudo mu300-usb host\" for host"
             echo "off again: sudo mu300-usb pd off" ;;
         off)
@@ -269,6 +283,7 @@ if [ "${1:-}" = pd ]; then
             mkdir -p "${PD_CONF%/*}" && echo off > "$PD_CONF" || die "cannot write $PD_CONF"
             # the module puts it all back as it goes: 5 V out off, device, the Type-C block as the boot left it
             if [ -d "$R/sys/module/$PD_MOD" ]; then rmmod "$PD_MOD" || die "cannot unload $PD_MOD"; fi
+            typec_back
             echo "USB-C power delivery off: device, and the manual host mode (sudo mu300-usb host)" ;;
         status)
             if pd_wanted; then echo "USB-C power delivery: on (experimental)"; else echo "USB-C power delivery: off"; fi

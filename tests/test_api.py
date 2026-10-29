@@ -389,6 +389,7 @@ class HotspotUbuntu(ApiCase):
             self.assertIn('BAND=2.4', self.conf())
             self.assertIn('CHANNEL=auto', self.conf())
             self.ok(shell, 'wifi.set', {'channel': '11'})
+            self.ok(shell, 'wifi.set', {'channel': 11})                # a JSON number as well
             self.assertIn('CHANNEL=11', self.conf())
             # while the radio is a client of another network, the hotspot is not restarted
             (self.root / 'run/mu300-wifi-client.active').write_text('')
@@ -857,6 +858,7 @@ class Jobs(ApiCase):
         for shell in self.each_shell():
             self.ok(shell, 'job.clear')
             self.refused(shell, 'kernel.set', {'version': '6.1'}, 'bad-value', 'version')
+            self.refused(shell, 'kernel.set', {'version': '7.4'}, 'bad-value', 'version')
             self.ok(shell, 'kernel.set', {'version': '7.2'})
             self.assertFalse(self.ok(shell, 'job.status')['job']['cancel'])
             self.refused(shell, 'job.cancel', {}, 'unsupported')
@@ -984,7 +986,8 @@ class PanelAdapters(ApiCase):
         req = {'enabled': True, 'template': '{text}\n-- {sender}', 'allow': 'BANK*\n+90555', 'webhook': True,
                'webhook_url': 'https://hook.example.com/s3cret', 'webhook_headers': 'Authorization: Bearer hdrsecret',
                'webhook_format': 'json', 'webhook_expect': 'errcode=0', 'telegram': False, 'telegram_token': '123456:' + 'A' * 30,
-               'email': False, 'email_password': 'mailsecret', 'sms': False, 'clear': 'telegram_token'}
+               'email': False, 'email_password': 'mailsecret', 'sms': False, 'clear': 'telegram_token',
+               'webhook_secret': 'ppsecret', 'timeout': '30', 'power': True}
         for shell in self.each_shell():
             self.assertEqual(self.ok(shell, 'sms.forward')['data'], {'ok': 1})
             self.assertEqual(self.calls('forward')[-1], ['forward', 'get'])
@@ -992,12 +995,20 @@ class PanelAdapters(ApiCase):
             self.assertEqual(self.calls('forward')[-1], ['forward', 'set'])
             sent = json.loads((self.tmp / 'stdin.forward').read_text())
             self.assertEqual((sent['enabled'], sent['webhook'], sent['telegram'], sent['email'], sent['sms']), ('1', '1', '0', '0', '0'))
-            for k in ('template', 'allow', 'webhook_url', 'webhook_headers', 'telegram_token', 'email_password', 'clear'):
+            for k in ('template', 'allow', 'webhook_url', 'webhook_headers', 'telegram_token', 'email_password', 'clear',
+                      'webhook_secret', 'timeout'):
                 self.assertEqual(sent[k], req[k], k)
+            self.assertEqual(sent['power'], '1')
+            # a client that does not know the battery notices sends none: none goes on (the saved setting stays)
+            self.ok(shell, 'sms.forward_set', {'enabled': True})
+            self.assertNotIn('power', json.loads((self.tmp / 'stdin.forward').read_text()))
+            self.refused(shell, 'sms.forward_set', {'power': 'maybe'}, 'bad-value', 'power')
+            self.ok(shell, 'sms.forward_set', req)
             self.assertEqual((self.tmp / 'fwdcheck').read_text().strip(), '')
             # no secret in an argument list, and no request file left behind
             for c in self.calls():
-                self.assertFalse(any(x in '\x1f'.join(c) for x in ('s3cret', 'hdrsecret', 'mailsecret', 'AAAAAAAAAA')), c)
+                self.assertFalse(any(x in '\x1f'.join(c) for x in ('s3cret', 'hdrsecret', 'mailsecret', 'AAAAAAAAAA',
+                                                                   'ppsecret')), c)
             self.assertEqual([f.name for f in self.run_dir.iterdir() if f.name.startswith('fwd.')], [])
             # the adapter's refusal is the answer's detail
             (self.tmp / 'fwdout').write_text('{"ok":0,"error":"Invalid Telegram bot token"}\n')
@@ -1086,7 +1097,7 @@ class ModemTools(ApiCase):
 
     def setUp(self):
         super().setUp()
-        for name in ('mu300-ttl', 'mu300-power', 'mu300-cpu', 'mu300-zram', 'mu300-led', 'mu300-ussd', 'mu300-user-packages'):
+        for name in ('mu300-ttl', 'mu300-tcp', 'mu300-power', 'mu300-cpu', 'mu300-zram', 'mu300-led', 'mu300-ussd', 'mu300-user-packages'):
             self.tool(name)
         (self.stubs / 'docker').write_text(RECORD)
         (self.stubs / 'docker').chmod(0o755)
@@ -1130,10 +1141,28 @@ class ModemTools(ApiCase):
             self.assertEqual(self.ok(shell, 'ttl.get'), {'ok': 1, 'enabled': False, 'value': None, 'backend': 'none'})
             self.ok(shell, 'ttl.set', {'value': '65'})
             self.assertEqual(self.calls('mu300-ttl')[-1], ['mu300-ttl', 'set', '65'])
+            self.ok(shell, 'ttl.set', {'value': 65})                  # a JSON number as well
+            self.assertEqual(self.calls('mu300-ttl')[-1], ['mu300-ttl', 'set', '65'])
             self.ok(shell, 'ttl.set', {'value': 'off'})
             self.assertEqual(self.calls('mu300-ttl')[-1], ['mu300-ttl', 'off'])
-            for bad in ('0', '256', '064', '-1', 'on'):
+            for bad in ('0', '256', '064', '-1', 'on', 256, 0, 64.5, True):
                 self.refused(shell, 'ttl.set', {'value': bad}, 'bad-value', 'value')
+
+    def test_tcp(self):
+        # mu300-tcp (kanoqwq's b9f71e72): what the kernel offers of cubic and bbr, nothing else; the value checked
+        for shell in self.each_shell():
+            self.out('mu300-tcp', 'SAVED=bbr\nCURRENT=bbr\nQDISC=fq\nOFFERED=cubic bbr\nSUPPORTED=1\nDEFAULT=cubic\n')
+            self.assertEqual(self.ok(shell, 'tcp.get'), {'ok': 1, 'supported': True, 'saved': 'bbr', 'current': 'bbr',
+                                                         'qdisc': 'fq', 'default': 'cubic', 'offered': ['cubic', 'bbr']})
+            # the 5.4 kernel: no BBR offered; odd words are not passed on
+            self.out('mu300-tcp', 'SAVED=reno\nCURRENT=cu"bic\nQDISC=pfifo_fast\nOFFERED=cubic reno\nSUPPORTED=1\nDEFAULT=\n')
+            self.assertEqual(self.ok(shell, 'tcp.get'), {'ok': 1, 'supported': True, 'saved': 'default', 'current': '',
+                                                         'qdisc': 'pfifo_fast', 'default': '', 'offered': ['cubic']})
+            for v in ('bbr', 'cubic', 'default'):
+                self.ok(shell, 'tcp.set', {'value': v})
+                self.assertEqual(self.calls('mu300-tcp')[-1], ['mu300-tcp', 'set', v])
+            for bad in ('reno', 'BBR', '-x', 'bbr;reboot', ''):
+                self.refused(shell, 'tcp.set', {'value': bad}, 'bad-value', 'value')
 
     def test_traffic(self):
         for shell in self.each_shell():
@@ -1145,18 +1174,33 @@ class ModemTools(ApiCase):
                               ({'key': 'warn', 'value': 90}, ['set', 'warn', '90']),
                               ({'key': 'cut', 'value': 'on'}, ['set', 'cut', 'on']),
                               ({'key': 'used', 'value': '1000'}, ['used', '1000']),
-                              ({'key': 'clear', 'value': 'yes'}, ['clear', '--yes'])):
+                              ({'key': 'clear', 'value': 'yes'}, ['clear', '--yes']),
+                              ({'key': 'daily', 'value': '0'}, ['set', 'daily', 'off']),
+                              ({'key': 'daily', 'value': '2147483648'}, ['set', 'daily', '2147483648']),
+                              # the byte counts as JSON numbers too (the F50's page sent daily as one: bad-value)
+                              ({'key': 'daily', 'value': 1073741824}, ['set', 'daily', '1073741824']),
+                              ({'key': 'daily', 'value': 0}, ['set', 'daily', 'off']),
+                              ({'key': 'cap', 'value': 53687091200}, ['set', 'cap', '53687091200']),
+                              ({'key': 'used', 'value': 1000}, ['used', '1000']),
+                              ({'key': 'daily_cut', 'value': 'on'}, ['set', 'daily-cut', 'on']),
+                              ({'key': 'count', 'value': 'rx'}, ['set', 'count', 'rx']),
+                              ({'key': 'plan', 'value': 'Gece "50" \u6708'}, ['set', 'plan', 'Gece "50" \u6708']),
+                              ({'key': 'plan', 'value': ''}, ['set', 'plan', ''])):
                 self.ok(shell, 'traffic.set', req)
                 self.assertEqual(self.calls('mu300-traffic')[-1], ['mu300-traffic'] + argv, req)
             for req in ({'key': 'reset_day', 'value': 32}, {'key': 'cap', 'value': '-1'}, {'key': 'cut', 'value': 'x'},
-                        {'key': 'clear', 'value': 'no'}, {'key': 'device', 'value': 'eth0'}):
+                        {'key': 'clear', 'value': 'no'}, {'key': 'device', 'value': 'eth0'},
+                        {'key': 'daily', 'value': '1.5'}, {'key': 'daily', 'value': 1.5}, {'key': 'daily', 'value': -1},
+                        {'key': 'daily', 'value': 1e9}, {'key': 'cap', 'value': True}, {'key': 'count', 'value': 'both'},
+                        {'key': 'daily_cut', 'value': 'yes'}, {'key': 'plan', 'value': 'a\nb'},
+                        {'key': 'plan', 'value': 'x' * 97}, {'key': 'plan', 'value': 'a\tb'}):
                 self.assertEqual(self.call(shell, 'traffic.set', req)[1]['error'], 'bad-value', req)
             self.out('mu300-traffic', 'nope\n')
             self.refused(shell, 'traffic.get', {}, 'failed')
 
     def test_power(self):
         status = ('state: active\nprofile: battery (automatic)\nsupply: battery\nbattery: 80 %\n'
-                  'SAVER_BELOW=20 CHARGE_TO=80\nPOWER_ON_CHARGER=1\nplugged: WIFI_IDLE=0 RADIO_IDLE=keep LEDS_IDLE=on CPU=full\n'
+                  'SAVER_BELOW=20 CHARGE_TO=80\nPOWER_ON_CHARGER=1\nRESUME_AT=60 CHARGE_PAUSE=1 FULL_ONCE=0\nplugged: WIFI_IDLE=0 RADIO_IDLE=keep LEDS_IDLE=on CPU=full\n'
                   'battery: WIFI_IDLE=10 RADIO_IDLE=lte LEDS_IDLE=off CPU=eco\nsaver: WIFI_IDLE=5 RADIO_IDLE=off LEDS_IDLE=off CPU=eco\n')
         (self.root / 'etc/mu300/power.conf').write_text('PROFILE=saver\n')
         for shell in self.each_shell():
@@ -1166,31 +1210,55 @@ class ModemTools(ApiCase):
             self.assertEqual(o['conf']['PROFILE'], 'saver')
             self.assertEqual((o['conf']['SAVER_BELOW'], o['conf']['CHARGE_TO']), (20, 80))
             self.assertEqual(o['conf']['POWER_ON_CHARGER'], 1)
+            self.assertEqual((o['conf']['RESUME_AT'], o['conf']['CHARGE_PAUSE'], o['conf']['FULL_ONCE']), (60, 1, 0))
             self.assertEqual(o['conf']['battery'], {'WIFI_IDLE': 10, 'RADIO_IDLE': 'lte', 'LEDS_IDLE': 'off', 'CPU': 'eco'})
             for req, argv in (({'key': 'PROFILE', 'value': 'auto'}, ['profile', 'auto']),
                               ({'key': 'CHARGE_TO', 'value': 80}, ['set', 'CHARGE_TO', '80']),
                               ({'key': 'POWER_ON_CHARGER', 'value': 0}, ['set', 'POWER_ON_CHARGER', '0']),
+                              ({'key': 'RESUME_AT', 'value': 60}, ['set', 'RESUME_AT', '60']),
+                              ({'key': 'CHARGE_PAUSE', 'value': 1}, ['set', 'CHARGE_PAUSE', '1']),
+                              ({'key': 'FULL_ONCE', 'value': 1}, ['set', 'FULL_ONCE', '1']),
                               ({'key': 'saver.RADIO_IDLE', 'value': 'off'}, ['set', 'saver.RADIO_IDLE', 'off']),
                               ({'key': 'battery.WIFI_IDLE', 'value': 15}, ['set', 'battery.WIFI_IDLE', '15'])):
                 self.ok(shell, 'power.set', req)
                 self.assertEqual(self.calls('mu300-power')[-1], ['mu300-power'] + argv)
             for req in ({'key': 'PROFILE', 'value': 'x'}, {'key': 'FOO', 'value': 1}, {'key': 'CHARGE_TO', 'value': 101},
-                        {'key': 'POWER_ON_CHARGER', 'value': 2},
+                        {'key': 'POWER_ON_CHARGER', 'value': 2}, {'key': 'RESUME_AT', 'value': 100},
+                        {'key': 'CHARGE_PAUSE', 'value': 2}, {'key': 'FULL_ONCE', 'value': -1},
                         {'key': 'battery.CPU', 'value': 'turbo'}):
                 self.assertEqual(self.call(shell, 'power.set', req)[1]['error'], 'bad-value', req)
 
     def test_leds_and_zram(self):
         for shell in self.each_shell():
             (self.root / 'etc/mu300/led.conf').unlink(missing_ok=True)
-            self.assertEqual(self.ok(shell, 'led.get'), {'ok': 1, 'timeout': None, 'device': 'f50'})
+            self.out('mu300-led', '')
+            self.assertEqual(self.ok(shell, 'led.get'), {'ok': 1, 'timeout': None, 'device': 'f50', 'settings': None})
             self.ok(shell, 'led.set', {'timeout': 120})
             self.assertEqual((self.root / 'etc/mu300/led.conf').read_text(), 'LED_TIMEOUT=120\n')
             self.assertEqual(self.ok(shell, 'led.get')['timeout'], 120)
+            # mu300-led's settings as they are (the lamps, switches, brightness, boot indicator, heat alarm)
+            self.out('mu300-led', '{"device":"f50","lamps":["network","wifi"],"dimmable":["network","wifi"],'
+                                  '"network":false,"network_brightness":40,"boot":true,"thermal":"blink"}\n')
+            o = self.ok(shell, 'led.get')['settings']
+            self.assertEqual((o['lamps'], o['network'], o['network_brightness'], o['boot'], o['thermal']),
+                             (['network', 'wifi'], False, 40, True, 'blink'))
+            self.clear_calls()
+            self.ok(shell, 'led.set', {'network': False, 'wifi_brightness': 30, 'boot': True, 'thermal': 'off'})
+            self.assertEqual((self.root / 'etc/mu300/led.conf').read_text(),
+                             'LED_TIMEOUT=120\nLED_NETWORK=0\nLED_BOOT=1\nLED_WIFI_BRIGHTNESS=30\nLED_THERMAL=off\n')
+            self.assertEqual(self.calls('later')[-1][-1], 'refresh')
+            self.ok(shell, 'led.set', {'timeout_default': True})
+            self.assertNotIn('LED_TIMEOUT', (self.root / 'etc/mu300/led.conf').read_text())
             self.clear_calls()
             self.ok(shell, 'led.set', {'test': True})
             self.assertEqual(self.calls('later')[-1][-1], 'test')
             self.refused(shell, 'led.set', {}, 'missing', 'timeout')
             self.refused(shell, 'led.set', {'timeout': -1}, 'bad-value', 'timeout')
+            for req, field in (({'network': 'off'}, 'network'), ({'battery_brightness': 0}, 'battery_brightness'),
+                               ({'wifi_brightness': 101}, 'wifi_brightness'), ({'thermal': 'loud'}, 'thermal'),
+                               ({'timeout': 5, 'timeout_default': True}, 'timeout_default'), ({'colour': 'red'}, 'colour')):
+                self.refused(shell, 'led.set', req, 'unknown-field' if field == 'colour' else 'bad-value', field)
+            (self.root / 'etc/mu300/led.conf').unlink()
             self.out('mu300-zram', 'zram swap: on, 700 MiB, lz4, priority 100\n  empty\n')
             o = self.ok(shell, 'zram.get')
             self.assertEqual((o['active'], o['enabled']), (True, True))

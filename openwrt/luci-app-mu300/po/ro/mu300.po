@@ -52,6 +52,9 @@ msgstr "Limbi"
 msgid "Power"
 msgstr "Alimentare"
 
+msgid "LEDs"
+msgstr "LED-uri"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Modul gazdă deconectează rețeaua USB și portul serial de pe acest po
 msgid "USB network mode"
 msgstr "Mod rețea USB"
 
+msgid "Current sharing protocol"
+msgstr "Protocolul de partajare actual"
+
 msgid "Network protocol"
 msgstr "Protocol de rețea"
 
@@ -658,6 +664,27 @@ msgstr "Reîmprospătare"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Disponibil doar în modul gazdă. Reîmprospătarea activează adaptoarele USB găsite; adăugarea la LAN salvează puntea și reîncarcă rețeaua."
 
+msgid "Network performance"
+msgstr "Performanța rețelei"
+
+msgid "Active congestion control"
+msgstr "Controlul congestiei activ"
+
+msgid "Default queue"
+msgstr "Coadă implicită"
+
+msgid "TCP congestion control"
+msgstr "Controlul congestiei TCP"
+
+msgid "Apply"
+msgstr "Aplicare"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Afectează în principal conexiunile TCP noi ale acestui dispozitiv. Conexiunile redirecționate ale clienților hotspot și USB nu folosesc automat BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR alege FQ drept coadă implicită pentru interfețele nou create. Conexiunile, interfețele și QoS existente se păstrează. Setarea rămâne după repornire."
+
 msgid "Recent modem operations"
 msgstr "Operații recente ale modemului"
 
@@ -670,6 +697,12 @@ msgstr "Apelurile recente ale panoului de control, din această pornire și din 
 msgid "Unavailable"
 msgstr "Indisponibil"
 
+msgid "Mixed"
+msgstr "Mixt"
+
+msgid "None"
+msgstr "Niciuna"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Modul rețea USB nu este disponibil în modul gazdă; pornirea automată a modului gazdă dezactivează și pornirea automată a rețelei USB."
 
@@ -681,9 +714,6 @@ msgstr "Rețeaua USB și portul serial vor fi reenumerate în modul dispozitiv."
 
 msgid "Switch USB role?"
 msgstr "Comutați rolul USB?"
-
-msgid "Apply"
-msgstr "Aplicare"
 
 msgid "Switching USB role…"
 msgstr "Se comută rolul USB…"
@@ -721,6 +751,21 @@ msgstr "Setări salvate"
 msgid "Save failed: %s"
 msgstr "Salvarea a eșuat: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Setările de performanță a rețelei nu au putut fi citite; reîmprospătați pentru a reîncerca"
+
+msgid "This kernel does not provide this setting"
+msgstr "Acest nucleu nu oferă această setare"
+
+msgid "System default"
+msgstr "Implicit sistem"
+
+msgid "Applied and saved for future boots."
+msgstr "Aplicat și salvat pentru pornirile următoare."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Nucleul nu a acceptat setările de rețea"
+
 msgid "This boot"
 msgstr "Această pornire"
 
@@ -739,6 +784,9 @@ msgstr "Se caută adaptoare USB…"
 msgid "No USB adapters found."
 msgstr "Nu s-au găsit adaptoare USB."
 
+msgid "In use by another network"
+msgstr "Folosit de altă rețea"
+
 msgid "Link connected"
 msgstr "Legătură conectată"
 
@@ -747,6 +795,9 @@ msgstr "Fără legătură; s-a încercat activarea"
 
 msgid "Added to LAN"
 msgstr "Adăugat la LAN"
+
+msgid "Cannot add"
+msgstr "Nu se poate adăuga"
 
 msgid "Add to LAN"
 msgstr "Adăugare la LAN"
@@ -784,6 +835,9 @@ msgstr "Formular (codificat URL)"
 msgid "Plain text"
 msgstr "Text simplu"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "De asemenea {sim} (SIM 1 sau SIM 2) și {kind} (sms, test sau power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Mesajele primite sunt redirecționate imediat ce ajung în fondul de SMS. O livrare eșuată este reîncercată după 30 s, apoi de fiecare dată după un timp de două ori mai lung (cel mult o oră), de zece ori în total."
 
@@ -811,6 +865,15 @@ msgstr "Doar mesajele care conțin unul dintre aceste cuvinte"
 msgid "One per line; empty: every message."
 msgstr "Unul pe linie; gol: toate mesajele."
 
+msgid "Battery"
+msgstr "Baterie"
+
+msgid "Battery and charger notices"
+msgstr "Notificări despre baterie și încărcător"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Un mesaj către fiecare destinație când bateria trece de 5, 20, 40, 60, 80 sau 100 % și când încărcătorul este conectat sau deconectat."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Corp personalizat"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Gol: câmpurile standard (text simplu: mesajul). Substituenți: {sender}, {time}, {text}, {device}, {message}. Fiecare valoare este escapată potrivit tipului ales. Acest corp este afișat din nou aici: păstrați secretele în adresă sau într-un antet."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Secret pentru {secret} în corpul personalizat"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pentru un serviciu care vrea tokenul în corp (PushPlus). Salvat doar pentru această adresă: o adresă nouă are din nou nevoie de el."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Antete suplimentare (un \"Nume: valoare\" pe linie)"
 
@@ -840,6 +909,9 @@ msgstr "Răspunsul trebuie să conțină"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Gol: orice răspuns HTTP 2xx contează ca livrat. Cu cheie=valoare (de exemplu errcode=0), răspunsul trebuie să fie în plus un obiect JSON care are această valoare sub această cheie la nivelul său superior; altfel livrarea eșuează. În jurnal ajunge doar rezultatul verificării, niciodată răspunsul."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Timp limită pentru cerere (secunde, 1-120; webhook și Telegram)"
 
 msgid "Bot token"
 msgstr "Tokenul botului"
@@ -861,9 +933,6 @@ msgstr "Port"
 
 msgid "Security"
 msgstr "Securitate"
-
-msgid "None"
-msgstr "Niciuna"
 
 msgid "User name"
 msgstr "Nume de utilizator"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux blocat"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Da: următoarea repornire pornește Android"
+
+msgid "No"
+msgstr "Nu"
+
+msgid "Writable"
+msgstr "Inscriptibil"
+
+msgid "This boot image cannot change the boot"
+msgstr "Această imagine de pornire nu poate schimba pornirea"
+
 msgid "%s of %s"
 msgstr "%s din %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Memorie"
 
 msgid "Storage"
 msgstr "Stocare"
-
-msgid "Battery"
-msgstr "Baterie"
 
 msgid "Channel"
 msgstr "Canal"
@@ -1105,14 +1186,23 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Repornire modem"
 
-msgid "Restart device"
-msgstr "Repornire dispozitiv"
+msgid "Power off or restart"
+msgstr "Oprire sau repornire"
 
 msgid "Switch to Android"
 msgstr "Comutare la Android"
 
 msgid "Lock Linux"
 msgstr "Blochează Linux"
+
+msgid "Default boot"
+msgstr "Pornire implicită"
+
+msgid "One-time boot"
+msgstr "Pornire unică"
+
+msgid "Boot control"
+msgstr "Controlul pornirii"
 
 msgid "Neighbor cells"
 msgstr "Celule vecine"
@@ -1125,6 +1215,9 @@ msgstr "Frecvență"
 
 msgid "Running %s…"
 msgstr "Se rulează %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Setările hotspot au fost salvate; se aplică modificările"
 
 msgid "Started in background: %s"
 msgstr "Pornit în fundal: %s"
@@ -1165,11 +1258,14 @@ msgstr "Datele mobile sunt folosite și în rețelele de roaming, ceea ce poate 
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Conectivitatea celulară se poate opri timp de 1–2 minute."
 
-msgid "Restart the entire device"
-msgstr "Repornirea întregului dispozitiv"
-
 msgid "All connections will be interrupted."
 msgstr "Toate conexiunile vor fi întrerupte."
+
+msgid "Power off"
+msgstr "Oprire"
+
+msgid "Restart"
+msgstr "Repornește"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Următoarea pornire va intra în Android, iar dispozitivul repornește acum. Această pagină de administrare și partajarea celulară se vor deconecta."
@@ -1243,6 +1339,9 @@ msgstr "SIM intern selectat: folosit după o repornire"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM intern selectat, dar neacceptat pe acest dispozitiv: se folosește SIM-ul extern"
 
+msgid "in use"
+msgstr "în uz"
+
 msgid "Uptime %s"
 msgstr "Timp de funcționare %s"
 
@@ -1309,9 +1408,6 @@ msgstr "Legătură LTE"
 msgid "Hidden"
 msgstr "Ascuns"
 
-msgid "No"
-msgstr "Nu"
-
 msgid "Running"
 msgstr "Rulează"
 
@@ -1371,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptor AT indisponibil"
-
-msgid "Linux locked"
-msgstr "Linux blocat"
 
 msgid "Installing the language pack…"
 msgstr "Se instalează pachetul de limbi…"
@@ -1453,6 +1546,51 @@ msgstr "Tradus"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Traducerile proprii ale LuCI provin din OpenWrt. Traducerile acestui panou, cu excepția turcei și chinezei, sunt traduceri automate (AI); corecturile sunt binevenite."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Introduceți un număr întreg de la 0 la %d"
+
+msgid "Network lamp"
+msgstr "Lampa de rețea"
+
+msgid "Wi-Fi lamp"
+msgstr "Lampa Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Lampa bateriei"
+
+msgid "On"
+msgstr "Pornit"
+
+msgid "Brightness (%)"
+msgstr "Luminozitate (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "O lampă oprită rămâne stinsă; alarma de căldură apare totuși pe LED-ul ei."
+
+msgid "Device default"
+msgstr "Implicit pentru dispozitiv"
+
+msgid "LED timeout (seconds)"
+msgstr "Timp LED-uri (secunde)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Cât timp rămân aprinse LED-urile după apăsarea unei taste sau o schimbare; 0 le ține aprinse. Pe încărcător rămân aprinse."
+
+msgid "Boot indicator"
+msgstr "Indicator de pornire"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED-ul își arată culorile pe rând cât timp sistemul pornește"
+
+msgid "Heat alarm"
+msgstr "Alarmă de căldură"
+
+msgid "Siren"
+msgstr "Sirenă"
+
+msgid "Red blink"
+msgstr "Clipire roșie"
+
 msgid "Automatic"
 msgstr "Automat"
 
@@ -1494,6 +1632,21 @@ msgstr "Blocare celulă de servire curentă"
 
 msgid "Unlock cell"
 msgstr "Deblocare celulă"
+
+msgid "Enter a cell"
+msgstr "Introduceți o celulă"
+
+msgid "Type"
+msgstr "Tip"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Număr de canal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Blochează această celulă"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Un număr de canal, nu o frecvență în MHz; celula nu trebuie să fie în lista celulelor vecine."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Aplicarea repornește stiva radio (SFUN) și întrerupe scurt serviciul celular. Setările sunt salvate și reaplicate de plugin după ce AT este pregătit, dacă Aplicare la pornire este activat. Un hook pre-radio al platformei poate reaplica fără repornire. Aplicați fără benzi selectate pentru a reveni la modul automat."
@@ -1582,17 +1735,20 @@ msgstr "Se blochează %s în fundal…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s blocat în fundal (repornire SFUN, aproximativ 30 de secunde); se citește starea…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Introduceți un număr de canal și un PCI în intervalele de mai jos"
+
 msgid "No serving-network data"
 msgstr "Nu există date despre rețeaua de servire"
 
 msgid "NR serving cell"
 msgstr "Celulă de servire NR"
 
-msgid "Status confirmed"
-msgstr "Stare confirmată"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Citirea de verificare a expirat; selectați „Reîmprospătare stare blocări”"
+
+msgid "Status confirmed"
+msgstr "Stare confirmată"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Resetare verificată: mod de rețea automatic, EN-DC pornit, toate benzile, fără blocare de celulă; setările de blocare salvate au fost șterse"
@@ -1732,9 +1888,6 @@ msgstr "trezit de tasta %s"
 msgid "the modem is suspended (%s)"
 msgstr "modemul este suspendat (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Introduceți un număr întreg de la 0 la %d"
-
 msgid "Power status unavailable"
 msgstr "Starea alimentării nu este disponibilă"
 
@@ -1792,6 +1945,12 @@ msgstr "Încărcare întreruptă: temperatura bateriei"
 msgid "Charging paused: charge limit"
 msgstr "Încărcare întreruptă: limita de încărcare"
 
+msgid "Charging paused: by hand"
+msgstr "Încărcare în pauză: manual"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Încărcare completă o dată, apoi înapoi la limită"
+
 msgid "Sleep now"
 msgstr "Repaus acum"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % nu încarcă niciodată bateria (dispozitivul funcționează de la �
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % protejează mai bine bateria unui dispozitiv care rămâne la priză."
 
+msgid "Start charging again under"
+msgstr "Reia încărcarea sub"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 reia cu 5 puncte sub nivelul de oprire. O valoare mai mică reia încărcarea doar sub ea; cu 100 %, o baterie plină așteaptă până scade sub ea."
+
+msgid "Resume charging"
+msgstr "Reia încărcarea"
+
+msgid "Pause charging"
+msgstr "Pune încărcarea pe pauză"
+
+msgid "Cancel the full charge"
+msgstr "Anulează încărcarea completă"
+
+msgid "Charge to full once"
+msgstr "Încarcă complet o dată"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "În pauză bateria nu se încarcă și dispozitivul merge de la încărcător; sub 5 % se încarcă totuși, iar protecția termică se aplică mereu."
+
 msgid "When the charger switches the device on"
 msgstr "Când încărcătorul pornește dispozitivul"
 
@@ -1830,9 +2010,6 @@ msgstr "Lasă neschimbat"
 
 msgid "LTE only (5G off)"
 msgstr "Doar LTE (5G oprit)"
-
-msgid "On"
-msgstr "Pornit"
 
 msgid "Full"
 msgstr "Complet"
@@ -2057,9 +2234,6 @@ msgstr "Implicit modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "în uz"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Oprește radioul SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Șters (doar local)"
 msgid "Enter both a number and a message."
 msgstr "Introduceți atât un număr, cât și un mesaj."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Memoria SIM: %d din %d locuri ocupate (la %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d mesaje, %d necitite · %d conversații"
 
@@ -2234,8 +2411,26 @@ msgstr "Limită lunară"
 msgid "%s, warning at %d%%"
 msgstr "%s, avertizare la %d%%"
 
+msgid "Daily quota"
+msgstr "Cotă zilnică"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Limita lunară a fost atinsă: datele mobile au fost oprite. Revin când începe ciclul următor."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Cota zilnică a fost atinsă: datele mobile au fost oprite. Revin la miezul nopții."
+
+msgid "The daily quota is reached"
+msgstr "Cota zilnică a fost atinsă"
+
+msgid "%d%% of the daily quota is used"
+msgstr "S-a folosit %d%% din cota zilnică"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limita și cota zilnică numără doar descărcările."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limita și cota zilnică numără doar încărcările."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s așteaptă ceasul: nu a fost încă setat din rețea. Se socotește deja în acest ciclu și va merge la ziua lui după ce ceasul e setat."
@@ -2267,6 +2462,9 @@ msgstr "Pe ciclu de facturare"
 msgid "Billing cycle"
 msgstr "Ciclu de facturare"
 
+msgid "Counted"
+msgstr "Numărat"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Introduceți o dimensiune în GB, de exemplu 50 sau 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Oprește datele mobile la limită"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Când acest ciclu atinge limita, datele mobile se opresc: fără internet prin operator până începe ciclul următor, se mărește limita sau se dezactivează din nou această opțiune. Datele mobile repornite manual rămân pornite până la următoarea repornire."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Oprește datele mobile la cota zilnică"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Când consumul de azi atinge cota zilnică, datele mobile sunt oprite până la miezul nopții, până când cota este mărită sau până când aceasta este oprită din nou. Repornirea manuală a datelor mobile le păstrează pornite până la următoarea repornire."
+
+msgid "Both ways"
+msgstr "Ambele sensuri"
+
+msgid "Downloads only"
+msgstr "Doar descărcări"
+
+msgid "Uploads only"
+msgstr "Doar încărcări"
 
 msgid "Set"
 msgstr "Setează"
@@ -2302,6 +2515,15 @@ msgstr "Limită lunară (GB, 0: niciuna)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Avertizează la acest procent din limită"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Cotă zilnică (GB, 0: niciuna)"
+
+msgid "The cap and the daily quota count"
+msgstr "Ce numără limita și cota zilnică"
+
+msgid "Plan name"
+msgstr "Numele abonamentului"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Folosit până acum în acest ciclu (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Dispozitivul repornește acum. Pornirea implicită este Android, deci po
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Dispozitivul repornește acum și lipsește aproximativ un minut. Dacă noul sistem nu pornește, dispozitivul revine singur la Android după încercările eșuate."
 
-msgid "Restart"
-msgstr "Repornește"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Se repornește… deschideți din nou această pagină peste aproximativ un minut."
 
@@ -2468,9 +2687,6 @@ msgstr "Imagine de pornire"
 msgid "from the installer"
 msgstr "din programul de instalare"
 
-msgid "Default boot"
-msgstr "Pornire implicită"
-
 msgid "Free space"
 msgstr "Spațiu liber"
 
@@ -2527,6 +2743,9 @@ msgstr "Note de versiune"
 
 msgid "Download"
 msgstr "Descărcare"
+
+msgid "only what changed since the installed release"
+msgstr "doar ce s-a schimbat de la versiunea instalată"
 
 msgid "Free space needed"
 msgstr "Spațiu liber necesar"
@@ -3056,9 +3275,6 @@ msgstr "Detectează"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL-ul poate conține un token: ajunge separat la dispozitiv, niciodată într-o linie de comandă sau într-un jurnal."
 
-msgid "Type"
-msgstr "Tip"
-
 msgid "Share link"
 msgstr "Link de partajare"
 
@@ -3388,6 +3604,21 @@ msgstr "Tip de blocare necunoscut"
 msgid "Invalid value for this lock kind"
 msgstr "Valoare invalidă pentru acest tip de blocare"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Blocările de bandă, mod și celulă nu sunt încă acceptate pentru SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Blocările de bandă, mod și celulă nu sunt acceptate cât timp comutarea dual-SIM gestionează radioul"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Acest modem nu acceptă niciuna dintre aceste benzi"
+
+msgid "Lock change failed"
+msgstr "Modificarea blocării a eșuat"
+
+msgid "Invalid job id"
+msgstr "ID de sarcină nevalid"
+
 msgid "Invalid page"
 msgstr "Pagină invalidă"
 
@@ -3478,14 +3709,29 @@ msgstr "Adaptorul TTL nu a dat un răspuns valid"
 msgid "Invalid TTL"
 msgstr "TTL nevalid"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptorul TCP nu a dat un răspuns valid"
+
+msgid "Invalid congestion control"
+msgstr "Control al congestiei nevalid"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptorul de pornire nu a dat un răspuns valid"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptorul LED nu a dat un răspuns valid"
+
+msgid "Unknown LED setting"
+msgstr "Setare LED necunoscută"
+
+msgid "Invalid value for this setting"
+msgstr "Valoare invalidă pentru această setare"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptorul de consum de date nu a dat un răspuns valid"
 
 msgid "Unknown data usage setting"
 msgstr "Setare de consum de date necunoscută"
-
-msgid "Invalid value for this setting"
-msgstr "Valoare invalidă pentru această setare"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptorul de redirecționare nu a dat un răspuns valid"
@@ -3731,8 +3977,29 @@ msgstr "Radioul nu și-a urmat setarea"
 msgid "The data roaming setting could not be saved"
 msgstr "Setarea roamingului de date nu a putut fi salvată"
 
-msgid "Expected on or off"
-msgstr "Se așteaptă on sau off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Setarea hotspot este salvată, dar reîncărcarea wireless a eșuat"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Setările wireless au modificări nesalvate: salvați-le sau anulați-le mai întâi"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspotul este deja în curs de comutare; reîncercați în curând"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Nu este configurat niciun hotspot (punct de acces)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Pornirea acestui radio ar afecta altă interfață; folosiți pagina Wireless"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radioul este folosit de clientul Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Setarea hotspot nu a putut fi scrisă"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Această platformă nu oferă controlul hotspotului"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Integrarea VPN nu este oferită de această platformă"
@@ -3833,6 +4100,15 @@ msgstr "Nu este o interfață de rețea USB"
 msgid "LAN bridge device section was not found"
 msgstr "Secțiunea de dispozitiv a punții LAN nu a fost găsită"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nu s-a putut stabili cui aparține adaptorul; reîncercați mai târziu"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptorul aparține altei rețele și nu se poate alătura LAN-ului"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Setările de rețea au modificări nesalvate: salvați-le sau anulați-le mai întâi"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Nu se poate activa interfața de rețea USB"
 
@@ -3865,6 +4141,12 @@ msgstr "Corpul webhook-ului este prea lung sau conține un caracter de control"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Verificarea răspunsului trebuie să fie cheie=valoare, ca errcode=0 sau ok=true (valoarea un număr întreg sau litere mici, cel mult 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Secret webhook nevalid (până la 256 de caractere imprimabile, fără spațiu)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Timpul limită trebuie să fie între 1 și 120 de secunde"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Antet nevalid (un \"Nume: valoare\" pe linie; Host, Content-Type, Content-Length, Transfer-Encoding și Connection sunt setate de dispozitiv)"
@@ -3926,8 +4208,17 @@ msgstr "O instalare rulează deja"
 msgid "The language pack could not be removed"
 msgstr "Pachetul de limbi nu a putut fi eliminat"
 
+msgid "The LED settings could not be read"
+msgstr "Setările LED-urilor nu au putut fi citite"
+
+msgid "The LED setting could not be saved"
+msgstr "Setarea LED-ului nu a putut fi salvată"
+
 msgid "Lock cache unavailable"
 msgstr "Cache-ul blocărilor nu este disponibil"
+
+msgid "The modem refused a write"
+msgstr "Modemul a refuzat o scriere"
 
 msgid "The saved locks could not be cleared"
 msgstr "Blocările salvate nu au putut fi șterse"
@@ -3938,9 +4229,6 @@ msgstr "Nicio celulă de servire pe care să se blocheze"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modemul nu a răspuns la interogarea modului; nu s-a trimis nimic"
 
-msgid "The modem refused a write"
-msgstr "Modemul a refuzat o scriere"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Recitirea nu corespunde valorilor automate"
 
@@ -3949,6 +4237,21 @@ msgstr "Recitirea după repornirea stivei nu corespunde valorilor automate"
 
 msgid "The reset was interrupted"
 msgstr "Resetarea a fost întreruptă"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Rezultatul acestei modificări a blocării nu mai este cunoscut"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Modificarea blocării a durat prea mult; selectați „Reîmprospătare stare blocări”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Modificarea blocării a fost întreruptă; selectați „Reîmprospătare stare blocări”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Se pornește o altă modificare a blocării; încercați din nou peste un moment"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Prea multe modificări ale blocării așteaptă; încercați din nou când se termină"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Reinstalarea pachetelor nu este disponibilă pe acest sistem"
@@ -3967,6 +4270,12 @@ msgstr "Operație pe pachete necunoscută"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Această platformă nu oferă controlul congestiei TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Setările TCP nu au putut fi citite"
 
 msgid "Data usage is not available on this system"
 msgstr "Consumul de date nu este disponibil pe acest sistem"

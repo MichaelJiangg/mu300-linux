@@ -4,6 +4,7 @@ kernel option and the images. On by default and open to every computer (FINDINGS
 before that stays."""
 import os
 import re
+import shutil
 import signal
 import subprocess
 import time
@@ -51,8 +52,9 @@ class AdbdBuild(unittest.TestCase):
 
     def test_the_daemon_is_started_with_the_mode(self):
         s = (BIN / 'mu300-adbd').read_text()
-        self.assertIn('MU300_ADB_AUTH=$auth "$ADBD" </dev/null &', s)
-        self.assertEqual(1, s.count('"$ADBD" </dev/null &'))
+        # (9<&-: not the loop's wait fifo, FINDINGS 235)
+        self.assertIn('MU300_ADB_AUTH=$auth "$ADBD" </dev/null 9<&- &', s)
+        self.assertEqual(1, s.count('"$ADBD" </dev/null'))
 
     def test_keys_only_from_root_owned_files(self):
         auth = added(PATCH, 'native/libs/adbd_auth/adbd_auth.cpp')
@@ -122,6 +124,29 @@ class AdbImages(unittest.TestCase):
         r = (TOP / 'tools/make-release.sh').read_text()
         self.assertIn('tools/adbd/build.sh', r)
         self.assertIn('/adbd:ro', r)
+
+
+class GadgetOsDescTable(unittest.TestCase):
+    """The oops of 2026-10-22 on an adbd restart (FINDINGS 213): f_ncm and f_rndis freed os_desc_table at unbind and
+    kept the pointer, so a bind without OS descriptors left it for the next unbind to free again. Patch 0027 forgets
+    it in both; mu300-adbd keeps the descriptors on, for kernels without the patch."""
+
+    KPATCH = TOP / 'upstream/patches/0027-usb-gadget-ncm-rndis-os-desc-table-double-free.patch'
+
+    def test_both_unbinds_forget_the_table_they_freed(self):
+        p = self.KPATCH.read_text()
+        for f in ('f_ncm.c', 'f_rndis.c'):
+            hunk = p.split(f'+++ b/drivers/usb/gadget/function/{f}\n', 1)[1].split('\n--- ', 1)[0]
+            self.assertIn('\n \tkfree(f->os_desc_table);\n+\tf->os_desc_table = NULL;\n \tf->os_desc_n = 0;\n', hunk)
+
+    def test_one_patch_with_its_number(self):
+        names = [q.name for q in (TOP / 'upstream/patches').rglob('0027-*.patch')]
+        self.assertEqual([self.KPATCH.name], names)
+
+    def test_adbd_never_turns_the_descriptors_off(self):
+        s = (BIN / 'mu300-adbd').read_text()
+        self.assertNotIn('echo 0 > "$G/os_desc/use"', s)
+        self.assertNotIn('rm -f "$G/os_desc/c.1"', s)
 
 
 class Gadget(ShellTest):
@@ -269,8 +294,9 @@ class Gadget(ShellTest):
             self.assertFalse(self.linked())
             self.assertEqual(self.UDC, self.read('UDC'))
             self.assertEqual('0x0301', self.read('bcdDevice'))
-            self.assertEqual('0', self.read('os_desc/use'))
-            self.assertFalse(os.path.lexists(self.g / 'os_desc/c.1'))
+            # left on: a bind without them would leave f_ncm's freed os_desc_table for the next unbind to free again
+            self.assertEqual('1', self.read('os_desc/use'))
+            self.assertTrue(os.path.islink(self.g / 'os_desc/c.1'))
             self.assertFalse((self.g / 'functions/ffs.adb').exists())
             self.assertIn(f'umount {self.ffs}', self.calls())
             # nothing was ever set on this device: on, and open to every computer
@@ -279,6 +305,25 @@ class Gadget(ShellTest):
             self.assertIn('auth open: every computer on the USB cable gets a root shell', out)
             (self.tmp / 'adbd.log').unlink()
             (self.tmp / 'calls').unlink()
+
+    def test_lan_recovery_hook_does_not_queue_a_second_rebind(self):
+        hook = self.tmp / 'hook'
+        hook.write_text('#!/bin/sh\n'
+                        'echo "hook $ACTION $INTERFACE" >> "$STUBLOG/hooks"\n'
+                        '[ "$MU300_USB_SKIP_REBIND" = 1 ] || echo rebind >> "$STUBLOG/queued"\n'
+                        'exit 0\n')
+        hook.chmod(0o755)
+        for shell in self.each_shell():
+            p = self.start(shell, MU300_USB_HOOK=hook)
+            try:
+                self.assertTrue(self.until(lambda: (self.tmp / 'hooks').exists()))
+                self.assertFalse((self.tmp / 'queued').exists(), 'ADB recovery requested another USB rebind')
+            finally:
+                rc, out = self.stop(p)
+            self.assertEqual(0, rc, out)
+            self.assertEqual(['hook ifup lan', 'hook ifup lan'], (self.tmp / 'hooks').read_text().splitlines())
+            self.assertFalse((self.tmp / 'queued').exists(), 'ADB teardown requested another USB rebind')
+            (self.tmp / 'hooks').unlink()
 
     def test_rndis_keeps_its_ms_os_descriptors(self):
         (self.g / 'configs/c.1/f1').unlink()
@@ -312,6 +357,37 @@ class Gadget(ShellTest):
                 self.assertTrue(self.linked())
             finally:
                 self.stop(p)
+
+    def test_a_gadget_that_is_as_it_should_be_is_looked_at_without_a_process(self):
+        # FINDINGS 235: the loop's look is the shell's own reads (no cat), and where read takes a timeout (bash,
+        # busybox ash) its wait is no sleep process either; dash sleeps
+        self.adbd.write_text('#!/bin/sh\n: > "$MU300_FFS/ep1"\n'
+                             'trap \'rm -f "$MU300_FFS/ep1"; exit 0\' TERM\nwhile :; do /bin/sleep 0.05; done\n')
+        for name in ('cat', 'cut', 'sleep'):
+            real = shutil.which(name)
+            self.stub(name, f'echo {name} >> "$STUBLOG/procs"; exec {real} "$@"')
+        for shell in self.each_shell():
+            p = self.start(shell, MU300_ADBD_IDLE_TICK='1')
+            try:
+                self.assertTrue(self.until(self.linked), 'adb never joined the gadget')
+                self.assertTrue(self.until(lambda: self.read('UDC') == self.UDC))
+                time.sleep(0.5)
+                (self.tmp / 'procs').unlink(missing_ok=True)
+                time.sleep(2.5)
+                procs = (self.tmp / 'procs').read_text().split() if (self.tmp / 'procs').exists() else []
+                self.assertNotIn('cat', procs)
+                self.assertNotIn('cut', procs)
+                if subprocess.run(shell + ['-c', 'case ${BASH_VERSION:-} in [123].*|"") exit 1 ;; esac'],
+                                  capture_output=True).returncode == 0:   # bash 4 and later: the fifo's read -t
+                    self.assertNotIn('sleep', procs)
+                else:
+                    self.assertLessEqual(procs.count('sleep'), 4)   # one a second, not one every TICK (0.1 s)
+                # and an unbound gadget is still bound again
+                (self.g / 'UDC').write_text('\n')
+                self.assertTrue(self.until(lambda: self.read('UDC') == self.UDC, timeout=15), 'never bound again')
+            finally:
+                rc, out = self.stop(p)
+            self.assertEqual(0, rc, out)
 
     def test_unready_adbd_never_costs_the_network(self):
         # adbd that never writes its descriptors: the gadget stays as it is, bound, without adb

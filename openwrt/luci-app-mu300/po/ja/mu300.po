@@ -52,6 +52,9 @@ msgstr "言語"
 msgid "Power"
 msgstr "電源"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "ホストモードではこのポートの USB ネットワークとシ�
 msgid "USB network mode"
 msgstr "USB ネットワークモード"
 
+msgid "Current sharing protocol"
+msgstr "現在の共有プロトコル"
+
 msgid "Network protocol"
 msgstr "ネットワークプロトコル"
 
@@ -658,6 +664,27 @@ msgstr "更新"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "ホストモードでのみ利用できます。更新すると検出された USB アダプタを起動します。LAN に追加するとブリッジ設定を保存し、ネットワークを再読み込みします。"
 
+msgid "Network performance"
+msgstr "ネットワーク性能"
+
+msgid "Active congestion control"
+msgstr "現在の輻輳制御"
+
+msgid "Default queue"
+msgstr "デフォルトキュー"
+
+msgid "TCP congestion control"
+msgstr "TCP 輻輳制御"
+
+msgid "Apply"
+msgstr "適用"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "主にこのデバイス自身が新しく張る TCP 接続に影響します。転送されるホットスポットや USB クライアントの接続が自動的に BBR になるわけではありません。"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR では新しく作成されるインターフェースの既定キューに FQ を使います。既存の接続・インターフェース・QoS はそのままです。設定は再起動後も保持されます。"
+
 msgid "Recent modem operations"
 msgstr "最近のモデム操作"
 
@@ -670,6 +697,12 @@ msgstr "今回と前回の起動におけるコントロールパネルの最近
 msgid "Unavailable"
 msgstr "利用不可"
 
+msgid "Mixed"
+msgstr "混在"
+
+msgid "None"
+msgstr "なし"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "ホストモードでは USB ネットワークモードを使用できません。ホストモードの自動起動を有効にすると USB ネットワークの自動起動も無効になります。"
 
@@ -681,9 +714,6 @@ msgstr "デバイスモードでは USB ネットワークとシリアルが再�
 
 msgid "Switch USB role?"
 msgstr "USB ロールを切り替えますか?"
-
-msgid "Apply"
-msgstr "適用"
 
 msgid "Switching USB role…"
 msgstr "USB ロールを切り替えています…"
@@ -721,6 +751,21 @@ msgstr "設定を保存しました"
 msgid "Save failed: %s"
 msgstr "保存に失敗しました: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "ネットワーク性能の設定を読み取れません。更新して再試行してください"
+
+msgid "This kernel does not provide this setting"
+msgstr "このカーネルはこの設定に対応していません"
+
+msgid "System default"
+msgstr "システム既定"
+
+msgid "Applied and saved for future boots."
+msgstr "適用し、次回以降の起動用に保存しました。"
+
+msgid "The kernel did not accept the network settings"
+msgstr "カーネルがネットワーク設定を受け付けませんでした"
+
 msgid "This boot"
 msgstr "今回の起動"
 
@@ -739,6 +784,9 @@ msgstr "USB アダプタをスキャンしています…"
 msgid "No USB adapters found."
 msgstr "USB アダプタが見つかりません。"
 
+msgid "In use by another network"
+msgstr "別のネットワークが使用中"
+
 msgid "Link connected"
 msgstr "リンク接続済み"
 
@@ -747,6 +795,9 @@ msgstr "リンクなし、有効化を試行済み"
 
 msgid "Added to LAN"
 msgstr "LAN に追加済み"
+
+msgid "Cannot add"
+msgstr "追加不可"
 
 msgid "Add to LAN"
 msgstr "LAN に追加"
@@ -784,6 +835,9 @@ msgstr "フォーム（URL エンコード）"
 msgid "Plain text"
 msgstr "プレーンテキスト"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "ほかに {sim} (SIM 1 または SIM 2) と {kind} (sms、test、power)。"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "受信したメッセージは SMS プールに届きしだい転送されます。送信に失敗すると 30 秒後に再試行し、その後は毎回 2 倍の間隔（最大 1 時間）で、合計 10 回試みます。"
 
@@ -811,6 +865,15 @@ msgstr "これらの語のいずれかを含むメッセージのみ"
 msgid "One per line; empty: every message."
 msgstr "1 行に 1 つ。空欄: すべてのメッセージ。"
 
+msgid "Battery"
+msgstr "バッテリー"
+
+msgid "Battery and charger notices"
+msgstr "バッテリーと充電器の通知"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "バッテリーが 5、20、40、60、80、100 % を通過したときと、充電器の抜き差しのときに、すべての送信先へメッセージを送ります。"
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "カスタム本文"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "空欄: 標準のフィールド（プレーンテキスト: メッセージ）。プレースホルダー: {sender}、{time}、{text}、{device}、{message}。各値は選択した形式に合わせてエスケープされます。この本文はここに再表示されます。秘密情報はアドレスかヘッダーに入れてください。"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "カスタム本文の {secret} に入れるシークレット"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "本文にトークンを求めるサービス (PushPlus) 用。このアドレス専用に保存され、新しいアドレスでは再入力が必要です。"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "追加ヘッダー（1 行に 1 つの \"Name: value\"）"
 
@@ -840,6 +909,9 @@ msgstr "応答に含まれるべき内容"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "空欄: HTTP 2xx の応答はすべて配信済みとみなします。キー=値（例: errcode=0）を指定すると、応答はさらに、最上位のそのキーにその値を持つ JSON オブジェクトでなければならず、そうでない場合は配信失敗になります。ログに記録されるのは確認の結果だけで、応答そのものは記録されません。"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "リクエストのタイムアウト (秒、1-120、webhook と Telegram)"
 
 msgid "Bot token"
 msgstr "ボットトークン"
@@ -861,9 +933,6 @@ msgstr "ポート"
 
 msgid "Security"
 msgstr "セキュリティ"
-
-msgid "None"
-msgstr "なし"
 
 msgid "User name"
 msgstr "ユーザー名"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linuxロック中"
+
+msgid "Yes: the next restart starts Android"
+msgstr "はい: 次の再起動で Android が起動します"
+
+msgid "No"
+msgstr "いいえ"
+
+msgid "Writable"
+msgstr "書き込み可能"
+
+msgid "This boot image cannot change the boot"
+msgstr "このブートイメージでは起動先を変更できません"
+
 msgid "%s of %s"
 msgstr "%s / %s"
 
@@ -1032,9 +1116,6 @@ msgstr "メモリ"
 
 msgid "Storage"
 msgstr "ストレージ"
-
-msgid "Battery"
-msgstr "バッテリー"
 
 msgid "Channel"
 msgstr "チャネル"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi ホットスポット"
 msgid "Restart modem"
 msgstr "モデムを再起動"
 
-msgid "Restart device"
-msgstr "デバイスを再起動"
+msgid "Power off or restart"
+msgstr "電源オフまたは再起動"
 
 msgid "Switch to Android"
 msgstr "Android に切り替え"
 
 msgid "Lock Linux"
 msgstr "Linuxをロック"
+
+msgid "Default boot"
+msgstr "既定の起動先"
+
+msgid "One-time boot"
+msgstr "一時的な起動"
+
+msgid "Boot control"
+msgstr "ブート制御"
 
 msgid "Neighbor cells"
 msgstr "隣接セル"
@@ -1125,6 +1215,9 @@ msgstr "周波数"
 
 msgid "Running %s…"
 msgstr "%s を実行中…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "ホットスポット設定を保存しました。反映中です"
 
 msgid "Started in background: %s"
 msgstr "バックグラウンドで開始: %s"
@@ -1165,11 +1258,14 @@ msgstr "ローミングネットワークでもモバイルデータが使われ
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "セルラー接続が 1～2 分間停止する場合があります。"
 
-msgid "Restart the entire device"
-msgstr "デバイス全体を再起動"
-
 msgid "All connections will be interrupted."
 msgstr "すべての接続が中断されます。"
+
+msgid "Power off"
+msgstr "電源オフ"
+
+msgid "Restart"
+msgstr "再起動"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "次回の起動で Android に入るよう設定し、今すぐ再起動します。この管理ページとセルラー共有は切断されます。"
@@ -1243,6 +1339,9 @@ msgstr "内蔵 SIM を選択済み: 再起動後に使用されます"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "内蔵 SIM を選択済みですが、このデバイスでは対応していません: 外部 SIM を使用中です"
 
+msgid "in use"
+msgstr "使用中"
+
 msgid "Uptime %s"
 msgstr "稼働時間 %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE リンク"
 msgid "Hidden"
 msgstr "非表示"
 
-msgid "No"
-msgstr "いいえ"
-
 msgid "Running"
 msgstr "実行中"
 
@@ -1371,9 +1467,6 @@ msgstr "オンライン"
 
 msgid "AT adapter unavailable"
 msgstr "AT アダプタを利用できません"
-
-msgid "Linux locked"
-msgstr "Linuxロック中"
 
 msgid "Installing the language pack…"
 msgstr "言語パックをインストールしています…"
@@ -1453,6 +1546,51 @@ msgstr "翻訳範囲"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI 自体の翻訳は OpenWrt によるものです。このパネルのトルコ語と中国語以外の翻訳は機械 (AI) 翻訳です。修正を歓迎します。"
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 から %d までの整数を入力してください"
+
+msgid "Network lamp"
+msgstr "ネットワークランプ"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi ランプ"
+
+msgid "Battery lamp"
+msgstr "バッテリーランプ"
+
+msgid "On"
+msgstr "オン"
+
+msgid "Brightness (%)"
+msgstr "明るさ (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "オフにしたランプは消灯したままです。高温アラームはそれでもその LED に表示されます。"
+
+msgid "Device default"
+msgstr "デバイスの既定値"
+
+msgid "LED timeout (seconds)"
+msgstr "LED のタイムアウト (秒)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "キー操作や状態の変化の後に LED が点灯し続ける時間です。0 で常に点灯します。充電器に接続中は点灯したままです。"
+
+msgid "Boot indicator"
+msgstr "起動インジケーター"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "システムの起動中、LED が色を順番に表示します"
+
+msgid "Heat alarm"
+msgstr "高温アラーム"
+
+msgid "Siren"
+msgstr "サイレン"
+
+msgid "Red blink"
+msgstr "赤色の点滅"
+
 msgid "Automatic"
 msgstr "自動"
 
@@ -1494,6 +1632,21 @@ msgstr "現在のサービングセルをロック"
 
 msgid "Unlock cell"
 msgstr "セルロックを解除"
+
+msgid "Enter a cell"
+msgstr "セルを入力"
+
+msgid "Type"
+msgstr "種類"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "チャネル番号（EARFCN / NR-ARFCN）"
+
+msgid "Lock this cell"
+msgstr "このセルをロック"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. MHz 単位の周波数ではなくチャネル番号です。セルが隣接セル一覧にある必要はありません。"
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "適用すると無線スタックが再起動し (SFUN)、セルラーサービスが一時的に中断されます。設定は保存され、「起動時に適用」が有効な場合は AT の準備完了後にプラグインが再適用します。プラットフォームの無線起動前フックがあれば再起動なしで再適用できます。バンドを何も選択せずに適用すると自動モードに戻ります。"
@@ -1582,17 +1735,20 @@ msgstr "バックグラウンドで %s をロックしています…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "バックグラウンドで %s をロックしました (SFUN 再起動、約 30 秒)。ステータスを読み戻しています…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "下記の範囲内でチャネル番号と PCI を入力してください"
+
 msgid "No serving-network data"
 msgstr "サービングネットワークのデータなし"
 
 msgid "NR serving cell"
 msgstr "NR サービングセル"
 
-msgid "Status confirmed"
-msgstr "ステータスを確認しました"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "読み戻しがタイムアウトしました。「ロック状態を更新」を選択してください"
+
+msgid "Status confirmed"
+msgstr "ステータスを確認しました"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "リセットを確認しました: ネットワークモード自動、EN-DC オン、全バンド、セルロックなし。保存されたロック設定は消去されました"
@@ -1732,9 +1888,6 @@ msgstr "%s キーで復帰"
 msgid "the modem is suspended (%s)"
 msgstr "モデムは一時停止中です（%s）"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 から %d までの整数を入力してください"
-
 msgid "Power status unavailable"
 msgstr "電源の状態を取得できません"
 
@@ -1792,6 +1945,12 @@ msgstr "充電を一時停止：バッテリー温度"
 msgid "Charging paused: charge limit"
 msgstr "充電を一時停止：充電上限"
 
+msgid "Charging paused: by hand"
+msgstr "充電を一時停止：手動"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "一度だけ満充電し、その後上限に戻ります"
+
 msgid "Sleep now"
 msgstr "今すぐスリープ"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % ではバッテリーを充電しません（本体は充電器で�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % にすると、常時電源につないだままの機器でバッテリーが長持ちします。"
 
+msgid "Start charging again under"
+msgstr "再開する残量（未満）"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 は停止レベルの 5 ポイント下で再開します。それより低い値ではその値を下回ったときだけ再開します。100 % の場合、満充電のバッテリーはその値を下回るまで待ちます。"
+
+msgid "Resume charging"
+msgstr "充電を再開"
+
+msgid "Pause charging"
+msgstr "充電を一時停止"
+
+msgid "Cancel the full charge"
+msgstr "満充電を取り消す"
+
+msgid "Charge to full once"
+msgstr "一度だけ満充電"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "一時停止中はバッテリーを充電せず、機器は充電器で動作します。5 % 未満では充電し、温度保護は常に有効です。"
+
 msgid "When the charger switches the device on"
 msgstr "充電器がデバイスの電源を入れたとき"
 
@@ -1830,9 +2010,6 @@ msgstr "そのまま"
 
 msgid "LTE only (5G off)"
 msgstr "LTE のみ（5G オフ）"
-
-msgid "On"
-msgstr "オン"
 
 msgid "Full"
 msgstr "フルパワー"
@@ -2057,9 +2234,6 @@ msgstr "モデムの既定値"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "使用中"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d の無線をオフにする"
 
@@ -2159,6 +2333,9 @@ msgstr "削除しました (ローカルのみ)"
 msgid "Enter both a number and a message."
 msgstr "番号とメッセージの両方を入力してください。"
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM ストレージ: %d / %d 件使用中 (%s 時点)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d 件、未読 %d 件 · 会話 %d 件"
 
@@ -2234,8 +2411,26 @@ msgstr "月間上限"
 msgid "%s, warning at %d%%"
 msgstr "%s、%d%% で警告"
 
+msgid "Daily quota"
+msgstr "1日の上限"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "月間上限に達しました: モバイルデータをオフにしました。次の期間が始まるとオンに戻ります。"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "1日の上限に達しました: モバイルデータをオフにしました。午前0時に再びオンになります。"
+
+msgid "The daily quota is reached"
+msgstr "1日の上限に達しました"
+
+msgid "%d%% of the daily quota is used"
+msgstr "1日の上限の %d%% を使用済み"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "上限と1日の上限はダウンロードのみを数えます。"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "上限と1日の上限はアップロードのみを数えます。"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s は時刻待ちです: 時刻がまだネットワークから設定されていません。すでに今回の期間に計上されており、時刻が設定されるとその日に記録されます。"
@@ -2267,6 +2462,9 @@ msgstr "請求期間別"
 msgid "Billing cycle"
 msgstr "請求期間"
 
+msgid "Counted"
+msgstr "計上"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB 単位でサイズを入力してください (例: 50 や 2.5)"
 
@@ -2278,6 +2476,21 @@ msgstr "上限でモバイルデータをオフにする"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "今回の期間が上限に達するとモバイルデータをオフにします: 次の期間が始まる、上限を上げる、またはこの設定をオフにするまで、通信事業者経由のインターネットは使えません。手動でモバイルデータをオンに戻すと、次の再起動までオンのままです。"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "1日の上限でモバイルデータをオフにする"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "今日の使用量が1日の上限に達すると、午前0時まで、上限を引き上げるまで、またはこれをオフにするまでモバイルデータをオフにします。手動でモバイルデータをオンにすると、次の再起動までオンのままです。"
+
+msgid "Both ways"
+msgstr "上下合計"
+
+msgid "Downloads only"
+msgstr "ダウンロードのみ"
+
+msgid "Uploads only"
+msgstr "アップロードのみ"
 
 msgid "Set"
 msgstr "設定"
@@ -2302,6 +2515,15 @@ msgstr "月間上限 (GB、0: なし)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "上限のこのパーセントで警告"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "1日の上限 (GB、0: なし)"
+
+msgid "The cap and the daily quota count"
+msgstr "上限と1日の上限の計量方法"
+
+msgid "Plan name"
+msgstr "プラン名"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "今回の期間のこれまでの使用量 (GB)"
@@ -2399,9 +2621,6 @@ msgstr "デバイスを再起動します。既定の起動先は Android なの
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "デバイスを再起動します。約 1 分間は接続できません。新しいシステムが起動しない場合は、何度か失敗したあと自動的に Android に戻ります。"
 
-msgid "Restart"
-msgstr "再起動"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "再起動中… 約 1 分後にこのページを開き直してください。"
 
@@ -2468,9 +2687,6 @@ msgstr "ブートイメージ"
 msgid "from the installer"
 msgstr "インストーラーによる"
 
-msgid "Default boot"
-msgstr "既定の起動先"
-
 msgid "Free space"
 msgstr "空き容量"
 
@@ -2527,6 +2743,9 @@ msgstr "リリースノート"
 
 msgid "Download"
 msgstr "ダウンロード"
+
+msgid "only what changed since the installed release"
+msgstr "インストール済みのリリースからの変更分のみ"
 
 msgid "Free space needed"
 msgstr "必要な空き容量"
@@ -3056,9 +3275,6 @@ msgstr "検出"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL にはトークンが含まれる場合があります。デバイスには単独で送られ、コマンドラインやログには決して書かれません。"
 
-msgid "Type"
-msgstr "種類"
-
 msgid "Share link"
 msgstr "共有リンク"
 
@@ -3388,6 +3604,21 @@ msgstr "不明なロック種別"
 msgid "Invalid value for this lock kind"
 msgstr "このロック種別に対して無効な値です"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "バンド・モード・セルのロックは SIM2 ではまだサポートされていません"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "デュアル SIM 切り替えが無線を管理している間は、バンド・モード・セルのロックはサポートされていません"
+
+msgid "None of these bands is supported by this modem"
+msgstr "このモデムはこれらのバンドのいずれにも対応していません"
+
+msgid "Lock change failed"
+msgstr "ロックの変更に失敗しました"
+
+msgid "Invalid job id"
+msgstr "無効なジョブ ID です"
+
 msgid "Invalid page"
 msgstr "無効なページ"
 
@@ -3478,14 +3709,29 @@ msgstr "TTL アダプターから有効な応答がありませんでした"
 msgid "Invalid TTL"
 msgstr "無効な TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP アダプタから有効な応答がありません"
+
+msgid "Invalid congestion control"
+msgstr "無効な輻輳制御です"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "ブートアダプタから有効な応答がありません"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED アダプターから有効な応答がありませんでした"
+
+msgid "Unknown LED setting"
+msgstr "不明な LED の設定"
+
+msgid "Invalid value for this setting"
+msgstr "この設定には無効な値です"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "データ使用量アダプターが有効な応答を返しませんでした"
 
 msgid "Unknown data usage setting"
 msgstr "不明なデータ使用量の設定"
-
-msgid "Invalid value for this setting"
-msgstr "この設定には無効な値です"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "転送アダプターが有効な応答を返しませんでした"
@@ -3731,8 +3977,29 @@ msgstr "無線が設定に従いませんでした"
 msgid "The data roaming setting could not be saved"
 msgstr "データローミングの設定を保存できませんでした"
 
-msgid "Expected on or off"
-msgstr "on または off を指定してください"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "ホットスポット設定は保存されましたが、無線の再読み込みに失敗しました"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "無線設定に未保存の変更があります。先に保存するか元に戻してください"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "ホットスポットは切り替え中です。少し待ってから再試行してください"
+
+msgid "No hotspot (access point) is configured"
+msgstr "ホットスポット (アクセスポイント) が設定されていません"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "この無線を有効にすると別のインターフェースにも影響します。無線ページを使ってください"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "無線は Wi-Fi クライアントが使用中です"
+
+msgid "The hotspot setting could not be written"
+msgstr "ホットスポット設定を書き込めませんでした"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "このプラットフォームではホットスポットを制御できません"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "このプラットフォームは VPN 連携を提供していません"
@@ -3833,6 +4100,15 @@ msgstr "USB ネットワークインターフェースではありません"
 msgid "LAN bridge device section was not found"
 msgstr "LAN ブリッジのデバイスセクションが見つかりません"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "アダプタの所属を確認できません。後で再試行してください"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "アダプタは別のネットワークに属しているため LAN に追加できません"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "ネットワーク設定に未保存の変更があります。先に保存するか元に戻してください"
+
 msgid "Cannot bring USB network interface up"
 msgstr "USB ネットワークインターフェースを起動できません"
 
@@ -3865,6 +4141,12 @@ msgstr "Webhook の本文が長すぎるか、制御文字を含んでいます"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "応答の確認は キー=値 の形式（例: errcode=0 や ok=true）で指定してください（値は整数または英小文字、16 文字まで）"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "無効な webhook シークレット (印字可能文字 256 文字まで、空白なし)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "タイムアウトは 1-120 秒にしてください"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "無効なヘッダー（1 行に 1 つの \"Name: value\"。Host、Content-Type、Content-Length、Transfer-Encoding、Connection はデバイスが設定します）"
@@ -3926,8 +4208,17 @@ msgstr "インストールはすでに実行中です"
 msgid "The language pack could not be removed"
 msgstr "言語パックを削除できませんでした"
 
+msgid "The LED settings could not be read"
+msgstr "LED の設定を読み取れませんでした"
+
+msgid "The LED setting could not be saved"
+msgstr "LED の設定を保存できませんでした"
+
 msgid "Lock cache unavailable"
 msgstr "ロックキャッシュを利用できません"
+
+msgid "The modem refused a write"
+msgstr "モデムが書き込みを拒否しました"
 
 msgid "The saved locks could not be cleared"
 msgstr "保存されたロックを消去できませんでした"
@@ -3938,9 +4229,6 @@ msgstr "ロックできるサービングセルがありません"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "モデムがモード照会に応答しませんでした。何も送信されていません"
 
-msgid "The modem refused a write"
-msgstr "モデムが書き込みを拒否しました"
-
 msgid "The read-back does not match the automatic values"
 msgstr "読み戻し値が自動の値と一致しません"
 
@@ -3949,6 +4237,21 @@ msgstr "スタック再起動後の読み戻し値が自動の値と一致しま
 
 msgid "The reset was interrupted"
 msgstr "リセットが中断されました"
+
+msgid "The result of this lock change is no longer known"
+msgstr "このロック変更の結果はもうわかりません"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "ロックの変更に時間がかかりすぎました。「ロック状態を更新」を選択してください"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "ロックの変更が中断されました。「ロック状態を更新」を選択してください"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "別のロック変更を開始中です。しばらくしてからもう一度お試しください"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "待機中のロック変更が多すぎます。終了してからもう一度お試しください"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "このシステムではパッケージの再インストールを利用できません"
@@ -3967,6 +4270,12 @@ msgstr "不明なパッケージ操作"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "このプラットフォームでは TCP 輻輳制御を変更できません"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP 設定を読み取れませんでした"
 
 msgid "Data usage is not available on this system"
 msgstr "このシステムではデータ使用量を利用できません"

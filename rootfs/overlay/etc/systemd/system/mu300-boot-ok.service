@@ -7,6 +7,8 @@ After=mu300-usb-net.service ssh.socket
 
 [Service]
 Type=oneshot
+# reachable over USB: the boot indicator (mu300-led boot on in mu300-fixups, LED_BOOT=1) ends
+ExecStartPre=-/opt/mu300/bin/mu300-led boot off
 # give the system a moment to prove it is usable before committing to the next Linux boot
 ExecStartPre=/bin/sleep 30
 ExecStart=/opt/mu300/bin/mu300-next-boot --rearm

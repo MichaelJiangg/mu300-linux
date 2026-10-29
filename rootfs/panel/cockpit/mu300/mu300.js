@@ -398,6 +398,7 @@
         var lb = lc.appendChild(el('div'));
         var MODES = [ [ 'auto', _('Automatic') ], [ 'auto152', _('Automatic without 2G (152)') ], [ '4g', _('4G only') ], [ 'sa', '5G SA' ], [ 'nsa', '5G NSA' ] ];
         var RESTART = _('The modem\'s protocol stack restarts: cellular service stops for about half a minute.');
+        var shownEnd = 0;
         function set(btn, kind, val, what, quick) {
             act(btn, 'lock.set', { kind: kind, val: val }, {
                 confirm: quick ? null : cockpit.format(_('Apply: $0?'), what) + '\n\n' + RESTART,
@@ -442,6 +443,7 @@
             }).join('; ') : _('none')));
             lb.appendChild(row(_('Apply at startup'), on(d.auto_apply === 1 || d.auto_apply === true)));
             var rs = d.reset;
+            shownEnd = (rs && rs.end) || 0;
             if (rs && rs.state) {
                 var st = { running: _('running'), ok: _('done'), done: _('done'), failed: _('failed'), interrupted: _('interrupted') }[rs.state] || rs.state;
                 lb.appendChild(row(_('Last reset to automatic'), st + (rs.error ? ' (' + rs.error + ')' : '')));
@@ -505,10 +507,28 @@
                 act(rb, 'lock.set', { kind: 'reset', val: 'auto' }, {
                     confirm: _('Network mode automatic, EN-DC on, every LTE and NR band, no cell lock; the saved locks are cleared, so nothing is applied at startup.') + '\n\n' + RESTART,
                     ok: _('Started in the background; the reading below follows when the modem is back.'),
-                    done: function () { setTimeout(function () { refresh(true); }, 5000); } });
+                    done: function () { afterReset(shownEnd); } });
             }, 'danger');
             lb.appendChild(actions([ ab, rb ]));
             lb.appendChild(note(_('Off: nothing is sent at startup; the saved settings stay.')));
+        }
+        /* the reset runs detached (half a minute and more): follow its result (lock.get's "reset", new when its end is
+         * after PREV, the device's clock) and paint once it has ended and, when ok, the reading is from after its start
+         * (the lock program rewrites the cache to the verified automatic state before it says ok); a reading taken
+         * while it ran showed the old locks until "Read again". Up to about 150 s, then the reading as it is. */
+        function afterReset(prev) {
+            var tries = 0;
+            clear(lb).appendChild(note(_('Reading the locks from the modem...')));
+            var step = function () {
+                api('lock.get', {}).then(function (r) {
+                    var d = (r && r.data) || {}, rs = d.reset || {};
+                    var ended = rs.state && rs.state !== 'running' && (rs.end || 0) > prev;
+                    if ((ended && (rs.state !== 'ok' || (d.ts || 0) >= (rs.ts || 0))) || ++tries > 50) {
+                        clear(lb); paint(d);
+                    } else setTimeout(step, 3000);
+                }, function () { if (++tries > 50) refresh(false); else setTimeout(step, 3000); });
+            };
+            setTimeout(step, 3000);
         }
         function refresh(fresh) {
             if (fresh) clear(lb).appendChild(note(_('Reading the locks from the modem...')));
@@ -520,7 +540,9 @@
     /* SMS forwarding (sms.forward, sms.forward_set, sms.forward_test, sms.forward_log_clear): received messages sent on
      * to a webhook, a Telegram chat, an e-mail address (with msmtp) or another phone. The secrets (the webhook address
      * and headers, the bot token, the mail password) are never sent back: an empty field keeps the saved one, a box
-     * removes it. The webhook's own body and the answer check are templates, not secrets: they come back. */
+     * removes it. The webhook's own body and the answer check are templates, not secrets: they come back. The webhook
+     * secret ({secret} in the body, PushPlus's token) is a secret; the timeout and the battery notices (where the board
+     * has a battery) are kanoqwq's, with his Bark, PushPlus and ServerChan presets. */
     var FWD_TEMPLATE = '{text}\n-- {sender}, {time} ({device})';
     function forwardCard(root) {
         var fc = root.appendChild(card(_('SMS forwarding'), 'mu-sms-forward'));
@@ -553,7 +575,7 @@
             var log = st.log || [];
             if (!log.length) logb.appendChild(note(_('No deliveries yet.')));
             else logb.appendChild(table([ _('Time'), _('Message'), _('Target'), _('Result'), _('Detail') ], log.map(function (e) {
-                return [ new Date((e.time || 0) * 1000).toLocaleString(), e.id === 'test' ? _('Test') : '#' + e.id,
+                return [ new Date((e.time || 0) * 1000).toLocaleString(), e.id === 'test' ? _('Test') : e.id === 'power' ? _('Battery') : '#' + e.id,
                     targets[e.target] || '-', results[e.result] || e.result, e.detail || '' ];
             })));
             var cl = button(_('Clear the log'), function () { act(cl, 'sms.forward_log_clear', {}, { done: refresh }); });
@@ -573,6 +595,11 @@
             fb.appendChild(field(_('Never these senders'), F.deny));
             F.keywords = area('mu-fwd-keywords', st.keywords, 2);
             fb.appendChild(field(_('Only messages with one of these words (one per line; empty: every message)'), F.keywords));
+            fb.appendChild(note(_('Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power), in the template and the custom body.')));
+            if (st.power_available) {
+                box('power', _('Battery and charger notices'), st.power);
+                fb.appendChild(note(_('A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out.')));
+            }
 
             fb.appendChild(el('h3', { text: _('Webhook') }));
             box('webhook', _('On'), st.webhook);
@@ -582,26 +609,38 @@
             fb.appendChild(field(_('Body (fields: sender, time, text, device, message)'), F.webhook_format));
             F.webhook_body = area('mu-fwd-webhook_body', st.webhook_body, 4, '{"text":"{message}"}');
             fb.appendChild(field(_('Custom body (empty: the standard fields; placeholders {sender}, {time}, {text}, {device}, {message}, each escaped for the type; shown again here: keep secrets in the address or a header)'), F.webhook_body));
+            /* [ body, answer check, type, address ] (the address filled in only when none is saved) */
             var BODIES = { wecom: [ '{"msgtype":"text","text":{"content":"{message}"}}', 'errcode=0' ],
-                feishu: [ '{"msg_type":"text","content":{"text":"{message}"}}', 'code=0' ] };
-            var bp = select('mu-fwd-body-preset', [ [ '', _('Presets') ], [ 'wecom', 'WeCom, DingTalk' ], [ 'feishu', 'Feishu, Lark' ] ], '');
+                feishu: [ '{"msg_type":"text","content":{"text":"{message}"}}', 'code=0' ],
+                bark: [ '{"title":"{sender}","body":"{message}","group":"MU300"}', 'code=200', 'json', 'https://api.day.app/YOUR_KEY' ],
+                pushplus: [ '{"token":"{secret}","title":"{sender}","content":"{message}","template":"txt"}', 'code=200', 'json',
+                    'https://www.pushplus.plus/send' ],
+                serverchan: [ 'title={sender}&desp={message}', 'code=0', 'form', 'https://sctapi.ftqq.com/YOUR_SENDKEY.send' ] };
+            var bp = select('mu-fwd-body-preset', [ [ '', _('Presets') ], [ 'wecom', 'WeCom, DingTalk' ], [ 'feishu', 'Feishu, Lark' ],
+                [ 'bark', 'Bark' ], [ 'pushplus', 'PushPlus' ], [ 'serverchan', 'ServerChan' ] ], '');
             bp.addEventListener('change', function () {
                 var b = Object.prototype.hasOwnProperty.call(BODIES, bp.value) ? BODIES[bp.value] : null;
                 if (b) {
                     F.webhook_body.value = b[0];
-                    F.webhook_format.value = 'json';
+                    F.webhook_format.value = b[2] || 'json';
                     if (!F.webhook_expect.value.trim()) F.webhook_expect.value = b[1];
+                    if (b[3] && !F.webhook_url.value.trim()) {
+                        if (st.webhook_url_set) F.webhook_url.placeholder = b[3]; else F.webhook_url.value = b[3];
+                    }
                 }
                 bp.value = '';
             });
             fb.appendChild(field(_('Body presets'), bp));
             secret('webhook_headers', st.webhook_headers_set, st.webhook_header_names, _('Extra headers (one "Name: value" per line)'), { area: true, ph: 'Authorization: Bearer ...' });
+            secret('webhook_secret', st.webhook_secret_set, '', _('Secret for {secret} in the custom body'), { password: true });
+            fb.appendChild(note(_('For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again.')));
             text('webhook_expect', _('The answer must contain (key=value; empty: every HTTP 2xx answer counts)'), st.webhook_expect, 'errcode=0');
             var ep = select('mu-fwd-expect-preset', [ [ '', _('Presets') ], [ 'errcode=0', 'DingTalk, WeCom: errcode=0' ], [ 'code=0', 'Feishu, Lark: code=0' ],
-                [ 'code=200', 'Bark: code=200' ], [ 'ok=true', 'Slack API, Telegram API: ok=true' ] ], '');
+                [ 'code=200', 'Bark, PushPlus: code=200' ], [ 'ok=true', 'Slack API, Telegram API: ok=true' ] ], '');
             ep.addEventListener('change', function () { if (ep.value) F.webhook_expect.value = ep.value; ep.value = ''; });
             fb.appendChild(field(_('Answer presets'), ep));
             fb.appendChild(note(_('With key=value the answer must be a JSON object with that value under that key at its top level, or the delivery fails. Only the result of the check is logged, never the answer.')));
+            text('timeout', _('Request timeout (seconds, 1-120; webhook and Telegram)'), String(st.timeout || 15));
 
             fb.appendChild(el('h3', { text: 'Telegram' }));
             box('telegram', _('On'), st.telegram);
@@ -628,11 +667,12 @@
                 var req = {}, clear = [];
                 [ 'enabled', 'webhook', 'telegram', 'email', 'sms' ].forEach(function (k) { req[k] = !!F[k].checked; });
                 [ 'template', 'allow', 'deny', 'keywords', 'webhook_body' ].forEach(function (k) { req[k] = F[k].value; });
-                [ 'webhook_url', 'webhook_expect', 'telegram_token', 'telegram_chat', 'email_host', 'email_port', 'email_user',
-                    'email_from', 'email_to', 'sms_number' ].forEach(function (k) { req[k] = F[k].value.trim(); });
+                [ 'webhook_url', 'webhook_expect', 'webhook_secret', 'timeout', 'telegram_token', 'telegram_chat', 'email_host',
+                    'email_port', 'email_user', 'email_from', 'email_to', 'sms_number' ].forEach(function (k) { req[k] = F[k].value.trim(); });
                 req.webhook_format = F.webhook_format.value; req.email_tls = F.email_tls.value;
                 req.webhook_headers = F.webhook_headers.value; req.email_password = F.email_password.value;
-                [ 'webhook_url', 'webhook_headers', 'telegram_token', 'email_password' ].forEach(function (k) {
+                if (F.power) req.power = !!F.power.checked;   /* no battery: left out, the saved setting stays */
+                [ 'webhook_url', 'webhook_headers', 'webhook_secret', 'telegram_token', 'email_password' ].forEach(function (k) {
                     if (F[k + '_clear'] && F[k + '_clear'].checked) clear.push(k);
                 });
                 req.clear = clear.join(' ');
@@ -854,6 +894,28 @@
             };
             tload();
         }
+        /* TCP congestion control of the device's own connections (mu300-tcp; kanoqwq's b9f71e72): only what the kernel
+         * offers (the 5.4 kernel has no BBR) */
+        if (has('tcp.get')) {
+            var cc = root.appendChild(card(_('TCP congestion control'), 'mu-tcp'));
+            var cb = cc.appendChild(el('div'));
+            var cload = function () {
+                return load(cb, 'tcp.get', {}, function (o) {
+                    cb.appendChild(note(_('Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR.')));
+                    cb.appendChild(row(_('Active congestion control'), (o.current || '--').toUpperCase()));
+                    cb.appendChild(row(_('Default queue'), o.qdisc || '--'));
+                    if (!o.supported) { cb.appendChild(note(_('This kernel does not provide this setting'), 'warn')); return; }
+                    var opts = [ [ 'default', _('System default') + (o.default ? ' (' + o.default.toUpperCase() + ')' : '') ] ];
+                    (o.offered || []).forEach(function (a) { opts.push([ a, a.toUpperCase() ]); });
+                    var sel = select('mu-tcp-algo', opts, o.saved || 'default');
+                    cb.appendChild(field(_('TCP congestion control'), sel));
+                    cb.appendChild(note(_('BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots.')));
+                    var s = button(_('Save and apply'), function () { act(s, 'tcp.set', { value: sel.value }, { done: cload }); }, 'primary');
+                    cb.appendChild(actions([ s ]));
+                });
+            };
+            cload();
+        }
         if (has('ussd.send')) {
             var uc = root.appendChild(card(_('USSD'), 'mu-ussd'));
             var code = input('mu-ussd-code', { maxlength: '40', placeholder: '*100#' });
@@ -974,7 +1036,8 @@
         history();
     };
 
-    /* Data usage: mu300-traffic's count (per day, per billing cycle) and the monthly cap */
+    /* Data usage: mu300-traffic's count (per day, per billing cycle), the monthly cap, the daily quota, the count mode
+     * and the plan's name */
     pages.usage = function (root) {
         var sc = root.appendChild(card(_('Data usage'), 'mu-traffic'));
         var sb = sc.appendChild(el('div'));
@@ -986,7 +1049,8 @@
         function set(btn, key, value, conf) { act(btn, 'traffic.set', { key: key, value: value }, { done: refresh, confirm: conf }); }
         function refresh() {
             return load(sb, 'traffic.get', {}, function (o) {
-                var t = o.traffic || {};
+                var t = o.traffic || {}, daily = t.daily || {};
+                if (t.plan) sb.appendChild(row(_('Plan'), t.plan));
                 if (t.today) sb.appendChild(row(_('Today'), fmtBytes(Number(t.today.rx) + Number(t.today.tx)) + '  (↓ ' + fmtBytes(t.today.rx) + ', ↑ ' + fmtBytes(t.today.tx) + ')'));
                 if (t.cycle) {
                     sb.appendChild(row(_('This billing cycle'), fmtBytes(t.cycle.used)));
@@ -997,6 +1061,12 @@
                 if (cap.bytes && t.cycle) sb.appendChild(row(_('Of the cap'), Math.round(100 * t.cycle.used / cap.bytes) + ' %'));
                 if (cap.cut_active) sb.appendChild(note(_('The cap is reached: mobile data is off until the next cycle.'), 'warn'));
                 else if (cap.level === 'warn') sb.appendChild(note(_('Close to the monthly cap.'), 'warn'));
+                if (daily.bytes) sb.appendChild(row(_('Daily quota'), fmtBytes(daily.used) + ' / ' + fmtBytes(daily.bytes)));
+                if (daily.cut_active) sb.appendChild(note(_('The daily quota is reached: mobile data is off until midnight.'), 'warn'));
+                else if (daily.level === 'over') sb.appendChild(note(_('The daily quota is reached.'), 'warn'));
+                else if (daily.level === 'warn') sb.appendChild(note(_('Close to the daily quota.'), 'warn'));
+                if (t.count === 'rx') sb.appendChild(note(_('The cap and the daily quota count downloads only.')));
+                else if (t.count === 'tx') sb.appendChild(note(_('The cap and the daily quota count uploads only.')));
                 sb.appendChild(row(_('Interface counted'), t.device));
                 if (!t.clock) sb.appendChild(note(_('The clock is not set yet (no network time): new traffic waits to be put on its day.')));
 
@@ -1005,16 +1075,26 @@
                 var capIn = input('mu-tr-cap', { type: 'number', min: '0', step: '0.5', value: cap.bytes ? String(+(cap.bytes / GIB).toFixed(2)) : '0' });
                 var warn = input('mu-tr-warn', { type: 'number', min: '1', max: '100', value: String(cap.warn || 90) });
                 var cut = check('mu-tr-cut', _('Turn mobile data off at the cap until the next cycle'), !!cap.cut);
+                var dIn = input('mu-tr-daily', { type: 'number', min: '0', step: '0.1', value: daily.bytes ? String(+(daily.bytes / GIB).toFixed(2)) : '0' });
+                var dcut = check('mu-tr-dcut', _('Turn mobile data off at the daily quota until midnight'), !!daily.cut);
+                var count = select('mu-tr-count', [ [ 'total', _('Both ways') ], [ 'rx', _('Downloads only') ], [ 'tx', _('Uploads only') ] ], t.count || 'total');
+                var plan = input('mu-tr-plan', { maxlength: '32', value: t.plan || '' });
+                cb.appendChild(field(_('Plan name'), plan));
                 cb.appendChild(field(_('The day a billing cycle starts (31: the month\'s last day)'), rd));
                 cb.appendChild(field(_('Monthly cap in GiB (0: none)'), capIn));
                 cb.appendChild(field(_('Warn at this percentage of the cap'), warn));
                 cb.appendChild(cut.node);
+                cb.appendChild(field(_('Daily quota in GiB (0: none)'), dIn));
+                cb.appendChild(dcut.node);
+                cb.appendChild(field(_('The cap and the daily quota count'), count));
                 var save = button(_('Save'), function () {
-                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value);
-                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
+                    var d = Number(rd.value), g = Number(capIn.value), w = Number(warn.value), dg = Number(dIn.value);
+                    if (!(d >= 1 && d <= 31 && Math.floor(d) === d) || !(g >= 0) || !(dg >= 0) || !(w >= 1 && w <= 100 && Math.floor(w) === w)) {
                         toast(_('Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100.'), 'error'); return;
                     }
-                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ] ];
+                    var steps = [ [ 'reset_day', d ], [ 'cap', String(Math.round(g * GIB)) ], [ 'warn', w ], [ 'cut', cut.box.checked ? 'on' : 'off' ],
+                        [ 'daily', String(Math.round(dg * GIB)) ], [ 'daily_cut', dcut.box.checked ? 'on' : 'off' ], [ 'count', count.value ],
+                        [ 'plan', String(plan.value).trim() ] ];
                     busy(save, true);
                     steps.reduce(function (p, s) { return p.then(function () { return api('traffic.set', { key: s[0], value: s[1] }); }); },
                         Promise.resolve()).then(function () { busy(save, false); toast(_('Saved'), 'ok'); refresh(); },
@@ -1039,8 +1119,9 @@
                     return [ d.date, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx)) ];
                 })));
                 hb.appendChild(el('h3', { text: _('Billing cycles') }));
-                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), _('Total') ], (t.cycles || []).map(function (d) {
-                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx), fmtBytes(Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
+                hb.appendChild(table([ _('Cycle'), _('Down'), _('Up'), t.count === 'rx' || t.count === 'tx' ? _('Counted') : _('Total') ], (t.cycles || []).map(function (d) {
+                    return [ d.start + ' - ' + d.last, fmtBytes(d.rx), fmtBytes(d.tx),
+                        fmtBytes(d.used !== undefined ? Number(d.used) : Number(d.rx) + Number(d.tx) + Number(d.adj || 0)) ];
                 })));
             });
         }
@@ -1363,6 +1444,8 @@
                 else b.appendChild(row(_('Battery'), _('none (powered by USB)')));
                 if (o.charge_off === 'temp') b.appendChild(note(_('Charging paused: battery temperature'), 'warn'));
                 else if (o.charge_off === 'limit') b.appendChild(note(_('Charging paused: charge limit')));
+                else if (o.charge_off === 'manual') b.appendChild(note(_('Charging paused: by hand')));
+                if (bt && (o.conf || {}).FULL_ONCE === 1) b.appendChild(note(_('Charging to full once, then back to the limit')));
                 var conf = o.conf || {};
                 clear(pb);
                 var prof = select('mu-pw-profile', [ [ 'auto', _('Automatic: plugged in / on battery') ], [ 'plugged', NAMES.plugged ],
@@ -1375,15 +1458,26 @@
                     var cto = input('mu-pw-chargeto', { type: 'number', min: '0', max: '100', value: show(conf.CHARGE_TO) });
                     pb.appendChild(field(_('Switch to Saver under (%)'), saver));
                     pb.appendChild(field(_('Stop charging at (%)'), cto));
+                    var res = input('mu-pw-resume', { type: 'number', min: '0', max: '99', value: show(conf.RESUME_AT) });
+                    pb.appendChild(field(_('Start charging again under (%)'), res));
                     pb.appendChild(note(_('0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in.')));
                     var bs = button(_('Save'), function () {
                         busy(bs, true);
                         api('power.set', { key: 'SAVER_BELOW', value: Number(saver.value) }).then(function () {
                             return api('power.set', { key: 'CHARGE_TO', value: Number(cto.value) });
+                        }).then(function () {
+                            return api('power.set', { key: 'RESUME_AT', value: Number(res.value) });
                         }).then(function () { busy(bs, false); toast(_('Saved'), 'ok'); refresh(); },
                             function (ex) { busy(bs, false); toast(errText(ex), 'error'); });
                     });
+                    pb.appendChild(note(_('Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it.')));
                     pb.appendChild(actions([ bs ]));
+                    // the pause and the full charge by hand (kanoqwq's controls); the temperature guard always applies
+                    var paused = conf.CHARGE_PAUSE === 1, full = conf.FULL_ONCE === 1;
+                    var pz = button(paused ? _('Resume charging') : _('Pause charging'), function () { set(pz, 'CHARGE_PAUSE', paused ? 0 : 1); });
+                    var fo = button(full ? _('Cancel the full charge') : _('Charge to full once'), function () { set(fo, 'FULL_ONCE', full ? 0 : 1); });
+                    pb.appendChild(actions([ pz, fo ]));
+                    pb.appendChild(note(_('Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies.')));
                     var pon = select('mu-pw-poweron', [ [ '0', _('Charge only, until a key starts it') ], [ '1', _('Start normally') ] ],
                         conf.POWER_ON_CHARGER === 1 ? '1' : '0');
                     pon.addEventListener('change', function () { set(null, 'POWER_ON_CHARGER', Number(pon.value)); });
@@ -1417,10 +1511,45 @@
                 var t = input('mu-led-timeout', { type: 'number', min: '0', max: '86400', value: o.timeout === null ? '' : String(o.timeout),
                     placeholder: o.device === 'u30air' ? '60' : '0' });
                 b.appendChild(field(_('Seconds (empty: the device\'s default)'), t));
+                /* mu300-led's settings (kanoqwq's): each lamp on or off and, where it dims, its brightness; the boot
+                 * indicator; how the heat alarm shows */
+                var st = o.settings, names = { network: _('Network lamp'), wifi: _('Wi-Fi lamp'), battery: _('Battery lamp') };
+                var onoff = [ [ 1, _('On') ], [ 0, _('Off') ] ], lamps = [];
+                if (st && Array.isArray(st.lamps)) {
+                    st.lamps.forEach(function (l) {
+                        if (!names[l]) return;
+                        var sw = select('mu-led-' + l, onoff, st[l] ? 1 : 0), br = null;
+                        b.appendChild(field(names[l], sw));
+                        if ((st.dimmable || []).indexOf(l) >= 0) {
+                            br = input('mu-led-' + l + '-brightness', { type: 'number', min: '1', max: '100',
+                                value: String(st[l + '_brightness']) });
+                            b.appendChild(field(names[l] + ': ' + _('Brightness (%)'), br));
+                        }
+                        lamps.push([ l, sw, br ]);
+                    });
+                    b.appendChild(note(_('A lamp switched off stays dark; the heat alarm still shows on its LED.')));
+                    var boot = select('mu-led-boot', onoff, st.boot ? 1 : 0);
+                    b.appendChild(field(_('Boot indicator'), boot));
+                    b.appendChild(note(_('The LED shows its colours in turn while the system starts')));
+                    var heat = select('mu-led-thermal', [ [ 'siren', _('Siren') ], [ 'blink', _('Red blink') ], [ 'off', _('Off') ] ],
+                        st.thermal || 'siren');
+                    b.appendChild(field(_('Heat alarm'), heat));
+                }
                 var s = button(_('Save'), function () {
-                    var n = Number(t.value);
-                    if (t.value === '' || !(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
-                    act(s, 'led.set', { timeout: n }, { done: refresh });
+                    var n = Number(t.value), req = {};
+                    if (t.value === '') req.timeout_default = true;
+                    else if (!(n >= 0 && n <= 86400 && Math.floor(n) === n)) { toast(_('A whole number of seconds, 0 or more.'), 'error'); return; }
+                    else req.timeout = n;
+                    for (var i = 0; i < lamps.length; i++) {
+                        req[lamps[i][0]] = lamps[i][1].value === '1';
+                        if (lamps[i][2]) {
+                            var p = Number(lamps[i][2].value);
+                            if (!(p >= 1 && p <= 100 && Math.floor(p) === p)) { toast(_('A brightness is a whole number from 1 to 100.'), 'error'); return; }
+                            req[lamps[i][0] + '_brightness'] = p;
+                        }
+                    }
+                    if (boot) { req.boot = boot.value === '1'; req.thermal = heat.value; }
+                    act(s, 'led.set', req, { done: refresh });
                 }, 'primary');
                 var tb = button(_('Light each LED in turn'), function () { act(tb, 'led.set', { test: true }, { ok: _('Each LED lights for 2 seconds, one after the other.') }); });
                 b.appendChild(actions([ s, tb ]));
@@ -1748,8 +1877,8 @@
             load(kb, 'system.get', {}, function (o) {
                 kb.appendChild(row(_('Kernel running'), o.kernel));
                 kb.appendChild(row(_('Kernel chosen'), o.kernel_choice));
-                kb.appendChild(note(_('5.4 is the vendor kernel (Android\'s drivers); 6.18 is the mainline long-term kernel; 7.2 the newest mainline one. A change downloads the kernel and takes effect at the next reboot.')));
-                var k = select('mu-kernel', [ [ '7.2', '7.2' ], [ '6.18', '6.18 LTS' ], [ '5.4', '5.4 (vendor)' ] ], o.kernel_choice || '7.2');
+                kb.appendChild(note(_('5.4 is the vendor kernel (Android\'s drivers); 6.18 is the mainline long-term kernel; 7.2 the stable mainline one; 7.3 the newest mainline one. A change downloads the kernel and takes effect at the next reboot.')));
+                var k = select('mu-kernel', [ [ '7.3', '7.3' ], [ '7.2', '7.2' ], [ '6.18', '6.18 LTS' ], [ '5.4', '5.4 (vendor)' ] ], o.kernel_choice || '7.2');
                 var kbtn = button(_('Change the kernel'), function () {
                     act(kbtn, 'kernel.set', { version: k.value }, { confirm: cockpit.format(_('Install kernel $0? It runs after the next reboot.'), k.value), done: refresh });
                 });

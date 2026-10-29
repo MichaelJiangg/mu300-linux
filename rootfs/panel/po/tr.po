@@ -563,6 +563,15 @@ msgstr "Asla bu gönderenler"
 msgid "Only messages with one of these words (one per line; empty: every message)"
 msgstr "Yalnızca bu sözcüklerden birini içeren mesajlar (satır başına bir; boş: tüm mesajlar)"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power), in the template and the custom body."
+msgstr "Şablonda ve özel gövdede ayrıca {sim} (SIM 1 ya da SIM 2) ve {kind} (sms, test ya da power)."
+
+msgid "Battery and charger notices"
+msgstr "Pil ve şarj bildirimleri"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Pil %5, %20, %40, %60, %80 ya da %100 seviyesini geçtiğinde ve şarj cihazı takılıp çıkarıldığında her hedefe bir mesaj."
+
 msgid "Address (http:// or https://)"
 msgstr "Adres (http:// veya https://)"
 
@@ -587,6 +596,12 @@ msgstr "Gövde hazır ayarları"
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ek başlıklar (satır başına bir \"Ad: değer\")"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Özel gövdedeki {secret} için gizli değer"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Belirtecini gövdede isteyen bir hizmet için (PushPlus). Yalnızca bu adres için saklanır: yeni bir adres onu yeniden ister."
+
 msgid "The answer must contain (key=value; empty: every HTTP 2xx answer counts)"
 msgstr "Yanıt şunu içermeli (anahtar=değer; boş: her HTTP 2xx yanıtı sayılır)"
 
@@ -595,6 +610,9 @@ msgstr "Yanıt hazır ayarları"
 
 msgid "With key=value the answer must be a JSON object with that value under that key at its top level, or the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "anahtar=değer ile yanıt, en üst düzeyinde bu anahtarın altında bu değeri taşıyan bir JSON nesnesi olmalıdır; değilse teslim başarısız olur. Günlüğe yalnızca denetimin sonucu yazılır, yanıtın kendisi asla."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "İstek zaman aşımı (saniye, 1-120; webhook ve Telegram)"
 
 msgid "Bot token"
 msgstr "Bot belirteci"
@@ -827,6 +845,30 @@ msgstr "TTL, 1 ile 255 arasında bir tam sayıdır."
 msgid "Leave the TTL alone"
 msgstr "TTL'ye dokunma"
 
+msgid "TCP congestion control"
+msgstr "TCP tıkanıklık denetimi"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Temel olarak bu cihazın yeni TCP bağlantılarını etkiler. Hotspot ve USB üzerinden yönlendirilen istemci bağlantıları otomatik olarak BBR kullanmaz."
+
+msgid "Active congestion control"
+msgstr "Etkin tıkanıklık denetimi"
+
+msgid "Default queue"
+msgstr "Varsayılan kuyruk"
+
+msgid "This kernel does not provide this setting"
+msgstr "Bu çekirdek bu ayarı sağlamıyor"
+
+msgid "System default"
+msgstr "Sistem varsayılanı"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR, yeni arayüzler için varsayılan kuyruk olarak FQ kullanır. Mevcut bağlantılar, arayüzler ve QoS korunur. Ayarlar yeniden başlatmada saklanır."
+
+msgid "Save and apply"
+msgstr "Kaydet ve uygula"
+
 msgid "USSD"
 msgstr "USSD"
 
@@ -920,6 +962,9 @@ msgstr "Fatura dönemi ve kota"
 msgid "History"
 msgstr "Geçmiş"
 
+msgid "Plan"
+msgstr "Tarife"
+
 msgid "$0 days left"
 msgstr "$0 gün kaldı"
 
@@ -932,6 +977,24 @@ msgstr "Kotaya ulaşıldı: mobil veri sonraki döneme kadar kapalı."
 msgid "Close to the monthly cap."
 msgstr "Aylık kotaya yaklaşıldı."
 
+msgid "Daily quota"
+msgstr "Günlük kota"
+
+msgid "The daily quota is reached: mobile data is off until midnight."
+msgstr "Günlük kotaya ulaşıldı: mobil veri gece yarısına kadar kapalı."
+
+msgid "The daily quota is reached."
+msgstr "Günlük kotaya ulaşıldı."
+
+msgid "Close to the daily quota."
+msgstr "Günlük kotaya yaklaşıldı."
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Kota ve günlük kota yalnızca indirmeleri sayar."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Kota ve günlük kota yalnızca yüklemeleri sayar."
+
 msgid "Interface counted"
 msgstr "Sayılan arayüz"
 
@@ -941,6 +1004,21 @@ msgstr "Saat henüz ayarlanmadı (ağ saati yok): yeni trafik kendi gününe yaz
 msgid "Turn mobile data off at the cap until the next cycle"
 msgstr "Kotaya ulaşınca mobil veriyi sonraki döneme kadar kapat"
 
+msgid "Turn mobile data off at the daily quota until midnight"
+msgstr "Günlük kotada mobil veriyi gece yarısına kadar kapat"
+
+msgid "Both ways"
+msgstr "İki yön"
+
+msgid "Downloads only"
+msgstr "Yalnızca indirme"
+
+msgid "Uploads only"
+msgstr "Yalnızca yükleme"
+
+msgid "Plan name"
+msgstr "Tarife adı"
+
 msgid "The day a billing cycle starts (31: the month's last day)"
 msgstr "Fatura döneminin başladığı gün (31: ayın son günü)"
 
@@ -949,6 +1027,12 @@ msgstr "GiB cinsinden aylık kota (0: yok)"
 
 msgid "Warn at this percentage of the cap"
 msgstr "Kotanın bu yüzdesinde uyar"
+
+msgid "Daily quota in GiB (0: none)"
+msgstr "GiB cinsinden günlük kota (0: yok)"
+
+msgid "The cap and the daily quota count"
+msgstr "Kota ve günlük kotanın saydığı"
 
 msgid "Check the values: a day from 1 to 31, a cap of 0 or more, a percentage from 1 to 100."
 msgstr "Değerleri kontrol edin: 1 ile 31 arası bir gün, 0 veya daha büyük bir kota, 1 ile 100 arası bir yüzde."
@@ -985,6 +1069,9 @@ msgstr "Toplam"
 
 msgid "Billing cycles"
 msgstr "Fatura dönemleri"
+
+msgid "Counted"
+msgstr "Sayılan"
 
 msgid "Hotspot"
 msgstr "Hotspot"
@@ -1295,6 +1382,12 @@ msgstr "Şarj duraklatıldı: pil sıcaklığı"
 msgid "Charging paused: charge limit"
 msgstr "Şarj duraklatıldı: şarj sınırı"
 
+msgid "Charging paused: by hand"
+msgstr "Şarj duraklatıldı: elle"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Bir kez tam şarj, ardından sınıra dönülür"
+
 msgid "Automatic: plugged in / on battery"
 msgstr "Otomatik: şarjda / pilde"
 
@@ -1307,8 +1400,29 @@ msgstr "Şu seviyenin altında Tasarruf'a geç (%)"
 msgid "Stop charging at (%)"
 msgstr "Şarjı şu seviyede durdur (%)"
 
+msgid "Start charging again under (%)"
+msgstr "Şarjı yeniden başlatma seviyesi (altında, %)"
+
 msgid "0 % never charges the battery (the device runs on the charger), 100 % charges it full; in between, charging stops at that level and starts again 5 points lower. Under 5 % the battery always charges. 80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "%0 pili hiç şarj etmez (cihaz şarj cihazıyla çalışır), %100 tam şarj eder; arada şarj o seviyede durur ve 5 puan aşağıda yeniden başlar. %5'in altında pil her zaman şarj olur. Sürekli takılı kalan bir cihazda %80 pili daha sağlıklı tutar."
+
+msgid "Start charging again under: 0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "Şarjı yeniden başlatma seviyesi: 0, durma seviyesinin 5 puan altında yeniden başlatır. Daha düşük bir değer şarjı yalnızca onun altında yeniden başlatır; 100 % ile dolu pil bu değerin altına inene kadar bekler."
+
+msgid "Resume charging"
+msgstr "Şarjı sürdür"
+
+msgid "Pause charging"
+msgstr "Şarjı duraklat"
+
+msgid "Cancel the full charge"
+msgstr "Tam şarjı iptal et"
+
+msgid "Charge to full once"
+msgstr "Bir kez tam şarj et"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Duraklatıldığında pil şarj edilmez ve cihaz şarj cihazıyla çalışır; 5 % altında yine de şarj olur ve sıcaklık koruması her zaman geçerlidir."
 
 msgid "Charge only, until a key starts it"
 msgstr "Yalnızca şarj, bir tuş başlatana kadar"
@@ -1358,8 +1472,41 @@ msgstr "Bir tuşa basıldıktan veya bir değişiklikten sonra LED'lerin ne kada
 msgid "Seconds (empty: the device's default)"
 msgstr "Saniye (boş: cihazın varsayılanı)"
 
+msgid "Network lamp"
+msgstr "Ağ ışığı"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi ışığı"
+
+msgid "Battery lamp"
+msgstr "Pil ışığı"
+
+msgid "Brightness (%)"
+msgstr "Parlaklık (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Kapatılan bir ışık karanlık kalır; ısı alarmı yine de kendi LED'inde görünür."
+
+msgid "Boot indicator"
+msgstr "Açılış göstergesi"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Sistem açılırken LED renklerini sırayla gösterir"
+
+msgid "Siren"
+msgstr "Siren"
+
+msgid "Red blink"
+msgstr "Kırmızı yanıp sönme"
+
+msgid "Heat alarm"
+msgstr "Isı alarmı"
+
 msgid "A whole number of seconds, 0 or more."
 msgstr "0 veya daha büyük, tam sayı olarak saniye."
+
+msgid "A brightness is a whole number from 1 to 100."
+msgstr "Parlaklık 1 ile 100 arasında bir tam sayıdır."
 
 msgid "Light each LED in turn"
 msgstr "Her LED'i sırayla yak"
@@ -1709,8 +1856,8 @@ msgstr "Çalışan kernel"
 msgid "Kernel chosen"
 msgstr "Seçilen kernel"
 
-msgid "5.4 is the vendor kernel (Android's drivers); 6.18 is the mainline long-term kernel; 7.2 the newest mainline one. A change downloads the kernel and takes effect at the next reboot."
-msgstr "5.4 üretici kernelidir (Android'in sürücüleri); 6.18 uzun süreli destekli mainline kerneldir; 7.2 en yeni mainline kerneldir. Bir değişiklik kerneli indirir ve sonraki yeniden başlatmada geçerli olur."
+msgid "5.4 is the vendor kernel (Android's drivers); 6.18 is the mainline long-term kernel; 7.2 the stable mainline one; 7.3 the newest mainline one. A change downloads the kernel and takes effect at the next reboot."
+msgstr "5.4 üretici kernelidir (Android'in sürücüleri); 6.18 uzun süreli destekli mainline kerneldir; 7.2 kararlı mainline kerneldir; 7.3 en yeni mainline kerneldir. Bir değişiklik kerneli indirir ve sonraki yeniden başlatmada etkili olur."
 
 msgid "Change the kernel"
 msgstr "Kerneli değiştir"

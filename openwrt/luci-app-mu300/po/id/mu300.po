@@ -52,6 +52,9 @@ msgstr "Bahasa"
 msgid "Power"
 msgstr "Daya"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Mode host memutus jaringan USB dan serial pada port ini. F50 tidak memil
 msgid "USB network mode"
 msgstr "Mode jaringan USB"
 
+msgid "Current sharing protocol"
+msgstr "Protokol berbagi saat ini"
+
 msgid "Network protocol"
 msgstr "Protokol jaringan"
 
@@ -658,6 +664,27 @@ msgstr "Segarkan"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Hanya tersedia dalam mode host. Segarkan menyalakan adaptor USB yang ditemukan; menambahkan ke LAN menyimpan bridge dan memuat ulang jaringan."
 
+msgid "Network performance"
+msgstr "Kinerja jaringan"
+
+msgid "Active congestion control"
+msgstr "Kontrol kemacetan aktif"
+
+msgid "Default queue"
+msgstr "Antrean bawaan"
+
+msgid "TCP congestion control"
+msgstr "Kontrol kemacetan TCP"
+
+msgid "Apply"
+msgstr "Terapkan"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Terutama memengaruhi koneksi TCP baru dari perangkat ini. Koneksi klien hotspot dan USB yang diteruskan tidak otomatis memakai BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR memilih FQ sebagai antrean bawaan untuk antarmuka yang baru dibuat. Koneksi, antarmuka, dan QoS yang ada tetap. Pengaturan bertahan setelah reboot."
+
 msgid "Recent modem operations"
 msgstr "Operasi modem terbaru"
 
@@ -670,6 +697,12 @@ msgstr "Panggilan terbaru panel kontrol, dari boot ini dan sebelumnya: kapan, pa
 msgid "Unavailable"
 msgstr "Tidak tersedia"
 
+msgid "Mixed"
+msgstr "Campuran"
+
+msgid "None"
+msgstr "Tidak ada"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Mode jaringan USB tidak tersedia dalam mode host; mulai otomatis host juga menonaktifkan mulai otomatis jaringan USB."
 
@@ -681,9 +714,6 @@ msgstr "Jaringan USB dan serial akan dienumerasi ulang dalam mode perangkat."
 
 msgid "Switch USB role?"
 msgstr "Ganti peran USB?"
-
-msgid "Apply"
-msgstr "Terapkan"
 
 msgid "Switching USB role…"
 msgstr "Mengganti peran USB…"
@@ -721,6 +751,21 @@ msgstr "Pengaturan disimpan"
 msgid "Save failed: %s"
 msgstr "Gagal menyimpan: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Tidak dapat membaca pengaturan kinerja jaringan; segarkan untuk mencoba lagi"
+
+msgid "This kernel does not provide this setting"
+msgstr "Kernel ini tidak menyediakan pengaturan ini"
+
+msgid "System default"
+msgstr "Bawaan sistem"
+
+msgid "Applied and saved for future boots."
+msgstr "Diterapkan dan disimpan untuk boot berikutnya."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Kernel tidak menerima pengaturan jaringan"
+
 msgid "This boot"
 msgstr "Boot ini"
 
@@ -739,6 +784,9 @@ msgstr "Memindai adaptor USB…"
 msgid "No USB adapters found."
 msgstr "Tidak ada adaptor USB yang ditemukan."
 
+msgid "In use by another network"
+msgstr "Dipakai jaringan lain"
+
 msgid "Link connected"
 msgstr "Link tersambung"
 
@@ -747,6 +795,9 @@ msgstr "Tidak ada link; sudah dicoba diaktifkan"
 
 msgid "Added to LAN"
 msgstr "Ditambahkan ke LAN"
+
+msgid "Cannot add"
+msgstr "Tidak dapat ditambahkan"
 
 msgid "Add to LAN"
 msgstr "Tambahkan ke LAN"
@@ -784,6 +835,9 @@ msgstr "Formulir (dienkode URL)"
 msgid "Plain text"
 msgstr "Teks biasa"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Juga {sim} (SIM 1 atau SIM 2) dan {kind} (sms, test, atau power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Pesan yang diterima diteruskan begitu sampai di pool SMS. Pengiriman yang gagal dicoba lagi setelah 30 dtk, lalu setiap kali setelah waktu dua kali lebih lama (paling lama satu jam), sepuluh kali seluruhnya."
 
@@ -811,6 +865,15 @@ msgstr "Hanya pesan yang memuat salah satu kata ini"
 msgid "One per line; empty: every message."
 msgstr "Satu per baris; kosong: semua pesan."
 
+msgid "Battery"
+msgstr "Baterai"
+
+msgid "Battery and charger notices"
+msgstr "Pemberitahuan baterai dan pengisi daya"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Pesan ke setiap tujuan saat baterai melewati 5, 20, 40, 60, 80, atau 100 % dan saat pengisi daya dicolok atau dicabut."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Isi kustom"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Kosong: bidang standar (teks biasa: pesannya). Placeholder: {sender}, {time}, {text}, {device}, {message}. Setiap nilai di-escape sesuai jenis yang dipilih. Isi ini ditampilkan lagi di sini: simpan rahasia di alamat atau di header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Rahasia untuk {secret} di isi khusus"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Untuk layanan yang meminta tokennya di isi (PushPlus). Disimpan hanya untuk alamat ini: alamat baru memerlukannya lagi."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Header tambahan (satu \"Nama: nilai\" per baris)"
 
@@ -840,6 +909,9 @@ msgstr "Jawaban harus memuat"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Kosong: setiap jawaban HTTP 2xx dihitung sebagai terkirim. Dengan kunci=nilai (misalnya errcode=0), jawaban juga harus berupa objek JSON yang memiliki nilai ini di bawah kunci ini pada tingkat teratasnya; jika tidak, pengiriman gagal. Hanya hasil pemeriksaan yang dicatat, jawabannya tidak pernah."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Batas waktu permintaan (detik, 1-120; webhook dan Telegram)"
 
 msgid "Bot token"
 msgstr "Token bot"
@@ -861,9 +933,6 @@ msgstr "Port"
 
 msgid "Security"
 msgstr "Keamanan"
-
-msgid "None"
-msgstr "Tidak ada"
 
 msgid "User name"
 msgstr "Nama pengguna"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux terkunci"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ya: mulai ulang berikutnya menjalankan Android"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "Writable"
+msgstr "Dapat ditulis"
+
+msgid "This boot image cannot change the boot"
+msgstr "Image boot ini tidak dapat mengubah boot"
+
 msgid "%s of %s"
 msgstr "%s dari %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Memori"
 
 msgid "Storage"
 msgstr "Penyimpanan"
-
-msgid "Battery"
-msgstr "Baterai"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -1105,14 +1186,23 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Mulai ulang modem"
 
-msgid "Restart device"
-msgstr "Mulai ulang perangkat"
+msgid "Power off or restart"
+msgstr "Matikan atau mulai ulang"
 
 msgid "Switch to Android"
 msgstr "Beralih ke Android"
 
 msgid "Lock Linux"
 msgstr "Kunci Linux"
+
+msgid "Default boot"
+msgstr "Boot bawaan"
+
+msgid "One-time boot"
+msgstr "Boot sekali"
+
+msgid "Boot control"
+msgstr "Kontrol boot"
 
 msgid "Neighbor cells"
 msgstr "Sel tetangga"
@@ -1125,6 +1215,9 @@ msgstr "Frekuensi"
 
 msgid "Running %s…"
 msgstr "Menjalankan %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Pengaturan hotspot disimpan; menerapkan perubahan"
 
 msgid "Started in background: %s"
 msgstr "Dimulai di latar belakang: %s"
@@ -1165,11 +1258,14 @@ msgstr "Data seluler juga digunakan di jaringan roaming, yang bisa menambah biay
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Konektivitas seluler mungkin berhenti selama 1–2 menit."
 
-msgid "Restart the entire device"
-msgstr "Mulai ulang seluruh perangkat"
-
 msgid "All connections will be interrupted."
 msgstr "Semua koneksi akan terputus."
+
+msgid "Power off"
+msgstr "Matikan"
+
+msgid "Restart"
+msgstr "Mulai ulang"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Boot berikutnya akan masuk ke Android dan perangkat dimulai ulang sekarang. Halaman manajemen ini dan berbagi seluler akan terputus."
@@ -1243,6 +1339,9 @@ msgstr "SIM internal dipilih: digunakan setelah boot ulang"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "SIM internal dipilih, tetapi tidak didukung di perangkat ini: SIM eksternal yang digunakan"
 
+msgid "in use"
+msgstr "digunakan"
+
 msgid "Uptime %s"
 msgstr "Waktu aktif %s"
 
@@ -1309,9 +1408,6 @@ msgstr "Link LTE"
 msgid "Hidden"
 msgstr "Tersembunyi"
 
-msgid "No"
-msgstr "Tidak"
-
 msgid "Running"
 msgstr "Berjalan"
 
@@ -1371,9 +1467,6 @@ msgstr "Daring"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptor AT tidak tersedia"
-
-msgid "Linux locked"
-msgstr "Linux terkunci"
 
 msgid "Installing the language pack…"
 msgstr "Memasang paket bahasa…"
@@ -1453,6 +1546,51 @@ msgstr "Diterjemahkan"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Terjemahan LuCI sendiri berasal dari OpenWrt. Terjemahan panel ini selain bahasa Turki dan Mandarin adalah terjemahan mesin (AI); koreksi dipersilakan."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Masukkan bilangan bulat dari 0 hingga %d"
+
+msgid "Network lamp"
+msgstr "Lampu jaringan"
+
+msgid "Wi-Fi lamp"
+msgstr "Lampu Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Lampu baterai"
+
+msgid "On"
+msgstr "Hidup"
+
+msgid "Brightness (%)"
+msgstr "Kecerahan (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Lampu yang dimatikan tetap gelap; alarm panas tetap tampil pada LED-nya."
+
+msgid "Device default"
+msgstr "Bawaan perangkat"
+
+msgid "LED timeout (seconds)"
+msgstr "Batas waktu LED (detik)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Berapa lama LED tetap menyala setelah tombol ditekan atau ada perubahan; 0 membuatnya tetap menyala. Saat di pengisi daya LED tetap menyala."
+
+msgid "Boot indicator"
+msgstr "Indikator boot"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED menampilkan warnanya bergantian selama sistem dimulai"
+
+msgid "Heat alarm"
+msgstr "Alarm panas"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Kedip merah"
+
 msgid "Automatic"
 msgstr "Otomatis"
 
@@ -1494,6 +1632,21 @@ msgstr "Kunci sel layanan saat ini"
 
 msgid "Unlock cell"
 msgstr "Buka kunci sel"
+
+msgid "Enter a cell"
+msgstr "Masukkan sel"
+
+msgid "Type"
+msgstr "Jenis"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Nomor kanal (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Kunci sel ini"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Nomor kanal, bukan frekuensi dalam MHz; sel tidak harus ada di daftar sel tetangga."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Menerapkan akan memulai ulang stack radio (SFUN) dan memutus layanan seluler sebentar. Pengaturan disimpan dan diterapkan ulang oleh plugin setelah AT siap jika Terapkan saat startup diaktifkan. Hook pra-radio platform dapat menerapkan ulang tanpa memulai ulang. Terapkan tanpa band terpilih untuk mengembalikan mode otomatis."
@@ -1582,17 +1735,20 @@ msgstr "Mengunci %s di latar belakang…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s dikunci di latar belakang (mulai ulang SFUN, sekitar 30 detik); membaca kembali status…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Masukkan nomor kanal dan PCI dalam rentang di bawah"
+
 msgid "No serving-network data"
 msgstr "Tidak ada data jaringan layanan"
 
 msgid "NR serving cell"
 msgstr "Sel layanan NR"
 
-msgid "Status confirmed"
-msgstr "Status dipastikan"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Waktu pembacaan habis; pilih “Segarkan status kunci”"
+
+msgid "Status confirmed"
+msgstr "Status dipastikan"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Pengaturan ulang terverifikasi: mode jaringan otomatis, EN-DC aktif, semua band, tanpa kunci sel; pengaturan kunci yang tersimpan dihapus"
@@ -1732,9 +1888,6 @@ msgstr "dibangunkan oleh tombol %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem ditangguhkan (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Masukkan bilangan bulat dari 0 hingga %d"
-
 msgid "Power status unavailable"
 msgstr "Status daya tidak tersedia"
 
@@ -1792,6 +1945,12 @@ msgstr "Pengisian dijeda: suhu baterai"
 msgid "Charging paused: charge limit"
 msgstr "Pengisian dijeda: batas pengisian"
 
+msgid "Charging paused: by hand"
+msgstr "Pengisian dijeda: manual"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Mengisi penuh sekali, lalu kembali ke batas"
+
 msgid "Sleep now"
 msgstr "Tidurkan sekarang"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % tidak pernah mengisi baterai (perangkat berjalan dari pengisi daya),
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % menjaga baterai tetap sehat pada perangkat yang terus tercolok."
 
+msgid "Start charging again under"
+msgstr "Mulai mengisi lagi di bawah"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 mulai lagi 5 poin di bawah level berhenti. Nilai lebih rendah mulai mengisi lagi hanya di bawahnya; dengan 100 %, baterai penuh menunggu hingga turun di bawahnya."
+
+msgid "Resume charging"
+msgstr "Lanjutkan pengisian"
+
+msgid "Pause charging"
+msgstr "Jeda pengisian"
+
+msgid "Cancel the full charge"
+msgstr "Batalkan isi penuh"
+
+msgid "Charge to full once"
+msgstr "Isi penuh sekali"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Saat dijeda, baterai tidak diisi dan perangkat berjalan dari pengisi daya; di bawah 5 % tetap diisi, dan pelindung suhu selalu berlaku."
+
 msgid "When the charger switches the device on"
 msgstr "Saat pengisi daya menyalakan perangkat"
 
@@ -1830,9 +2010,6 @@ msgstr "Biarkan apa adanya"
 
 msgid "LTE only (5G off)"
 msgstr "Hanya LTE (5G mati)"
-
-msgid "On"
-msgstr "Hidup"
 
 msgid "Full"
 msgstr "Penuh"
@@ -2057,9 +2234,6 @@ msgstr "Bawaan modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "digunakan"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Matikan radio SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Dihapus (hanya lokal)"
 msgid "Enter both a number and a message."
 msgstr "Masukkan nomor dan pesan."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Penyimpanan SIM: %d dari %d slot terpakai (pukul %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d pesan, %d belum dibaca · %d percakapan"
 
@@ -2234,8 +2411,26 @@ msgstr "Batas bulanan"
 msgid "%s, warning at %d%%"
 msgstr "%s, peringatan pada %d%%"
 
+msgid "Daily quota"
+msgstr "Kuota harian"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Batas bulanan tercapai: data seluler dimatikan. Data akan menyala lagi saat siklus berikutnya dimulai."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Kuota harian tercapai: data seluler dimatikan. Data akan aktif lagi tengah malam."
+
+msgid "The daily quota is reached"
+msgstr "Kuota harian tercapai"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% kuota harian telah terpakai"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Batas dan kuota harian hanya menghitung unduhan."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Batas dan kuota harian hanya menghitung unggahan."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s menunggu jam: jam belum disetel dari jaringan. Ini sudah dihitung dalam siklus ini dan masuk ke harinya setelah jam disetel."
@@ -2267,6 +2462,9 @@ msgstr "Per siklus tagihan"
 msgid "Billing cycle"
 msgstr "Siklus tagihan"
 
+msgid "Counted"
+msgstr "Dihitung"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Masukkan ukuran dalam GB, misalnya 50 atau 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Matikan data seluler saat batas tercapai"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Saat siklus ini mencapai batas, data seluler dimatikan: tidak ada internet melalui operator sampai siklus berikutnya dimulai, batas dinaikkan, atau opsi ini dimatikan lagi. Data seluler yang dinyalakan kembali secara manual tetap menyala sampai reboot berikutnya."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Matikan data seluler saat kuota harian tercapai"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Saat pemakaian hari ini mencapai kuota harian, data seluler dimatikan sampai tengah malam, sampai kuota dinaikkan, atau sampai opsi ini dimatikan lagi. Menyalakan data seluler secara manual membuatnya tetap aktif sampai boot ulang berikutnya."
+
+msgid "Both ways"
+msgstr "Dua arah"
+
+msgid "Downloads only"
+msgstr "Hanya unduhan"
+
+msgid "Uploads only"
+msgstr "Hanya unggahan"
 
 msgid "Set"
 msgstr "Atur"
@@ -2302,6 +2515,15 @@ msgstr "Batas bulanan (GB, 0: tidak ada)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Peringatkan pada persentase batas ini"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Kuota harian (GB, 0: tidak ada)"
+
+msgid "The cap and the daily quota count"
+msgstr "Yang dihitung batas dan kuota harian"
+
+msgid "Plan name"
+msgstr "Nama paket"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Terpakai sejauh ini dalam siklus ini (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Perangkat dimulai ulang sekarang. Boot bawaan adalah Android, jadi Andro
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Perangkat dimulai ulang sekarang dan tidak dapat diakses selama sekitar satu menit. Jika sistem baru tidak mau menyala, perangkat kembali ke Android dengan sendirinya setelah beberapa percobaan gagal."
 
-msgid "Restart"
-msgstr "Mulai ulang"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Memulai ulang… buka lagi halaman ini sekitar satu menit lagi."
 
@@ -2468,9 +2687,6 @@ msgstr "Image boot"
 msgid "from the installer"
 msgstr "dari penginstal"
 
-msgid "Default boot"
-msgstr "Boot bawaan"
-
 msgid "Free space"
 msgstr "Ruang kosong"
 
@@ -2527,6 +2743,9 @@ msgstr "Catatan rilis"
 
 msgid "Download"
 msgstr "Unduhan"
+
+msgid "only what changed since the installed release"
+msgstr "hanya yang berubah sejak rilis yang terpasang"
 
 msgid "Free space needed"
 msgstr "Ruang kosong yang diperlukan"
@@ -3056,9 +3275,6 @@ msgstr "Deteksi"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL dapat memuat token: dikirim ke perangkat tersendiri, tidak pernah masuk ke baris perintah atau log."
 
-msgid "Type"
-msgstr "Jenis"
-
 msgid "Share link"
 msgstr "Tautan bagikan"
 
@@ -3388,6 +3604,21 @@ msgstr "Jenis kunci tidak diketahui"
 msgid "Invalid value for this lock kind"
 msgstr "Nilai tidak valid untuk jenis kunci ini"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Kunci band, mode, dan sel belum didukung untuk SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Kunci band, mode, dan sel tidak didukung selama peralihan dual-SIM mengelola radio"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Modem ini tidak mendukung satu pun dari band ini"
+
+msgid "Lock change failed"
+msgstr "Perubahan kunci gagal"
+
+msgid "Invalid job id"
+msgstr "ID tugas tidak valid"
+
 msgid "Invalid page"
 msgstr "Halaman tidak valid"
 
@@ -3478,14 +3709,29 @@ msgstr "Adaptor TTL tidak memberi balasan yang valid"
 msgid "Invalid TTL"
 msgstr "TTL tidak valid"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptor TCP tidak memberi balasan yang valid"
+
+msgid "Invalid congestion control"
+msgstr "Kontrol kemacetan tidak valid"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptor boot tidak memberi balasan yang valid"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptor LED tidak memberi balasan yang valid"
+
+msgid "Unknown LED setting"
+msgstr "Pengaturan LED tidak dikenal"
+
+msgid "Invalid value for this setting"
+msgstr "Nilai tidak valid untuk pengaturan ini"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptor penggunaan data tidak memberi balasan yang valid"
 
 msgid "Unknown data usage setting"
 msgstr "Pengaturan penggunaan data tidak dikenal"
-
-msgid "Invalid value for this setting"
-msgstr "Nilai tidak valid untuk pengaturan ini"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptor penerusan tidak memberi balasan yang valid"
@@ -3731,8 +3977,29 @@ msgstr "Radio tidak mengikuti pengaturannya"
 msgid "The data roaming setting could not be saved"
 msgstr "Pengaturan roaming data tidak dapat disimpan"
 
-msgid "Expected on or off"
-msgstr "Diharapkan on atau off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Pengaturan hotspot tersimpan, tetapi memuat ulang nirkabel gagal"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Pengaturan nirkabel memiliki perubahan yang belum disimpan: simpan atau batalkan dulu"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot sedang dialihkan; coba lagi sebentar lagi"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Tidak ada hotspot (titik akses) yang dikonfigurasi"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Menyalakan radio ini akan memengaruhi antarmuka lain; gunakan halaman Nirkabel"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radio sedang dipakai klien Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Pengaturan hotspot tidak dapat ditulis"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Platform ini tidak menyediakan kontrol hotspot"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Integrasi VPN tidak disediakan oleh platform ini"
@@ -3833,6 +4100,15 @@ msgstr "Bukan antarmuka jaringan USB"
 msgid "LAN bridge device section was not found"
 msgstr "Bagian perangkat bridge LAN tidak ditemukan"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Tidak dapat menentukan kepemilikan adaptor; coba lagi nanti"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptor milik jaringan lain dan tidak dapat bergabung ke LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Pengaturan jaringan memiliki perubahan yang belum disimpan: simpan atau batalkan dulu"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Tidak dapat menyalakan antarmuka jaringan USB"
 
@@ -3865,6 +4141,12 @@ msgstr "Isi webhook terlalu panjang atau mengandung karakter kontrol"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Pemeriksaan jawaban harus berbentuk kunci=nilai, seperti errcode=0 atau ok=true (nilainya bilangan bulat atau huruf kecil, paling banyak 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Rahasia webhook tidak valid (hingga 256 karakter cetak, tanpa spasi)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Batas waktu harus 1 sampai 120 detik"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Header tidak valid (satu \"Nama: nilai\" per baris; Host, Content-Type, Content-Length, Transfer-Encoding, dan Connection diatur oleh perangkat)"
@@ -3926,8 +4208,17 @@ msgstr "Instalasi sudah berjalan"
 msgid "The language pack could not be removed"
 msgstr "Paket bahasa tidak dapat dihapus"
 
+msgid "The LED settings could not be read"
+msgstr "Pengaturan LED tidak dapat dibaca"
+
+msgid "The LED setting could not be saved"
+msgstr "Pengaturan LED tidak dapat disimpan"
+
 msgid "Lock cache unavailable"
 msgstr "Cache kunci tidak tersedia"
+
+msgid "The modem refused a write"
+msgstr "Modem menolak sebuah penulisan"
 
 msgid "The saved locks could not be cleared"
 msgstr "Kunci yang tersimpan tidak dapat dihapus"
@@ -3938,9 +4229,6 @@ msgstr "Tidak ada sel layanan untuk dikunci"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem tidak menjawab kueri mode; tidak ada yang dikirim"
 
-msgid "The modem refused a write"
-msgstr "Modem menolak sebuah penulisan"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Pembacaan ulang tidak cocok dengan nilai otomatis"
 
@@ -3949,6 +4237,21 @@ msgstr "Pembacaan ulang setelah tumpukan dimulai ulang tidak cocok dengan nilai 
 
 msgid "The reset was interrupted"
 msgstr "Pengaturan ulang terputus"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Hasil perubahan kunci ini tidak diketahui lagi"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Perubahan kunci memakan waktu terlalu lama; pilih “Segarkan status kunci”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Perubahan kunci terputus; pilih “Segarkan status kunci”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Perubahan kunci lain sedang dimulai; coba lagi sebentar lagi"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Terlalu banyak perubahan kunci yang menunggu; coba lagi setelah selesai"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pemasangan ulang paket tidak tersedia di sistem ini"
@@ -3967,6 +4270,12 @@ msgstr "Operasi paket tidak dikenal"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Platform ini tidak menyediakan kontrol kemacetan TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Pengaturan TCP tidak dapat dibaca"
 
 msgid "Data usage is not available on this system"
 msgstr "Penggunaan data tidak tersedia di sistem ini"

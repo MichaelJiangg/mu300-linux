@@ -52,6 +52,9 @@ msgstr "Тілдер"
 msgid "Power"
 msgstr "Қуат"
 
+msgid "LEDs"
+msgstr "Жарық диодтары"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Хост режимі осы порттағы USB желісі мен с
 msgid "USB network mode"
 msgstr "USB желі режимі"
 
+msgid "Current sharing protocol"
+msgstr "Ағымдағы бөлісу хаттамасы"
+
 msgid "Network protocol"
 msgstr "Желі протоколы"
 
@@ -658,6 +664,27 @@ msgstr "Жаңарту"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Тек хост режимінде қолжетімді. «Жаңарту» табылған USB адаптерлерін іске қосады; LAN-ға қосу көпірді сақтап, желіні қайта жүктейді."
 
+msgid "Network performance"
+msgstr "Желі өнімділігі"
+
+msgid "Active congestion control"
+msgstr "Белсенді кептелісті басқару"
+
+msgid "Default queue"
+msgstr "Әдепкі кезек"
+
+msgid "TCP congestion control"
+msgstr "TCP кептелісін басқару"
+
+msgid "Apply"
+msgstr "Қолдану"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Негізінен осы құрылғының жаңа TCP қосылымдарына әсер етеді. Хотспот пен USB клиенттерінің бағытталған қосылымдары BBR-ді автоматты түрде қолданбайды."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR жаңадан құрылған интерфейстер үшін әдепкі кезек ретінде FQ таңдайды. Бар қосылымдар, интерфейстер және QoS сақталады. Баптаулар қайта жүктегеннен кейін де сақталады."
+
 msgid "Recent modem operations"
 msgstr "Модемнің соңғы операциялары"
 
@@ -670,6 +697,12 @@ msgstr "Басқару панелінің осы және алдыңғы жүк�
 msgid "Unavailable"
 msgstr "Қолжетімсіз"
 
+msgid "Mixed"
+msgstr "Аралас"
+
+msgid "None"
+msgstr "Жоқ"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB желі режимі хост режимінде қолжетімсіз; хост режимін автоматты іске қосу USB желісін автоматты іске қосуды да өшіреді."
 
@@ -681,9 +714,6 @@ msgstr "USB желісі мен сериялық порт құрылғы реж�
 
 msgid "Switch USB role?"
 msgstr "USB рөлін ауыстыру керек пе?"
-
-msgid "Apply"
-msgstr "Қолдану"
 
 msgid "Switching USB role…"
 msgstr "USB рөлі ауыстырылуда…"
@@ -721,6 +751,21 @@ msgstr "Параметрлер сақталды"
 msgid "Save failed: %s"
 msgstr "Сақтау сәтсіз: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Желі өнімділігі баптауларын оқу мүмкін болмады; қайталау үшін жаңартыңыз"
+
+msgid "This kernel does not provide this setting"
+msgstr "Бұл ядро бұл баптауды қамтамасыз етпейді"
+
+msgid "System default"
+msgstr "Жүйе әдепкісі"
+
+msgid "Applied and saved for future boots."
+msgstr "Қолданылды және келесі іске қосулар үшін сақталды."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ядро желі баптауларын қабылдамады"
+
 msgid "This boot"
 msgstr "Осы жүктелу"
 
@@ -739,6 +784,9 @@ msgstr "USB адаптерлері ізделуде…"
 msgid "No USB adapters found."
 msgstr "USB адаптерлері табылмады."
 
+msgid "In use by another network"
+msgstr "Басқа желі пайдалануда"
+
 msgid "Link connected"
 msgstr "Байланыс орнатылды"
 
@@ -747,6 +795,9 @@ msgstr "Байланыс жоқ; қосу әрекеті жасалды"
 
 msgid "Added to LAN"
 msgstr "LAN-ға қосылды"
+
+msgid "Cannot add"
+msgstr "Қосу мүмкін емес"
 
 msgid "Add to LAN"
 msgstr "LAN-ға қосу"
@@ -784,6 +835,9 @@ msgstr "Пішін (URL кодталған)"
 msgid "Plain text"
 msgstr "Қарапайым мәтін"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Сондай-ақ {sim} (SIM 1 немесе SIM 2) және {kind} (sms, test немесе power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Алынған хабарлар SMS пулына түскен бойда қайта жіберіледі. Сәтсіз жіберу 30 с кейін, содан кейін әр жолы екі есе ұзақ уақыттан соң (ең көбі бір сағат) қайталанады, барлығы он рет."
 
@@ -811,6 +865,15 @@ msgstr "Тек осы сөздердің бірі бар хабарлар"
 msgid "One per line; empty: every message."
 msgstr "Әр жолда біреу; бос: барлық хабарлар."
 
+msgid "Battery"
+msgstr "Батарея"
+
+msgid "Battery and charger notices"
+msgstr "Батарея мен зарядтағыш хабарламалары"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Батарея 5, 20, 40, 60, 80 немесе 100 % деңгейінен өткенде және зарядтағыш қосылғанда не ажыратылғанда әр мақсатқа хабар."
+
 msgid "Webhook"
 msgstr "Вебхук"
 
@@ -832,6 +895,12 @@ msgstr "Өзіндік дене"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Бос: стандартты өрістер (қарапайым мәтін: хабарлама). Толтырғыштар: {sender}, {time}, {text}, {device}, {message}. Әр мән таңдалған түрге сай экрандалады. Бұл дене осында қайта көрсетіледі: құпияларды мекенжайда немесе тақырыпта сақтаңыз."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Өз денедегі {secret} үшін құпия"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Токенін денеде күтетін қызмет үшін (PushPlus). Тек осы мекенжай үшін сақталады: жаңа мекенжайға қайта керек."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Қосымша тақырыптар (әр жолда бір \"Аты: мәні\")"
 
@@ -840,6 +909,9 @@ msgstr "Жауапта болуы тиіс"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Бос: кез келген HTTP 2xx жауабы жеткізілді деп саналады. кілт=мән берілсе (мысалы, errcode=0), жауап сонымен қатар жоғарғы деңгейінде осы кілттің астында осы мәні бар JSON нысаны болуы тиіс; әйтпесе жеткізу сәтсіз болады. Журналға тек тексеру нәтижесі жазылады, жауаптың өзі ешқашан жазылмайды."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Сұрау уақыты шегі (секунд, 1-120; webhook және Telegram)"
 
 msgid "Bot token"
 msgstr "Бот токені"
@@ -861,9 +933,6 @@ msgstr "Порт"
 
 msgid "Security"
 msgstr "Қауіпсіздік"
-
-msgid "None"
-msgstr "Жоқ"
 
 msgid "User name"
 msgstr "Пайдаланушы аты"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux құлыпталған"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Иә: келесі қайта іске қосу Android-ты бастайды"
+
+msgid "No"
+msgstr "Жоқ"
+
+msgid "Writable"
+msgstr "Жазуға болады"
+
+msgid "This boot image cannot change the boot"
+msgstr "Бұл жүктеу бейнесі жүктеуді өзгерте алмайды"
+
 msgid "%s of %s"
 msgstr "%s / %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Жад"
 
 msgid "Storage"
 msgstr "Сақтау орны"
-
-msgid "Battery"
-msgstr "Батарея"
 
 msgid "Channel"
 msgstr "Арна"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi кіру нүктесі"
 msgid "Restart modem"
 msgstr "Модемді қайта іске қосу"
 
-msgid "Restart device"
-msgstr "Құрылғыны қайта жүктеу"
+msgid "Power off or restart"
+msgstr "Өшіру немесе қайта іске қосу"
 
 msgid "Switch to Android"
 msgstr "Android-ге ауысу"
 
 msgid "Lock Linux"
 msgstr "Linux-ты құлыптау"
+
+msgid "Default boot"
+msgstr "Әдепкі жүктелу"
+
+msgid "One-time boot"
+msgstr "Бір реттік жүктеу"
+
+msgid "Boot control"
+msgstr "Жүктеуді басқару"
 
 msgid "Neighbor cells"
 msgstr "Көрші ұяшықтар"
@@ -1125,6 +1215,9 @@ msgstr "Жиілік"
 
 msgid "Running %s…"
 msgstr "%s орындалуда…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Хотспот баптаулары сақталды; өзгерістер қолданылуда"
 
 msgid "Started in background: %s"
 msgstr "Фонда іске қосылды: %s"
@@ -1165,11 +1258,14 @@ msgstr "Мобильді деректер роуминг желілерінде 
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Ұялы байланыс 1–2 минутқа тоқтауы мүмкін."
 
-msgid "Restart the entire device"
-msgstr "Бүкіл құрылғыны қайта жүктеу"
-
 msgid "All connections will be interrupted."
 msgstr "Барлық қосылымдар үзіледі."
+
+msgid "Power off"
+msgstr "Өшіру"
+
+msgid "Restart"
+msgstr "Қайта іске қосу"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Келесі жүктелу Android-ге кіреді, құрылғы қазір қайта жүктеледі. Бұл басқару беті мен ұялы байланысты тарату ажыратылады."
@@ -1243,6 +1339,9 @@ msgstr "Ішкі SIM таңдалды: қайта жүктегеннен кей�
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Ішкі SIM таңдалды, бірақ бұл құрылғыда қолдау көрсетілмейді: сыртқы SIM қолданылуда"
 
+msgid "in use"
+msgstr "қолданыста"
+
 msgid "Uptime %s"
 msgstr "Жұмыс уақыты %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE байланысы"
 msgid "Hidden"
 msgstr "Жасырын"
 
-msgid "No"
-msgstr "Жоқ"
-
 msgid "Running"
 msgstr "Жұмыс істеуде"
 
@@ -1371,9 +1467,6 @@ msgstr "Желіде"
 
 msgid "AT adapter unavailable"
 msgstr "AT адаптері қолжетімсіз"
-
-msgid "Linux locked"
-msgstr "Linux құлыпталған"
 
 msgid "Installing the language pack…"
 msgstr "Тіл бумасы орнатылуда…"
@@ -1453,6 +1546,51 @@ msgstr "Аударылған"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI-дің өз аудармалары OpenWrt-тен алынады. Бұл панельдің түрік және қытай тілдерінен басқа аудармалары машиналық (ЖИ) аударма; түзетулер қабылданады."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0-ден %d-ге дейінгі бүтін санды енгізіңіз"
+
+msgid "Network lamp"
+msgstr "Желі шамы"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi шамы"
+
+msgid "Battery lamp"
+msgstr "Батарея шамы"
+
+msgid "On"
+msgstr "Қосулы"
+
+msgid "Brightness (%)"
+msgstr "Жарықтық (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Сөндірілген шам қараңғы қалады; қызу дабылы бәрібір өз жарық диодында көрсетіледі."
+
+msgid "Device default"
+msgstr "Құрылғының әдепкі мәні"
+
+msgid "LED timeout (seconds)"
+msgstr "Жарық диодтарының күту уақыты (секунд)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Түйме басылғаннан немесе өзгерістен кейін жарық диодтары қанша уақыт жанып тұрады; 0 оларды үнемі жандырады. Зарядтағышта жанып тұрады."
+
+msgid "Boot indicator"
+msgstr "Жүктелу көрсеткіші"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Жүйе іске қосылып жатқанда жарық диоды түстерін кезекпен көрсетеді"
+
+msgid "Heat alarm"
+msgstr "Қызу дабылы"
+
+msgid "Siren"
+msgstr "Сирена"
+
+msgid "Red blink"
+msgstr "Қызыл жыпылықтау"
+
 msgid "Automatic"
 msgstr "Автоматты"
 
@@ -1494,6 +1632,21 @@ msgstr "Ағымдағы қызмет көрсететін ұяшықты бек
 
 msgid "Unlock cell"
 msgstr "Ұяшық бекітуін алу"
+
+msgid "Enter a cell"
+msgstr "Ұяшықты енгізу"
+
+msgid "Type"
+msgstr "Түрі"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Арна нөмірі (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Осы ұяшықты құлыптау"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. МГц-тегі жиілік емес, арна нөмірі; ұяшықтың көршілер тізімінде болуы міндетті емес."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Қолдану радиостекті (SFUN) қайта іске қосып, ұялы байланысты қысқа уақытқа үзеді. Параметрлер сақталады және «Іске қосылғанда қолдану» қосулы болса, AT дайын болғаннан кейін плагин оларды қайта қолданады. Платформаның радио алдындағы ілгегі оларды қайта іске қосусыз қолдана алады. Автоматты режимге оралу үшін ешбір жолақ таңдамай қолданыңыз."
@@ -1582,17 +1735,20 @@ msgstr "%s фонда бекітілуде…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s фонда бекітілді (SFUN қайта іске қосылуы, шамамен 30 секунд); күй қайта оқылуда…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Төмендегі ауқымдарда арна нөмірі мен PCI енгізіңіз"
+
 msgid "No serving-network data"
 msgstr "Қызмет көрсететін желі туралы дерек жоқ"
 
 msgid "NR serving cell"
 msgstr "NR қызмет көрсететін ұяшығы"
 
-msgid "Status confirmed"
-msgstr "Күй расталды"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Қайта оқу уақыты өтті; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "Status confirmed"
+msgstr "Күй расталды"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Қалпына келтіру тексерілді: желі режимі автоматты, EN-DC қосулы, барлық жолақтар, ұяшық құлпы жоқ; сақталған құлып параметрлері өшірілді"
@@ -1732,9 +1888,6 @@ msgstr "%s пернесімен оянды"
 msgid "the modem is suspended (%s)"
 msgstr "модем тоқтатылған (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0-ден %d-ге дейінгі бүтін санды енгізіңіз"
-
 msgid "Power status unavailable"
 msgstr "Қуат күйі қолжетімсіз"
 
@@ -1792,6 +1945,12 @@ msgstr "Зарядтау тоқтатылды: батарея температу
 msgid "Charging paused: charge limit"
 msgstr "Зарядтау тоқтатылды: заряд шегі"
 
+msgid "Charging paused: by hand"
+msgstr "Зарядтау тоқтатылды: қолмен"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Бір рет толық зарядтау, содан кейін шекке оралу"
+
 msgid "Sleep now"
 msgstr "Қазір ұйықтату"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % батареяны ешқашан зарядтамайды (құры
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % үнемі желіде тұратын құрылғыда батареяны сақтайды."
 
+msgid "Start charging again under"
+msgstr "Зарядтауды мына деңгейден төмен қайта бастау"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 тоқтау деңгейінен 5 пункт төмен қайта бастайды. Төменірек мән зарядтауды тек одан төмен қайта бастайды; 100 % кезінде толы батарея одан төмен түскенше күтеді."
+
+msgid "Resume charging"
+msgstr "Зарядтауды жалғастыру"
+
+msgid "Pause charging"
+msgstr "Зарядтауды тоқтату"
+
+msgid "Cancel the full charge"
+msgstr "Толық зарядтаудан бас тарту"
+
+msgid "Charge to full once"
+msgstr "Бір рет толық зарядтау"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Тоқтатылғанда батарея зарядталмайды, құрылғы зарядтағыштан жұмыс істейді; 5 % төмен болса бәрібір зарядталады, ал температура қорғанысы әрқашан жұмыс істейді."
+
 msgid "When the charger switches the device on"
 msgstr "Зарядтағыш құрылғыны қосқанда"
 
@@ -1830,9 +2010,6 @@ msgstr "Өзгеріссіз қалдыру"
 
 msgid "LTE only (5G off)"
 msgstr "Тек LTE (5G өшірулі)"
-
-msgid "On"
-msgstr "Қосулы"
 
 msgid "Full"
 msgstr "Толық"
@@ -2057,9 +2234,6 @@ msgstr "Модемнің әдепкі мәні"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "қолданыста"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d радиосын өшіру"
 
@@ -2159,6 +2333,9 @@ msgstr "Жойылды (тек жергілікті)"
 msgid "Enter both a number and a message."
 msgstr "Нөмірді де, хабарды да енгізіңіз."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM жады: %d / %d ұяшық бос емес (%s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d хабар, %d оқылмаған · %d сұхбат"
 
@@ -2234,8 +2411,26 @@ msgstr "Айлық лимит"
 msgid "%s, warning at %d%%"
 msgstr "%s, ескерту %d%% кезінде"
 
+msgid "Daily quota"
+msgstr "Күндік квота"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Айлық лимитке жетті: мобильді деректер өшірілді. Келесі кезең басталғанда қайта қосылады."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Күндік квотаға жетті: мобильді деректер өшірілді. Түн ортасында қайта қосылады."
+
+msgid "The daily quota is reached"
+msgstr "Күндік квотаға жетті"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Күндік квотаның %d%% пайдаланылды"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Лимит пен күндік квота тек жүктеп алуды санайды."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Лимит пен күндік квота тек жіберуді санайды."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s сағатты күтуде: уақыт әлі желіден орнатылмаған. Ол осы кезеңге есептеліп қойған және сағат орнатылғанда өз күніне жазылады."
@@ -2267,6 +2462,9 @@ msgstr "Есеп кезеңдері бойынша"
 msgid "Billing cycle"
 msgstr "Есеп кезеңі"
 
+msgid "Counted"
+msgstr "Есептелген"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Өлшемді ГБ-пен енгізіңіз, мысалы 50 немесе 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Лимитке жеткенде мобильді деректерді ө
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Бұл кезең лимитке жеткенде мобильді деректер өшіріледі: келесі кезең басталғанша, лимит көтерілгенше немесе бұл параметр қайта өшірілгенше оператор арқылы интернет болмайды. Мобильді деректерді қолмен қайта қоссаңыз, келесі қайта жүктелгенге дейін қосулы қалады."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Күндік квотада мобильді деректерді өшіру"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Бүгінгі трафик күндік квотаға жеткенде мобильді деректер түн ортасына дейін, квота көбейтілгенше немесе бұл қайта өшірілгенше өшіріледі. Мобильді деректерді қолмен қосу оларды келесі қайта жүктелуге дейін қосулы қалдырады."
+
+msgid "Both ways"
+msgstr "Екі бағыт"
+
+msgid "Downloads only"
+msgstr "Тек жүктеп алу"
+
+msgid "Uploads only"
+msgstr "Тек жіберу"
 
 msgid "Set"
 msgstr "Орнату"
@@ -2302,6 +2515,15 @@ msgstr "Айлық лимит (ГБ, 0: жоқ)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Лимиттің осы пайызында ескерту"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Күндік квота (ГБ, 0: жоқ)"
+
+msgid "The cap and the daily quota count"
+msgstr "Лимит пен күндік квота нені санайды"
+
+msgid "Plan name"
+msgstr "Тариф атауы"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Осы кезеңде осы уақытқа дейін пайдаланылғаны (ГБ)"
@@ -2399,9 +2621,6 @@ msgstr "Құрылғы қазір қайта жүктеледі. Әдепкі ж
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Құрылғы қазір қайта жүктеледі және бір минуттай қолжетімсіз болады. Жаңа жүйе іске қосылмаса, сәтсіз әрекеттерден кейін құрылғы Android жүйесіне өздігінен қайтады."
 
-msgid "Restart"
-msgstr "Қайта іске қосу"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Қайта жүктелуде… бір минуттан кейін осы бетті қайта ашыңыз."
 
@@ -2468,9 +2687,6 @@ msgstr "Жүктеу бейнесі"
 msgid "from the installer"
 msgstr "орнатқыштан"
 
-msgid "Default boot"
-msgstr "Әдепкі жүктелу"
-
 msgid "Free space"
 msgstr "Бос орын"
 
@@ -2527,6 +2743,9 @@ msgstr "Релиз ескертпелері"
 
 msgid "Download"
 msgstr "Жүктеп алу"
+
+msgid "only what changed since the installed release"
+msgstr "тек орнатылған шығарылымнан бергі өзгерістер"
 
 msgid "Free space needed"
 msgstr "Қажетті бос орын"
@@ -3056,9 +3275,6 @@ msgstr "Анықтау"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL токенді қамтуы мүмкін: ол құрылғыға бөлек жіберіледі, командалық жолға немесе журналға ешқашан түспейді."
 
-msgid "Type"
-msgstr "Түрі"
-
 msgid "Share link"
 msgstr "Бөлісу сілтемесі"
 
@@ -3388,6 +3604,21 @@ msgstr "Белгісіз бекіту түрі"
 msgid "Invalid value for this lock kind"
 msgstr "Бұл бекіту түрі үшін жарамсыз мән"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Жолақ, режим және ұяшық құлыптары SIM2 үшін әлі қолдау көрсетілмейді"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Қос SIM ауыстыру радионы басқарып тұрғанда жолақ, режим және ұяшық құлыптарына қолдау көрсетілмейді"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Бұл модем осы жолақтардың ешқайсысын қолдамайды"
+
+msgid "Lock change failed"
+msgstr "Бекітуді өзгерту сәтсіз аяқталды"
+
+msgid "Invalid job id"
+msgstr "Жарамсыз тапсырма идентификаторы"
+
 msgid "Invalid page"
 msgstr "Жарамсыз бет"
 
@@ -3478,14 +3709,29 @@ msgstr "TTL адаптері жарамды жауап бермеді"
 msgid "Invalid TTL"
 msgstr "Жарамсыз TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP адаптері жарамды жауап бермеді"
+
+msgid "Invalid congestion control"
+msgstr "Жарамсыз кептелісті басқару"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Жүктеу адаптері жарамды жауап бермеді"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED адаптері жарамды жауап бермеді"
+
+msgid "Unknown LED setting"
+msgstr "Белгісіз жарық диоды баптауы"
+
+msgid "Invalid value for this setting"
+msgstr "Бұл параметр үшін жарамсыз мән"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Деректер шығыны адаптері дұрыс жауап бермеді"
 
 msgid "Unknown data usage setting"
 msgstr "Белгісіз деректер шығыны параметрі"
-
-msgid "Invalid value for this setting"
-msgstr "Бұл параметр үшін жарамсыз мән"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Қайта жіберу адаптері дұрыс жауап бермеді"
@@ -3731,8 +3977,29 @@ msgstr "Радио өз баптауына сәйкестенбеді"
 msgid "The data roaming setting could not be saved"
 msgstr "Деректер роумингі параметрін сақтау мүмкін болмады"
 
-msgid "Expected on or off"
-msgstr "on немесе off күтіледі"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Хотспот баптауы сақталды, бірақ сымсыз желіні қайта жүктеу сәтсіз болды"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Сымсыз баптауларда сақталмаған өзгерістер бар: алдымен сақтаңыз немесе қайтарыңыз"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Хотспот қазір ауыстырылуда; сәлден соң қайталаңыз"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Ешбір хотспот (кіру нүктесі) бапталмаған"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Бұл радионы қосу басқа интерфейске әсер етеді; Сымсыз бетін пайдаланыңыз"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Радионы Wi-Fi клиенті пайдалануда"
+
+msgid "The hotspot setting could not be written"
+msgstr "Хотспот баптауын жазу мүмкін болмады"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Бұл платформа хотспотты басқаруды қамтамасыз етпейді"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN интеграциясын бұл платформа қамтамасыз етпейді"
@@ -3833,6 +4100,15 @@ msgstr "USB желі интерфейсі емес"
 msgid "LAN bridge device section was not found"
 msgstr "LAN көпірі құрылғысының бөлімі табылмады"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Адаптердің қай желіге тиесілі екенін анықтау мүмкін болмады; кейінірек қайталаңыз"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Адаптер басқа желіге тиесілі және LAN-ға қосыла алмайды"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Желі баптауларында сақталмаған өзгерістер бар: алдымен сақтаңыз немесе қайтарыңыз"
+
 msgid "Cannot bring USB network interface up"
 msgstr "USB желі интерфейсін іске қосу мүмкін емес"
 
@@ -3865,6 +4141,12 @@ msgstr "Webhook денесі тым ұзын немесе басқару таң�
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Жауапты тексеру кілт=мән түрінде болуы тиіс, мысалы errcode=0 немесе ok=true (мән — бүтін сан немесе кіші әріптер, ең көбі 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Жарамсыз webhook құпиясы (256-ға дейін басылатын таңба, бос орынсыз)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Уақыт шегі 1-ден 120 секундқа дейін болуы керек"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Жарамсыз тақырып (әр жолда бір \"Аты: мәні\"; Host, Content-Type, Content-Length, Transfer-Encoding және Connection құрылғымен орнатылады)"
@@ -3926,8 +4208,17 @@ msgstr "Орнату әлдеқашан орындалуда"
 msgid "The language pack could not be removed"
 msgstr "Тіл бумасын жою мүмкін болмады"
 
+msgid "The LED settings could not be read"
+msgstr "Жарық диоды баптауларын оқу мүмкін болмады"
+
+msgid "The LED setting could not be saved"
+msgstr "Жарық диоды баптауын сақтау мүмкін болмады"
+
 msgid "Lock cache unavailable"
 msgstr "Бекіту кэші қолжетімсіз"
+
+msgid "The modem refused a write"
+msgstr "Модем жазуды қабылдамады"
 
 msgid "The saved locks could not be cleared"
 msgstr "Сақталған құлыптарды өшіру мүмкін болмады"
@@ -3938,9 +4229,6 @@ msgstr "Бекітетін қызмет көрсететін ұяшық жоқ"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Модем режим сұрауына жауап бермеді; ештеңе жіберілмеді"
 
-msgid "The modem refused a write"
-msgstr "Модем жазуды қабылдамады"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Кері оқу автоматты мәндерге сәйкес келмейді"
 
@@ -3949,6 +4237,21 @@ msgstr "Стек қайта іске қосылғаннан кейінгі ке�
 
 msgid "The reset was interrupted"
 msgstr "Қалпына келтіру үзілді"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Бұл бекіту өзгерісінің нәтижесі енді белгісіз"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Бекітуді өзгерту тым ұзаққа созылды; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Бекітуді өзгерту үзілді; «Бекіту күйін жаңарту» таңдаңыз"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Басқа бекіту өзгерісі басталуда; сәлден кейін қайталап көріңіз"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Тым көп бекіту өзгерісі күтуде; олар аяқталғанда қайталап көріңіз"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Бұл жүйеде пакеттерді қайта орнату қолжетімсіз"
@@ -3967,6 +4270,12 @@ msgstr "Пакеттермен белгісіз әрекет"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Бұл платформа TCP кептелісін басқаруды қамтамасыз етпейді"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP баптауларын оқу мүмкін болмады"
 
 msgid "Data usage is not available on this system"
 msgstr "Бұл жүйеде деректер шығыны қолжетімсіз"

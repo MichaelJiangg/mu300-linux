@@ -1,6 +1,7 @@
 """mu300-power: profiles, idle radios and the charging boot, against a fake / (MU300_SYSROOT), a fake /run and
 stub commands. The spec is docs/superpowers/specs/2026-10-06-power-profiles-design.md."""
 import os
+import shutil
 import unittest
 
 from helpers import ShellTest, BIN, TOP
@@ -436,6 +437,73 @@ class Daemon(DaemonTest):
             self.loops(shell)
             self.assertEqual(self.state(), 'active')
             self.assertIn('station', (self.run_dir / 'mu300/power/reason').read_text())
+
+    # --- FINDINGS 235: what a loop costs
+    def daemon_in(self, shell, loops, **env):
+        """the daemon under SHELL itself (not its #! line), LOOPS loops"""
+        r = self.script(shell, POWER, 'daemon', MU300_SYSROOT=self.root, MU300_RUN=self.run_dir,
+                        MU300_POWER_CONF=self.conf, MU300_POWER_INTERVAL=0, MU300_POWER_LOOPS=loops, **env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r
+
+    def test_the_stations_and_the_hotspot_are_asked_every_sixth_loop(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.stub('ubus', 'echo "ubus $*" >> "$STUBLOG/calls"; [ -e "$STUBLOG/ap-up" ]')
+            self.charger(online=1)                       # plugged: WIFI_IDLE=0, the self-check looks at the hotspot
+            self.stations(1)
+            self.uptime(600)
+            self.daemon_in(shell, 7)
+            c = self.calls().splitlines()
+            self.assertEqual(len([l for l in c if l.startswith('iw ')]), 2, c)          # loops 1 and 7
+            self.assertEqual(len([l for l in c if l.startswith('ubus ')]), 2, c)
+            self.assertEqual(self.state(), 'active')
+            # a hotspot whose interface is gone is looked at in the very next loop
+            (self.tmp / 'calls').unlink()
+            (self.root / 'sys/class/net/wlan0').rmdir()
+            self.daemon_in(shell, 3)
+            self.assertEqual(len([l for l in self.calls().splitlines() if l.startswith('ubus ')]), 3)
+
+    def test_the_idle_timer_asks_the_stations_before_it_runs_out(self):
+        """Between two looks at the stations the timer may run out: they are asked then, and a client that came since
+        keeps the hotspot up. (The iw stub moves the uptime on by 61 s, so the second loop finds the timer out.)"""
+        for shell in self.each_shell():
+            for n, want in ((1, 'active'), (0, 'idle')):
+                with self.subTest(stations=n):
+                    self.setUp()
+                    self.stub('iw', 'echo "iw $*" >> "$STUBLOG/calls"; cat "$STUBLOG/stations" 2>/dev/null\n'
+                                    'read -r u _ < "$MU300_SYSROOT/proc/uptime"; u=${u%%.*}\n'
+                                    'echo "$((u + 61)).00 0.00" > "$MU300_SYSROOT/proc/uptime"')
+                    self.write_conf('battery_WIFI_IDLE=1\n')
+                    st = self.run_dir / 'mu300/power'
+                    st.mkdir(parents=True, exist_ok=True)
+                    (st / 'state').write_text('active\n')
+                    (st / 'idle-since').write_text('100\n')
+                    self.stations(n)
+                    self.uptime(100)
+                    self.daemon_in(shell, 2, MU300_POWER_SAMPLE_EVERY=2)
+                    self.assertEqual(self.calls().count('iw dev wlan0 station dump'), 2)
+                    self.assertEqual(self.state(), want)
+                    if n:
+                        self.assertEqual((st / 'idle-since').read_text().strip(), '161')
+
+    def test_a_loop_starts_no_process_to_read_a_file(self):
+        """cat, sed, tail, grep... are no longer what a loop is made of: four loops start as many of them as one (the
+        first loop finds the charge switch and the device once)"""
+        real = {n: shutil.which(n) for n in ('cat', 'sed', 'tail', 'cut', 'grep', 'tr', 'mkdir', 'rm', 'date', 'od')}
+        for shell in self.each_shell():
+            counts = []
+            for loops in (1, 4):
+                self.setUp()
+                for n, path in real.items():
+                    self.stub(n, f'echo {n} >> "$STUBLOG/procs"; exec {path} "$@"')
+                self.charger(online=0)
+                self.write_conf('battery_WIFI_IDLE=10\nCHARGE_TO=80\n')
+                self.uptime(600)
+                self.daemon_in(shell, loops)
+                p = self.tmp / 'procs'
+                counts.append(sorted(p.read_text().split()) if p.exists() else [])
+            self.assertEqual(counts[0], counts[1])
 
     def test_exit_trap_wakes(self):
         for shell in self.each_shell():
@@ -883,6 +951,174 @@ class Guards(DaemonTest):
             self.assertEqual((ch / 'charge_type').read_text().strip(), 'Fast')
             r = self.power(shell, 'charge-limit')
             self.assertIn('no battery here', r.stdout)
+
+    # --- kanoqwq's charging controls (61bb5a30): a resume level, a pause by hand, one full charge
+    def ctype(self, ch):
+        return (ch / 'charge_type').read_text().strip()
+
+    def charge_off(self):
+        p = self.run_dir / 'mu300/power/charge-off'
+        return p.read_text().strip() if p.exists() else ''
+
+    def test_resume_at_sets_where_charging_starts_again(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.write_conf('CHARGE_TO=80\nRESUME_AT=60\n')
+            ch = self.charger(online=1); self.battery(capacity=80)
+            self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'limit')
+            self.battery(capacity=74); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')   # under N-5, but RESUME_AT says 60
+            self.battery(capacity=60); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            self.battery(capacity=59); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+            self.battery(capacity=70); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')   # charging up again: not held on the way up
+            # RESUME_AT at or over the limit is ignored: N-5 as before
+            self.setUp()
+            self.write_conf('CHARGE_TO=60\nRESUME_AT=70\n')
+            ch = self.charger(online=1); self.battery(capacity=60)
+            self.loops(shell)
+            self.battery(capacity=55); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            self.battery(capacity=54); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+
+    def test_resume_at_with_no_limit_holds_a_full_battery(self):
+        """CHARGE_TO=100 with RESUME_AT: off at 100 %, on under RESUME_AT (kanoqwq's stop 100 band)."""
+        for shell in self.each_shell():
+            self.setUp()
+            self.write_conf('RESUME_AT=90\n')
+            ch = self.charger(online=1); self.battery(capacity=99)
+            self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+            self.battery(capacity=100); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            self.battery(capacity=90); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            self.battery(capacity=89); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+
+    def test_default_is_unchanged(self):
+        """No new key: the guard leaves a battery at 100 % on the charger alone."""
+        for shell in self.each_shell():
+            self.setUp()
+            ch = self.charger(online=1); self.battery(capacity=100, status='Full')
+            r = self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast'); self.assertNotIn('charging', r.stderr)
+            self.assertFalse(self.conf.exists())
+
+    def test_pause_by_hand(self):
+        for shell in self.each_shell():
+            self.setUp()
+            ch = self.charger(online=1); self.battery(capacity=50)
+            r = self.power(shell, 'charge pause')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('CHARGE_PAUSE=1\n', self.conf.read_text())
+            r = self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'manual')
+            self.assertIn('charging off: manual', r.stderr)
+            self.assertIn('charging: paused by hand', self.power(shell, 'charge').stdout)
+            # never held under 5 %, as the limit
+            self.battery(capacity=4); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+            self.battery(capacity=6); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            r = self.power(shell, 'charge resume')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast'); self.assertEqual(self.charge_off(), '')
+
+    def test_pause_and_temperature_both_keep_it_off_and_resume_never_overrides_the_temperature(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.write_conf('CHARGE_PAUSE=1\n')
+            ch = self.charger(online=1); self.battery(capacity=50, temp=460)
+            self.loops(shell)
+            self.assertEqual(self.charge_off(), 'temp')
+            self.battery(capacity=50, temp=390); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'manual')   # cooled, still paused
+            self.battery(capacity=50, temp=460); self.loops(shell)
+            self.power(shell, 'charge resume'); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'temp')   # too hot: stays off
+            self.battery(capacity=3, temp=470); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')   # the 5 % floor never overrides the temperature
+            self.battery(capacity=50, temp=390); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+
+    def test_resume_falls_back_to_the_limit(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.write_conf('CHARGE_TO=80\nCHARGE_PAUSE=1\n')
+            ch = self.charger(online=1); self.battery(capacity=85)
+            self.loops(shell)
+            self.assertEqual(self.charge_off(), 'manual')
+            self.power(shell, 'charge resume'); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'limit')
+            # paused by hand between the levels: resumed, it charges up to the limit
+            self.setUp()
+            self.write_conf('CHARGE_TO=80\nCHARGE_PAUSE=1\n')
+            ch = self.charger(online=1); self.battery(capacity=77)
+            self.loops(shell)
+            self.power(shell, 'charge resume'); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+
+    def test_full_once(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.write_conf('CHARGE_TO=80\nCHARGE_PAUSE=1\n')
+            ch = self.charger(online=1); self.battery(capacity=85)
+            self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A')
+            r = self.power(shell, 'charge full')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('full once: charging to 100 %', r.stdout)
+            self.assertIn('FULL_ONCE=1\n', self.conf.read_text())
+            self.assertIn('CHARGE_PAUSE=0\n', self.conf.read_text())   # a full charge ends the pause
+            self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')
+            self.battery(capacity=100, status='Charging'); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')   # 100 %, but not Full yet
+            self.battery(capacity=100, status='Full'); r = self.loops(shell)
+            self.assertIn('full once: the battery is full, back to the limit', r.stderr)
+            self.assertIn('FULL_ONCE=0\n', self.conf.read_text())
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'limit')
+            # a pause ends a full charge; the temperature still wins over one
+            self.power(shell, 'charge full')
+            self.power(shell, 'charge pause')
+            self.assertIn('FULL_ONCE=0\n', self.conf.read_text())
+            self.power(shell, 'charge full')
+            self.battery(capacity=90, temp=460); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'N/A'); self.assertEqual(self.charge_off(), 'temp')
+
+    def test_charging_controls_are_the_u30_air_s(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.stub('mu300-device', 'echo f50')
+            ch = self.charger(online=1); self.battery(capacity=50)
+            for args in ('charge pause', 'charge full', 'set RESUME_AT 60', 'set CHARGE_PAUSE 1'):
+                r = self.power(shell, args)
+                self.assertEqual(r.returncode, 2, args); self.assertIn('no battery here', r.stderr)
+            self.assertEqual(self.power(shell, 'set CHARGE_PAUSE 0').returncode, 0)   # off is taken anywhere
+            self.write_conf('CHARGE_PAUSE=1\nRESUME_AT=60\n'); self.loops(shell)
+            self.assertEqual(self.ctype(ch), 'Fast')   # a hand-written file does nothing without a battery
+            for args in ('set RESUME_AT 100', 'set RESUME_AT 07', 'set CHARGE_PAUSE 2', 'charge stop', 'charge pause 1'):
+                self.assertEqual(self.power(shell, args).returncode, 2, args)
+
+    def test_status_and_charge_limit_show_the_new_keys(self):
+        for shell in self.each_shell():
+            self.setUp()
+            self.charger(online=1); self.battery(capacity=50)
+            self.assertIn('RESUME_AT=0 CHARGE_PAUSE=0 FULL_ONCE=0\n', self.power(shell, 'status').stdout)
+            self.write_conf('CHARGE_TO=80\nRESUME_AT=60\n')
+            r = self.power(shell, 'charge-limit')
+            self.assertIn('charge limit: 80 % (charging stops at 80 %, starts again under 60 %)', r.stdout)
+            self.write_conf('RESUME_AT=90\n')
+            self.assertIn('charging stops at 100 %, starts again under 90 %', self.power(shell, 'charge').stdout)
+            self.write_conf('CHARGE_TO=50\nRESUME_AT=60\n')
+            r = self.power(shell, 'charge-limit')
+            self.assertIn('starts again under 45 %', r.stdout); self.assertIn('RESUME_AT=60 is not under the limit', r.stdout)
 
     def test_guard_without_a_reading_or_a_switch_changes_nothing(self):
         for shell in self.each_shell():
@@ -1506,6 +1742,39 @@ class Incident(DaemonTest):
             self.assertNotIn('wifi up', self.calls())
 
 
+class ForwardNotice(DaemonTest):
+    """The SMS forwarding's battery notices: the daemon tells mu300-sms-forward the capacity and the charger, once per
+    change, and nothing on a board without a battery."""
+
+    def told(self):
+        import time
+        time.sleep(0.3)     # in the background
+        p = self.tmp / 'fwd'
+        return p.read_text().splitlines() if p.exists() else []
+
+    def test_told_once_per_change_and_never_without_a_battery(self):
+        fw = self.stubs / 'fwd'
+        fw.write_text('#!/bin/sh\necho "$*" >> "$STUBLOG/fwd"\n')
+        fw.chmod(0o755)
+        for shell in self.each_shell():
+            (self.tmp / 'fwd').unlink(missing_ok=True)
+            self.uptime(100)
+            self.loops(shell, 3, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), ['power 64 0'])
+            self.charger(online=1)
+            self.loops(shell, 2, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), ['power 64 0', 'power 64 1'])
+            chg = (self.root / 'sys/class/power_supply/bq256xx-charger')
+            for f in chg.iterdir():
+                f.unlink()
+            chg.rmdir()
+            (self.tmp / 'fwd').unlink()
+            self.stub('mu300-device', 'echo f50')
+            self.loops(shell, 2, MU300_POWER_FORWARD=fw)
+            self.assertEqual(self.told(), [])
+            self.stub('mu300-device', 'echo u30air')
+
+
 class Units(unittest.TestCase):
     def test_openwrt_instance_runs_mobile_data_through_netifd(self):
         f = (TOP / 'openwrt/overlay/etc/init.d/mu300-power').read_text()
@@ -1557,6 +1826,22 @@ class Adapter(DaemonTest):
             self.assertEqual(json.loads(r.stdout), {'ok': 1})
             r = self.adapter(shell, 'set CHARGE_TO 101')
             self.assertEqual(json.loads(r.stdout)['ok'], 0)
+
+    def test_get_has_the_charging_controls(self):
+        import json
+        for shell in self.each_shell():
+            self.setUp()
+            self.charger(online=1)
+            d = json.loads(self.adapter(shell, 'get').stdout)
+            self.assertEqual((d['conf']['RESUME_AT'], d['conf']['CHARGE_PAUSE'], d['conf']['FULL_ONCE']), (0, 0, 0))
+            for key, value in (('RESUME_AT', '60'), ('CHARGE_PAUSE', '1')):
+                self.assertEqual(json.loads(self.adapter(shell, f'set {key} {value}').stdout), {'ok': 1})
+            d = json.loads(self.adapter(shell, 'get').stdout)
+            self.assertEqual((d['conf']['RESUME_AT'], d['conf']['CHARGE_PAUSE']), (60, 1))
+            self.assertEqual(json.loads(self.adapter(shell, 'set FULL_ONCE 1').stdout), {'ok': 1})
+            d = json.loads(self.adapter(shell, 'get').stdout)
+            self.assertEqual((d['conf']['CHARGE_PAUSE'], d['conf']['FULL_ONCE']), (0, 1))
+            self.assertEqual(json.loads(self.adapter(shell, 'set RESUME_AT 100').stdout)['ok'], 0)
 
     def test_get_on_the_f50_has_no_battery(self):
         import json

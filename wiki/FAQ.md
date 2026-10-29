@@ -32,7 +32,7 @@ Ubuntu for a general Linux computer, OpenWrt for a lean router, OpenWrt with the
 dashboard for the modem. You can install both. See [Choosing a System](Choosing-a-System).
 
 ### Which kernel?
-5.4 if unsure (the longest tested); 6.18 or 7.2 for Ubuntu 26.04, U30 Air USB host mode or WireGuard. You can change it
+5.4 if unsure (the longest tested); 6.18, 7.2 or 7.3 for Ubuntu 26.04 or WireGuard, 6.18 or 7.2 for U30 Air USB host mode (not yet tried on 7.3). You can change it
 later. See [Kernels](Kernels).
 
 ### How do I connect to it?
@@ -79,10 +79,7 @@ sudo mu300-usb adb off          # no adb at all
 A device where you turned adb off, or set it up with a key, before this release stays as it was.
 
 ### Can I make calls or play sound?
-Calls yes, sound on the device no: the board has no speaker or microphone. A call's audio runs through the modem's
-audio DSP, to the device's own taps on the call or a Bluetooth headset (the headset route is not measured yet), with
-the audio extra: `sudo mu300-extra install audio` installs it from [mu300-audio](https://github.com/dikeckaan/mu300-audio) for
-the kernel the device uses, with the DSP image (checked against its pinned sha256).
+Voice calls are not supported. The board has no speaker or microphone; USB sound cards remain supported by the kernel.
 
 ### Can I plug in a screen?
 No. HDMI over USB-C does not work (the USB-C power-delivery chip never answers). It is a headless machine.

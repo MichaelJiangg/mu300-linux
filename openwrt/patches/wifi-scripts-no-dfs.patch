@@ -9,14 +9,14 @@
  } from 'wifi.common';
  import { validate } from 'wifi.validate';
  import * as netifd from 'wifi.netifd';
-@@ -483,8 +483,63 @@
+@@ -483,8 +483,100 @@
  	phy_features.ftm_responder = device_extended_features(phy.extended_features, NL80211_EXT_FEATURE_ENABLE_FTM_RESPONDER);
  	phy_features.radar_background = device_extended_features(phy.extended_features, NL80211_EXT_FEATURE_RADAR_BACKGROUND);
  	phy_features.cipher_gcmp256 = WLAN_CIPHER_SUITE_GCMP_256 in (phy.cipher_suites ?? []);
 +	/* mu300: a driver that can detect radar names the widths in an interface combination */
 +	phy_features.radar_detect = length(filter(phy.interface_combinations ?? [], (c) => c.radar_detect_widths)) > 0;
 +	phy_capabilities.freqs = band?.freqs ?? [];
- }
++}
 +
 +/* mu300: an AP on a DFS channel needs radar detection; without it hostapd's start_dfs_cac() fails and the AP never
 + * comes up (the SC2355 driver: mu300-linux docs/FINDINGS.md 42). For such a driver an explicit DFS channel becomes
@@ -25,7 +25,7 @@
 +function device_no_dfs(config) {
 +	if (config.band != '5g' || phy_features.radar_detect)
 +		return;
- 
++
 +	let radar = {}, usable = [], allowed = [];
 +	for (let f in phy_capabilities.freqs) {
 +		let chan = (f.freq - 5000) / 5;
@@ -68,15 +68,54 @@
 +	if (m[1] == 'HT')
 +		width = min(width, 40);
 +	config.htmode = m[1] + width;
+ }
+ 
++/* mu300: a channel list (chanlist, LuCI's "channels") only means something on its own band. openwrt-wifi-config
++ * writes the 5 GHz one for "auto"; after the band is changed to 2.4 GHz in LuCI it stayed, ACS found "No available
++ * channels" and the access point never came up (issue #424). Entries outside the radio's band are dropped (a range
++ * "a-b" is kept when both ends are on it), and when none is left the list goes, so ACS uses the whole band. */
++function device_chanlist_band(config) {
++	let list = config.chanlist;
++	if (list == null)
++		return;
++	if (type(list) != 'array')
++		list = [ list ];
++	let chans = {};
++	for (let f in phy_capabilities.freqs) {
++		let chan = f.freq == 2484 ? 14 : f.freq < 2484 ? (f.freq - 2407) / 5 :
++			f.freq < 5950 ? (f.freq - 5000) / 5 : (f.freq - 5950) / 5;
++		chans[chan] = true;
++	}
++	let keep = [], dropped = [];
++	for (let entry in list)
++		for (let item in split(trim(`${entry}`), /[ \t]+/)) {
++			if (item == '')
++				continue;
++			let ends = split(item, '-');
++			if (length(filter(ends, (c) => !chans[+c])))
++				push(dropped, item);
++			else
++				push(keep, item);
++		}
++	if (!length(dropped))
++		return;
++	log(`channel list: ${join(' ', dropped)} not on the ${config.band} band, left out` +
++	    (length(keep) ? '' : '; automatic channel selection uses the whole band'));
++	if (length(keep))
++		config.chanlist = keep;
++	else
++		delete config.chanlist;
 +}
 +
  function generate(config) {
  	if (!config)
  		die(`${config.path} is an unknown phy`);
-@@ -495,6 +550,8 @@
+@@ -495,6 +587,10 @@
  
  	set_device_defaults(config);
  
++	device_chanlist_band(config);
++
 +	device_no_dfs(config);
 +
  	device_log_append(config);

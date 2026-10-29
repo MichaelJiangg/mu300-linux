@@ -33,7 +33,7 @@ case $- in *x*) set +x; APN_XTRACE=1 ;; *) APN_XTRACE= ;; esac
 # quotes around the value taken off), never executed. Not under netifd, whose settings come from mu300cell.sh.
 MD_CONF=${MU300_CONF:-/etc/mu300/mobile-data.conf}
 if [ "${MU300_NETIFD:-}" != 1 ] && [ -f "$MD_CONF" ] && [ -r "$MD_CONF" ]; then
-    for _k in MU300_APN MU300_PDP_TYPE MU300_APN_USER MU300_APN_PASSWORD MU300_APN_AUTH; do
+    for _k in MU300_APN MU300_PDP_TYPE MU300_APN_USER MU300_APN_PASSWORD MU300_APN_AUTH MU300_APN_ICCID; do
         [ -z "${!_k+x}" ] || continue                                # the environment says it
         grep -q "^[[:space:]]*$_k=" "$MD_CONF" 2>/dev/null || continue
         _v=$(sed -n "s/^[[:space:]]*$_k=//p" "$MD_CONF" | tail -n 1)
@@ -47,6 +47,7 @@ if [ "${MU300_NETIFD:-}" != 1 ] && [ -f "$MD_CONF" ] && [ -r "$MD_CONF" ]; then
     unset _k _v
 fi
 APN_SET_USER=${MU300_APN_USER:-}; APN_SET_PASS=${MU300_APN_PASSWORD:-}; APN_SET_AUTH=${MU300_APN_AUTH:-}
+APN_SET_ICCID=${MU300_APN_ICCID:-}
 unset MU300_APN_USER MU300_APN_PASSWORD
 [ -z "$APN_XTRACE" ] || set -x
 
@@ -950,6 +951,31 @@ apn_auth_send() {
         echo "the modem refused the APN credentials (AT+CGPCO)" >&2; return 1; }
 }
 
+# --- the APN settings bound to one SIM card (kanoqwq's APN profiles, 3826be8b, in the one form FINDINGS 65 left
+# room for, FINDINGS 231) --------------------------------------------------------------------------------------------
+# MU300_APN_ICCID (Ubuntu's mobile-data.conf; OpenWrt: the wan interface's iccid): the ICCID of the card these
+# settings - the APN, its PDP type and its credentials - are for. Unset, they are for any card, as always. Set, the
+# card in use is asked for its ICCID (AT+CCID) before the context is defined: the same card dials with them; another
+# card dials with none of them (its own context, as with no APN at all, and credentials given to the modem earlier
+# are taken back), so a card put in the device is never offered another carrier's APN password. A card that does
+# not say its ICCID gets no dial: whether it is the card the settings are for is not known. ICCIDs are never printed.
+# apn_card: 0 the card is the one of the settings, 1 another card, 2 not known (a message on stderr)
+apn_card() {
+    local want have LC_ALL=C
+    want=$(printf '%s' "$APN_SET_ICCID" | tr 'a-z' 'A-Z')
+    case $want in *[!0-9A-Z]*) echo "the ICCID of the APN settings holds something else than letters and digits" >&2; return 2 ;; esac
+    [ ${#want} -ge 18 ] && [ ${#want} -le 22 ] ||
+        { echo "the ICCID of the APN settings is not 18 to 22 characters long" >&2; return 2; }
+    # (+CCID: 8990..., quoted on some firmware; alphanumeric on some cards, FINDINGS 174)
+    have=$(at 'AT+CCID' 5 2>/dev/null | tr -d '\r" ' | sed -n 's/^+CCID://p' | head -n 1 | tr 'a-z' 'A-Z')
+    case $have in ''|*[!0-9A-Z]*)
+        echo "the SIM card did not say its ICCID (AT+CCID): the APN settings are for one card only, not dialling" >&2
+        return 2 ;;
+    esac
+    [ "$have" = "$want" ] && return 0
+    return 1
+}
+
 # define_context APN: the data context as the settings ask for it. With no APN nothing is defined: the modem keeps
 # the context the SIM already defines. Runs with set -x off: the trace would hold the password.
 define_context() {
@@ -960,8 +986,18 @@ define_context() {
     return $rc
 }
 define_context_quiet() {
-    local apn=${1:-}
+    local apn=${1:-} rc=0
     APN_MARK=$APN_AUTH_MARK.sim$SIM_SLOT
+    if [ -n "${APN_SET_ICCID:-}" ]; then
+        apn_card || rc=$?
+        case $rc in
+            0) ;;
+            1)  # another card: none of the settings (APN_SET_* are this run's; the next run reads them again)
+                radio_say "the APN settings are for another SIM card: dialling with this card's own context"
+                apn=; APN_SET_USER=; APN_SET_PASS=; APN_SET_AUTH= ;;
+            *) return 1 ;;
+        esac
+    fi
     # The APN is pasted into a quoted AT argument: a quote, a CR or a LF in it (a free-text field in LuCI, a
     # hand-edited mobile-data.conf) would end the argument or the command early and define something else.
     case $apn in
@@ -1075,7 +1111,7 @@ up_locked() {
     if [ "$SIM_NATIVE" = 1 ] && [ ! -e /run/mu300/sim-radio-ready ]; then
         local native_end=$((SECONDS + ${MU300_NATIVE_RADIO_WAIT:-40}))
         until [ -e /run/mu300/sim-radio-ready ] || [ ! -e /run/mu300-radio-freeze ] || [ "$SECONDS" -ge "$native_end" ]; do
-            sleep 1
+            nap 0.2   # the dial starts as soon as the radio is (a whole second here was up to a second of each boot)
         done
     fi
     tty_setup

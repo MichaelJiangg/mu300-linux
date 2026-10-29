@@ -72,7 +72,7 @@ them. If that is not acceptable to you, do not install it.
 | Heat alarm | the network LED flashes red, white, blue in turn: the SoC at 85 °C, until it cools down (`thermal-guard`) | the battery LED flashes red, white, blue in turn: the SoC at 85 °C or the battery at 50 °C, until they cool down (`thermal-guard`) |
 | USB network | `192.168.77.1` | `192.168.78.1` (so both can be plugged into one computer) |
 | Tested | everything below | 5.4, 6.18 and 7.2: USB, Wi-Fi hotspot, Bluetooth, mobile data, VPN, LEDs |
-| Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit`, the `openwrt-luci` dashboard and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`). Charging: on 5.4 by the vendor charger stack; on 6.18 and 7.2 by the `bq256xx` driver (from v2026.10.12; the mainline kernels of v2026.10.11 and older leave charging off). From v2026.10.20: a **charge limit** of 0-100 % (`sudo mu300-power charge-limit 80`, `CHARGE_TO` in the power settings, System > Power on the panel; charging stops at the limit and resumes 5 points below it, and the battery is never held under 5 %), and on the mainline kernels the **Type-C current** the port advertises is read, so a 1.5 A or 3 A port charges at up to 2 A instead of 500 mA |
+| Battery | - | level, voltage, current, temperature and charging state in `mu300-toolkit`, the `openwrt-luci` dashboard and `/sys/class/power_supply` on every kernel (mainline: `sc27xx-fgu`). Charging: on 5.4 by the vendor charger stack; on 6.18, 7.2 and 7.3 by the `bq256xx` driver (from v2026.10.12; the mainline kernels of v2026.10.11 and older leave charging off). From v2026.10.20: a **charge limit** of 0-100 % (`sudo mu300-power charge-limit 80`, `CHARGE_TO` in the power settings, System > Power on the panel; charging stops at the limit and resumes 5 points below it, and the battery is never held under 5 %), and on the mainline kernels the **Type-C current** the port advertises is read, so a 1.5 A or 3 A port charges at up to 2 A instead of 500 mA |
 | USB host (OTG) | - (its USB port is its power supply) | `sudo mu300-usb host` with an OTG adapter: flash drives (FAT, exFAT), keyboards and mice, USB modems and Ethernet adapters, with 5 V from the battery; `sudo mu300-usb device` back to the computer (the default at every boot). Mainline kernels; HDMI through USB-C adapters does not work. **Experimental:** `sudo mu300-usb pd on` lets USB-C power delivery choose the roles (an OTG adapter: host by itself; a PD dock with its charger: charging, and `mu300-usb host` asks it for the host role); off by default (FINDINGS 150) |
 | SD card | the Linux filesystem can live on a card instead of the internal storage (see [Install](#install)) | no card slot |
 | Buttons | power: held 3 s shuts down | power: a short press wakes the LEDs (they go dark after 60 s), held 3 s shuts down; the Wi-Fi key switches the hotspot 2.4 / 5 GHz, held 3 s turns it off or on |
@@ -92,12 +92,13 @@ this project has a V50 or has tested one**: install it only if you can get back 
 
 | | ZTE V50 / MU3351 |
 |---|---|
-| Kernel | mainline only: 6.18 or 7.2 of a release that names the V50 (its kernel bundle lists `v50` in `devices`); 5.4 is refused |
+| Kernel | mainline only: 6.18, 7.2 or 7.3 of a release that names the V50 (its kernel bundle lists `v50` in `devices`); 5.4 is refused |
 | What runs | what runs on an F50: the same systems, modules and settings, USB-powered (no battery) |
 | LEDs | NET1 lamp: blue 4G, white 5G, red no service; Wi-Fi lamp: white 5 GHz, blue 2.4 GHz; NET2 dark (`leds-aw9523b`, mainline) |
 | USB network | `192.168.79.1` (neither the F50's nor the U30 Air's subnet) |
 | SIM cards | one per boot: built-in SIM 1, 2, 3 or the external SIM, as the board has them (`mu300-sim card`, LuCI Cellular > SIM; [docs/SIM-SELECTION.md](docs/SIM-SELECTION.md), FINDINGS 204); untested on a V50 here |
-| Not yet | NFC; the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
+| NFC | the U30 Air's `mu300-nfc` on the same tag (reset line 189 from ZTE's device tree, FINDINGS 229); untested on a V50 here |
+| Not yet | the eMMC host is kept awake (kano's fix for lost files, patch 0017) |
 
 The installers say so in one line and stop a V50 that is not exactly that (a model V50 with another device or
 platform). Linux tells the board by its device tree, as before for the other two: the V50's has the AW9523B, which no
@@ -109,9 +110,9 @@ LAN setting pins the address).
 
 * **A real Linux system**, not an app or a container: Ubuntu 24.04 or 26.04 LTS with systemd and `apt`, OpenWrt
   with its LuCI web interface, or OpenWrt with the MU300 control panel (below).
-* **Three kernels to choose from:** Unisoc's vendor 5.4, mainline 6.18 LTS and mainline 7.2 (6.18.56 and 7.2.10 in
-  v2026.10.20, with BTF and the eBPF hooks that [dae](https://github.com/daeuniverse/dae) needs), with KVM
-  (`/dev/kvm`) on all three.
+* **Four kernels to choose from:** Unisoc's vendor 5.4, mainline 6.18 LTS, mainline 7.2 (stable) and mainline 7.3,
+  the newest (from the next release after v2026.10.19.2 on); 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the eBPF
+  hooks that [dae](https://github.com/daeuniverse/dae) needs. KVM (`/dev/kvm`) on all of them.
 * **Internet over 5G/LTE**, shared with everything connected to the device.
 * **A Wi-Fi hotspot** (5 GHz or 2.4 GHz) and **USB networking**: plug it into a computer and it shows up as a network adapter.
 * **SSH access** at `192.168.77.1` (U30 Air: `192.168.78.1`), plus a USB serial console.
@@ -132,9 +133,7 @@ trying it costs you the server.
 * **The hardware stays what it is**, under either system:
   * no screen output: HDMI over USB-C does not work (the power-delivery chip never answers), so it is a headless
     machine you use over SSH or the web interface;
-  * no speaker or microphone: a call's audio can only go through the modem's audio DSP, to the device's own taps on
-    the call or a Bluetooth headset, with the audio extra (`sudo mu300-extra install audio`; see
-    [What works](#what-works-and-what-does-not));
+  * no speaker or microphone; voice calls are not supported;
   * about 1.4 GB of RAM, because the modem firmware reserves most of the rest. Compressed swap in RAM (zram, half the
     RAM, lz4) is on by default and stretches it; `sudo mu300-zram off` turns it off.
 
@@ -233,7 +232,7 @@ label `mu300sd`); on the eMMC only `boot_b` (or `boot_a`) and 32 bytes of `misc`
 needs no repartitioning. A card that holds another Linux (ext4) filesystem is never formatted. A `mu300sd` card
 always comes first. Without the card the device starts the internal installation if there is one; with none, it
 waits 8 s for the card (30 s while one is still being detected), then returns to Android after about five minutes.
-All three kernels read the card. The U30 Air has no card slot, so it never asks there.
+All four kernels have the card's driver (5.4, 6.18 and 7.2 read it on the boards; 7.3 not tried yet). The U30 Air has no card slot, so it never asks there.
 
 
 * Put the card in while the device is switched off. A card inserted while Linux runs is seen, but it cannot be
@@ -279,7 +278,7 @@ with GitHub - a `git clone` is fast-forwarded, a downloaded zip gets the files t
 there was anything new; without GitHub it simply continues (`MU300_NO_SELF_UPDATE=1` / `-NoSelfUpdate` skips it).
 
 With Ubuntu it asks for the release: **24.04 LTS** (the default, the longest tested) or **26.04 LTS** - the
-newest, with systemd 259, on kernel 6.18 or 7.2. An installed Ubuntu moves
+newest, with systemd 259, on kernel 6.18, 7.2 or 7.3. An installed Ubuntu moves
 to the other release with `sudo MU300_UBUNTU=26.04 mu300-update apply` (or `24.04`), keeping settings and data.
 
 It also asks for the **kernel**:
@@ -288,11 +287,12 @@ It also asks for the **kernel**:
 |---|---|---|
 | 1 | 5.4 | Unisoc's vendor kernel (Android 12 base): the longest tested, everything this project supports |
 | 2 | 6.18 | mainline Linux, the current long-term (LTS) release: newer drivers and security fixes, the same functions (hotspot, mobile data, SMS, Bluetooth, VPN, GPU); no USB-C video output yet |
-| 3 | latest stable (7.2 for now) | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 6.18 |
+| 3 | 7.2 (stable) | the stable 7.2 series of mainline Linux: newer drivers, the same functions as 6.18; tested less than 6.18 |
+| 4 | 7.3 | the newest mainline release: the newest drivers, the same functions as 6.18; tested less than 7.2 (from the next release after v2026.10.19.2 on) |
 
-It can be changed later on the device with `sudo mu300-update kernel 5.4`, `... kernel 6.18` or `... kernel 7.2`.
-Ubuntu 26.04 needs 6.18 or 7.2 (its programs use system calls 5.4 does not have), and so does USB host mode on the
-U30 Air.
+It can be changed later on the device with `sudo mu300-update kernel 5.4`, `... kernel 6.18`, `... kernel 7.2` or
+`... kernel 7.3`. Ubuntu 26.04 needs 6.18, 7.2 or 7.3 (its programs use system calls 5.4 does not have), and so does USB host mode on the
+U30 Air (tried on 6.18 and 7.2; not yet on 7.3).
 
 ![The kernel question, in Turkish](docs/images/installer/installer-2-kernel-tr.png)
 
@@ -393,7 +393,7 @@ whenever OpenWrt is chosen (`MU300_OPENWRT=plain|luci` answers without asking), 
   adapters in host mode that can join the LAN bridge.
 * **Cellular > Adapter settings:** how the panel reaches the modem (AT backend, serial port, custom AT adapter).
 * **System > Languages:** the language of the interface, and the lang extra: download it, or upload the file.
-* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`), and what a boot the charger started does (U30 Air: charge only until the Wi-Fi key or a held power key starts it, off when unplugged; or start normally, `POWER_ON_CHARGER=1`). The U30 Air powers off cleanly on an empty battery by the stock rules (docs/FINDINGS.md 196, 197).
+* **System > Power:** the active power profile and why (in the page's language), the battery, the power source and the charger's input current, the idle knobs of the three profiles (Wi-Fi idle minutes, radio idle keep/lte/off, LEDs, CPU), the saver threshold and the charge limit (0-100 %, U30 Air; also `mu300-power charge-limit N`), where charging starts again (`RESUME_AT`), a pause by hand and a one-off full charge (U30 Air; `mu300-power charge pause|resume|full`), and what a boot the charger started does (U30 Air: charge only until the Wi-Fi key or a held power key starts it, off when unplugged; or start normally, `POWER_ON_CHARGER=1`). The U30 Air powers off cleanly on an empty battery by the stock rules (docs/FINDINGS.md 196, 197).
 * **System > Packages after an update:** the packages you had installed yourself and what the update did with them
   (see [Updating](#updating)): what came back, what is pending or failed and why, the settings set aside, and the
   buttons Try again, Repair DNS (after a confirmation) and Dismiss.
@@ -462,10 +462,11 @@ the archive once online). `mu300-panel status` says where it is.
 | Change the hotspot's channel | Ubuntu: `CHANNEL=` in `/etc/mu300/hotspot.conf` (`auto`, or on 5 GHz 36-48 / 149-165). OpenWrt: LuCI → Network → Wireless. Never a DFS channel (52-144): the Wi-Fi driver cannot detect radar, so hostapd could not start there; a DFS channel is replaced by 36 (149 where 36-48 are not allowed) and the log says why (FINDINGS 42) |
 | Read and send SMS | `sudo sms list`, `sudo sms send NUMBER TEXT...`, `sudo sms delete INDEX` (an index, `read` or `all`; anything else is refused before it reaches the modem) (OpenWrt with the panel: Cellular → SMS; Ubuntu with the panel extra: the MU300 page) |
 | Send a USSD code (balance, own number) | `sudo mu300-ussd '*101#'` |
-| Change the kernel | `sudo mu300-update kernel 6.18` (or `5.4`, `7.2`), then reboot |
+| Change the kernel | `sudo mu300-update kernel 6.18` (or `5.4`, `7.2`, `7.3`), then reboot |
 | Connect the device to someone else's Wi-Fi | `sudo mu300-toolkit` → Network → Wi-Fi → "Join a network", or `sudo wifi-client scan` then `sudo wifi-client connect "NAME"` (it asks for the password); see [Wi-Fi client](#wi-fi-client) |
 | Update to the newest release | `sudo mu300-update check` then `sudo mu300-update apply`. The device looks for a new release at boot and every 6 hours and says so at login and in `mu300-toolkit`; it never installs one by itself |
 | Fixed TTL for mobile data (so the operator cannot tell hotspot traffic from the device's own) | `sudo mu300-ttl set 64` (`sudo mu300-ttl off` goes back to the default), `mu300-toolkit` -> Network -> TTL, or LuCI Cellular -> TTL. On the mainline kernels the rule is in tc and flow offloading stays on; on 5.4 it is in nftables and offloading is off while a TTL is set |
+| TCP congestion control (BBR or CUBIC) for the device's own connections | `sudo mu300-tcp set bbr` (`sudo mu300-tcp set default` goes back to the kernel's own), or LuCI Cellular -> Device management. Only what the kernel offers: the mainline kernels have BBR, 5.4 does not |
 | Compressed swap in RAM (zram) | On by default on every system and kernel: half the RAM (~700 MB of swap), lz4, priority 100, `vm.swappiness` 100. `mu300-zram` shows it and what it costs; `sudo mu300-zram off` / `on` (kept across reboots and updates), or `mu300-toolkit` → System → Compressed swap. Size, compressor (`zstd` packs ~3.5:1 against lz4's ~2.5:1, for more CPU) and swappiness: `/etc/mu300/zram.conf`, see `/opt/mu300/lib/zram.conf.example` (FINDINGS 162) |
 | Switch between OpenWrt and Ubuntu | `sudo mu300-os openwrt` / `sudo mu300-os ubuntu` (`openwrt-luci` for the one with the control panel) |
 | Failed boots in a row before it falls back to Android (1-6, default 5) | `sudo mu300-next-boot attempts N` |
@@ -473,10 +474,11 @@ the archive once online). `mu300-panel status` says where it is.
 | Go back to Android | `sudo mu300-next-boot android`, then `sudo reboot` |
 | Return to Linux from Android | `su -c mu300-linux` on the device (see below), or `boot/android-boot-linux.sh work/boot-linux-slotb.img` from a computer |
 | Send all traffic through a VPN | see below (`sudo mu300-extra install vpn` first) |
-| Add or remove optional parts (the VPN module, call audio, more web interface languages) | `mu300-extra list`, `sudo mu300-extra install vpn`, `sudo mu300-extra remove vpn` (`audio` for call audio, `lang` for the languages) |
+| Add or remove optional parts (the VPN module, more web interface languages) | `mu300-extra list`, `sudo mu300-extra install vpn`, `sudo mu300-extra remove vpn` (`lang` for the languages) |
 | Save battery: profiles, radios that go idle when nobody is connected, a charge limit | `mu300-power status`, `sudo mu300-power profile battery` (`plugged`, `saver`, `auto`), `sudo mu300-power set battery.WIFI_IDLE 10`, `mu300-power log 5 /tmp/power.csv`; on `openwrt-luci` the page System -> Power. A boot that started from a charger stays a charging boot (LED blinking, hotspot and modem down) until the Wi-Fi key is pressed; see FINDINGS 36 |
 | Language of the web interface (OpenWrt) | System -> System -> Language and Style; more languages: see Languages below |
 | Find out which LED is which | `sudo mu300-led test` |
+| LEDs: a lamp off, dimmer, how long they stay lit, a boot indicator, how the heat alarm shows | `mu300-led settings`, `sudo mu300-led set network 0` (`wifi`, `battery`; `network_brightness 30`, `timeout 120`, `boot 1`, `thermal blink` or `off`); on `openwrt-luci` the page System -> LEDs, on Ubuntu the panel's LEDs card. By default nothing changes: every lamp on at its usual level, no boot indicator, the siren |
 | `adb shell`, `adb push`/`pull`, `adb forward` to Linux from a computer, as with Android | on by default, for every computer (a root shell without a password for anyone with a cable); only your own computers: `sudo mu300-usb adb key adbkey.pub`, then `sudo mu300-usb adb auth keys`; not at all: `sudo mu300-usb adb off`; see [adb to Linux](#adb-to-linux) |
 
 ### CPU voltage offset (EXPERIMENTAL)
@@ -485,7 +487,7 @@ the archive once online). `mu300-panel status` says where it is.
 > voltage can make the device unstable, corrupt your data or break the hardware for good, and nobody can repair or
 > replace a device damaged this way. It is off by default; if you are not sure, leave it off.
 
-On the mainline kernels (6.18, 7.2; not 5.4) the CPU voltage can be moved per core cluster, domains 0, 1, 2 = CPUs
+On the mainline kernels (6.18, 7.2, 7.3; not 5.4; on 7.3 not yet tried on a device) the CPU voltage can be moved per core cluster, domains 0, 1, 2 = CPUs
 0-3, 4-6, 7: from -25 mV to +12.5 mV in steps of 3.125 mV. The SoC firmware applies it once per boot, so a new value
 takes effect at the next reboot, as **one trial boot**: it is kept once that boot has been up 10 minutes, and it is
 dropped (back to 0, the setting cleared) by any boot with it that ends in a crash, a watchdog reset or a power cut,
@@ -569,7 +571,7 @@ without a computer: from the Magisk app (reached through scrcpy, a web panel or 
 by itself when a release is published, so the zips follow the other assets after a few minutes. Building them yourself:
 `tools/make-magisk-zips.sh RELEASE_DIR OUT_DIR`.
 
-**1. Take one zip.** One per system and kernel, 11 in all. The same zip works on the F50 and on the U30 Air, and
+**1. Take one zip.** One per system and kernel, 15 in all (11 up to v2026.10.19.2, before 7.3). The same zip works on the F50 and on the U30 Air, and
 installs to the internal storage or to an SD card: the installer recognises the device and finds the place.
 
 | zip | system | kernel | size |
@@ -577,16 +579,20 @@ installs to the internal storage or to an SD card: the installer recognises the 
 | `mu300-magisk-<tag>-openwrt-k5.4.zip` | OpenWrt | 5.4 (vendor) | 48.5 MB |
 | `mu300-magisk-<tag>-openwrt-k6.18.zip` | OpenWrt | 6.18 LTS | 37.2 MB |
 | `mu300-magisk-<tag>-openwrt-k7.2.zip` | OpenWrt | 7.2 | 37.9 MB |
+| `mu300-magisk-<tag>-openwrt-k7.3.zip` | OpenWrt | 7.3 | ~37.9 MB |
 | `mu300-magisk-<tag>-openwrt-luci-k5.4.zip` | OpenWrt with the control panel | 5.4 (vendor) | 48.8 MB |
 | `mu300-magisk-<tag>-openwrt-luci-k6.18.zip` | OpenWrt with the control panel | 6.18 LTS | 37.6 MB |
 | `mu300-magisk-<tag>-openwrt-luci-k7.2.zip` | OpenWrt with the control panel | 7.2 | 38.3 MB |
+| `mu300-magisk-<tag>-openwrt-luci-k7.3.zip` | OpenWrt with the control panel | 7.3 | ~38.3 MB |
 | `mu300-magisk-<tag>-ubuntu-24.04-k5.4.zip` | Ubuntu 24.04 | 5.4 | 124.1 MB |
 | `mu300-magisk-<tag>-ubuntu-24.04-k6.18.zip` | Ubuntu 24.04 | 6.18 LTS | 112.9 MB |
 | `mu300-magisk-<tag>-ubuntu-24.04-k7.2.zip` | Ubuntu 24.04 | 7.2 | 113.6 MB |
+| `mu300-magisk-<tag>-ubuntu-24.04-k7.3.zip` | Ubuntu 24.04 | 7.3 | ~113.6 MB |
 | `mu300-magisk-<tag>-ubuntu-26.04-k6.18.zip` | Ubuntu 26.04 | 6.18 LTS | 125.2 MB |
 | `mu300-magisk-<tag>-ubuntu-26.04-k7.2.zip` | Ubuntu 26.04 | 7.2 | 125.9 MB |
+| `mu300-magisk-<tag>-ubuntu-26.04-k7.3.zip` | Ubuntu 26.04 | 7.3 | ~125.9 MB |
 
-The sizes are those of the v2026.10.18 build. The VPN is not in the zips: add its module on the device with
+The sizes are those of the v2026.10.18 build; the k7.3 zips come from the next release after v2026.10.19.2 on, and their sizes (~) are estimated from the k7.2 ones. The VPN is not in the zips: add its module on the device with
 `sudo mu300-extra install vpn` (see [VPN](#vpn)). There is no Ubuntu 26.04 zip with kernel 5.4: its programs need system
 calls that kernel does not have, the same rule as for `install.sh`. Check a download with `SHA256SUMS-magisk`.
 
@@ -605,7 +611,7 @@ checked)"; a `mu300-install.conf` you put into the zip can check the current pas
 
 **Both systems: two zips.** Install the OpenWrt zip and the Ubuntu zip one after the other, in either order. The
 second one adds its system next to the first and becomes the one that boots; `mu300-os openwrt` and
-`mu300-os ubuntu` switch. Ubuntu 26.04 needs kernel 6.18 or 7.2, so with it installed a zip with kernel 5.4 refuses.
+`mu300-os ubuntu` switch. Ubuntu 26.04 needs kernel 6.18, 7.2 or 7.3, so with it installed a zip with kernel 5.4 refuses.
 
 After a successful install the zip stays as the Magisk module "MU300 Linux" (the switch module of
 [android/magisk/README.md](android/magisk/README.md), same id): its Action button and `su -c mu300-linux` start
@@ -807,8 +813,8 @@ and the places that work with it (mobile data, the Wi-Fi client, power saving, t
 Module **v2.0.0** (with mu300-linux v2026.10.20) splits it into a core and engine extras, adds subscriptions (a URL
 that yields profiles, refreshed on a schedule), a `--json` interface the control panel's VPN section is built on, and
 an **IPv6 guard**: `IPV6` is `auto`, `1` or `0`; when the tunnel carries no IPv6, IPv6 is blocked beside it instead
-of leaking past the kill switch. [dae](https://github.com/daeuniverse/dae), the eBPF engine, needs kernel 6.18 or
-7.2 of v2026.10.20 or newer (they carry BTF); 5.4 cannot run it.
+of leaking past the kill switch. [dae](https://github.com/daeuniverse/dae), the eBPF engine, needs kernel 6.18,
+7.2 or 7.3 of v2026.10.20 or newer (they carry BTF); 5.4 cannot run it.
 
 ```sh
 sudo mu300-extra install vpn                                # online: the core and the engines its profiles need (first time: xray)
@@ -874,29 +880,7 @@ the hotspot and USB clients, and **not** from the mobile network. Containers can
 itself (SSH, the web panels, LuCI, ubus): the firewall drops what comes from Docker's bridges to the device (their DNS
 works all the same). On OpenWrt every Docker network is in the firewall zone `docker` (172.16.0.0/12, the range Docker
 is given there), which reaches the internet but not the LAN, and one Docker network does not reach another; to publish
-to the mobile network, add a forwarding `wan -> docker`. Docker works on all three kernels (5.4, 6.18, 7.2).
-
-### Call audio (the audio extra)
-
-The board has no speaker or microphone; a call's audio goes through the modem's audio DSP, to the device's own taps
-on the call or a Bluetooth headset. Its drivers, `mu300-audio-dsp`, `mu300-voice` and the services are not in the
-images: they are the audio extra, released by [mu300-audio](https://github.com/dikeckaan/mu300-audio) for each kernel
-(FINDINGS 194).
-
-```sh
-sudo mu300-extra install audio                       # the kernel this device uses; fetches the DSP image (pinned sha256)
-sudo mu300-extra install audio --from /mnt/usb/      # offline: mu300-audio-KERNEL.tar.gz, SHA256SUMS and agdsp.bin
-sudo MU300_AUDIO_FIRMWARE=none mu300-extra install audio   # no firmware (MU300_AUDIO_FIRMWARE=FILE: your own image)
-mu300-audio-dsp status                               # dsp: running - it answered
-sudo mu300-extra remove audio                        # out of every system again (reboot: the drivers stay loaded)
-```
-
-`mu300-update kernel X` takes the audio extra of kernel X along (offline: `mu300-audio-X.tar.gz` and `SHA256SUMS` in
-`/mnt/mu300-disk/.mu300-update/audio/` first; without it the switch still happens and call audio waits). **Coming from
-v2026.10.19.1 or older**, where the images carried the stack: the update sees that the device uses call audio (a DSP
-firmware is installed) and installs the audio extra by itself before it switches the systems; when it cannot have it
-(offline, nothing staged), the update goes on, ends with a loud notice, and `mu300-update check` says so until
-`sudo mu300-extra install audio` ran. The firmware is kept either way.
+to the mobile network, add a forwarding `wan -> docker`. Docker works on all four kernels (5.4, 6.18, 7.2, 7.3).
 
 ### Languages
 
@@ -906,7 +890,7 @@ panel. The web interface starts in **English**; switch it under System -> System
 `openwrt-luci` under System -> Languages. An update keeps the language you picked.
 
 Every other language is the **lang extra** (about 2 MB, OpenWrt only - Ubuntu has no web interface): LuCI in the 40
-further languages OpenWrt 25.12.5 translates it to, and the control panel in 29 of them (ar, az, bg, cs, da, de, el,
+further languages OpenWrt 25.12.6 translates it to, and the control panel in 29 of them (ar, az, bg, cs, da, de, el,
 es, fa, fi, fr, he, hi, hu, id, it, ja, kk, ko, nl, pl, pt-BR, ro, ru, sk, sv, uk, vi, zh-TW; az, kk and id have no
 LuCI translation, only the panel's). Install it from the panel (System -> Languages: download it, or upload
 `mu300-extra-lang.tar.gz` from the release page when the device has no internet) or on the device:
@@ -990,7 +974,7 @@ sudo mu300-update check           # installed version vs newest release
 sudo mu300-update apply           # system, kernel and boot image: download, unpack, switch; then reboot
 sudo mu300-update rollback        # back to the previous system
 sudo mu300-update rollback-boot   # back to the previous kernel and boot image
-sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS) or 7.2; no argument shows the current one
+sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS), 7.2 (stable) or 7.3; no argument shows the current one
 ```
 
 `mu300-toolkit` offers the same under System -> Software update. **Everything you added to the system or changed in
@@ -1075,9 +1059,9 @@ Like the installer, it offers to reboot the device from Linux into Android first
 | | |
 |---|---|
 | Ubuntu 24.04 LTS, OpenWrt 25.12, OpenWrt with the control panel | ✅ |
-| Ubuntu 26.04 LTS | ✅ kernel 6.18 or 7.2 (its programs need system calls 5.4 does not have) |
-| Kernels | ✅ vendor 5.4, mainline 6.18 LTS and 7.2 (6.18.56 and 7.2.10 in v2026.10.20, with BTF and the BPF JIT, so dae runs), with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
-| KVM | ✅ `/dev/kvm` on all three kernels |
+| Ubuntu 26.04 LTS | ✅ kernel 6.18, 7.2 or 7.3 (its programs need system calls 5.4 does not have) |
+| Kernels | ✅ vendor 5.4, mainline 6.18 LTS, 7.2 and 7.3 (7.3 from the next release after v2026.10.19.2 on; 6.18.56 and 7.2.10 in v2026.10.20, with BTF and the BPF JIT, so dae runs), with the same functions (USB host on the U30 Air: mainline only); the mainline bundles carry about 360 modules (WireGuard, SQM, tunnels, USB adapters and modems, NTFS/exFAT/btrfs/NFS/CIFS, dm-crypt, containers). 6.18 hangs at boot about once in 20 boots and the device goes back to Android ([FINDINGS 31m](docs/FINDINGS.md)) |
+| KVM | ✅ `/dev/kvm` on all four kernels |
 | Mobile data (5G NSA / LTE) | ✅ shared with Wi-Fi and USB clients; reconnects by itself after modem resets |
 | SMS, USSD | ✅ `sms`, `mu300-ussd`; on `openwrt-luci` also in the panel |
 | Wi-Fi access point | ✅ 5 GHz (802.11ac) or 2.4 GHz, one at a time |
@@ -1094,7 +1078,7 @@ Like the installer, it offers to reboot the device from Linux into Android first
 | Web panels | ✅ OpenWrt: LuCI, and the MU300 control panel on `openwrt-luci` (with a terminal in the browser); Ubuntu: Cockpit with an MU300 page as the panel extra; adb to Linux over USB on both (off by default) |
 | Back to Android, automatic rollback | ✅ |
 | Screen output (HDMI over USB-C) | ✗ the USB-C power chip never answers, so no display |
-| Call audio | ⚠️ the board has no speaker and no microphone, but a call's audio runs through the modem's audio DSP with the audio extra: `sudo mu300-extra install audio` installs the drivers of the kernel the device uses, `mu300-audio-dsp` and `mu300-voice` from [mu300-audio](https://github.com/dikeckaan/mu300-audio), and fetches the measured DSP image (a ZTE Voyage 41S image, published in [mu300-audio-firmware](https://github.com/dikeckaan/mu300-audio-firmware)) only if its sha256 is the pinned one (`MU300_AUDIO_FIRMWARE=FILE` takes your own); it follows `mu300-update kernel`. The images carry none of it since [FINDINGS 194](docs/FINDINGS.md); an update from v2026.10.19.1 installs the extra by itself on a device that used call audio. Measured: the other side hears what is played into the call (`mu300-voice tone`), the downlink is recorded, and `mu300-voice echo` plays the caller back to themselves ([FINDINGS 24d, 24e](docs/FINDINGS.md)). A Bluetooth headset as the output (after kano's [e5-linux](https://github.com/kanoqwq/e5-linux); `mu300-voice audio start bt`, `tools/hfp`) is built, but a whole call on one is not measured yet. The kernels have USB audio drivers, not tried here |
+| Sound | No built-in speaker or microphone. USB audio drivers remain available, untested here |
 
 ## How it works, in short
 
@@ -1108,7 +1092,7 @@ the first two run under a system account of their own, `mu300vnd`, with only the
 and the modem's device nodes (its calibration partitions among them) belong to that account rather than to the login
 user, and nothing in `/dev` is world-writable ([FINDINGS 41](docs/FINDINGS.md)).
 
-The 5.4 kernel is built from ZTE's published (GPL) source; 6.18 and 7.2 are mainline Linux with this project's
+The 5.4 kernel is built from ZTE's published (GPL) source; 6.18, 7.2 and 7.3 are mainline Linux with this project's
 patches and the vendor drivers ported to them ([`upstream/`](upstream/)). The reasoning behind each step is in
 [`docs/FINDINGS.md`](docs/FINDINGS.md), and the full build is in [`docs/BUILD.md`](docs/BUILD.md).
 
@@ -1190,7 +1174,7 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 * [`docs/FINDINGS.md`](docs/FINDINGS.md) — everything learned about this hardware and why each workaround exists.
 * [`docs/DISTROS.md`](docs/DISTROS.md) — running other distributions (ImmortalWrt, Arch Linux ARM, Debian, Kali; the
   Ubuntu image's `Dockerfile` takes another base with `--build-arg BASE=...`) and what the 5.4 kernel rules out.
-* [`upstream/`](upstream/) — the mainline kernel port, 6.18 LTS and 7.2.
+* [`upstream/`](upstream/) — the mainline kernel port, 6.18 LTS, 7.2 and 7.3.
 * [`tests/`](tests/README.md) — `cd tests && python3 -m unittest` runs them all (standard library only; `lz4` for
   the boot image tests), and `python3 tools/check-i18n.py` checks the installers' translations. CI
   (`.github/workflows/`): `tests.yml` on Ubuntu, macOS and Windows, `installer.yml` (translations, script syntax),
@@ -1208,7 +1192,7 @@ and would overwrite the device's storage. A normal `apk upgrade` is fine, except
 | `rootfs/` | Ubuntu image: `Dockerfile`, `assemble.sh`, services and scripts in `overlay/` |
 | `openwrt/` | OpenWrt and ImmortalWrt image build; `luci-overlay/` and `luci-app-mu300/` make the `openwrt-luci` system |
 | `arch/` | Arch Linux ARM image build |
-| `upstream/` | the mainline kernel port (6.18, 7.2) |
+| `upstream/` | the mainline kernel port (6.18, 7.2, 7.3) |
 | `android/magisk/` | the Magisk module and the zip installer |
 | `android-vendor/` | scripts that copy the needed Android files from *your* device |
 | `tests/` | unit tests for the installers, the boot image, `boot/init` and the device scripts |

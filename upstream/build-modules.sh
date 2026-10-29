@@ -3,15 +3,18 @@
 # the kernel's own modules next to them (upstream/out/modules, flat).
 # Run inside the mu300-mainline-build container: bash /work/build-modules.sh [module-dir...]
 set -eo pipefail
-KV=${KV:-6.18.57}
+KV=${KV:-6.18.59}
 K=/src/linux-$KV
 O=/src/out-$KV
 OUT=/work/${OUTDIR:-out}   # as in build.sh
 # every out-of-tree module, in dependency order (wlan/bt use wcn_bsp, the PMIC watchdog and Mali the modem's headers;
-# mu300_thermal, the stock virtual thermal zone, needs only the kernel). The call-audio stack is not here: it is the
-# audio extra's (https://github.com/dikeckaan/mu300-audio, built against this tree's build kit; FINDINGS 194)
-mods=${*:-wcn_bsp sprd_wlan_combo sprdbt_tty sprd_modem sprd_pmic_wdt mali mu300_thermal}
+# mu300_thermal, the stock virtual thermal zone, ums9620_lpintc and zte_sar_stk (the U30 Air's SAR sensor) need only
+# the kernel.
+mods=${*:-wcn_bsp sprd_wlan_combo sprdbt_tty sprd_modem sprd_pmic_wdt mali mu300_thermal ums9620_lpintc zte_sar_stk}
 mkdir -p $OUT/modules
+# xt_HL.ko and xt_hl.ko (and three more pairs) must stay two files: not on a host directory that ignores case
+. /work/case-sensitive.sh
+case_sensitive $OUT/modules || exit 1
 # a full build starts clean, so no module of another kernel release ends up next to the new ones
 [ $# -gt 0 ] || rm -f $OUT/modules/*.ko $OUT/modules/*.log
 # Module.symvers for the built-in exports (pcie-sprd etc.)
@@ -62,4 +65,10 @@ for m in $mods; do
     done
 done
 cp "$O/modules.in-tree" "$OUT/modules.in-tree"
+# nothing the 5.4 kernel has may be missing here unsaid (parity-5.4.txt): every mainline equivalent it names, and every
+# 5.4 module it does not name, must be in this build. Not on a partial run (some vendor modules only) nor for the
+# fragment alone (MU300_ALL_MODULES=0), which leave out what the full build has.
+if [ $# -eq 0 ] && [ "${MU300_ALL_MODULES:-1}" != 0 ]; then
+    python3 /work/check-parity.py --mainline $OUT --builtin $O/modules.builtin --config $O/.config
+fi
 ls -la $OUT/modules/*.ko

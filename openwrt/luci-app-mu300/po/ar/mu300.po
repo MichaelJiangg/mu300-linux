@@ -52,6 +52,9 @@ msgstr "اللغات"
 msgid "Power"
 msgstr "الطاقة"
 
+msgid "LEDs"
+msgstr "مصابيح LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "يؤدي وضع المضيف إلى قطع شبكة USB والاتصال
 msgid "USB network mode"
 msgstr "وضع شبكة USB"
 
+msgid "Current sharing protocol"
+msgstr "بروتوكول المشاركة الحالي"
+
 msgid "Network protocol"
 msgstr "بروتوكول الشبكة"
 
@@ -658,6 +664,27 @@ msgstr "تحديث"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "متاح في وضع المضيف فقط. يؤدي «تحديث» إلى تشغيل محوّلات USB المكتشفة؛ والإضافة إلى LAN تحفظ الجسر وتعيد تحميل الشبكة."
 
+msgid "Network performance"
+msgstr "أداء الشبكة"
+
+msgid "Active congestion control"
+msgstr "التحكم في الازدحام الحالي"
+
+msgid "Default queue"
+msgstr "قائمة الانتظار الافتراضية"
+
+msgid "TCP congestion control"
+msgstr "التحكم في ازدحام TCP"
+
+msgid "Apply"
+msgstr "تطبيق"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "يؤثر أساسًا على اتصالات TCP الجديدة التي ينشئها هذا الجهاز. لا تستخدم اتصالات عملاء نقطة الاتصال وUSB المُمرَّرة BBR تلقائيًا."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "يختار BBR قائمة FQ كقائمة انتظار افتراضية للواجهات المُنشأة حديثًا. تبقى الاتصالات والواجهات وQoS الحالية كما هي. تُحفظ الإعدادات بعد إعادة التشغيل."
+
 msgid "Recent modem operations"
 msgstr "عمليات المودم الأخيرة"
 
@@ -670,6 +697,12 @@ msgstr "الاستدعاءات الأخيرة للوحة التحكم، في ه�
 msgid "Unavailable"
 msgstr "غير متاح"
 
+msgid "Mixed"
+msgstr "مختلط"
+
+msgid "None"
+msgstr "بلا"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "وضع شبكة USB غير متاح في وضع المضيف؛ كما أن التشغيل التلقائي لوضع المضيف يعطّل التشغيل التلقائي لشبكة USB."
 
@@ -681,9 +714,6 @@ msgstr "ستُعاد عملية تعداد شبكة USB والاتصال الت�
 
 msgid "Switch USB role?"
 msgstr "تبديل دور USB؟"
-
-msgid "Apply"
-msgstr "تطبيق"
 
 msgid "Switching USB role…"
 msgstr "جارٍ تبديل دور USB…"
@@ -721,6 +751,21 @@ msgstr "تم حفظ الإعدادات"
 msgid "Save failed: %s"
 msgstr "فشل الحفظ: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "تعذّرت قراءة إعدادات أداء الشبكة؛ حدّث الصفحة للمحاولة مجددًا"
+
+msgid "This kernel does not provide this setting"
+msgstr "هذه النواة لا توفر هذا الإعداد"
+
+msgid "System default"
+msgstr "الافتراضي للنظام"
+
+msgid "Applied and saved for future boots."
+msgstr "طُبّق وحُفظ لعمليات الإقلاع القادمة."
+
+msgid "The kernel did not accept the network settings"
+msgstr "لم تقبل النواة إعدادات الشبكة"
+
 msgid "This boot"
 msgstr "هذا الإقلاع"
 
@@ -739,6 +784,9 @@ msgstr "جارٍ البحث عن محوّلات USB…"
 msgid "No USB adapters found."
 msgstr "لم يُعثر على محوّلات USB."
 
+msgid "In use by another network"
+msgstr "مستخدم من شبكة أخرى"
+
 msgid "Link connected"
 msgstr "الرابط متصل"
 
@@ -747,6 +795,9 @@ msgstr "لا يوجد رابط؛ جرت محاولة التفعيل"
 
 msgid "Added to LAN"
 msgstr "أُضيف إلى LAN"
+
+msgid "Cannot add"
+msgstr "لا يمكن الإضافة"
 
 msgid "Add to LAN"
 msgstr "إضافة إلى LAN"
@@ -784,6 +835,9 @@ msgstr "نموذج (ترميز URL)"
 msgid "Plain text"
 msgstr "نص عادي"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "وأيضًا {sim} (SIM 1 أو SIM 2) و{kind} (sms أو test أو power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "تُعاد توجيه الرسائل المستلمة فور وصولها إلى مجمّع الرسائل القصيرة. يُعاد إرسال التسليم الفاشل بعد 30 ثانية، ثم في كل مرة بعد ضعف المدة (ساعة على الأكثر)، عشر مرات إجمالًا."
 
@@ -811,6 +865,15 @@ msgstr "الرسائل التي تحتوي إحدى هذه الكلمات فقط
 msgid "One per line; empty: every message."
 msgstr "واحدة في كل سطر؛ فارغ: كل الرسائل."
 
+msgid "Battery"
+msgstr "البطارية"
+
+msgid "Battery and charger notices"
+msgstr "إشعارات البطارية والشاحن"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "رسالة إلى كل وجهة عندما تتجاوز البطارية 5 أو 20 أو 40 أو 60 أو 80 أو 100 % وعند توصيل الشاحن أو فصله."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "نص طلب مخصص"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "فارغ: الحقول القياسية (نص عادي: الرسالة). العناصر النائبة: {sender}، {time}، {text}، {device}، {message}. تُهرَّب كل قيمة بحسب النوع المختار. يُعرض هذا النص هنا مجددًا: ضع الأسرار في العنوان أو في ترويسة."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "السر الخاص بـ {secret} في النص المخصص"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "لخدمة تريد رمزها في النص (PushPlus). يُحفظ لهذا العنوان فقط: العنوان الجديد يحتاجه مرة أخرى."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "ترويسات إضافية (واحدة \"Name: value\" في كل سطر)"
 
@@ -840,6 +909,9 @@ msgstr "يجب أن يحتوي الرد على"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "فارغ: كل رد HTTP 2xx يُعدّ تسليمًا. مع مفتاح=قيمة (مثل errcode=0) يجب أن يكون الرد أيضًا كائن JSON يحمل هذه القيمة تحت هذا المفتاح في مستواه الأعلى؛ وإلا يفشل التسليم. لا يُسجَّل سوى نتيجة الفحص، ولا يُسجَّل الرد نفسه أبدًا."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "مهلة الطلب (بالثواني، 1-120؛ webhook وTelegram)"
 
 msgid "Bot token"
 msgstr "رمز البوت"
@@ -861,9 +933,6 @@ msgstr "المنفذ"
 
 msgid "Security"
 msgstr "الأمان"
-
-msgid "None"
-msgstr "بلا"
 
 msgid "User name"
 msgstr "اسم المستخدم"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux مقفل"
+
+msgid "Yes: the next restart starts Android"
+msgstr "نعم: إعادة التشغيل التالية تبدأ Android"
+
+msgid "No"
+msgstr "لا"
+
+msgid "Writable"
+msgstr "قابل للكتابة"
+
+msgid "This boot image cannot change the boot"
+msgstr "لا تستطيع صورة الإقلاع هذه تغيير الإقلاع"
+
 msgid "%s of %s"
 msgstr "%s من %s"
 
@@ -1032,9 +1116,6 @@ msgstr "الذاكرة"
 
 msgid "Storage"
 msgstr "التخزين"
-
-msgid "Battery"
-msgstr "البطارية"
 
 msgid "Channel"
 msgstr "القناة"
@@ -1105,14 +1186,23 @@ msgstr "نقطة اتصال Wi-Fi"
 msgid "Restart modem"
 msgstr "إعادة تشغيل المودم"
 
-msgid "Restart device"
-msgstr "إعادة تشغيل الجهاز"
+msgid "Power off or restart"
+msgstr "إيقاف التشغيل أو إعادة التشغيل"
 
 msgid "Switch to Android"
 msgstr "التبديل إلى Android"
 
 msgid "Lock Linux"
 msgstr "قفل Linux"
+
+msgid "Default boot"
+msgstr "الإقلاع الافتراضي"
+
+msgid "One-time boot"
+msgstr "إقلاع لمرة واحدة"
+
+msgid "Boot control"
+msgstr "التحكم في الإقلاع"
 
 msgid "Neighbor cells"
 msgstr "الخلايا المجاورة"
@@ -1125,6 +1215,9 @@ msgstr "التردد"
 
 msgid "Running %s…"
 msgstr "جارٍ تنفيذ %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "حُفظت إعدادات نقطة الاتصال؛ يجري تطبيق التغييرات"
 
 msgid "Started in background: %s"
 msgstr "بدأ في الخلفية: %s"
@@ -1165,11 +1258,14 @@ msgstr "تُستخدم بيانات الجوال على شبكات التجوا�
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "قد يتوقف الاتصال الخلوي لمدة 1–2 دقيقة."
 
-msgid "Restart the entire device"
-msgstr "إعادة تشغيل الجهاز بالكامل"
-
 msgid "All connections will be interrupted."
 msgstr "ستنقطع جميع الاتصالات."
+
+msgid "Power off"
+msgstr "إيقاف التشغيل"
+
+msgid "Restart"
+msgstr "إعادة التشغيل"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "سيدخل الإقلاع التالي إلى Android وستتم إعادة التشغيل الآن. ستنقطع صفحة الإدارة هذه ومشاركة الاتصال الخلوي."
@@ -1243,6 +1339,9 @@ msgstr "تم اختيار SIM الداخلية: تُستخدم بعد إعادة
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "تم اختيار SIM الداخلية لكنها غير مدعومة على هذا الجهاز: تُستخدم SIM الخارجية"
 
+msgid "in use"
+msgstr "قيد الاستخدام"
+
 msgid "Uptime %s"
 msgstr "مدة التشغيل %s"
 
@@ -1309,9 +1408,6 @@ msgstr "رابط LTE"
 msgid "Hidden"
 msgstr "مخفي"
 
-msgid "No"
-msgstr "لا"
-
 msgid "Running"
 msgstr "قيد التشغيل"
 
@@ -1371,9 +1467,6 @@ msgstr "متصل"
 
 msgid "AT adapter unavailable"
 msgstr "محوّل AT غير متاح"
-
-msgid "Linux locked"
-msgstr "Linux مقفل"
 
 msgid "Installing the language pack…"
 msgstr "جارٍ تثبيت حزمة اللغات…"
@@ -1453,6 +1546,51 @@ msgstr "مترجَم"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "ترجمات LuCI نفسها مصدرها OpenWrt. ترجمات هذه اللوحة، باستثناء التركية والصينية، ترجمات آلية (بالذكاء الاصطناعي)؛ نرحب بالتصحيحات."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "أدخل عددًا صحيحًا من 0 إلى %d"
+
+msgid "Network lamp"
+msgstr "مصباح الشبكة"
+
+msgid "Wi-Fi lamp"
+msgstr "مصباح Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "مصباح البطارية"
+
+msgid "On"
+msgstr "يعمل"
+
+msgid "Brightness (%)"
+msgstr "السطوع (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "المصباح المُطفأ يبقى مظلمًا؛ ويظهر إنذار الحرارة على مصباحه رغم ذلك."
+
+msgid "Device default"
+msgstr "الإعداد الافتراضي للجهاز"
+
+msgid "LED timeout (seconds)"
+msgstr "مهلة مصابيح LED (ثوانٍ)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "المدة التي تبقى فيها المصابيح مضاءة بعد ضغطة زر أو تغيير؛ القيمة 0 تبقيها مضاءة. وعلى الشاحن تبقى مضاءة."
+
+msgid "Boot indicator"
+msgstr "مؤشر الإقلاع"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "يعرض المصباح ألوانه بالتناوب أثناء بدء تشغيل النظام"
+
+msgid "Heat alarm"
+msgstr "إنذار الحرارة"
+
+msgid "Siren"
+msgstr "صفارة"
+
+msgid "Red blink"
+msgstr "وميض أحمر"
+
 msgid "Automatic"
 msgstr "تلقائي"
 
@@ -1494,6 +1632,21 @@ msgstr "قفل الخلية الخادمة الحالية"
 
 msgid "Unlock cell"
 msgstr "إلغاء قفل الخلية"
+
+msgid "Enter a cell"
+msgstr "إدخال خلية"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "رقم القناة (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "قفل هذه الخلية"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. رقم قناة وليس ترددًا بالميغاهرتز؛ لا يلزم أن تظهر الخلية في قائمة الخلايا المجاورة."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "يؤدي التطبيق إلى إعادة تشغيل حزمة الراديو (SFUN) ويقطع الخدمة الخلوية لفترة وجيزة. تُحفظ الإعدادات ويعيد الملحق تطبيقها بعد جاهزية AT عند تفعيل «التطبيق عند بدء التشغيل». يمكن لخطّاف ما قبل تشغيل الراديو في المنصة إعادة تطبيقها دون إعادة تشغيل. طبّق دون تحديد أي نطاق لاستعادة الوضع التلقائي."
@@ -1582,17 +1735,20 @@ msgstr "جارٍ قفل %s في الخلفية…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "تم قفل %s في الخلفية (إعادة تشغيل SFUN، حوالي 30 ثانية)؛ جارٍ قراءة الحالة…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "أدخل رقم قناة وPCI ضمن النطاقات أدناه"
+
 msgid "No serving-network data"
 msgstr "لا توجد بيانات عن الشبكة الخادمة"
 
 msgid "NR serving cell"
 msgstr "خلية NR الخادمة"
 
-msgid "Status confirmed"
-msgstr "تم تأكيد الحالة"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "انتهت مهلة القراءة؛ اختر «تحديث حالة القفل»"
+
+msgid "Status confirmed"
+msgstr "تم تأكيد الحالة"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "تم التحقق من إعادة الضبط: وضع الشبكة تلقائي، EN-DC مفعّل، كل النطاقات، لا قفل خلية؛ تم مسح إعدادات القفل المحفوظة"
@@ -1732,9 +1888,6 @@ msgstr "استيقظ بزر %s"
 msgid "the modem is suspended (%s)"
 msgstr "المودم معلّق (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "أدخل عددًا صحيحًا من 0 إلى %d"
-
 msgid "Power status unavailable"
 msgstr "حالة الطاقة غير متاحة"
 
@@ -1792,6 +1945,12 @@ msgstr "تم إيقاف الشحن مؤقتًا: درجة حرارة البطا�
 msgid "Charging paused: charge limit"
 msgstr "تم إيقاف الشحن مؤقتًا: حد الشحن"
 
+msgid "Charging paused: by hand"
+msgstr "الشحن متوقف: يدويًا"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "شحن كامل لمرة واحدة، ثم العودة إلى الحد"
+
 msgid "Sleep now"
 msgstr "إسبات الآن"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % لا يشحن البطارية أبدًا (يعمل الجهاز م�
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % تحافظ على صحة البطارية في جهاز يبقى موصولًا بالكهرباء."
 
+msgid "Start charging again under"
+msgstr "استئناف الشحن تحت"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 يستأنف الشحن عند 5 نقاط تحت مستوى الإيقاف. القيمة الأقل تستأنف الشحن فقط تحتها؛ مع 100 %، تنتظر البطارية الممتلئة حتى تنخفض تحتها."
+
+msgid "Resume charging"
+msgstr "استئناف الشحن"
+
+msgid "Pause charging"
+msgstr "إيقاف الشحن مؤقتًا"
+
+msgid "Cancel the full charge"
+msgstr "إلغاء الشحن الكامل"
+
+msgid "Charge to full once"
+msgstr "شحن كامل مرة واحدة"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "عند الإيقاف المؤقت لا تُشحن البطارية ويعمل الجهاز من الشاحن؛ تحت 5 % تُشحن دائمًا، وحماية درجة الحرارة تبقى سارية."
+
 msgid "When the charger switches the device on"
 msgstr "عندما يشغّل الشاحن الجهاز"
 
@@ -1830,9 +2010,6 @@ msgstr "بدون تغيير"
 
 msgid "LTE only (5G off)"
 msgstr "LTE فقط (5G متوقف)"
-
-msgid "On"
-msgstr "يعمل"
 
 msgid "Full"
 msgstr "كامل"
@@ -2057,9 +2234,6 @@ msgstr "افتراضي المودم"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "قيد الاستخدام"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "إطفاء راديو SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "تم الحذف (محلياً فقط)"
 msgid "Enter both a number and a message."
 msgstr "أدخل رقماً ورسالة معاً."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "ذاكرة SIM: ‏%d من %d خانة مستخدمة (عند %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d رسالة، %d غير مقروءة · %d محادثة"
 
@@ -2234,8 +2411,26 @@ msgstr "الحد الشهري"
 msgid "%s, warning at %d%%"
 msgstr "%s، تنبيه عند %d%%"
 
+msgid "Daily quota"
+msgstr "الحصة اليومية"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "تم بلوغ الحد الشهري: أُوقفت بيانات الجوال. ستعود عند بدء الدورة التالية."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "تم بلوغ الحصة اليومية: أُوقفت بيانات الجوال. تعود عند منتصف الليل."
+
+msgid "The daily quota is reached"
+msgstr "تم بلوغ الحصة اليومية"
+
+msgid "%d%% of the daily quota is used"
+msgstr "استُخدم %d%% من الحصة اليومية"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "يحتسب الحد الشهري والحصة اليومية التنزيلات فقط."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "يحتسب الحد الشهري والحصة اليومية الرفع فقط."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s بانتظار الساعة: لم تُضبط الساعة من الشبكة بعد. هذه البيانات محسوبة بالفعل ضمن هذه الدورة وستُسجل في يومها بعد ضبط الساعة."
@@ -2267,6 +2462,9 @@ msgstr "حسب دورة الفوترة"
 msgid "Billing cycle"
 msgstr "دورة الفوترة"
 
+msgid "Counted"
+msgstr "المحتسب"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "أدخل حجماً بالغيغابايت، مثلاً 50 أو 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "إيقاف بيانات الجوال عند بلوغ الحد"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "عندما تبلغ هذه الدورة الحد، تُوقف بيانات الجوال: لا إنترنت عبر المشغل حتى تبدأ الدورة التالية أو يُرفع الحد أو يُعطّل هذا الخيار. إعادة تشغيل بيانات الجوال يدوياً تبقيها مفعلة حتى إعادة التشغيل التالية."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "إيقاف بيانات الجوال عند بلوغ الحصة اليومية"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "عندما يبلغ استهلاك اليوم الحصة اليومية، تُوقف بيانات الجوال حتى منتصف الليل أو رفع الحصة أو إيقاف هذا الخيار. تشغيل بيانات الجوال يدويًا يبقيها تعمل حتى إعادة التشغيل التالية."
+
+msgid "Both ways"
+msgstr "الاتجاهين"
+
+msgid "Downloads only"
+msgstr "التنزيلات فقط"
+
+msgid "Uploads only"
+msgstr "الرفع فقط"
 
 msgid "Set"
 msgstr "اضبط"
@@ -2302,6 +2515,15 @@ msgstr "الحد الشهري (غيغابايت، 0: لا يوجد)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "التنبيه عند هذه النسبة من الحد"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "الحصة اليومية (غيغابايت، 0: لا يوجد)"
+
+msgid "The cap and the daily quota count"
+msgstr "ما يحتسبه الحد الشهري والحصة اليومية"
+
+msgid "Plan name"
+msgstr "اسم الباقة"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "المستخدم حتى الآن في هذه الدورة (غيغابايت)"
@@ -2399,9 +2621,6 @@ msgstr "سيُعاد تشغيل الجهاز الآن. الإقلاع الافت
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "سيُعاد تشغيل الجهاز الآن ويغيب نحو دقيقة. إذا لم يبدأ النظام الجديد، يعود الجهاز إلى Android تلقائيًا بعد المحاولات الفاشلة."
 
-msgid "Restart"
-msgstr "إعادة التشغيل"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "جارٍ إعادة التشغيل… افتح هذه الصفحة مجددًا بعد نحو دقيقة."
 
@@ -2468,9 +2687,6 @@ msgstr "صورة الإقلاع"
 msgid "from the installer"
 msgstr "من المثبِّت"
 
-msgid "Default boot"
-msgstr "الإقلاع الافتراضي"
-
 msgid "Free space"
 msgstr "المساحة الحرة"
 
@@ -2527,6 +2743,9 @@ msgstr "ملاحظات الإصدار"
 
 msgid "Download"
 msgstr "التنزيل"
+
+msgid "only what changed since the installed release"
+msgstr "فقط ما تغيّر منذ الإصدار المثبّت"
 
 msgid "Free space needed"
 msgstr "المساحة الحرة المطلوبة"
@@ -3056,9 +3275,6 @@ msgstr "اكتشاف"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "قد يحتوي URL على رمز: يُرسل إلى الجهاز منفردًا، ولا يدخل أبدًا في سطر أوامر أو سجل."
 
-msgid "Type"
-msgstr "النوع"
-
 msgid "Share link"
 msgstr "رابط مشاركة"
 
@@ -3388,6 +3604,21 @@ msgstr "نوع قفل غير معروف"
 msgid "Invalid value for this lock kind"
 msgstr "قيمة غير صالحة لنوع القفل هذا"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "أقفال النطاق والوضع والخلية غير مدعومة لبطاقة SIM2 بعد"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "أقفال النطاق والوضع والخلية غير مدعومة أثناء إدارة تبديل الشريحتين للراديو"
+
+msgid "None of these bands is supported by this modem"
+msgstr "لا يدعم هذا المودم أيًا من هذه النطاقات"
+
+msgid "Lock change failed"
+msgstr "فشل تغيير القفل"
+
+msgid "Invalid job id"
+msgstr "معرّف مهمة غير صالح"
+
 msgid "Invalid page"
 msgstr "صفحة غير صالحة"
 
@@ -3478,14 +3709,29 @@ msgstr "لم يُرجع محول TTL ردًا صالحًا"
 msgid "Invalid TTL"
 msgstr "قيمة TTL غير صالحة"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "لم يُرجع محوّل TCP ردًا صالحًا"
+
+msgid "Invalid congestion control"
+msgstr "تحكم ازدحام غير صالح"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "لم يُرجع محوّل الإقلاع ردًا صالحًا"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "لم يُرجع محول LED ردًا صالحًا"
+
+msgid "Unknown LED setting"
+msgstr "إعداد LED غير معروف"
+
+msgid "Invalid value for this setting"
+msgstr "قيمة غير صالحة لهذا الإعداد"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "لم يُرجع محوّل استهلاك البيانات رداً صالحاً"
 
 msgid "Unknown data usage setting"
 msgstr "إعداد استهلاك بيانات غير معروف"
-
-msgid "Invalid value for this setting"
-msgstr "قيمة غير صالحة لهذا الإعداد"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "لم يُعطِ محوّل إعادة التوجيه ردًا صالحًا"
@@ -3731,8 +3977,29 @@ msgstr "لم يتبع الراديو إعداده"
 msgid "The data roaming setting could not be saved"
 msgstr "تعذّر حفظ إعداد تجوال البيانات"
 
-msgid "Expected on or off"
-msgstr "المتوقع on أو off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "حُفظ إعداد نقطة الاتصال، لكن فشلت إعادة تحميل اللاسلكي"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "في إعدادات اللاسلكي تغييرات غير محفوظة: احفظها أو تراجع عنها أولًا"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "يجري تبديل نقطة الاتصال بالفعل؛ حاول مجددًا بعد قليل"
+
+msgid "No hotspot (access point) is configured"
+msgstr "لا توجد نقطة اتصال (نقطة وصول) مُهيأة"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "تشغيل هذا الراديو سيؤثر على واجهة أخرى؛ استخدم صفحة اللاسلكي"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "الراديو مستخدم من عميل Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "تعذّرت كتابة إعداد نقطة الاتصال"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "هذه المنصة لا توفر التحكم في نقطة الاتصال"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "هذه المنصة لا توفر تكامل VPN"
@@ -3833,6 +4100,15 @@ msgstr "ليست واجهة شبكة USB"
 msgid "LAN bridge device section was not found"
 msgstr "لم يُعثر على قسم جهاز جسر LAN"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "تعذّر تحديد الشبكة المالكة للمحوّل؛ حاول لاحقًا"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "المحوّل تابع لشبكة أخرى ولا يمكن ضمه إلى LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "في إعدادات الشبكة تغييرات غير محفوظة: احفظها أو تراجع عنها أولًا"
+
 msgid "Cannot bring USB network interface up"
 msgstr "تعذّر تشغيل واجهة شبكة USB"
 
@@ -3865,6 +4141,12 @@ msgstr "نص طلب الـ webhook طويل جدًا أو يحتوي على مح
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "يجب أن يكون فحص الرد بصيغة مفتاح=قيمة، مثل errcode=0 أو ok=true (القيمة عدد صحيح أو حروف صغيرة، 16 على الأكثر)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "سر webhook غير صالح (حتى 256 حرفًا قابلًا للطباعة، بلا مسافات)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "يجب أن تكون المهلة من 1 إلى 120 ثانية"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "ترويسة غير صالحة (واحدة \"Name: value\" في كل سطر؛ يضبط الجهاز Host وContent-Type وContent-Length وTransfer-Encoding وConnection)"
@@ -3926,8 +4208,17 @@ msgstr "هناك عملية تثبيت قيد التشغيل بالفعل"
 msgid "The language pack could not be removed"
 msgstr "تعذّرت إزالة حزمة اللغات"
 
+msgid "The LED settings could not be read"
+msgstr "تعذّرت قراءة إعدادات LED"
+
+msgid "The LED setting could not be saved"
+msgstr "تعذّر حفظ إعداد LED"
+
 msgid "Lock cache unavailable"
 msgstr "ذاكرة التخزين المؤقت للأقفال غير متاحة"
+
+msgid "The modem refused a write"
+msgstr "رفض المودم عملية كتابة"
 
 msgid "The saved locks could not be cleared"
 msgstr "تعذر مسح الأقفال المحفوظة"
@@ -3938,9 +4229,6 @@ msgstr "لا توجد خلية خادمة للقفل عليها"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "لم يرد المودم على استعلام الوضع؛ لم يُرسل شيء"
 
-msgid "The modem refused a write"
-msgstr "رفض المودم عملية كتابة"
-
 msgid "The read-back does not match the automatic values"
 msgstr "القراءة المرتجعة لا تطابق القيم التلقائية"
 
@@ -3949,6 +4237,21 @@ msgstr "القراءة المرتجعة بعد إعادة تشغيل المكد�
 
 msgid "The reset was interrupted"
 msgstr "تمت مقاطعة إعادة الضبط"
+
+msgid "The result of this lock change is no longer known"
+msgstr "لم تعد نتيجة تغيير القفل هذا معروفة"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "استغرق تغيير القفل وقتًا طويلًا؛ اختر «تحديث حالة القفل»"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "انقطع تغيير القفل؛ اختر «تحديث حالة القفل»"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "يجري بدء تغيير قفل آخر؛ حاول مرة أخرى بعد لحظة"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "تغييرات قفل كثيرة في الانتظار؛ حاول مرة أخرى عند انتهائها"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "إعادة تثبيت الحزم غير متاحة على هذا النظام"
@@ -3967,6 +4270,12 @@ msgstr "عملية حزم غير معروفة"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "هذه المنصة لا توفر التحكم في ازدحام TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "تعذّرت قراءة إعدادات TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "استهلاك البيانات غير متاح على هذا النظام"

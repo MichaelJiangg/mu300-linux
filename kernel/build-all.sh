@@ -53,7 +53,7 @@ echo "==> sources"
 fetch /src/zte-u30air "$KERNEL_REPO" "$KERNEL_REV"
 cd /src/zte-u30air
 # the tree is the pinned commit plus exactly these patches: reapply from a clean checkout whenever they change
-KPATCHES="bluetooth-marlin3-link-policy of-reserved-mem-skip of-reserved-mem-add regdb-wens-certificate sipa-delegate-einprogress wcn-pcie-scan-timeout sipc-base-addr-attr sipa-delegate-pm-runtime sipc-debug-once sprdwcn-mbuf-pool-deinit-null logspam-quiet sipa-wcn-logspam-quiet wcn-pcie-rx-push-cursor xfrm-sysctl-fragment-per-netns"
+KPATCHES="bluetooth-marlin3-link-policy of-reserved-mem-skip regdb-wens-certificate sipa-delegate-einprogress wcn-pcie-scan-timeout sipc-base-addr-attr sipa-delegate-pm-runtime sipc-debug-once sprdwcn-mbuf-pool-deinit-null logspam-quiet sipa-wcn-logspam-quiet wcn-pcie-rx-push-cursor sprdwcn-tx-pending-backpressure xfrm-sysctl-fragment-per-netns sdhci-sprd-dma-ordering"
 sum=$(cd /work/patches && cat $(for p in $KPATCHES; do echo $p.patch; done) | sha256sum | cut -d" " -f1)
 if [ "$(cat .mu300-patches 2>/dev/null)" != "$sum" ]; then
     git checkout -q -f "$KERNEL_REV" && git clean -q -fdx -e .mu300-patches
@@ -69,6 +69,8 @@ fetch /src/realme "$MODULES_REPO" "$MODULES_REV" $M/wcn/wlan/wlan_combo $M/wcn/b
 patched_copy() { # patched_copy DEST SOURCE PATCH-GLOB
     local sum; sum=$(cat /work/patches/$3 | sha256sum | cut -d" " -f1)
     [ "$(cat "$1/.mu300-patches" 2>/dev/null)" = "$sum" ] && return 0
+    # it removes DEST whole: only ever one of its own copies (kanoqwq f0926715)
+    case $1 in /src/ext-wlan_combo|/src/ext-sprdbt) ;; *) echo "patched_copy: refusing to replace $1" >&2; exit 1 ;; esac
     rm -rf "$1" && cp -r "$2" "$1"
     (cd "$1" && for p in /work/patches/$3; do patch -p1 -s -f < "$p"; done)
     echo "$sum" > "$1/.mu300-patches"
@@ -99,4 +101,7 @@ docker run --rm -v "$W":/work mu300-kbuild chown -R "$(id -u):$(id -g)" /work/ou
 mkdir -p "$OUT"
 rm -rf "$OUT/modules" "$OUT/modules-u30air"
 cp -R "$W/out/." "$OUT/"
+# the parity rule (upstream/parity-5.4.txt): record this build's modules and built-in objects in
+# upstream/parity/5.4-build.list and check that the file says what stands on mainline for each of them
+python3 "$TOP/upstream/check-parity.py" --5.4 "$OUT"
 echo "kernel outputs in $OUT"

@@ -31,7 +31,7 @@ adb shell /opt/mu300/bin/mu300-device --json
 One line of JSON on stdout, exit status 0, nothing on stderr:
 
 ```json
-{"mu300":1,"device":"f50","system":"openwrt-luci","version_id":"25.12.5","release":"v2026.10.23","kernel":"7.2.10","root":true,"adb":"open"}
+{"mu300":1,"device":"f50","system":"openwrt-luci","version_id":"25.12.6","release":"v2026.10.23","kernel":"7.2.10","root":true,"adb":"open"}
 ```
 
 | Field | Type | Values |
@@ -41,7 +41,7 @@ One line of JSON on stdout, exit status 0, nothing on stderr:
 | `system` | string | `ubuntu`, `openwrt` or `openwrt-luci`: the system that is running (the name of its directory on the Linux partition; a system of the user's own has its own name) |
 | `version_id` | string | `VERSION_ID` of the system's `/etc/os-release`: `24.04` or `26.04` for Ubuntu, OpenWrt's version for OpenWrt; empty when there is none |
 | `release` | string | The mu300-linux release the running system's image came from (`/etc/mu300/image-version`), e.g. `v2026.10.23`; `unknown` when the file is missing, `dev` for an image built without a version |
-| `kernel` | string | `uname -r`: `5.4.…`, `6.18.…` or `7.2.…` |
+| `kernel` | string | `uname -r`: `5.4.…`, `6.18.…`, `7.2.…` or `7.3.…` |
 | `root` | boolean | Whether the caller is root. Always `true` over adb; `false` when a program runs it over SSH as `ubuntu` |
 | `adb` | string | `open` (every computer is let in), `keys` (only authorised keys), `off`, or `unavailable` (no adbd or no FunctionFS in this system) |
 
@@ -148,8 +148,9 @@ module installed, `vpn_extra` mu300-extra there, `wifi_client`, `sms` (`cli`, `p
 | `ussd.send`, `ussd.cancel` | `code` (`[0-9*#+]`, 40 at most: a code or a menu's answer), - | `text` |
 | `modem.restart` | - | - (mobile data dials again: Ubuntu's mu300-mobile-data restarted, OpenWrt's WAN down and up) |
 | `ttl.get`, `ttl.set` | -, `value` 1-255 or `off` | `enabled value backend` (mu300-ttl) |
+| `tcp.get`, `tcp.set` | -, `value` `default cubic bbr` (what the kernel lacks is refused: 5.4 has no BBR) | `supported saved current qdisc default offered` (mu300-tcp) |
 | `traffic.get`, `traffic.set` | -, `key` `reset_day cap warn cut used clear` and its `value` (1-31, bytes (0: none), 1-100, `on`/`off`, bytes, `yes`) | `traffic` (mu300-traffic json) |
-| `power.get`, `power.set` | -, `key` `PROFILE SAVER_BELOW CHARGE_TO` or `plugged`/`battery`/`saver` `.WIFI_IDLE .RADIO_IDLE .LEDS_IDLE .CPU`, `value` | `state profile why supply battery charge_off conf text` (mu300-power) |
+| `power.get`, `power.set` | -, `key` `PROFILE SAVER_BELOW CHARGE_TO POWER_ON_CHARGER RESUME_AT CHARGE_PAUSE FULL_ONCE` (the last three U30 Air only) or `plugged`/`battery`/`saver` `.WIFI_IDLE .RADIO_IDLE .LEDS_IDLE .CPU`, `value` | `state profile why supply battery charge_off conf text` (mu300-power) |
 | `led.get`, `led.set` | -, `timeout` (seconds, 0: always on) and/or `test` (bool: each LED in turn) | `timeout device` |
 | `zram.get`, `zram.set` | -, `state` on/off | `active enabled text` |
 | `cpu.get` | - | `cpu` (mu300-cpu status --json), `voltage` (mu300-cpu voltage status --json, or null) |

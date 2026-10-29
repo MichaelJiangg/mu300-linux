@@ -74,12 +74,7 @@ watchdog in the power co-processor was never told to stand down, because that me
 
 ## No sound, no screen
 
-* **Sound (§24-24e, §188):** the board has no speaker path and no microphone; nothing answers at the amplifier's
-  address. Call audio runs through the modem's audio DSP with a DSP image (the ZTE Voyage 41S image is the one
-  measured): the other side hears what is played into the call, and the downlink can be recorded. The drivers and the
-  call scripts are the audio extra, [mu300-audio](https://github.com/dikeckaan/mu300-audio), for all three kernels:
-  `sudo mu300-extra install audio` (§194). The kernels keep only what no module can bring: the DSP's memory reserved
-  at boot and the ALSA/ASoC core.
+* **Sound:** the board has no speaker or microphone. Voice calls are not supported.
 * **Screen:** HDMI over USB-C does not work, because the USB-C power-delivery chip never answers. The device is headless.
 
 ## A rare boot hang on 6.18 (§31m, open)
@@ -91,11 +86,13 @@ the device lands in Android about 20 minutes later. The cause is still open.
 ## U30 Air: battery, buttons, NFC, USB host
 
 * **Battery (§33d, §36):** level, voltage, current, temperature and charging state in `mu300-toolkit`, the panel and
-  `/sys/class/power_supply` on every kernel. Charging: on 5.4 by the vendor charger stack; on 6.18 and 7.2 by the
+  `/sys/class/power_supply` on every kernel. Charging: on 5.4 by the vendor charger stack; on 6.18, 7.2 and 7.3 by the
   `bq256xx` driver from v2026.10.12 on. `mu300-power` adds profiles (`plugged`, `battery`, `saver`, `auto`), idle radios
   and a **charge limit** (from v2026.10.20: any value from 0 to 100 %, `sudo mu300-power charge-limit 80` or
   `CHARGE_TO`; charging stops at the limit and resumes 5 points below it, 0 never charges, and the battery is never
-  held under 5 %; before: 100 or 80); charging pauses above 45 °C.
+  held under 5 %; before: 100 or 80); charging pauses above 45 °C. Also (U30 Air): `RESUME_AT` (charging starts
+  again only under that level), `mu300-power charge pause|resume` and `charge full` (once to 100 %, then back to the
+  limit); System > Power has them too (FINDINGS 226).
 * **Type-C current (§40, v2026.10.20, mainline kernels):** the charger used to take 500 mA from every port. Now the
   PMIC's Type-C block is read and the larger of the BC1.2 and the Type-C (Rp) current is taken, 3 A capped to 2 A:
   on a 1.5 or 3 A port the battery charges at about 1.6 A instead of 0.36 A.
@@ -110,10 +107,13 @@ the device lands in Android about 20 minutes later. The cause is still open.
   2.4 GHz, as ZTE's firmware and its guide, §152). `sudo mu300-led test` shows which is which.
 * **Heat alarm:** the battery LED flashes red, white, blue in turn when the chip reaches 85 °C or the battery 50 °C
   (`thermal-guard`). On the F50 the network LED does this.
+* **LED settings (every board):** each lamp on or off, the dimmable ones' brightness (§227), the timeout, a boot
+  indicator (the RGB LED's colours in turn while the system starts) and the heat alarm as the siren, a red blink or
+  nothing: `mu300-led set ...`, System -> LEDs on `openwrt-luci`, the panel's LEDs card on Ubuntu. Off by default.
 * **Buttons:** power: a short press wakes the LEDs, held 3 s shuts down. Wi-Fi key: switches 2.4 / 5 GHz, held 3 s turns
   the hotspot off or on.
 * **NFC (§33g):** a phone held to the device can join the hotspot: `sudo mu300-nfc wifi` writes the hotspot's name and
-  password into the tag (also `url`, `text`, `clear`, `on`/`off`).
+  password into the tag (also `url`, `text`, `clear`, `on`/`off`). The V50 has the same tag (§229).
 * **USB host (§33e):** `sudo mu300-usb host` with an OTG adapter, on the mainline kernels: flash drives (FAT, exFAT),
   keyboards, mice, USB modems and Ethernet adapters. `sudo mu300-usb device` goes back (the default at every boot).
 * **USB-C power delivery (§150, EXPERIMENTAL, off by default):** `sudo mu300-usb pd on` (mainline kernels) hands the
@@ -137,7 +137,7 @@ The V50 is the F50's platform (`ums9620_2h10_feimao`, T760) with two SIM slots, 
 
 * **How Linux tells it:** its device tree has an AW9523B LED controller at 0x5b on I2C3, which no F50's or U30 Air's
   has (both checked: no such node). The installers take only model `V50`, device `MU3351`, platform `ums9620`.
-* **Kernel:** mainline (6.18 or 7.2) of a release whose bundle names the V50; never 5.4. It runs as an F50 does
+* **Kernel:** mainline (6.18, 7.2 or 7.3) of a release whose bundle names the V50; never 5.4. It runs as an F50 does
   otherwise, USB-powered, no battery: no charger is bound (patch 0016 binds the 0x1a charger only with the U30 Air's
   charger policy service, which the V50 lacks).
 * **LEDs:** NET1 is the network lamp (blue 4G, white 5G, red no service), the Wi-Fi lamp white on 5 GHz and blue on

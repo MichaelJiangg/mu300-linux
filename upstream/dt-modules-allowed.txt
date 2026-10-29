@@ -3,3 +3,7 @@
 # the U30 Air's USB-C port controller (patch 0020, FINDINGS 150): its probe returns -ENODEV unless the module is
 # loaded with enable=1 (mu300-usb pd on), and Ubuntu's udev does not load it at all (modprobe.d/mu300-usb-pd.conf)
 ump9620_tcpc
+# the PMIC's Type-C detection and BC1.2 detection (FINDINGS 234): bound by default, as on 5.4 - they report what the
+# PMIC detects (port0, extcon, charger_type) and switch no role; mu300-usb hands the Type-C block to ump9620_tcpc
+sc27xx_typec
+sprd_bc1p2

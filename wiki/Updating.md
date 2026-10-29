@@ -18,7 +18,7 @@ sudo mu300-update apply           # system, kernel and boot image: download, unp
 sudo mu300-update report          # what the last updates set aside or put back
 sudo mu300-update rollback        # back to the previous system
 sudo mu300-update rollback-boot   # back to the previous kernel and boot image
-sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS) or 7.2; no argument shows the current one
+sudo mu300-update kernel 7.2      # another kernel: 5.4 (vendor), 6.18 (LTS), 7.2 (stable) or 7.3; no argument shows the current one
 sudo mu300-update clean           # delete the kept previous version
 ```
 
@@ -52,7 +52,7 @@ release after v2026.10.25 on). It runs the same `mu300-update`, so everything on
   release page first. One whose signature is wrong is never installed.
 * **Previous version:** *Back to the previous version*, *Back to the previous boot image* and *Remove the previous
   version* are `rollback`, `rollback-boot` and `clean`. Each takes a tick and a confirmation.
-* **Kernel:** switch between 5.4, 6.18 and 7.2 (`mu300-update kernel`), and *Start Android at the next restart*.
+* **Kernel:** switch between 5.4, 6.18, 7.2 and 7.3 (`mu300-update kernel`), and *Start Android at the next restart*.
 
 Only one update runs at a time. If one was started in a terminal, the page shows it and waits.
 
@@ -71,6 +71,19 @@ A release can carry a signature of its checksums (`SHA256SUMS.sig`). A system th
 (`/opt/mu300/lib/release.pub`) checks it on every update and refuses a release whose signature is wrong, and one
 that has none unless you say so (`--unsigned`). Systems up to v2026.10.27 have no key and update as they always did. Details:
 [FINDINGS 86](https://github.com/dikeckaan/mu300-linux/blob/main/docs/FINDINGS.md).
+
+### Smaller downloads: diffs
+
+A release also carries, for each system, a diff from each of the five releases before it
+(`mu300-<system>-rootfs.diff-<tag>.tar.gz`): the new image without the programs and libraries the older image already
+had as they are. When your system runs one of those releases, `apply` downloads the diff instead of the whole image
+(the panel's "Download" figure says so), takes the rest from your installed system, and installs the result only when
+it is, file for file, the image the release's signed manifest describes. The diff is listed in the signed
+`SHA256SUMS` like every other file of the release and checked the same way before it is used. If a file the diff
+relies on was changed on your device, or the result is not the release's image, the whole image is downloaded
+instead; your files, the VPN and its kill switch are handled exactly as in a whole-image update. `MU300_DIFF=0
+mu300-update apply` always downloads the whole image. (The idea is kanoqwq's OTA diff; here the release itself makes
+and signs the diffs.)
 
 ### Where the release files come from
 
@@ -267,7 +280,7 @@ background (from the extra when it carries them, else from Ubuntu's archive once
 sudo MU300_UBUNTU=26.04 mu300-update apply   # or 24.04
 ```
 
-Settings and data are kept. Ubuntu 26.04 needs kernel 6.18 or 7.2.
+Settings and data are kept. Ubuntu 26.04 needs kernel 6.18, 7.2 or 7.3.
 
 ## Release names
 

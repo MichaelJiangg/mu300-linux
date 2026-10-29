@@ -102,7 +102,7 @@
    "name": "Ubuntu mu OpenWrt mi, hangisini seçmeliyim?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Çoğunlukla web arayüzlü bir yönlendirici istiyorsanız OpenWrt; apt ile küçük bir sunucu istiyorsanız Ubuntu. İkisini birden kurup mu300-os ile geçiş de yapabilirsiniz. Sistem seçimi sayfası bunu üç çekirdekle birlikte anlatır."
+    "text": "Çoğunlukla web arayüzlü bir yönlendirici istiyorsanız OpenWrt; apt ile küçük bir sunucu istiyorsanız Ubuntu. İkisini birden kurup mu300-os ile geçiş de yapabilirsiniz. Sistem seçimi sayfası bunu dört çekirdekle birlikte anlatır."
    }
   },
   {
@@ -180,7 +180,9 @@ açılamazsa cihaz kendiliğinden Android'e döner.</p>
 <div class="actions">
 <a class="btn primary" href="install/">Kurulum rehberini okuyun</a>
 <a class="btn" href="https://github.com/dikeckaan/mu300-linux/releases/latest">GitHub'daki son sürüm</a>
+<a class="btn sponsor" href="https://github.com/sponsors/dikeckaan"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M8 14.2 6.9 13.2C3 9.7.5 7.4.5 4.6.5 2.4 2.2.7 4.4.7c1.2 0 2.4.6 3.1 1.5C8.2 1.3 9.4.7 10.6.7c2.2 0 3.9 1.7 3.9 3.9 0 2.8-2.5 5.1-6.4 8.6z"/></svg>Sponsor ol</a>
 </div>
+<p class="sponsor-note">Türkiye'de tek bir kişi tarafından, boş zamanlarında yapılıyor ve herkese ücretsiz. Bir cihazını ya da paranı kurtardıysa, sponsorluk projenin devam etmesini sağlar.</p>
 </div>
 <svg xmlns="http://www.w3.org/2000/svg" class="mu-dg hero-art" viewBox="0 0 440 440" width="440" height="440" role="img" aria-label="Üç durum LED'i olan küçük bir 5G hotspot çizimi. Ön yüzünde iki oda var: Android için yeşil, Linux için turuncu." lang="en">
 <title id="device-t">A 5G pocket hotspot running Linux</title>
@@ -326,7 +328,7 @@ isteğe bağlı bir modül olarak.</li>
 <li><strong>USB ağı ve SSH</strong>Bir bilgisayara takın, ağ bağdaştırıcısı olarak görünür.</li>
 <li><strong>SMS ve USSD</strong>Komut satırında <code>sms</code> ve <code>mu300-ussd</code>, ayrıca kontrol panelinde.</li>
 <li><strong>VPN</strong>WireGuard, OpenVPN, VLESS, VMess, Trojan, Shadowsocks, Clash/mihomo profilleri; tünel üzerinden Tailscale.</li>
-<li><strong>Üç çekirdek</strong>Unisoc'un üretici çekirdeği 5.4, ana hat 6.18 LTS ve ana hat 7.2 (v2026.10.20'de 6.18.56 ve 7.2.10); üçünde de KVM.</li>
+<li><strong>Dört çekirdek</strong>Unisoc'un üretici çekirdeği 5.4, ana hat 6.18 LTS, ana hat 7.2 (kararlı) ve ana hat 7.3 (v2026.10.19.2'den sonraki sürümden itibaren); hepsinde KVM.</li>
 <li><strong>Web panelleri, terminal, adb</strong>OpenWrt'de LuCI ve MU300 paneli (VPN bölümü ve tarayıcıda terminalle), Ubuntu'da MU300 sayfalı Cockpit, ve USB üzerinden Linux'a <code>adb shell</code>.</li>
 <li><strong>Bluetooth ve GPU</strong>BlueZ ve OpenCL için Mali-G57 (görüntü çıkışı yok).</li>
 <li class="g"><strong>Android yerinde kalır</strong>Tek komutla geri dönülür, başarısız açılışlar kendiliğinden Android'e döner.</li>
@@ -828,7 +830,7 @@ değiştirmek (TTL, bant kilidi, VPN) operatörünüzün koşullarına ya da yer
 <details class="faq">
 <summary>Ubuntu mu OpenWrt mi, hangisini seçmeliyim?</summary>
 <div>
-<p>Çoğunlukla web arayüzlü bir yönlendirici istiyorsanız OpenWrt; <code>apt</code> ile küçük bir sunucu istiyorsanız Ubuntu. İkisini birden kurup <code>mu300-os</code> ile geçiş de yapabilirsiniz. <a href="choose/">Sistem seçimi</a> sayfası bunu üç çekirdekle birlikte anlatır.</p>
+<p>Çoğunlukla web arayüzlü bir yönlendirici istiyorsanız OpenWrt; <code>apt</code> ile küçük bir sunucu istiyorsanız Ubuntu. İkisini birden kurup <code>mu300-os</code> ile geçiş de yapabilirsiniz. <a href="choose/">Sistem seçimi</a> sayfası bunu dört çekirdekle birlikte anlatır.</p>
 </div>
 </details>
 <details class="faq">

@@ -1,0 +1,62 @@
+power: supply: UMP9620 fuel gauge and bq2560x charger only on a board with a battery (F50, V50: none)
+
+Ported from kanoqwq/mu300-linux f59a2968 (his patch 0019, "isolate UMP9620 battery drivers before register access").
+
+The F50 and the V50 share the U30 Air's PMIC and ZTE's charger node but have no battery. Under mainline the
+UMP9620's fuel gauge still bound there and listed a "Battery" (sc27xx-fgu) with made-up readings: status Full, health
+"Over voltage", a temperature from an unconnected NTC input. mu300-power, mu300-api, the panel, thermal-guard,
+mu300-sms-forward and the LuCI dashboard each had to be told by the board to ignore it. Patch 0016 already keeps the
+charger's 0x1a fallback to the board with a battery; the charger at the node's own address stayed reachable.
+
+Both probes now end with -ENODEV before any register access unless the device tree has the U30 Air's charger policy
+service: the same test as patch 0016, patch 0023 and mu300-device (kano's version also asks of_device_is_available;
+the node is only ever tested for presence here, so a U30 Air is told apart exactly as everywhere else). Only the
+UMP9620 gauge ("sprd,ump9620-fgu") and ZTE's charger node ("ti,bq2560x_chg") are affected; other SC27xx and BQ256xx
+boards keep their behaviour.
+
+--- a/drivers/power/supply/bq256xx_charger.c
++++ b/drivers/power/supply/bq256xx_charger.c
+@@ -2289,7 +2289,21 @@
+ 	struct i2c_client *chip = client;	/* where the registers are: 0x1a for the SGM41513 */
+ 
+ 	int ret;
++
++	/*
++	 * MU300 (kanoqwq f59a2968): ZTE's charger node is on every board of this family, but there is a battery to
++	 * charge only where the device tree has the U30 Air's charger policy service (the test of patch 0016 and
++	 * mu300-device). The F50 and V50 have none: no register of either charger address is touched there, so no
++	 * chip that answers at the node's own address can be set up to charge a battery that is not there.
++	 */
++	if (of_device_is_compatible(dev->of_node, "ti,bq2560x_chg")) {
++		struct device_node *policy = of_find_node_by_path("/charger_policy_service");
+ 
++		of_node_put(policy);
++		if (!policy)
++			return -ENODEV;
++	}
++
+ 	bq = devm_kzalloc(dev, sizeof(*bq), GFP_KERNEL);
+ 	if (!bq)
+ 		return -ENOMEM;
+--- a/drivers/power/supply/sc27xx_fuel_gauge.c
++++ b/drivers/power/supply/sc27xx_fuel_gauge.c
+@@ -1405,6 +1405,19 @@
+ 	struct sc27xx_fgu_data *data;
+ 	int ret, irq;
+ 
++	/*
++	 * MU300 (kanoqwq f59a2968): the F50 and V50 have the UMP9620's fuel gauge but no battery; bound, it reported
++	 * one with made-up readings (19 %, "Over voltage", 75 C from an unconnected NTC) that every user-space reader
++	 * had to be told to ignore. Only the U30 Air's device tree has the charger policy service.
++	 */
++	if (of_device_is_compatible(dev->of_node, "sprd,ump9620-fgu")) {
++		struct device_node *policy = of_find_node_by_path("/charger_policy_service");
++
++		of_node_put(policy);
++		if (!policy)
++			return -ENODEV;
++	}
++
+ 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return -ENOMEM;

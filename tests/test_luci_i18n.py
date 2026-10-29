@@ -297,6 +297,23 @@ return {
     sms: notes.map((n) => n.querySelector('b').textContent)
 };'''
 
+    def test_cell_identity_is_decimal_from_the_snapshot(self):
+        # #398: the home page shows the serving cell's TAC and cell ID in decimal, from the status snapshot it already
+        # has (no RPC, no AT command): 5G SA's C5GREG while registered there (a 9-digit NCI too), else CEREG
+        r = self.run_js(None, '''return [
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '081C1879' }, reg5g: { stat: 4, tac: null, cid: null } }),
+    M.cellIdentity({ reg: { stat: 5, tac: 'd920', cid: '1' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '081C1879' }, reg5g: { stat: 1, tac: '00D920', cid: '123456789' } }),
+    M.cellIdentity({ reg: { stat: 2, tac: 'D920', cid: '081C1879' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '0x81C' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: '1234567', cid: '1' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 'D920', cid: '1234567890' } }),
+    M.cellIdentity({ reg: { stat: 1, tac: 55584, cid: '1' } }),
+    M.cellIdentity({ error: 'x' }), M.cellIdentity(null) ];''')['result']
+        self.assertEqual(r, [
+            {'tac': 55584, 'cid': 136059001, 'nr': False}, {'tac': 55584, 'cid': 1, 'nr': False},
+            {'tac': 55584, 'cid': 4886718345, 'nr': True}, None, None, None, None, None, None, None])
+
     def test_three_languages(self):
         # The fork's case was a sentence assembled from fragments ('Link & traffic' + ' · ' + 'No response', a pair
         # that exists only in its test). common.js's own assembled sentence was the new-SMS banner, ('new SMS · ' in
@@ -433,7 +450,7 @@ if (selected !== true) throw Error('the Bootstrap token bridge must survive the 
 
 VIEWS = APP / 'htdocs/luci-static/resources/view/mu300'
 VIEW_NAMES = ('home', 'locks', 'sms', 'at', 'settings', 'device', 'languages', 'ttl', 'traffic', 'packages', 'terminal',
-              'update')
+              'leds', 'update')
 CJK_RE = re.compile('[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef]')
 
 
@@ -841,6 +858,29 @@ rpcReply = { ok: 0, error: 'Invalid value for this setting' }; await V.set(null,
 rpcReply = { ok: 1 }; await V.set(null, 'warn', '80'); await flush();
 return notes();'''
 
+    # System > LEDs: a U30 Air (a lamp that dims, two that only switch), an F50, no answer, and the replies of led_set
+    LEDS = '''
+const st = { ok: 1, device: 'u30air', lamps: [ 'network', 'wifi', 'battery' ], dimmable: [ 'battery' ], timeout: 60,
+             timeout_default: true, default_timeout: 60, network: true, network_brightness: 100, wifi: false,
+             wifi_brightness: 100, battery: true, battery_brightness: 40, boot: false, thermal: 'siren' };
+V.render(st);
+V.paint(Object.assign({}, st, { device: 'f50', lamps: [ 'network', 'wifi' ], dimmable: [ 'network', 'wifi' ],
+                                timeout: 0, timeout_default: false, default_timeout: 0, boot: true, thermal: 'blink' }));
+V.paint({ ok: 0, error: 'The LED adapter gave no valid reply' });
+rpcReply = { ok: 0, error: 'Unknown LED setting' }; await V.save('colour', '1'); await flush();
+rpcReply = { ok: 1 }; await V.save('boot', '1'); await flush();
+return notes();'''
+
+    def test_leds_page_messages(self):
+        for lang, want in ((None, ['Failed: Unknown LED setting', 'Saved']),
+                           ('zh_Hans', ['失败：未知的状态灯设置', '已保存'])):
+            with self.subTest(lang=lang):
+                out = self.run_view('leds', lang, self.LEDS)
+                self.assertEqual(out['result'], want)
+                for m in ('LEDs', 'Network lamp', 'Wi-Fi lamp', 'Battery lamp', 'Brightness (%)', 'LED timeout (seconds)',
+                          'Device default', 'Boot indicator', 'Heat alarm', 'Siren', 'Red blink'):
+                    self.assertIn(m, out['used'])
+
     # System > Terminal: a token framed over HTTP, a tab of its own over HTTPS, and each refusal code
     TERMINAL = '''
 window.location.protocol = 'http:'; window.location.hostname = '192.168.77.1';
@@ -950,9 +990,9 @@ rpcReply = { ok: 0, error: 'The TTL could not be set', detail: 'tc and nftables'
 await V.set(null, 64); await flush();
 return [ notes().pop() ];""", [('Failed: %s', 'The TTL could not be set', 'tc and nftables')]),
         ('home', """V.render(); await flush(); toasts.length = 0;
-rpcReply = { ok: 0, op: 'wifi on', error: 'Expected on or off' };
+rpcReply = { ok: 0, op: 'wifi on', error: 'No hotspot (access point) is configured' };
 get('mud-btn-wifi').onclick.call(get('mud-btn-wifi')); await flush();
-return [ notes().pop() ];""", [('Failed: %s', 'Expected on or off', None)]),
+return [ notes().pop() ];""", [('Failed: %s', 'No hotspot (access point) is configured', None)]),
         ('locks', """V.render(); await flush();
 V.lastLock = { error: 'Lock cache unavailable' }; V.paint();
 V.paintServing({ error: 'The modem is restarting (network locks or a SIM switch): no live signal right now' });

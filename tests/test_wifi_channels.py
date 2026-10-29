@@ -7,7 +7,7 @@ start_dfs_cac() fails and the AP stays down).
 * `openwrt-wifi-config` and `mu300-wifi-band` on OpenWrt (a stub `uci`): the channel, htmode, the channel list for
   auto, and a DFS channel set in LuCI rewritten at boot;
 * `openwrt/patches/wifi-scripts-no-dfs.patch`: how the build applies it, and - with MU300_WRT_IMAGE naming an
-  OpenWrt 25.12 docker image (e.g. mu300-openwrt-base:25.12.5, as openwrt/build-rootfs.sh imports it) - the hostapd
+  OpenWrt 25.12 docker image (e.g. mu300-openwrt-base:25.12.6, as openwrt/build-rootfs.sh imports it) - the hostapd
   configuration the patched wifi-scripts generate for a fake wiphy with and without radar detection.
 """
 import json
@@ -355,6 +355,7 @@ class WifiScriptsPatch(unittest.TestCase):
         self.assertIn('c.radar_detect_widths', added)
         self.assertIn('config.acs_exclude_dfs = true;', added)
         self.assertIn('device_no_dfs(config);', added)
+        self.assertIn('device_chanlist_band(config);', added)
 
 
 @unittest.skipUnless(os.environ.get('MU300_WRT_IMAGE') and shutil.which('docker'),
@@ -373,7 +374,8 @@ class WifiScriptsInOpenWrt(unittest.TestCase):
             e.update(flags.get(c, {'radar': True, 'no_ir': True} if 52 <= c <= 144 else {}))
             freqs.append(e)
         return {'extended_features': [0] * 16, 'cipher_suites': [], 'interface_combinations': [comb],
-                'wiphy_bands': [{'freqs': [{'freq': 2412}]}, {'freqs': freqs, 'ht_capa': 0x1fe,
+                'wiphy_bands': [{'freqs': [{'freq': 2407 + 5 * c} for c in range(1, 14)], 'ht_capa': 0x1fe},
+                                {'freqs': freqs, 'ht_capa': 0x1fe,
                                                                'vht_capa': 0x339071b2}]}
 
     @staticmethod
@@ -400,6 +402,10 @@ class WifiScriptsInOpenWrt(unittest.TestCase):
             'auto-list': (False, {}, 'auto', 'VHT80', {'channels': '36 40 44 48 149 153 157 161 165'}),
             'no36-60': (False, no36, 60, 'VHT80', None),
             'no5g-60': (False, {c: {'disabled': True} for c in FIVE if not 52 <= c <= 144}, 60, 'VHT80', None),
+            # #424: LuCI changed the band to 2.4 GHz and left the 5 GHz list openwrt-wifi-config wrote for auto
+            '2g-auto-5glist': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': '36 40 44 48'}),
+            '2g-auto-mixed': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': ['1 6', '36', '1-11', '1-36']}),
+            '2g-auto-list': (False, {}, 'auto', 'HT20', {'band': '2g', 'channels': '1 6 11'}),
         }
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
@@ -459,6 +465,18 @@ done
             # 36-48 not allowed: 149
             _, c = conf('no36-60')
             self.assertEqual((c['channel'], c['vht_oper_centr_freq_seg0_idx']), ('149', '155'))
+            # a channel list off the radio's band is dropped (#424): ACS over the whole band instead of no channel
+            text, c = conf('2g-auto-5glist')
+            self.assertEqual((c['hw_mode'], c['channel']), ('g', '0'))
+            self.assertNotIn('chanlist', c)
+            self.assertIn('channel list: 36 40 44 48 not on the 2g band, left out; automatic channel selection uses '
+                          'the whole band', text)
+            text, c = conf('2g-auto-mixed')
+            self.assertEqual(c['chanlist'], '1 6 1-11')
+            self.assertIn('channel list: 36 1-36 not on the 2g band, left out\n', text + '\n')
+            text, c = conf('2g-auto-list')
+            self.assertEqual(c['chanlist'], '1 6 11')
+            self.assertNotIn('channel list', text)
             # nothing to go to: left as it was, and said
             text, c = conf('no5g-60')
             self.assertEqual(c['channel'], '60')
@@ -506,8 +524,21 @@ class HotspotVerify(ShellTest):
             self.assertEqual(sleeps, 40)
             self.assertEqual(sc, '')
 
+    REFUSED = '[{:12.6f}] sprd-wlan: sc2355_rx_rsp_process ctx_id 0 recv rsp[CMD_START_AP] status[SPRD_CMD_STATUS_NOT_SUPPORT]\n'
+
+    @staticmethod
+    def uptime():
+        """The host's /proc/uptime (hotspot-verify reads only the dmesg lines from its own start on); None without it."""
+        try:
+            return float(Path('/proc/uptime').read_text().split()[0])
+        except (OSError, ValueError, IndexError):
+            return None
+
     def test_a_refused_start_goes_to_2g(self):
-        line = '[   27.5] sprd-wlan: sc2355_rx_rsp_process ctx_id 0 recv rsp[CMD_START_AP] status[SPRD_CMD_STATUS_NOT_SUPPORT]\n'
+        # printed after hotspot-verify began (a fixed early time, 27.5 s, was before it on any Linux host up longer than
+        # that: the line was skipped; without /proc/uptime, as on macOS, the script keeps every line)
+        now = self.uptime()
+        line = self.REFUSED.format(27.5 if now is None else now + 5)
         for shell in self.each_shell():
             # the refusal is printed before the access point shows up, or in the same moment
             for up in (0, 1000):
@@ -515,6 +546,17 @@ class HotspotVerify(ShellTest):
                 self.assertIn('restart mu300-hotspot.service', sc)
                 self.assertIn('falling back to 2.4 GHz', err)
                 self.assertEqual(sleeps, 1)
+
+    def test_a_refusal_from_before_this_start_is_not_this_one(self):
+        now = self.uptime()
+        if now is None or now < 3:
+            self.skipTest('needs /proc/uptime, and a host up for more than 3 s')
+        line = self.REFUSED.format(now - 2)
+        for shell in self.each_shell():
+            sleeps, sc, err = self.run_verify(shell, dmesg=line, FAKE_UP=3)
+            self.assertEqual(sc, '')
+            self.assertNotIn('falling back', err)
+            self.assertEqual(sleeps, 4)
 
     @unittest.skipUnless(Path('/proc/self/comm').exists(), 'needs /proc')
     def test_an_ssid_before_hostapd_runs_is_not_this_start(self):

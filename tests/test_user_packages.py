@@ -671,6 +671,68 @@ class Service(ShellTest):
             self.assertEqual(self.dhcp(), before)
             self.assertIn('0100007F:1EC2', (self.R / 'proc/net/udp').read_text())   # the wait did run
 
+    # #421: DNS that only a package still to come back answered (AdGuardHome on 127.0.0.1#8858)
+    def test_dns_only_a_waiting_package_answered_is_said_at_once(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            write(self.R, {'etc/mu300/vpn.conf': 'ENABLE=1\nSECRET=do-not-print\n'})
+            before = self.dhcp()
+            r = self.run_upk(shell, 'run', MU300_PKG_TRIES=3)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            self.assertEqual(self.rec('state'), 'offline\n')
+            self.assertEqual(self.dhcp(), before)
+            self.assertIn('DNS goes only to 127.0.0.1#7874, where nothing answers', self.rec('note'))
+            self.assertIn('mu300-user-packages retry --dns', self.rec('note'))
+            self.assertEqual(self.rec('log').count('dnsmasq forwards only to 127.0.0.1#7874'), 1)
+            self.assertIn('retry --dns', self.run_upk(shell, 'status').stdout)
+            self.assertNotIn('do-not-print', r.stdout + self.rec('log'))
+            # a DNS server that answers (or the connection's resolvers): nothing said
+            self.setup_openwrt(server='127.0.0.1#7874 8.8.8.8')
+            self.run_upk(shell, 'run')
+            self.assertNotIn('retry --dns', self.rec('note') or '')
+
+    def test_retry_dns_asks_the_connections_resolvers_for_that_run_only(self):
+        # apk reaches its feeds only while dnsmasq may ask the connection's resolvers
+        self.stub('apk', 'echo "apk $*" >> "$STUBLOG/pm.log"\n'
+                         'case $1 in\n'
+                         '  update) grep -q "^dhcp.cfg01.noresolv=0" "$STUBLOG/uci.db" || { echo "0 unavailable"; exit 1; } ;;\n'
+                         '  add) shift; for p; do echo "$p" >> "$STUBLOG/installed"; done ;;\n'
+                         '  info) grep -qx "$3" "$STUBLOG/installed" 2>/dev/null ;;\n'
+                         'esac')
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            self.init_scripts()
+            r = self.run_upk(shell, 'run')
+            self.assertEqual(self.rec('state'), 'offline\n')
+            r = self.run_upk(shell, 'retry', '--dns')
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            self.assertEqual(self.rec('state'), 'done\n')
+            self.assertIn('2 of 2 packages', r.stdout)
+            # dnsmasq as it was: its forwarder, and only its own servers
+            u = self.dhcp()
+            self.assertIn('dhcp.cfg01.server=127.0.0.1#7874', u)
+            self.assertIn('dhcp.cfg01.noresolv=1', u)
+            self.assertEqual((self.tmp / 'init.log').read_text().count('dnsmasq restart'), 2)
+            self.assertFalse((self.R / 'etc/mu300/user-packages/dns-bridge').exists())
+            self.assertIn('as before retry --dns', self.rec('log'))
+            self.assertNotIn('retry --dns', self.rec('note') or '')
+
+    def test_retry_dns_stopped_by_a_restart_is_undone_by_the_next_run(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            self.init_scripts()
+            write(self.R, {'etc/mu300/user-packages/dns-bridge': 'cfg01 1\n'})
+            (self.tmp / 'uci.db').write_text(self.uci().replace('dhcp.cfg01.noresolv=1', 'dhcp.cfg01.noresolv=0'))
+            r = self.run_upk(shell, 'run')
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+            self.assertIn('dhcp.cfg01.noresolv=1', self.dhcp())
+            self.assertFalse((self.R / 'etc/mu300/user-packages/dns-bridge').exists())
+
+    def test_retry_dns_usage(self):
+        for shell in self.each_shell():
+            self.setup_openwrt()
+            self.assertEqual(self.run_upk(shell, 'retry', '--bogus').returncode, 2)
+
     def test_a_dead_feed_of_the_users_is_not_offline(self):
         """apk update fails for one feed that does not answer (a U30 Air: a custom feed of example.invalid); the
         others answered, so the packages are installed again. With every feed unavailable it is offline."""

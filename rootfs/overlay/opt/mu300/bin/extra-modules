@@ -37,13 +37,29 @@ fi
 # hands frequency control over. The vendor 5.4 kernel has its own driver for it and no such module. modprobe needs
 # depmod's index (Ubuntu keeps the bundle's modules in extra/), so insmod by path is the fallback; a failure leaves
 # thermal-guard in charge, as before.
-if ! grep -q '^mu300_thermal ' /proc/modules; then
-    for f in "$M/mu300_thermal.ko" "$M/extra/mu300_thermal.ko"; do
+# ums9620_lpintc (upstream/modules/ums9620_lpintc, docs/FINDINGS.md 218), the same way: the interrupts the kernel
+# enabled become wake sources of the CPU clusters' power-down, which TF-A left at its own short list (USB, IPA and
+# the Wi-Fi's PCIe were not on it). Mainline only; without it an interrupt waits for something else to wake the cluster.
+# zte_sar_stk, the U30 Air's SAR sensor (upstream/modules/zte_sar_stk on mainline, ZTE's own module on 5.4): only where
+# the kernel has it (the U30 Air's module sets); udev loads it on Ubuntu as well, OpenWrt has only this.
+for m in mu300_thermal ums9620_lpintc zte_sar_stk; do
+    grep -q "^$m " /proc/modules && continue
+    for f in "$M/$m.ko" "$M/extra/$m.ko"; do
         [ -f "$f" ] || continue
-        if modprobe mu300_thermal 2>/dev/null || insmod "$f" 2>/dev/null; then echo "loaded mu300_thermal"; else echo "FAILED mu300_thermal"; fi
+        if modprobe "$m" 2>/dev/null || insmod "$f" 2>/dev/null; then echo "loaded $m"; else echo "FAILED $m"; fi
         break
     done
-fi
+done
+
+# The PMIC's Type-C and BC1.2 detection (sc27xx_typec: port0, its partner and extcon; sprd_bc1p2), on by default as
+# on 5.4 (FINDINGS 234): udev loads them on Ubuntu, OpenWrt has only this. Where the kernel has them; with USB-C power
+# delivery on (mu300-usb pd on) the port controller has the Type-C block and sc27xx_typec does not bind.
+for m in sc27xx_typec sprd_bc1p2; do
+    grep -q "^$m " /proc/modules && continue
+    f=$(find "$M" -name "$m.ko" -o -name "$(echo "$m" | tr _ -).ko" 2>/dev/null | head -n 1)
+    [ -n "$f" ] || continue
+    if modprobe "$m" 2>/dev/null || insmod "$f" 2>/dev/null; then echo "loaded $m"; else echo "FAILED $m"; fi
+done
 
 for m in sprd_soc_thm thermal-generic-adc sprd_cpu_cooling leds-sc27xx-bltc zte_sar zte_card_holder_det sc27xx-vibra sprd_cp_dvfs sprd_ddr_dvfs sprd_gpu_cooling mali_kbase; do
     if modprobe "$m" 2>/tmp/mu300-modprobe.err; then

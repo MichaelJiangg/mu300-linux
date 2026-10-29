@@ -153,6 +153,83 @@ class Counting(TrafficBase):
             self.assertEqual(self.days(shell, self.now + 120), {'2026-10-10': (60, 10)})
 
 
+class LiveDevice(TrafficBase):
+    """DEVICE=auto (the default; issue #369): the interface mobile data uses now - netifd's WAN device on OpenWrt,
+    else the sipa_eth that is up (sipa_eth8 with the internal SIM), else the one counted last."""
+
+    def oper(self, dev, state):
+        d = self.root / 'sys/class/net' / dev
+        d.mkdir(parents=True, exist_ok=True)
+        (d / 'operstate').write_text(state + '\n')
+
+    def setUp(self):
+        super().setUp()
+        self.stub('mu300-sim', 'echo 0')
+
+    def test_the_internal_sims_bearer_is_counted(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.counters(0, 0, 50, dev='sipa_eth0', idx=5)
+            self.oper('sipa_eth0', 'down')
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.sample(shell, 6000, 600, 160, self.now + 60, dev='sipa_eth8', idx=9)
+            v = self.view(shell, self.now + 60)
+            self.assertEqual((v['device'], v['available']), ('sipa_eth8', 1))
+            self.assertEqual(self.days(shell, self.now + 60), {'2026-10-10': (5000, 500)})
+
+    def test_the_old_default_in_the_file_means_auto(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.set(shell, 'cap', '50G')       # writes every setting, DEVICE included
+            self.store.joinpath('conf').write_text(
+                self.store.joinpath('conf').read_text().replace('DEVICE=auto', 'DEVICE=sipa_eth0'))
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth8')
+            self.set(shell, 'device', 'auto')
+            self.assertIn('DEVICE=auto', self.store.joinpath('conf').read_text())
+
+    def test_an_explicit_device_wins(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.oper('sipa_eth8', 'up')
+            self.set(shell, 'device', 'wwan0')
+            self.sample(shell, 1000, 100, 100, self.now, dev='wwan0')
+            self.assertEqual(self.view(shell, self.now)['device'], 'wwan0')
+
+    def test_data_down_for_a_moment_keeps_the_device_counted_last(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth8', idx=9)
+            self.oper('sipa_eth8', 'down')                  # no sipa_eth is up now
+            self.sample(shell, 3000, 300, 160, self.now + 60, dev='sipa_eth8', idx=9)
+            v = self.view(shell, self.now + 60)
+            self.assertEqual((v['device'], v['available']), ('sipa_eth8', 0))
+            self.oper('sipa_eth8', 'up')
+            self.sample(shell, 4000, 400, 220, self.now + 120, dev='sipa_eth8', idx=9)
+            self.assertEqual(self.days(shell, self.now + 120), {'2026-10-10': (3000, 300)})
+
+    def test_nothing_known_falls_back_to_the_active_slots_bearer(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.stub('mu300-sim', 'echo 1')
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth8')
+
+    def test_openwrt_follows_netifds_wan_device(self):
+        for shell in self.each_shell():
+            self.fresh()
+            (self.root / 'etc').mkdir(exist_ok=True)
+            (self.root / 'etc/openwrt_release').write_text("DISTRIB_ID='OpenWrt'\n")
+            self.stub('uci', 'exit 1')
+            self.stub('ubus', 'echo "$*" >> "$STUBLOG/ubus"; printf \'{\\n\\t"up": true,\\n\\t"l3_device": "sipa_eth9",\\n\\t"device": "sipa_eth9"\\n}\\n\'')
+            self.oper('sipa_eth0', 'up')                    # up, but not the WAN's
+            self.sample(shell, 1000, 100, 100, self.now, dev='sipa_eth9', idx=11)
+            self.assertEqual(self.view(shell, self.now)['device'], 'sipa_eth9')
+            self.assertIn('call network.interface.wan status', (self.tmp / 'ubus').read_text())
+
+
 class Days(TrafficBase):
     def test_an_interval_over_midnight_is_split_by_time(self):
         for shell in self.each_shell():
@@ -335,7 +412,7 @@ class Cycle(TrafficBase):
             self.assertEqual((v['reset_day'], v['cap']['bytes'], v['cap']['warn']), (1, 0, 90))
 
 
-class Cap(TrafficBase):
+class CapBase(TrafficBase):
     def setUp(self):
         super().setUp()
         (self.root / 'etc').mkdir()
@@ -355,6 +432,8 @@ class Cap(TrafficBase):
         self.counters(rx, 0, up, **kw)
         return self.run_tool(shell, 'save', now=now or self.now + up)
 
+
+class Cap(CapBase):
     def test_warning_and_cut_once(self):
         for shell in self.each_shell():
             self.fresh()
@@ -454,6 +533,114 @@ class Cap(TrafficBase):
             self.assertIn('today         2026-10-10  down 3.0 GB, up 0 B', out)
             self.assertIn('this cycle    2026-10-01 - 2026-10-31  3.0 GB used of 50.0 GB (6%), 22 days left', out)
             self.assertIn('2026-10-10  down    3.0 GB', self.run_tool(shell, 'days', now=self.now + 160).stdout)
+
+
+class Plan(CapBase):
+    """the daily quota (its own warning and cut, until midnight), the count mode and the plan's name"""
+
+    def test_defaults_are_unchanged(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.sample(shell, 0, 0, 100, self.now)
+            self.sample(shell, 900, 100, 160, self.now + 60)
+            v = self.view(shell, self.now + 60)
+            self.assertEqual((v['plan'], v['count'], v['cycle']['used']), ('', 'total', 1000))
+            self.assertEqual(v['daily'], {'bytes': 0, 'used': 1000, 'cut': 0, 'level': 'none', 'cut_active': 0})
+            self.assertNotIn('dalert', self.ledger())
+            out = self.run_tool(shell, now=self.now + 60).stdout
+            self.assertNotIn('daily quota', out)
+            self.assertNotIn('plan ', out)
+
+    def test_daily_quota_warns_cuts_and_comes_back_at_midnight(self):
+        for shell in self.each_shell():
+            self.fresh()
+            (self.root / 'run/mu300-mobile-data-down').unlink(missing_ok=True)
+            self.set(shell, 'daily', '1000')
+            self.set(shell, 'warn', '80')
+            self.round(shell, 0, 100)
+            self.round(shell, 850, 160)
+            self.assertIn('80% of the daily quota is used', self.log())
+            self.round(shell, 1200, 220)
+            v = self.view(shell, self.now + 220)
+            self.assertEqual((v['daily']['level'], v['daily']['cut_active'], v['cap']['level']), ('over', 0, 'none'))
+            self.assertEqual(self.calls(), [])            # daily-cut is off by default: a warning only
+            self.assertIn('the daily quota is reached', self.log())
+            self.fresh()
+            (self.root / 'run/mu300-mobile-data-down').unlink(missing_ok=True)
+            self.set(shell, 'daily', '1000')
+            self.set(shell, 'daily-cut', 'on')
+            self.round(shell, 0, 100)
+            self.round(shell, 1200, 160)
+            self.assertEqual(self.view(shell, self.now + 160)['daily']['cut_active'], 1)
+            self.assertEqual(self.calls(), ['ifdown wan'])
+            self.assertIn('daily quota until midnight', self.log())
+            (self.root / 'run/mu300-mobile-data-down').write_text('')
+            self.round(shell, 1300, 220)
+            self.assertEqual(self.calls(), ['ifdown wan'])
+            # the next day: back on
+            self.round(shell, 1300, 280, now=at(2026, 10, 11, 0, 5))
+            self.assertEqual(self.calls(), ['ifdown wan', 'ifup wan'])
+
+    def test_back_on_only_when_neither_limit_holds_it(self):
+        for shell in self.each_shell():
+            self.fresh()
+            (self.root / 'run/mu300-mobile-data-down').unlink(missing_ok=True)
+            self.set(shell, 'daily', '1000')
+            self.set(shell, 'daily-cut', 'on')
+            self.set(shell, 'cap', '1500')
+            self.set(shell, 'cut', 'on')
+            self.round(shell, 0, 100)
+            self.round(shell, 2000, 160)              # both reached: one ifdown
+            self.assertEqual(self.calls(), ['ifdown wan'])
+            (self.root / 'run/mu300-mobile-data-down').write_text('')
+            self.round(shell, 2000, 220, now=at(2026, 10, 11, 0, 5))    # the day is over, the cycle is not
+            self.assertEqual(self.calls(), ['ifdown wan'])
+            self.set(shell, 'cut', 'off')
+            self.round(shell, 2000, 280, now=at(2026, 10, 11, 0, 6))
+            self.assertEqual(self.calls(), ['ifdown wan', 'ifup wan'])
+
+    def test_count_mode(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.set(shell, 'cap', '1000')
+            self.round(shell, 0, 100)
+            self.round(shell, 700, 160)
+            self.counters(700, 600, 220)
+            self.run_tool(shell, 'save', now=self.now + 220)
+            self.assertEqual(self.view(shell, self.now + 220)['cap']['level'], 'over')
+            self.set(shell, 'count', 'rx')
+            v = self.view(shell, self.now + 220)
+            self.assertEqual((v['count'], v['cycle']['used'], v['cap']['level'], v['cycle']['rx'], v['cycle']['tx']),
+                             ('rx', 700, 'ok', 700, 600))
+            self.assertEqual(v['cycles'][0]['used'], 700)
+            self.set(shell, 'count', 'tx')
+            self.assertEqual(self.view(shell, self.now + 220)['daily']['used'], 600)
+            # a correction belongs to its mode
+            self.run_tool(shell, 'used', '5000', now=self.now + 220)
+            self.assertEqual(self.view(shell, self.now + 220)['cycle']['used'], 5000)
+            self.assertIn('adj 2026-10-01 4400 tx', self.ledger())
+            self.assertIn('counted       uploads only', self.run_tool(shell, now=self.now + 220).stdout)
+            self.set(shell, 'count', 'total')
+            self.assertEqual(self.view(shell, self.now + 220)['cycle']['used'], 1300)
+            self.assertNotEqual(self.run_tool(shell, 'set', 'count', 'both', ok=False).returncode, 0)
+
+    def test_plan_name(self):
+        for shell in self.each_shell():
+            self.fresh()
+            self.counters(0, 0, 100)
+            name = 'Turkcell 50GB "gece" \\ \u6708\u5957\u9910'
+            self.set(shell, 'plan', name)
+            self.assertEqual(self.view(shell)['plan'], name)
+            self.assertIn('plan          ' + name, self.run_tool(shell).stdout)
+            for bad in ('a\nb', 'x' * 97, 'tab\there'):
+                self.assertNotEqual(self.run_tool(shell, 'set', 'plan', bad, ok=False).returncode, 0, bad)
+            self.assertEqual(self.view(shell)['plan'], name)
+            self.set(shell, 'plan', '')
+            self.assertEqual(self.view(shell)['plan'], '')
+            # a file edited by hand: a control character is refused, the name is none
+            conf = (self.store / 'conf').read_text().replace('PLAN=\n', 'PLAN=x\x1b[2Jy\n')
+            (self.store / 'conf').write_text(conf)
+            self.assertEqual(self.view(shell)['plan'], '')
 
 
 class Service(TrafficBase):

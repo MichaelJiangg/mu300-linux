@@ -30,6 +30,11 @@
 #   lang_get, lang_set  LuCI's languages and the lang extra (unisoc-modem/languages, mu300-extra)
 #   power_get, power_set  the power profiles (unisoc-modem/power, mu300-power)
 #   ttl_get, ttl_set value  the TTL of mobile data (unisoc-modem/ttl, mu300-ttl); value off or 1-255
+#   tcp_get, tcp_set value  the TCP congestion control of the device's own connections (unisoc-modem/tcp, mu300-tcp);
+#                     value default|cubic|bbr
+#   boot_get          the dual boot's state, read only (unisoc-modem/boot, mu300-next-boot status)
+#   led_get, led_set key value  the LED settings (unisoc-modem/led, mu300-led): the lamps' switches and brightness,
+#                     the timeout, the boot indicator, the heat alarm's light
 #   traffic_get, traffic_set op value  the mobile data count, its billing cycle and cap (unisoc-modem/traffic,
 #                     mu300-traffic)
 #   forward_get, forward_set ..., forward_test, forward_log_clear  SMS forwarding (unisoc-modem/forward,
@@ -240,7 +245,7 @@ m_act() {
         roaming)            allowed "$arg" '(on|off)' ;;
         vpn)                allowed "$arg" '(start|stop)' ;;
         os)                 allowed "$arg" '(android|lock|unlock)' ;;
-        modem-reset|reboot) [ -z "$arg" ] ;;
+        modem-reset|reboot|poweroff) [ -z "$arg" ] ;;
         *)                  refuse 'Unknown op'; return ;;
     esac || { refuse 'Invalid argument for this op'; return; }
     # the radio ops take mobile-data's radio lock (unisoc-modem/action): while the dial, the watchdog or another
@@ -253,7 +258,7 @@ m_act() {
     esac
     case $op in
         # the SFUN dance can run half a minute: never inside the request
-        radio|modem-reset|reboot|vpn)
+        radio|modem-reset|reboot|poweroff|vpn)
             setsid "$DASH/action" "$op" "$arg" >/dev/null 2>&1 &
             printf '{"ok":1,"started":1,"op":%s}\n' "$(json_str "$op${arg:+ $arg}")"
             ;;
@@ -482,8 +487,20 @@ lock_val_ok() {  # lock_val_ok KIND VALUE
     esac
 }
 
+# lock_bands_supported KIND LIST: at least one band of LIST is in the modem's capabilities of the last reading
+# (the helper's cache, read here: no AT, nothing started); no reading yet: not refused here (the helper checks again)
+lock_bands_supported() {
+    local caps b
+    caps=$(jsonfilter -e "@.caps.$1" 2>/dev/null < "$LOCKF")
+    case $caps in ''|*[!0-9,]*) return 0 ;; esac
+    for b in $(printf '%s' "$2" | tr ',' ' '); do
+        case ",$caps," in *",$b,"*) return 0 ;; esac
+    done
+    return 1
+}
+
 m_lock_set() {
-    local kind val q=0
+    local kind val q=0 out id
     inp '@.kind'; kind=$V
     inp '@.val'; val=$V
     case "$kind" in
@@ -491,17 +508,52 @@ m_lock_set() {
         *) refuse 'Unknown lock kind'; return ;;
     esac
     lock_val_ok "$kind" "$val" || { refuse 'Invalid value for this lock kind'; return; }
+    # #356: the lock helper refuses these two cases before it writes anything, but it runs detached, so the page
+    # got ok and the read-back quietly put the old bands back. Say it here instead.
+    if [ "$kind" != auto_apply ] && [ "$kind" != reset ]; then
+        [ "$(cat "${MU300_SIM_RUN:-/run/mu300}/sim-slot" 2>/dev/null)" != 1 ] ||
+            { refuse 'Band, mode and cell locks are not supported for SIM2 yet'; return; }
+        [ ! -e "${MU300_SIM_RUN:-/run/mu300}/sim-managed" ] ||
+            { refuse 'Band, mode and cell locks are not supported while dual-SIM switching manages the radio'; return; }
+    fi
+    # a band list of which the modem supports nothing (n999) was written as "automatic" and reported done
+    case $kind in lte|nr)
+        [ -z "$val" ] || lock_bands_supported "$kind" "$val" ||
+            { refuse 'None of these bands is supported by this modem'; return; } ;;
+    esac
     # applying restarts the protocol stack (SFUN 5 -> 4): half a minute without
     # cellular - exactly the thing that must never run inside a request
     # queued=1 tells the page another apply is still running (SFUN restart);
     # the new one waits for the modem and the page can say so
     { [ -d /run/unisoc-modem-lock-apply ] || [ -e /run/mu300/sim-switching ] || [ -e /run/mu300/sim-active-unknown ]; } && q=1
-    if [ "$kind" = reset ]; then
-        setsid "$DASH/lock" reset >/dev/null 2>&1 &
-    else
-        setsid "$DASH/lock" apply "$kind" "$val" >/dev/null 2>&1 &
-    fi
+    case $kind in
+        reset)      setsid "$DASH/lock" reset >/dev/null 2>&1 & ;;
+        auto_apply) setsid "$DASH/lock" apply "$kind" "$val" >/dev/null 2>&1 & ;;
+        *)
+            # a job of its own (kanoqwq's lock job queue): the helper answers at once with its id, and lock_job
+            # tells the page how the apply ended - a refused write is an error there, not a read-back that "did
+            # not take"
+            out=$("$DASH/lock" start "$kind" "$val" 2>/dev/null)
+            id=$(printf '%s' "$out" | jsonfilter -e '@.id' 2>/dev/null)
+            if ! allowed "$id" '[A-Za-z0-9]{10}'; then
+                # the helper's own refusal (busy, too many waiting) as it said it; anything else is a failure
+                if [ "$(printf '%s' "$out" | jsonfilter -e '@.ok' 2>/dev/null)" = 0 ]; then reply_obj "$out" 'Lock change failed'
+                else refuse 'Lock change failed'; fi
+                return
+            fi
+            printf '{"ok":1,"started":1,"queued":%d,"op":%s,"job":%s}\n' "$q" "$(json_str "lock $kind=$val")" "$(json_str "$id")"
+            return ;;
+    esac
     printf '{"ok":1,"started":1,"queued":%d,"op":%s}\n' "$q" "$(json_str "lock $kind=$val")"
+}
+
+# lock_job {id}: how the lock change with that id (lock_set's "job") has gone: queued, running, done or error, with
+# the reason; read from the helper's runtime directory, no AT
+m_lock_job() {
+    local id
+    inp '@.id'; id=$V
+    allowed "$id" '[A-Za-z0-9]{10}' || { refuse 'Invalid job id'; return; }
+    reply_obj "$("$DASH/lock" status "$id" 2>/dev/null)" 'Lock change failed'
 }
 
 # --------------------------------------------------------------------- SMS
@@ -517,9 +569,14 @@ m_sms_list() {
     allowed "$page" "$SMS_ID" || { refuse 'Invalid page'; return; }
     out=$("$SMS" list "$page" 2>/dev/null) || out=''
     [ -n "$out" ] || { printf '{"error":"mu300-sms is not available (the SMS service is not installed or not running)"}\n'; return; }
+    # the SIM storage as the last sync left it (mu300-sms storage_note, a line in RAM: no AT command here):
+    # "STORE USED TOTAL EPOCH", numbers and SM/ME only, else null
+    local cap
+    cap=$(sed -nE '1s/^(SM|ME) (0|[1-9][0-9]{0,5}) ([1-9][0-9]{0,5}) ([1-9][0-9]{0,11})$/{"store":"\1","used":\2,"total":\3,"at":\4}/p' \
+        "${MU300_SMS_RUN:-/run}/mu300-sms-storage" 2>/dev/null)
     # first line "pool: N message(s), U unread - page P/T (10 per page)",
     # then fixed-width rows (see mu300-sms cmd_list); parse by column position
-    printf '%s\n' "$out" | awk "$JSON_ESC"'
+    printf '%s\n' "$out" | awk -v cap="${cap:-null}" "$JSON_ESC"'
         NR == 1 {
             total = $0; sub(/^pool: /, "", total); sub(/ message.*/, "", total)
             unread = $0; sub(/^pool: [0-9]+ message\(s\), /, "", unread); sub(/ unread.*/, "", unread)
@@ -540,7 +597,7 @@ m_sms_list() {
                 printf "%s{\"id\":\"%s\",\"status\":\"%s\",\"dir\":\"%s\",\"peer\":\"%s\",\"time\":\"%s\",\"preview\":\"%s\"}",
                     (n++ ? "," : ""), id, jesc(st), jesc(dir), jesc(peer), jesc(tm), jesc(prev)
         }
-        END { if (NR) print "]}"; else print "{\"error\":\"No output\"}" }'
+        END { if (NR) print "],\"sim_storage\":" cap "}"; else print "{\"error\":\"No output\"}" }'
 }
 
 m_sms_show() {
@@ -752,7 +809,7 @@ m_power_set() {
     allowed "$op" '(set|wake|idle)' || { refuse 'Unknown power operation'; return; }
     case $op in
         set)
-            allowed "$key" '(PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU))' ||
+            allowed "$key" '(PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|RESUME_AT|CHARGE_PAUSE|FULL_ONCE|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU))' ||
                 { refuse 'Unknown power setting'; return; }
             allowed "$value" '[a-z0-9]{1,5}' || { refuse 'Invalid power value'; return; }
             out=$("$POWERA" set "$key" "$value" 2>/dev/null) ;;
@@ -808,6 +865,37 @@ m_ttl_set() {
     reply_obj "$("$TTLA" set "$value" 2>/dev/null)" 'The TTL adapter gave no valid reply'
 }
 
+# ------------------------------------------------------------ TCP, boot
+# The Device page's TCP congestion control card: mu300-tcp through the adapter, which checks the value again
+TCPA=${MU300_TCP_ADAPTER:-$DASH/tcp}
+m_tcp_get() { reply_obj "$("$TCPA" get 2>/dev/null)" 'The TCP adapter gave no valid reply'; }
+m_tcp_set() {
+    local value
+    inp '@.value'; value=$V
+    allowed "$value" '(default|cubic|bbr)' || { refuse 'Invalid congestion control'; return; }
+    reply_obj "$("$TCPA" set "$value" 2>/dev/null)" 'The TCP adapter gave no valid reply'
+}
+# The dashboard's boot card: mu300-next-boot status, read only (the changes are act os ...)
+BOOTA=${MU300_BOOT_ADAPTER:-$DASH/boot}
+m_boot_get() { reply_obj "$("$BOOTA" get 2>/dev/null)" 'The boot adapter gave no valid reply'; }
+# --------------------------------------------------------------------- LEDs
+# The LED page: mu300-led through the adapter, which checks the key and the value again (and mu300-led after it)
+LEDA=${MU300_LED_ADAPTER:-$DASH/led}
+m_led_get() { reply_obj "$("$LEDA" get 2>/dev/null)" 'The LED adapter gave no valid reply'; }
+m_led_set() {
+    local key value
+    inp '@.key'; key=$V
+    inp '@.value'; value=$V
+    case $key in
+        timeout) allowed "$value" '(default|0|[1-9][0-9]{0,4})' && { [ "$value" = default ] || [ "$value" -le 86400 ]; } ;;
+        network|wifi|battery|boot) allowed "$value" '[01]' ;;
+        network_brightness|wifi_brightness|battery_brightness) allowed "$value" '([1-9][0-9]?|100)' ;;
+        thermal) allowed "$value" '(siren|blink|off)' ;;
+        *) refuse 'Unknown LED setting'; return ;;
+    esac || { refuse 'Invalid value for this setting'; return; }
+    reply_obj "$("$LEDA" set "$key" "$value" 2>/dev/null)" 'The LED adapter gave no valid reply'
+}
+
 # --------------------------------------------------------------- data usage
 # The Data usage page: mu300-traffic through the adapter, which checks every value again. Sizes are whole bytes.
 TRAFA=${MU300_TRAFFIC_ADAPTER:-$DASH/traffic}
@@ -818,9 +906,13 @@ m_traffic_set() {
     inp '@.value'; value=$V
     case $op in
         reset_day) allowed "$value" '([1-9]|[12][0-9]|3[01])' ;;
-        cap|used)  allowed "$value" '(0|[1-9][0-9]{0,15})' ;;
+        cap|used|daily) allowed "$value" '(0|[1-9][0-9]{0,15})' ;;
         warn)      allowed "$value" '([1-9]|[1-9][0-9]|100)' ;;
-        cut)       allowed "$value" '(on|off)' ;;
+        cut|daily_cut) allowed "$value" '(on|off)' ;;
+        count)     allowed "$value" '(total|rx|tx)' ;;
+        # the plan's name: one line of text (UTF-8 allowed), no control character, at most 96 bytes; empty: none
+        plan)      [ "$(printf '%s' "$value" | LC_ALL=C tr -d '\040-\176\200-\377'; echo x)" = x ] &&
+                       [ "$(printf '%s' "$value" | wc -c)" -le 96 ] ;;
         clear)     allowed "$value" 'yes' ;;
         *)         refuse 'Unknown data usage setting'; return ;;
     esac || { refuse 'Invalid value for this setting'; return; }
@@ -937,7 +1029,7 @@ m_update_act() {
         { refuse 'Unknown update operation'; return; }
     # a release tag (docs/FINDINGS.md 125: vYYYY.MM.DD, and vYYYY.MM.DD.N after v2026.10.27) or none
     allowed "$tag" '(v[0-9]{4}\.[0-9]{2}\.[0-9]{2}|v[0-9]{4}\.(0[1-9]|1[0-2])\.(0[1-9]|[12][0-9]|3[01])\.[1-9][0-9]?)?' && allowed "$systems" "($UPD_SYS( $UPD_SYS){0,2})?" &&
-        allowed "$kernel" '(5\.4|6\.18|7\.2)?' && allowed "$sha" '([0-9a-f]{64})?' && allowed "$size" '([1-9][0-9]{0,9})?' &&
+        allowed "$kernel" '(5\.4|6\.18|7\.2|7\.3)?' && allowed "$sha" '([0-9a-f]{64})?' && allowed "$size" '([1-9][0-9]{0,9})?' &&
         allowed "$flags" "($UPD_FLAG( $UPD_FLAG){0,2})?" && allowed "$confirm" '(apply|rollback|clean|kernel|source)?' &&
         # (the release source, op source: a plain http(s) URL, or empty for GitHub - the shape the updater itself
         #  takes, and what is written is one root's own file of its, which checks it again)
@@ -960,6 +1052,7 @@ do_list() {
 	"ops_log": { },
 	"lock_get": { "fresh": "String" },
 	"lock_set": { "kind": "String", "val": "String" },
+	"lock_job": { "id": "String" },
 	"sms_list": { "page": "String" },
 	"sms_show": { "id": "String" },
 	"sms_send": { "num": "String", "text": "String" },
@@ -980,6 +1073,11 @@ do_list() {
 	"simcard_set": { "kind": "String", "slot": "String", "state": "String" },
 	"ttl_get": { },
 	"ttl_set": { "value": "String" },
+	"tcp_get": { },
+	"tcp_set": { "value": "String" },
+	"boot_get": { },
+	"led_get": { },
+	"led_set": { "key": "String", "value": "String" },
 	"traffic_get": { },
 	"traffic_set": { "op": "String", "value": "String" },
 	"forward_get": { },
@@ -989,7 +1087,7 @@ do_list() {
 		"telegram_chat": "String", "email": "String", "email_host": "String", "email_port": "String",
 		"email_tls": "String", "email_user": "String", "email_password": "String", "email_from": "String",
 		"email_to": "String", "sms": "String", "sms_number": "String", "webhook_body": "String",
-		"webhook_expect": "String" },
+		"webhook_expect": "String", "webhook_secret": "String", "timeout": "String", "power": "String" },
 	"forward_test": { },
 	"forward_log_clear": { },
 	"cpu_get": { },
@@ -1137,6 +1235,7 @@ ops_detail() {
         update_act) inp '@.op'; allowed "$V" '[a-z_]{1,16}' && printf '%s\n' "$V" ;;
         cpu_voltage_set) inp '@.op'; allowed "$V" '[a-z]{1,8}' && printf '%s\n' "$V" ;;
         cpu_tune) inp '@.op'; allowed "$V" '[a-z]{1,10}' && printf '%s\n' "$V" ;;
+        led_set) inp '@.key'; allowed "$V" '[a-z_]{1,20}' && printf '%s\n' "$V" ;;
     esac
 }
 
@@ -1219,7 +1318,7 @@ run_m() {  # run_m LABEL FUNCTION: the method's reply, logged
     case $1 in
         # (the send's job logs its own result once it is in; the polls that ask after it are not worth a line each)
         ops_log|sms_job|update_job|backup_job) return ;;
-        sysinfo|status|signal|at_job|at_history|sms_list|sms_show|*_get|usb_net_list)
+        sysinfo|status|signal|at_job|lock_job|at_history|sms_list|sms_show|*_get|usb_net_list)
             [ "$how" != ok ] || [ "$dt" -ge 200 ] || [ -n "$detail" ] || return ;;
     esac
     ops_add "$(printf '%s %d.%02ds %s' "$stamp" $((dt / 100)) $((dt % 100)) "$how")"
@@ -1252,6 +1351,7 @@ call)
         ops_log)      run_m ops_log      m_ops_log ;;
         lock_get)     run_m lock_get     m_lock_get ;;
         lock_set)     run_m lock_set     m_lock_set ;;
+        lock_job)     run_m lock_job     m_lock_job ;;
         sms_list)     run_m sms_list     m_sms_list ;;
         sms_show)     run_m sms_show     m_sms_show ;;
         sms_send)     run_m sms_send     m_sms_send ;;
@@ -1272,6 +1372,11 @@ call)
         simcard_set)  run_m simcard_set  m_simcard_set ;;
         ttl_get)      run_m ttl_get      m_ttl_get ;;
         ttl_set)      run_m ttl_set      m_ttl_set ;;
+        tcp_get)      run_m tcp_get      m_tcp_get ;;
+        tcp_set)      run_m tcp_set      m_tcp_set ;;
+        boot_get)     run_m boot_get     m_boot_get ;;
+        led_get)      run_m led_get      m_led_get ;;
+        led_set)      run_m led_set      m_led_set ;;
         traffic_get)  run_m traffic_get  m_traffic_get ;;
         traffic_set)  run_m traffic_set  m_traffic_set ;;
         forward_get)  run_m forward_get  m_forward_get ;;

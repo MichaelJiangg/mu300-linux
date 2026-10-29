@@ -1163,7 +1163,7 @@ class ChooseSystems(ShellTest):
     def run_choose(self, shell, choice, answers='', preset='', size=100):
         m = re.search(r'# --- choose-systems begin\n(.*?)# --- choose-systems end', self.SRC, re.S)
         self.assertIsNotNone(m, 'install.sh has no choose-systems block')
-        code = (f'TOP="{TOP}"; . "$TOP/tools/i18n.sh"; MU300_LANG=en; OWRT_VER=25.12.5; '
+        code = (f'TOP="{TOP}"; . "$TOP/tools/i18n.sh"; MU300_LANG=en; OWRT_VER=25.12.6; '
                 f'NEED_OPENWRT=1; NEED_UBUNTU=2; NEED_BOTH=3; SIZE={size}; '
                 'say() { :; }; die() { echo "DIE $*"; exit 1; }; '
                 'ask() { printf "ASKED[%s] " "$3"; read -r _a; [ -n "$_a" ] || _a=$3; eval "$1=\\$_a"; }; '
@@ -1180,7 +1180,7 @@ class ChooseSystems(ShellTest):
         for shell in self.each_shell():
             out = self.run_choose(shell, 2, '1\n')
             self.assertIn('OSES=openwrt BOOT=openwrt', out, shell)
-            self.assertIn('1) OpenWrt 25.12.5: the standard LuCI', out)
+            self.assertIn('1) OpenWrt 25.12.6: the standard LuCI', out)
             self.assertNotIn('Which one should boot', out)
 
     def test_default_is_the_standard_openwrt(self):

@@ -52,6 +52,9 @@ msgstr "Sprog"
 msgid "Power"
 msgstr "Strøm"
 
+msgid "LEDs"
+msgstr "LED'er"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Værtstilstand afbryder USB-netværk og seriel forbindelse på denne por
 msgid "USB network mode"
 msgstr "USB-netværkstilstand"
 
+msgid "Current sharing protocol"
+msgstr "Aktuel delingsprotokol"
+
 msgid "Network protocol"
 msgstr "Netværksprotokol"
 
@@ -658,6 +664,27 @@ msgstr "Opdater"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Kun tilgængelig i værtstilstand. Opdater aktiverer fundne USB-adaptere; tilføjelse til LAN gemmer broen og genindlæser netværket."
 
+msgid "Network performance"
+msgstr "Netværksydelse"
+
+msgid "Active congestion control"
+msgstr "Aktiv overbelastningskontrol"
+
+msgid "Default queue"
+msgstr "Standardkø"
+
+msgid "TCP congestion control"
+msgstr "TCP-overbelastningskontrol"
+
+msgid "Apply"
+msgstr "Anvend"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Påvirker primært nye TCP-forbindelser, som denne enhed opretter. Videresendte forbindelser fra hotspot- og USB-klienter bruger ikke automatisk BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR vælger FQ som standardkø for nyoprettede grænseflader. Eksisterende forbindelser, grænseflader og QoS bevares. Indstillingerne bevares efter genstart."
+
 msgid "Recent modem operations"
 msgstr "Seneste modemhandlinger"
 
@@ -670,6 +697,12 @@ msgstr "Kontrolpanelets seneste kald fra denne og den forrige opstart: hvornår,
 msgid "Unavailable"
 msgstr "Utilgængelig"
 
+msgid "Mixed"
+msgstr "Blandet"
+
+msgid "None"
+msgstr "Ingen"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-netværkstilstand er ikke tilgængelig i værtstilstand; automatisk start af værtstilstand deaktiverer også automatisk start af USB-netværk."
 
@@ -681,9 +714,6 @@ msgstr "USB-netværk og seriel forbindelse enumereres igen i enhedstilstand."
 
 msgid "Switch USB role?"
 msgstr "Skift USB-rolle?"
-
-msgid "Apply"
-msgstr "Anvend"
 
 msgid "Switching USB role…"
 msgstr "Skifter USB-rolle…"
@@ -721,6 +751,21 @@ msgstr "Indstillinger gemt"
 msgid "Save failed: %s"
 msgstr "Gem mislykkedes: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Netværksydelsesindstillingerne kunne ikke læses; opdater for at prøve igen"
+
+msgid "This kernel does not provide this setting"
+msgstr "Denne kerne har ikke denne indstilling"
+
+msgid "System default"
+msgstr "Systemstandard"
+
+msgid "Applied and saved for future boots."
+msgstr "Anvendt og gemt til fremtidige opstarter."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Kernen accepterede ikke netværksindstillingerne"
+
 msgid "This boot"
 msgstr "Denne opstart"
 
@@ -739,6 +784,9 @@ msgstr "Søger efter USB-adaptere…"
 msgid "No USB adapters found."
 msgstr "Ingen USB-adaptere fundet."
 
+msgid "In use by another network"
+msgstr "Bruges af et andet netværk"
+
 msgid "Link connected"
 msgstr "Link forbundet"
 
@@ -747,6 +795,9 @@ msgstr "Intet link; aktivering forsøgt"
 
 msgid "Added to LAN"
 msgstr "Tilføjet til LAN"
+
+msgid "Cannot add"
+msgstr "Kan ikke tilføjes"
 
 msgid "Add to LAN"
 msgstr "Tilføj til LAN"
@@ -784,6 +835,9 @@ msgstr "Formular (URL-kodet)"
 msgid "Plain text"
 msgstr "Almindelig tekst"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Også {sim} (SIM 1 eller SIM 2) og {kind} (sms, test eller power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Modtagne beskeder videresendes, så snart de når SMS-puljen. En mislykket levering forsøges igen efter 30 s og derefter hver gang efter dobbelt så lang tid (højst en time), ti gange i alt."
 
@@ -811,6 +865,15 @@ msgstr "Kun beskeder, der indeholder et af disse ord"
 msgid "One per line; empty: every message."
 msgstr "Ét pr. linje; tom: alle beskeder."
 
+msgid "Battery"
+msgstr "Batteri"
+
+msgid "Battery and charger notices"
+msgstr "Meddelelser om batteri og oplader"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "En besked til alle mål, når batteriet passerer 5, 20, 40, 60, 80 eller 100 %, og når opladeren sættes i eller tages ud."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Brugerdefineret indhold"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Tom: standardfelterne (almindelig tekst: beskeden). Pladsholdere: {sender}, {time}, {text}, {device}, {message}. Hver værdi escapes efter den valgte type. Dette indhold vises her igen: læg hemmeligheder i adressen eller i en header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Hemmelighed til {secret} i den egen brødtekst"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Til en tjeneste, der vil have sit token i brødteksten (PushPlus). Gemmes kun til denne adresse: en ny adresse skal have det igen."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Ekstra headere (én \"Navn: værdi\" pr. linje)"
 
@@ -840,6 +909,9 @@ msgstr "Svaret skal indeholde"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Tom: ethvert HTTP 2xx-svar tæller som leveret. Med nøgle=værdi (for eksempel errcode=0) skal svaret desuden være et JSON-objekt, der har denne værdi under denne nøgle på øverste niveau; ellers mislykkes leveringen. Kun resultatet af kontrollen logges, aldrig svaret."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Tidsgrænse for forespørgsel (sekunder, 1-120; webhook og Telegram)"
 
 msgid "Bot token"
 msgstr "Bot-token"
@@ -861,9 +933,6 @@ msgstr "Port"
 
 msgid "Security"
 msgstr "Sikkerhed"
-
-msgid "None"
-msgstr "Ingen"
 
 msgid "User name"
 msgstr "Brugernavn"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux låst"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ja: næste genstart starter Android"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "Writable"
+msgstr "Skrivbar"
+
+msgid "This boot image cannot change the boot"
+msgstr "Dette boot-image kan ikke ændre opstarten"
+
 msgid "%s of %s"
 msgstr "%s af %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Hukommelse"
 
 msgid "Storage"
 msgstr "Lager"
-
-msgid "Battery"
-msgstr "Batteri"
 
 msgid "Channel"
 msgstr "Kanal"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi-hotspot"
 msgid "Restart modem"
 msgstr "Genstart modem"
 
-msgid "Restart device"
-msgstr "Genstart enhed"
+msgid "Power off or restart"
+msgstr "Sluk eller genstart"
 
 msgid "Switch to Android"
 msgstr "Skift til Android"
 
 msgid "Lock Linux"
 msgstr "Lås Linux"
+
+msgid "Default boot"
+msgstr "Standardopstart"
+
+msgid "One-time boot"
+msgstr "Engangsopstart"
+
+msgid "Boot control"
+msgstr "Opstartsstyring"
 
 msgid "Neighbor cells"
 msgstr "Naboceller"
@@ -1125,6 +1215,9 @@ msgstr "Frekvens"
 
 msgid "Running %s…"
 msgstr "Kører %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspot-indstillinger gemt; ændringerne anvendes"
 
 msgid "Started in background: %s"
 msgstr "Startet i baggrunden: %s"
@@ -1165,11 +1258,14 @@ msgstr "Mobildata bruges også på roamingnetværk, hvilket kan koste ekstra. No
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobilforbindelsen kan stoppe i 1–2 minutter."
 
-msgid "Restart the entire device"
-msgstr "Genstart hele enheden"
-
 msgid "All connections will be interrupted."
 msgstr "Alle forbindelser vil blive afbrudt."
+
+msgid "Power off"
+msgstr "Sluk"
+
+msgid "Restart"
+msgstr "Genstart"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Næste opstart går til Android, og enheden genstarter nu. Denne administrationsside og mobildelingen afbrydes."
@@ -1243,6 +1339,9 @@ msgstr "Intern SIM valgt: bruges efter en genstart"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Intern SIM valgt, men understøttes ikke på denne enhed: den eksterne SIM er i brug"
 
+msgid "in use"
+msgstr "i brug"
+
 msgid "Uptime %s"
 msgstr "Oppetid %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE-link"
 msgid "Hidden"
 msgstr "Skjult"
 
-msgid "No"
-msgstr "Nej"
-
 msgid "Running"
 msgstr "Kører"
 
@@ -1371,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "AT-adapter utilgængelig"
-
-msgid "Linux locked"
-msgstr "Linux låst"
 
 msgid "Installing the language pack…"
 msgstr "Installerer sprogpakken…"
@@ -1453,6 +1546,51 @@ msgstr "Oversat"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI's egne oversættelser kommer fra OpenWrt. Dette panels oversættelser ud over tyrkisk og kinesisk er maskinoversættelser (AI); rettelser er velkomne."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Angiv et helt tal fra 0 til %d"
+
+msgid "Network lamp"
+msgstr "Netværkslampe"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-lampe"
+
+msgid "Battery lamp"
+msgstr "Batterilampe"
+
+msgid "On"
+msgstr "Til"
+
+msgid "Brightness (%)"
+msgstr "Lysstyrke (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "En slukket lampe forbliver mørk; varmealarmen vises stadig på sin LED."
+
+msgid "Device default"
+msgstr "Enhedens standard"
+
+msgid "LED timeout (seconds)"
+msgstr "LED-timeout (sekunder)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Hvor længe LED'erne lyser efter et tastetryk eller en ændring; 0 holder dem tændt. På en oplader forbliver de tændt."
+
+msgid "Boot indicator"
+msgstr "Opstartsindikator"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED'en viser sine farver efter tur, mens systemet starter"
+
+msgid "Heat alarm"
+msgstr "Varmealarm"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Rødt blink"
+
 msgid "Automatic"
 msgstr "Automatisk"
 
@@ -1494,6 +1632,21 @@ msgstr "Lås aktuel betjenende celle"
 
 msgid "Unlock cell"
 msgstr "Lås celle op"
+
+msgid "Enter a cell"
+msgstr "Angiv en celle"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanalnummer (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Lås denne celle"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Et kanalnummer, ikke en frekvens i MHz; cellen behøver ikke at være på listen over naboceller."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Anvendelse genstarter radiostakken (SFUN) og afbryder mobiltjenesten kortvarigt. Indstillingerne gemmes og genanvendes af pluginet, når AT er klar, hvis Anvend ved opstart er aktiveret. En platform-hook før radioen kan genanvende uden genstart. Anvend uden valgte bånd for at gendanne automatisk tilstand."
@@ -1582,17 +1735,20 @@ msgstr "Låser %s i baggrunden…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s låst i baggrunden (SFUN-genstart, ca. 30 sekunder); læser status tilbage…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Angiv et kanalnummer og en PCI inden for intervallerne nedenfor"
+
 msgid "No serving-network data"
 msgstr "Ingen data om betjenende netværk"
 
 msgid "NR serving cell"
 msgstr "Betjenende NR-celle"
 
-msgid "Status confirmed"
-msgstr "Status bekræftet"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Tilbagelæsning fik timeout; vælg “Opdater låsestatus”"
+
+msgid "Status confirmed"
+msgstr "Status bekræftet"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Nulstilling bekræftet: netværkstilstand automatisk, EN-DC til, alle bånd, ingen cellelås; de gemte låseindstillinger er ryddet"
@@ -1732,9 +1888,6 @@ msgstr "vækket af %s-knappen"
 msgid "the modem is suspended (%s)"
 msgstr "modemmet er sat på pause (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Angiv et helt tal fra 0 til %d"
-
 msgid "Power status unavailable"
 msgstr "Strømstatus ikke tilgængelig"
 
@@ -1792,6 +1945,12 @@ msgstr "Opladning sat på pause: batteritemperatur"
 msgid "Charging paused: charge limit"
 msgstr "Opladning sat på pause: opladningsgrænse"
 
+msgid "Charging paused: by hand"
+msgstr "Opladning sat på pause: manuelt"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Oplader helt én gang og vender så tilbage til grænsen"
+
 msgid "Sleep now"
 msgstr "Sov nu"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % oplader aldrig batteriet (enheden kører på opladeren), 100 % lader
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % skåner batteriet i en enhed, der bliver siddende i stikket."
 
+msgid "Start charging again under"
+msgstr "Start opladning igen under"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 starter igen 5 point under stopniveauet. En lavere værdi starter først opladningen igen under den; med 100 % venter et fuldt batteri, til det falder under den."
+
+msgid "Resume charging"
+msgstr "Genoptag opladning"
+
+msgid "Pause charging"
+msgstr "Sæt opladning på pause"
+
+msgid "Cancel the full charge"
+msgstr "Annuller fuld opladning"
+
+msgid "Charge to full once"
+msgstr "Oplad helt én gang"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "På pause oplades batteriet ikke, og enheden kører på opladeren; under 5 % oplades det stadig, og temperaturbeskyttelsen gælder altid."
+
 msgid "When the charger switches the device on"
 msgstr "Når opladeren tænder enheden"
 
@@ -1830,9 +2010,6 @@ msgstr "Lad være som det er"
 
 msgid "LTE only (5G off)"
 msgstr "Kun LTE (5G fra)"
-
-msgid "On"
-msgstr "Til"
 
 msgid "Full"
 msgstr "Fuld"
@@ -2057,9 +2234,6 @@ msgstr "Modemets standard"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "i brug"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Sluk radioen i SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Slettet (kun lokalt)"
 msgid "Enter both a number and a message."
 msgstr "Indtast både et nummer og en besked."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-lager: %d af %d pladser i brug (kl. %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d beskeder, %d ulæste · %d samtaler"
 
@@ -2234,8 +2411,26 @@ msgstr "Månedsgrænse"
 msgid "%s, warning at %d%%"
 msgstr "%s, advarsel ved %d%%"
 
+msgid "Daily quota"
+msgstr "Daglig kvote"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Månedsgrænsen er nået: mobildata blev slået fra. Det tændes igen, når næste periode begynder."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Den daglige kvote er nået: mobildata blev slået fra. De slås til igen ved midnat."
+
+msgid "The daily quota is reached"
+msgstr "Den daglige kvote er nået"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% af den daglige kvote er brugt"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Grænsen og den daglige kvote tæller kun downloads."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Grænsen og den daglige kvote tæller kun uploads."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s venter på uret: det er endnu ikke stillet via netværket. Det tæller allerede med i denne periode og kommer på sin dag, når uret er stillet."
@@ -2267,6 +2462,9 @@ msgstr "Pr. faktureringsperiode"
 msgid "Billing cycle"
 msgstr "Faktureringsperiode"
 
+msgid "Counted"
+msgstr "Talt"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Angiv en størrelse i GB, for eksempel 50 eller 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Slå mobildata fra ved grænsen"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Når denne periode når grænsen, slås mobildata fra: intet internet via operatøren, før næste periode begynder, grænsen hæves, eller dette slås fra igen. Mobildata, der tændes igen i hånden, forbliver tændt til næste genstart."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Slå mobildata fra ved den daglige kvote"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Når dagens forbrug når den daglige kvote, slås mobildata fra indtil midnat, indtil kvoten hæves, eller indtil dette slås fra igen. Slår du mobildata til manuelt, forbliver de tændt indtil næste genstart."
+
+msgid "Both ways"
+msgstr "Begge veje"
+
+msgid "Downloads only"
+msgstr "Kun downloads"
+
+msgid "Uploads only"
+msgstr "Kun uploads"
 
 msgid "Set"
 msgstr "Sæt"
@@ -2302,6 +2515,15 @@ msgstr "Månedsgrænse (GB, 0: ingen)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Advar ved denne procentdel af grænsen"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Daglig kvote (GB, 0: ingen)"
+
+msgid "The cap and the daily quota count"
+msgstr "Hvad grænsen og den daglige kvote tæller"
+
+msgid "Plan name"
+msgstr "Abonnementets navn"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Brugt indtil nu i denne periode (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Enheden genstarter nu. Standardopstarten er Android, så den starter And
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Enheden genstarter nu og er væk i cirka et minut. Hvis det nye system ikke starter, går enheden selv tilbage til Android efter de mislykkede forsøg."
 
-msgid "Restart"
-msgstr "Genstart"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Genstarter… åbn denne side igen om cirka et minut."
 
@@ -2468,9 +2687,6 @@ msgstr "Boot-image"
 msgid "from the installer"
 msgstr "fra installationsprogrammet"
 
-msgid "Default boot"
-msgstr "Standardopstart"
-
 msgid "Free space"
 msgstr "Ledig plads"
 
@@ -2527,6 +2743,9 @@ msgstr "Udgivelsesnoter"
 
 msgid "Download"
 msgstr "Hentning"
+
+msgid "only what changed since the installed release"
+msgstr "kun det, der er ændret siden den installerede udgivelse"
 
 msgid "Free space needed"
 msgstr "Nødvendig ledig plads"
@@ -3056,9 +3275,6 @@ msgstr "Registrer"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL'en kan indeholde et token: det sendes til enheden for sig selv, aldrig ind i en kommandolinje eller en log."
 
-msgid "Type"
-msgstr "Type"
-
 msgid "Share link"
 msgstr "Delingslink"
 
@@ -3388,6 +3604,21 @@ msgstr "Ukendt låsetype"
 msgid "Invalid value for this lock kind"
 msgstr "Ugyldig værdi for denne låsetype"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Lås af bånd, tilstand og celle understøttes endnu ikke for SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Lås af bånd, tilstand og celle understøttes ikke, mens dobbelt-SIM-skift styrer radioen"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Dette modem understøtter ingen af disse bånd"
+
+msgid "Lock change failed"
+msgstr "Låseændringen mislykkedes"
+
+msgid "Invalid job id"
+msgstr "Ugyldigt job-id"
+
 msgid "Invalid page"
 msgstr "Ugyldig side"
 
@@ -3478,14 +3709,29 @@ msgstr "TTL-adapteren gav intet gyldigt svar"
 msgid "Invalid TTL"
 msgstr "Ugyldig TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP-adapteren gav intet gyldigt svar"
+
+msgid "Invalid congestion control"
+msgstr "Ugyldig overbelastningskontrol"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Opstartsadapteren gav intet gyldigt svar"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED-adapteren gav intet gyldigt svar"
+
+msgid "Unknown LED setting"
+msgstr "Ukendt LED-indstilling"
+
+msgid "Invalid value for this setting"
+msgstr "Ugyldig værdi for denne indstilling"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adapteren til dataforbrug gav intet gyldigt svar"
 
 msgid "Unknown data usage setting"
 msgstr "Ukendt indstilling for dataforbrug"
-
-msgid "Invalid value for this setting"
-msgstr "Ugyldig værdi for denne indstilling"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Videresendelsesadapteren gav intet gyldigt svar"
@@ -3731,8 +3977,29 @@ msgstr "Radioen fulgte ikke sin indstilling"
 msgid "The data roaming setting could not be saved"
 msgstr "Indstillingen for dataroaming kunne ikke gemmes"
 
-msgid "Expected on or off"
-msgstr "Forventede on eller off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspot-indstillingen er gemt, men genindlæsning af trådløs fejlede"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "De trådløse indstillinger har ugemte ændringer: gem eller fortryd dem først"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspottet skiftes allerede; prøv igen om lidt"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Intet hotspot (adgangspunkt) er konfigureret"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "At tænde denne radio vil påvirke en anden grænseflade; brug siden Trådløst"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Radioen bruges af Wi-Fi-klienten"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspot-indstillingen kunne ikke skrives"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Denne platform har ingen hotspot-styring"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN-integration leveres ikke af denne platform"
@@ -3833,6 +4100,15 @@ msgstr "Ikke en USB-netværksgrænseflade"
 msgid "LAN bridge device section was not found"
 msgstr "Enhedssektionen for LAN-broen blev ikke fundet"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Kunne ikke afgøre, hvem adapteren tilhører; prøv igen senere"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adapteren tilhører et andet netværk og kan ikke tilføjes LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Netværksindstillingerne har ugemte ændringer: gem eller fortryd dem først"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Kan ikke aktivere USB-netværksgrænsefladen"
 
@@ -3865,6 +4141,12 @@ msgstr "Webhookens indhold er for langt eller indeholder et kontroltegn"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Svarkontrollen skal være nøgle=værdi, som errcode=0 eller ok=true (værdien et heltal eller små bogstaver, højst 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Ugyldig webhook-hemmelighed (op til 256 synlige tegn, ingen mellemrum)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Tidsgrænsen skal være 1 til 120 sekunder"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Ugyldig header (én \"Navn: værdi\" pr. linje; Host, Content-Type, Content-Length, Transfer-Encoding og Connection sættes af enheden)"
@@ -3926,8 +4208,17 @@ msgstr "En installation kører allerede"
 msgid "The language pack could not be removed"
 msgstr "Sprogpakken kunne ikke fjernes"
 
+msgid "The LED settings could not be read"
+msgstr "LED-indstillingerne kunne ikke læses"
+
+msgid "The LED setting could not be saved"
+msgstr "LED-indstillingen kunne ikke gemmes"
+
 msgid "Lock cache unavailable"
 msgstr "Låsecache utilgængelig"
+
+msgid "The modem refused a write"
+msgstr "Modemmet afviste en skrivning"
 
 msgid "The saved locks could not be cleared"
 msgstr "De gemte låse kunne ikke ryddes"
@@ -3938,9 +4229,6 @@ msgstr "Ingen betjenende celle at låse til"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modemmet svarede ikke på tilstandsforespørgslen; intet blev sendt"
 
-msgid "The modem refused a write"
-msgstr "Modemmet afviste en skrivning"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Tilbagelæsningen stemmer ikke med de automatiske værdier"
 
@@ -3949,6 +4237,21 @@ msgstr "Tilbagelæsningen efter genstart af stakken stemmer ikke med de automati
 
 msgid "The reset was interrupted"
 msgstr "Nulstillingen blev afbrudt"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Resultatet af denne låseændring kendes ikke længere"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Låseændringen tog for lang tid; vælg “Opdater låsestatus”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Låseændringen blev afbrudt; vælg “Opdater låsestatus”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "En anden låseændring er ved at blive startet; prøv igen om et øjeblik"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "For mange låseændringer venter; prøv igen, når de er afsluttet"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Geninstallation af pakker er ikke tilgængelig på dette system"
@@ -3967,6 +4270,12 @@ msgstr "Ukendt pakkehandling"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Denne platform har ingen TCP-overbelastningskontrol"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP-indstillingerne kunne ikke læses"
 
 msgid "Data usage is not available on this system"
 msgstr "Dataforbrug er ikke tilgængeligt på dette system"

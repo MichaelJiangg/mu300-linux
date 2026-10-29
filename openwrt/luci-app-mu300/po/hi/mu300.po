@@ -52,6 +52,9 @@ msgstr "भाषाएँ"
 msgid "Power"
 msgstr "पावर"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "होस्ट मोड इस पोर्ट पर USB नेटव
 msgid "USB network mode"
 msgstr "USB नेटवर्क मोड"
 
+msgid "Current sharing protocol"
+msgstr "वर्तमान साझाकरण प्रोटोकॉल"
+
 msgid "Network protocol"
 msgstr "नेटवर्क प्रोटोकॉल"
 
@@ -658,6 +664,27 @@ msgstr "रीफ़्रेश करें"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "केवल होस्ट मोड में उपलब्ध। रीफ़्रेश करने पर मिले हुए USB एडेप्टर चालू हो जाते हैं; LAN में जोड़ने से ब्रिज सहेजा जाता है और नेटवर्किंग पुनः लोड होती है।"
 
+msgid "Network performance"
+msgstr "नेटवर्क प्रदर्शन"
+
+msgid "Active congestion control"
+msgstr "सक्रिय कंजेशन नियंत्रण"
+
+msgid "Default queue"
+msgstr "डिफ़ॉल्ट कतार"
+
+msgid "TCP congestion control"
+msgstr "TCP कंजेशन नियंत्रण"
+
+msgid "Apply"
+msgstr "लागू करें"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "मुख्य रूप से इस डिवाइस के नए TCP कनेक्शन प्रभावित होते हैं। हॉटस्पॉट और USB क्लाइंट के अग्रेषित कनेक्शन अपने आप BBR का उपयोग नहीं करते।"
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR नए बनाए गए इंटरफ़ेस के लिए FQ को डिफ़ॉल्ट कतार चुनता है। मौजूदा कनेक्शन, इंटरफ़ेस और QoS बने रहते हैं। सेटिंग्स रीबूट के बाद भी बनी रहती हैं।"
+
 msgid "Recent modem operations"
 msgstr "हाल के मॉडेम संचालन"
 
@@ -670,6 +697,12 @@ msgstr "इस और पिछले बूट में कंट्रोल 
 msgid "Unavailable"
 msgstr "अनुपलब्ध"
 
+msgid "Mixed"
+msgstr "मिश्रित"
+
+msgid "None"
+msgstr "कोई नहीं"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "होस्ट मोड में USB नेटवर्क मोड उपलब्ध नहीं है; होस्ट ऑटो-स्टार्ट USB नेटवर्क का ऑटो-स्टार्ट भी बंद कर देता है।"
 
@@ -681,9 +714,6 @@ msgstr "डिवाइस मोड में USB नेटवर्किं�
 
 msgid "Switch USB role?"
 msgstr "USB भूमिका बदलें?"
-
-msgid "Apply"
-msgstr "लागू करें"
 
 msgid "Switching USB role…"
 msgstr "USB भूमिका बदली जा रही है…"
@@ -721,6 +751,21 @@ msgstr "सेटिंग्स सहेजी गईं"
 msgid "Save failed: %s"
 msgstr "सहेजना विफल: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "नेटवर्क प्रदर्शन सेटिंग्स नहीं पढ़ी जा सकीं; पुनः प्रयास के लिए रीफ़्रेश करें"
+
+msgid "This kernel does not provide this setting"
+msgstr "यह कर्नेल यह सेटिंग प्रदान नहीं करता"
+
+msgid "System default"
+msgstr "सिस्टम डिफ़ॉल्ट"
+
+msgid "Applied and saved for future boots."
+msgstr "लागू किया गया और आगे के बूट के लिए सहेजा गया।"
+
+msgid "The kernel did not accept the network settings"
+msgstr "कर्नेल ने नेटवर्क सेटिंग्स स्वीकार नहीं कीं"
+
 msgid "This boot"
 msgstr "यह बूट"
 
@@ -739,6 +784,9 @@ msgstr "USB एडेप्टर स्कैन किए जा रहे ह
 msgid "No USB adapters found."
 msgstr "कोई USB एडेप्टर नहीं मिला।"
 
+msgid "In use by another network"
+msgstr "किसी अन्य नेटवर्क द्वारा उपयोग में"
+
 msgid "Link connected"
 msgstr "लिंक जुड़ा है"
 
@@ -747,6 +795,9 @@ msgstr "लिंक नहीं; सक्षम करने का प्र
 
 msgid "Added to LAN"
 msgstr "LAN में जोड़ा गया"
+
+msgid "Cannot add"
+msgstr "जोड़ा नहीं जा सकता"
 
 msgid "Add to LAN"
 msgstr "LAN में जोड़ें"
@@ -784,6 +835,9 @@ msgstr "फ़ॉर्म (URL-एन्कोडेड)"
 msgid "Plain text"
 msgstr "सादा पाठ"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "साथ ही {sim} (SIM 1 या SIM 2) और {kind} (sms, test या power)।"
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "प्राप्त संदेश SMS पूल में पहुँचते ही आगे भेजे जाते हैं। विफल डिलीवरी 30 सेकंड बाद फिर आज़माई जाती है, फिर हर बार दोगुने समय बाद (अधिकतम एक घंटा), कुल दस बार।"
 
@@ -811,6 +865,15 @@ msgstr "केवल वे संदेश जिनमें इनमें �
 msgid "One per line; empty: every message."
 msgstr "प्रति पंक्ति एक; खाली: सभी संदेश।"
 
+msgid "Battery"
+msgstr "बैटरी"
+
+msgid "Battery and charger notices"
+msgstr "बैटरी और चार्जर सूचनाएँ"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "जब बैटरी 5, 20, 40, 60, 80 या 100 % पार करे और जब चार्जर लगाया या निकाला जाए, तब हर लक्ष्य को एक संदेश।"
+
 msgid "Webhook"
 msgstr "वेबहुक"
 
@@ -832,6 +895,12 @@ msgstr "कस्टम बॉडी"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "खाली: मानक फ़ील्ड (सादा पाठ: संदेश)। प्लेसहोल्डर: {sender}, {time}, {text}, {device}, {message}। हर मान चुने गए प्रकार के अनुसार एस्केप किया जाता है। यह बॉडी यहाँ फिर दिखाई जाती है: गोपनीय जानकारी पते या किसी हेडर में रखें।"
 
+msgid "Secret for {secret} in the custom body"
+msgstr "कस्टम बॉडी में {secret} के लिए गुप्त मान"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "उस सेवा के लिए जो अपना टोकन बॉडी में चाहती है (PushPlus)। केवल इसी पते के लिए सहेजा जाता है: नए पते को इसकी फिर ज़रूरत होगी।"
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "अतिरिक्त हेडर (प्रति पंक्ति एक \"Name: value\")"
 
@@ -840,6 +909,9 @@ msgstr "उत्तर में यह होना चाहिए"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "खाली: हर HTTP 2xx उत्तर डिलीवर माना जाता है। कुंजी=मान (उदाहरण के लिए errcode=0) देने पर उत्तर साथ ही ऐसा JSON ऑब्जेक्ट होना चाहिए जिसके शीर्ष स्तर पर इस कुंजी के नीचे यही मान हो; अन्यथा डिलीवरी विफल होती है। लॉग में केवल जाँच का परिणाम लिखा जाता है, उत्तर कभी नहीं।"
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "अनुरोध समय-सीमा (सेकंड, 1-120; webhook और Telegram)"
 
 msgid "Bot token"
 msgstr "बॉट टोकन"
@@ -861,9 +933,6 @@ msgstr "पोर्ट"
 
 msgid "Security"
 msgstr "सुरक्षा"
-
-msgid "None"
-msgstr "कोई नहीं"
 
 msgid "User name"
 msgstr "उपयोगकर्ता नाम"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux लॉक है"
+
+msgid "Yes: the next restart starts Android"
+msgstr "हाँ: अगला रीस्टार्ट Android शुरू करेगा"
+
+msgid "No"
+msgstr "नहीं"
+
+msgid "Writable"
+msgstr "लिखने योग्य"
+
+msgid "This boot image cannot change the boot"
+msgstr "यह बूट इमेज बूट नहीं बदल सकती"
+
 msgid "%s of %s"
 msgstr "%s / %s"
 
@@ -1032,9 +1116,6 @@ msgstr "मेमोरी"
 
 msgid "Storage"
 msgstr "स्टोरेज"
-
-msgid "Battery"
-msgstr "बैटरी"
 
 msgid "Channel"
 msgstr "चैनल"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi हॉटस्पॉट"
 msgid "Restart modem"
 msgstr "मॉडेम पुनः आरंभ करें"
 
-msgid "Restart device"
-msgstr "डिवाइस पुनः आरंभ करें"
+msgid "Power off or restart"
+msgstr "बंद करें या पुनः आरंभ करें"
 
 msgid "Switch to Android"
 msgstr "Android पर जाएँ"
 
 msgid "Lock Linux"
 msgstr "Linux लॉक करें"
+
+msgid "Default boot"
+msgstr "डिफ़ॉल्ट बूट"
+
+msgid "One-time boot"
+msgstr "एक-बार का बूट"
+
+msgid "Boot control"
+msgstr "बूट नियंत्रण"
 
 msgid "Neighbor cells"
 msgstr "पड़ोसी सेल"
@@ -1125,6 +1215,9 @@ msgstr "आवृत्ति"
 
 msgid "Running %s…"
 msgstr "%s चल रहा है…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "हॉटस्पॉट सेटिंग्स सहेजी गईं; बदलाव लागू हो रहे हैं"
 
 msgid "Started in background: %s"
 msgstr "पृष्ठभूमि में शुरू किया गया: %s"
@@ -1165,11 +1258,14 @@ msgstr "मोबाइल डेटा रोमिंग नेटवर्क
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "सेल्युलर कनेक्टिविटी 1–2 मिनट के लिए रुक सकती है।"
 
-msgid "Restart the entire device"
-msgstr "पूरा डिवाइस पुनः आरंभ करें"
-
 msgid "All connections will be interrupted."
 msgstr "सभी कनेक्शन बाधित होंगे।"
+
+msgid "Power off"
+msgstr "बंद करें"
+
+msgid "Restart"
+msgstr "रीस्टार्ट करें"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "अगला बूट Android में होगा और डिवाइस अभी रीबूट होगा। यह प्रबंधन पेज और सेल्युलर शेयरिंग डिस्कनेक्ट हो जाएँगे।"
@@ -1243,6 +1339,9 @@ msgstr "आंतरिक SIM चुना गया: रीबूट के �
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "आंतरिक SIM चुना गया, पर इस डिवाइस पर समर्थित नहीं है: बाहरी SIM उपयोग में है"
 
+msgid "in use"
+msgstr "उपयोग में"
+
 msgid "Uptime %s"
 msgstr "अपटाइम %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE लिंक"
 msgid "Hidden"
 msgstr "छिपा"
 
-msgid "No"
-msgstr "नहीं"
-
 msgid "Running"
 msgstr "चल रहा है"
 
@@ -1371,9 +1467,6 @@ msgstr "ऑनलाइन"
 
 msgid "AT adapter unavailable"
 msgstr "AT एडेप्टर उपलब्ध नहीं"
-
-msgid "Linux locked"
-msgstr "Linux लॉक है"
 
 msgid "Installing the language pack…"
 msgstr "भाषा पैक इंस्टॉल किया जा रहा है…"
@@ -1453,6 +1546,51 @@ msgstr "अनुवादित"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCI के अपने अनुवाद OpenWrt से आते हैं। तुर्की और चीनी के अलावा इस पैनल के अनुवाद मशीनी (AI) अनुवाद हैं; सुधारों का स्वागत है।"
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "0 से %d के बीच की पूर्ण संख्या दर्ज करें"
+
+msgid "Network lamp"
+msgstr "नेटवर्क लैंप"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi लैंप"
+
+msgid "Battery lamp"
+msgstr "बैटरी लैंप"
+
+msgid "On"
+msgstr "चालू"
+
+msgid "Brightness (%)"
+msgstr "चमक (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "बंद किया गया लैंप अंधेरा रहता है; ताप अलार्म फिर भी अपने LED पर दिखता है।"
+
+msgid "Device default"
+msgstr "डिवाइस का डिफ़ॉल्ट"
+
+msgid "LED timeout (seconds)"
+msgstr "LED टाइमआउट (सेकंड)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "किसी बटन के दबने या बदलाव के बाद LED कितनी देर जले रहते हैं; 0 उन्हें जलाए रखता है। चार्जर पर वे जले रहते हैं।"
+
+msgid "Boot indicator"
+msgstr "बूट संकेतक"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "सिस्टम शुरू होते समय LED बारी-बारी से अपने रंग दिखाता है"
+
+msgid "Heat alarm"
+msgstr "ताप अलार्म"
+
+msgid "Siren"
+msgstr "सायरन"
+
+msgid "Red blink"
+msgstr "लाल झपकना"
+
 msgid "Automatic"
 msgstr "स्वचालित"
 
@@ -1494,6 +1632,21 @@ msgstr "वर्तमान सर्विंग सेल लॉक कर�
 
 msgid "Unlock cell"
 msgstr "सेल अनलॉक करें"
+
+msgid "Enter a cell"
+msgstr "सेल दर्ज करें"
+
+msgid "Type"
+msgstr "प्रकार"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "चैनल संख्या (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "इस सेल को लॉक करें"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. चैनल संख्या, MHz में आवृत्ति नहीं; सेल का पड़ोसी सूची में होना ज़रूरी नहीं है।"
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "लागू करने से रेडियो स्टैक (SFUN) पुनः आरंभ होता है और सेल्युलर सेवा कुछ देर बाधित होती है। सेटिंग्स सहेजी जाती हैं और “स्टार्टअप पर लागू करें” सक्षम होने पर AT तैयार होने के बाद प्लगइन उन्हें दोबारा लागू करता है। प्लेटफ़ॉर्म का प्री-रेडियो हुक बिना पुनः आरंभ के उन्हें लागू कर सकता है। स्वचालित मोड पर लौटने के लिए बिना कोई बैंड चुने लागू करें।"
@@ -1582,17 +1735,20 @@ msgstr "%s को पृष्ठभूमि में लॉक किया �
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s पृष्ठभूमि में लॉक किया गया (SFUN पुनः आरंभ, लगभग 30 सेकंड); स्थिति वापस पढ़ी जा रही है…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "नीचे दी गई सीमाओं में चैनल संख्या और PCI दर्ज करें"
+
 msgid "No serving-network data"
 msgstr "सर्विंग नेटवर्क का कोई डेटा नहीं"
 
 msgid "NR serving cell"
 msgstr "NR सर्विंग सेल"
 
-msgid "Status confirmed"
-msgstr "स्थिति की पुष्टि हुई"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "वापस पढ़ने का समय समाप्त; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "Status confirmed"
+msgstr "स्थिति की पुष्टि हुई"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "रीसेट सत्यापित: नेटवर्क मोड स्वचालित, EN-DC चालू, सभी बैंड, कोई सेल लॉक नहीं; सहेजी गई लॉक सेटिंग्स साफ़ कर दी गईं"
@@ -1732,9 +1888,6 @@ msgstr "%s बटन से जागा"
 msgid "the modem is suspended (%s)"
 msgstr "मॉडेम निलंबित है (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "0 से %d के बीच की पूर्ण संख्या दर्ज करें"
-
 msgid "Power status unavailable"
 msgstr "पावर स्थिति उपलब्ध नहीं है"
 
@@ -1792,6 +1945,12 @@ msgstr "चार्जिंग रुकी: बैटरी का ताप�
 msgid "Charging paused: charge limit"
 msgstr "चार्जिंग रुकी: चार्ज सीमा"
 
+msgid "Charging paused: by hand"
+msgstr "चार्जिंग रुकी: हाथ से"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "एक बार पूरा चार्ज, फिर सीमा पर वापस"
+
 msgid "Sleep now"
 msgstr "अभी सुलाएँ"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % बैटरी को कभी चार्ज नहीं कर
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % हमेशा बिजली से जुड़े रहने वाले डिवाइस में बैटरी को स्वस्थ रखता है।"
 
+msgid "Start charging again under"
+msgstr "इससे नीचे फिर चार्ज शुरू करें"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 रुकने के स्तर से 5 अंक नीचे फिर शुरू करता है। कम मान चार्जिंग को केवल उसके नीचे फिर शुरू करता है; 100 % के साथ, भरी बैटरी उसके नीचे आने तक रुकती है।"
+
+msgid "Resume charging"
+msgstr "चार्जिंग फिर शुरू करें"
+
+msgid "Pause charging"
+msgstr "चार्जिंग रोकें"
+
+msgid "Cancel the full charge"
+msgstr "पूरा चार्ज रद्द करें"
+
+msgid "Charge to full once"
+msgstr "एक बार पूरा चार्ज करें"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "रुकने पर बैटरी चार्ज नहीं होती और डिवाइस चार्जर से चलता है; 5 % से नीचे यह फिर भी चार्ज होती है, और तापमान सुरक्षा हमेशा लागू रहती है।"
+
 msgid "When the charger switches the device on"
 msgstr "जब चार्जर डिवाइस को चालू करे"
 
@@ -1830,9 +2010,6 @@ msgstr "जैसा है वैसा रखें"
 
 msgid "LTE only (5G off)"
 msgstr "केवल LTE (5G बंद)"
-
-msgid "On"
-msgstr "चालू"
 
 msgid "Full"
 msgstr "पूर्ण"
@@ -2057,9 +2234,6 @@ msgstr "मॉडेम का डिफ़ॉल्ट"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "उपयोग में"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "SIM%d का रेडियो बंद करें"
 
@@ -2159,6 +2333,9 @@ msgstr "हटाया गया (केवल स्थानीय)"
 msgid "Enter both a number and a message."
 msgstr "नंबर और संदेश दोनों दर्ज करें।"
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM संग्रहण: %d में से %d स्लॉट उपयोग में (%s पर)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d संदेश, %d अपठित · %d बातचीत"
 
@@ -2234,8 +2411,26 @@ msgstr "मासिक सीमा"
 msgid "%s, warning at %d%%"
 msgstr "%s, %d%% पर चेतावनी"
 
+msgid "Daily quota"
+msgstr "दैनिक कोटा"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "मासिक सीमा पूरी हो गई: मोबाइल डेटा बंद कर दिया गया। अगला चक्र शुरू होने पर यह फिर चालू होगा।"
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "दैनिक कोटा पूरा हो गया: मोबाइल डेटा बंद कर दिया गया। यह आधी रात को फिर चालू होगा।"
+
+msgid "The daily quota is reached"
+msgstr "दैनिक कोटा पूरा हो गया"
+
+msgid "%d%% of the daily quota is used"
+msgstr "दैनिक कोटे का %d%% उपयोग हो चुका है"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "सीमा और दैनिक कोटा केवल डाउनलोड गिनते हैं।"
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "सीमा और दैनिक कोटा केवल अपलोड गिनते हैं।"
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s घड़ी की प्रतीक्षा में है: घड़ी अभी नेटवर्क से सेट नहीं हुई है। यह पहले से इस चक्र में गिना जा रहा है और घड़ी सेट होने पर अपने दिन में जाएगा।"
@@ -2267,6 +2462,9 @@ msgstr "प्रति बिलिंग चक्र"
 msgid "Billing cycle"
 msgstr "बिलिंग चक्र"
 
+msgid "Counted"
+msgstr "गिना गया"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "GB में आकार दर्ज करें, उदाहरण 50 या 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "सीमा पर मोबाइल डेटा बंद करे�
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "जब यह चक्र सीमा तक पहुँचेगा, मोबाइल डेटा बंद हो जाएगा: अगला चक्र शुरू होने, सीमा बढ़ाने या यह विकल्प फिर बंद करने तक ऑपरेटर से इंटरनेट नहीं मिलेगा। मोबाइल डेटा हाथ से फिर चालू करने पर वह अगले रीबूट तक चालू रहता है।"
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "दैनिक कोटे पर मोबाइल डेटा बंद करें"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "जब आज का उपयोग दैनिक कोटे तक पहुँचता है, तो मोबाइल डेटा आधी रात तक, कोटा बढ़ाए जाने तक या इसे फिर से बंद किए जाने तक बंद रहता है। मोबाइल डेटा को हाथ से चालू करने पर वह अगले रीबूट तक चालू रहता है।"
+
+msgid "Both ways"
+msgstr "दोनों दिशाएँ"
+
+msgid "Downloads only"
+msgstr "केवल डाउनलोड"
+
+msgid "Uploads only"
+msgstr "केवल अपलोड"
 
 msgid "Set"
 msgstr "सेट करें"
@@ -2302,6 +2515,15 @@ msgstr "मासिक सीमा (GB, 0: कोई नहीं)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "सीमा के इस प्रतिशत पर चेतावनी दें"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "दैनिक कोटा (GB, 0: कोई नहीं)"
+
+msgid "The cap and the daily quota count"
+msgstr "सीमा और दैनिक कोटा क्या गिनते हैं"
+
+msgid "Plan name"
+msgstr "प्लान का नाम"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "इस चक्र में अब तक उपयोग (GB)"
@@ -2399,9 +2621,6 @@ msgstr "डिवाइस अभी रीस्टार्ट होगा।
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "डिवाइस अभी रीस्टार्ट होगा और लगभग एक मिनट तक उपलब्ध नहीं रहेगा। अगर नया सिस्टम शुरू नहीं होता, तो विफल प्रयासों के बाद डिवाइस अपने आप Android पर लौट जाता है।"
 
-msgid "Restart"
-msgstr "रीस्टार्ट करें"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "रीस्टार्ट हो रहा है… लगभग एक मिनट बाद यह पेज फिर से खोलें।"
 
@@ -2468,9 +2687,6 @@ msgstr "बूट इमेज"
 msgid "from the installer"
 msgstr "इंस्टॉलर से"
 
-msgid "Default boot"
-msgstr "डिफ़ॉल्ट बूट"
-
 msgid "Free space"
 msgstr "खाली जगह"
 
@@ -2527,6 +2743,9 @@ msgstr "रिलीज़ नोट्स"
 
 msgid "Download"
 msgstr "डाउनलोड"
+
+msgid "only what changed since the installed release"
+msgstr "केवल वह जो स्थापित रिलीज़ के बाद बदला है"
 
 msgid "Free space needed"
 msgstr "ज़रूरी खाली जगह"
@@ -3056,9 +3275,6 @@ msgstr "पहचानें"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL में टोकन हो सकता है: वह डिवाइस को अलग से भेजा जाता है, कभी कमांड लाइन या लॉग में नहीं जाता।"
 
-msgid "Type"
-msgstr "प्रकार"
-
 msgid "Share link"
 msgstr "शेयर लिंक"
 
@@ -3388,6 +3604,21 @@ msgstr "अज्ञात लॉक प्रकार"
 msgid "Invalid value for this lock kind"
 msgstr "इस लॉक प्रकार के लिए अमान्य मान"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "बैंड, मोड और सेल लॉक अभी SIM2 के लिए समर्थित नहीं हैं"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "जब डुअल-SIM स्विचिंग रेडियो को नियंत्रित करती है, तब बैंड, मोड और सेल लॉक समर्थित नहीं हैं"
+
+msgid "None of these bands is supported by this modem"
+msgstr "यह मॉडेम इनमें से किसी भी बैंड का समर्थन नहीं करता"
+
+msgid "Lock change failed"
+msgstr "लॉक बदलना विफल रहा"
+
+msgid "Invalid job id"
+msgstr "अमान्य जॉब आईडी"
+
 msgid "Invalid page"
 msgstr "अमान्य पेज"
 
@@ -3478,14 +3709,29 @@ msgstr "TTL एडेप्टर ने कोई मान्य उत्त�
 msgid "Invalid TTL"
 msgstr "अमान्य TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
+
+msgid "Invalid congestion control"
+msgstr "अमान्य कंजेशन नियंत्रण"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "बूट एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED एडेप्टर ने कोई मान्य उत्तर नहीं दिया"
+
+msgid "Unknown LED setting"
+msgstr "अज्ञात LED सेटिंग"
+
+msgid "Invalid value for this setting"
+msgstr "इस सेटिंग के लिए अमान्य मान"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "डेटा उपयोग एडेप्टर ने मान्य उत्तर नहीं दिया"
 
 msgid "Unknown data usage setting"
 msgstr "अज्ञात डेटा उपयोग सेटिंग"
-
-msgid "Invalid value for this setting"
-msgstr "इस सेटिंग के लिए अमान्य मान"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "अग्रेषण एडैप्टर ने कोई मान्य उत्तर नहीं दिया"
@@ -3731,8 +3977,29 @@ msgstr "रेडियो ने अपनी सेटिंग का पा�
 msgid "The data roaming setting could not be saved"
 msgstr "डेटा रोमिंग सेटिंग सहेजी नहीं जा सकी"
 
-msgid "Expected on or off"
-msgstr "on या off अपेक्षित है"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "हॉटस्पॉट सेटिंग सहेज ली गई, पर वायरलेस रीलोड विफल रहा"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "वायरलेस सेटिंग्स में बिना सहेजे बदलाव हैं: पहले उन्हें सहेजें या वापस लें"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "हॉटस्पॉट पहले से बदला जा रहा है; थोड़ी देर में फिर प्रयास करें"
+
+msgid "No hotspot (access point) is configured"
+msgstr "कोई हॉटस्पॉट (एक्सेस पॉइंट) कॉन्फ़िगर नहीं है"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "इस रेडियो को चालू करने से दूसरा इंटरफ़ेस प्रभावित होगा; वायरलेस पेज का उपयोग करें"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "रेडियो Wi-Fi क्लाइंट द्वारा उपयोग में है"
+
+msgid "The hotspot setting could not be written"
+msgstr "हॉटस्पॉट सेटिंग लिखी नहीं जा सकी"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "यह प्लेटफ़ॉर्म हॉटस्पॉट नियंत्रण प्रदान नहीं करता"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "यह प्लेटफ़ॉर्म VPN एकीकरण प्रदान नहीं करता"
@@ -3833,6 +4100,15 @@ msgstr "यह USB नेटवर्क इंटरफ़ेस नहीं �
 msgid "LAN bridge device section was not found"
 msgstr "LAN ब्रिज डिवाइस सेक्शन नहीं मिला"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "एडेप्टर किस नेटवर्क का है, यह तय नहीं हो सका; बाद में प्रयास करें"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "एडेप्टर किसी अन्य नेटवर्क का है और LAN में नहीं जुड़ सकता"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "नेटवर्क सेटिंग्स में बिना सहेजे बदलाव हैं: पहले उन्हें सहेजें या वापस लें"
+
 msgid "Cannot bring USB network interface up"
 msgstr "USB नेटवर्क इंटरफ़ेस चालू नहीं किया जा सकता"
 
@@ -3865,6 +4141,12 @@ msgstr "वेबहुक बॉडी बहुत लंबी है या 
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "उत्तर की जाँच कुंजी=मान के रूप में होनी चाहिए, जैसे errcode=0 या ok=true (मान एक पूर्णांक या छोटे अक्षर, अधिकतम 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "अमान्य webhook गुप्त मान (अधिकतम 256 मुद्रण योग्य वर्ण, कोई रिक्त स्थान नहीं)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "समय-सीमा 1 से 120 सेकंड होनी चाहिए"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "अमान्य हेडर (प्रति पंक्ति एक \"Name: value\"; Host, Content-Type, Content-Length, Transfer-Encoding और Connection डिवाइस सेट करता है)"
@@ -3926,8 +4208,17 @@ msgstr "एक इंस्टॉलेशन पहले से चल रह�
 msgid "The language pack could not be removed"
 msgstr "भाषा पैक हटाया नहीं जा सका"
 
+msgid "The LED settings could not be read"
+msgstr "LED सेटिंग्स पढ़ी नहीं जा सकीं"
+
+msgid "The LED setting could not be saved"
+msgstr "LED सेटिंग सहेजी नहीं जा सकी"
+
 msgid "Lock cache unavailable"
 msgstr "लॉक कैश उपलब्ध नहीं"
+
+msgid "The modem refused a write"
+msgstr "मोडेम ने एक लेखन अस्वीकार कर दिया"
 
 msgid "The saved locks could not be cleared"
 msgstr "सहेजे गए लॉक साफ़ नहीं किए जा सके"
@@ -3938,9 +4229,6 @@ msgstr "लॉक करने के लिए कोई सर्विंग 
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "मोडेम ने मोड क्वेरी का उत्तर नहीं दिया; कुछ भी नहीं भेजा गया"
 
-msgid "The modem refused a write"
-msgstr "मोडेम ने एक लेखन अस्वीकार कर दिया"
-
 msgid "The read-back does not match the automatic values"
 msgstr "रीड-बैक स्वचालित मानों से मेल नहीं खाता"
 
@@ -3949,6 +4237,21 @@ msgstr "स्टैक पुनरारंभ के बाद रीड-ब�
 
 msgid "The reset was interrupted"
 msgstr "रीसेट बाधित हो गया"
+
+msgid "The result of this lock change is no longer known"
+msgstr "इस लॉक बदलाव का परिणाम अब ज्ञात नहीं है"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "लॉक बदलने में बहुत समय लगा; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "लॉक बदलना बाधित हो गया; “लॉक स्थिति रीफ़्रेश करें” चुनें"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "एक और लॉक बदलाव शुरू किया जा रहा है; थोड़ी देर में फिर से प्रयास करें"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "बहुत सारे लॉक बदलाव प्रतीक्षा में हैं; उनके समाप्त होने पर फिर से प्रयास करें"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "इस सिस्टम पर पैकेज फिर से इंस्टॉल करना उपलब्ध नहीं है"
@@ -3967,6 +4270,12 @@ msgstr "अज्ञात पैकेज क्रिया"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "यह प्लेटफ़ॉर्म TCP कंजेशन नियंत्रण प्रदान नहीं करता"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP सेटिंग्स पढ़ी नहीं जा सकीं"
 
 msgid "Data usage is not available on this system"
 msgstr "इस सिस्टम पर डेटा उपयोग उपलब्ध नहीं है"

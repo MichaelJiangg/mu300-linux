@@ -73,6 +73,11 @@ IN=$D/inputs
 ls "$KOUT"/modules-u30air/*.ko >/dev/null 2>&1 || { echo "U30 Air modules missing in $KOUT/modules-u30air (kernel/build-all.sh)" >&2; exit 1; }
 [ -z "$(git -C "$TOP" status --porcelain)" ] || { echo "commit your changes first: the release must match a commit" >&2; exit 1; }
 rm -rf "$D" && mkdir -p "$IN/out" "$IN/tools/logdw" "$IN/tools/bt-init" "$IN/tools/gpu"
+# the module trees are staged here and in TMPDIR (upstream/make-bundle.sh): both must keep xt_HL.ko and xt_hl.ko
+# apart, which macOS's default file system does not (FINDINGS 212)
+. "$TOP/upstream/case-sensitive.sh"
+case_sensitive "$D" || exit 1
+case_sensitive "${TMPDIR:-/tmp}" || exit 1
 
 echo "==> helper binaries"
 cp -R "$KOUT/modules" "$IN/out/modules"
@@ -125,9 +130,10 @@ tar -C "$K" -czf "$D/mu300-kernel.tar.gz" .
 rm -rf "$K"
 
 echo "==> mainline kernel bundles"
-# "mu300-update kernel 6.18|7.2": built by upstream/build.sh + build-modules.sh at this commit - 6.18 into
-# upstream/out, 7.2 into upstream/out-7.2 (OUTDIR=out-7.2 KV=7.2.x); each build must be the version its name says
-for kv in 6.18:out 7.2:out-7.2; do
+# "mu300-update kernel 6.18|7.2|7.3": built by upstream/build.sh + build-modules.sh at this commit - 6.18 into
+# upstream/out, 7.2 into upstream/out-7.2 (OUTDIR=out-7.2 KV=7.2.x), 7.3 into upstream/out-7.3 (OUTDIR=out-7.3 KV=7.3
+# or 7.3.x; its first release reports 7.3.0); each build must be the version its name says
+for kv in 6.18:out 7.2:out-7.2 7.3:out-7.3; do
     v=${kv%%:*}; o=$TOP/upstream/${kv#*:}
     [ -f "$o/Image" ] || { echo "$o/Image missing (upstream/build.sh, build-modules.sh)" >&2; exit 1; }
     rel=$(strings "$o/Image" | sed -n 's/^Linux version \([^ ]*\) .*/\1/p' | head -1)
@@ -171,7 +177,7 @@ sh "$TOP/tools/make-extra.sh" panel-offline "$D/mu300-extra-panel-offline.tar.gz
 echo "==> audit"
 fail=0
 list_of_image() { tar -tzf "$D/$1.tar.gz" | sed 's|^\./||'; }
-for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-ubuntu-rootfs mu300-ubuntu-26.04-rootfs mu300-openwrt-rootfs \
+for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3 mu300-ubuntu-rootfs mu300-ubuntu-26.04-rootfs mu300-openwrt-rootfs \
          mu300-openwrt-luci-rootfs; do
     bad=$(tar -tzf "$D/$a.tar.gz" | sed 's|^\./||' | grep -E \
         -e '(^|/)lib/firmware/(wcnmodem|gnssmodem|wifi_board_config|bt_configure)' \
@@ -258,14 +264,14 @@ for x in lang; do
 done
 # mu300-update refuses a kernel bundle without the SD host for a system on the card, and one whose init runs only from
 # slot b for a Linux on slot a: every bundle must say it has both
-for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2; do
+for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     tar -xzOf "$D/$a.tar.gz" ./features 2>/dev/null | grep -qx sdcard || { echo "$a does not list sdcard in ./features"; fail=1; }
     tar -xzOf "$D/$a.tar.gz" ./features 2>/dev/null | grep -qx linux-slot || { echo "$a does not list linux-slot in ./features"; fail=1; }
     tar -xzOf "$D/$a.tar.gz" ./features 2>/dev/null | grep -qx gpt-root || { echo "$a does not list gpt-root in ./features"; fail=1; }
 done
 # every generic ramdisk segment brings init's e2fsck: a root filesystem with recorded errors is checked before it is
 # mounted (FINDINGS 182)
-for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2; do
+for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     tar -xzOf "$D/$a.tar.gz" ./ramdisk-generic.lz4 > "$D/ramdisk.check" 2>/dev/null &&
     python3 -c 'import importlib.util as u, sys
 s = u.spec_from_file_location("b", sys.argv[1]); b = u.module_from_spec(s); s.loader.exec_module(b)
@@ -275,34 +281,46 @@ sys.exit("sbin/e2fsck" not in b.cpio_names(b.unlz4_legacy(open(sys.argv[2], "rb"
 done
 # a mainline bundle carries the kernel's own modules next to the vendor ones (upstream/build-modules.sh): one of each
 # kind - qdisc, filesystem, device mapper, USB modem, vhost - and the vendor Wi-Fi
-for a in mu300-kernel-6.18 mu300-kernel-7.2; do
+for a in mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     l=$(tar -tzf "$D/$a.tar.gz")
     for m in sch_htb.ko ntfs3.ko dm-crypt.ko cdc_mbim.ko vhost_net.ko sprd_wlan_combo.ko; do
         printf '%s\n' "$l" | grep -qx "./modules/$m" || { echo "$a lacks modules/$m"; fail=1; }
     done
 done
-# Call audio is the audio extra's (https://github.com/dikeckaan/mu300-audio, mu300-extra install audio; FINDINGS 194):
-# no kernel bundle carries a driver of the Unisoc call-audio stack, and no image its programs or services. The 23 of
-# 5.4 and the 20 of mainline - mainline's sprd-dma.ko is the stack's AGCP DMA driver; 5.4's is the vendor kernel's
-# own DMA driver, which stays.
+# every module a mainline build made (its modules.in-tree) is in the bundle, by its exact name: on a file system that
+# ignores case xt_HL.ko and xt_hl.ko, xt_TCPMSS.ko and xt_tcpmss.ko, xt_DSCP.ko and xt_dscp.ko, xt_RATEEST.ko and
+# xt_rateest.ko became one file each - in every mainline bundle before v2026.10.23.1 (FINDINGS 212). The TTL and
+# MSS pairs are named as well, so a modules.in-tree that lost them too does not pass.
+for a in mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
+    tar -tzf "$D/$a.tar.gz" | sed -n 's|^\./modules/||p' > "$D/modules.check"
+    want=$(tar -xzOf "$D/$a.tar.gz" ./modules.in-tree 2>/dev/null) || { echo "$a has no modules.in-tree"; fail=1; }
+    for m in $(printf '%s\n' $want xt_HL.ko xt_hl.ko xt_TCPMSS.ko xt_tcpmss.ko | sort -u | grep -vxF -f "$D/modules.check"); do
+        echo "$a lacks modules/$m"; fail=1
+    done
+    rm -f "$D/modules.check"
+done
+# Call audio is not supported: reject leftover drivers, programs and services in release inputs.
+# The vendor kernel keeps its native DMA driver; mainline has no call-audio DMA module.
 AUDIO_KO="audio_mem agdsp_access audio_sipc sprd_audcp_boot sprd_audcp_dvfs audio-dsp-dump audio-pipe sprd_apipe
 mcdt_hw_r2p0 saudio sprd-dmaengine-pcm sprd-platform-pcm-routing sprd-compr-2stage-dma snd-soc-sprd-dai snd-soc-sprd-vaudio
 snd-soc-sprd-vbc-v4 snd-soc-sprd-vbc-fe snd-soc-sprd-codec-ump9620-power snd-soc-sprd-codec-ump9620-power-dev
 snd-soc-sprd-codec-ump9620 snd-soc-sprd-pa-ucp1301 snd-soc-sprd-dummy-codec snd-soc-sprd-card"
-for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2; do
+for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do
     l=$(tar -tzf "$D/$a.tar.gz")
     extra=; [ "$a" = mu300-kernel ] || extra=sprd-dma
     for m in $AUDIO_KO $extra; do
-        ! printf '%s\n' "$l" | grep -Eq "/$m\.ko\$" || { echo "$a carries $m.ko, which is the audio extra's"; fail=1; }
+        ! printf '%s\n' "$l" | grep -Eq "/$m\.ko\$" || { echo "$a carries $m.ko, which belongs to the removed call-audio stack"; fail=1; }
     done
 done
 for m in mu300-ubuntu-rootfs mu300-ubuntu-26.04-rootfs mu300-openwrt-rootfs mu300-openwrt-luci-rootfs; do
     [ -f "$D/$m.manifest.gz" ] || continue
     ! gzip -dc "$D/$m.manifest.gz" | grep -Eq '(opt/mu300/bin/(mu300-audio-dsp|mu300-voice|pcmhost|ctlset|mu300-hfp)|systemd/system/mu300-(audio|voice)\.service|init\.d/mu300-(audio|voice)|modprobe\.d/mu300-audio\.conf)( |$)' ||
-        { echo "$m carries the audio extra's programs or services"; fail=1; }
+        { echo "$m carries removed call-audio programs or services"; fail=1; }
 done
 [ $fail = 0 ] || { echo "audit failed, nothing published" >&2; exit 1; }
 rm -rf "$IN"
+# the diffs from the releases before this one (tools/make-diffs.sh): listed in SHA256SUMS below, so signed with the rest
+sh "$TOP/tools/make-diffs.sh" "$D" "$TAG"
 # the updater itself: an older mu300-update fetches this one and continues with it
 cp "$TOP/rootfs/overlay/opt/mu300/bin/mu300-update" "$D/mu300-update"
 # mu300-release: the tag, as a file, so that SHA256SUMS - and with it the signature - says which release these
@@ -334,7 +352,7 @@ ls -la "$D"
 commit=$(git -C "$TOP" rev-parse HEAD)
 kernel_rev=$(sed -n 's/^KERNEL_REV=//p' "$TOP/kernel/build-all.sh")
 modules_rev=$(sed -n 's/^MODULES_REV=//p' "$TOP/kernel/build-all.sh")
-notes=$(mktemp)
+notes=$(mktemp "${TMPDIR:-/tmp}/mu300-notes.XXXXXX")
 cat > "$notes" <<EOF
 Prebuilt images for \`./install.sh\` (ZTE F50 / MU300 and ZTE U30 Air; the installer recognises which). Check your device
 first with \`./install.sh --check\`.
@@ -343,15 +361,17 @@ first with \`./install.sh --check\`.
 |---|---|
 | mu300-kernel.tar.gz | Linux 5.4.254 \`Image\` and modules (with the U30 Air's own in \`modules-u30air/\`), with the patches of \`kernel/patches\` (among them: no panic when a network namespace goes away, #103, and the Wi-Fi driver's routine lines no longer at error level, #140), static busybox, logdw and e2fsck for the boot image, the installers' static password checker \`mu300-pwcheck\`, and the generic boot ramdisk segment \`mu300-update\` uses |
 | mu300-kernel-6.18.tar.gz | mainline Linux 6.18 (longterm) for \`mu300-update kernel 6.18\`: \`Image\`, modules, generic boot ramdisk segment; with BTF and the BPF JIT (so the VPN module's dae engine runs), FunctionFS (for adb) and card detect for the F50's SD slot (an empty slot is no longer polled, #181) |
-| mu300-kernel-7.2.tar.gz | mainline Linux 7.2 (newest stable) for \`mu300-update kernel 7.2\`: the same parts |
+| mu300-kernel-7.2.tar.gz | mainline Linux 7.2 (stable) for \`mu300-update kernel 7.2\`: the same parts |
+| mu300-kernel-7.3.tar.gz | mainline Linux 7.3 (the newest mainline release) for \`mu300-update kernel 7.3\`: the same parts |
 | mu300-ubuntu-rootfs.tar.gz | Ubuntu 24.04 LTS root filesystem |
 | mu300-ubuntu-26.04-rootfs.tar.gz | Ubuntu 26.04 LTS root filesystem |
-| mu300-openwrt-rootfs.tar.gz | OpenWrt 25.12.5 root filesystem |
-| mu300-openwrt-luci-rootfs.tar.gz | OpenWrt 25.12.5 with the MU300 control panel (luci-app-mu300 by kanoqwq, Aurora theme by eamonxg) |
-| mu300-extra-lang.tar.gz | LuCI and the MU300 panel in more languages (OpenWrt only; English, Turkish and Chinese are in the images): \`mu300-extra install lang\` on the device, or System > Languages in the panel; LuCI's catalogs from the OpenWrt 25.12.5 feed, the panel's AI-translated |
+| mu300-openwrt-rootfs.tar.gz | OpenWrt 25.12.6 root filesystem |
+| mu300-openwrt-luci-rootfs.tar.gz | OpenWrt 25.12.6 with the MU300 control panel (luci-app-mu300 by kanoqwq, Aurora theme by eamonxg) |
+| mu300-extra-lang.tar.gz | LuCI and the MU300 panel in more languages (OpenWrt only; English, Turkish and Chinese are in the images): \`mu300-extra install lang\` on the device, or System > Languages in the panel; LuCI's catalogs from the OpenWrt 25.12.6 feed, the panel's AI-translated |
 | mu300-extra-panel.tar.gz | the web panel for Ubuntu: Cockpit (Ubuntu's web console: terminal, logs, services, networking, storage) and the MU300 page (signal, mobile data, data usage, SMS, VPN, power and CPU, Wi-Fi, updates), on the LAN only: \`sudo mu300-extra install panel\` on the device (Cockpit from Ubuntu's archive), or the installer's question |
 | mu300-extra-panel-offline.tar.gz | the same with Cockpit's packages for Ubuntu 24.04 and 26.04, for a device that is not online: \`sudo mu300-extra install panel --from mu300-extra-panel-offline.tar.gz\` |
 | mu300-update | the on-device updater of this release (\`mu300-update apply\` switches to it before it changes anything) |
+| mu300-*-rootfs.diff-<tag>.tar.gz | an image without the files the image of release <tag> (one of the five before this one) had as they are: \`mu300-update apply\` on a device that runs <tag> downloads it instead of the whole image, takes the rest from the installed system, and installs it only when the result is, file for file, the image this release's signed manifest describes (else it downloads the whole image) |
 | mu300-*-rootfs.manifest.gz | the list of each image's files (type, mode, owner, size, sha256), which the image also carries: an update reads it to tell the image's files from yours, and carries yours over |
 | mu300-magisk-*.zip | attached a few minutes later by the Magisk installers workflow, one per system and kernel. Two ways to use one: install it in **Magisk** on the device (no computer), or **unpack it on a computer** and run \`start.cmd\` / \`sh start.sh\` (\`start-gui\` for the window): the project's installer, with that system and kernel, offline (\`START-HERE.md\` in the zip; adb from Google's platform-tools is not included) |
 | (the VPN) | not part of this release: the VPN toolkit (\`mu300-vpn\`, module v2: the core with hev-socks5-tunnel, and the engines as extras: \`vpn-xray\`, \`vpn-singbox\`, \`vpn-mihomo\`, \`vpn-dae\`) is the module of https://github.com/dikeckaan/mu300-linux-vpn - \`mu300-extra install vpn\` on the device, or the installer's question, takes its latest release with the engines its profiles need; on OpenWrt with the panel the VPN menu drives it |

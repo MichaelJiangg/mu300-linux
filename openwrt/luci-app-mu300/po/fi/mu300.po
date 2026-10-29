@@ -52,6 +52,9 @@ msgstr "Kielet"
 msgid "Power"
 msgstr "Virta"
 
+msgid "LEDs"
+msgstr "Merkkivalot"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Isäntätila katkaisee tämän portin USB-verkon ja sarjayhteyden. F50:s
 msgid "USB network mode"
 msgstr "USB-verkkotila"
 
+msgid "Current sharing protocol"
+msgstr "Nykyinen jakoprotokolla"
+
 msgid "Network protocol"
 msgstr "Verkkoprotokolla"
 
@@ -658,6 +664,27 @@ msgstr "Päivitä"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Käytettävissä vain isäntätilassa. Päivitä ottaa löydetyt USB-sovittimet käyttöön; LAN-verkkoon lisääminen tallentaa sillan ja lataa verkon uudelleen."
 
+msgid "Network performance"
+msgstr "Verkon suorituskyky"
+
+msgid "Active congestion control"
+msgstr "Käytössä oleva ruuhkanhallinta"
+
+msgid "Default queue"
+msgstr "Oletusjono"
+
+msgid "TCP congestion control"
+msgstr "TCP-ruuhkanhallinta"
+
+msgid "Apply"
+msgstr "Käytä"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Vaikuttaa lähinnä tämän laitteen uusiin TCP-yhteyksiin. Välitetyt hotspot- ja USB-asiakkaiden yhteydet eivät käytä BBR:ää automaattisesti."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR valitsee FQ:n uusien liitäntöjen oletusjonoksi. Nykyiset yhteydet, liitännät ja QoS säilyvät. Asetus säilyy uudelleenkäynnistyksissä."
+
 msgid "Recent modem operations"
 msgstr "Viimeisimmät modeemitoiminnot"
 
@@ -670,6 +697,12 @@ msgstr "Ohjauspaneelin viimeisimmät kutsut tältä ja edelliseltä käynnistysk
 msgid "Unavailable"
 msgstr "Ei käytettävissä"
 
+msgid "Mixed"
+msgstr "Sekoitettu"
+
+msgid "None"
+msgstr "Ei mitään"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-verkkotila ei ole käytettävissä isäntätilassa; isäntätilan automaattinen käynnistys poistaa käytöstä myös USB-verkon automaattisen käynnistyksen."
 
@@ -681,9 +714,6 @@ msgstr "USB-verkko ja sarjayhteys tunnistetaan uudelleen laitetilassa."
 
 msgid "Switch USB role?"
 msgstr "Vaihdetaanko USB-rooli?"
-
-msgid "Apply"
-msgstr "Käytä"
 
 msgid "Switching USB role…"
 msgstr "Vaihdetaan USB-roolia…"
@@ -721,6 +751,21 @@ msgstr "Asetukset tallennettu"
 msgid "Save failed: %s"
 msgstr "Tallennus epäonnistui: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Verkon suorituskykyasetuksia ei voitu lukea; yritä uudelleen päivittämällä"
+
+msgid "This kernel does not provide this setting"
+msgstr "Tämä ydin ei tarjoa tätä asetusta"
+
+msgid "System default"
+msgstr "Järjestelmän oletus"
+
+msgid "Applied and saved for future boots."
+msgstr "Otettu käyttöön ja tallennettu tuleville käynnistyksille."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Ydin ei hyväksynyt verkkoasetuksia"
+
 msgid "This boot"
 msgstr "Tämä käynnistys"
 
@@ -739,6 +784,9 @@ msgstr "Etsitään USB-sovittimia…"
 msgid "No USB adapters found."
 msgstr "USB-sovittimia ei löytynyt."
 
+msgid "In use by another network"
+msgstr "Toisen verkon käytössä"
+
 msgid "Link connected"
 msgstr "Linkki yhdistetty"
 
@@ -747,6 +795,9 @@ msgstr "Ei linkkiä; käyttöönottoa yritetty"
 
 msgid "Added to LAN"
 msgstr "Lisätty LAN-verkkoon"
+
+msgid "Cannot add"
+msgstr "Ei voi lisätä"
 
 msgid "Add to LAN"
 msgstr "Lisää LAN-verkkoon"
@@ -784,6 +835,9 @@ msgstr "Lomake (URL-koodattu)"
 msgid "Plain text"
 msgstr "Pelkkä teksti"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Myös {sim} (SIM 1 tai SIM 2) ja {kind} (sms, test tai power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Vastaanotetut viestit lähetetään edelleen heti, kun ne saapuvat SMS-pooliin. Epäonnistunut toimitus yritetään uudelleen 30 s kuluttua ja sen jälkeen aina kaksinkertaisen ajan päästä (enintään tunti), yhteensä kymmenen kertaa."
 
@@ -811,6 +865,15 @@ msgstr "Vain viestit, joissa on jokin näistä sanoista"
 msgid "One per line; empty: every message."
 msgstr "Yksi riviä kohden; tyhjä: kaikki viestit."
 
+msgid "Battery"
+msgstr "Akku"
+
+msgid "Battery and charger notices"
+msgstr "Akku- ja laturi-ilmoitukset"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Viesti jokaiseen kohteeseen, kun akku ohittaa 5, 20, 40, 60, 80 tai 100 % ja kun laturi kytketään tai irrotetaan."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Mukautettu runko"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Tyhjä: vakiokentät (pelkkä teksti: viesti). Paikkamerkit: {sender}, {time}, {text}, {device}, {message}. Jokainen arvo suojataan valitun tyypin mukaan. Tämä runko näytetään tässä uudelleen: pidä salaisuudet osoitteessa tai otsakkeessa."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Salaisuus kohtaan {secret} omassa rungossa"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Palvelulle, joka haluaa tunnuksensa runkoon (PushPlus). Tallennetaan vain tälle osoitteelle: uusi osoite tarvitsee sen uudelleen."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Lisäotsakkeet (yksi \"Nimi: arvo\" riviä kohden)"
 
@@ -840,6 +909,9 @@ msgstr "Vastauksessa on oltava"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Tyhjä: jokainen HTTP 2xx -vastaus lasketaan toimitetuksi. Kun annetaan avain=arvo (esimerkiksi errcode=0), vastauksen on lisäksi oltava JSON-objekti, jonka ylimmällä tasolla tällä avaimella on tämä arvo; muuten toimitus epäonnistuu. Lokiin kirjataan vain tarkistuksen tulos, ei koskaan vastausta."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Pyynnön aikaraja (sekuntia, 1-120; webhook ja Telegram)"
 
 msgid "Bot token"
 msgstr "Botin tunnus"
@@ -861,9 +933,6 @@ msgstr "Portti"
 
 msgid "Security"
 msgstr "Suojaus"
-
-msgid "None"
-msgstr "Ei mitään"
 
 msgid "User name"
 msgstr "Käyttäjänimi"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux lukittu"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Kyllä: seuraava uudelleenkäynnistys käynnistää Androidin"
+
+msgid "No"
+msgstr "Ei"
+
+msgid "Writable"
+msgstr "Kirjoitettavissa"
+
+msgid "This boot image cannot change the boot"
+msgstr "Tämä käynnistyskuva ei voi muuttaa käynnistystä"
+
 msgid "%s of %s"
 msgstr "%s / %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Muisti"
 
 msgid "Storage"
 msgstr "Tallennustila"
-
-msgid "Battery"
-msgstr "Akku"
 
 msgid "Channel"
 msgstr "Kanava"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi-tukiasema"
 msgid "Restart modem"
 msgstr "Käynnistä modeemi uudelleen"
 
-msgid "Restart device"
-msgstr "Käynnistä laite uudelleen"
+msgid "Power off or restart"
+msgstr "Sammuta tai käynnistä uudelleen"
 
 msgid "Switch to Android"
 msgstr "Vaihda Androidiin"
 
 msgid "Lock Linux"
 msgstr "Lukitse Linux"
+
+msgid "Default boot"
+msgstr "Oletuskäynnistys"
+
+msgid "One-time boot"
+msgstr "Kertakäynnistys"
+
+msgid "Boot control"
+msgstr "Käynnistyksen hallinta"
 
 msgid "Neighbor cells"
 msgstr "Naapurisolut"
@@ -1125,6 +1215,9 @@ msgstr "Taajuus"
 
 msgid "Running %s…"
 msgstr "Suoritetaan %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspotin asetukset tallennettu; muutoksia otetaan käyttöön"
 
 msgid "Started in background: %s"
 msgstr "Käynnistetty taustalla: %s"
@@ -1165,11 +1258,14 @@ msgstr "Mobiilidataa käytetään myös verkkovierailuverkoissa, mikä voi maksa
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Matkapuhelinyhteys voi katketa 1–2 minuutiksi."
 
-msgid "Restart the entire device"
-msgstr "Käynnistä koko laite uudelleen"
-
 msgid "All connections will be interrupted."
 msgstr "Kaikki yhteydet katkeavat."
+
+msgid "Power off"
+msgstr "Sammuta"
+
+msgid "Restart"
+msgstr "Käynnistä uudelleen"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Seuraava käynnistys siirtyy Androidiin, ja laite käynnistyy uudelleen nyt. Tämä hallintasivu ja matkapuhelinyhteyden jakaminen katkeavat."
@@ -1243,6 +1339,9 @@ msgstr "Sisäinen SIM valittu: käytössä uudelleenkäynnistyksen jälkeen"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Sisäinen SIM valittu, mutta tämä laite ei tue sitä: ulkoinen SIM on käytössä"
 
+msgid "in use"
+msgstr "käytössä"
+
 msgid "Uptime %s"
 msgstr "Käynnissä %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE-linkki"
 msgid "Hidden"
 msgstr "Piilotettu"
 
-msgid "No"
-msgstr "Ei"
-
 msgid "Running"
 msgstr "Käynnissä"
 
@@ -1371,9 +1467,6 @@ msgstr "Verkossa"
 
 msgid "AT adapter unavailable"
 msgstr "AT-sovitin ei käytettävissä"
-
-msgid "Linux locked"
-msgstr "Linux lukittu"
 
 msgid "Installing the language pack…"
 msgstr "Asennetaan kielipakettia…"
@@ -1453,6 +1546,51 @@ msgstr "Käännetty"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "LuCIn omat käännökset tulevat OpenWrt:stä. Tämän paneelin käännökset turkkia ja kiinaa lukuun ottamatta ovat konekäännöksiä (tekoäly); korjaukset ovat tervetulleita."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Anna kokonaisluku väliltä 0–%d"
+
+msgid "Network lamp"
+msgstr "Verkon merkkivalo"
+
+msgid "Wi-Fi lamp"
+msgstr "Wi-Fi-merkkivalo"
+
+msgid "Battery lamp"
+msgstr "Akun merkkivalo"
+
+msgid "On"
+msgstr "Päällä"
+
+msgid "Brightness (%)"
+msgstr "Kirkkaus (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Pois kytketty merkkivalo pysyy pimeänä; lämpöhälytys näkyy silti omassa ledissään."
+
+msgid "Device default"
+msgstr "Laitteen oletus"
+
+msgid "LED timeout (seconds)"
+msgstr "Merkkivalojen aikakatkaisu (sekuntia)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Kuinka kauan merkkivalot palavat näppäimen painalluksen tai muutoksen jälkeen; 0 pitää ne päällä. Laturissa ne palavat."
+
+msgid "Boot indicator"
+msgstr "Käynnistyksen ilmaisin"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "Ledi näyttää värinsä vuorotellen järjestelmän käynnistyessä"
+
+msgid "Heat alarm"
+msgstr "Lämpöhälytys"
+
+msgid "Siren"
+msgstr "Sireeni"
+
+msgid "Red blink"
+msgstr "Punainen vilkkuminen"
+
 msgid "Automatic"
 msgstr "Automaattinen"
 
@@ -1494,6 +1632,21 @@ msgstr "Lukitse nykyinen palveleva solu"
 
 msgid "Unlock cell"
 msgstr "Poista solulukitus"
+
+msgid "Enter a cell"
+msgstr "Syötä solu"
+
+msgid "Type"
+msgstr "Tyyppi"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanavanumero (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Lukitse tämä solu"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Kanavanumero, ei taajuus megahertseinä; solun ei tarvitse olla naapurisolujen luettelossa."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Käyttöönotto käynnistää radiopinon uudelleen (SFUN) ja katkaisee matkapuhelinpalvelun hetkeksi. Asetukset tallennetaan, ja laajennus ottaa ne uudelleen käyttöön AT:n ollessa valmis, kun Käytä käynnistyksessä on käytössä. Alustan radiota edeltävä koukku voi ottaa ne käyttöön ilman uudelleenkäynnistystä. Palauta automaattinen tila käyttämällä ilman valittuja kaistoja."
@@ -1582,17 +1735,20 @@ msgstr "Lukitaan %s taustalla…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s lukittu taustalla (SFUN-uudelleenkäynnistys, noin 30 sekuntia); luetaan tila takaisin…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Syötä kanavanumero ja PCI alla olevien rajojen sisällä"
+
 msgid "No serving-network data"
 msgstr "Ei palvelevan verkon tietoja"
 
 msgid "NR serving cell"
 msgstr "Palveleva NR-solu"
 
-msgid "Status confirmed"
-msgstr "Tila vahvistettu"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Takaisinluku aikakatkaistiin; valitse ”Päivitä lukitusten tila”"
+
+msgid "Status confirmed"
+msgstr "Tila vahvistettu"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Palautus vahvistettu: verkkotila automaattinen, EN-DC päällä, kaikki taajuusalueet, ei solulukitusta; tallennetut lukitusasetukset on poistettu"
@@ -1732,9 +1888,6 @@ msgstr "herätetty %s-painikkeella"
 msgid "the modem is suspended (%s)"
 msgstr "modeemi on keskeytetty (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Anna kokonaisluku väliltä 0–%d"
-
 msgid "Power status unavailable"
 msgstr "Virran tila ei ole saatavilla"
 
@@ -1792,6 +1945,12 @@ msgstr "Lataus tauolla: akun lämpötila"
 msgid "Charging paused: charge limit"
 msgstr "Lataus tauolla: latausraja"
 
+msgid "Charging paused: by hand"
+msgstr "Lataus keskeytetty: käsin"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Ladataan kerran täyteen, sitten takaisin rajaan"
+
 msgid "Sleep now"
 msgstr "Nuku nyt"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % ei koskaan lataa akkua (laite toimii laturin varassa), 100 % lataa s
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % säästää akkua laitteessa, joka pysyy verkossa."
 
+msgid "Start charging again under"
+msgstr "Aloita lataus uudelleen alle"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 aloittaa uudelleen 5 pistettä pysäytystason alapuolella. Pienempi arvo aloittaa latauksen vasta sen alapuolella; 100 %:lla täysi akku odottaa, kunnes se laskee sen alle."
+
+msgid "Resume charging"
+msgstr "Jatka latausta"
+
+msgid "Pause charging"
+msgstr "Keskeytä lataus"
+
+msgid "Cancel the full charge"
+msgstr "Peru täyteen lataus"
+
+msgid "Charge to full once"
+msgstr "Lataa kerran täyteen"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Keskeytettynä akkua ei ladata ja laite toimii laturilla; alle 5 %:ssa se latautuu silti, ja lämpötilasuoja on aina voimassa."
+
 msgid "When the charger switches the device on"
 msgstr "Kun laturi käynnistää laitteen"
 
@@ -1830,9 +2010,6 @@ msgstr "Jätä ennalleen"
 
 msgid "LTE only (5G off)"
 msgstr "Vain LTE (5G pois)"
-
-msgid "On"
-msgstr "Päällä"
 
 msgid "Full"
 msgstr "Täysi"
@@ -2057,9 +2234,6 @@ msgstr "Modeemin oletus"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "käytössä"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Kytke SIM%d:n radio pois"
 
@@ -2159,6 +2333,9 @@ msgstr "Poistettu (vain paikallinen)"
 msgid "Enter both a number and a message."
 msgstr "Anna sekä numero että viesti."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-muisti: %d / %d paikkaa käytössä (klo %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d viestiä, %d lukematonta · %d keskustelua"
 
@@ -2234,8 +2411,26 @@ msgstr "Kuukausiraja"
 msgid "%s, warning at %d%%"
 msgstr "%s, varoitus %d%%:ssa"
 
+msgid "Daily quota"
+msgstr "Päiväkiintiö"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Kuukausiraja on täynnä: mobiilidata kytkettiin pois. Se kytkeytyy takaisin, kun seuraava jakso alkaa."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Päiväkiintiö on täynnä: mobiilidata kytkettiin pois. Se palaa keskiyöllä."
+
+msgid "The daily quota is reached"
+msgstr "Päiväkiintiö on täynnä"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% päiväkiintiöstä on käytetty"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Raja ja päiväkiintiö laskevat vain lataukset."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Raja ja päiväkiintiö laskevat vain lähetykset."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s odottaa kelloa: sitä ei ole vielä asetettu verkosta. Se lasketaan jo tähän jaksoon ja siirtyy omalle päivälleen, kun kello on asetettu."
@@ -2267,6 +2462,9 @@ msgstr "Laskutusjaksoittain"
 msgid "Billing cycle"
 msgstr "Laskutusjakso"
 
+msgid "Counted"
+msgstr "Laskettu"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Anna koko gigatavuina, esimerkiksi 50 tai 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Katkaise mobiilidata rajalla"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Kun tämä jakso saavuttaa rajan, mobiilidata katkaistaan: ei internetiä operaattorin kautta ennen kuin seuraava jakso alkaa, rajaa nostetaan tai tämä kytketään taas pois. Käsin uudelleen kytketty mobiilidata pysyy päällä seuraavaan uudelleenkäynnistykseen asti."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Katkaise mobiilidata päiväkiintiön täyttyessä"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Kun päivän käyttö saavuttaa päiväkiintiön, mobiilidata katkaistaan keskiyöhön asti, kunnes kiintiötä nostetaan tai tämä kytketään pois. Jos kytket mobiilidatan käsin takaisin, se pysyy päällä seuraavaan uudelleenkäynnistykseen asti."
+
+msgid "Both ways"
+msgstr "Molemmat suunnat"
+
+msgid "Downloads only"
+msgstr "Vain lataukset"
+
+msgid "Uploads only"
+msgstr "Vain lähetykset"
 
 msgid "Set"
 msgstr "Aseta"
@@ -2302,6 +2515,15 @@ msgstr "Kuukausiraja (GB, 0: ei rajaa)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varoita tällä prosentilla rajasta"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Päiväkiintiö (GB, 0: ei kiintiötä)"
+
+msgid "The cap and the daily quota count"
+msgstr "Mitä raja ja päiväkiintiö laskevat"
+
+msgid "Plan name"
+msgstr "Liittymän nimi"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Käytetty tähän mennessä tässä jaksossa (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Laite käynnistyy nyt uudelleen. Oletuskäynnistys on Android, joten lai
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Laite käynnistyy nyt uudelleen ja on poissa noin minuutin. Jos uusi järjestelmä ei käynnisty, laite palaa itsestään Androidiin epäonnistuneiden yritysten jälkeen."
 
-msgid "Restart"
-msgstr "Käynnistä uudelleen"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Käynnistetään uudelleen… avaa tämä sivu uudelleen noin minuutin kuluttua."
 
@@ -2468,9 +2687,6 @@ msgstr "Käynnistyskuva"
 msgid "from the installer"
 msgstr "asennusohjelmasta"
 
-msgid "Default boot"
-msgstr "Oletuskäynnistys"
-
 msgid "Free space"
 msgstr "Vapaa tila"
 
@@ -2527,6 +2743,9 @@ msgstr "Julkaisutiedot"
 
 msgid "Download"
 msgstr "Lataus"
+
+msgid "only what changed since the installed release"
+msgstr "vain se, mikä on muuttunut asennetun julkaisun jälkeen"
 
 msgid "Free space needed"
 msgstr "Tarvittava vapaa tila"
@@ -3056,9 +3275,6 @@ msgstr "Tunnista"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL voi sisältää tunnuksen: se menee laitteelle erikseen, ei koskaan komentoriville tai lokiin."
 
-msgid "Type"
-msgstr "Tyyppi"
-
 msgid "Share link"
 msgstr "Jakolinkki"
 
@@ -3388,6 +3604,21 @@ msgstr "Tuntematon lukitustyyppi"
 msgid "Invalid value for this lock kind"
 msgstr "Virheellinen arvo tälle lukitustyypille"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Taajuusalueen, tilan ja solun lukitusta ei vielä tueta SIM2:lle"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Taajuusalueen, tilan ja solun lukitusta ei tueta, kun kahden SIM-kortin vaihto hallitsee radiota"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Tämä modeemi ei tue mitään näistä taajuuskaistoista"
+
+msgid "Lock change failed"
+msgstr "Lukituksen muutos epäonnistui"
+
+msgid "Invalid job id"
+msgstr "Virheellinen työn tunniste"
+
 msgid "Invalid page"
 msgstr "Virheellinen sivu"
 
@@ -3478,14 +3709,29 @@ msgstr "TTL-sovitin ei antanut kelvollista vastausta"
 msgid "Invalid TTL"
 msgstr "Virheellinen TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "TCP-sovitin ei antanut kelvollista vastausta"
+
+msgid "Invalid congestion control"
+msgstr "Virheellinen ruuhkanhallinta"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Käynnistyssovitin ei antanut kelvollista vastausta"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "LED-sovitin ei antanut kelvollista vastausta"
+
+msgid "Unknown LED setting"
+msgstr "Tuntematon merkkivaloasetus"
+
+msgid "Invalid value for this setting"
+msgstr "Virheellinen arvo tälle asetukselle"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Datan käytön sovitin ei antanut kelvollista vastausta"
 
 msgid "Unknown data usage setting"
 msgstr "Tuntematon datan käytön asetus"
-
-msgid "Invalid value for this setting"
-msgstr "Virheellinen arvo tälle asetukselle"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Edelleenlähetyksen sovitin ei antanut kelvollista vastausta"
@@ -3731,8 +3977,29 @@ msgstr "Radio ei seurannut asetustaan"
 msgid "The data roaming setting could not be saved"
 msgstr "Datavierailun asetusta ei voitu tallentaa"
 
-msgid "Expected on or off"
-msgstr "Odotettiin on tai off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Hotspot-asetus on tallennettu, mutta langattoman uudelleenlataus epäonnistui"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Langattomissa asetuksissa on tallentamattomia muutoksia: tallenna tai peru ne ensin"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspotin tilaa vaihdetaan jo; yritä hetken päästä uudelleen"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Hotspotia (tukiasemaa) ei ole määritetty"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Tämän radion käynnistäminen vaikuttaisi toiseen liitäntään; käytä Langaton-sivua"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Wi-Fi-asiakas käyttää radiota"
+
+msgid "The hotspot setting could not be written"
+msgstr "Hotspot-asetusta ei voitu kirjoittaa"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Tämä alusta ei tarjoa hotspotin hallintaa"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Tämä alusta ei tarjoa VPN-integraatiota"
@@ -3833,6 +4100,15 @@ msgstr "Ei USB-verkkoliitäntä"
 msgid "LAN bridge device section was not found"
 msgstr "LAN-sillan laiteosiota ei löytynyt"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Sovittimen omistajaa ei voitu selvittää; yritä myöhemmin uudelleen"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Sovitin kuuluu toiseen verkkoon eikä voi liittyä LANiin"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Verkkoasetuksissa on tallentamattomia muutoksia: tallenna tai peru ne ensin"
+
 msgid "Cannot bring USB network interface up"
 msgstr "USB-verkkoliitäntää ei voi ottaa käyttöön"
 
@@ -3865,6 +4141,12 @@ msgstr "Webhookin runko on liian pitkä tai sisältää ohjausmerkin"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Vastauksen tarkistuksen on oltava muotoa avain=arvo, kuten errcode=0 tai ok=true (arvo kokonaisluku tai pieniä kirjaimia, enintään 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Virheellinen webhook-salaisuus (enintään 256 tulostettavaa merkkiä, ei välilyöntiä)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Aikarajan on oltava 1-120 sekuntia"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Virheellinen otsake (yksi \"Nimi: arvo\" riviä kohden; laite asettaa Host-, Content-Type-, Content-Length-, Transfer-Encoding- ja Connection-otsakkeet)"
@@ -3926,8 +4208,17 @@ msgstr "Asennus on jo käynnissä"
 msgid "The language pack could not be removed"
 msgstr "Kielipakettia ei voitu poistaa"
 
+msgid "The LED settings could not be read"
+msgstr "Merkkivaloasetuksia ei voitu lukea"
+
+msgid "The LED setting could not be saved"
+msgstr "Merkkivaloasetusta ei voitu tallentaa"
+
 msgid "Lock cache unavailable"
 msgstr "Lukitusvälimuisti ei käytettävissä"
+
+msgid "The modem refused a write"
+msgstr "Modeemi hylkäsi kirjoituksen"
 
 msgid "The saved locks could not be cleared"
 msgstr "Tallennettuja lukituksia ei voitu poistaa"
@@ -3938,9 +4229,6 @@ msgstr "Ei palvelevaa solua lukittavaksi"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modeemi ei vastannut tilakyselyyn; mitään ei lähetetty"
 
-msgid "The modem refused a write"
-msgstr "Modeemi hylkäsi kirjoituksen"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Takaisinluku ei vastaa automaattisia arvoja"
 
@@ -3949,6 +4237,21 @@ msgstr "Takaisinluku pinon uudelleenkäynnistyksen jälkeen ei vastaa automaatti
 
 msgid "The reset was interrupted"
 msgstr "Palautus keskeytyi"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Tämän lukitusmuutoksen tulosta ei enää tiedetä"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Lukituksen muutos kesti liian kauan; valitse ”Päivitä lukitusten tila”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Lukituksen muutos keskeytyi; valitse ”Päivitä lukitusten tila”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Toista lukitusmuutosta aloitetaan; yritä hetken kuluttua uudelleen"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Liian monta lukitusmuutosta odottaa; yritä uudelleen, kun ne ovat päättyneet"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pakettien uudelleenasennus ei ole käytettävissä tässä järjestelmässä"
@@ -3967,6 +4270,12 @@ msgstr "Tuntematon pakettitoiminto"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Tämä alusta ei tarjoa TCP-ruuhkanhallintaa"
+
+msgid "The TCP settings could not be read"
+msgstr "TCP-asetuksia ei voitu lukea"
 
 msgid "Data usage is not available on this system"
 msgstr "Datan käyttö ei ole käytettävissä tässä järjestelmässä"

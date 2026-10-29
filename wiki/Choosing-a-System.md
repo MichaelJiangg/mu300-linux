@@ -29,16 +29,16 @@ optional [VPN](VPN) module.
 ```
 ==> What should be installed?
   1) Ubuntu LTS: 24.04 or 26.04, asked next (full distribution, apt, ~500 MiB RAM in use)
-  2) OpenWrt 25.12.5 (router, LuCI web UI, ~140 MiB RAM in use)
+  2) OpenWrt 25.12.6 (router, LuCI web UI, ~140 MiB RAM in use)
   3) both (switch later with: mu300-os ubuntu|openwrt)
 
 ==> Which OpenWrt?
-  1) OpenWrt 25.12.5: the standard LuCI web interface
-  2) OpenWrt 25.12.5 with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)
+  1) OpenWrt 25.12.6: the standard LuCI web interface
+  2) OpenWrt 25.12.6 with the MU300 control panel: dashboard, cellular locks, SMS, AT terminal, USB modes (by kanoqwq)
 
 ==> Which Ubuntu?
   1) 24.04 LTS  the longest tested, supported until 2029
-  2) 26.04 LTS  the newest (systemd 259, newer packages), supported until 2031; kernel 6.18 or 7.2
+  2) 26.04 LTS  the newest (systemd 259, newer packages), supported until 2031; kernel 6.18, 7.2 or 7.3
 ```
 
 `MU300_OPENWRT=plain|luci` answers the OpenWrt question without asking.
@@ -52,7 +52,7 @@ The installer asks for room for the system plus a spare copy kept by updates: ab
 
 * **24.04 LTS** is the default and the longest tested. It works with every kernel.
 * **26.04 LTS** is the newest, supported until 2031. Its programs use system calls the 5.4 kernel does not have (`tar`, for one, cannot
-  unpack folders there), so it **needs kernel 6.18 or 7.2**. The installer will not let you combine it with 5.4.
+  unpack folders there), so it **needs kernel 6.18, 7.2 or 7.3**. The installer will not let you combine it with 5.4.
 
 An installed Ubuntu moves to the other release with `sudo MU300_UBUNTU=26.04 mu300-update apply` (or `24.04`),
 keeping settings and data.

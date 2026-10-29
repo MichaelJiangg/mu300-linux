@@ -28,6 +28,7 @@ var callAtHist = rpc.declare({ object: 'mu300dash', method: 'at_history', expect
 var callLockGet = rpc.declare({ object: 'mu300dash', method: 'lock_get', expect: { '': {} }, nobatch: true });
 var callLockFresh = rpc.declare({ object: 'mu300dash', method: 'lock_get', params: [ 'fresh' ], expect: { '': {} }, nobatch: true });
 var callLockSet = rpc.declare({ object: 'mu300dash', method: 'lock_set', params: [ 'kind', 'val' ], expect: { '': {} }, nobatch: true });
+var callLockJob = rpc.declare({ object: 'mu300dash', method: 'lock_job', params: [ 'id' ], expect: { '': {} }, nobatch: true });
 var callSmsList = rpc.declare({ object: 'mu300dash', method: 'sms_list', params: [ 'page' ], expect: { '': {} }, nobatch: true });
 var callSmsShow = rpc.declare({ object: 'mu300dash', method: 'sms_show', params: [ 'id' ], expect: { '': {} }, nobatch: true });
 var callSmsSend = rpc.declare({ object: 'mu300dash', method: 'sms_send', params: [ 'num', 'text' ], expect: { '': {} }, nobatch: true });
@@ -48,11 +49,19 @@ var callSimcardGet = rpc.declare({ object: 'mu300dash', method: 'simcard_get', e
 var callSimcardSet = rpc.declare({ object: 'mu300dash', method: 'simcard_set', params: [ 'kind', 'slot', 'state' ], expect: { '': {} }, nobatch: true });
 var callTtlGet = rpc.declare({ object: 'mu300dash', method: 'ttl_get', expect: { '': {} }, nobatch: true });
 var callTtlSet = rpc.declare({ object: 'mu300dash', method: 'ttl_set', params: [ 'value' ], expect: { '': {} }, nobatch: true });
+/* the TCP congestion control of the device's own connections (value default|cubic|bbr), and the dual boot's state */
+var callTcpGet = rpc.declare({ object: 'mu300dash', method: 'tcp_get', expect: { '': {} }, nobatch: true });
+var callTcpSet = rpc.declare({ object: 'mu300dash', method: 'tcp_set', params: [ 'value' ], expect: { '': {} }, nobatch: true });
+var callBootGet = rpc.declare({ object: 'mu300dash', method: 'boot_get', expect: { '': {} }, nobatch: true });
+/* System > LEDs: mu300-led's settings (key: timeout, network, wifi, battery, *_brightness, boot, thermal) */
+var callLedGet = rpc.declare({ object: 'mu300dash', method: 'led_get', expect: { '': {} }, nobatch: true });
+var callLedSet = rpc.declare({ object: 'mu300dash', method: 'led_set', params: [ 'key', 'value' ], expect: { '': {} }, nobatch: true });
 var callFwdGet = rpc.declare({ object: 'mu300dash', method: 'forward_get', expect: { '': {} }, nobatch: true });
 var callFwdSet = rpc.declare({ object: 'mu300dash', method: 'forward_set', params: [ 'enabled', 'template', 'allow',
 	'deny', 'keywords', 'clear', 'webhook', 'webhook_url', 'webhook_format', 'webhook_headers', 'telegram',
 	'telegram_token', 'telegram_chat', 'email', 'email_host', 'email_port', 'email_tls', 'email_user', 'email_password',
-	'email_from', 'email_to', 'sms', 'sms_number', 'webhook_body', 'webhook_expect' ], expect: { '': {} }, nobatch: true });
+	'email_from', 'email_to', 'sms', 'sms_number', 'webhook_body', 'webhook_expect', 'webhook_secret', 'timeout',
+	'power' ], expect: { '': {} }, nobatch: true });
 var callFwdTest = rpc.declare({ object: 'mu300dash', method: 'forward_test', expect: { '': {} }, nobatch: true });
 var callFwdLogClear = rpc.declare({ object: 'mu300dash', method: 'forward_log_clear', expect: { '': {} }, nobatch: true });
 var callCpuGet = rpc.declare({ object: 'mu300dash', method: 'cpu_get', expect: { '': {} }, nobatch: true });
@@ -265,8 +274,20 @@ html.mud-bootstrap-theme{--surface:var(--background-color-high);--surface-sunken
 .mud-lockbtn{padding:0 10px;border-radius:99px;border:1px solid var(--hairline,var(--border,#ccc));background:var(--surface,var(--background,#fff));color:var(--text,#222);font-size:.72rem;cursor:pointer;line-height:1.7}
 .mud-lockbtn.on,.mud-lockbtn:active{background:var(--brand,var(--primary,#2f7bf6));border-color:var(--brand,var(--primary,#2f7bf6));color:var(--on-brand,#fff)}
 .mud-lockbtn.locked{opacity:.45;pointer-events:none;background:var(--surface-sunken,rgba(127,127,127,.1));color:var(--text-muted,var(--text-light,#888));border-color:transparent}
+/* the IMEI rows: a click copies the value; the active card's tag */
+.mud-copy{cursor:pointer;border-bottom:1px dotted color-mix(in oklab,var(--hairline,var(--border,#ddd)) 90%,transparent)}
+.mud-copy:hover,.mud-copy.ok{color:var(--success,#1e7e34)}
+.mud-imei-active{display:inline-block;margin-left:6px;padding:0 6px;border-radius:9px;background:color-mix(in oklab,var(--success,#2FBF71) 15%,transparent);color:var(--success,#1e7e34);font-size:11px;line-height:18px;font-weight:600}
 .mud-hero-l{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:5px}
 .mud-hero-r{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+/* The USB link pill in the hero's status line */
+.mud-vsep{display:inline-block;width:1px;height:11px;margin:0 8px 0 2px;vertical-align:-1px;background:color-mix(in oklab,var(--hairline,var(--border,#ddd)) 85%,transparent)}
+.mud-usb{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:999px;background:var(--surface,var(--background,#fff));border:1px solid color-mix(in oklab,var(--hairline,var(--border,#ddd)) 80%,transparent);font-size:.72rem;color:var(--text-muted,var(--text-light,#777));white-space:nowrap;vertical-align:1px}
+.mud-usb[hidden],.mud-vsep[hidden]{display:none}
+.mud-usb i{width:6px;height:6px;border-radius:50%;flex:0 0 auto;background:var(--text-subtle,var(--text-light,#999))}
+.mud-usb b{font-weight:600;color:var(--text,#222);font-variant-numeric:tabular-nums}
+.mud-usb.warn i{background:var(--warning,#f59e0b)}
+.mud-usb.ok i{background:var(--success,#2FBF71)}
 .mud-rat{font-size:1.7rem;font-weight:700;line-height:1.1;letter-spacing:.01em}
 .mud-op{color:var(--text-muted,var(--text-light,#777));font-size:.85rem}
 .mud-cellline{font-size:.78rem;color:var(--text-muted,var(--text-light,#777));font-variant-numeric:tabular-nums;line-height:1.55}
@@ -292,6 +313,14 @@ html.mud-bootstrap-theme{--surface:var(--background-color-high);--surface-sunken
 .mud-meter i{display:block;height:100%;border-radius:3px}
 .mud-freq{display:flex;align-items:center;font-size:.76rem;font-variant-numeric:tabular-nums;padding:1px 0}
 .mud-freq .mud-k{flex:0 0 2.4em}
+.mud-manual-cell{margin:12px 0;max-width:720px;min-width:0}
+.mud-manual-cell summary{cursor:pointer;padding:8px 0;font-size:.85rem;font-weight:600}
+.mud-manual-cell form{margin:4px 0 12px}
+.mud-manual-cell-fields{display:flex;flex-wrap:wrap;align-items:end;gap:12px}
+.mud-manual-cell-fields label{display:flex;flex:1 1 140px;flex-direction:column;gap:6px;margin:0;min-width:0;font-size:.82rem}
+.mud-manual-cell-fields input,.mud-manual-cell-fields select{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:38px;margin:0;padding:8px 10px;border:1px solid var(--hairline,var(--border,#ccc));border-radius:var(--radius-base,.5rem);background:var(--surface,var(--background,#fff));color:var(--text,#222);font:inherit}
+.mud-manual-cell-fields button{min-height:38px;margin:0;white-space:normal}
+.mud-manual-cell-fields input:focus,.mud-manual-cell-fields select:focus{outline:2px solid var(--brand,var(--primary,#37a));outline-offset:1px}
 .mud-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;border:1px solid var(--hairline,var(--border,#ccc));border-radius:var(--radius-base,.5rem);background:var(--surface,var(--background,#fff));color:var(--text,#222);font-size:.82rem;cursor:pointer;user-select:none}
 .mud-btn:active{transform:scale(.97)}
 .mud-btn.on{background:var(--brand,var(--primary,#2f7bf6));border-color:var(--brand,var(--primary,#2f7bf6));color:var(--on-brand,#fff)}
@@ -412,6 +441,16 @@ function injectCss() {
 	st.id = 'mud-style';
 	st.textContent = CSS;
 	document.head.appendChild(st);
+}
+/* cellIdentity(snapshot): the serving cell's TAC and cell ID in decimal, or null. AT+C5GREG's while registered on 5G SA
+ * (stat 1 or 5 there), else AT+CEREG's; both give them as hex strings: a TAC of up to 6 digits, a cell ID of up to 9
+ * (NR's 36-bit NCI). Anything else (no registration, a value that is not plain hex) gives null. */
+function cellIdentity(c) {
+	var r = c && c.reg5g && (c.reg5g.stat == 1 || c.reg5g.stat == 5) ? c.reg5g : null, nr = !!r;
+	if (!r) r = c && c.reg && (c.reg.stat == 1 || c.reg.stat == 5) ? c.reg : null;
+	if (!r || typeof r.tac != 'string' || typeof r.cid != 'string' ||
+	    !/^[0-9A-Fa-f]{1,6}$/.test(r.tac) || !/^[0-9A-Fa-f]{1,9}$/.test(r.cid)) return null;
+	return { tac: parseInt(r.tac, 16), cid: parseInt(r.cid, 16), nr: nr };
 }
 function v(id) { return document.getElementById('mud-' + id); }
 function set(id, text, color) {
@@ -725,7 +764,7 @@ function choiceBox(title, message, choices, opts) {
 return baseclass.extend({
 	callStatus: callStatus, callSignal: callSignal, callSysinfo: callSysinfo, callAct: callAct, callAt: callAt, callAtHist: callAtHist,
 	callAtJob: callAtJob, callOpsLog: callOpsLog, backoff: backoff, ageText: ageText,
-	callLockGet: callLockGet, callLockFresh: callLockFresh, callLockSet: callLockSet,
+	callLockGet: callLockGet, callLockFresh: callLockFresh, callLockSet: callLockSet, callLockJob: callLockJob,
 	callSmsList: callSmsList, callSmsShow: callSmsShow, callSmsSend: callSmsSend, callSmsJob: callSmsJob,
 	callSmsDel: callSmsDel, callSmsSync: callSmsSync,
 	callUsbGet: callUsbGet, callUsbSet: callUsbSet,
@@ -734,6 +773,8 @@ return baseclass.extend({
 	callPowerGet: callPowerGet, callPowerSet: callPowerSet,
 	callSimGet: callSimGet, callSimSet: callSimSet, callSimcardGet: callSimcardGet, callSimcardSet: callSimcardSet,
 	callTtlGet: callTtlGet, callTtlSet: callTtlSet,
+	callTcpGet: callTcpGet, callTcpSet: callTcpSet, callBootGet: callBootGet,
+	callLedGet: callLedGet, callLedSet: callLedSet,
 	callFwdGet: callFwdGet, callFwdSet: callFwdSet, callFwdTest: callFwdTest, callFwdLogClear: callFwdLogClear,
 	callCpuGet: callCpuGet, callCpuSet: callCpuSet, callCpuTune: callCpuTune, callCpuVoltageGet: callCpuVoltageGet, callCpuVoltageSet: callCpuVoltageSet,
 	callPackagesGet: callPackagesGet, callPackagesAct: callPackagesAct,
@@ -743,7 +784,7 @@ return baseclass.extend({
 	callTermToken: callTermToken,
 	carrierName: carrierName, qLevel: qLevel, qLevelLabel: qLevelLabel, qLabel: qLabel, qCol: qCol, qScore: qScore,
 	esc: esc, fmtBytes: fmtBytes, fmtRate: fmtRate, fmtUptime: fmtUptime, PLMN_CN: PLMN_CN,
-	injectCss: injectCss, v: v, set: set, spark: spark, neighborRows: neighborRows,
+	injectCss: injectCss, v: v, set: set, cellIdentity: cellIdentity, spark: spark, neighborRows: neighborRows,
 	errText: errText, toast: toast, busy: busy, confirmBox: confirmBox, alertBox: alertBox, choiceBox: choiceBox,
 	notify: notify, watchSms: watchSms
 });

@@ -116,6 +116,7 @@ return view.extend({
 		var first = L.resolveDefault(M.callStatus()).then(function(st) {
 			self.update(st || {});
 		});
+		this.loadBoot();
 		/* LuCI poll.add() truncates intervals to whole seconds. Use a one-shot
 		 * timer so 1.5 s remains 1.5 s and slow requests never overlap; after a
 		 * failed snapshot the next one waits longer (M.backoff), up to 18 s. */
@@ -155,6 +156,24 @@ return view.extend({
 	unload: function() {
 		clearTimeout(this._refreshTimer);
 		clearTimeout(this._rateTimer);
+	},
+
+	/* The dual boot's state under the boot buttons (mu300-next-boot status, read only; kanoqwq's f6b0668d): the default
+	 * boot, whether this boot is a one-time one (the default is Android: the next restart goes there), and whether the
+	 * boot control blocks can be written, which the buttons need. Read once, and again after a boot button. */
+	loadBoot: function() {
+		var root = this._root;
+		return L.resolveDefault(M.callBootGet(), {}).then(function(b) {
+			var box = root.querySelector('#mud-boot');
+			if (!box) return;
+			if (!b || b.ok !== 1 || !b.available) { box.style.display = 'none'; return; }
+			box.style.display = '';
+			var set = function(id, text) { root.querySelector('#mud-boot-' + id).textContent = text; };
+			set('default', b.default === 'linux' ? 'Linux' + (b.locked ? ' (' + _('Linux locked') + ')' : '')
+				: b.default === 'android' ? 'Android' : _('Unknown'));
+			set('temp', b.temporary === true ? _('Yes: the next restart starts Android') : b.temporary === false ? _('No') : _('Unknown'));
+			set('ctl', b.writable ? _('Writable') : _('This boot image cannot change the boot'));
+		});
 	},
 
 	/* One reading of the fast lane: rates over the time since the last one (a counter that went down - the interface
@@ -205,10 +224,11 @@ return view.extend({
   <div class="mud-hero-l">
     <div style="font-size:.78rem;color:var(--text-muted,var(--text-light,#777))">
       <span class="mud-dot" id="mud-dot"></span><b id="mud-host" style="color:var(--text,#222)">--</b>
-      <span id="mud-uptime"></span></div>
+      <span id="mud-uptime"></span><span class="mud-vsep" id="mud-vsep" hidden></span><span class="mud-usb" id="mud-usb" hidden></span></div>
     <div class="mud-rat" id="mud-rat">--<span class="mud-bars" id="mud-bars"><i style="height:25%"></i><i style="height:45%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></span></div>
     <div class="mud-op" id="mud-op">--</div>
     <div class="mud-cellline" id="mud-cellline"></div>
+    <div class="mud-note" id="mud-cellid" style="margin-top:4px"></div>
     <div class="mud-note" id="mud-stale" style="display:none;margin:4px 0 0;color:var(--warning,#f59e0b)"></div>
     <a class="mud-note" id="mud-update" href="${L.url('admin/system/mu300-update')}" style="display:none;margin:4px 0 0;color:var(--brand,var(--primary,#2f7bf6))"></a>
   </div>
@@ -276,7 +296,7 @@ return view.extend({
     <div class="mud-kpi"><b id="mud-cpu">--</b><span>${_('CPU usage')}</span><div class="mud-meter"><i id="mud-cpu-bar" style="background:var(--brand,var(--primary,#3b82f6))"></i></div></div>
     <div class="mud-kpi"><b id="mud-ram">--</b><span>${_('Memory')} · <span class="mud-sub" id="mud-ram-sub">--</span></span><div class="mud-meter"><i id="mud-ram-bar" style="background:var(--info,#0ea5e9)"></i></div></div>
     <div class="mud-kpi"><b id="mud-disk">--</b><span>${_('Storage')}</span><div class="mud-meter"><i id="mud-disk-bar" style="background:var(--warning,#f59e0b)"></i></div></div>
-    <div class="mud-kpi" id="mud-batt-kpi" style="display:none"><b id="mud-batt">--</b><span id="mud-batt-l">${_('Battery')}</span></div>
+    <div class="mud-kpi" id="mud-batt-kpi" style="display:none"><b id="mud-batt">--</b><span id="mud-batt-l">${_('Battery')}</span><div class="mud-meter" id="mud-batt-meter" hidden aria-hidden="true"><i id="mud-batt-bar" style="width:0%;background:var(--success,#16a34a)"></i></div></div>
   </div>
   <div id="mud-freqs" class="mud-freqs"></div>
   <div class="mud-cols">
@@ -303,7 +323,8 @@ return view.extend({
         <div class="mud-r"><span class="mud-k">${_('Modem')}</span><span class="mud-v" id="mud-modem">--</span></div>
         <div class="mud-r"><span class="mud-k">${_('Carrier')}</span><span class="mud-v" id="mud-carr">--</span></div>
         <div class="mud-r"><span class="mud-k">PLMN</span><span class="mud-v" id="mud-plmn">--</span></div>
-        <div class="mud-r"><span class="mud-k">IMEI</span><span class="mud-v" id="mud-imei">--</span></div>
+        <div class="mud-r" id="mud-imei1-r"><span class="mud-k" id="mud-imei1-k">IMEI1 (SIM1)</span><span class="mud-v mud-copy" id="mud-imei1">--</span></div>
+        <div class="mud-r" id="mud-imei2-r" style="display:none"><span class="mud-k" id="mud-imei2-k">IMEI2 (SIM2)</span><span class="mud-v mud-copy" id="mud-imei2">--</span></div>
         <div class="mud-r"><span class="mud-k">IMSI</span><span class="mud-v" id="mud-imsi">--</span></div>
         <div class="mud-r"><span class="mud-k">ICCID</span><span class="mud-v" id="mud-iccid">--</span></div>
         <div class="mud-r" id="mud-msisdn-r" style="display:none"><span class="mud-k">${_('Own number')}</span><span class="mud-v" id="mud-msisdn">--</span></div>
@@ -325,9 +346,14 @@ return view.extend({
     <button class="mud-btn" id="mud-btn-roam">${_('Data roaming')}</button>
     <button class="mud-btn" id="mud-btn-wifi">${_('Wi-Fi hotspot')}</button>
     <button class="mud-btn warn" id="mud-btn-modem">${_('Restart modem')}</button>
-    <button class="mud-btn warn" id="mud-btn-reboot">${_('Restart device')}</button>
+    <button class="mud-btn warn" id="mud-btn-reboot">${_('Power off or restart')}</button>
     <button class="mud-btn warn" id="mud-btn-android">${_('Switch to Android')}</button>
     <button class="mud-btn" id="mud-btn-bootlock">${_('Lock Linux')}</button>
+  </div>
+  <div class="mud-rows" id="mud-boot" style="display:none;margin-top:10px">
+    <div class="mud-r"><span class="mud-k">${_('Default boot')}</span><span class="mud-v" id="mud-boot-default">--</span></div>
+    <div class="mud-r"><span class="mud-k">${_('One-time boot')}</span><span class="mud-v" id="mud-boot-temp">--</span></div>
+    <div class="mud-r"><span class="mud-k">${_('Boot control')}</span><span class="mud-v" id="mud-boot-ctl">--</span></div>
   </div>
 </div>
 <div class="mud-sec">
@@ -358,7 +384,9 @@ return view.extend({
 			return L.resolveDefault(M.callAct(op, arg)).then(function(r) {
 				r = r || {};
 				M.busy(btn, false);
-				M.toast(r.ok ? (r.started ? _('Started in background: %s') : _('Done: %s')).format(r.op || op)
+				/* (the hotspot: written and committed, netifd applies it asynchronously - kanoqwq's db4e5d2) */
+				M.toast(r.ok && r.pending && op === 'wifi' ? _('Hotspot settings saved; applying changes')
+					: r.ok ? (r.started ? _('Started in background: %s') : _('Done: %s')).format(r.op || op)
 					: _('Failed: %s').format(M.errText(r)),
 					{ type: r.ok ? 'success' : 'error' });
 			}, function() { M.busy(btn, false); M.toast(_('Request failed'), { type: 'error' }); });
@@ -395,10 +423,14 @@ return view.extend({
 			M.confirmBox(_('Restart modem'), _('Cellular connectivity may stop for 1–2 minutes.'), { danger: true })
 				.then(function(go) { if (go) act('modem-reset', null, null, btn); });
 		};
+		/* power off or restart (kanoqwq's b8d4f222): both the orderly way, after the reply is out */
 		q('btn-reboot').onclick = function() {
 			var btn = this;
-			M.confirmBox(_('Restart the entire device'), _('All connections will be interrupted.'), { danger: true })
-				.then(function(go) { if (go) act('reboot', null, null, btn); });
+			M.choiceBox(_('Power off or restart'), _('All connections will be interrupted.'), [
+				{ label: _('Cancel'), value: undefined },
+				{ label: _('Power off'), value: 'poweroff', danger: true },
+				{ label: _('Restart'), value: 'reboot', danger: true }
+			]).then(function(op) { if (op === 'poweroff' || op === 'reboot') act(op, null, null, btn); });
 		};
 		/* The network mode and band locks live in the modem's NV, which Android shares: they stay in force there (#96).
 		 * When the last lock state shows anything not automatic, the dialog says so and offers to reset first; when
@@ -439,13 +471,36 @@ return view.extend({
 					  _('A new kernel from an update still gets its first boots on trial, and locks again once one of them succeeds.'),
 					  _('If the system itself no longer starts, the device waits on USB (telnet) instead of going to Android.') ].join('\n'),
 					{ danger: true, okText: _('Lock') })
-			).then(function(go) { if (go) act('os', locked ? 'unlock' : 'lock', null, btn); });
+			).then(function(go) { if (go) act('os', locked ? 'unlock' : 'lock', null, btn).then(function() { self.loadBoot(); }); });
 		};
 		q('reveal').onclick = function() {
 			self.identShown = !self.identShown;
 			M.v('reveal').textContent = self.identShown ? _('Hide SIM identifiers') : _('Show SIM identifiers');
 			self.paintIdent(self.lastCell);
 		};
+		/* a click on an IMEI copies the whole value; the panel is plain HTTP (no secure context), so execCommand is
+		 * the fallback of the clipboard API */
+		[ 0, 1 ].forEach(function(n) {
+			var el = q('imei' + (n + 1));
+			if (!el) return;
+			el.onclick = function() {
+				var v = self.imeiFull && self.imeiFull[n];
+				if (!v) return;
+				var copy = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(v)
+					: new Promise(function(res, rej) {
+						var ta = document.createElement('textarea');
+						ta.value = v; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
+						document.body.appendChild(ta); ta.select();
+						try { document.execCommand('copy') ? res() : rej(new Error('copy')); } catch (e) { rej(e); }
+						document.body.removeChild(ta);
+					});
+				copy.then(function() {
+					el.classList.add('ok');
+					setTimeout(function() { el.classList.remove('ok'); }, 900);
+					M.toast('IMEI' + (n + 1) + ' \u2713', { type: 'success' });
+				}, function() { M.toast('\u2717', { type: 'error' }); });
+			};
+		});
 
 		/* Lock from a neighbor row (event delegation) */
 		q('neigh').addEventListener('click', function(ev) {
@@ -546,7 +601,21 @@ return view.extend({
 			if (!s) return '--';
 			return this.identShown ? s : s.substring(0, 4) + '****' + s.substring(s.length - 3);
 		}.bind(this);
-		M.set('imei', mask(id && id.imei));
+		/* The module has two IMEIs, one per card (cell's imei1/imei2, read over diag, FINDINGS 221). Both are shown,
+		 * the active one tagged, and a click copies the full value (the page may be masking it). Where diag gave
+		 * nothing (another modem, the 5.4 kernel), the AT+CGSN IMEI stands in for the active card's, and a row with
+		 * no value at all is hidden. */
+		var slot = id && typeof id.slot === 'number' ? id.slot : 0;
+		var imei = [ id && id.imei1, id && id.imei2 ];
+		if (!imei[slot] && id && id.imei) imei[slot] = id.imei;
+		this.imeiFull = imei;
+		for (var n = 0; n < 2; n++) {
+			var k = M.v('imei' + (n + 1) + '-k'), r = M.v('imei' + (n + 1) + '-r');
+			if (k) k.innerHTML = 'IMEI' + (n + 1) + ' (SIM' + (n + 1) + ')' +
+				(slot === n && imei[n] ? ' <span class="mud-imei-active">\u2713 ' + _('in use') + '</span>' : '');
+			if (r) r.style.display = imei[n] || n === slot ? '' : 'none';
+			M.set('imei' + (n + 1), mask(imei[n]));
+		}
 		M.set('imsi', mask(id && id.imsi));
 		M.set('iccid', mask(id && id.iccid));
 		/* The SIM's own number (CNUM, else the IMS identity; full rounds only): a row only when there is one, masked
@@ -564,6 +633,27 @@ return view.extend({
 		if (el && this.lastCell) el.innerHTML = M.neighborRows(this.lastCell, this.lockedCell);
 	},
 
+	/* The USB cable's link speed (dashboard-info's usblink). Device mode reports the gadget's negotiated
+	 * speed, host mode the attached device's. Hidden with nothing plugged in; amber when the link is below what the
+	 * port can do -- a USB 2.0 cable or host port caps a 10 Gbps port at 480 Mbps. */
+	paintUsb: function(l) {
+		var el = M.v('usb'), sep = M.v('vsep');
+		if (!el) return;
+		var mbps = l && typeof l.mbps === 'number' ? l.mbps : null;
+		if (mbps == null) { el.hidden = true; if (sep) sep.hidden = true; return; }
+		var names = { 'low-speed': 'Low Speed', 'full-speed': 'Full Speed', 'high-speed': 'High Speed',
+			'super-speed': 'SuperSpeed', 'super-speed-plus': 'SuperSpeed+' };
+		var rate = function(n) { return n >= 1000 ? (n / 1000) + ' Gbps' : n + ' Mbps'; };
+		var max = typeof l.max_mbps === 'number' ? l.max_mbps : null;
+		var name = names[l.speed] || (l.role === 'host' ? 'Host' : 'link');
+		el.className = 'mud-usb' + (max == null ? '' : (mbps >= max ? ' ok' : ' warn'));
+		el.innerHTML = '<i></i><b>' + M.esc('USB ' + name + ' \u00b7 ' + rate(mbps)) + '</b>';
+		el.title = l.role === 'host'
+			? 'USB host mode, attached device ' + rate(mbps)
+			: 'USB ' + rate(mbps) + ' now, port maximum ' + (max == null ? '--' : (names[l.max] ? names[l.max] + ' ' : '') + rate(max));
+		el.hidden = false;
+		if (sep) sep.hidden = false;
+	},
 	update: function(st) {
 		var i = st.info || {};
 		this.lastInfo = i;
@@ -575,7 +665,7 @@ return view.extend({
 		var c = st.cell || null;
 		var s = st.sig || null;
 		if (s && !s.error && (!c || !c.ts || (s.ts || 0) >= c.ts)) {
-			if (c && s.partial) {
+			if (c && !c.error && s.partial) {
 				/* The first core reply updates the registration, but a transient empty CESQ does not wipe the last engineering signal. */
 				c = Object.assign({}, c, {
 					ts: s.ts, cfun: s.cfun, reg: s.reg, reg5g: s.reg5g
@@ -583,7 +673,10 @@ return view.extend({
 			} else c = c ? Object.assign({}, c, {
 				ts: s.ts, cfun: s.cfun, reg: s.reg, reg5g: s.reg5g,
 				sig_src: s.sig_src, sig: s.sig, lte: s.lte, nr: s.nr
-			}) : s;
+			}) : Object.assign({}, s);
+			/* A newer successful read supersedes the slow tier's old failure: without this the card kept saying
+			 * "No response" after the modem had recovered, until the slow tier's next full refresh (kanoqwq 3c350105). */
+			delete c.error;
 		}
 		this.lastCell = c;
 		/* Slow-tier data (neighbors/carrier/identity) is redrawn only when the whole cache's timestamp changes */
@@ -594,6 +687,7 @@ return view.extend({
 		M.set('host', i.host);
 		M.set('uptime', i.uptime ? _('Uptime %s').format(M.fmtUptime(i.uptime)) : '');
 		M.v('dot').className = 'mud-dot' + (i.modem && i.modem.alive ? ' on' : '');
+		this.paintUsb(i.usblink);
 
 		var sig = c && !c.error ? (c.sig || {}) : {};
 		var rsrp = sig.rsrp, rsrq = sig.rsrq, sinr = sig.sinr;
@@ -648,6 +742,10 @@ return view.extend({
 		if (c && c.lte && c.lte.band) cl.push(_('Anchor B%s').format(c.lte.band) + ' · PCI ' + c.lte.pci + ' · EARFCN ' + c.lte.earfcn +
 			(c.lte.sinr != null ? ' · SINR ' + c.lte.sinr.toFixed(1) + ' dB' : ''));
 		M.v('cellline').innerHTML = cl.map(M.esc).join('<br>') || '<span style="color:var(--text-muted,var(--text-light,#777))">' + _('No serving cell') + '</span>';
+		/* The serving cell's identity in decimal, as cell databases list it (#398, from gonav8): read from the snapshot
+		 * already in hand (AT+C5GREG while registered on 5G SA, else AT+CEREG), so it costs no RPC and no AT command */
+		var ci = M.cellIdentity(c);
+		M.v('cellid').textContent = ci ? 'TAC ' + ci.tac + ' · Cell ID ' + ci.cid + (ci.nr ? ' (5G)' : '') : '';
 
 		M.set('rsrp', '--');
 		if (rsrp != null) M.v('rsrp').innerHTML = rsrp.toFixed(1) + '<small> dBm</small>';
@@ -804,6 +902,12 @@ return view.extend({
 				(p.in_volt != null ? ' (' + p.in_volt + ' V)' : '') : 'USB');
 			M.set('batt', p.capacity != null ? p.capacity + '%' : (p.volt != null ? p.volt + ' V' : '--'));
 			M.set('batt-l', parts.join(' · '));
+		}
+		/* the capacity as a bar, as CPU, memory and storage have (kanoqwq's edcdeb27) */
+		var bpct = p.present && typeof p.capacity === 'number' && isFinite(p.capacity) ? Math.max(0, Math.min(100, p.capacity)) : null;
+		if (M.v('batt-meter')) {
+			M.v('batt-meter').hidden = bpct == null;
+			M.v('batt-bar').style.width = (bpct == null ? 0 : bpct) + '%';
 		}
 		M.set('model', i.model || '--');
 		M.set('fwos', i.fw || '--');

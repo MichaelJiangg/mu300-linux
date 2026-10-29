@@ -27,6 +27,19 @@ append_once('drivers/misc/Kconfig', 'config ZTE_V50_SIM',
             '\tdepends on GPIOLIB && OF\n\thelp\n'
             '\t  The ZTE V50 (MU3351) switches between its built-in and external SIM cards (zte,sim_gpio_ctrl).\n'
             '\t  Binds only on a board with the V50\'s AW9523B; leaves the lines as the bootloader set them.\n')
+# ZTE's board extras of the 5.4 kernel (FINDINGS 234): the card holder (tray) detection, /sys/zcard_det/zcard_det,
+# and the board state, /proc/driver/board_id and /dev/zte_board_state
+append_once('drivers/misc/Makefile', 'zte_card_holder_det.o', 'obj-$(CONFIG_ZTE_CARD_HOLDER_DET) += zte_card_holder_det.o\n')
+append_once('drivers/misc/Makefile', 'board_state.o', 'obj-$(CONFIG_ZTE_BOARD_STATE) += board_state.o\n')
+append_once('drivers/misc/Kconfig', 'config ZTE_CARD_HOLDER_DET',
+            '\nconfig ZTE_CARD_HOLDER_DET\n\ttristate "ZTE card holder detection"\n'
+            '\tdepends on GPIOLIB && OF\n\thelp\n'
+            '\t  /sys/zcard_det/zcard_det: whether the card tray is in (the F50: the card slot\'s detect line), as the\n'
+            '\t  ZTE 5.4 kernel\'s zte_card_holder_det.\n'
+            '\nconfig ZTE_BOARD_STATE\n\ttristate "ZTE board state"\n'
+            '\tdepends on OF && PROC_FS\n\thelp\n'
+            '\t  The board ID and secure-boot state the bootloader passes (/proc/driver/board_id,\n'
+            '\t  /dev/zte_board_state), as the ZTE 5.4 kernel\'s board_state.\n')
 
 append_once('drivers/clk/sprd/Makefile', 'reset.o', 'clk-sprd-y\t+= reset.o\n')
 append_once('drivers/clk/sprd/Makefile', 'ums9620-clk.o', 'obj-$(CONFIG_SPRD_UMS9620_CLK)\t\t+= ums9620-clk.o\n')
@@ -101,6 +114,26 @@ if 'REGULATOR_UMP9620' not in r:
                  '\thelp\n\t  Regulators of the UMP9620 PMIC (ported from the Unisoc 5.4 kernel).\n\n') + r[i:]
     open(rk, 'w').write(r)
 
+# the PMIC's Type-C detection (sc27xx_typec: port0, partner, extcon) and BC1.2 detection (sprd-bc1p2), as on 5.4
+append_once('drivers/usb/typec/Makefile', 'sc27xx_typec.o', 'obj-$(CONFIG_TYPEC_SC27XX)\t+= sc27xx_typec.o\n')
+tk = os.path.join(tree, 'drivers/usb/typec/Kconfig')
+k = open(tk).read()
+if 'config TYPEC_SC27XX\n' not in k:
+    i = k.rindex('endif # TYPEC')
+    k = k[:i] + ('config TYPEC_SC27XX\n\ttristate "Unisoc UMP9620 USB Type-C detection"\n'
+                 '\tdepends on MFD_SC27XX_PMIC && EXTCON && NVMEM && OF\n\thelp\n'
+                 '\t  The PMIC Type-C block\'s attach/detach detection as a Type-C port with extcon, as the\n'
+                 '\t  Unisoc 5.4 kernel\'s sc27xx_typec (no power delivery).\n\n') + k[i:]
+    open(tk, 'w').write(k)
+append_once('drivers/usb/phy/Makefile', 'sprd-bc1p2.o', 'obj-$(CONFIG_SPRD_BC1P2) += sprd-bc1p2.o\n')
+pk = os.path.join(tree, 'drivers/usb/phy/Kconfig')
+k = open(pk).read()
+if 'config SPRD_BC1P2\n' not in k:
+    i = k.rindex('endmenu')
+    k = k[:i] + ('config SPRD_BC1P2\n\ttristate "Unisoc UMP9620 BC1.2 charger detection"\n'
+                 '\tdepends on MFD_SC27XX_PMIC && OF\n\thelp\n'
+                 '\t  The PMIC\'s BC1.2 charger-port detection result, as the Unisoc 5.4 kernel\'s sprd_bc1p2.\n\n') + k[i:]
+    open(pk, 'w').write(k)
 append_once('drivers/usb/phy/Makefile', 'phy-sprd-ums9620-ssphy.o', 'obj-$(CONFIG_USB_SPRD_UMS9620_SSPHY) += phy-sprd-ums9620-ssphy.o\n')
 pk = os.path.join(tree, 'drivers/usb/phy/Kconfig')
 k = open(pk).read()
@@ -263,6 +296,22 @@ if 'qogirn6pro' not in t:
     t = t.replace('static int sprd_efuse_write(', 'static int __maybe_unused sprd_efuse_write(')
     open(ep, 'w').write(t)
 assert 'reg_write' not in open(ep).read()
+# the SoC's identity, as the vendor 5.4 drivers sprd_soc_id and sprd_manufacturer_model gave it: /proc/socid/socid_inf,
+# sprd_get_soc_id() and /sys/devices/soc0 (soc_model, soc_manufacturer and the standard SoC device attributes)
+append_once('drivers/soc/Makefile', 'sprd/', 'obj-y\t\t\t\t+= sprd/\n')
+open(os.path.join(tree, 'drivers/soc/sprd/Makefile'), 'a').close()
+append_once('drivers/soc/sprd/Makefile', 'sprd_soc_id.o', 'obj-$(CONFIG_SPRD_SOC_ID) += sprd_soc_id.o\n')
+append_once('drivers/soc/Kconfig', 'config SPRD_SOC_ID', '''
+menu "Unisoc SoC drivers (MU300 port)"
+config SPRD_SOC_ID
+	tristate "Unisoc SoC ID and model"
+	depends on (ARCH_SPRD && OF && MFD_SYSCON) || COMPILE_TEST
+	select SOC_BUS
+	help
+	  The chip ID registers (sprd,soc-id) and the SoC model the device tree names: /proc/socid/socid_inf and
+	  /sys/devices/soc0, as the Unisoc 5.4 kernel's sprd_soc_id and sprd_manufacturer_model gave them.
+endmenu
+''')
 # cpufreq: UMS9620 apcpu DVFS is done by ATF through Unisoc SIP calls (vendor sprd_sip_svc + sprd-cpufreq-v2)
 append_once('drivers/firmware/Makefile', 'sprd_sip_svc.o', 'obj-$(CONFIG_SPRD_SIP_SVC) += sprd_sip_svc.o\n')
 append_once('drivers/firmware/Kconfig', 'SPRD_SIP_SVC', '''
@@ -292,6 +341,17 @@ t = open(rp).read()
 if 'ump96xx-rtc' not in t:
     t = t.replace('\t{ .compatible = "sprd,sc2731-rtc", },\n', '\t{ .compatible = "sprd,sc2731-rtc", },\n\t{ .compatible = "sprd,ump96xx-rtc", },\n', 1)
     open(rp, 'w').write(t)
+# the SoC's TRNG (rng@e0000, sprd,sprd-trng): /dev/hwrng and the random pool's hardware source, as on 5.4 (FINDINGS 234)
+append_once('drivers/char/hw_random/Makefile', 'sprd_trng.o', 'obj-$(CONFIG_HW_RANDOM_SPRD) += sprd_trng.o\n')
+hk = os.path.join(tree, 'drivers/char/hw_random/Kconfig')
+h = open(hk).read()
+if 'config HW_RANDOM_SPRD\n' not in h:
+    i = h.rindex('endif # HW_RANDOM')
+    h = h[:i] + ('config HW_RANDOM_SPRD\n\ttristate "Unisoc UMS9620 true random number generator"\n'
+                 '\tdepends on ARCH_SPRD || COMPILE_TEST\n\tdepends on HAS_IOMEM && OF && COMMON_CLK\n'
+                 '\thelp\n\t  The TRNG of the UMS9620\'s crypto engine (sprd,sprd-trng), ported from the Unisoc 5.4\n'
+                 '\t  kernel. The module is called sprd_trng.\n\n') + h[i:]
+    open(hk, 'w').write(h)
 # The ZTE U30 Air's charger (SGM41511, a bq25601): its vendor DT compatible in bq256xx's OF and I2C tables; the
 # driver's handling of that node (no IRQ, no input current in the DT, the chip as Android left it) is patch 0009. The
 # I2C table is an edit rather than part of the patch: 6.18 writes its entries positionally, 7.x with .name/.driver_data.

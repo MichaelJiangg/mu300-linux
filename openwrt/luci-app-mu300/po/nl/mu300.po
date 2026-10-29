@@ -52,6 +52,9 @@ msgstr "Talen"
 msgid "Power"
 msgstr "Voeding"
 
+msgid "LEDs"
+msgstr "Leds"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Hostmodus verbreekt USB-netwerk en seriële verbinding op deze poort. De
 msgid "USB network mode"
 msgstr "USB-netwerkmodus"
 
+msgid "Current sharing protocol"
+msgstr "Huidig deelprotocol"
+
 msgid "Network protocol"
 msgstr "Netwerkprotocol"
 
@@ -658,6 +664,27 @@ msgstr "Vernieuwen"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Alleen beschikbaar in hostmodus. Vernieuwen activeert gevonden USB-adapters; toevoegen aan LAN slaat de bridge op en herlaadt het netwerk."
 
+msgid "Network performance"
+msgstr "Netwerkprestaties"
+
+msgid "Active congestion control"
+msgstr "Actieve congestiecontrole"
+
+msgid "Default queue"
+msgstr "Standaardwachtrij"
+
+msgid "TCP congestion control"
+msgstr "TCP-congestiecontrole"
+
+msgid "Apply"
+msgstr "Toepassen"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Geldt vooral voor nieuwe TCP-verbindingen van dit apparaat. Doorgestuurde verbindingen van hotspot- en USB-clients gebruiken niet automatisch BBR."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR kiest FQ als standaardwachtrij voor nieuw aangemaakte interfaces. Bestaande verbindingen, interfaces en QoS blijven behouden. De instelling blijft na herstarten."
+
 msgid "Recent modem operations"
 msgstr "Recente modembewerkingen"
 
@@ -670,6 +697,12 @@ msgstr "De recente aanroepen van het bedieningspaneel, van deze opstart en de vo
 msgid "Unavailable"
 msgstr "Niet beschikbaar"
 
+msgid "Mixed"
+msgstr "Gemengd"
+
+msgid "None"
+msgstr "Geen"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "USB-netwerkmodus is niet beschikbaar in hostmodus; automatisch starten als host schakelt ook het automatisch starten van het USB-netwerk uit."
 
@@ -681,9 +714,6 @@ msgstr "USB-netwerk en seriële verbinding worden in apparaatmodus opnieuw geën
 
 msgid "Switch USB role?"
 msgstr "USB-rol wisselen?"
-
-msgid "Apply"
-msgstr "Toepassen"
 
 msgid "Switching USB role…"
 msgstr "USB-rol wordt gewisseld…"
@@ -721,6 +751,21 @@ msgstr "Instellingen opgeslagen"
 msgid "Save failed: %s"
 msgstr "Opslaan mislukt: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Netwerkprestatie-instellingen konden niet worden gelezen; vernieuw om opnieuw te proberen"
+
+msgid "This kernel does not provide this setting"
+msgstr "Deze kernel biedt deze instelling niet"
+
+msgid "System default"
+msgstr "Systeemstandaard"
+
+msgid "Applied and saved for future boots."
+msgstr "Toegepast en opgeslagen voor volgende opstarts."
+
+msgid "The kernel did not accept the network settings"
+msgstr "De kernel heeft de netwerkinstellingen niet geaccepteerd"
+
 msgid "This boot"
 msgstr "Deze opstart"
 
@@ -739,6 +784,9 @@ msgstr "USB-adapters zoeken…"
 msgid "No USB adapters found."
 msgstr "Geen USB-adapters gevonden."
 
+msgid "In use by another network"
+msgstr "In gebruik door een ander netwerk"
+
 msgid "Link connected"
 msgstr "Link verbonden"
 
@@ -747,6 +795,9 @@ msgstr "Geen link; inschakelen geprobeerd"
 
 msgid "Added to LAN"
 msgstr "Toegevoegd aan LAN"
+
+msgid "Cannot add"
+msgstr "Kan niet worden toegevoegd"
 
 msgid "Add to LAN"
 msgstr "Toevoegen aan LAN"
@@ -784,6 +835,9 @@ msgstr "Formulier (URL-gecodeerd)"
 msgid "Plain text"
 msgstr "Platte tekst"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Ook {sim} (SIM 1 of SIM 2) en {kind} (sms, test of power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Ontvangen berichten worden doorgestuurd zodra ze in de SMS-pool aankomen. Een mislukte levering wordt na 30 s opnieuw geprobeerd, daarna telkens na twee keer zo lang (hooguit een uur), in totaal tien keer."
 
@@ -811,6 +865,15 @@ msgstr "Alleen berichten met een van deze woorden"
 msgid "One per line; empty: every message."
 msgstr "Eén per regel; leeg: alle berichten."
 
+msgid "Battery"
+msgstr "Accu"
+
+msgid "Battery and charger notices"
+msgstr "Meldingen over accu en lader"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Een bericht naar elk doel wanneer de accu 5, 20, 40, 60, 80 of 100 % passeert en wanneer de lader wordt aangesloten of losgekoppeld."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Aangepaste body"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Leeg: de standaardvelden (platte tekst: het bericht). Plaatshouders: {sender}, {time}, {text}, {device}, {message}. Elke waarde wordt ge-escapet voor het gekozen type. Deze body wordt hier opnieuw getoond: zet geheimen in het adres of in een header."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Geheim voor {secret} in de eigen body"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Voor een dienst die zijn token in de body wil (PushPlus). Alleen voor dit adres bewaard: een nieuw adres heeft het opnieuw nodig."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Extra headers (één \"Naam: waarde\" per regel)"
 
@@ -840,6 +909,9 @@ msgstr "Het antwoord moet bevatten"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Leeg: elk HTTP 2xx-antwoord telt als afgeleverd. Met sleutel=waarde (bijvoorbeeld errcode=0) moet het antwoord bovendien een JSON-object zijn dat op het hoogste niveau onder deze sleutel deze waarde heeft; anders mislukt de aflevering. Alleen de uitkomst van de controle wordt gelogd, nooit het antwoord."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Time-out van het verzoek (seconden, 1-120; webhook en Telegram)"
 
 msgid "Bot token"
 msgstr "Bot-token"
@@ -861,9 +933,6 @@ msgstr "Poort"
 
 msgid "Security"
 msgstr "Beveiliging"
-
-msgid "None"
-msgstr "Geen"
 
 msgid "User name"
 msgstr "Gebruikersnaam"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux vergrendeld"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ja: de volgende herstart start Android"
+
+msgid "No"
+msgstr "Nee"
+
+msgid "Writable"
+msgstr "Beschrijfbaar"
+
+msgid "This boot image cannot change the boot"
+msgstr "Deze boot-image kan het opstarten niet wijzigen"
+
 msgid "%s of %s"
 msgstr "%s van %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Geheugen"
 
 msgid "Storage"
 msgstr "Opslag"
-
-msgid "Battery"
-msgstr "Accu"
 
 msgid "Channel"
 msgstr "Kanaal"
@@ -1105,14 +1186,23 @@ msgstr "Wi-Fi-hotspot"
 msgid "Restart modem"
 msgstr "Modem herstarten"
 
-msgid "Restart device"
-msgstr "Apparaat herstarten"
+msgid "Power off or restart"
+msgstr "Uitschakelen of herstarten"
 
 msgid "Switch to Android"
 msgstr "Overschakelen naar Android"
 
 msgid "Lock Linux"
 msgstr "Linux vergrendelen"
+
+msgid "Default boot"
+msgstr "Standaardstart"
+
+msgid "One-time boot"
+msgstr "Eenmalige start"
+
+msgid "Boot control"
+msgstr "Opstartbeheer"
 
 msgid "Neighbor cells"
 msgstr "Buurcellen"
@@ -1125,6 +1215,9 @@ msgstr "Frequentie"
 
 msgid "Running %s…"
 msgstr "%s wordt uitgevoerd…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Hotspotinstellingen opgeslagen; wijzigingen worden toegepast"
 
 msgid "Started in background: %s"
 msgstr "Op de achtergrond gestart: %s"
@@ -1165,11 +1258,14 @@ msgstr "Mobiele data wordt ook op roamingnetwerken gebruikt, wat extra kan koste
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "De mobiele verbinding kan 1–2 minuten wegvallen."
 
-msgid "Restart the entire device"
-msgstr "Het hele apparaat herstarten"
-
 msgid "All connections will be interrupted."
 msgstr "Alle verbindingen worden onderbroken."
+
+msgid "Power off"
+msgstr "Uitschakelen"
+
+msgid "Restart"
+msgstr "Herstarten"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "De volgende start gaat naar Android en er wordt nu herstart. Deze beheerpagina en het delen van de mobiele verbinding worden verbroken."
@@ -1243,6 +1339,9 @@ msgstr "Interne SIM gekozen: in gebruik na een herstart"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Interne SIM gekozen, maar niet ondersteund op dit apparaat: de externe SIM is in gebruik"
 
+msgid "in use"
+msgstr "in gebruik"
+
 msgid "Uptime %s"
 msgstr "Uptime %s"
 
@@ -1309,9 +1408,6 @@ msgstr "LTE-verbinding"
 msgid "Hidden"
 msgstr "Verborgen"
 
-msgid "No"
-msgstr "Nee"
-
 msgid "Running"
 msgstr "Actief"
 
@@ -1371,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "AT-adapter niet beschikbaar"
-
-msgid "Linux locked"
-msgstr "Linux vergrendeld"
 
 msgid "Installing the language pack…"
 msgstr "Taalpakket wordt geïnstalleerd…"
@@ -1453,6 +1546,51 @@ msgstr "Vertaald"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "De eigen vertalingen van LuCI komen van OpenWrt. De vertalingen van dit paneel, behalve Turks en Chinees, zijn machinevertalingen (AI); correcties zijn welkom."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Voer een geheel getal van 0 tot %d in"
+
+msgid "Network lamp"
+msgstr "Netwerklampje"
+
+msgid "Wi-Fi lamp"
+msgstr "Wifi-lampje"
+
+msgid "Battery lamp"
+msgstr "Batterijlampje"
+
+msgid "On"
+msgstr "Aan"
+
+msgid "Brightness (%)"
+msgstr "Helderheid (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Een uitgeschakeld lampje blijft donker; het hittealarm verschijnt toch op zijn led."
+
+msgid "Device default"
+msgstr "Standaard van het apparaat"
+
+msgid "LED timeout (seconds)"
+msgstr "Led-time-out (seconden)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Hoe lang de leds blijven branden na een toetsdruk of een wijziging; 0 houdt ze aan. Aan de lader blijven ze aan."
+
+msgid "Boot indicator"
+msgstr "Opstartindicator"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "De led toont zijn kleuren om de beurt terwijl het systeem opstart"
+
+msgid "Heat alarm"
+msgstr "Hittealarm"
+
+msgid "Siren"
+msgstr "Sirene"
+
+msgid "Red blink"
+msgstr "Rood knipperen"
+
 msgid "Automatic"
 msgstr "Automatisch"
 
@@ -1494,6 +1632,21 @@ msgstr "Huidige serving cell vergrendelen"
 
 msgid "Unlock cell"
 msgstr "Cel ontgrendelen"
+
+msgid "Enter a cell"
+msgstr "Een cel invoeren"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Kanaalnummer (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Deze cel vergrendelen"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Een kanaalnummer, geen frequentie in MHz; de cel hoeft niet in de lijst met buurcellen te staan."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Toepassen herstart de radiostack (SFUN) en onderbreekt de mobiele dienst kort. Instellingen worden opgeslagen en door de plugin opnieuw toegepast zodra AT gereed is, als „Toepassen bij opstarten” is ingeschakeld. Een pre-radio-hook van het platform kan ze zonder herstart toepassen. Pas toe zonder geselecteerde banden om de automatische modus te herstellen."
@@ -1582,17 +1735,20 @@ msgstr "%s wordt op de achtergrond vergrendeld…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s op de achtergrond vergrendeld (SFUN-herstart, ongeveer 30 seconden); status wordt teruggelezen…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Voer een kanaalnummer en een PCI in binnen de bereiken hieronder"
+
 msgid "No serving-network data"
 msgstr "Geen gegevens over het serving netwerk"
 
 msgid "NR serving cell"
 msgstr "NR serving cell"
 
-msgid "Status confirmed"
-msgstr "Status bevestigd"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Time-out bij teruglezen; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "Status confirmed"
+msgstr "Status bevestigd"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Reset geverifieerd: netwerkmodus automatisch, EN-DC aan, alle banden, geen celvergrendeling; de opgeslagen vergrendelingsinstellingen zijn gewist"
@@ -1732,9 +1888,6 @@ msgstr "gewekt door de %s-toets"
 msgid "the modem is suspended (%s)"
 msgstr "de modem is gepauzeerd (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Voer een geheel getal van 0 tot %d in"
-
 msgid "Power status unavailable"
 msgstr "Voedingsstatus niet beschikbaar"
 
@@ -1792,6 +1945,12 @@ msgstr "Laden gepauzeerd: batterijtemperatuur"
 msgid "Charging paused: charge limit"
 msgstr "Laden gepauzeerd: laadlimiet"
 
+msgid "Charging paused: by hand"
+msgstr "Laden gepauzeerd: handmatig"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Eenmaal volledig laden, daarna terug naar de grens"
+
 msgid "Sleep now"
 msgstr "Nu slapen"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % laadt de batterij nooit op (het apparaat draait op de lader), 100 % 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % spaart de batterij van een apparaat dat aangesloten blijft."
 
+msgid "Start charging again under"
+msgstr "Opnieuw laden onder"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 begint weer 5 punten onder het stopniveau. Een lagere waarde begint pas weer te laden onder die waarde; met 100 % wacht een volle accu tot hij eronder zakt."
+
+msgid "Resume charging"
+msgstr "Laden hervatten"
+
+msgid "Pause charging"
+msgstr "Laden pauzeren"
+
+msgid "Cancel the full charge"
+msgstr "Volledig laden annuleren"
+
+msgid "Charge to full once"
+msgstr "Eenmaal volledig laden"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Gepauzeerd wordt de accu niet geladen en draait het apparaat op de lader; onder 5 % laadt hij toch, en de temperatuurbeveiliging geldt altijd."
+
 msgid "When the charger switches the device on"
 msgstr "Wanneer de oplader het apparaat inschakelt"
 
@@ -1830,9 +2010,6 @@ msgstr "Ongewijzigd laten"
 
 msgid "LTE only (5G off)"
 msgstr "Alleen LTE (5G uit)"
-
-msgid "On"
-msgstr "Aan"
 
 msgid "Full"
 msgstr "Volledig"
@@ -2057,9 +2234,6 @@ msgstr "Standaard van de modem"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "in gebruik"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Radio van SIM%d uitzetten"
 
@@ -2159,6 +2333,9 @@ msgstr "Verwijderd (alleen lokaal)"
 msgid "Enter both a number and a message."
 msgstr "Voer zowel een nummer als een bericht in."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "SIM-opslag: %d van %d plaatsen in gebruik (om %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d berichten, %d ongelezen · %d gesprekken"
 
@@ -2234,8 +2411,26 @@ msgstr "Maandlimiet"
 msgid "%s, warning at %d%%"
 msgstr "%s, waarschuwing bij %d%%"
 
+msgid "Daily quota"
+msgstr "Daglimiet"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "De maandlimiet is bereikt: mobiele data is uitgeschakeld. Die gaat weer aan als de volgende periode begint."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "De daglimiet is bereikt: mobiele data is uitgezet. Om middernacht gaat het weer aan."
+
+msgid "The daily quota is reached"
+msgstr "De daglimiet is bereikt"
+
+msgid "%d%% of the daily quota is used"
+msgstr "%d%% van de daglimiet is gebruikt"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "De limiet en de daglimiet tellen alleen downloads."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "De limiet en de daglimiet tellen alleen uploads."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s wacht op de klok: die is nog niet via het netwerk gezet. Het telt al mee voor deze periode en gaat naar zijn dag zodra de klok gezet is."
@@ -2267,6 +2462,9 @@ msgstr "Per factuurperiode"
 msgid "Billing cycle"
 msgstr "Factuurperiode"
 
+msgid "Counted"
+msgstr "Geteld"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Voer een grootte in GB in, bijvoorbeeld 50 of 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Mobiele data uitschakelen bij de limiet"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Bereikt deze periode de limiet, dan wordt mobiele data uitgeschakeld: geen internet via de provider tot de volgende periode begint, de limiet verhoogd wordt of dit weer wordt uitgezet. Wordt mobiele data met de hand weer aangezet, dan blijft die aan tot de volgende herstart."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Mobiele data uitzetten bij de daglimiet"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Wanneer het verbruik van vandaag de daglimiet bereikt, gaat mobiele data uit tot middernacht, tot de limiet is verhoogd of tot dit weer wordt uitgezet. Zet u mobiele data handmatig weer aan, dan blijft het aan tot de volgende herstart."
+
+msgid "Both ways"
+msgstr "Beide richtingen"
+
+msgid "Downloads only"
+msgstr "Alleen downloads"
+
+msgid "Uploads only"
+msgstr "Alleen uploads"
 
 msgid "Set"
 msgstr "Instellen"
@@ -2302,6 +2515,15 @@ msgstr "Maandlimiet (GB, 0: geen)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Waarschuwen bij dit percentage van de limiet"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Daglimiet (GB, 0: geen)"
+
+msgid "The cap and the daily quota count"
+msgstr "Wat de limiet en de daglimiet tellen"
+
+msgid "Plan name"
+msgstr "Naam van het abonnement"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Tot nu toe gebruikt in deze periode (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Het apparaat herstart nu. De standaardstart is Android, dus Android star
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Het apparaat herstart nu en is ongeveer een minuut weg. Als het nieuwe systeem niet start, gaat het apparaat na de mislukte pogingen vanzelf terug naar Android."
 
-msgid "Restart"
-msgstr "Herstarten"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Herstarten… open deze pagina over ongeveer een minuut opnieuw."
 
@@ -2468,9 +2687,6 @@ msgstr "Boot-image"
 msgid "from the installer"
 msgstr "van het installatieprogramma"
 
-msgid "Default boot"
-msgstr "Standaardstart"
-
 msgid "Free space"
 msgstr "Vrije ruimte"
 
@@ -2527,6 +2743,9 @@ msgstr "Release-opmerkingen"
 
 msgid "Download"
 msgstr "Download"
+
+msgid "only what changed since the installed release"
+msgstr "alleen wat er sinds de geïnstalleerde release is veranderd"
 
 msgid "Free space needed"
 msgstr "Benodigde vrije ruimte"
@@ -3056,9 +3275,6 @@ msgstr "Detecteren"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "De URL kan een token bevatten: die gaat apart naar het apparaat, nooit in een opdrachtregel of een log."
 
-msgid "Type"
-msgstr "Type"
-
 msgid "Share link"
 msgstr "Deellink"
 
@@ -3388,6 +3604,21 @@ msgstr "Onbekend type vergrendeling"
 msgid "Invalid value for this lock kind"
 msgstr "Ongeldige waarde voor dit type vergrendeling"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Band-, modus- en celvergrendeling wordt nog niet ondersteund voor SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Band-, modus- en celvergrendeling wordt niet ondersteund zolang dubbele-SIM-wisseling de radio beheert"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Deze modem ondersteunt geen van deze banden"
+
+msgid "Lock change failed"
+msgstr "Vergrendeling wijzigen mislukt"
+
+msgid "Invalid job id"
+msgstr "Ongeldige taak-ID"
+
 msgid "Invalid page"
 msgstr "Ongeldige pagina"
 
@@ -3478,14 +3709,29 @@ msgstr "De TTL-adapter gaf geen geldig antwoord"
 msgid "Invalid TTL"
 msgstr "Ongeldige TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "De TCP-adapter gaf geen geldig antwoord"
+
+msgid "Invalid congestion control"
+msgstr "Ongeldige congestiecontrole"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "De opstartadapter gaf geen geldig antwoord"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "De LED-adapter gaf geen geldig antwoord"
+
+msgid "Unknown LED setting"
+msgstr "Onbekende led-instelling"
+
+msgid "Invalid value for this setting"
+msgstr "Ongeldige waarde voor deze instelling"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "De dataverbruik-adapter gaf geen geldig antwoord"
 
 msgid "Unknown data usage setting"
 msgstr "Onbekende instelling voor dataverbruik"
-
-msgid "Invalid value for this setting"
-msgstr "Ongeldige waarde voor deze instelling"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "De doorstuuradapter gaf geen geldig antwoord"
@@ -3731,8 +3977,29 @@ msgstr "De radio volgde zijn instelling niet"
 msgid "The data roaming setting could not be saved"
 msgstr "De instelling voor dataroaming kon niet worden opgeslagen"
 
-msgid "Expected on or off"
-msgstr "on of off verwacht"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "De hotspotinstelling is opgeslagen, maar het herladen van wifi is mislukt"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "De wifi-instellingen hebben niet-opgeslagen wijzigingen: sla ze eerst op of draai ze terug"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "De hotspot wordt al omgeschakeld; probeer het zo opnieuw"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Er is geen hotspot (access point) ingesteld"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Deze radio inschakelen raakt een andere interface; gebruik de pagina Draadloos"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "De radio wordt gebruikt door de wifi-client"
+
+msgid "The hotspot setting could not be written"
+msgstr "De hotspotinstelling kon niet worden geschreven"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Dit platform biedt geen hotspotbeheer"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "VPN-integratie wordt niet door dit platform geboden"
@@ -3833,6 +4100,15 @@ msgstr "Geen USB-netwerkinterface"
 msgid "LAN bridge device section was not found"
 msgstr "Apparaatsectie van de LAN-bridge niet gevonden"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Kon niet bepalen bij welk netwerk de adapter hoort; probeer het later opnieuw"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "De adapter hoort bij een ander netwerk en kan niet aan het LAN worden toegevoegd"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "De netwerkinstellingen hebben niet-opgeslagen wijzigingen: sla ze eerst op of draai ze terug"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Kan USB-netwerkinterface niet activeren"
 
@@ -3865,6 +4141,12 @@ msgstr "De webhook-body is te lang of bevat een stuurteken"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "De antwoordcontrole moet sleutel=waarde zijn, zoals errcode=0 of ok=true (de waarde een geheel getal of kleine letters, hooguit 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Ongeldig webhookgeheim (tot 256 afdrukbare tekens, geen spatie)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "De time-out moet 1 tot 120 seconden zijn"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Ongeldige header (één \"Naam: waarde\" per regel; Host, Content-Type, Content-Length, Transfer-Encoding en Connection stelt het apparaat in)"
@@ -3926,8 +4208,17 @@ msgstr "Er loopt al een installatie"
 msgid "The language pack could not be removed"
 msgstr "Het taalpakket kon niet worden verwijderd"
 
+msgid "The LED settings could not be read"
+msgstr "De led-instellingen konden niet worden gelezen"
+
+msgid "The LED setting could not be saved"
+msgstr "De led-instelling kon niet worden opgeslagen"
+
 msgid "Lock cache unavailable"
 msgstr "Vergrendelingscache niet beschikbaar"
+
+msgid "The modem refused a write"
+msgstr "De modem weigerde een schrijfopdracht"
 
 msgid "The saved locks could not be cleared"
 msgstr "De opgeslagen vergrendelingen konden niet worden gewist"
@@ -3938,9 +4229,6 @@ msgstr "Geen serving cell om op te vergrendelen"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "De modem antwoordde niet op de modusopvraag; er is niets verzonden"
 
-msgid "The modem refused a write"
-msgstr "De modem weigerde een schrijfopdracht"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Het teruglezen komt niet overeen met de automatische waarden"
 
@@ -3949,6 +4237,21 @@ msgstr "Het teruglezen na de herstart van de stack komt niet overeen met de auto
 
 msgid "The reset was interrupted"
 msgstr "Het resetten is onderbroken"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Het resultaat van deze vergrendelingswijziging is niet meer bekend"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Het wijzigen van de vergrendeling duurde te lang; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Het wijzigen van de vergrendeling is onderbroken; kies „Vergrendelingsstatus vernieuwen”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Er wordt al een andere vergrendelingswijziging gestart; probeer het zo opnieuw"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Er wachten te veel vergrendelingswijzigingen; probeer het opnieuw als ze klaar zijn"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Pakketten opnieuw installeren is op dit systeem niet beschikbaar"
@@ -3967,6 +4270,12 @@ msgstr "Onbekende pakketbewerking"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Dit platform biedt geen TCP-congestiecontrole"
+
+msgid "The TCP settings could not be read"
+msgstr "De TCP-instellingen konden niet worden gelezen"
 
 msgid "Data usage is not available on this system"
 msgstr "Dataverbruik is op dit systeem niet beschikbaar"

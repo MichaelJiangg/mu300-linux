@@ -85,6 +85,26 @@ class Rules(unittest.TestCase):
         self.assertIn('power_get', acl['luci-app-mu300']['read']['ubus']['mu300dash'])
         self.assertIn('power_set', acl['luci-app-mu300']['write']['ubus']['mu300dash'])
 
+    def test_led_page_is_wired(self):
+        # System > LEDs (kanoqwq's LED settings, as a page of this app over mu300-led, not LuCI's own LED page): the menu
+        # entry, its view, the rpc declarations, led_get readable and led_set only with write access, the adapter
+        app = TOP / 'openwrt' / 'luci-app-mu300'
+        menu = json.loads((app / 'root/usr/share/luci/menu.d/luci-app-mu300.json').read_text())
+        self.assertEqual(menu['admin/system/mu300-leds']['action'], {'type': 'view', 'path': 'mu300/leds'})
+        self.assertNotIn('admin/system/leds', menu)
+        self.assertFalse((TOP / 'openwrt/overlay/www/luci-static/resources/view/system/leds.js').exists())
+        common = (app / 'htdocs/luci-static/resources/mu300/common.js').read_text()
+        self.assertIn("method: 'led_get'", common)
+        self.assertIn("method: 'led_set', params: [ 'key', 'value' ]", common)
+        view = (app / 'htdocs/luci-static/resources/view/mu300/leds.js').read_text()
+        for s in ('callLedGet', 'callLedSet', "'timeout'", "'boot'", "'thermal'", "_brightness'"):
+            self.assertIn(s, view)
+        acl = json.loads((app / 'root/usr/share/rpcd/acl.d/luci-app-mu300.json').read_text())['luci-app-mu300']
+        self.assertIn('led_get', acl['read']['ubus']['mu300dash'])
+        self.assertNotIn('led_set', acl['read']['ubus']['mu300dash'])
+        self.assertIn('led_set', acl['write']['ubus']['mu300dash'])
+        self.assertTrue((app / 'root/usr/libexec/unisoc-modem/led').stat().st_mode & 0o111)
+
     def test_power_profiles_are_wired_in(self):
         # the daemon runs on both systems, the keys wake it, the Ubuntu units skip the radios in a charging boot,
         # the command is on PATH, OpenWrt's own power-key handler (a tap = poweroff) is neutralised, and power.conf is kept
@@ -324,7 +344,7 @@ class Rules(unittest.TestCase):
         # mu300-update knows the module (fixed asset names, the repository's latest release, MU300_VPN_URL), and
         # mu300-extra lists vpn and its engine extras from it (module v2: the core, and the bundle as the fallback)
         up = (BIN / 'mu300-update').read_text()
-        self.assertRegex(up, r'(?m)^EXTRAS="vpn lang vpn-mihomo panel vpn-xray vpn-singbox vpn-dae audio"$')
+        self.assertRegex(up, r'(?m)^EXTRAS="vpn lang vpn-mihomo panel vpn-xray vpn-singbox vpn-dae"$')
         self.assertRegex(up, r'(?m)^VPN_ENGINE_EXTRAS="vpn-xray vpn-singbox vpn-mihomo vpn-dae"$')
         self.assertRegex(up, r'(?m)^VPN_REPO=dikeckaan/mu300-linux-vpn$')
         self.assertIn('VPN_URL=${MU300_VPN_URL:-https://github.com/$VPN_REPO/releases/latest/download}', up)
@@ -446,9 +466,8 @@ class Rules(unittest.TestCase):
         self.assertIn('[ -e /etc/mu300/docker-zone ] && exit 0', zone)
 
     def test_release_audit_refuses_the_audio_stack(self):
-        # make-release.sh: call audio is the audio extra's (FINDINGS 194): no kernel bundle carries a driver of the
-        # call-audio stack (mainline's sprd-dma.ko is the stack's own; 5.4's is the vendor kernel's DMA driver and
-        # stays), and no image its programs or services. The audit's own lines, run against bundles made here.
+        # make-release.sh: no kernel bundle carries a driver of the removed call-audio stack, and no image its programs or
+        # services. The audit's own lines, run against bundles made here.
         rel = (TOP / 'tools' / 'make-release.sh').read_text()
         audit = rel[rel.index('AUDIO_KO="'):rel.index('[ $fail = 0 ] || { echo "audit failed')]
         self.assertEqual(23, len(re.search(r'AUDIO_KO="([^"]*)"', audit).group(1).split()))
@@ -476,11 +495,12 @@ class Rules(unittest.TestCase):
             bundle('mu300-kernel', 'sprd-dma.ko', 'virt-dma.ko')
             bundle('mu300-kernel-6.18')
             bundle('mu300-kernel-7.2')
+            bundle('mu300-kernel-7.3')
             manifest('mu300-ubuntu-rootfs', 'opt/mu300/bin/mu300-atd', 'etc/systemd/system/mu300-atd.service')
             manifest('mu300-openwrt-rootfs', 'etc/init.d/mu300-atd')
             self.assertIn('fail=0', run())
             for name, mods in (('mu300-kernel', ('audio_sipc.ko',)), ('mu300-kernel-6.18', ('sprd-dma.ko',)),
-                               ('mu300-kernel-7.2', ('snd-soc-sprd-card.ko',))):
+                               ('mu300-kernel-7.2', ('snd-soc-sprd-card.ko',)), ('mu300-kernel-7.3', ('audio_mem.ko',))):
                 bundle(name, *mods)
                 out = run()
                 self.assertIn('fail=1', out, name)
@@ -825,6 +845,34 @@ class Rules(unittest.TestCase):
         view = (app / 'htdocs/luci-static/resources/view/mu300/ttl.js').read_text()
         self.assertRegex(view, r"if \(st\.backend === 'nft'\)\s*card\.appendChild\([^;]*firewall fast-path is off")
 
+    def test_tcp_and_boot_cards_are_wired(self):
+        # kanoqwq's b9f71e72 (the TCP card on the Device page) and f6b0668d (the boot state on the dashboard): rpc
+        # declarations, tcp_get/boot_get readable, tcp_set only with write access, the adapters executable; the boot
+        # card only reads (its changes stay the act os buttons)
+        import json
+        app = TOP / 'openwrt' / 'luci-app-mu300'
+        common = (app / 'htdocs/luci-static/resources/mu300/common.js').read_text()
+        self.assertIn("method: 'tcp_get'", common)
+        self.assertIn("method: 'tcp_set', params: [ 'value' ]", common)
+        self.assertIn("method: 'boot_get', expect", common)
+        self.assertIn('callTcpGet: callTcpGet, callTcpSet: callTcpSet, callBootGet: callBootGet', common)
+        acl = json.loads((app / 'root/usr/share/rpcd/acl.d/luci-app-mu300.json').read_text())['luci-app-mu300']
+        self.assertIn('tcp_get', acl['read']['ubus']['mu300dash'])
+        self.assertIn('boot_get', acl['read']['ubus']['mu300dash'])
+        self.assertNotIn('tcp_set', acl['read']['ubus']['mu300dash'])
+        self.assertIn('tcp_set', acl['write']['ubus']['mu300dash'])
+        self.assertNotIn('boot_set', json.dumps(acl))
+        for name in ('tcp', 'boot'):
+            self.assertTrue((app / 'root/usr/libexec/unisoc-modem' / name).stat().st_mode & 0o111, name)
+        self.assertTrue((TOP / 'rootfs/overlay/opt/mu300/bin/mu300-tcp').stat().st_mode & 0o111)
+        device = (app / 'htdocs/luci-static/resources/view/mu300/device.js').read_text()
+        self.assertIn('M.callTcpGet()', device)
+        self.assertIn('M.callTcpSet(value)', device)
+        self.assertIn('s.net_current', device)
+        self.assertIn('d.eligible === 0', device)
+        home = (app / 'htdocs/luci-static/resources/view/mu300/home.js').read_text()
+        self.assertIn('M.callBootGet()', home)
+
     def test_mainline_rewrites_the_ttl_in_tc(self):
         # mu300-ttl's tc backend (clsact egress, matchall, pedit, csum): the flowtable transmits through egress, so
         # flow offloading stays on. The 5.4 kernel has no pedit: mu300-ttl falls back to nftables there.
@@ -838,11 +886,11 @@ class Rules(unittest.TestCase):
 
     def test_every_release_kernel_bundle_has_the_sd_host(self):
         # 5.4 reads the card as well (FINDINGS 31j): its bundle says so, and the release audit fails when any of the
-        # three bundles does not (mu300-update refuses such a bundle for a system on the card)
+        # four bundles does not (mu300-update refuses such a bundle for a system on the card)
         mr = (TOP / 'tools' / 'make-release.sh').read_text()
         self.assertIn("printf 'sdcard\\nlinux-slot\\ngpt-root\\n' > \"$K/features\"", mr)
         self.assertLess(mr.index('$K/features'), mr.index('tar -C "$K" -czf "$D/mu300-kernel.tar.gz" .'))
-        self.assertIn('for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2; do\n'
+        self.assertIn('for a in mu300-kernel mu300-kernel-6.18 mu300-kernel-7.2 mu300-kernel-7.3; do\n'
                       '    tar -xzOf "$D/$a.tar.gz" ./features 2>/dev/null | grep -qx sdcard', mr)
         # and that its init works with Linux on either slot (mu300-update refuses one without it on slot a)
         self.assertIn('    tar -xzOf "$D/$a.tar.gz" ./features 2>/dev/null | grep -qx linux-slot', mr)
@@ -1046,7 +1094,7 @@ class Rules(unittest.TestCase):
         # one argument: the build's own `set --` statement is run with spaces in every path
         text = (TOP / 'openwrt' / 'build-rootfs.sh').read_text()
         self.assertNotIn('$LUCI', text)
-        m = re.search(r'\n    (set -- -v "\$THEME_APK:.*?:/in/catalogs:ro")\n', text, re.S)
+        m = re.search(r'\n    (set -- -v "\$THEME_APK:.*?:/in/luci-lexical-translator.sh:ro")\n', text, re.S)
         self.assertTrue(m, 'the luci mounts are not one set -- statement')
         self.assertRegex(text, r'-v "\$REGDB":/in/regdb:ro "\$@" \\\n')
         for sh in shells():
@@ -1054,7 +1102,8 @@ class Rules(unittest.TestCase):
                                env=dict(os.environ, THEME_APK='/a b/theme.apk', TOP='/my repo', CAT='/t m/cat'))
             self.assertEqual(r.stdout.splitlines(), [
                 '-v', '/a b/theme.apk:/in/luci-theme-aurora.apk:ro', '-v', '/my repo/openwrt/luci-app-mu300:/in/luci-plugin:ro',
-                '-v', '/my repo/openwrt/luci-overlay:/in/luci-overlay:ro', '-v', '/t m/cat:/in/catalogs:ro'], sh)
+                '-v', '/my repo/openwrt/luci-overlay:/in/luci-overlay:ro', '-v', '/t m/cat:/in/catalogs:ro',
+                '-v', '/my repo/openwrt/patches/luci-lexical-translator.sh:/in/luci-lexical-translator.sh:ro'], sh)
 
     def test_openwrt_luci_starts_ndp_learn(self):
         # K37: init.d/mu300-ndp is enabled in openwrt-luci's image (it does nothing unless wan is in relay mode) and
@@ -1376,6 +1425,54 @@ class SelfUpdateCopies(unittest.TestCase):
         self.assertIn('if [ -e "$TOP/.git" ] && command -v git >/dev/null; then', su)
         self.assertNotIn('-d "$TOP/.git"', su)
         self.assertIn("(Test-Path (Join-Path $Top '.git'))", (TOP / 'install.ps1').read_text())
+
+
+class Ps1FunctionOrder(unittest.TestCase):
+    """PowerShell knows a function only once the script has run past its definition: a top-level line of
+    install.ps1 that calls one defined further down (or that calls one whose body calls one) stops the installer
+    with 'The term ... is not recognized'. The make-room resume path did that on Windows with ResumeFacts and
+    GptDump (#357)."""
+
+    @staticmethod
+    def code(line):
+        line = re.sub(r"'[^']*'", "''", line)
+        line = re.sub(r'"[^"]*"', '""', line)
+        return line.split('#', 1)[0]
+
+    def test_top_level_calls_come_after_the_definitions(self):
+        text = (TOP / 'install.ps1').read_text()
+        lines = re.sub(r'<#.*?#>', lambda m: '\n' * m.group(0).count('\n'), text, flags=re.S).splitlines()
+        defs, bodies, top, i = {}, {}, [], 0
+        while i < len(lines):
+            m = re.match(r'function\s+([A-Za-z][\w-]*)', lines[i])
+            if not m:
+                top.append((i + 1, lines[i]))
+                i += 1
+                continue
+            name, start = m.group(1), i
+            while i < len(lines) and not re.match(r'}\s*$', lines[i]):
+                i += 1
+            defs[name] = start + 1
+            bodies[name] = '\n'.join(self.code(x) for x in lines[start + 1:i])
+            i += 1
+        self.assertIn('ResumeFacts', defs)
+        word = {n: re.compile(r'(?<![\w$.-])' + re.escape(n) + r'(?![\w-])') for n in defs}
+        calls = {n: {c for c in defs if c != n and word[c].search(bodies[n])} for n in defs}
+        late = []
+        for no, line in top:
+            for n in defs:
+                if not word[n].search(self.code(line)):
+                    continue
+                seen, todo = set(), [n]
+                while todo:
+                    f = todo.pop()
+                    if f in seen:
+                        continue
+                    seen.add(f)
+                    if defs[f] > no:
+                        late.append('line %d calls %s, defined at line %d' % (no, f, defs[f]))
+                    todo.extend(calls[f])
+        self.assertEqual(late, [])
 
 
 if __name__ == '__main__':

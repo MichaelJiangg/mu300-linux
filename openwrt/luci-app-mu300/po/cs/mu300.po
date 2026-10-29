@@ -52,6 +52,9 @@ msgstr "Jazyky"
 msgid "Power"
 msgstr "Napájení"
 
+msgid "LEDs"
+msgstr "LED"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "Režim hostitele odpojí síť a sériovou linku přes USB na tomto port
 msgid "USB network mode"
 msgstr "Režim sítě USB"
 
+msgid "Current sharing protocol"
+msgstr "Aktuální protokol sdílení"
+
 msgid "Network protocol"
 msgstr "Síťový protokol"
 
@@ -658,6 +664,27 @@ msgstr "Obnovit"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "Dostupné pouze v režimu hostitele. Obnovit aktivuje nalezené adaptéry USB; přidání do LAN uloží most a znovu načte síť."
 
+msgid "Network performance"
+msgstr "Výkon sítě"
+
+msgid "Active congestion control"
+msgstr "Aktivní řízení zahlcení"
+
+msgid "Default queue"
+msgstr "Výchozí fronta"
+
+msgid "TCP congestion control"
+msgstr "Řízení zahlcení TCP"
+
+msgid "Apply"
+msgstr "Použít"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "Týká se hlavně nových TCP spojení tohoto zařízení. Předávaná spojení klientů hotspotu a USB nepoužijí BBR automaticky."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR nastaví FQ jako výchozí frontu nově vytvořených rozhraní. Stávající spojení, rozhraní a QoS zůstanou. Nastavení přetrvá restart."
+
 msgid "Recent modem operations"
 msgstr "Nedávné operace modemu"
 
@@ -670,6 +697,12 @@ msgstr "Nedávná volání ovládacího panelu z tohoto a předchozího spuště
 msgid "Unavailable"
 msgstr "Nedostupné"
 
+msgid "Mixed"
+msgstr "Smíšený"
+
+msgid "None"
+msgstr "Žádné"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "Režim sítě USB není v režimu hostitele dostupný; automatické spuštění hostitele vypne i automatické spuštění sítě USB."
 
@@ -681,9 +714,6 @@ msgstr "Síť a sériová linka přes USB se v režimu zařízení znovu enumeru
 
 msgid "Switch USB role?"
 msgstr "Přepnout roli USB?"
-
-msgid "Apply"
-msgstr "Použít"
 
 msgid "Switching USB role…"
 msgstr "Přepínání role USB…"
@@ -721,6 +751,21 @@ msgstr "Nastavení uloženo"
 msgid "Save failed: %s"
 msgstr "Uložení selhalo: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "Nastavení výkonu sítě nelze načíst; obnovte a zkuste znovu"
+
+msgid "This kernel does not provide this setting"
+msgstr "Toto jádro toto nastavení nenabízí"
+
+msgid "System default"
+msgstr "Výchozí systému"
+
+msgid "Applied and saved for future boots."
+msgstr "Použito a uloženo pro další spuštění."
+
+msgid "The kernel did not accept the network settings"
+msgstr "Jádro nepřijalo síťová nastavení"
+
 msgid "This boot"
 msgstr "Toto spuštění"
 
@@ -739,6 +784,9 @@ msgstr "Vyhledávání adaptérů USB…"
 msgid "No USB adapters found."
 msgstr "Nebyly nalezeny žádné adaptéry USB."
 
+msgid "In use by another network"
+msgstr "Používá jiná síť"
+
 msgid "Link connected"
 msgstr "Linka připojena"
 
@@ -747,6 +795,9 @@ msgstr "Žádná linka; pokus o aktivaci proveden"
 
 msgid "Added to LAN"
 msgstr "Přidáno do LAN"
+
+msgid "Cannot add"
+msgstr "Nelze přidat"
 
 msgid "Add to LAN"
 msgstr "Přidat do LAN"
@@ -784,6 +835,9 @@ msgstr "Formulář (kódování URL)"
 msgid "Plain text"
 msgstr "Prostý text"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "Také {sim} (SIM 1 nebo SIM 2) a {kind} (sms, test nebo power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "Přijaté zprávy se přeposílají, jakmile dorazí do fondu SMS. Neúspěšné doručení se zopakuje po 30 s a pak pokaždé po dvojnásobné době (nejvýše hodina), celkem desetkrát."
 
@@ -811,6 +865,15 @@ msgstr "Jen zprávy obsahující některé z těchto slov"
 msgid "One per line; empty: every message."
 msgstr "Jedno na řádek; prázdné: všechny zprávy."
 
+msgid "Battery"
+msgstr "Baterie"
+
+msgid "Battery and charger notices"
+msgstr "Oznámení o baterii a nabíječce"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "Zpráva všem cílům, když baterie projde 5, 20, 40, 60, 80 nebo 100 % a když se nabíječka připojí nebo odpojí."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "Vlastní tělo"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "Prázdné: standardní pole (prostý text: zpráva). Zástupné symboly: {sender}, {time}, {text}, {device}, {message}. Každá hodnota se escapuje podle zvoleného typu. Toto tělo se zde znovu zobrazí: tajné údaje dejte do adresy nebo do hlavičky."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "Tajemství pro {secret} ve vlastním těle"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "Pro službu, která chce svůj token v těle (PushPlus). Uloží se jen pro tuto adresu: nová adresa ho potřebuje znovu."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "Další hlavičky (jedna \"Název: hodnota\" na řádek)"
 
@@ -840,6 +909,9 @@ msgstr "Odpověď musí obsahovat"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "Prázdné: každá odpověď HTTP 2xx se počítá jako doručení. S klíč=hodnota (například errcode=0) musí být odpověď navíc objekt JSON, který má na nejvyšší úrovni pod tímto klíčem tuto hodnotu; jinak doručení selže. Do protokolu se zapisuje jen výsledek kontroly, nikdy odpověď."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "Časový limit požadavku (sekundy, 1-120; webhook a Telegram)"
 
 msgid "Bot token"
 msgstr "Token bota"
@@ -861,9 +933,6 @@ msgstr "Port"
 
 msgid "Security"
 msgstr "Zabezpečení"
-
-msgid "None"
-msgstr "Žádné"
 
 msgid "User name"
 msgstr "Uživatelské jméno"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux zamčen"
+
+msgid "Yes: the next restart starts Android"
+msgstr "Ano: příští restart spustí Android"
+
+msgid "No"
+msgstr "Ne"
+
+msgid "Writable"
+msgstr "Zapisovatelné"
+
+msgid "This boot image cannot change the boot"
+msgstr "Tento zaváděcí obraz nemůže změnit spouštění"
+
 msgid "%s of %s"
 msgstr "%s z %s"
 
@@ -1032,9 +1116,6 @@ msgstr "Paměť"
 
 msgid "Storage"
 msgstr "Úložiště"
-
-msgid "Battery"
-msgstr "Baterie"
 
 msgid "Channel"
 msgstr "Kanál"
@@ -1105,14 +1186,23 @@ msgstr "Hotspot Wi-Fi"
 msgid "Restart modem"
 msgstr "Restartovat modem"
 
-msgid "Restart device"
-msgstr "Restartovat zařízení"
+msgid "Power off or restart"
+msgstr "Vypnout nebo restartovat"
 
 msgid "Switch to Android"
 msgstr "Přepnout na Android"
 
 msgid "Lock Linux"
 msgstr "Zamknout Linux"
+
+msgid "Default boot"
+msgstr "Výchozí spouštění"
+
+msgid "One-time boot"
+msgstr "Jednorázové spuštění"
+
+msgid "Boot control"
+msgstr "Řízení spouštění"
 
 msgid "Neighbor cells"
 msgstr "Sousední buňky"
@@ -1125,6 +1215,9 @@ msgstr "Frekvence"
 
 msgid "Running %s…"
 msgstr "Spouštění %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "Nastavení hotspotu uloženo; změny se uplatňují"
 
 msgid "Started in background: %s"
 msgstr "Spuštěno na pozadí: %s"
@@ -1165,11 +1258,14 @@ msgstr "Mobilní data se používají i v roamingových sítích, což může st
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "Mobilní připojení se může na 1–2 minuty zastavit."
 
-msgid "Restart the entire device"
-msgstr "Restartovat celé zařízení"
-
 msgid "All connections will be interrupted."
 msgstr "Všechna spojení budou přerušena."
+
+msgid "Power off"
+msgstr "Vypnout"
+
+msgid "Restart"
+msgstr "Restartovat"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "Příští spuštění přejde do Android a zařízení se nyní restartuje. Tato stránka správy a sdílení mobilního připojení se odpojí."
@@ -1243,6 +1339,9 @@ msgstr "Vybrána interní SIM: použije se po restartu"
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "Vybrána interní SIM, ale toto zařízení ji nepodporuje: používá se externí SIM"
 
+msgid "in use"
+msgstr "používá se"
+
 msgid "Uptime %s"
 msgstr "Doba provozu %s"
 
@@ -1309,9 +1408,6 @@ msgstr "Linka LTE"
 msgid "Hidden"
 msgstr "Skryté"
 
-msgid "No"
-msgstr "Ne"
-
 msgid "Running"
 msgstr "Běží"
 
@@ -1371,9 +1467,6 @@ msgstr "Online"
 
 msgid "AT adapter unavailable"
 msgstr "Adaptér AT nedostupný"
-
-msgid "Linux locked"
-msgstr "Linux zamčen"
 
 msgid "Installing the language pack…"
 msgstr "Instalace jazykového balíčku…"
@@ -1453,6 +1546,51 @@ msgstr "Přeloženo"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "Vlastní překlady LuCI pocházejí z OpenWrt. Překlady tohoto panelu kromě turečtiny a čínštiny jsou strojové (AI); opravy jsou vítány."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "Zadejte celé číslo od 0 do %d"
+
+msgid "Network lamp"
+msgstr "Kontrolka sítě"
+
+msgid "Wi-Fi lamp"
+msgstr "Kontrolka Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "Kontrolka baterie"
+
+msgid "On"
+msgstr "Zapnuto"
+
+msgid "Brightness (%)"
+msgstr "Jas (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "Vypnutá kontrolka zůstane tmavá; tepelný alarm se přesto ukáže na své LED."
+
+msgid "Device default"
+msgstr "Výchozí hodnota zařízení"
+
+msgid "LED timeout (seconds)"
+msgstr "Doba svícení LED (sekundy)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "Jak dlouho LED svítí po stisku tlačítka nebo změně; 0 je nechá svítit. Na nabíječce svítí."
+
+msgid "Boot indicator"
+msgstr "Indikace spouštění"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "LED během startu systému postupně ukazuje své barvy"
+
+msgid "Heat alarm"
+msgstr "Tepelný alarm"
+
+msgid "Siren"
+msgstr "Siréna"
+
+msgid "Red blink"
+msgstr "Červené blikání"
+
 msgid "Automatic"
 msgstr "Automaticky"
 
@@ -1494,6 +1632,21 @@ msgstr "Uzamknout aktuální obsluhující buňku"
 
 msgid "Unlock cell"
 msgstr "Odemknout buňku"
+
+msgid "Enter a cell"
+msgstr "Zadat buňku"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "Číslo kanálu (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "Uzamknout tuto buňku"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. Číslo kanálu, ne frekvence v MHz; buňka nemusí být v seznamu sousedních."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "Použití restartuje rádiový stack (SFUN) a krátce přeruší mobilní službu. Nastavení se uloží a plugin je znovu použije, jakmile je AT připraveno, pokud je povoleno Použít při spuštění. Háček platformy spouštěný před rádiem je může použít bez restartu. Použijte bez vybraných pásem pro obnovení automatického režimu."
@@ -1582,17 +1735,20 @@ msgstr "Zamykání %s na pozadí…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s uzamčeno na pozadí (restart SFUN, asi 30 sekund); zpětné čtení stavu…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "Zadejte číslo kanálu a PCI v rozsazích níže"
+
 msgid "No serving-network data"
 msgstr "Žádná data o obsluhující síti"
 
 msgid "NR serving cell"
 msgstr "Obsluhující buňka NR"
 
-msgid "Status confirmed"
-msgstr "Stav ověřen"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "Časový limit zpětného čtení vypršel; zvolte „Obnovit stav zámků“"
+
+msgid "Status confirmed"
+msgstr "Stav ověřen"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "Reset ověřen: síťový režim automatický, EN-DC zapnuto, všechna pásma, bez zámku buňky; uložená nastavení zámků byla vymazána"
@@ -1732,9 +1888,6 @@ msgstr "probuzeno tlačítkem %s"
 msgid "the modem is suspended (%s)"
 msgstr "modem je pozastaven (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "Zadejte celé číslo od 0 do %d"
-
 msgid "Power status unavailable"
 msgstr "Stav napájení není dostupný"
 
@@ -1792,6 +1945,12 @@ msgstr "Nabíjení pozastaveno: teplota baterie"
 msgid "Charging paused: charge limit"
 msgstr "Nabíjení pozastaveno: limit nabití"
 
+msgid "Charging paused: by hand"
+msgstr "Nabíjení pozastaveno: ručně"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "Jednou nabíjení do plna, pak zpět na limit"
+
 msgid "Sleep now"
 msgstr "Uspat nyní"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % baterii nikdy nenabíjí (zařízení běží z nabíječky), 100 % 
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % šetří baterii zařízení, které zůstává připojené k síti."
 
+msgid "Start charging again under"
+msgstr "Znovu nabíjet pod"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 znovu nabíjí 5 bodů pod úrovní zastavení. Nižší hodnota začne nabíjet až pod ní; se 100 % plná baterie čeká, dokud pod ni neklesne."
+
+msgid "Resume charging"
+msgstr "Obnovit nabíjení"
+
+msgid "Pause charging"
+msgstr "Pozastavit nabíjení"
+
+msgid "Cancel the full charge"
+msgstr "Zrušit nabití do plna"
+
+msgid "Charge to full once"
+msgstr "Jednou nabít do plna"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "Při pozastavení se baterie nenabíjí a zařízení běží z nabíječky; pod 5 % se nabíjí vždy a teplotní ochrana platí stále."
+
 msgid "When the charger switches the device on"
 msgstr "Když nabíječka zapne zařízení"
 
@@ -1830,9 +2010,6 @@ msgstr "Ponechat beze změny"
 
 msgid "LTE only (5G off)"
 msgstr "Pouze LTE (5G vypnuto)"
-
-msgid "On"
-msgstr "Zapnuto"
 
 msgid "Full"
 msgstr "Plný"
@@ -2057,9 +2234,6 @@ msgstr "Výchozí nastavení modemu"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "používá se"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "Vypnout rádio SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "Smazáno (pouze místně)"
 msgid "Enter both a number and a message."
 msgstr "Zadejte číslo i zprávu."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "Úložiště SIM: obsazeno %d z %d pozic (v %s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· zpráv: %d, nepřečtených: %d · konverzací: %d"
 
@@ -2234,8 +2411,26 @@ msgstr "Měsíční limit"
 msgid "%s, warning at %d%%"
 msgstr "%s, varování při %d%%"
 
+msgid "Daily quota"
+msgstr "Denní kvóta"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "Měsíční limit je vyčerpán: mobilní data byla vypnuta. Znovu se zapnou na začátku dalšího období."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "Denní kvóta je vyčerpána: mobilní data byla vypnuta. Znovu se zapnou o půlnoci."
+
+msgid "The daily quota is reached"
+msgstr "Denní kvóta je vyčerpána"
+
+msgid "%d%% of the daily quota is used"
+msgstr "Využito %d%% denní kvóty"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "Limit a denní kvóta počítají jen stahování."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "Limit a denní kvóta počítají jen odesílání."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s čeká na hodiny: ještě nebyly nastaveny ze sítě. Už se započítává do tohoto období a přejde ke svému dni, jakmile budou hodiny nastaveny."
@@ -2267,6 +2462,9 @@ msgstr "Po zúčtovacích obdobích"
 msgid "Billing cycle"
 msgstr "Zúčtovací období"
 
+msgid "Counted"
+msgstr "Započteno"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "Zadejte velikost v GB, například 50 nebo 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "Vypnout mobilní data při dosažení limitu"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "Když toto období dosáhne limitu, mobilní data se vypnou: žádný internet přes operátora, dokud nezačne další období, nezvýší se limit nebo se tato volba znovu nevypne. Ručně znovu zapnutá mobilní data zůstanou zapnutá do dalšího restartu."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "Vypnout mobilní data při denní kvótě"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "Když dnešní provoz dosáhne denní kvóty, mobilní data se vypnou do půlnoci, do zvýšení kvóty nebo do vypnutí této volby. Ruční zapnutí mobilních dat je ponechá zapnutá do dalšího restartu."
+
+msgid "Both ways"
+msgstr "Oba směry"
+
+msgid "Downloads only"
+msgstr "Jen stahování"
+
+msgid "Uploads only"
+msgstr "Jen odesílání"
 
 msgid "Set"
 msgstr "Nastavit"
@@ -2302,6 +2515,15 @@ msgstr "Měsíční limit (GB, 0: žádný)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "Varovat při tomto procentu limitu"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "Denní kvóta (GB, 0: žádná)"
+
+msgid "The cap and the daily quota count"
+msgstr "Co počítá limit a denní kvóta"
+
+msgid "Plan name"
+msgstr "Název tarifu"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "Dosud spotřebováno v tomto období (GB)"
@@ -2399,9 +2621,6 @@ msgstr "Zařízení se nyní restartuje. Výchozí spouštění je Android, tak�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "Zařízení se nyní restartuje a asi minutu bude nedostupné. Pokud se nový systém nespustí, zařízení se po neúspěšných pokusech samo vrátí do Androidu."
 
-msgid "Restart"
-msgstr "Restartovat"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "Restartuje se… otevřete tuto stránku znovu asi za minutu."
 
@@ -2468,9 +2687,6 @@ msgstr "Spouštěcí obraz"
 msgid "from the installer"
 msgstr "z instalátoru"
 
-msgid "Default boot"
-msgstr "Výchozí spouštění"
-
 msgid "Free space"
 msgstr "Volné místo"
 
@@ -2527,6 +2743,9 @@ msgstr "Poznámky k vydání"
 
 msgid "Download"
 msgstr "Stažení"
+
+msgid "only what changed since the installed release"
+msgstr "jen to, co se změnilo od nainstalovaného vydání"
 
 msgid "Free space needed"
 msgstr "Potřebné volné místo"
@@ -3056,9 +3275,6 @@ msgstr "Zjistit"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "URL může obsahovat token: na zařízení jde samostatně, nikdy do příkazového řádku ani do protokolu."
 
-msgid "Type"
-msgstr "Typ"
-
 msgid "Share link"
 msgstr "Sdílený odkaz"
 
@@ -3388,6 +3604,21 @@ msgstr "Neznámý druh zámku"
 msgid "Invalid value for this lock kind"
 msgstr "Neplatná hodnota pro tento druh zámku"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "Zámky pásem, režimu a buňky zatím nejsou pro SIM2 podporovány"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "Zámky pásem, režimu a buňky nejsou podporovány, dokud rádio řídí přepínání dvou SIM"
+
+msgid "None of these bands is supported by this modem"
+msgstr "Tento modem nepodporuje žádné z těchto pásem"
+
+msgid "Lock change failed"
+msgstr "Změna zámku selhala"
+
+msgid "Invalid job id"
+msgstr "Neplatné ID úlohy"
+
 msgid "Invalid page"
 msgstr "Neplatná stránka"
 
@@ -3478,14 +3709,29 @@ msgstr "Adaptér TTL nevrátil platnou odpověď"
 msgid "Invalid TTL"
 msgstr "Neplatné TTL"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "Adaptér TCP nevrátil platnou odpověď"
+
+msgid "Invalid congestion control"
+msgstr "Neplatné řízení zahlcení"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "Adaptér spouštění nevrátil platnou odpověď"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "Adaptér LED nevrátil platnou odpověď"
+
+msgid "Unknown LED setting"
+msgstr "Neznámé nastavení LED"
+
+msgid "Invalid value for this setting"
+msgstr "Neplatná hodnota pro toto nastavení"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "Adaptér spotřeby dat nedal platnou odpověď"
 
 msgid "Unknown data usage setting"
 msgstr "Neznámé nastavení spotřeby dat"
-
-msgid "Invalid value for this setting"
-msgstr "Neplatná hodnota pro toto nastavení"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "Adaptér přeposílání nedal platnou odpověď"
@@ -3731,8 +3977,29 @@ msgstr "Rádio se neřídilo svým nastavením"
 msgid "The data roaming setting could not be saved"
 msgstr "Nastavení datového roamingu se nepodařilo uložit"
 
-msgid "Expected on or off"
-msgstr "Očekáváno on nebo off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "Nastavení hotspotu je uloženo, ale znovunačtení bezdrátové sítě selhalo"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "Bezdrátová nastavení mají neuložené změny: nejprve je uložte nebo vraťte"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "Hotspot se právě přepíná; zkuste to za chvíli znovu"
+
+msgid "No hotspot (access point) is configured"
+msgstr "Není nastaven žádný hotspot (přístupový bod)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "Zapnutí tohoto rádia by ovlivnilo jiné rozhraní; použijte stránku Bezdrátové"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "Rádio používá klient Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "Nastavení hotspotu nelze zapsat"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "Tato platforma neposkytuje ovládání hotspotu"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "Tato platforma neposkytuje integraci VPN"
@@ -3833,6 +4100,15 @@ msgstr "Nejde o síťové rozhraní USB"
 msgid "LAN bridge device section was not found"
 msgstr "Sekce zařízení mostu LAN nebyla nalezena"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "Nelze zjistit, které síti adaptér patří; zkuste to později"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "Adaptér patří jiné síti a nemůže se připojit k LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "Síťová nastavení mají neuložené změny: nejprve je uložte nebo vraťte"
+
 msgid "Cannot bring USB network interface up"
 msgstr "Nelze aktivovat síťové rozhraní USB"
 
@@ -3865,6 +4141,12 @@ msgstr "Tělo webhooku je příliš dlouhé nebo obsahuje řídicí znak"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "Kontrola odpovědi musí mít tvar klíč=hodnota, například errcode=0 nebo ok=true (hodnota celé číslo nebo malá písmena, nejvýše 16)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "Neplatné tajemství webhooku (až 256 tisknutelných znaků, bez mezer)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "Časový limit musí být 1 až 120 sekund"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "Neplatná hlavička (jedna \"Název: hodnota\" na řádek; Host, Content-Type, Content-Length, Transfer-Encoding a Connection nastavuje zařízení)"
@@ -3926,8 +4208,17 @@ msgstr "Instalace již probíhá"
 msgid "The language pack could not be removed"
 msgstr "Jazykový balíček se nepodařilo odebrat"
 
+msgid "The LED settings could not be read"
+msgstr "Nastavení LED nelze přečíst"
+
+msgid "The LED setting could not be saved"
+msgstr "Nastavení LED nelze uložit"
+
 msgid "Lock cache unavailable"
 msgstr "Mezipaměť zámků není dostupná"
+
+msgid "The modem refused a write"
+msgstr "Modem odmítl zápis"
 
 msgid "The saved locks could not be cleared"
 msgstr "Uložené zámky se nepodařilo vymazat"
@@ -3938,9 +4229,6 @@ msgstr "Žádná obsluhující buňka k uzamčení"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "Modem neodpověděl na dotaz na režim; nic nebylo odesláno"
 
-msgid "The modem refused a write"
-msgstr "Modem odmítl zápis"
-
 msgid "The read-back does not match the automatic values"
 msgstr "Zpětné čtení neodpovídá automatickým hodnotám"
 
@@ -3949,6 +4237,21 @@ msgstr "Zpětné čtení po restartu zásobníku neodpovídá automatickým hodn
 
 msgid "The reset was interrupted"
 msgstr "Reset byl přerušen"
+
+msgid "The result of this lock change is no longer known"
+msgstr "Výsledek této změny zámku již není znám"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "Změna zámku trvala příliš dlouho; zvolte „Obnovit stav zámků“"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "Změna zámku byla přerušena; zvolte „Obnovit stav zámků“"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "Spouští se jiná změna zámku; zkuste to za chvíli znovu"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "Čeká příliš mnoho změn zámků; zkuste to znovu, až skončí"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "Opětovná instalace balíčků není v tomto systému k dispozici"
@@ -3967,6 +4270,12 @@ msgstr "Neznámá operace s balíčky"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "Tato platforma neposkytuje řízení zahlcení TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "Nastavení TCP nelze načíst"
 
 msgid "Data usage is not available on this system"
 msgstr "Spotřeba dat není v tomto systému k dispozici"

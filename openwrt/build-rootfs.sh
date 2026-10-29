@@ -19,10 +19,20 @@
 set -eu
 FLAVOUR=${MU300_FLAVOUR:-openwrt}
 case $FLAVOUR in
-    openwrt)     VER=${MU300_WRT_VER:-25.12.5}; BASEURL=https://downloads.openwrt.org/releases ;;
+    openwrt)     VER=${MU300_WRT_VER:-25.12.6}; BASEURL=https://downloads.openwrt.org/releases ;;
     # ImmortalWrt is an OpenWrt fork: same package manager, same layout, more drivers and LuCI apps
     immortalwrt) VER=${MU300_WRT_VER:-25.12.2}; BASEURL=https://downloads.immortalwrt.org/releases ;;
     *) echo "unknown flavour '$FLAVOUR' (openwrt or immortalwrt)" >&2; exit 1 ;;
+esac
+# The hash comes from the release's sha256sums, and that file counts only with a valid usign signature by the
+# release's key, pinned in openwrt/keys/usign/ (OpenWrt's keyring, git.openwrt.org/keyring.git usign/<number>): the
+# 25.12 releases are signed by b5043e70f9a75cde (OpenWrt) and 467a35c14d7fbc5c (ImmortalWrt). Another release
+# series is signed by another key, which has to be pinned here first. Without the check, whoever could change the
+# download (a mirror, a proxy) could change sha256sums with it, and the tarball would match.
+case $FLAVOUR:$VER in
+    openwrt:25.12.*)     USIGN_KEY=b5043e70f9a75cde ;;
+    immortalwrt:25.12.*) USIGN_KEY=467a35c14d7fbc5c ;;
+    *) echo "no pinned usign key for $FLAVOUR $VER (openwrt/keys/usign, openwrt/build-rootfs.sh)" >&2; exit 1 ;;
 esac
 SYSTEM=${MU300_SYSTEM:-openwrt}
 case $SYSTEM in
@@ -105,7 +115,8 @@ if [ "$SYSTEM" = openwrt-luci ]; then
     [ -s "$CAT/mu300.tr.lmo" ] || { echo "no Turkish catalog built from openwrt/luci-app-mu300/po/tr" >&2; exit 1; }
     [ -s "$CAT/mu300.zh-cn.lmo" ] || { echo "no Chinese catalog built from openwrt/luci-app-mu300/po/zh_Hans" >&2; exit 1; }
     set -- -v "$THEME_APK:/in/luci-theme-aurora.apk:ro" -v "$TOP/openwrt/luci-app-mu300:/in/luci-plugin:ro" \
-        -v "$TOP/openwrt/luci-overlay:/in/luci-overlay:ro" -v "$CAT:/in/catalogs:ro"
+        -v "$TOP/openwrt/luci-overlay:/in/luci-overlay:ro" -v "$CAT:/in/catalogs:ro" \
+        -v "$TOP/openwrt/patches/luci-lexical-translator.sh:/in/luci-lexical-translator.sh:ro"
 fi
 TARBALL=$FLAVOUR-$VER-armsr-armv8-rootfs.tar.gz
 URL=$BASEURL/$VER/targets/armsr/armv8
@@ -114,7 +125,15 @@ cd "$TOP"
 if [ ! -f "openwrt/$TARBALL" ]; then
     curl -fL -o "openwrt/$TARBALL" "$URL/$TARBALL"
 fi
-want=$(curl -fsL "$URL/sha256sums" | sed -n "s/^\([0-9a-f]*\) \*$TARBALL$/\1/p")
+# sha256sums (below) counts only with a valid usign signature by the release's key
+SUMS=$(mktemp -d)
+curl -fsL -o "$SUMS/sha256sums" "$URL/sha256sums" && curl -fsL -o "$SUMS/sha256sums.sig" "$URL/sha256sums.sig" ||
+    { echo "cannot download $URL/sha256sums and its signature" >&2; rm -rf "$SUMS"; exit 1; }
+python3 "$TOP/tools/usign-verify.py" "$TOP/openwrt/keys/usign/$USIGN_KEY" "$SUMS/sha256sums.sig" "$SUMS/sha256sums" >/dev/null ||
+    { echo "$URL/sha256sums: no valid signature by $FLAVOUR's key $USIGN_KEY" >&2; rm -rf "$SUMS"; exit 1; }
+want=$(sed -n "s/^\([0-9a-f]\{64\}\) \*$TARBALL$/\1/p" "$SUMS/sha256sums")
+rm -rf "$SUMS"
+[ -n "$want" ] || { echo "$TARBALL is not in the signed sha256sums" >&2; exit 1; }
 have=$(shasum -a 256 "openwrt/$TARBALL" 2>/dev/null || sha256sum "openwrt/$TARBALL")
 [ "${have%% *}" = "$want" ] || { echo "checksum mismatch for $TARBALL" >&2; exit 1; }
 docker import --platform linux/arm64 "openwrt/$TARBALL" mu300-$FLAVOUR-base:$VER >/dev/null
@@ -282,6 +301,8 @@ if [ -d /in/luci-plugin ]; then
     [ -d /in/luci-overlay ] && cp -a /in/luci-overlay/. $R/
     cp -a /in/luci-plugin/root/. $R/
     cp -a /in/luci-plugin/htdocs/. $R/www/
+    # the views keep their translations when a browser extension puts Lodash on window._ (issue #376)
+    sh /in/luci-lexical-translator.sh $R/www/luci-static/resources/luci.js
     chmod 0755 $R/etc/init.d/unisoc-modem-ui $R/etc/hotplug.d/net/90-unisoc-usb-host $R/etc/hotplug.d/iface/90-unisoc-usb-host $R/usr/libexec/rpcd/mu300dash $R/usr/libexec/rpcd/mu300vpn $R/usr/libexec/unisoc-modem/*
     chmod 0755 $R/usr/libexec/rpcd/mu300term $R/usr/libexec/mu300-terminal-login $R/etc/hotplug.d/iface/95-mu300-terminal
     # the terminal is System > Terminal (the panel menu: the page, and the settings page of luci-app-ttyd); its own Services >

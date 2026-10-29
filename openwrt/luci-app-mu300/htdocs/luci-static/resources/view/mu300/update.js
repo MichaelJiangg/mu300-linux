@@ -230,8 +230,10 @@ return view.extend({
 			E('div', { 'class': 'mud-note' }, _('It was started outside this page (a terminal, the toolkit). Nothing can be started here until it has finished.'))
 		]));
 
-		if (st.restart_pending && !(job.state === 'done' && job.changed)) {
-			var prb = E('button', { 'class': 'mud-btn on', 'id': 'mud-upd-pending-restart', 'disabled': off ? '' : null }, _('Restart now'));
+		/* not while an update still runs: the system is switched before the kernel step, and a restart then cuts that
+		   step short (#422) */
+		if (st.restart_pending && !off && !(job.state === 'done' && job.changed)) {
+			var prb = E('button', { 'class': 'mud-btn on', 'id': 'mud-upd-pending-restart' }, _('Restart now'));
 			prb.addEventListener('click', function() { self.restart(prb); });
 			cards.push(E('section', { 'class': 'mud-card', 'id': 'mud-upd-pending', 'style': 'margin-bottom:14px' }, [
 				E('h3', {}, _('Restart needed')),
@@ -296,7 +298,8 @@ return view.extend({
 			var box = E('div', { 'id': pre ? 'mud-upd-beta' : 'mud-upd-latest', 'style': 'margin:10px 0' }, [
 				row(pre ? _('Pre-release') : _('Newest release'), [ rel.tag + (rel.published ? ' · ' + rel.published : '') + ' ',
 					E('a', { 'href': rel.url, 'target': '_blank', 'rel': 'noopener noreferrer' }, _('Release notes')) ]),
-				row(_('Download'), M.fmtBytes(rel.download)),
+				/* a diff: only what changed since the installed release, checked by mu300-update against the signed release */
+				row(_('Download'), M.fmtBytes(rel.download) + (rel.diffs > 0 ? ' · ' + _('only what changed since the installed release') : '')),
 				row(_('Free space needed'), kb(rel.need_kb) + (disk.free_kb != null && rel.need_kb > disk.free_kb ? ' · ' + _('not enough: remove the previous version first') : ''))
 			]);
 			if (pre) box.appendChild(E('div', { 'class': 'mud-note' }, _('A pre-release is a release still being tried: it can have faults a release does not. The previous version is kept all the same.')));

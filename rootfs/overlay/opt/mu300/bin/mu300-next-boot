@@ -30,7 +30,13 @@ RUN=${MU300_RUN:-/run/mu300}
 # The initramfs says which slot Linux runs from (Android may be on either); without that (or garbled), the slot LK
 # booted, from the command line or the device tree's bootargs, and b only when nothing says. The blocks it publishes
 # are the pair of that slot; an initramfs from before that publishes only the old names, and only ever for Linux on b.
+# Between the two, the slot the initramfs' Linux block names: it publishes that block with the file, and its first two
+# bytes are the slot suffix (_a/_b) LK reads (kanoqwq's b8d4f222).
+suffix_of() { dd if="$1" bs=1 count=2 2>/dev/null; }
 LINUX_SLOT=$(cat "$RUN/linux-slot" 2>/dev/null || true)
+case $LINUX_SLOT in a|b) ;; *)
+    case $(suffix_of "$RUN/misc-bc-linux-trial.bin") in _a) LINUX_SLOT=a ;; _b) LINUX_SLOT=b ;; esac ;;
+esac
 case $LINUX_SLOT in a|b) ;; *)
     LINUX_SLOT=$(for f in ${MU300_CMDLINE_SRC:-/proc/cmdline /proc/device-tree/chosen/bootargs}; do
         [ -r "$f" ] && tr '\000' ' ' < "$f" | sed -n 's/.*androidboot\.slot_suffix=_\([ab]\).*/\1/p'; done | head -n1)
@@ -43,6 +49,14 @@ if [ "$LINUX_SLOT" = b ]; then
     [ -s "$BC_A" ] || BC_A=$RUN/misc-bc-slot-a.bin
     [ -s "$BC_B" ] || BC_B=$RUN/misc-bc-slot-b-trial.bin
 fi
+# A block that names another slot than the one it is used for is never written: Linux's must name Linux's slot, and
+# Android's the other one. The initramfs never publishes such a pair; this keeps misc unchanged if anything else did
+# (kanoqwq's b8d4f222). A missing block is write_bc's to refuse, as before.
+if [ "$LINUX_SLOT" = a ]; then ANDROID_SLOT=b; else ANDROID_SLOT=a; fi
+pair_ok() {
+    { [ ! -s "$BC_B" ] || [ "$(suffix_of "$BC_B")" = "_$LINUX_SLOT" ]; } &&
+        { [ ! -s "$BC_A" ] || [ "$(suffix_of "$BC_A")" = "_$ANDROID_SLOT" ]; }
+}
 MISC=$(cat "$RUN/misc-dev" 2>/dev/null || readlink -f /dev/block/by-name/misc)
 DEFAULT_ATTEMPTS=5
 
@@ -88,16 +102,34 @@ set_conf() {
 }
 
 # write_bc FILE: the 32-byte block into misc, read back; then, and only then, the default boot that goes with it
-# (PENDING_CONF, set by the command). A failed or unverified write leaves the file as it was.
+# (PENDING_CONF, set by the command). A failed or unverified write leaves the file as it was. When the file cannot be
+# written after misc was, misc gets its previous block back (kanoqwq f6b0668d), so the two do not disagree: misc
+# armed for Linux with the file still saying android, or the reverse.
 PENDING_CONF=
+misc_bc() { dd if="$MISC" bs=1 skip=2048 count=32 2>/dev/null | od -An -tx1 -v | tr -d ' \n'; }
+put_bc() {  # put_bc FILE: write and read back; false when either fails
+    dd if="$1" of="$MISC" bs=1 seek=2048 conv=notrunc 2>/dev/null || return 1
+    sync
+    [ "$(misc_bc)" = "$(hex_of "$1")" ]
+}
 write_bc() {
+    local prev tmp
     [ -s "$1" ] || { echo "no boot control block $1 (initramfs too old for this slot?)" >&2; exit 1; }
+    prev=$(misc_bc)
     dd if="$1" of="$MISC" bs=1 seek=2048 conv=notrunc 2>/dev/null || { echo "writing misc failed" >&2; exit 1; }
     sync
-    [ "$(dd if="$MISC" bs=1 skip=2048 count=32 2>/dev/null | od -An -tx1 -v | tr -d ' \n')" = "$(hex_of "$1")" ] \
-        || { echo "misc verify failed" >&2; exit 1; }
+    [ "$(misc_bc)" = "$(hex_of "$1")" ] || { echo "misc verify failed" >&2; exit 1; }
     if [ -n "$PENDING_CONF" ]; then
-        set_conf "$PENDING_CONF" || { echo "misc written, but $CONF could not be written" >&2; exit 1; }
+        if ! set_conf "$PENDING_CONF"; then
+            tmp=$(mktemp)
+            if [ "${#prev}" = 64 ] && bytes_of "$prev" > "$tmp" && put_bc "$tmp"; then
+                echo "$CONF could not be written: misc put back as it was, nothing changed" >&2
+            else
+                echo "misc written, but $CONF could not be written, and putting misc back failed too" >&2
+            fi
+            rm -f "$tmp"
+            exit 1
+        fi
         PENDING_CONF=
     fi
 }
@@ -135,6 +167,12 @@ arm_linux() {  # arm_linux [trial]: locked when that is wanted, unless this is t
     fi
 }
 
+# bc_writable: this slot's pair of boot control blocks is there and matches it, and misc can be written - what every
+# command but status needs (the panel's boot card shows it: kanoqwq's f6b0668d)
+bc_writable() {
+    [ -s "$BC_A" ] && [ -s "$BC_B" ] && pair_ok && [ -n "$MISC" ] && [ -e "$MISC" ] && [ -w "$MISC" ]
+}
+
 slot_state() {
     b=$(dd if="$MISC" bs=1 skip=2048 count=32 2>/dev/null | od -An -tx1 -v | tr -d ' \n')
     echo "misc bootloader_control: $b"
@@ -157,7 +195,9 @@ take_lock() {
         sleep 1
     done
 }
-case "${1:-status}" in status) ;; *) take_lock ;; esac
+case "${1:-status}" in status) ;; *) take_lock
+    pair_ok || { echo "the boot control blocks do not match Linux on slot $LINUX_SLOT; boot control unchanged" >&2; exit 1; } ;;
+esac
 
 case "${1:-status}" in
     linux)   PENDING_CONF=linux; arm_linux; echo "default boot: linux" ;;
@@ -188,6 +228,7 @@ case "${1:-status}" in
              if lock_wanted; then echo "failed boots in a row before Android: $(attempts) (only while a new boot image is on trial)"
              else echo "failed boots in a row before Android: $(attempts)"; fi
              d=$(disk_dir) && [ -f "$d/boot-tries" ] && echo "boots since the last good one: $(cat "$d/boot-tries")"
+             if bc_writable; then echo "boot control: writable"; else echo "boot control: not writable"; fi
              slot_state ;;
     *) echo "usage: $0 linux|android|lock|unlock|attempts [N]|status" >&2; exit 2 ;;
 esac

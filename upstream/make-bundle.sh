@@ -14,14 +14,20 @@
 set -eu
 TOP=$(cd "$(dirname "$0")/.." && pwd)
 U=$TOP/upstream
-# the build to package: upstream/out (6.18), or MU300_UPSTREAM_OUT=upstream/out-7.2 for another kernel
+# the build to package: upstream/out (6.18), or MU300_UPSTREAM_OUT=upstream/out-7.2 (out-7.3) for another kernel
 UO=${MU300_UPSTREAM_OUT:-$U/out}
 OUT=${1:?usage: upstream/make-bundle.sh OUT.tar.gz [mu300-kernel.tar.gz]}
 REF=${2:-$(ls -t "$TOP"/release/*/mu300-kernel.tar.gz 2>/dev/null | head -1)}
 [ -f "$UO/Image" ] || { echo "no $UO/Image (run build.sh)" >&2; exit 1; }
 [ -f "$REF" ] || { echo "no 5.4 kernel bundle for busybox/logdw (give one as the second argument)" >&2; exit 1; }
+# the build's module tree and the staging directory must keep xt_HL.ko and xt_hl.ko apart (FINDINGS 212); a tree built
+# on a file system that ignores case has lost one of each pair already (audit-bundle.py also finds that)
+. "$U/case-sensitive.sh"
+case_sensitive "$UO/modules" || exit 1
 
 python3 "$U/audit-bundle.py" "$UO" "$U/mu300-mainline.config"
+# nothing of the 5.4 kernel missing unsaid (parity-5.4.txt; audit-bundle.py wrote kernel.config)
+python3 "$U/check-parity.py" --mainline "$UO"
 # the modules the devices' guard keeps from on-demand loading, against this build (FINDINGS 163)
 python3 "$U/check-autoload-blocked.py" "$UO" "$TOP/rootfs/overlay/opt/mu300/lib/autoload-blocked" \
     "$TOP/rootfs/overlay/opt/mu300/bin/mu300-modprobe-guard"
@@ -33,12 +39,25 @@ for m in "$UO"/modules/*.ko; do
     v=$(strings "$m" | sed -n 's/^vermagic=\([^ ]*\) .*/\1/p' | head -1)
     [ "$v" = "$krel" ] || { echo "$m is built for '$v', the kernel is '$krel'" >&2; exit 1; }
 done
+# --- stale begin
+# ... and a vendor module built before its source last changed has the right vermagic and the old code (kanoqwq
+# 265f4de3, f6b0668d: a Wi-Fi fix that was in the tree and not in the bundle). build-modules.sh logs each module directory's build
+# to modules/NAME.log, so a file of upstream/modules/NAME newer than that log was changed after the build: refused
+# until build-modules.sh has run again. (A release builds from a fresh checkout, where the logs come last.)
+for d in "$U"/modules/*/; do
+    d=${d%/}; n=${d##*/}
+    [ -f "$UO/modules/$n.log" ] || { echo "$n was not built for this kernel: no $UO/modules/$n.log (build-modules.sh)" >&2; exit 1; }
+    f=$(find "$d" -type f -newer "$UO/modules/$n.log" | head -n 1)
+    [ -z "$f" ] || { echo "${f#"$TOP"/} changed after $n was built for $krel: run build-modules.sh $n again" >&2; exit 1; }
+done
+# --- stale end
 for m in $(cat "$U/module-order.txt"); do
     [ -f "$UO/modules/$m" ] || { echo "module-order.txt names $m, which was not built" >&2; exit 1; }
 done
 
-W=$(mktemp -d)
+W=$(mktemp -d "${TMPDIR:-/tmp}/mu300-bundle.XXXXXX")
 trap 'rm -rf "$W"' EXIT
+case_sensitive "$W" || exit 1
 tar -xzf "$REF" -C "$W" ./busybox ./logdw
 # init's e2fsck (FINDINGS 182), from 5.4 bundles since it came; an older one: the ramdisk boots without it (the
 # release audit refuses such a bundle)

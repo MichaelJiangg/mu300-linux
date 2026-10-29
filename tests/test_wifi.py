@@ -1,10 +1,13 @@
-"""wifi-start loads the WCN modules without modules.dep (K55); mu300-hw restarts the AP once the country is live (K15)."""
+"""wifi-start loads the WCN modules without modules.dep (K55); mu300-hw restarts the AP once the country is live (K15),
+and makes a broken /etc/board.json again before the wifi-scripts read it (kanoqwq f6b0668d)."""
 import subprocess
+import sys
 import unittest
 
 from helpers import BIN, TOP, ShellTest
 
 HW = TOP / 'openwrt' / 'overlay' / 'etc' / 'init.d' / 'mu300-hw'
+OWBIN = TOP / 'openwrt' / 'overlay' / 'opt' / 'mu300' / 'bin'
 
 
 class WifiStart(ShellTest):
@@ -67,6 +70,89 @@ class HwBringup(unittest.TestCase):
         self.assertEqual(s.count('wifi down'), 1)
         self.assertEqual(s.count('wifi up'), 1)
         self.assertLess(up, s.index('\nstart()'))
+
+    def test_board_json_checked_and_readiness_from_wifi_ready(self):
+        s = HW.read_text()
+        self.assertLess(s.index('openwrt-board-check'), s.index('/opt/mu300/bin/wifi-start'))
+        body = s[s.index('ap_enabled_soon() {'):]
+        self.assertIn('/opt/mu300/bin/wifi-ready', body)
+        self.assertNotIn('hostapd.wlan0', body)       # a hotspot switched off has none: 20 s and a restart for nothing
+
+
+class BoardCheck(ShellTest):
+    """openwrt-board-check, with ucode's JSON check played by Python (the real one ran in the OpenWrt 25.12 image)."""
+
+    def setUp(self):
+        super().setUp()
+        self.root = self.tmp / 'root'
+        (self.root / 'etc').mkdir(parents=True)
+        self.board = self.root / 'etc' / 'board.json'
+        parser = self.stubs / 'ucode'
+        parser.write_text('#!%s\nimport json, sys\ntry:\n    sys.exit(0 if isinstance(json.load(open(sys.argv[-1])), '
+                          'dict) else 1)\nexcept Exception:\n    sys.exit(1)\n' % sys.executable)
+        parser.chmod(0o755)
+        self.stub('board_detect', 'printf \'{"model":{"id":"zte,u30air"}}\' > "$1"')
+        self.stub('bad_detect', 'printf \'{"model":\' > "$1"')
+        self.stub('sync', ':')
+
+    def check(self, shell, detector='board_detect'):
+        return self.script(shell, OWBIN / 'openwrt-board-check', MU300_SYSROOT=self.root,
+                           MU300_BOARD_DETECTOR=self.stubs / detector)
+
+    def leftovers(self):
+        return sorted(p.name for p in self.board.parent.iterdir() if p.name != 'board.json')
+
+    def test_valid_is_kept_whatever_it_holds(self):
+        for shell in self.each_shell():
+            self.board.write_text('{"custom": 1}')
+            r = self.check(shell)
+            self.assertEqual((r.returncode, r.stdout), (0, ''), r.stderr)
+            self.assertEqual(self.board.read_text(), '{"custom": 1}')
+
+    def test_broken_is_made_again_and_kept_beside_it(self):
+        for shell in self.each_shell():
+            for old in ('{"model":{', '', '[1]'):
+                for p in self.board.parent.iterdir():
+                    p.unlink()
+                self.board.write_text(old)
+                r = self.check(shell)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertEqual(self.board.read_text(), '{"model":{"id":"zte,u30air"}}')
+                kept = self.leftovers()
+                self.assertEqual(len(kept), 1)
+                self.assertTrue(kept[0].startswith('board.json.corrupt.'))
+                self.assertEqual((self.board.parent / kept[0]).read_text(), old)
+
+    def test_missing_is_made(self):
+        for shell in self.each_shell():
+            self.board.unlink(missing_ok=True)
+            self.assertEqual(self.check(shell).returncode, 0)
+            self.assertEqual(self.board.read_text(), '{"model":{"id":"zte,u30air"}}')
+            self.assertEqual(self.leftovers(), [])
+            self.board.unlink()
+
+    def test_a_bad_rebuild_leaves_the_file_as_it_was(self):
+        for shell in self.each_shell():
+            self.board.write_text('[1]')
+            r = self.check(shell, 'bad_detect')
+            self.assertEqual(r.returncode, 1)
+            self.assertIn('no valid JSON', r.stderr)
+            self.assertEqual(self.board.read_text(), '[1]')
+            self.assertEqual(self.leftovers(), [])
+            r = self.check(shell, 'no_such_detector')
+            self.assertEqual(r.returncode, 1)
+            self.assertEqual(self.board.read_text(), '[1]')
+
+    def test_a_symlink_is_not_replaced(self):
+        for shell in self.each_shell():
+            real = self.root / 'etc' / 'real'
+            real.write_text('x')
+            self.board.unlink(missing_ok=True)
+            self.board.symlink_to('real')
+            self.assertEqual(self.check(shell).returncode, 1)
+            self.assertEqual(real.read_text(), 'x')
+            self.board.unlink()
+            real.unlink()
 
 
 if __name__ == '__main__':

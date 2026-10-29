@@ -66,7 +66,7 @@ lan.get lan.set usb.role usb.net adb.auth
 system.get system.hostname system.timezone system.password system.ssh system.reboot system.boot system.bootos
 update.check update.apply kernel.set extra.list extra.install extra.remove logs
 backup.export backup.import
-at.send at.history ussd.send ussd.cancel modem.restart ttl.get ttl.set traffic.get traffic.set
+at.send at.history ussd.send ussd.cancel modem.restart ttl.get ttl.set tcp.get tcp.set traffic.get traffic.set
 power.get power.set led.get led.set zram.get zram.set cpu.get cpu.profile cpu.core cpu.lowlatency cpu.voltage
 update.status update.source packages.get packages.act docker.status
 job.status job.cancel job.clear'
@@ -131,10 +131,11 @@ fget() {
     [ "$FT" != z ] || FV=
     return 0
 }
-# only KEY...: the request has no other field
+# only KEY...: the request has no other field. ubus_rpc_session is not one: OpenWrt's ubus over HTTP adds the caller's
+# session to every call it passes on, and LuCI's backup page reached mu300-api with it (#383)
 only() {
     for _k in $(printf '%s' "$FIELDS" | cut -f1); do
-        case " $* " in *" $_k "*) ;; *) refuse unknown-field "$_k" ;; esac
+        case " $* ubus_rpc_session " in *" $_k "*) ;; *) refuse unknown-field "$_k" ;; esac
     done
 }
 is_ascii_line() { [ "$(printf '%s' "$1" | LC_ALL=C tr -d ' -~'; echo x)" = x ]; }
@@ -153,6 +154,13 @@ word() {
     fget "$1" || { V=; return 1; }
     [ "$FT" != z ] || { V=; return 1; }
     [ "$FT" = s ] && allowed "$FV" "$2" || refuse bad-value "$1"
+    V=$FV
+}
+# wnum KEY ERE: as word, and a JSON number too (traffic.set's daily 1073741824, not only "1073741824")
+wnum() {
+    fget "$1" || { V=; return 1; }
+    [ "$FT" != z ] || { V=; return 1; }
+    { [ "$FT" = s ] || [ "$FT" = n ]; } && allowed "$FV" "$2" || refuse bad-value "$1"
     V=$FV
 }
 # int KEY MIN MAX: a whole number (a JSON number, or a string of digits)
@@ -482,7 +490,7 @@ hotspot_check() {
     fget ssid && { [ "$FT" = s ] && ssid_ok "$FV" || refuse bad-value ssid; SSID=$FV; }
     fget password && { [ "$FT" = s ] && psk_ok "$FV" || refuse bad-value password; PSK=$FV; }
     word band '2\.4|5' && BAND=$V
-    word channel 'auto|[0-9]{1,3}' && CHAN=$V
+    wnum channel 'auto|[0-9]{1,3}' && CHAN=$V
     flag hidden && HIDDEN=$V
     _b=$BAND
     [ -n "$_b" ] || _b=$(m_band_now)
@@ -1068,12 +1076,15 @@ m_sms_forward() {
 }
 FWD_FLAGS='enabled webhook telegram email sms'
 FWD_TEXTS='template allow deny keywords clear webhook_url webhook_format webhook_headers webhook_body webhook_expect
-telegram_token telegram_chat email_host email_port email_tls email_user email_password email_from email_to sms_number'
+webhook_secret timeout telegram_token telegram_chat email_host email_port email_tls email_user email_password email_from
+email_to sms_number'
 m_sms_forward_set() {
-    only $FWD_FLAGS $FWD_TEXTS
+    only $FWD_FLAGS $FWD_TEXTS power
     need_forward
     _req='{'
     for _k in $FWD_FLAGS; do flag "$_k"; _req="$_req\"$_k\":\"${V:-0}\","; done
+    # the battery notices: left out, the saved setting stays (a page that does not know them)
+    if flag power; then _req="$_req\"power\":\"$V\","; fi
     for _k in $FWD_TEXTS; do
         fget "$_k" || continue
         case $FT in z) continue ;; s) ;; *) refuse bad-value "$_k" ;; esac
@@ -1299,7 +1310,7 @@ m_update_check() { only; job_start update-check 300 "" "$BIN/mu300-update" check
 m_update_apply() { only; job_start update-apply 7200 "" "$BIN/mu300-update" apply; }
 m_kernel_set() {
     only version
-    word version '5\.4|6\.18|7\.2'; need version
+    word version '5\.4|6\.18|7\.2|7\.3'; need version
     job_start kernel 3600 "" "$BIN/mu300-update" kernel "$V"
 }
 EXTRAS='vpn lang panel vpn-xray vpn-singbox vpn-mihomo vpn-dae'
@@ -1426,12 +1437,36 @@ m_ttl_get() {
 }
 m_ttl_set() {
     only value
-    word value 'off|[1-9][0-9]{0,2}'; need value
+    wnum value 'off|[1-9][0-9]{0,2}'; need value
     [ "$V" = off ] || [ "$V" -le 255 ] || refuse bad-value value
     [ -x "$BIN/mu300-ttl" ] || refuse unsupported mu300-ttl
     checked
     if [ "$V" = off ]; then tool 30 "$BIN/mu300-ttl" off </dev/null; else tool 30 "$BIN/mu300-ttl" set "$V" </dev/null; fi ||
         refuse failed "$ERR"
+    ok
+}
+# tcp.get: the TCP congestion control of the device's own connections (mu300-tcp): saved (default|cubic|bbr), what is in
+# force, the kernel's own default and what it offers of cubic and bbr (the 5.4 kernel has no BBR)
+m_tcp_get() {
+    only
+    [ -x "$BIN/mu300-tcp" ] || refuse unsupported mu300-tcp
+    tool 20 "$BIN/mu300-tcp" state </dev/null || refuse failed "$ERR"
+    _tv() { printf '%s\n' "$OUT" | sed -n "s/^$1=//p" | head -n 1; }
+    _s=$(_tv SAVED); case $_s in cubic|bbr) ;; *) _s=default ;; esac
+    _c=$(_tv CURRENT); allowed "$_c" '[a-z][a-z0-9_]{0,31}' || _c=
+    _q=$(_tv QDISC); allowed "$_q" '[a-z][a-z0-9_]{0,31}' || _q=
+    _d=$(_tv DEFAULT); allowed "$_d" '[a-z][a-z0-9_]{0,31}' || _d=
+    _o=
+    for _a in $(_tv OFFERED); do case $_a in cubic|bbr) _o="$_o $_a" ;; esac; done
+    ok "\"supported\":$(jb "$(_tv SUPPORTED)"),\"saved\":\"$_s\",\"current\":$(js "$_c"),\"qdisc\":$(js "$_q"),\"default\":$(js "$_d"),\"offered\":$(jlist $_o)"
+}
+# tcp.set {value}: default, cubic or bbr (bbr also makes fq the default queue); what the kernel lacks is refused
+m_tcp_set() {
+    only value
+    word value 'default|cubic|bbr'; need value
+    [ -x "$BIN/mu300-tcp" ] || refuse unsupported mu300-tcp
+    checked
+    tool 30 "$BIN/mu300-tcp" set "$V" </dev/null || refuse failed "$ERR"
     ok
 }
 m_traffic_get() {
@@ -1441,24 +1476,28 @@ m_traffic_get() {
     _j=$(jcheck "$OUT") || refuse failed "mu300-traffic gave no JSON"
     ok "\"traffic\":$_j"
 }
-# traffic.set {key, value}: reset_day 1-31, cap bytes (0: none), warn 1-100, cut on|off, used bytes, clear "yes"
+# traffic.set {key, value}: reset_day 1-31, cap bytes (0: none; the byte counts a number or a string of digits), warn 1-100, cut on|off, used bytes, clear "yes",
+# daily bytes (0: none), daily_cut on|off, count total|rx|tx, plan text (at most 96 bytes; "" for none)
 m_traffic_set() {
     only key value
-    word key 'reset_day|cap|warn|cut|used|clear'; need key; _k=$V
+    word key 'reset_day|cap|warn|cut|used|clear|daily|daily_cut|count|plan'; need key; _k=$V
     case $_k in
         reset_day) int value 1 31 ;;
         warn) int value 1 100 ;;
-        cut) word value 'on|off' ;;
+        cut|daily_cut) word value 'on|off' ;;
         clear) word value 'yes' ;;
-        cap|used) word value '0|[1-9][0-9]{0,15}' ;;
+        count) word value 'total|rx|tx' ;;
+        cap|used|daily) wnum value '0|[1-9][0-9]{0,15}' ;;
+        plan) fget value || refuse missing value; text value 96 ;;
     esac
-    need value
+    [ "$_k" = plan ] || need value
     [ -x "$BIN/mu300-traffic" ] || refuse unsupported mu300-traffic
     checked
     case $_k in
         reset_day) set -- set reset-day "$V" ;;
-        cap) if [ "$V" = 0 ]; then set -- set cap off; else set -- set cap "$V"; fi ;;
-        warn|cut) set -- set "$_k" "$V" ;;
+        cap|daily) if [ "$V" = 0 ]; then set -- set "$_k" off; else set -- set "$_k" "$V"; fi ;;
+        warn|cut|count|plan) set -- set "$_k" "$V" ;;
+        daily_cut) set -- set daily-cut "$V" ;;
         used) set -- used "$V" ;;
         clear) set -- clear --yes ;;
     esac
@@ -1485,6 +1524,8 @@ m_power_get() {
     _state=$(echo "$_pst" | sed -n 's/^state: //p' | head -n 1); _supply=$(echo "$_pst" | sed -n 's/^supply: //p' | head -n 1)
     _sb=$(echo "$_pst" | sed -n 's/^SAVER_BELOW=\([0-9]*\) .*/\1/p'); _ct=$(echo "$_pst" | sed -n 's/.*CHARGE_TO=\([0-9]*\)$/\1/p')
     _poc=$(echo "$_pst" | sed -n 's/^POWER_ON_CHARGER=\([01]\)$/\1/p')
+    _ra=$(echo "$_pst" | sed -n 's/^RESUME_AT=\([0-9]*\) .*/\1/p'); _cp=$(echo "$_pst" | sed -n 's/.* CHARGE_PAUSE=\([01]\) .*/\1/p')
+    _fo=$(echo "$_pst" | sed -n 's/.* FULL_ONCE=\([01]\)$/\1/p')
     _bat=null
     if ! echo "$_pst" | grep -qx 'battery: none'; then
         for _d in "$R"/sys/class/power_supply/*; do
@@ -1501,20 +1542,22 @@ m_power_get() {
     printf '{"ok":1,"state":%s,"profile":%s,"why":%s,"supply":%s,"battery":%s,"charge_off":%s,' \
         "$(js "${_state:-active}")" "$(js "$_prof")" "$(js "$_why")" "$(js "$_supply")" "$_bat" \
         "$(js "$(first "$R/run/mu300/power/charge-off")")"
-    printf '"conf":{"PROFILE":"%s","SAVER_BELOW":%s,"CHARGE_TO":%s,"POWER_ON_CHARGER":%s,"plugged":%s,"battery":%s,"saver":%s},"text":%s}\n' \
-        "$_conf" "$(jn "$_sb")" "$(jn "$_ct")" "$(jn "$_poc")" "$(power_knobs plugged)" "$(power_knobs battery)" "$(power_knobs saver)" \
+    printf '"conf":{"PROFILE":"%s","SAVER_BELOW":%s,"CHARGE_TO":%s,"POWER_ON_CHARGER":%s,"RESUME_AT":%s,"CHARGE_PAUSE":%s,"FULL_ONCE":%s,"plugged":%s,"battery":%s,"saver":%s},"text":%s}\n' \
+        "$_conf" "$(jn "$_sb")" "$(jn "$_ct")" "$(jn "$_poc")" "$(jn "$_ra")" "$(jn "$_cp")" "$(jn "$_fo")" "$(power_knobs plugged)" "$(power_knobs battery)" "$(power_knobs saver)" \
         "$(js "$_pst")"
     exit 0
 }
-# power.set {key, value}: as mu300-power set takes them (it checks the value again): PROFILE, SAVER_BELOW, CHARGE_TO,
-# POWER_ON_CHARGER, PROFILE.KNOB
+# power.set {key, value}: as mu300-power set takes them (it checks the value again, and refuses the charging controls
+# where there is no battery): PROFILE, SAVER_BELOW, CHARGE_TO, POWER_ON_CHARGER, RESUME_AT, CHARGE_PAUSE, FULL_ONCE,
+# PROFILE.KNOB
 m_power_set() {
     only key value
-    word key 'PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU)'; need key; _k=$V
+    word key 'PROFILE|SAVER_BELOW|CHARGE_TO|POWER_ON_CHARGER|RESUME_AT|CHARGE_PAUSE|FULL_ONCE|(plugged|battery|saver)\.(WIFI_IDLE|RADIO_IDLE|LEDS_IDLE|CPU)'; need key; _k=$V
     case $_k in
         PROFILE) word value 'auto|plugged|battery|saver' ;;
         SAVER_BELOW|CHARGE_TO) int value 0 100 ;;
-        POWER_ON_CHARGER) int value 0 1 ;;
+        POWER_ON_CHARGER|CHARGE_PAUSE|FULL_ONCE) int value 0 1 ;;
+        RESUME_AT) int value 0 99 ;;
         *.WIFI_IDLE) int value 0 1440 ;;
         *.RADIO_IDLE) word value 'keep|lte|off' ;;
         *.LEDS_IDLE) word value 'on|off' ;;
@@ -1528,23 +1571,44 @@ m_power_set() {
     ok
 }
 LEDCONF=$R/etc/mu300/led.conf
+# led.get: timeout (null: the device's own), device, and settings: mu300-led's (the lamps this device has, which of
+# them dim, each switch and brightness, the boot indicator, the heat alarm's light), null without it
 m_led_get() {
     only
     _t=$(sed -n 's/^LED_TIMEOUT=\([0-9][0-9]*\)$/\1/p' "$LEDCONF" 2>/dev/null | tail -n 1)
-    ok "\"timeout\":$(jn "$_t"),\"device\":$(js "$DEV")"
+    _s=null
+    if [ -x "$BIN/mu300-led" ] && tool 10 "$BIN/mu300-led" settings </dev/null; then _s=$(jcheck "$OUT") || _s=null; fi
+    ok "\"timeout\":$(jn "$_t"),\"device\":$(js "$DEV"),\"settings\":$_s"
 }
-# led.set {timeout}: seconds the LEDs stay on after a key or a change (0: always on); led.set {test:true}: each LED in
-# turn, 2 s each (to tell which one is where)
+# led.set {timeout}: seconds the LEDs stay on after a key or a change (0: always on; timeout_default: true, the device's
+# own); led.set {test:true}: each LED in turn, 2 s each (to tell which one is where). The other settings, as mu300-led
+# has them (kanoqwq's): network, wifi, battery (true: the lamp as it should be, false: dark), network_brightness,
+# wifi_brightness, battery_brightness (1-100 % of its usual level), boot (the boot indicator), thermal (siren, blink
+# or off: how the heat alarm shows)
 m_led_set() {
-    only timeout test
+    only timeout timeout_default test network wifi battery network_brightness wifi_brightness battery_brightness boot thermal
+    _kv=
     int timeout 0 86400; _t=$V
+    flag timeout_default; [ "${V:-0}" = 0 ] || { [ -z "$_t" ] || refuse bad-value timeout_default; _t=default; }
     flag test; _test=${V:-0}
-    [ -n "$_t" ] || [ "$_test" = 1 ] || refuse missing timeout
+    for _k in network wifi battery boot; do
+        flag "$_k"; [ -z "$V" ] || _kv="$_kv LED_$(echo "$_k" | tr a-z A-Z)=$V"
+    done
+    for _k in network_brightness wifi_brightness battery_brightness; do
+        int "$_k" 1 100; [ -z "$V" ] || _kv="$_kv LED_$(echo "$_k" | tr a-z A-Z)=$V"
+    done
+    word thermal 'siren|blink|off'; [ -z "$V" ] || _kv="$_kv LED_THERMAL=$V"
+    [ -n "$_t$_kv" ] || [ "$_test" = 1 ] || refuse missing timeout
     [ -x "$BIN/mu300-led" ] || refuse unsupported mu300-led
     checked
     if [ -n "$_t" ]; then
+        [ "$_t" != default ] || _t=
         conf_put "$LEDCONF" 644 "LED_TIMEOUT=$_t" || refuse failed "could not write led.conf"
         later "$BIN/mu300-led" wake
+    fi
+    if [ -n "$_kv" ]; then
+        conf_put "$LEDCONF" 644 $_kv || refuse failed "could not write led.conf"   # (fixed keys, checked values: split)
+        later "$BIN/mu300-led" refresh
     fi
     [ "$_test" = 0 ] || later "$BIN/mu300-led" test
     ok
@@ -1927,6 +1991,8 @@ case $METHOD in
     modem.restart) m_modem_restart ;;
     ttl.get) m_ttl_get ;;
     ttl.set) m_ttl_set ;;
+    tcp.get) m_tcp_get ;;
+    tcp.set) m_tcp_set ;;
     traffic.get) m_traffic_get ;;
     traffic.set) m_traffic_set ;;
     power.get) m_power_get ;;

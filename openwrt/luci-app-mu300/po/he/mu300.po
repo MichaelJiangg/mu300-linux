@@ -52,6 +52,9 @@ msgstr "שפות"
 msgid "Power"
 msgstr "צריכת חשמל"
 
+msgid "LEDs"
+msgstr "נוריות"
+
 msgid "CPU"
 msgstr "CPU"
 
@@ -628,6 +631,9 @@ msgstr "מצב מארח מנתק את רשת ה-USB ואת הממשק הטורי
 msgid "USB network mode"
 msgstr "מצב רשת USB"
 
+msgid "Current sharing protocol"
+msgstr "פרוטוקול השיתוף הנוכחי"
+
 msgid "Network protocol"
 msgstr "פרוטוקול רשת"
 
@@ -658,6 +664,27 @@ msgstr "רענון"
 msgid "Available only in host mode. Refresh brings discovered USB adapters up; adding to LAN saves the bridge and reloads networking."
 msgstr "זמין במצב מארח בלבד. רענון מעלה את מתאמי ה-USB שהתגלו; הוספה ל-LAN שומרת את הגשר וטוענת מחדש את הרשת."
 
+msgid "Network performance"
+msgstr "ביצועי רשת"
+
+msgid "Active congestion control"
+msgstr "בקרת עומס פעילה"
+
+msgid "Default queue"
+msgstr "תור ברירת מחדל"
+
+msgid "TCP congestion control"
+msgstr "בקרת עומס TCP"
+
+msgid "Apply"
+msgstr "החלה"
+
+msgid "Mainly affects new TCP connections made by this device. Forwarded hotspot and USB client connections do not automatically use BBR."
+msgstr "משפיע בעיקר על חיבורי TCP חדשים שהמכשיר הזה יוצר. חיבורים מועברים של לקוחות נקודה חמה ו-USB אינם משתמשים ב-BBR אוטומטית."
+
+msgid "BBR selects FQ as the default queue for newly created interfaces. Existing connections, interfaces and QoS are retained. Settings persist across reboots."
+msgstr "BBR בוחר ב-FQ כתור ברירת המחדל לממשקים חדשים. חיבורים, ממשקים ו-QoS קיימים נשמרים. ההגדרות נשמרות גם אחרי הפעלה מחדש."
+
 msgid "Recent modem operations"
 msgstr "פעולות מודם אחרונות"
 
@@ -670,6 +697,12 @@ msgstr "הקריאות האחרונות של לוח הבקרה, מהאתחול �
 msgid "Unavailable"
 msgstr "לא זמין"
 
+msgid "Mixed"
+msgstr "מעורב"
+
+msgid "None"
+msgstr "ללא"
+
 msgid "USB network mode is unavailable in host mode; host auto-start also disables USB network auto-start."
 msgstr "מצב רשת USB אינו זמין במצב מארח; הפעלה אוטומטית של מצב מארח משביתה גם את ההפעלה האוטומטית של רשת ה-USB."
 
@@ -681,9 +714,6 @@ msgstr "רשת ה-USB והממשק הטורי יזוהו מחדש במצב הת�
 
 msgid "Switch USB role?"
 msgstr "להחליף את תפקיד ה-USB?"
-
-msgid "Apply"
-msgstr "החלה"
 
 msgid "Switching USB role…"
 msgstr "מחליף תפקיד USB…"
@@ -721,6 +751,21 @@ msgstr "ההגדרות נשמרו"
 msgid "Save failed: %s"
 msgstr "השמירה נכשלה: %s"
 
+msgid "Unable to read network performance settings; refresh to retry"
+msgstr "לא ניתן לקרוא את הגדרות ביצועי הרשת; רענן כדי לנסות שוב"
+
+msgid "This kernel does not provide this setting"
+msgstr "הליבה הזו אינה מספקת הגדרה זו"
+
+msgid "System default"
+msgstr "ברירת המחדל של המערכת"
+
+msgid "Applied and saved for future boots."
+msgstr "הוחל ונשמר לאתחולים הבאים."
+
+msgid "The kernel did not accept the network settings"
+msgstr "הליבה לא קיבלה את הגדרות הרשת"
+
 msgid "This boot"
 msgstr "האתחול הזה"
 
@@ -739,6 +784,9 @@ msgstr "סורק מתאמי USB…"
 msgid "No USB adapters found."
 msgstr "לא נמצאו מתאמי USB."
 
+msgid "In use by another network"
+msgstr "בשימוש רשת אחרת"
+
 msgid "Link connected"
 msgstr "הקישור מחובר"
 
@@ -747,6 +795,9 @@ msgstr "אין קישור; בוצע ניסיון הפעלה"
 
 msgid "Added to LAN"
 msgstr "נוסף ל-LAN"
+
+msgid "Cannot add"
+msgstr "לא ניתן להוסיף"
 
 msgid "Add to LAN"
 msgstr "הוספה ל-LAN"
@@ -784,6 +835,9 @@ msgstr "טופס (קידוד URL)"
 msgid "Plain text"
 msgstr "טקסט פשוט"
 
+msgid "Also {sim} (SIM 1 or SIM 2) and {kind} (sms, test or power)."
+msgstr "וגם {sim} (SIM 1 או SIM 2) ו-{kind} (sms,‏ test או power)."
+
 msgid "Received messages are sent on as they reach the SMS pool. A failed delivery is retried after 30 s, then after twice as long each time (an hour at most), ten times in all."
 msgstr "הודעות שהתקבלו מועברות ברגע שהן מגיעות למאגר ה-SMS. מסירה שנכשלה מנוסה שוב אחרי 30 שניות, ואז בכל פעם אחרי זמן כפול (שעה לכל היותר), עשר פעמים בסך הכול."
 
@@ -811,6 +865,15 @@ msgstr "רק הודעות שמכילות אחת מהמילים האלה"
 msgid "One per line; empty: every message."
 msgstr "אחת בכל שורה; ריק: כל ההודעות."
 
+msgid "Battery"
+msgstr "סוללה"
+
+msgid "Battery and charger notices"
+msgstr "התראות סוללה ומטען"
+
+msgid "A message to every target when the battery passes 5, 20, 40, 60, 80 or 100 % and when the charger is plugged in or out."
+msgstr "הודעה לכל יעד כשהסוללה עוברת 5, 20, 40, 60, 80 או 100 % וכשהמטען מחובר או מנותק."
+
 msgid "Webhook"
 msgstr "Webhook"
 
@@ -832,6 +895,12 @@ msgstr "גוף מותאם אישית"
 msgid "Empty: the standard fields (plain text: the message). Placeholders: {sender}, {time}, {text}, {device}, {message}. Each value is escaped for the chosen type. This body is shown again here: keep secrets in the address or a header."
 msgstr "ריק: השדות הרגילים (טקסט פשוט: ההודעה). מצייני מקום: {sender}, {time}, {text}, {device}, {message}. כל ערך עובר escape לפי הסוג שנבחר. גוף זה מוצג כאן שוב: שמרו סודות בכתובת או בכותרת."
 
+msgid "Secret for {secret} in the custom body"
+msgstr "סוד עבור {secret} בגוף המותאם"
+
+msgid "For a service that wants its token in the body (PushPlus). Saved for this address only: a new address needs it again."
+msgstr "לשירות שרוצה את האסימון שלו בגוף (PushPlus). נשמר לכתובת זו בלבד: כתובת חדשה צריכה אותו שוב."
+
 msgid "Extra headers (one \"Name: value\" per line)"
 msgstr "כותרות נוספות (\"Name: value\" אחת בכל שורה)"
 
@@ -840,6 +909,9 @@ msgstr "התשובה חייבת להכיל"
 
 msgid "Empty: every HTTP 2xx answer counts as delivered. With key=value (for example errcode=0), the answer must also be a JSON object that has this value under this key at its top level; otherwise the delivery fails. Only the result of the check is logged, never the answer."
 msgstr "ריק: כל תשובת HTTP 2xx נחשבת כמסירה. עם מפתח=ערך (למשל errcode=0) התשובה חייבת בנוסף להיות אובייקט JSON שברמה העליונה שלו יש את הערך הזה תחת המפתח הזה; אחרת המסירה נכשלת. ביומן נרשמת רק תוצאת הבדיקה, ולעולם לא התשובה עצמה."
+
+msgid "Request timeout (seconds, 1-120; webhook and Telegram)"
+msgstr "זמן קצוב לבקשה (שניות, 1-120; webhook ו-Telegram)"
 
 msgid "Bot token"
 msgstr "אסימון בוט"
@@ -861,9 +933,6 @@ msgstr "פורט"
 
 msgid "Security"
 msgstr "אבטחה"
-
-msgid "None"
-msgstr "ללא"
 
 msgid "User name"
 msgstr "שם משתמש"
@@ -973,6 +1042,21 @@ msgstr "MCS DL/UL"
 msgid "BLER DL/UL"
 msgstr "BLER DL/UL"
 
+msgid "Linux locked"
+msgstr "Linux נעול"
+
+msgid "Yes: the next restart starts Android"
+msgstr "כן: ההפעלה מחדש הבאה תפעיל את Android"
+
+msgid "No"
+msgstr "לא"
+
+msgid "Writable"
+msgstr "ניתן לכתיבה"
+
+msgid "This boot image cannot change the boot"
+msgstr "תמונת האתחול הזו אינה יכולה לשנות את האתחול"
+
 msgid "%s of %s"
 msgstr "%s מתוך %s"
 
@@ -1032,9 +1116,6 @@ msgstr "זיכרון"
 
 msgid "Storage"
 msgstr "אחסון"
-
-msgid "Battery"
-msgstr "סוללה"
 
 msgid "Channel"
 msgstr "ערוץ"
@@ -1105,14 +1186,23 @@ msgstr "נקודה חמה Wi-Fi"
 msgid "Restart modem"
 msgstr "הפעלה מחדש של המודם"
 
-msgid "Restart device"
-msgstr "הפעלה מחדש של ההתקן"
+msgid "Power off or restart"
+msgstr "כיבוי או הפעלה מחדש"
 
 msgid "Switch to Android"
 msgstr "מעבר ל-Android"
 
 msgid "Lock Linux"
 msgstr "נעילת Linux"
+
+msgid "Default boot"
+msgstr "ברירת המחדל לאתחול"
+
+msgid "One-time boot"
+msgstr "אתחול חד־פעמי"
+
+msgid "Boot control"
+msgstr "בקרת אתחול"
 
 msgid "Neighbor cells"
 msgstr "תאים שכנים"
@@ -1125,6 +1215,9 @@ msgstr "תדר"
 
 msgid "Running %s…"
 msgstr "מריץ %s…"
+
+msgid "Hotspot settings saved; applying changes"
+msgstr "הגדרות הנקודה החמה נשמרו; השינויים מוחלים"
 
 msgid "Started in background: %s"
 msgstr "הופעל ברקע: %s"
@@ -1165,11 +1258,14 @@ msgstr "נתונים סלולריים משמשים גם ברשתות נדידה,
 msgid "Cellular connectivity may stop for 1–2 minutes."
 msgstr "הקישוריות הסלולרית עלולה להיפסק ל-1–2 דקות."
 
-msgid "Restart the entire device"
-msgstr "הפעלה מחדש של ההתקן כולו"
-
 msgid "All connections will be interrupted."
 msgstr "כל החיבורים ינותקו."
+
+msgid "Power off"
+msgstr "כיבוי"
+
+msgid "Restart"
+msgstr "הפעלה מחדש"
 
 msgid "The next boot will enter Android and reboot now. This management page and cellular sharing will disconnect."
 msgstr "האתחול הבא ייכנס ל-Android וההתקן יאותחל כעת. דף ניהול זה ושיתוף החיבור הסלולרי ינותקו."
@@ -1243,6 +1339,9 @@ msgstr "נבחר SIM פנימי: ייכנס לשימוש לאחר הפעלה מ�
 msgid "Internal SIM selected, but not supported on this device: the external SIM is in use"
 msgstr "נבחר SIM פנימי, אך הוא אינו נתמך במכשיר זה: ה-SIM החיצוני בשימוש"
 
+msgid "in use"
+msgstr "בשימוש"
+
 msgid "Uptime %s"
 msgstr "זמן פעולה %s"
 
@@ -1309,9 +1408,6 @@ msgstr "קישור LTE"
 msgid "Hidden"
 msgstr "מוסתר"
 
-msgid "No"
-msgstr "לא"
-
 msgid "Running"
 msgstr "פועל"
 
@@ -1371,9 +1467,6 @@ msgstr "מקוון"
 
 msgid "AT adapter unavailable"
 msgstr "מתאם AT אינו זמין"
-
-msgid "Linux locked"
-msgstr "Linux נעול"
 
 msgid "Installing the language pack…"
 msgstr "מתקין את חבילת השפות…"
@@ -1453,6 +1546,51 @@ msgstr "מתורגם"
 msgid "LuCI's own translations come from OpenWrt. This panel's translations other than Turkish and Chinese are machine (AI) translations; corrections are welcome."
 msgstr "התרגומים של LuCI עצמו מגיעים מ-OpenWrt. התרגומים של לוח זה, למעט טורקית וסינית, הם תרגומי מכונה (בינה מלאכותית); תיקונים יתקבלו בברכה."
 
+msgid "Enter a whole number from 0 to %d"
+msgstr "הזינו מספר שלם בין 0 ל-%d"
+
+msgid "Network lamp"
+msgstr "נורית רשת"
+
+msgid "Wi-Fi lamp"
+msgstr "נורית Wi-Fi"
+
+msgid "Battery lamp"
+msgstr "נורית סוללה"
+
+msgid "On"
+msgstr "פועל"
+
+msgid "Brightness (%)"
+msgstr "בהירות (%)"
+
+msgid "A lamp switched off stays dark; the heat alarm still shows on its LED."
+msgstr "נורית כבויה נשארת חשוכה; התראת החום עדיין מוצגת בנורית שלה."
+
+msgid "Device default"
+msgstr "ברירת המחדל של המכשיר"
+
+msgid "LED timeout (seconds)"
+msgstr "זמן הדלקת הנוריות (שניות)"
+
+msgid "How long the LEDs stay lit after a key press or a change; 0 keeps them on. On a charger they stay lit."
+msgstr "כמה זמן הנוריות נשארות דולקות אחרי לחיצה על מקש או שינוי; 0 משאיר אותן דולקות. על מטען הן נשארות דולקות."
+
+msgid "Boot indicator"
+msgstr "מחוון אתחול"
+
+msgid "The LED shows its colours in turn while the system starts"
+msgstr "הנורית מציגה את צבעיה בזה אחר זה בזמן שהמערכת עולה"
+
+msgid "Heat alarm"
+msgstr "התראת חום"
+
+msgid "Siren"
+msgstr "צופר"
+
+msgid "Red blink"
+msgstr "הבהוב אדום"
+
 msgid "Automatic"
 msgstr "אוטומטי"
 
@@ -1494,6 +1632,21 @@ msgstr "נעילת התא המשרת הנוכחי"
 
 msgid "Unlock cell"
 msgstr "ביטול נעילת תא"
+
+msgid "Enter a cell"
+msgstr "הזנת תא"
+
+msgid "Type"
+msgstr "סוג"
+
+msgid "Channel number (EARFCN / NR-ARFCN)"
+msgstr "מספר ערוץ (EARFCN / NR-ARFCN)"
+
+msgid "Lock this cell"
+msgstr "נעילת תא זה"
+
+msgid "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list."
+msgstr "LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. מספר ערוץ, לא תדר ב-MHz; התא אינו חייב להופיע ברשימת התאים השכנים."
 
 msgid "Applying restarts the radio stack (SFUN) and briefly interrupts cellular service. Settings are saved and replayed by the plugin after AT is ready when Apply at startup is enabled. A platform pre-radio hook can replay without a restart. Apply with no bands selected to restore automatic mode."
 msgstr "ההחלה מפעילה מחדש את מחסנית הרדיו (SFUN) וקוטעת לזמן קצר את השירות הסלולרי. ההגדרות נשמרות, והתוסף מחיל אותן מחדש לאחר ש-AT מוכן כאשר “החלה בעת האתחול” מופעלת. Hook של הפלטפורמה שרץ לפני הרדיו יכול להחיל אותן ללא הפעלה מחדש. החלה ללא בחירת פסים משחזרת את המצב האוטומטי."
@@ -1582,17 +1735,20 @@ msgstr "נועל את %s ברקע…"
 msgid "Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…"
 msgstr "%s ננעל ברקע (הפעלה מחדש של SFUN, כ-30 שניות); קורא את המצב בחזרה…"
 
+msgid "Enter a channel number and a PCI in the ranges below"
+msgstr "הזינו מספר ערוץ ו-PCI בטווחים שלהלן"
+
 msgid "No serving-network data"
 msgstr "אין נתוני רשת משרתת"
 
 msgid "NR serving cell"
 msgstr "תא משרת NR"
 
-msgid "Status confirmed"
-msgstr "המצב אושר"
-
 msgid "Readback timed out; select “Refresh lock status”"
 msgstr "תם הזמן לקריאה חוזרת; יש לבחור “רענון מצב הנעילה”"
+
+msgid "Status confirmed"
+msgstr "המצב אושר"
 
 msgid "Reset verified: network mode automatic, EN-DC on, all bands, no cell lock; the saved lock settings are cleared"
 msgstr "האיפוס אומת: מצב רשת אוטומטי, EN-DC פועל, כל הפסים, ללא נעילת תא; הגדרות הנעילה השמורות נוקו"
@@ -1732,9 +1888,6 @@ msgstr "התעורר מלחצן %s"
 msgid "the modem is suspended (%s)"
 msgstr "המודם מושהה (%s)"
 
-msgid "Enter a whole number from 0 to %d"
-msgstr "הזינו מספר שלם בין 0 ל-%d"
-
 msgid "Power status unavailable"
 msgstr "מצב החשמל אינו זמין"
 
@@ -1792,6 +1945,12 @@ msgstr "הטעינה הושהתה: טמפרטורת הסוללה"
 msgid "Charging paused: charge limit"
 msgstr "הטעינה הושהתה: מגבלת הטעינה"
 
+msgid "Charging paused: by hand"
+msgstr "הטעינה מושהית: ידנית"
+
+msgid "Charging to full once, then back to the limit"
+msgstr "טעינה מלאה פעם אחת, ואז חזרה למגבלה"
+
 msgid "Sleep now"
 msgstr "שינה עכשיו"
 
@@ -1816,6 +1975,27 @@ msgstr "0 % לעולם לא טוען את הסוללה (המכשיר פועל מ
 msgid "80 % keeps the battery healthier on a device that stays plugged in."
 msgstr "80 % שומרים על הסוללה במכשיר שנשאר מחובר לחשמל."
 
+msgid "Start charging again under"
+msgstr "התחל לטעון שוב מתחת ל־"
+
+msgid "0 starts again 5 points under the stop level. A lower value starts charging again only under it; with 100 %, a full battery waits until it drops under it."
+msgstr "0 מתחיל שוב 5 נקודות מתחת לרמת העצירה. ערך נמוך יותר מתחיל לטעון שוב רק מתחתיו; עם 100 %, סוללה מלאה ממתינה עד שתרד מתחתיו."
+
+msgid "Resume charging"
+msgstr "המשך טעינה"
+
+msgid "Pause charging"
+msgstr "השהה טעינה"
+
+msgid "Cancel the full charge"
+msgstr "בטל טעינה מלאה"
+
+msgid "Charge to full once"
+msgstr "טען עד הסוף פעם אחת"
+
+msgid "Paused, the battery is not charged and the device runs on the charger; under 5 % it still charges, and the temperature guard always applies."
+msgstr "בהשהיה הסוללה אינה נטענת והמכשיר פועל מהמטען; מתחת ל־5 % היא נטענת בכל זאת, והגנת הטמפרטורה חלה תמיד."
+
 msgid "When the charger switches the device on"
 msgstr "כאשר המטען מדליק את המכשיר"
 
@@ -1830,9 +2010,6 @@ msgstr "ללא שינוי"
 
 msgid "LTE only (5G off)"
 msgstr "LTE בלבד (5G כבוי)"
-
-msgid "On"
-msgstr "פועל"
 
 msgid "Full"
 msgstr "מלא"
@@ -2057,9 +2234,6 @@ msgstr "ברירת המחדל של המודם"
 msgid "SIM%d"
 msgstr "SIM%d"
 
-msgid "in use"
-msgstr "בשימוש"
-
 msgid "Turn off the radio of SIM%d"
 msgstr "כיבוי הרדיו של SIM%d"
 
@@ -2159,6 +2333,9 @@ msgstr "נמחק (מקומי בלבד)"
 msgid "Enter both a number and a message."
 msgstr "יש להזין גם מספר וגם הודעה."
 
+msgid "SIM storage: %d of %d slots in use (at %s)"
+msgstr "אחסון SIM: ‏%d מתוך %d משבצות בשימוש (ב-%s)"
+
 msgid "· %d messages, %d unread · %d conversations"
 msgstr "· %d הודעות, %d שלא נקראו · %d שיחות"
 
@@ -2234,8 +2411,26 @@ msgstr "מכסה חודשית"
 msgid "%s, warning at %d%%"
 msgstr "%s, אזהרה ב-%d%%"
 
+msgid "Daily quota"
+msgstr "מכסה יומית"
+
 msgid "The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts."
 msgstr "המכסה החודשית הושגה: הנתונים הסלולריים כובו. הם יחזרו כשהמחזור הבא יתחיל."
+
+msgid "The daily quota is reached: mobile data was turned off. It comes back on at midnight."
+msgstr "המכסה היומית מוצתה: נתוני הסלולר כובו. הם יחזרו בחצות."
+
+msgid "The daily quota is reached"
+msgstr "המכסה היומית מוצתה"
+
+msgid "%d%% of the daily quota is used"
+msgstr "נוצלו %d%% מהמכסה היומית"
+
+msgid "The cap and the daily quota count downloads only."
+msgstr "המכסה והמכסה היומית סופרות הורדות בלבד."
+
+msgid "The cap and the daily quota count uploads only."
+msgstr "המכסה והמכסה היומית סופרות העלאות בלבד."
 
 msgid "%s waits for the clock: it has not been set over the network yet. It already counts towards this cycle and goes to its day once the clock is set."
 msgstr "%s ממתין לשעון: השעון עוד לא כוון מהרשת. זה כבר נספר במחזור הזה ויעבור ליום שלו כשהשעון יכוון."
@@ -2267,6 +2462,9 @@ msgstr "לפי מחזור חיוב"
 msgid "Billing cycle"
 msgstr "מחזור חיוב"
 
+msgid "Counted"
+msgstr "נספר"
+
 msgid "Enter a size in GB, for example 50 or 2.5"
 msgstr "הזינו גודל ב-GB, למשל 50 או 2.5"
 
@@ -2278,6 +2476,21 @@ msgstr "כיבוי נתונים סלולריים במכסה"
 
 msgid "When this cycle reaches the cap, mobile data is turned off: no internet through the operator until the next cycle starts, the cap is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
 msgstr "כשהמחזור הזה מגיע למכסה, הנתונים הסלולריים כבים: אין אינטרנט דרך המפעיל עד שהמחזור הבא מתחיל, המכסה מוגדלת או שאפשרות זו מכובה שוב. הדלקה ידנית של הנתונים הסלולריים משאירה אותם דולקים עד ההפעלה מחדש הבאה."
+
+msgid "Turn mobile data off at the daily quota"
+msgstr "כיבוי נתוני סלולר במכסה היומית"
+
+msgid "When today reaches the daily quota, mobile data is turned off until midnight, the quota is raised or this is turned off again. Turning mobile data back on by hand keeps it on until the next reboot."
+msgstr "כשהשימוש היום מגיע למכסה היומית, נתוני הסלולר נכבים עד חצות, עד שהמכסה מוגדלת או עד שאפשרות זו מכובה. הפעלה ידנית של נתוני הסלולר משאירה אותם פעילים עד האתחול הבא."
+
+msgid "Both ways"
+msgstr "בשני הכיוונים"
+
+msgid "Downloads only"
+msgstr "הורדות בלבד"
+
+msgid "Uploads only"
+msgstr "העלאות בלבד"
 
 msgid "Set"
 msgstr "קבע"
@@ -2302,6 +2515,15 @@ msgstr "מכסה חודשית (GB, 0: אין)"
 
 msgid "Warning at this percentage of the cap"
 msgstr "אזהרה באחוז זה מהמכסה"
+
+msgid "Daily quota (GB, 0: none)"
+msgstr "מכסה יומית (GB, 0: אין)"
+
+msgid "The cap and the daily quota count"
+msgstr "מה המכסה והמכסה היומית סופרות"
+
+msgid "Plan name"
+msgstr "שם החבילה"
 
 msgid "Used so far in this cycle (GB)"
 msgstr "נוצל עד כה במחזור הזה (GB)"
@@ -2399,9 +2621,6 @@ msgstr "ההתקן מופעל מחדש עכשיו. ברירת המחדל לאת�
 msgid "The device restarts now and is away for about a minute. If the new system does not start, the device goes back to Android by itself after the failed attempts."
 msgstr "ההתקן מופעל מחדש עכשיו ולא יהיה זמין כדקה. אם המערכת החדשה לא תעלה, ההתקן יחזור ל-Android מעצמו אחרי הניסיונות הכושלים."
 
-msgid "Restart"
-msgstr "הפעלה מחדש"
-
 msgid "Restarting… open this page again in about a minute."
 msgstr "מופעל מחדש… פתחו את הדף הזה שוב בעוד כדקה."
 
@@ -2468,9 +2687,6 @@ msgstr "תמונת אתחול"
 msgid "from the installer"
 msgstr "מהמתקין"
 
-msgid "Default boot"
-msgstr "ברירת המחדל לאתחול"
-
 msgid "Free space"
 msgstr "שטח פנוי"
 
@@ -2527,6 +2743,9 @@ msgstr "הערות גרסה"
 
 msgid "Download"
 msgstr "הורדה"
+
+msgid "only what changed since the installed release"
+msgstr "רק מה שהשתנה מאז הגרסה המותקנת"
 
 msgid "Free space needed"
 msgstr "שטח פנוי נדרש"
@@ -3056,9 +3275,6 @@ msgstr "זיהוי"
 msgid "The URL may hold a token: it goes to the device on its own, never into a command line or a log."
 msgstr "ה-URL עשוי להכיל אסימון: הוא נשלח להתקן בנפרד, ואף פעם לא לשורת פקודה או ליומן."
 
-msgid "Type"
-msgstr "סוג"
-
 msgid "Share link"
 msgstr "קישור שיתוף"
 
@@ -3388,6 +3604,21 @@ msgstr "סוג נעילה לא ידוע"
 msgid "Invalid value for this lock kind"
 msgstr "ערך לא חוקי לסוג נעילה זה"
 
+msgid "Band, mode and cell locks are not supported for SIM2 yet"
+msgstr "נעילות פס, מצב ותא עדיין אינן נתמכות עבור SIM2"
+
+msgid "Band, mode and cell locks are not supported while dual-SIM switching manages the radio"
+msgstr "נעילות פס, מצב ותא אינן נתמכות בזמן שהחלפת שני כרטיסי SIM מנהלת את הרדיו"
+
+msgid "None of these bands is supported by this modem"
+msgstr "המודם הזה אינו תומך באף אחד מהתדרים האלה"
+
+msgid "Lock change failed"
+msgstr "שינוי הנעילה נכשל"
+
+msgid "Invalid job id"
+msgstr "מזהה משימה לא תקין"
+
 msgid "Invalid page"
 msgstr "דף לא חוקי"
 
@@ -3478,14 +3709,29 @@ msgstr "מתאם ה-TTL לא החזיר תשובה תקינה"
 msgid "Invalid TTL"
 msgstr "TTL לא תקין"
 
+msgid "The TCP adapter gave no valid reply"
+msgstr "מתאם ה-TCP לא החזיר תשובה תקינה"
+
+msgid "Invalid congestion control"
+msgstr "בקרת עומס לא תקינה"
+
+msgid "The boot adapter gave no valid reply"
+msgstr "מתאם האתחול לא החזיר תשובה תקינה"
+
+msgid "The LED adapter gave no valid reply"
+msgstr "מתאם ה-LED לא החזיר תשובה תקינה"
+
+msgid "Unknown LED setting"
+msgstr "הגדרת נוריות לא מוכרת"
+
+msgid "Invalid value for this setting"
+msgstr "ערך לא תקין להגדרה זו"
+
 msgid "The data usage adapter gave no valid reply"
 msgstr "מתאם השימוש בנתונים לא החזיר תשובה תקינה"
 
 msgid "Unknown data usage setting"
 msgstr "הגדרת שימוש בנתונים לא ידועה"
-
-msgid "Invalid value for this setting"
-msgstr "ערך לא תקין להגדרה זו"
 
 msgid "The forwarding adapter gave no valid reply"
 msgstr "מתאם ההעברה לא החזיר תשובה תקינה"
@@ -3731,8 +3977,29 @@ msgstr "הרדיו לא פעל לפי ההגדרה שלו"
 msgid "The data roaming setting could not be saved"
 msgstr "לא ניתן היה לשמור את הגדרת נדידת הנתונים"
 
-msgid "Expected on or off"
-msgstr "נדרש on או off"
+msgid "The hotspot setting is saved, but the wireless reload failed"
+msgstr "הגדרת הנקודה החמה נשמרה, אך טעינה מחדש של האלחוט נכשלה"
+
+msgid "The wireless settings have unsaved changes: save or revert them first"
+msgstr "בהגדרות האלחוט יש שינויים שלא נשמרו: שמור או בטל אותם קודם"
+
+msgid "The hotspot is being switched already; try again shortly"
+msgstr "הנקודה החמה כבר מוחלפת; נסה שוב בעוד רגע"
+
+msgid "No hotspot (access point) is configured"
+msgstr "לא הוגדרה נקודה חמה (נקודת גישה)"
+
+msgid "Turning this radio on would affect another interface; use the Wireless page"
+msgstr "הפעלת רדיו זה תשפיע על ממשק אחר; השתמש בדף האלחוט"
+
+msgid "The radio is in use by the Wi-Fi client"
+msgstr "הרדיו בשימוש לקוח ה-Wi-Fi"
+
+msgid "The hotspot setting could not be written"
+msgstr "לא ניתן לכתוב את הגדרת הנקודה החמה"
+
+msgid "Hotspot control is not provided by this platform"
+msgstr "הפלטפורמה הזו אינה מספקת שליטה בנקודה החמה"
 
 msgid "VPN integration is not provided by this platform"
 msgstr "הפלטפורמה אינה מספקת שילוב VPN"
@@ -3833,6 +4100,15 @@ msgstr "אינו ממשק רשת USB"
 msgid "LAN bridge device section was not found"
 msgstr "מקטע ההתקן של גשר ה-LAN לא נמצא"
 
+msgid "Could not determine adapter ownership; try again later"
+msgstr "לא ניתן לקבוע לאיזו רשת שייך המתאם; נסה שוב מאוחר יותר"
+
+msgid "Adapter belongs to another network and cannot join LAN"
+msgstr "המתאם שייך לרשת אחרת ואינו יכול להצטרף ל-LAN"
+
+msgid "The network settings have unsaved changes: save or revert them first"
+msgstr "בהגדרות הרשת יש שינויים שלא נשמרו: שמור או בטל אותם קודם"
+
 msgid "Cannot bring USB network interface up"
 msgstr "לא ניתן להעלות את ממשק רשת ה-USB"
 
@@ -3865,6 +4141,12 @@ msgstr "גוף ה-webhook ארוך מדי או מכיל תו בקרה"
 
 msgid "The answer check must be key=value, like errcode=0 or ok=true (the value a whole number or lowercase letters, 16 at most)"
 msgstr "בדיקת התשובה חייבת להיות בצורת מפתח=ערך, כמו errcode=0 או ok=true (הערך מספר שלם או אותיות קטנות, 16 לכל היותר)"
+
+msgid "Invalid webhook secret (up to 256 printable characters, no space)"
+msgstr "סוד webhook לא תקין (עד 256 תווים מודפסים, ללא רווח)"
+
+msgid "The timeout must be 1 to 120 seconds"
+msgstr "הזמן הקצוב חייב להיות בין 1 ל-120 שניות"
 
 msgid "Invalid header (one \"Name: value\" per line; Host, Content-Type, Content-Length, Transfer-Encoding and Connection are set by the device)"
 msgstr "כותרת לא תקינה (\"Name: value\" אחת בכל שורה; את Host, Content-Type, Content-Length, Transfer-Encoding ו-Connection המכשיר קובע)"
@@ -3926,8 +4208,17 @@ msgstr "התקנה כבר מתבצעת"
 msgid "The language pack could not be removed"
 msgstr "לא ניתן היה להסיר את חבילת השפות"
 
+msgid "The LED settings could not be read"
+msgstr "לא ניתן לקרוא את הגדרות הנוריות"
+
+msgid "The LED setting could not be saved"
+msgstr "לא ניתן לשמור את הגדרת הנוריות"
+
 msgid "Lock cache unavailable"
 msgstr "מטמון הנעילות אינו זמין"
+
+msgid "The modem refused a write"
+msgstr "המודם דחה כתיבה"
 
 msgid "The saved locks could not be cleared"
 msgstr "לא ניתן היה לנקות את הנעילות השמורות"
@@ -3938,9 +4229,6 @@ msgstr "אין תא משרת לנעילה"
 msgid "The modem did not answer the mode query; nothing was sent"
 msgstr "המודם לא ענה לשאילתת המצב; לא נשלח דבר"
 
-msgid "The modem refused a write"
-msgstr "המודם דחה כתיבה"
-
 msgid "The read-back does not match the automatic values"
 msgstr "הקריאה החוזרת אינה תואמת לערכים האוטומטיים"
 
@@ -3949,6 +4237,21 @@ msgstr "הקריאה החוזרת לאחר הפעלת המחסנית מחדש א
 
 msgid "The reset was interrupted"
 msgstr "האיפוס הופסק"
+
+msgid "The result of this lock change is no longer known"
+msgstr "התוצאה של שינוי נעילה זה כבר אינה ידועה"
+
+msgid "The lock change took too long; select “Refresh lock status”"
+msgstr "שינוי הנעילה נמשך זמן רב מדי; יש לבחור “רענון מצב הנעילה”"
+
+msgid "The lock change was interrupted; select “Refresh lock status”"
+msgstr "שינוי הנעילה נקטע; יש לבחור “רענון מצב הנעילה”"
+
+msgid "Another lock change is being started; try again in a moment"
+msgstr "שינוי נעילה אחר מתחיל כעת; יש לנסות שוב בעוד רגע"
+
+msgid "Too many lock changes are waiting; try again when they have ended"
+msgstr "יותר מדי שינויי נעילה ממתינים; יש לנסות שוב כשיסתיימו"
 
 msgid "Reinstalling packages is not available on this system"
 msgstr "התקנה מחדש של חבילות אינה זמינה במערכת זו"
@@ -3967,6 +4270,12 @@ msgstr "פעולת חבילות לא ידועה"
 
 msgid "usage: power get|set KEY VALUE|wake|idle"
 msgstr "usage: power get|set KEY VALUE|wake|idle"
+
+msgid "TCP congestion control is not provided by this platform"
+msgstr "הפלטפורמה הזו אינה מספקת בקרת עומס TCP"
+
+msgid "The TCP settings could not be read"
+msgstr "לא ניתן לקרוא את הגדרות ה-TCP"
 
 msgid "Data usage is not available on this system"
 msgstr "שימוש בנתונים אינו זמין במערכת זו"

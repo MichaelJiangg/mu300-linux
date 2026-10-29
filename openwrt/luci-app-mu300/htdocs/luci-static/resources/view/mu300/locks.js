@@ -82,6 +82,18 @@ return view.extend({
     <button class="mud-btn" id="mud-lock-cell">${_('Lock current serving cell')}</button>
     <button class="mud-btn warn" id="mud-lock-cell-off">${_('Unlock cell')}</button>
   </div>
+  <details class="mud-manual-cell">
+    <summary>${_('Enter a cell')}</summary>
+    <form id="mud-lock-manual-form" novalidate>
+      <div class="mud-manual-cell-fields">
+        <label><span>${_('Type')}</span><select id="mud-lock-manual-rat"><option value="lte">LTE (4G)</option><option value="nr">NR (5G)</option></select></label>
+        <label><span>${_('Channel number (EARFCN / NR-ARFCN)')}</span><input id="mud-lock-manual-frequency" type="text" inputmode="numeric" autocomplete="off" required></label>
+        <label><span>PCI</span><input id="mud-lock-manual-pci" type="text" inputmode="numeric" autocomplete="off" required></label>
+        <button type="submit" class="mud-btn" id="mud-lock-manual-apply">${_('Lock this cell')}</button>
+      </div>
+      <div class="mud-note">${_('LTE: EARFCN 0–262143, PCI 0–503; NR: NR-ARFCN 1–3279165, PCI 0–1007. A channel number, not a frequency in MHz; the cell need not be in the neighbor list.')}</div>
+    </form>
+  </details>
   <div class="mud-scroll">
   <table class="mud-table"><thead><tr><th>${_('RAT/Band')}</th><th>PCI</th><th>${_('Frequency')}</th><th>RSRP</th><th>RSRQ</th><th>SINR</th><th></th></tr></thead>
   <tbody id="mud-neigh"><tr><td colspan="7" style="color:var(--text-muted,var(--text-light,#777))">--</td></tr></tbody></table>
@@ -142,6 +154,7 @@ return view.extend({
 					return self.readbackReset(prevEnd, btn);
 				}
 				self.note(_('Started in background: %s (SFUN restart, about 30 seconds); reading the status back…').format(r.op || kind), 'busy');
+				if (r.job) return self.followJob(r.job, Date.now(), btn);
 				self.readback(Date.now(), btn);
 			}, function() { M.busy(btn, false); self.note(_('Request failed'), 'error'); });
 		};
@@ -261,17 +274,14 @@ return view.extend({
 				M.busy(btn, false);
 				if (!r.ok) { self.note(_('Unlock failed: %s').format(M.errText(r)), 'error'); return; }
 					self.note(_('Unlock started in background (SFUN restart, about 30 seconds); reading the status back…'), 'busy');
-					self.readback(Date.now());
+					if (r.job) self.followJob(r.job, Date.now()); else self.readback(Date.now());
 				});
 			});
 		});
 
-		/* Lock from a neighbor row (event delegation, as on the dashboard) */
-		this.Q('neigh').addEventListener('click', function(ev) {
-			var btn = ev.target;
-			if (!btn.getAttribute || !btn.getAttribute('data-lock')) return;
-			var key = btn.getAttribute('data-lock');
-			M.confirmBox(_('Lock cell %s?').format(key.replace(':', ' ')),
+		/* Lock a cell: from a neighbor row (event delegation, as on the dashboard) or entered by hand */
+		var lockCell = function(key, btn) {
+			return M.confirmBox(_('Lock cell %s?').format(key.replace(':', ' ')),
 				_('The radio stack will restart (SFUN); cellular service will stop for about 30 seconds.'), { danger: true })
 				.then(function(go) {
 				if (!go) return;
@@ -282,10 +292,28 @@ return view.extend({
 				M.busy(btn, false);
 				if (!r.ok) { self.note(_('Lock failed: %s').format(M.errText(r)), 'error'); return; }
 					self.note(_('Locked %s in the background (SFUN restart, about 30 seconds); reading the status back…').format(key), 'busy');
-					self.readback(Date.now());
+					if (r.job) self.followJob(r.job, Date.now()); else self.readback(Date.now());
 				});
 			});
+		};
+		this.Q('neigh').addEventListener('click', function(ev) {
+			var btn = ev.target;
+			if (!btn.getAttribute || !btn.getAttribute('data-lock')) return;
+			lockCell(btn.getAttribute('data-lock'), btn);
 		});
+		/* By hand (kanoqwq's b8d4f222): a cell that is not in the neighbor list. The backend takes the same
+		 * RAT:ARFCN,PCI as a row's button; the ranges are the standards' (36.101 EARFCN, 38.101 NR-ARFCN, PCI 503/1007). */
+		this.Q('lock-manual-form').onsubmit = function(ev) {
+			ev.preventDefault();
+			var rat = self.Q('lock-manual-rat').value, nr = rat === 'nr';
+			var freq = self.Q('lock-manual-frequency').value.trim(), pci = self.Q('lock-manual-pci').value.trim();
+			if ((rat !== 'lte' && !nr) || !/^[0-9]{1,7}$/.test(freq) || !/^[0-9]{1,4}$/.test(pci) ||
+				Number(freq) < (nr ? 1 : 0) || Number(freq) > (nr ? 3279165 : 262143) || Number(pci) > (nr ? 1007 : 503)) {
+				self.note(_('Enter a channel number and a PCI in the ranges below'), 'error');
+				return;
+			}
+			lockCell(rat + ':' + Number(freq) + ',' + Number(pci), self.Q('lock-manual-apply'));
+		};
 
 		this.refresh();
 		this.loadServingMeta();
@@ -356,6 +384,27 @@ return view.extend({
 		if (nb) nb.innerHTML = M.neighborRows(c, (this.lastLock || {}).cells || []);
 	},
 
+	/* A lock change with a job id (backend: unisoc-modem/lock start, kanoqwq's job queue): first how the apply itself
+	 * ended - a write the modem refused, or a change that was interrupted, says so and stops here, with the
+	 * highlights put back from a fresh reading - and only a finished one goes on to the read-back of the new state.
+	 * Up to about seven minutes, the backend's own limit (another change or the dial may hold the radio first). */
+	followJob: function(id, t0ms, btn) {
+		var self = this, tries = 0;
+		var step = function() {
+			L.resolveDefault(M.callLockJob(id)).then(function(j) {
+				j = j || {};
+				if (j.state === 'done') return self.readback(t0ms, btn);
+				if (j.state === 'error' || ++tries > 170) {
+					M.busy(btn, false);
+					self.note(j.state === 'error' ? _('Failed: %s').format(M.errText(j))
+						: _('Readback timed out; select “Refresh lock status”'), 'error');
+					return self.refresh();
+				}
+				setTimeout(step, 2500);
+			});
+		};
+		setTimeout(step, 1500);
+	},
 	/* Readback after applying: poll the lock_get cache until its ts is after the click on Apply (SFUN restart + a fresh
 	 * read take up to a minute or two; meanwhile the backend never overwrites the cache with an empty reading), and
 	 * redraw the highlights only from the new state */
@@ -387,6 +436,13 @@ return view.extend({
 				l = l || {};
 				var res = l.reset || {};
 				var done = res.state && res.state !== 'running' && (res.end || 0) > prevEnd;
+				/* an ok reset paints only a reading taken since it started (res.ts): the backend rewrites the cache
+				 * to the verified automatic state before it says ok, and an older backend's re-read follows it -
+				 * the cache from before the reset showed the old locks until a reload */
+				if (done && res.state === 'ok' && !((l.ts || 0) >= (res.ts || 0)) && tries < 60) {
+					++tries;
+					return setTimeout(step, 2500);
+				}
 				if (done || ++tries > 60) {
 					M.busy(btn, false);
 					self.lastLock = l; self.paint(); self.paintServing(self.lastCell);
