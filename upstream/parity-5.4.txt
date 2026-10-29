@@ -166,9 +166,9 @@ cooling thermal-cpufreq-0 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu0 # named af
 cooling thermal-cpufreq-1 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu4
 cooling thermal-cpufreq-2 ok cfg:CPU_THERMAL has:cooling/cpufreq-cpu7
 cooling thermal-devfreq-0 ok cfg:DEVFREQ_THERMAL has:cooling/devfreq-23140000.gpu
-cooling thermal-cpu-0 missing group:thermal boards:f50,u30air,v50 # Unisoc's CPU hotplug cooling (cores taken offline when hot); mainline has none
-cooling thermal-cpu-1 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
-cooling thermal-cpu-2 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
+cooling thermal-cpu-0 ok cfg:SPRD_CPU_HOTPLUG_COOLING has:cooling/thermal-cpu-0 # Unisoc's CPU hotplug cooling (cores taken offline when hot): upstream/port/drivers/thermal/sprd_cpu_hotplug_cooling.c, bound to soc-thmzone's 85 C trip by the device tree's maps
+cooling thermal-cpu-1 ok cfg:SPRD_CPU_HOTPLUG_COOLING has:cooling/thermal-cpu-1 # as thermal-cpu-0
+cooling thermal-cpu-2 ok cfg:SPRD_CPU_HOTPLUG_COOLING has:cooling/thermal-cpu-2 # as thermal-cpu-0
 tz osctsen-thmzone ok cfg:SPRD_UMP96XX_TSENSOR has:tz/osctsen-thmzone # the UMP9622's sensors (tsensor@20f8 on pmic@2); read in factory calibration mode only, as on 5.4 (EAGAIN otherwise)
 tz outtsen-thmzone ok cfg:SPRD_UMP96XX_TSENSOR has:tz/outtsen-thmzone # as osctsen-thmzone
 module sprd_ump96xx_tsensor ok = cfg:SPRD_UMP96XX_TSENSOR bind:platform/ump96xx-tsensor # upstream/port/drivers/thermal/sprd_ump96xx_tsensor.c

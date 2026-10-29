@@ -28,6 +28,9 @@ cooling cpufreq-cpu0
 cooling cpufreq-cpu4
 cooling cpufreq-cpu7
 cooling devfreq-23140000.gpu
+cooling thermal-cpu-0
+cooling thermal-cpu-1
+cooling thermal-cpu-2
 cpufreq sprd-cpufreq-v2
 cpuidle WFI
 cpuidle cluster-pd
