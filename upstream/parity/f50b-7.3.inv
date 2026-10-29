@@ -72,6 +72,7 @@ driver platform/sprd-pinctrl
 driver platform/sprd-pmic-eic
 driver platform/sprd-rtc
 driver platform/sprd-sipc
+driver platform/sprd-soc-id
 driver platform/sprd-spipe
 driver platform/sprd-spool
 driver platform/sprd-ssphy

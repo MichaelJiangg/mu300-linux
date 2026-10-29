@@ -279,9 +279,9 @@ module snd_soc_aw883xx na # AW883xx amplifier at i2c-6 0x34: nothing answers the
 
 # ---------------------------------------------------------------------------------------------------------------------
 # SoC identity and ZTE board extras
-module sprd_soc_id missing group:soc-info boards:f50,u30air,v50 # the chip's ID registers (socid, /sys/devices/soc0 details)
-driver platform/sprd-soc-id missing group:soc-info boards:f50,u30air,v50 # see sprd_soc_id
-module sprd_manufacturer_model missing group:soc-info boards:f50,u30air,v50 # soc0's machine/manufacturer attributes
+module sprd_soc_id ok = cfg:SPRD_SOC_ID bind:platform/sprd-soc-id # the chip's ID registers: /proc/socid/socid_inf and sprd_get_soc_id() as on 5.4, and the SoC device /sys/devices/soc0 (upstream/port/drivers/soc/sprd/sprd_soc_id.c)
+driver platform/sprd-soc-id ok cfg:SPRD_SOC_ID bind:platform/sprd-soc-id
+module sprd_manufacturer_model ok cfg:SPRD_SOC_ID # in sprd_soc_id: /sys/devices/soc0/soc_model and soc_manufacturer with 5.4's text
 module misc_sprd_uid na # the chip UID as /sys/class/misc/sprd_uid; not loaded on 5.4, nothing reads it
 module zte_card_holder_det missing group:zte boards:f50,u30air,v50 # SIM tray detection, /sys/zcard_det (loaded on 5.4, FINDINGS 18)
 module zte_bootreason na # ZTE's boot reason for Android's property service; not loaded on 5.4 (boot/init reads the reason itself)
