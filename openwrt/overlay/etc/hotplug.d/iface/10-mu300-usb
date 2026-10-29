@@ -59,11 +59,42 @@ ports=
 for nic in usb0 rndis0; do
 	ip -o link show dev "$nic" 2>/dev/null | grep -q 'master br-lan' && ports="$ports $nic"
 done
+# One rebind at a time (FINDINGS 237): mu300-adbd adds adb to the gadget with a rebind of its own, at boot about 2 s
+# after the LAN comes up, which is when this one ran too; the two unbound and bound the gadget four times in a second
+# and on 2 boots in 13 a Mac's NCM driver kept a dead OUT path (169.254, no DHCP) until the next replug. So when adb
+# is about to join (on, adbd there, not in the configuration yet) this waits up to 12 s for that rebind, which
+# re-enumerates the gadget after the LAN came up just as this one would, and makes none of its own once it came. Its
+# own rebind holds the lock mu300-adbd takes for its rebinds (a directory with the holder's pid), so the two never
+# interleave.
+lock=/run/mu300-usb-rebind.lock
+adb_link=$g/configs/c.1/f3
+due=0
+[ ! -e $adb_link ] && [ -x /opt/mu300/bin/adbd ] && [ "$(cat /etc/mu300/adb 2>/dev/null)" != off ] &&
+	[ "$(cat /sys/class/usb_role/25100000.dwc3-role-switch/role 2>/dev/null)" != host ] && due=1
+lock_take() {   # up to 15 s; then on regardless, the gadget must be bound again
+	n=0
+	until mkdir $lock 2>/dev/null; do
+		n=$((n + 1)); [ $n -le 15 ] || break
+		p=$(cat $lock/pid 2>/dev/null)
+		if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then sleep 1; else rm -rf $lock; fi
+	done
+	me=$$; { read -r me _ < /proc/self/stat; } 2>/dev/null   # this subshell's pid ($$ is the hook's, gone by then)
+	echo "$me" > $lock/pid 2>/dev/null
+}
 (
 	sleep 2
+	n=0
+	while [ $due = 1 ] && [ $n -lt 12 ] && [ ! -e $adb_link ]; do sleep 1; n=$((n + 1)); done
+	lock_take
+	if [ $due = 1 ] && [ -e $adb_link ]; then
+		rm -rf $lock
+		logger -t mu300 "usb gadget re-enumerated by mu300-adbd (adb joined it)"
+		exit 0
+	fi
 	echo "" > $g/UDC 2>/dev/null
 	sleep 1
 	echo "$udc" > $g/UDC && logger -t mu300 "usb gadget re-enumerated on $udc"
+	rm -rf $lock
 	sleep 1
 	for nic in $ports; do
 		[ -e /sys/class/net/$nic ] || continue

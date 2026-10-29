@@ -41,6 +41,7 @@ MOUNTS=${MU300_PROC_MOUNTS:-/proc/mounts}
 BUILTIN=${MU300_MODULES_BUILTIN:-/lib/modules/$(uname -r)/modules.builtin}
 UDC_CLASS=${MU300_UDC_CLASS:-/sys/class/udc}
 HOOK=${MU300_USB_HOOK:-/etc/hotplug.d/iface/10-mu300-usb}
+LOCK=${MU300_USB_LOCK:-/run/mu300-usb-rebind.lock}   # held by whoever unbinds and binds the gadget (FINDINGS 237)
 TICK=${MU300_ADBD_TICK:-1}     # seconds between two looks at the gadget while something is under way
 IDLE_TICK=${MU300_ADBD_IDLE_TICK:-3}   # ... and while all is as it should be (FINDINGS 235)
 GRACE=${MU300_ADBD_GRACE:-5}   # looks at an unbound gadget before it is bound again
@@ -177,16 +178,44 @@ lan_back() {
 # rebind WANT: unbind, put adb in (WANT=adb, when adbd is ready) or take it out, bind again. A gadget that will not
 # bind with adb is bound without it: the network and the console come first. Status 2: bound, but without the adb
 # that was wanted; 1: not bound at all.
+# One rebind at a time (FINDINGS 237). OpenWrt's LAN hook re-enumerates the gadget 2 s after the LAN comes up,
+# which at boot is the moment this adds adb: the two unbound and bound the gadget four times in about a second, and
+# on 2 boots in 13 a Mac's NCM driver came out of that with a dead OUT path (169.254, no DHCP, no frame reached usb0,
+# adb fine) until the next replug. Whoever unbinds holds LOCK (a directory, made atomically, with its pid in it) until
+# the gadget is bound again; a lock whose holder is gone is taken over. The hook waits for this rebind instead of
+# making its own when adb is about to join (it re-enumerates the gadget just the same).
+lock_busy() {
+    [ -d "$LOCK" ] || return 1
+    # only root's lock counts: another user's directory in a writable /run would keep adb out of the gadget
+    trusted "$LOCK" || { rm -rf "$LOCK" 2>/dev/null; return 1; }
+    _p=; { read -r _p < "$LOCK/pid"; } 2>/dev/null
+    [ -n "$_p" ] && kill -0 "$_p" 2>/dev/null && return 0
+    rm -rf "$LOCK" 2>/dev/null; return 1   # its holder is gone (or never wrote its pid: taken over)
+}
+lock_take() {   # up to 15 s, then on regardless: the gadget must never stay unbound for a lock
+    _n=0
+    until mkdir "$LOCK" 2>/dev/null; do
+        _n=$((_n + 1)); [ "$_n" -le 75 ] || break
+        lock_busy || continue
+        nap 0.2
+    done
+    echo $$ > "$LOCK/pid" 2>/dev/null
+    return 0
+}
+lock_drop() { rm -rf "$LOCK" 2>/dev/null; return 0; }
+
 rebind() {
     u=$(udc_name)
     [ -n "$u" ] || { log "no USB device controller"; return 1; }
+    lock_take
     unbind
     if [ "$1" = adb ] && ffs_ready && with_adb && bind "$u"; then
-        lan_back; log "gadget bound on $u with adb"; return 0
+        lan_back; lock_drop; log "gadget bound on $u with adb"; return 0
     fi
     without_adb
-    bind "$u" 30 || { log "could not bind the gadget on $u"; return 1; }
+    bind "$u" 30 || { lock_drop; log "could not bind the gadget on $u"; return 1; }
     lan_back
+    lock_drop
     [ "$1" = adb ] || return 0
     log "gadget bound on $u without adb (adbd is not ready)"
     return 2
@@ -266,6 +295,8 @@ run() {
         fi
         udc_now
         if host_role; then idle=0
+        elif lock_busy; then
+            idle=0   # somebody else is rebinding the gadget (the LAN hook): not now, the next look
         elif [ -z "$_u" ]; then
             # FunctionFS took the gadget off the controller (an adb connection ended). Not at once: mu300-usb-reset
             # and the OpenWrt LAN hook unbind it on purpose for a few seconds, and bind it again themselves.
