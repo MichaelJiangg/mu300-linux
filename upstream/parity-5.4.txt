@@ -169,30 +169,30 @@ cooling thermal-devfreq-0 ok cfg:DEVFREQ_THERMAL has:cooling/devfreq-23140000.gp
 cooling thermal-cpu-0 missing group:thermal boards:f50,u30air,v50 # Unisoc's CPU hotplug cooling (cores taken offline when hot); mainline has none
 cooling thermal-cpu-1 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
 cooling thermal-cpu-2 missing group:thermal boards:f50,u30air,v50 # as thermal-cpu-0
-tz osctsen-thmzone missing group:pmic boards:f50,u30air,v50 # the UMP9622's sensors (tsensor@20f8 on pmic@2): needs the UMP9622 MFD
-tz outtsen-thmzone missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
-module sprd_ump96xx_tsensor missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
-driver platform/ump96xx-tsensor missing group:pmic boards:f50,u30air,v50 # as osctsen-thmzone
+tz osctsen-thmzone ok cfg:SPRD_UMP96XX_TSENSOR has:tz/osctsen-thmzone # the UMP9622's sensors (tsensor@20f8 on pmic@2); read in factory calibration mode only, as on 5.4 (EAGAIN otherwise)
+tz outtsen-thmzone ok cfg:SPRD_UMP96XX_TSENSOR has:tz/outtsen-thmzone # as osctsen-thmzone
+module sprd_ump96xx_tsensor ok = cfg:SPRD_UMP96XX_TSENSOR bind:platform/ump96xx-tsensor # upstream/port/drivers/thermal/sprd_ump96xx_tsensor.c
+driver platform/ump96xx-tsensor ok cfg:SPRD_UMP96XX_TSENSOR bind:platform/ump96xx-tsensor
 module sprd_npu_cooling na # NPU cooling: there is no NPU driver on either kernel (npu@27100000 binds nothing on 5.4)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # the PMIC's other parts
-module sc27xx_vibra missing group:pmic boards:f50,u30air,v50 # mainline sc27xx-vibra knows sc2721/2730/2731, not the UMP9620 (vibrator@2390): compatible and registers to add. Whether a motor is fitted is not known
-driver platform/sc27xx-vibrator missing group:pmic boards:f50,u30air,v50 # see sc27xx_vibra
-input sc27xx:vibrator missing group:pmic boards:f50,u30air,v50 # see sc27xx_vibra
-module sprd_7sreset missing group:pmic boards:f50,u30air,v50 # the PMIC's long-press hardware reset settings (hw_reset@23c0)
-driver platform/sc27xx-7sreset missing group:pmic boards:f50,u30air,v50 # see sprd_7sreset
+module sc27xx_vibra ok = cfg:INPUT_SC27XX_VIBRA bind:platform/sc27xx-vibrator # mainline's sc27xx-vibra with the UMP9620's compatible (the SC2730's bits, port/install.py), built in; whether a motor is fitted is not known
+driver platform/sc27xx-vibrator ok cfg:INPUT_SC27XX_VIBRA bind:platform/sc27xx-vibrator
+input sc27xx:vibrator ok cfg:INPUT_SC27XX_VIBRA has:input/sc27xx:vibrator
+module sprd_7sreset ok = cfg:SPRD_7SRESET bind:platform/sc27xx-7sreset # the PMIC's long-press hardware reset settings (hw_reset@23c0): upstream/port/drivers/soc/sprd/sprd_7sreset.c
+driver platform/sc27xx-7sreset ok cfg:SPRD_7SRESET bind:platform/sc27xx-7sreset
 module sprd_pmic_smpl na # SMPL (restart after a short power loss); not loaded on 5.4 (boot/module-order.txt), the bootloader's setting stands
-module sprd_pmic_syscon missing group:pmic boards:f50,u30air,v50 # the PMICs' global register blocks (syscon@2000 of pmic@0..2) as syscon devices
-driver platform/sprd-pmic-glb missing group:pmic boards:f50,u30air,v50 # see sprd_pmic_syscon
-module ump9621_regulator missing group:pmic boards:f50,u30air,v50 # the UMP9621 (pmic@1): vddcpu0, vddsram1/2, vddmm, vddai, DCDC_MODEM; mainline's MFD matches the UMP9620 only
-driver platform/ump9621-regulator missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator DCDC_MODEM missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator vddai missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator vddcpu0 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator vddmm missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator vddsram1 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
-regulator vddsram2 missing group:pmic boards:f50,u30air,v50 # see ump9621_regulator
+module sprd_pmic_syscon ok = cfg:SPRD_PMIC_SYSCON bind:platform/sprd-pmic-glb # the PMICs' global register blocks (syscon@2000 of pmic@0..2): upstream/port/drivers/soc/sprd/sprd_pmic_syscon.c
+driver platform/sprd-pmic-glb ok cfg:SPRD_PMIC_SYSCON bind:platform/sprd-pmic-glb
+module ump9621_regulator ok cfg:REGULATOR_UMP9621 ko:ump9621-regulator bind:platform/ump9621-regulator # the UMP9621 (pmic@1, upstream/port/drivers/mfd/ump962x-pmic.c): vddcpu0, vddsram1/2, vddmm, vddai, DCDC_MODEM
+driver platform/ump9621-regulator ok cfg:REGULATOR_UMP9621 bind:platform/ump9621-regulator
+regulator DCDC_MODEM ok cfg:REGULATOR_UMP9621 has:regulator/DCDC_MODEM
+regulator vddai ok cfg:REGULATOR_UMP9621 has:regulator/vddai
+regulator vddcpu0 ok cfg:REGULATOR_UMP9621 has:regulator/vddcpu0
+regulator vddmm ok cfg:REGULATOR_UMP9621 has:regulator/vddmm
+regulator vddsram1 ok cfg:REGULATOR_UMP9621 has:regulator/vddsram1
+regulator vddsram2 ok cfg:REGULATOR_UMP9621 has:regulator/vddsram2
 builtin act8945a na # Active-semi PMIC MFD; not on these boards (its i2c driver binds nothing on 5.4)
 builtin fixed na # the fixed regulator: the boards' device tree has no regulator-fixed node (reg-fixed-voltage binds nothing on 5.4)
 
