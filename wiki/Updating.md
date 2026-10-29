@@ -222,7 +222,9 @@ yours. Only their OpenWrt UCI settings (`/etc/config/<name>`) wait in `/etc/mu30
 settings without their program used to stay active - OpenClash's left the device without DNS. A package the feeds do
 not have (installed from a `.apk` file) cannot come back by itself: keep its file before the update
 (`mu300-user-packages keep FILE.apk`, in `/etc/mu300/user-apks/`, which an update carries over) and the first boot
-installs it from there; without a kept file its settings stay aside. Services come back enabled or disabled as they
+installs it from there; without a kept file its settings stay aside. Only root can read or change that store, and
+whatever you keep there is installed as root, so keep only files you trust. Its dependencies come from the feeds,
+signature-checked as usual. Only the kept file itself is installed without a signature check, as you installed it. Services come back enabled or disabled as they
 were (OpenWrt's init scripts, Ubuntu's systemd units).
 
 On Ubuntu the apt sources you added (`/etc/apt/sources.list.d`, a PPA, with the keys they name, and your pinning in

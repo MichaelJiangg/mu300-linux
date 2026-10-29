@@ -93,18 +93,48 @@ pm_has() {
 # programs away, and `apk add NAME` at the first boot fails for good. A copy of its file kept here is installed from
 # instead. The store is /etc/mu300/user-apks (under /etc, which an update carries over), its index a line
 # "NAME VERSION FILE" per package; the update writes the package's settings down as it does for any other (upk_record).
+# Only root writes there (the directory is 0700, its files 0600): what is in it is installed as root at a boot, so
+# it is as trusted as /etc/rc.local, and a name read from a file or from the index is checked before it is a path.
+# apk_word WORD: a package name or version that can be a file name and a field of the index
+apk_word() {
+    case $1 in ''|[.-]*|*[!A-Za-z0-9._+~-]*) return 1 ;; esac
+}
 # apk_meta FILE: "NAME VERSION" from the package file (apk adbdump's info block), when it reads them there
 apk_meta() {
     _km=$(apk adbdump "$1" 2>/dev/null) || return 1
-    _kn=$(printf '%s\n' "$_km" | sed -n 's/^[[:space:]]*name:[[:space:]]*//p' | head -n 1)
-    _kv=$(printf '%s\n' "$_km" | sed -n 's/^[[:space:]]*version:[[:space:]]*//p' | head -n 1)
-    [ -n "$_kn" ] && [ -n "$_kv" ] || return 1
+    _kn=$(printf '%s\n' "$_km" | sed -n 's/^  name:[[:space:]]*//p' | head -n 1)
+    _kv=$(printf '%s\n' "$_km" | sed -n 's/^  version:[[:space:]]*//p' | head -n 1)
+    apk_word "$_kn" && apk_word "$_kv" || return 1
     printf '%s %s\n' "$_kn" "$_kv"
+}
+# apk_deps FILE: the dependencies the package file names (its info block's depends), a line each; conflicts (!NAME)
+# are left to apk
+apk_deps() {
+    apk adbdump "$1" 2>/dev/null | awk '/^info:/ { i = 1; next } /^[^ #]/ { i = 0 }
+        i && /^  [^ ]/ { d = ($1 == "depends:"); next }
+        i && d && /^    - / { sub(/^    - /, ""); if ($0 !~ /^!/ && $0 != "") print }'
 }
 # kept_file NAME: the file kept for NAME, relative to /etc/mu300/user-apks (the index may still name one that is gone)
 kept_file() {
     _kf=$(awk -v n="$1" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
-    [ -n "$_kf" ] && [ -f "$APKS/$_kf" ] && echo "$_kf"
+    case $_kf in ''|[.-]*|*[!A-Za-z0-9._+~-]*) return 1 ;; esac
+    [ -f "$APKS/$_kf" ] && [ ! -L "$APKS/$_kf" ] && echo "$_kf"
+}
+# kept_add NAME FILE: install the kept file of NAME. Its signature cannot be checked against the feeds' key (it is
+# not theirs), so apk takes it with --allow-untrusted - which in apk-tools 3 also lets an unsigned index through for
+# that run. So its dependencies come first, from the feeds and checked as always (under a virtual name, dropped
+# after), and then the file alone, without the network. A file that is not the package it is kept for is refused.
+kept_add() {
+    _kam=$(apk_meta "$APKS/$2") || { echo "ERROR: /$UPK_APKS/$2: not a package file"; return 1; }
+    [ "${_kam%% *}" = "$1" ] || { echo "ERROR: /$UPK_APKS/$2 is ${_kam%% *}, not $1"; return 1; }
+    _kad=$(apk_deps "$APKS/$2")
+    if [ -n "$_kad" ]; then
+        # shellcheck disable=SC2086 # a dependency a word
+        apk add --virtual .mu300-kept-deps $_kad || { apk del .mu300-kept-deps >/dev/null 2>&1; return 1; }
+    fi
+    apk add --no-network --allow-untrusted "$APKS/$2"; _kar=$?
+    [ -z "$_kad" ] || apk del .mu300-kept-deps >/dev/null 2>&1 || :
+    return "$_kar"
 }
 # kept_list: the packages kept from their file, a line each (status, and keep with no argument)
 kept_list() {
@@ -116,12 +146,16 @@ kept_list() {
 # keep_file FILE: one package file into the store, and "NAME VERSION FILE" into the index, replacing the line and the
 # file of an older version of the same package (the file says both: the name is not guessed from the file name)
 keep_file() {
-    _km=$(apk_meta "$1") || { echo "keep: $1: not a package file (apk adbdump does not read its name and version)" >&2; return 1; }
+    _km=$(apk_meta "$1") || { echo "keep: $1: not a package file (apk adbdump does not read a name and a version fit for a file name)" >&2; return 1; }
     _kn=${_km%% *} _kv=${_km#* } _kd=$_kn-$_kv.apk
-    case $_kd in */*) echo "keep: $1: its name and version cannot be a file name" >&2; return 1 ;; esac
-    [ "$1" = "$APKS/$_kd" ] || cp -f "$1" "$APKS/$_kd" || { echo "keep: $1: cannot be copied to /$UPK_APKS/$_kd" >&2; return 1; }
+    if [ "$1" != "$APKS/$_kd" ]; then
+        rm -f "$APKS/$_kd.new"
+        ( umask 077; cp "$1" "$APKS/$_kd.new" ) && chmod 600 "$APKS/$_kd.new" && mv -f "$APKS/$_kd.new" "$APKS/$_kd" ||
+            { rm -f "$APKS/$_kd.new"; echo "keep: $1: cannot be copied to /$UPK_APKS/$_kd" >&2; return 1; }
+    fi
     _ko=$(awk -v n="$_kn" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
-    { awk -v n="$_kn" '$1 != n' "$APKS/index" 2>/dev/null; printf '%s %s %s\n' "$_kn" "$_kv" "$_kd"; } > "$APKS/index.new" &&
+    { awk -v n="$_kn" '$1 != n' "$APKS/index" 2>/dev/null; printf '%s %s %s\n' "$_kn" "$_kv" "$_kd"; } |
+        ( umask 077; cat > "$APKS/index.new" ) &&
         mv -f "$APKS/index.new" "$APKS/index" || { echo "keep: /$UPK_APKS/index cannot be written" >&2; return 1; }
     [ -z "$_ko" ] || [ "$_ko" = "$_kd" ] || rm -f "$APKS/$_ko"
     log "$_kn $_kv: kept, /$UPK_APKS/$_kd (installed from it when the feeds do not have it)"
@@ -141,8 +175,8 @@ keep_files() {
 keep_forget() {
     _kf=$(awk -v n="$1" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
     [ -n "$_kf" ] || { echo "nothing kept for $1" >&2; return 1; }
-    rm -f "$APKS/$_kf"
-    awk -v n="$1" '$1 != n' "$APKS/index" 2>/dev/null > "$APKS/index.new" &&
+    case $_kf in [.-]*|*[!A-Za-z0-9._+~-]*) ;; *) rm -f "$APKS/$_kf" ;; esac
+    awk -v n="$1" '$1 != n' "$APKS/index" 2>/dev/null | ( umask 077; cat > "$APKS/index.new" ) &&
         mv -f "$APKS/index.new" "$APKS/index" || return 1
     log "$1: not kept any more (/$UPK_APKS/$_kf is gone: the feeds install it again)"
 }
@@ -435,11 +469,11 @@ install_all() {
             echo "$_p" >> "$D/done"; log "$_p: installed again"; restore "$_p"
         else
             _why=$(pm_why "$_o")
-            # not in the feeds: a file kept before the update has it, and apk installs just that one (its signature
-            # is not the project's to check it against: --allow-untrusted)
+            # not in the feeds: a file kept before the update has it (kept_add: its dependencies from the feeds,
+            # then that one file)
             _kf= _ko= _ok=
             if [ "$KIND" = openwrt ]; then _kf=$(kept_file "$_p") || _kf=; fi
-            if [ -n "$_kf" ] && _ko=$(pm_add --allow-untrusted "$APKS/$_kf" 2>&1); then _ok=1; fi
+            if [ -n "$_kf" ] && _ko=$(kept_add "$_p" "$_kf" 2>&1); then _ok=1; fi
             if [ -n "$_ok" ]; then
                 echo "$_p" >> "$D/done"
                 log "$_p: installed again from its kept file (/$UPK_APKS/$_kf)"
@@ -608,7 +642,7 @@ case ${1:-status} in
                 [ $# = 2 ] || { echo "usage: mu300-user-packages keep --forget NAME" >&2; exit 2; }
                 mkdir -p "$D" && keep_forget "$2" ;;
             -*) echo "usage: mu300-user-packages keep [FILE.apk ...|--forget NAME]" >&2; exit 2 ;;
-            *) mkdir -p "$APKS" "$D" && keep_files "$@" ;;
+            *) mkdir -p "$APKS" "$D" && chmod 700 "$APKS" && keep_files "$@" ;;
         esac ;;
     skip)
         [ -s "$D/wanted" ] || { echo "nothing to skip"; exit 0; }
