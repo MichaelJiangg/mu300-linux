@@ -418,6 +418,18 @@ if 'config HW_RANDOM_SPRD\n' not in h:
                  '\thelp\n\t  The TRNG of the UMS9620\'s crypto engine (sprd,sprd-trng), ported from the Unisoc 5.4\n'
                  '\t  kernel. The module is called sprd_trng.\n\n') + h[i:]
     open(hk, 'w').write(h)
+# ZTE's charge policy of the U30 Air (expired mode) and the battery cooling device, as on 5.4 (FINDINGS 234)
+append_once('drivers/power/supply/Makefile', 'charger_policy_service.o',
+            'obj-$(CONFIG_CHARGER_POLICY_SERVICE) += charger_policy_service.o\n')
+sk = os.path.join(tree, 'drivers/power/supply/Kconfig')
+k = open(sk).read()
+if 'config CHARGER_POLICY_SERVICE\n' not in k:
+    i = k.rindex('endif # POWER_SUPPLY')
+    k = k[:i] + ('config CHARGER_POLICY_SERVICE\n\ttristate "ZTE charge policy (U30 Air) and battery cooling device"\n'
+                 '\tdepends on OF && THERMAL\n\thelp\n'
+                 '\t  ZTE\'s expired mode (zte,charger-policy-service): after a long time on the charger the battery is\n'
+                 '\t  kept between two capacities; and the "battery" cooling device of the 5.4 charger-manager.\n\n') + k[i:]
+    open(sk, 'w').write(k)
 # The ZTE U30 Air's charger (SGM41511, a bq25601): its vendor DT compatible in bq256xx's OF and I2C tables; the
 # driver's handling of that node (no IRQ, no input current in the DT, the chip as Android left it) is patch 0009. The
 # I2C table is an edit rather than part of the patch: 6.18 writes its entries positionally, 7.x with .name/.driver_data.

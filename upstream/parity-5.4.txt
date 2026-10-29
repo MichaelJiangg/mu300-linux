@@ -155,8 +155,8 @@ psy bq2560x_charger ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger # U30 Air
 psy usb ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger # charger-manager's virtual supplies; bq256xx reports input online itself
 psy ac ok cfg:CHARGER_BQ256XX has:psy/bq256xx-charger
 psy wireless na # no wireless charging on these boards (a charger-manager placeholder)
-module charger_policy_service missing group:charger boards:u30air # ZTE's charge policy (expired mode etc., FINDINGS 33, 11556): partly in patches 0024/0025, the rest not ported
-cooling battery missing group:charger boards:u30air # charger-manager's cooling device: charge current lowered by temperature (chg-thmzone)
+module charger_policy_service ok = cfg:CHARGER_POLICY_SERVICE bind:platform/zte,charger-policy-service # ZTE's charge policy: its expired mode (after 16 h on the charger the battery kept at 70-90 %), upstream/port/drivers/power/supply/charger_policy_service.c; the charger's CV and timer were patches 0024/0025
+cooling battery ok cfg:CHARGER_POLICY_SERVICE has:cooling/battery # the battery's cooling device: the charge current in four steps (charger_policy_service.c); no zone binds it, as on 5.4
 regulator vddvbus ok cfg:CHARGER_BQ256XX has:regulator/vddvbus # the charger's OTG boost (patch 0019; U30 Air)
 
 # ---------------------------------------------------------------------------------------------------------------------
