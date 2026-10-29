@@ -367,6 +367,17 @@ config SPRD_SOC_ID
 	  /sys/devices/soc0, as the Unisoc 5.4 kernel's sprd_soc_id and sprd_manufacturer_model gave them.
 endmenu
 ''')
+# CPU hotplug cooling (thermal-cpu-0/1/2, the vendor DT's /cooling-devices), as 5.4's sprd_cpu_cooling (FINDINGS 234)
+append_once('drivers/thermal/Makefile', 'sprd_cpu_hotplug_cooling.o',
+            'obj-$(CONFIG_SPRD_CPU_HOTPLUG_COOLING) += sprd_cpu_hotplug_cooling.o\n')
+append_once('drivers/thermal/Kconfig', 'config SPRD_CPU_HOTPLUG_COOLING', '''
+config SPRD_CPU_HOTPLUG_COOLING
+	tristate "Unisoc CPU hotplug cooling"
+	depends on THERMAL_OF && HOTPLUG_CPU && CPU_FREQ && OF
+	help
+	  Cooling devices that take a cluster's cores offline when it is hot (thermal-cpu-N), as the Unisoc 5.4
+	  kernel's sprd_cpu_cooling; bound to the zones by the device tree's cooling maps.
+''')
 # cpufreq: UMS9620 apcpu DVFS is done by ATF through Unisoc SIP calls (vendor sprd_sip_svc + sprd-cpufreq-v2)
 append_once('drivers/firmware/Makefile', 'sprd_sip_svc.o', 'obj-$(CONFIG_SPRD_SIP_SVC) += sprd_sip_svc.o\n')
 append_once('drivers/firmware/Kconfig', 'SPRD_SIP_SVC', '''
