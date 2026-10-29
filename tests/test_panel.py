@@ -636,6 +636,23 @@ const flush = async (n = 4) => { for (let i = 0; i < n; i++) await new Promise((
         'data.get': {'ok': 1, 'state': 'up', 'apn': 'internet', 'pdp': 'IP', 'auth': '', 'user': '', 'password_set': True,
                      'sim': None, 'roaming': None, 'roaming_switch': False},
         'data.set': {'ok': 1, 'restart': True},
+        # the Data usage page: a cycle with a cap, and the yearly plan
+        'traffic.get': {'ok': 1, 'traffic': {'device': 'sipa_eth0', 'available': 1, 'clock': 1, 'since': 1700000000,
+                                             'reset_day': 1, 'plan': 'Night 50GB', 'count': 'total',
+                                             'today': {'date': '2026-10-29', 'rx': 1073741824, 'tx': 536870912},
+                                             'pending': {'rx': 0, 'tx': 0},
+                                             'cycle': {'start': '2026-10-01', 'last': '2026-10-31', 'days_left': 3,
+                                                       'rx': 5368709120, 'tx': 0, 'adj': 0, 'used': 5368709120},
+                                             'cap': {'bytes': 21474836480, 'remaining': 16106127360, 'warn': 90,
+                                                     'cut': 0, 'level': 'ok', 'cut_active': 0},
+                                             'daily': {'bytes': 0, 'used': 0, 'cut': 0, 'level': 'none', 'cut_active': 0},
+                                             'yearly': {'bytes': 536870912000, 'used': 107374182400,
+                                                        'remaining': 429496729600, 'level': 'ok', 'cut_active': 0,
+                                                        'start': '03-15', 'cut': 0},
+                                             'days': [{'date': '2026-10-29', 'rx': 1073741824, 'tx': 536870912}],
+                                             'cycles': [{'start': '2026-10-01', 'last': '2026-10-31',
+                                                         'rx': 5368709120, 'tx': 0, 'used': 5368709120}]}},
+        'traffic.set': {'ok': 1},
     }
 
     def run_page(self, body, out=None, admin='true'):
@@ -859,6 +876,70 @@ return [M.netDev('Inter-|\n  lo: 1 0 0 0 0 0 0 0 2 0\n sipa_eth0: 300 5 0 0 0 0 
         M.fmtBytes(1536), M.fmtRate(125000), M.mask('8612345678901234')];""")
         self.assertEqual(out['result'], [{'lo': {'rx': 1, 'tx': 2}, 'sipa_eth0': {'rx': 300, 'tx': 400}}, '1.5 KiB',
                                          '1.0 Mbit/s', '8612****234'])
+
+    def test_usage_page_with_an_old_answer(self):
+        """an older traffic.get (no cap.remaining, no yearly): remaining is the cap less the count, the yearly plan is
+        hidden and its settings show their defaults"""
+        old = {'ok': 1, 'traffic': {'device': 'sipa_eth0', 'clock': 1, 'reset_day': 1, 'count': 'total',
+                                    'cycle': {'start': '2026-10-01', 'last': '2026-10-31', 'days_left': 3,
+                                              'rx': 0, 'tx': 0, 'used': 5368709120},
+                                    'cap': {'bytes': 21474836480, 'warn': 90, 'cut': 0, 'level': 'ok', 'cut_active': 0}}}
+        r = self.run_page(r"""
+window.MU300.show('usage'); await flush();
+const card = ids['mu-traffic'];
+const val = (label) => { const r = find(card, (n) => n.tag === 'div' && n.attrs['class'] === 'mu-row'
+    && n.children[0].textContent === label); return r ? r.children[1].textContent : null; };
+return [val('Remaining this cycle'), val('This billing cycle'), val('Yearly cap'), ids['mu-tr-yearly'].value,
+    ids['mu-tr-ystart'].value, ids['mu-tr-ycut'].checked];""", dict(self.OUT, **{'traffic.get': old}))
+        self.assertEqual(r['result'][:3], ['15.0 GiB', '5.0 GiB', None])
+        self.assertEqual(r['result'][3:], ['0', '01-01', False])
+
+    def test_usage_page_with_the_yearly_plan(self):
+        """the yearly numbers as the JSON gives them, and the settings holding what the device set"""
+        r = self.run_page(r"""
+window.MU300.show('usage'); await flush();
+const card = ids['mu-traffic'];
+const val = (label) => { const r = find(card, (n) => n.tag === 'div' && n.attrs['class'] === 'mu-row'
+    && n.children[0].textContent === label); return r ? r.children[1].textContent : null; };
+return [val('Plan'), val('Remaining this cycle'), val('Yearly cap'), val('Remaining this year'), val('Used this year'),
+    ids['mu-tr-yearly'].value, ids['mu-tr-ystart'].value, ids['mu-tr-ycut'].checked];""")
+        self.assertEqual(r['result'][:5], ['Night 50GB', '15.0 GiB', '500.0 GiB', '400.0 GiB', '100.0 GiB'])
+        self.assertEqual(r['result'][5:], ['500', '03-15', False])
+
+    def test_usage_page_yearly_notes(self):
+        """warn, over, and the cut's own note, each when the yearly plan has it"""
+        yearly = self.OUT['traffic.get']['traffic']['yearly']
+        for level, cut, note in (('warn', 0, 'Close to the yearly cap.'),
+                                 ('over', 0, 'The yearly cap is reached.'),
+                                 ('over', 1, 'The yearly cap is reached: mobile data is off until the next year.')):
+            out = {'ok': 1, 'traffic': dict(self.OUT['traffic.get']['traffic'],
+                                            yearly=dict(yearly, level=level, cut_active=cut))}
+            r = self.run_page(r"""window.MU300.show('usage'); await flush(); return ids['mu-traffic'].textContent;""",
+                              dict(self.OUT, **{'traffic.get': out}))
+            self.assertIn(note, r['result'])
+
+    def test_usage_settings_save_the_yearly_plan_and_the_corrections(self):
+        r = self.run_page(r"""
+window.MU300.show('usage'); await flush();
+ids['mu-tr-ystart'].value = '02-30'; btn(ids['mu-traffic-set'], 'Save').click(); await flush();
+const bad = calls.filter((c) => c.argv[1] === 'traffic.set').length;
+ids['mu-tr-yearly'].value = '500'; ids['mu-tr-ystart'].value = '03-15'; ids['mu-tr-ycut'].checked = true;
+btn(ids['mu-traffic-set'], 'Save').click(); await flush(20);
+ids['mu-tr-yused'].value = '120';
+all(ids['mu-traffic-set'], (n) => n.tag === 'button' && n.textContent === 'Correct the count')[1].click(); await flush(8);
+ids['mu-tr-yurem'].value = '40';
+all(ids['mu-traffic-set'], (n) => n.tag === 'button' && n.textContent === 'Correct the count')[3].click(); await flush(8);
+return bad;""")
+        # a year start the year does not have (02-30) sends nothing
+        self.assertEqual(r['result'], 0)
+        sets = [q for m, q in self.api_calls(r, 'traffic.set')]
+        self.assertEqual([(q['key'], q['value']) for q in sets[:11]], [
+            ('reset_day', 1), ('cap', '21474836480'), ('warn', 90), ('cut', 'off'), ('daily', '0'), ('daily_cut', 'off'),
+            ('yearly', '536870912000'), ('yearly_start', '03-15'), ('yearly_cut', 'on'), ('count', 'total'),
+            ('plan', 'Night 50GB')])
+        # the corrections by the operator's numbers: what the year used, and what is left this year
+        self.assertEqual([(q['key'], q['value']) for q in sets[11:]],
+                         [('yearly_used', '128849018880'), ('yearly_used_remaining', '42949672960')])
 
     def test_every_page_renders(self):
         """each tab against answers of the right shape, and against a device that refuses everything"""

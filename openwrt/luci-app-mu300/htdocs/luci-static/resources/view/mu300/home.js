@@ -199,7 +199,8 @@ return view.extend({
 		M.spark(M.v('spark-ul'), this.ulHist, 0, peak, RATE_WIN);
 	},
 
-	/* Today's and this billing cycle's mobile data (mu300-traffic's summary in the status snapshot), against the cap */
+	/* Today's and this billing cycle's mobile data (mu300-traffic's summary in the status snapshot), against the cap:
+	 * what is left of the cycle first, beside what is used, then the yearly plan's own numbers when one is set */
 	paintUsage: function(u) {
 		var box = M.v('usage');
 		if (!box) return;
@@ -207,15 +208,27 @@ return view.extend({
 		if (!u) return;
 		M.set('usage-today', M.fmtBytes(u.today));
 		var cap = u.cap > 0 ? u.cap : 0, pct = cap ? Math.min(100, Math.round(u.used * 100 / cap)) : null;
-		M.set('usage-cycle', cap ? _('%s of %s').format(M.fmtBytes(u.used), M.fmtBytes(cap)) : M.fmtBytes(u.used));
+		/* an older snapshot has no remaining: cap - used; no cap, nothing left to show */
+		var left = Math.max(0, u.remaining != null ? u.remaining : cap - u.used);
 		var col = u.level === 'over' ? 'var(--danger,#E25555)' : u.level === 'warn' ? 'var(--warning,#f59e0b)' : '';
+		M.v('usage-rem-kpi').style.display = cap ? '' : 'none';
+		M.set('usage-remaining', M.fmtBytes(left), col);
+		M.set('usage-cycle', cap ? _('%s of %s').format(M.fmtBytes(u.used), M.fmtBytes(cap)) : M.fmtBytes(u.used));
 		M.v('usage-cycle').style.color = col;
 		var bar = M.v('usage-bar');
 		M.v('usage-meter').style.display = cap ? '' : 'none';
 		bar.style.width = (pct || 0) + '%';
 		bar.style.background = col || 'var(--brand,var(--primary,#3b82f6))';
 		M.set('usage-note', u.level === 'over' ? _('The monthly cap is reached') :
-			u.level === 'warn' ? _('%d%% of the monthly cap is used').format(pct) : _('This billing cycle'));
+			u.level === 'warn' ? _('%d%% of the monthly cap is used').format(pct) : _('Used this cycle'));
+		var y = u.yearly, yB = y && y.bytes > 0 ? y.bytes : 0;
+		M.v('usage-year-kpi').style.display = yB ? '' : 'none';
+		if (yB) {
+			M.set('usage-yearly', M.fmtBytes(Math.max(0, y.remaining != null ? y.remaining : yB - y.used)),
+				y.level === 'over' ? 'var(--danger,#E25555)' : y.level === 'warn' ? 'var(--warning,#f59e0b)' : '');
+			M.set('usage-yearly-note', y.level === 'over' ? _('The yearly cap is reached') :
+				_('Remaining this year') + ' · ' + _('%s of %s').format(M.fmtBytes(y.used), M.fmtBytes(yB)));
+		} else M.set('usage-yearly', '');
 	},
 
 	html: function() {
@@ -257,8 +270,10 @@ return view.extend({
     <div class="mud-kpi"><b id="mud-tx">--</b><span>${_('Total sent')}</span></div>
   </div>
   <a class="mud-kpis" id="mud-usage" href="${L.url('admin/modem/traffic')}" style="display:none;color:inherit;text-decoration:none">
-    <div class="mud-kpi"><b id="mud-usage-today">--</b><span>${_('Used today')}</span></div>
-    <div class="mud-kpi"><b id="mud-usage-cycle">--</b><span id="mud-usage-note">${_('This billing cycle')}</span><div class="mud-meter" id="mud-usage-meter"><i id="mud-usage-bar"></i></div></div>
+    <div class="mud-kpi"><b id="mud-usage-today">--</b><span>${_('Today')}</span></div>
+    <div class="mud-kpi" id="mud-usage-rem-kpi" style="display:none"><b id="mud-usage-remaining">--</b><span>${_('Remaining this cycle')}</span></div>
+    <div class="mud-kpi"><b id="mud-usage-cycle">--</b><span id="mud-usage-note">${_('Used this cycle')}</span><div class="mud-meter" id="mud-usage-meter"><i id="mud-usage-bar"></i></div></div>
+    <div class="mud-kpi" id="mud-usage-year-kpi" style="display:none"><b id="mud-usage-yearly">--</b><span id="mud-usage-yearly-note">${_('Remaining this year')}</span></div>
   </a>
   <div class="mud-cols">
     <div>

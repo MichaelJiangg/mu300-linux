@@ -841,21 +841,44 @@ rpcReply = { ok: 1, enabled: 1, value: 65, backend: 'tc', offload: 1, iface: [ '
 await V.set(null, 65); await flush(); await flush();
 return notes();'''
 
-    # the Data usage page over its cap with bytes waiting for the clock, under it with a correction, without an
-    # interface, and the replies of traffic_set
+    # the Data usage page over its monthly and yearly caps with bytes waiting for the clock, under both with a
+    # correction, without an interface, with the yearly plan off, with an older JSON (no remaining, no yearly), and
+    # the replies of traffic_set
     TRAFFIC = '''
-const st = { device: 'sipa_eth0', available: 1, clock: 0, since: 1791622800, reset_day: 15,
+const st = { device: 'sipa_eth0', available: 1, clock: 0, since: 1791622800, reset_day: 15, count: 'total', plan: 'Home',
+             daily: { bytes: 0, used: 0, cut: 0, level: 'none', cut_active: 0 },
              today: { date: '2026-10-10', rx: 1000, tx: 10 }, pending: { rx: 5, tx: 5 },
              cycle: { start: '2026-09-15', last: '2026-10-14', days_left: 5, rx: 2000, tx: 20, adj: 0, used: 2030 },
-             cap: { bytes: 2000, warn: 90, cut: 1, level: 'over', cut_active: 1 },
+             cap: { bytes: 2000, remaining: -30, warn: 90, cut: 1, level: 'over', cut_active: 1 },
+             yearly: { bytes: 5000, used: 4800, remaining: 200, start: '06-01', cut: 1, level: 'over', cut_active: 1 },
              days: [ { date: '2026-10-10', rx: 1000, tx: 10 }, { date: '2026-10-08', rx: 1000, tx: 10 } ],
              cycles: [ { start: '2026-09-15', last: '2026-10-14', rx: 2000, tx: 20, adj: 0 } ] };
 V.render(st);
-V.paint(Object.assign({}, st, { available: 0, cap: { bytes: 4000, warn: 50, cut: 0, level: 'warn', cut_active: 0 },
+V.paint(Object.assign({}, st, { available: 0, cap: { bytes: 4000, remaining: 1970, warn: 50, cut: 0, level: 'warn', cut_active: 0 },
+                                yearly: { bytes: 5000, used: 4600, remaining: 400, start: '06-01', cut: 0, level: 'warn', cut_active: 0 },
                                 cycle: Object.assign({}, st.cycle, { adj: -100 }) }));
+// the yearly cap reached with its cut turned off: the plain note
+V.paint(Object.assign({}, st, { yearly: Object.assign({}, st.yearly, { cut: 0, cut_active: 0 }) }));
+// the yearly plan off: the row says None and there are no yearly numbers
+V.paint(Object.assign({}, st, { yearly: { bytes: 0, used: 0, remaining: 0, start: '01-01', cut: 0, level: 'none', cut_active: 0 } }));
+// an older mu300-traffic: no cap.remaining (cap - used), no yearly object
+const old = Object.assign({}, st, { cap: { bytes: 2000, warn: 90, cut: 1, level: 'over', cut_active: 1 } });
+delete old.yearly;
+V.paint(old);
 V.paint({ ok: 0, error: 'Data usage is not available on this system' });
 rpcReply = { ok: 0, error: 'Invalid value for this setting' }; await V.set(null, 'warn', '0'); await flush();
 rpcReply = { ok: 1 }; await V.set(null, 'warn', '80'); await flush();
+return notes();'''
+
+    # an older mu300-traffic knows no cap.remaining and no yearly object: the page falls back to cap - used, and the
+    # yearly plan and the settings it has no operations for are not offered
+    OLD_TRAFFIC = '''
+const st = { device: 'sipa_eth0', available: 1, clock: 0, since: 1791622800, reset_day: 15,
+             today: { date: '2026-10-10', rx: 1000, tx: 10 }, pending: { rx: 0, tx: 0 },
+             cycle: { start: '2026-09-15', last: '2026-10-14', days_left: 5, rx: 2000, tx: 20, adj: 0, used: 1500 },
+             cap: { bytes: 2000, warn: 90, cut: 0, level: 'ok', cut_active: 0 },
+             days: [], cycles: [] };
+V.render(st);
 return notes();'''
 
     # System > LEDs: a U30 Air (a lamp that dims, two that only switch), an F50, no answer, and the replies of led_set
@@ -963,24 +986,58 @@ return { asked: asked, before: before, notes: notes() };'''
                 out = self.run_view('traffic', lang, self.TRAFFIC)
                 self.assertEqual(out['result'], want)
                 for m in ('Data usage', 'The monthly cap is reached: mobile data was turned off. It comes back on when the next cycle starts.',
-                          '%d%% of the monthly cap is used', 'Corrected by', 'Turn mobile data off at the cap'):
+                          '%d%% of the monthly cap is used', 'Corrected by', 'Turn mobile data off at the cap',
+                          'Remaining this cycle', 'Used', 'Remaining this year', 'Yearly cap',
+                          '%d%% of the yearly cap is used', 'The yearly cap is reached',
+                          'The yearly cap is reached: mobile data was turned off. It comes back on when the next year starts.',
+                          'Yearly cap (GB, 0: none)', 'A billing year starts on (MM-DD)',
+                          'For example 01-01; 02-29 is 02-28 in a common year.',
+                          'Turn mobile data off at the yearly cap',
+                          'Warning at this percentage of the cap and the yearly cap', 'Used so far this year (GB)',
+                          'Left in this cycle as the operator shows it (GB)', 'Left this year as the operator shows it (GB)',
+                          'What the operator shows as left is used: the count is corrected to the cap minus it.'):
                     self.assertIn(m, out['used'])
+
+    def test_traffic_page_handles_an_older_json(self):
+        # no cap.remaining: what is left is cap - used; no yearly object: no yearly plan and none of the settings
+        # that only the new mu300-traffic can save
+        out = self.run_view('traffic', None, self.OLD_TRAFFIC)
+        self.assertEqual(out['result'], [])
+        for m in ('Monthly cap', 'Remaining this cycle', 'Used'):
+            self.assertIn(m, out['used'])
+        for m in ('Remaining this year', 'Yearly cap', 'Yearly cap (GB, 0: none)',
+                  'A billing year starts on (MM-DD)', 'Turn mobile data off at the yearly cap',
+                  'Used so far this year (GB)', 'Left in this cycle as the operator shows it (GB)',
+                  'Left this year as the operator shows it (GB)',
+                  'What the operator shows as left is used: the count is corrected to the cap minus it.'):
+            self.assertNotIn(m, out['used'])
 
     def test_home_rates_come_from_proc_net_dev(self):
         # the fast lane: two readings of /proc/net/dev one second apart give the rates; a counter that went down
-        # (the interface made again) starts over instead of a negative rate
+        # (the interface made again) starts over instead of a negative rate. The usage kpis: what is left of the
+        # cycle first, the yearly plan when one is set, and an older snapshot (no remaining, no yearly) falls back
+        # to cap - used and hides the yearly kpi
         body = r'''
 V.render(); await flush();
-V.update({ info: { ts: 1, data_device: 'sipa_eth0', traffic: { level: 'warn', today: 2048, used: 950, cap: 1000, warn: 90 } } });
+V.update({ info: { ts: 1, data_device: 'sipa_eth0', traffic: { level: 'warn', today: 2048, used: 950, cap: 1000, warn: 90,
+    remaining: 50, yearly: { bytes: 4096, used: 1024, remaining: 3072, level: 'warn', cut_active: 0 } } } });
 const dev = (rx, tx) => 'Inter-| Receive\n face |bytes\n    lo: 5 1 0 0 0 0 0 0 5 1 0 0 0 0 0 0\n' +
     ' sipa_eth0: ' + rx + ' 10 0 0 0 0 0 0 ' + tx + ' 5 0 0 0 0 0 0\n';
 V.rate(dev(1000, 100), 1000); V.rate(dev(1000 + 2048 * 1024, 100 + 1024), 3000);
 const a = [ text('dl'), text('ul'), text('rx') ];
 V.rate(dev(10, 1), 4000);
-return a.concat([ text('dl'), text('rx'), text('usage-today'), text('usage-cycle'), text('usage-note') ]);'''
+const b = [ text('dl'), text('rx'), text('usage-today'), text('usage-remaining'), text('usage-cycle'), text('usage-note'),
+            text('usage-yearly'), text('usage-yearly-note') ];
+const shown = get('mud-usage-rem-kpi').style.display + '|' + get('mud-usage-year-kpi').style.display;
+V.update({ info: { ts: 2, data_device: 'sipa_eth0', traffic: { level: 'ok', today: 2048, used: 900, cap: 1000, warn: 90 } } });
+const old = [ text('usage-remaining'), text('usage-note'), text('usage-yearly'), get('mud-usage-rem-kpi').style.display,
+              get('mud-usage-year-kpi').style.display ];
+return a.concat(b, [ shown ], old);'''
         r = self.run_view('home', None, body)['result']
-        self.assertEqual(r, ['1.0 MB/s', '512 B/s', '2.0 MB', '1.0 MB/s', '10.0 B', '2.0 KB', '950 B of 1000 B',
-                             '95% of the monthly cap is used'])
+        self.assertEqual(r, ['1.0 MB/s', '512 B/s', '2.0 MB', '1.0 MB/s', '10.0 B', '2.0 KB', '50.0 B',
+                             '950 B of 1000 B', '95% of the monthly cap is used', '3.0 KB',
+                             'Remaining this year · 1.0 KB of 4.0 KB', '|',
+                             '100 B', 'Used this cycle', '--', '', 'none'])
 
     # a backend error on each page: (view, body returning what was shown, [(template, error, detail)]); the
     # page shows the error through the catalog, inside its template if any, and the detail after it as data
