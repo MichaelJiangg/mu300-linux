@@ -131,10 +131,11 @@ fget() {
     [ "$FT" != z ] || FV=
     return 0
 }
-# only KEY...: the request has no other field
+# only KEY...: the request has no other field. ubus_rpc_session is not one: OpenWrt's ubus over HTTP adds the caller's
+# session to every call it passes on, and LuCI's backup page reached mu300-api with it (#383)
 only() {
     for _k in $(printf '%s' "$FIELDS" | cut -f1); do
-        case " $* " in *" $_k "*) ;; *) refuse unknown-field "$_k" ;; esac
+        case " $* ubus_rpc_session " in *" $_k "*) ;; *) refuse unknown-field "$_k" ;; esac
     done
 }
 is_ascii_line() { [ "$(printf '%s' "$1" | LC_ALL=C tr -d ' -~'; echo x)" = x ]; }

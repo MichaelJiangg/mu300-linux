@@ -889,7 +889,7 @@ boot_tries_exceeded() {
 }
 # --- boot-tries end
 # --- modules-settle begin
-# A kernel step of mu300-update that a restart stopped (#422, docs/FINDINGS.md 235) leaves .mu300's boot/modules.pending:
+# A kernel step of mu300-update that a restart stopped (#422, docs/FINDINGS.md 236) leaves .mu300's boot/modules.pending:
 # the release and banner of the kernel it was installing. Its module set is in the systems already, and with the image
 # before still in the slot the two builds did not match (an Oops in the Wi-Fi driver's probe 25 s in, then Android).
 # Before any module of the system loads, the set that goes with the kernel running now is put in: the unpacked

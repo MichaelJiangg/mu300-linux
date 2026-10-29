@@ -899,8 +899,10 @@ class Carry(CarryCase):
                      'www/index.html': '<html>', 'etc/apk/world': 'base\n', 'lib/modules/5.4/a.ko': 'ko', 'etc/sysctl.conf': '# d\n',
                      'lib/apk/db/installed': 'P:base\nF:etc\nR:banner\nR:sysctl.conf\nF:etc/init.d\nR:dnsmasq\nF:www\nR:index.html\n',
                      'lib/apk/packages/base.conffiles': '/etc/sysctl.conf\n/etc/config/\n', 'opt/mu300/lib/path-commands': 'mu300-update\n'}
+        old_image['etc/apk/repositories.d/distfeeds.list'] = 'https://downloads.openwrt.org/releases/25.12.5/targets/armsr/armv8/kmods/6.12.94-1-aa/packages.adb\n'
         new_image = dict(old_image)
-        new_image.update({'etc/mu300/image-version': 'v2\n', 'etc/init.d/dnsmasq': ('f', '#!/bin/sh\n# v2\n', 0o755), 'etc/config/sqm': 'config queue\n'})
+        new_image.update({'etc/mu300/image-version': 'v2\n', 'etc/init.d/dnsmasq': ('f', '#!/bin/sh\n# v2\n', 0o755), 'etc/config/sqm': 'config queue\n',
+                          'etc/apk/repositories.d/distfeeds.list': 'https://downloads.openwrt.org/releases/25.12.6/targets/armsr/armv8/kmods/6.12.112-1-bb/packages.adb\n'})
 
         def user(old):
             (old / 'etc/config/network').write_text("config interface 'lan'\n\toption ipaddr '10.0.0.1'\n")
@@ -913,6 +915,9 @@ class Carry(CarryCase):
             (old / 'etc/rc.d/S50cron').unlink()                                          # a service disabled
             (old / 'etc/uci-defaults/90-mu300').unlink()                                 # ran, and removed itself
             (old / 'etc/banner').unlink()
+            # another mirror (#420): the user's feeds, of the release the old image had
+            (old / 'etc/apk/repositories.d/distfeeds.list').write_text(
+                'https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/25.12.5/targets/armsr/armv8/kmods/6.12.94-1-aa/packages.adb\n')
             with open(old / 'etc/apk/world', 'a') as f:
                 f.write('userpkg\n')
             with open(old / 'lib/apk/db/installed', 'a') as f:
@@ -942,6 +947,10 @@ class Carry(CarryCase):
             self.assertEqual((new / 'etc/mu300/orphaned-config/etc/config/userpkg').read_text(), 'config main\n')
             self.assertFalse((new / 'etc/config/userpkg').exists())
             self.assertIn('/etc/config/userpkg -> /etc/mu300/orphaned-config/etc/config/userpkg', report)
+            # the mirror is the user's, the release and its kmods the new image's
+            self.assertEqual((new / 'etc/apk/repositories.d/distfeeds.list').read_text(),
+                             'https://mirrors.tuna.tsinghua.edu.cn/openwrt/releases/25.12.6/targets/armsr/armv8/kmods/6.12.112-1-bb/packages.adb\n')
+            self.assertIn('follow the new release, 25.12.6', r.stdout)
         self.each(user, check, old_image=old_image, new_image=new_image, image='openwrt', os_name='openwrt')
 
     def test_with_busybox_for_every_command(self):

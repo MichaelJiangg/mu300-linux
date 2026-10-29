@@ -301,8 +301,10 @@ case "$cmd" in
       if [ -f "$M/mode" ]; then printf '+SPTESTMODE: 134,134,0,19,3,1\n'; else printf '+SPTESTMODE: 3,134,0,19,3,1\n'; fi ;;
   'AT+SP5GRAN?') if [ -f "$M/gran" ]; then printf '+SP5GRAN: 1\n'; else printf '+SP5GRAN: 0\n'; fi ;;
   'AT+SPENDC?') if [ -f "$M/endc" ]; then printf '+ENDC: 1\n'; else printf '+ENDC: 2\n'; fi ;;
+  'AT+CGMR') if [ -f "$M/w25135" ]; then printf 'Platform Version: MOCORTM_V2_23A_W25.13.5_Debug\nOK\n'; else printf 'Platform Version: MOCORTM_V2_23A_W25.30.2_Debug\nOK\n'; fi ;;
   'AT+SPLBAND=0')
       if [ -f "$M/lte-raw" ]; then printf '+SPLBAND: %s\n' "$(cat "$M/lte-raw")"
+      elif [ -f "$M/lte" ] && [ -f "$M/w25135" ]; then printf '+SPLBAND: 0,450,0,149,0\n'
       elif [ -f "$M/lte" ] && [ -f "$M/u30air" ]; then printf '+SPLBAND: 0,2018,2057,2271,2\n'
       elif [ -f "$M/lte" ] && ! { [ -f "$M/revert-after-sfun" ] && [ -f "$M/sfun" ]; }; then printf '+SPLBAND: 0,482,0,149,0\n'
       else printf '+SPLBAND: 0,0,0,4,0\n'; fi ;;
@@ -339,12 +341,13 @@ printf 'OK\n'
         self.stub('setsid', 'exit 0')
         return lock, state, self.tmp / 'run', at
 
-    def reset_run(self, shell, lock, state, run, at, *args, cache=None):
+    def reset_run(self, shell, lock, state, run, at, *args, cache=None, saved=None):
         """One `lock reset` (or ARGS) from the saved-and-set starting point: (result, [AT commands sent]). CACHE is the
-        lock cache to start from (a short one by default)."""
+        lock cache to start from (a short one by default); SAVED replaces the default saved locks (a test that starts
+        with no LTE lock, for example)."""
         shutil.rmtree(state, ignore_errors=True)
         state.mkdir(parents=True)
-        for k, v in self.SAVED:
+        for k, v in (self.SAVED if saved is None else saved):
             (state / k).write_text(v)
         shutil.rmtree(self.tmp / 'modem', ignore_errors=True)
         (self.tmp / 'at.commands').unlink(missing_ok=True)
@@ -632,6 +635,35 @@ printf 'OK\n'
             self.assertEqual(data['lte']['locked'], '')
             self.assertFalse(state.exists() and any(p.name.startswith('lte') for p in state.iterdir()),
                              'a read writes nothing to the state directory')
+
+    def test_the_u30_air_w25135_table_is_its_cleared_read_back(self):
+        """W25.13.5's cleared mask is 0,450,0,149,0 (B1 B3 B5 B8 B34 B39 B40 B41); B38 is not carried, so a write
+        of 0,482,... reads back without it. The table is selected from AT+CGMR, not learned from a read-back: the
+        cleared read-back is automatic on that firmware, and a lock on any subset still shows as that lock."""
+        lock, state, run, at = self.reset_setup(device='u30air')
+        for shell in self.each_shell():
+            self.fresh_modem(run)
+            (self.tmp / 'modem' / 'w25135').touch()
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['caps']['lte'], '1,3,5,8,34,39,40,41')
+            self.assertEqual(data['lte']['raw'], '0,450,0,149,0')
+            self.assertEqual(data['lte']['locked'], '')
+            # a real lock on this firmware still shows
+            self.fresh_modem(run, '0,0,0,1,0')
+            (self.tmp / 'modem' / 'w25135').touch()
+            data = self.lock_get(shell, lock, run, at)
+            self.assertEqual(data['lte']['locked'], '1')
+
+    def test_reset_with_the_w25135_table_succeeds(self):
+        """The reset's read-back test accepts 0,450,0,149,0 as automatic on W25.13.5 (the 8-band table), while the
+        same read-back remains a lock on W25.30.2's 19-band table."""
+        lock, state, run, at = self.reset_setup(device='u30air', knobs=': > "$STUBLOG/modem/w25135"')
+        saved = [(k, v) for k, v in self.SAVED if k != 'lte']
+        for shell in self.each_shell():
+            r, sent = self.reset_run(shell, lock, state, run, at, 'reset', saved=saved)
+            self.assertEqual(r.returncode, 0, r.stderr + r.stdout + (run / 'lock.log').read_text())
+            self.assertEqual(self.reset_result(run)['state'], 'ok')
+            self.assertEqual(sorted(p.name for p in state.iterdir()), ['auto_apply'])
 
     def test_a_lock_the_panel_did_not_save_still_shows_as_that_lock(self):
         """#387's review: with no saved lock, the read-back 0,450,0,149,0 (a lock on the F50's list less B38, sent by

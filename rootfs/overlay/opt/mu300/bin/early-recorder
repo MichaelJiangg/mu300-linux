@@ -76,9 +76,11 @@ while [ "$(cut -d. -f1 /proc/uptime)" -lt "$end" ]; do
         ip -br addr 2>/dev/null
         echo "--- lsmod"
         systemctl list-units --no-legend --plain --state=activating,failed 2>/dev/null
+        # (logread -l: logd hands over its last 300 lines, not all of them to be cut here - the same text, a tenth of
+        # the work; dmesg -s: the kernel's last MB, without a tail of the whole log through a pipe)
         [ -f /etc/openwrt_release ] && { echo "--- ps"; ps w 2>/dev/null; echo "--- logread"; logread -l 300 2>/dev/null | grep -v PR_CAPBSET; echo "--- android logcat"; tail -150 /var/log/android-logcat.txt 2>/dev/null; echo "--- mu300 logs"; tail -40 /tmp/mu300-*.log 2>/dev/null; }
         echo "--- dmesg"
-        dmesg | tail -c 1000000
+        dmesg -s 1000000 2>/dev/null || dmesg | tail -c 1000000
         echo "MU300-PERSIST-END"
     } > /run/mu300-early.txt 2>&1
     head -c 65536 /dev/zero >> /run/mu300-early.txt
@@ -93,6 +95,7 @@ while [ "$(cut -d. -f1 /proc/uptime)" -lt "$end" ]; do
     node_ok
     sync
     # every 2 s for the first minute and a half, where the intermittent early hangs have happened; a 10 s gap
-    # left a single snapshot of a boot that died between 11 and 21 s
-    if [ "$(cut -d. -f1 /proc/uptime)" -lt 90 ]; then sleep 2; else sleep 10; fi
+    # left a single snapshot of a boot that died between 11 and 21 s. After that every 30 s to the end (was 10 s:
+    # a round is the kernel's whole log, and the boot is up by then; FINDINGS 235)
+    if [ "$(cut -d. -f1 /proc/uptime)" -lt 90 ]; then sleep 2; else sleep 30; fi
 done

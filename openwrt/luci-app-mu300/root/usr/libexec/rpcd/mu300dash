@@ -1029,7 +1029,7 @@ m_update_act() {
         { refuse 'Unknown update operation'; return; }
     # a release tag (docs/FINDINGS.md 125: vYYYY.MM.DD, and vYYYY.MM.DD.N after v2026.10.27) or none
     allowed "$tag" '(v[0-9]{4}\.[0-9]{2}\.[0-9]{2}|v[0-9]{4}\.(0[1-9]|1[0-2])\.(0[1-9]|[12][0-9]|3[01])\.[1-9][0-9]?)?' && allowed "$systems" "($UPD_SYS( $UPD_SYS){0,2})?" &&
-        allowed "$kernel" '(5\.4|6\.18|7\.2)?' && allowed "$sha" '([0-9a-f]{64})?' && allowed "$size" '([1-9][0-9]{0,9})?' &&
+        allowed "$kernel" '(5\.4|6\.18|7\.2|7\.3)?' && allowed "$sha" '([0-9a-f]{64})?' && allowed "$size" '([1-9][0-9]{0,9})?' &&
         allowed "$flags" "($UPD_FLAG( $UPD_FLAG){0,2})?" && allowed "$confirm" '(apply|rollback|clean|kernel|source)?' &&
         # (the release source, op source: a plain http(s) URL, or empty for GitHub - the shape the updater itself
         #  takes, and what is written is one root's own file of its, which checks it again)

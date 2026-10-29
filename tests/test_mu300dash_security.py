@@ -767,6 +767,9 @@ class Passthrough(Mu300Dash):
          [['update', 'act', 'apply', 'v2026.10.16.12', '', '', '', '', '', 'apply', '']]),
         ('update_act', {'op': 'kernel', 'kernel': '7.2', 'confirm': 'kernel'},
          [['update', 'act', 'kernel', '', '', '7.2', '', '', '', 'kernel', '']]),
+        # every kernel the updater has (#393: 7.3 was refused as an invalid request)
+        ('update_act', {'op': 'kernel', 'kernel': '7.3', 'confirm': 'kernel'},
+         [['update', 'act', 'kernel', '', '', '7.3', '', '', '', 'kernel', '']]),
         ('update_act', {'op': 'upload_begin', 'size': '52428800'},
          [['update', 'act', 'upload_begin', '', '', '', '', '52428800', '', '', '']]),
         ('update_act', {'op': 'apply_file', 'sha256': 'ab' * 32, 'flags': 'unsigned downgrade', 'confirm': 'apply'},
