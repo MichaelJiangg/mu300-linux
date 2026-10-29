@@ -1311,3 +1311,77 @@ class Fsck(ShellTest):
         # the next boot reads one byte and runs nothing
         out, log, _ = self.run_fsck(shell, MU300_FSCK_BIN=shutil.which('e2fsck'))
         self.assertEqual(('rc=0', ''), (out, log))
+
+
+class ModulesSettle(ShellTest):
+    """#422: a kernel step a restart stopped (boot/modules.pending) is settled before the system starts: the set that
+    goes with the running kernel goes in, from the unpacked bundle or from the set kept with the image before."""
+    KREL = '7.3.0'
+    BANNER = 'Linux version 7.3.0 (b@h) (gcc 14) #6 SMP PREEMPT Mon Oct 27 10:00:00 UTC 2026'
+
+    def setUp(self):
+        super().setUp()
+        self.disk = self.tmp / 'disk'
+        self.dirs = [self.disk / f'ubuntu/lib/modules/{self.KREL}/extra', self.disk / f'openwrt-luci/lib/modules/{self.KREL}']
+        for d in self.dirs:
+            d.mkdir(parents=True)
+            (d / 'a.ko').write_bytes(b'')
+            (d / 'gone.ko').write_bytes(b'new gone')
+        st = self.disk / '.mu300-update/boot/modules'
+        st.mkdir(parents=True)
+        (st / 'a.ko').write_bytes(b'new a')
+        kept = self.disk / 'boot/prev.modules.new'
+        for os_ in ('ubuntu', 'openwrt-luci'):
+            (kept / os_).mkdir(parents=True)
+            (kept / os_ / 'a.ko').write_bytes(b'old a')
+        (kept / 'kernel.release').write_text(self.KREL + '\n')
+        (self.disk / 'boot/modules.pending').write_text(f'{self.KREL}\n{self.BANNER}\n')
+
+    def settle(self, shell, release, version):
+        m = re.search(r'# --- modules-settle begin\n(.*?)# --- modules-settle end', INIT, re.S)
+        self.assertIsNotNone(m, 'boot/init has no modules-settle block')
+        code = ('log() { echo "$*" >&2; }; chroot() { echo "chroot $*" >> "$CHROOT_LOG"; }; '
+                f'uname() {{ case $1 in -r) echo "{release}" ;; -v) echo "{version}" ;; esac; }}\n'
+                + m.group(1) + f'\nmodules_settle "{self.disk}"; echo "rc=$?"')
+        r = self.sh(shell, code, CHROOT_LOG=self.tmp / 'chroot.log')
+        self.assertIn('rc=0', r.stdout, r.stderr)
+        self.assertFalse((self.disk / 'boot/modules.pending').exists())
+        return r.stderr + (self.tmp / 'chroot.log').read_text() if (self.tmp / 'chroot.log').exists() else r.stderr
+
+    def ko(self, d):
+        return {f.name: f.read_bytes() for f in sorted(d.glob('*.ko'))}
+
+    def test_the_image_before_gets_its_set_back(self):
+        for shell in self.each_shell():
+            self.setUp()
+            err = self.settle(shell, self.KREL, '#3 SMP PREEMPT Thu Oct 23 10:00:00 UTC 2026')
+            self.assertIn('stage=modules-settled release=7.3.0 set=kept', err)
+            self.assertIn(f'chroot {self.disk}/ubuntu', err)
+            for d in self.dirs:
+                self.assertEqual(self.ko(d), {'a.ko': b'old a'})
+            shutil.rmtree(self.tmp / 'disk')
+
+    def test_the_new_kernel_gets_the_unpacked_set_again(self):
+        for shell in self.each_shell():
+            self.setUp()
+            err = self.settle(shell, self.KREL, '#6 SMP PREEMPT Mon Oct 27 10:00:00 UTC 2026')
+            self.assertIn('set=new', err)
+            for d in self.dirs:
+                self.assertEqual(self.ko(d), {'a.ko': b'new a'})
+            shutil.rmtree(self.tmp / 'disk')
+
+    def test_another_kernel_running_puts_the_kept_set_back(self):
+        # a kernel switch that stopped: the release it was bringing is not the one running
+        for shell in self.each_shell():
+            self.setUp()
+            shutil.rmtree(self.disk / 'boot/prev.modules.new')
+            err = self.settle(shell, '7.2.13', '#1 SMP')
+            self.assertIn('set=kept', err)
+            # nothing was kept of 7.3.0: the systems had no set of it
+            for d in self.dirs:
+                self.assertEqual(self.ko(d), {})
+            shutil.rmtree(self.tmp / 'disk')
+
+    def test_it_runs_before_the_system_starts(self):
+        self.assertLess(INIT.index('    modules_settle /disk\n'), INIT.index('exec switch_root'))
+        self.assertLess(INIT.index('    modules_settle /disk\n'), INIT.index('(cd "$rootdir/lib/modules/$(uname -r)"'))

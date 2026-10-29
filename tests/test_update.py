@@ -1081,7 +1081,8 @@ class KernelStep(UpdateBase):
 
     def make_bundle(self, mods, krel=None):
         p = self.src / 'mu300-kernel-6.18.tar.gz'
-        files = [('./Image', b'N' * 100 + f'Linux version {krel or self.KREL} (b@h)'.encode() + b'N' * 8000), ('./ramdisk-generic.lz4', b'\x02\x21\x4c\x18generic'),
+        files = [('./Image', b'N' * 100 + f'Linux version {krel or self.KREL} (b@h) # SMP \n\0'.encode() +
+                  f'Linux version {krel or self.KREL} (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026\n\0'.encode() + b'N' * 8000), ('./ramdisk-generic.lz4', b'\x02\x21\x4c\x18generic'),
                  ('./devices', b'f50 u30air\n'), ('./features', b'sdcard\nlinux-slot\n'),
                  ('./kernel.release', ((krel or self.KREL) + '\n').encode()), ('./modules.builtin', b'kernel/x.ko\n'),
                  ('./kernel.config', b'CONFIG_X=y\n' * 100)]
@@ -1172,6 +1173,91 @@ class KernelStep(UpdateBase):
             self.assertEqual(self.ko(u), old)
             self.assertEqual(self.ko(o), old)
             self.assertEqual(self.ko(pm / 'ubuntu'), old)
+
+    def test_a_restart_before_the_image_is_written_puts_the_kept_set_back(self):
+        # #422: a restart while the step ran left the systems with the new build's modules and the slot with the image
+        # before - a module of one build in the kernel of another (an Oops 25 s in). modules.pending says so, and the
+        # next mu300-update (or the ramdisk's init) puts the set of the image in the slot back
+        old = {'a.ko': b'old a', 'gone.ko': b'old gone'}
+        new = {'a.ko': b'new a', 'b.ko': b'new b'}
+        for shell in self.each_shell():
+            img = self.old_image(self.KREL)
+            self.systems(old)
+            self.kept({'a.ko': b'older a'})
+            self.make_bundle(new)
+            # the restart: right after the systems got the new set (no EXIT trap runs)
+            r = self.run_step(shell, 'prev_modules_commit() { exit 9; }; ', **self.busybox_applets(shell))
+            self.assertEqual(r.returncode, 9, r.stderr)
+            u, o = self.mod_dirs()
+            self.assertEqual(self.ko(u), new)
+            self.assertEqual(self.part.read_bytes(), img)
+            pend = (self.disk / 'boot/modules.pending').read_text().splitlines()
+            self.assertEqual(pend[0], self.KREL)
+            # the banner of the final link, not init/version.o's without build number and time
+            self.assertEqual(pend[1], f'Linux version {self.KREL} (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026')
+            r = self.up(shell, (self.STUBS % self.PSIZE) + 'modules_settle; echo "rc=$?"', PART=self.part,
+                        MU300_NO_DEPMOD=1, **self.busybox_applets(shell))
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertIn('stopped before writing its image', r.stdout)
+            self.assertEqual(self.ko(u), old)
+            self.assertEqual(self.ko(o), old)
+            self.assertFalse((self.disk / 'boot/modules.pending').exists())
+            # the kept set of the image before that is still the one it had
+            self.assertEqual(self.ko(self.disk / 'boot/prev.modules/ubuntu'), {'a.ko': b'older a'})
+            # and the next step runs as usual
+            r = self.run_step(shell, **self.busybox_applets(shell))
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertEqual(self.ko(u), new)
+            self.assertFalse((self.disk / 'boot/modules.pending').exists())
+            self.assertEqual(self.leftovers(), [])
+
+    def test_a_restart_after_the_image_is_written_puts_its_set_in_again(self):
+        # the image went in, the end of the step did not (modules.pending is still there, the unpacked set too): that
+        # set goes in again, also over files a restart left empty
+        new = {'a.ko': b'new a', 'b.ko': b'new b'}
+        for shell in self.each_shell():
+            self.old_image(self.KREL)
+            self.systems({'a.ko': b'old a'})
+            self.kept({'a.ko': b'older a'})
+            self.make_bundle(new)
+            r = self.run_step(shell, **self.busybox_applets(shell))
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertFalse((self.disk / 'boot/modules.pending').exists())
+            # what a restart before the end of the step leaves
+            st = self.disk / '.mu300-update/boot'
+            (st / 'modules').mkdir(parents=True)
+            for n, data in new.items():
+                (st / 'modules' / n).write_bytes(data)
+            (st / 'kernel.release').write_text(self.KREL + '\n')
+            banner = 'Linux version 6.18.57 (b@h) #2 SMP Mon Oct 27 10:00:00 UTC 2026'
+            (self.disk / 'boot/modules.pending').write_text(f'{self.KREL}\n{banner}\n')
+            self.systems({'a.ko': b'', 'b.ko': b''})
+            r = self.up(shell, (self.STUBS % self.PSIZE) + 'modules_settle; echo "rc=$?"', PART=self.part,
+                        MU300_NO_DEPMOD=1, **self.busybox_applets(shell))
+            self.assertIn('rc=0', r.stdout, r.stderr)
+            self.assertIn('stopped after writing its image', r.stdout)
+            for d in self.mod_dirs():
+                self.assertEqual(self.ko(d), new)
+            self.assertFalse((self.disk / 'boot/modules.pending').exists())
+            shutil.rmtree(st)
+
+    def test_an_unpack_that_is_not_complete_changes_nothing(self):
+        # a module missing or empty after the unpack: no system gets the set, the image stays
+        old = {'a.ko': b'old a'}
+        for shell in self.each_shell():
+            for broken in ('rm -f "$STAGE/boot/modules/b.ko"', ': > "$STAGE/boot/modules/b.ko"'):
+                img = self.old_image(self.KREL)
+                self.systems(old)
+                self.kept({'a.ko': b'older a'})
+                self.make_bundle({'a.ko': b'new a', 'b.ko': b'new b'})
+                r = self.run_step(shell, f'untar() {{ tar "$@" && {broken}; }}; ')
+                self.assertIn('rc=1', r.stdout, r.stderr)
+                self.assertIn('unpacking the modules failed; nothing was changed', r.stderr)
+                self.assertEqual(self.part.read_bytes(), img)
+                for d in self.mod_dirs():
+                    self.assertEqual(self.ko(d), old)
+                self.assertFalse((self.disk / 'boot/modules.pending').exists())
+                self.assertEqual(self.leftovers(), [])
 
     def test_too_little_room_changes_nothing_and_leaves_nothing(self):
         old = {'a.ko': b'old a'}

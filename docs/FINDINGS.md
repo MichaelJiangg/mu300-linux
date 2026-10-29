@@ -12368,3 +12368,28 @@ asked before the idle timer runs out, four loops start no more `cat`/`sed`/`grep
 minute, a key; early-recorder's reads), `tests/test_adb.py` (an idle gadget is looked at without `cat`, and without
 `sleep` where read has a timeout), `tests/test_mu300cell.py` (ndp-learn's daemon calls ip only when the addresses or
 the routes changed, its rounds on the monitor's word, its rounds without a monitor, its solicitations).
+
+### 236. A restart in the middle of the kernel step leaves no module set the kernel does not match (#422)
+
+**Status: in `mu300-update` (the kernel step) and `boot/init`; tested against a fake boot partition and disk
+(tests/test_update.py `KernelStep`, tests/test_boot_init.py `ModulesSettle`).**
+
+On v2026.10.27.2 (7.3) a restart while the kernel step ran left 307 of 3056 modules as empty files, and the systems
+with the new build's set while the slot still held the image before. The two 7.3.0 builds disagree on
+`struct task_struct` (`CONFIG_UCLAMP_TASK`), so `sprd_wlan_combo.ko` read `current->nsproxy` at the wrong offset: an
+Oops 25 s into the boot, and the fallback went to Android. Both halves looked complete afterwards.
+
+* The empty files: the unpack writes 120 MB, and what was written in the last seconds before a hard restart is not on
+  the disk yet (delayed allocation); the systems get those files as second names, so the damage reaches all of them.
+  The step now checks the unpacked set (every module the bundle lists, none empty) and syncs it before any system
+  gets it.
+* The mismatch: from the moment the systems' set changes until the image is written (and in the "already up to date"
+  path), `boot/modules.pending` holds the release and banner of the new kernel. Whoever finds it next settles it: the
+  ramdisk's init before the system starts (the running kernel's `uname -r`/`uname -v` against the banner), or the next
+  mu300-update (the banner of the image in the slot). The new kernel gets the unpacked set again (it was on the disk
+  before the file was written); any other gets the set kept with the image before.
+* The Update page no longer shows "Restart needed" while an update still runs: the system is switched before the
+  kernel step, and that card invited the restart.
+
+The init part works from the next image on: a device restarted in the middle of the step that installs this image
+still boots the image before, whose init does not know the file; the next mu300-update settles it then.
