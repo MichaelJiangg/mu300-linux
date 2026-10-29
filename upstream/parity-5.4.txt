@@ -283,12 +283,12 @@ module sprd_soc_id ok = cfg:SPRD_SOC_ID bind:platform/sprd-soc-id # the chip's I
 driver platform/sprd-soc-id ok cfg:SPRD_SOC_ID bind:platform/sprd-soc-id
 module sprd_manufacturer_model ok cfg:SPRD_SOC_ID # in sprd_soc_id: /sys/devices/soc0/soc_model and soc_manufacturer with 5.4's text
 module misc_sprd_uid na # the chip UID as /sys/class/misc/sprd_uid; not loaded on 5.4, nothing reads it
-module zte_card_holder_det missing group:zte boards:f50,u30air,v50 # SIM tray detection, /sys/zcard_det (loaded on 5.4, FINDINGS 18)
+module zte_card_holder_det ok = cfg:ZTE_CARD_HOLDER_DET # the card tray's detection, /sys/zcard_det/zcard_det (upstream/port/drivers/misc/zte_card_holder_det.c; loaded by extra-modules as on 5.4)
 module zte_bootreason na # ZTE's boot reason for Android's property service; not loaded on 5.4 (boot/init reads the reason itself)
 module zte_stats_info na # ZTE's usage statistics for Android; not loaded on 5.4
-builtin board_state missing group:zte boards:f50,u30air,v50 # ZTE's board state (/dev/zte_board_state)
+builtin board_state ok = cfg:ZTE_BOARD_STATE # ZTE's board state: /dev/zte_board_state, /proc/driver/board_id (upstream/port/drivers/misc/board_state.c)
 module zte_sar na boards:f50,u30air # the AW9610x SAR sensor at i2c-2 0x12 is not fitted (i2cdetect on both; FINDINGS 18)
-module zte_sar_stk missing group:zte boards:u30air # the U30 Air's STK501xx SAR sensor answers at i2c-2 0x28 (i2cdetect 2026-10-28); no driver on mainline
+module zte_sar_stk ok = bind:i2c/stk501xx_sar # the U30 Air's STK501xx SAR sensor (i2c-2 0x28): ZTE's driver as an out-of-tree module, upstream/modules/zte_sar_stk
 module fm11tag ok cfg:I2C_CHARDEV # the U30 Air's NFC tag: mu300-nfc drives it over i2c-dev and GPIO 190 (FINDINGS 33g)
 module sprd_apdu_r3p0 na # the integrated secure element's APDU interface: loads on 5.4 but binds nothing (sprd,qogirn6pro-apdu stays unbound)
 module rpmb na # the vendor RPMB char device for Android's Trusty storage proxy; the partition is /dev/mmcblk0rpmb on both kernels (RPMB=y would make MMC_BLOCK a module, all-modules.exclude)

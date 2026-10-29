@@ -27,6 +27,19 @@ append_once('drivers/misc/Kconfig', 'config ZTE_V50_SIM',
             '\tdepends on GPIOLIB && OF\n\thelp\n'
             '\t  The ZTE V50 (MU3351) switches between its built-in and external SIM cards (zte,sim_gpio_ctrl).\n'
             '\t  Binds only on a board with the V50\'s AW9523B; leaves the lines as the bootloader set them.\n')
+# ZTE's board extras of the 5.4 kernel (FINDINGS 234): the card holder (tray) detection, /sys/zcard_det/zcard_det,
+# and the board state, /proc/driver/board_id and /dev/zte_board_state
+append_once('drivers/misc/Makefile', 'zte_card_holder_det.o', 'obj-$(CONFIG_ZTE_CARD_HOLDER_DET) += zte_card_holder_det.o\n')
+append_once('drivers/misc/Makefile', 'board_state.o', 'obj-$(CONFIG_ZTE_BOARD_STATE) += board_state.o\n')
+append_once('drivers/misc/Kconfig', 'config ZTE_CARD_HOLDER_DET',
+            '\nconfig ZTE_CARD_HOLDER_DET\n\ttristate "ZTE card holder detection"\n'
+            '\tdepends on GPIOLIB && OF\n\thelp\n'
+            '\t  /sys/zcard_det/zcard_det: whether the card tray is in (the F50: the card slot\'s detect line), as the\n'
+            '\t  ZTE 5.4 kernel\'s zte_card_holder_det.\n'
+            '\nconfig ZTE_BOARD_STATE\n\ttristate "ZTE board state"\n'
+            '\tdepends on OF && PROC_FS\n\thelp\n'
+            '\t  The board ID and secure-boot state the bootloader passes (/proc/driver/board_id,\n'
+            '\t  /dev/zte_board_state), as the ZTE 5.4 kernel\'s board_state.\n')
 
 append_once('drivers/clk/sprd/Makefile', 'reset.o', 'clk-sprd-y\t+= reset.o\n')
 append_once('drivers/clk/sprd/Makefile', 'ums9620-clk.o', 'obj-$(CONFIG_SPRD_UMS9620_CLK)\t\t+= ums9620-clk.o\n')

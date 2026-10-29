@@ -40,7 +40,9 @@ fi
 # ums9620_lpintc (upstream/modules/ums9620_lpintc, docs/FINDINGS.md 218), the same way: the interrupts the kernel
 # enabled become wake sources of the CPU clusters' power-down, which TF-A left at its own short list (USB, IPA and
 # the Wi-Fi's PCIe were not on it). Mainline only; without it an interrupt waits for something else to wake the cluster.
-for m in mu300_thermal ums9620_lpintc; do
+# zte_sar_stk, the U30 Air's SAR sensor (upstream/modules/zte_sar_stk on mainline, ZTE's own module on 5.4): only where
+# the kernel has it (the U30 Air's module sets); udev loads it on Ubuntu as well, OpenWrt has only this.
+for m in mu300_thermal ums9620_lpintc zte_sar_stk; do
     grep -q "^$m " /proc/modules && continue
     for f in "$M/$m.ko" "$M/extra/$m.ko"; do
         [ -f "$f" ] || continue
