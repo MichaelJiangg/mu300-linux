@@ -25,6 +25,7 @@ class usb_role
 class wakeup
 class watchdog
 class zram-control
+cooling battery
 cooling cpufreq-cpu0
 cooling cpufreq-cpu4
 cooling cpufreq-cpu7
@@ -100,6 +101,7 @@ driver platform/ums9620-ipa-sys-pd
 driver platform/unisoc-mailbox
 driver platform/unisoc-sipc-virt-bus
 driver platform/wlan
+driver platform/zte,charger-policy-service
 driver platform/zte-ldo-leds
 driver serial-base/ctrl
 driver serial-base/port

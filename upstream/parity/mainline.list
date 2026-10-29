@@ -3,6 +3,7 @@
 cfg ARM_SPRD_CPUFREQ_V2 6.18 7.2 7.3
 cfg BITREVERSE 6.18 7.2 7.3
 cfg CHARGER_BQ256XX 6.18 7.2 7.3
+cfg CHARGER_POLICY_SERVICE 6.18 7.2 7.3
 cfg CPU_FREQ_GOV_CONSERVATIVE 6.18 7.2 7.3
 cfg CPU_THERMAL 6.18 7.2 7.3
 cfg CRC32 6.18 7.2 7.3
@@ -139,6 +140,7 @@ ko cdc_wdm 6.18 7.2 7.3
 ko cfg80211 6.18 7.2 7.3
 ko ch341 6.18 7.2 7.3
 ko chacha20poly1305 6.18 7.2 7.3
+ko charger_policy_service 6.18 7.2 7.3
 ko cifs 6.18 7.2 7.3
 ko clk_sprd 6.18 7.2 7.3
 ko cls_basic 6.18 7.2 7.3
