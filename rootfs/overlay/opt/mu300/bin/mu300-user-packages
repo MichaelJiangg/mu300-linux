@@ -5,6 +5,8 @@
 #   mu300-user-packages retry     try again now (also after skip, a failure or no internet)
 #   mu300-user-packages retry --dns   the same, with dnsmasq asking the connection's resolvers too for that run (when
 #                                   its only DNS server is a package that waits to be installed again)
+#   mu300-user-packages keep [FILE.apk ...|--forget NAME]  a package the feeds do not have, installed from a file, is
+#                                   kept from it and installed from it again after an update; alone: what is kept
 #   mu300-user-packages skip      do not install them again; their settings stay set aside
 #   mu300-user-packages dismiss   drop the note shown at login
 #   mu300-user-packages run       the service at boot (OpenWrt: init.d/mu300-user-packages; Ubuntu: systemd)
@@ -16,7 +18,9 @@
 # seconds apart; an hour by default), installs what is missing (OpenWrt: apk add; Ubuntu: apt-get install) and puts
 # the settings the update set aside back in place, with the services enabled as they were. Offline for that long, it
 # tries again at the next boot, five boots at most (then: retry). A package the feeds do not have (installed from a
-# file) fails for good: its settings stay in /etc/mu300/orphaned-config, and status says how to put them back.
+# file) is installed from that file once it is kept (mu300-user-packages keep FILE.apk, in /etc/mu300/user-apks, which
+# an update carries over); without it, it fails for good: its settings stay in /etc/mu300/orphaned-config, and status
+# says how to put them back.
 #
 # After the reinstall step OpenWrt's DNS is checked: a proxy (OpenClash and the like) points dnsmasq at a port of its
 # own on 127.0.0.1 while it runs, and an update took that over with /etc/config/dhcp - without the proxy there was no
@@ -33,6 +37,7 @@ BIN=${MU300_BIN:-/opt/mu300/bin}
 MU300_LIB=1 . "$BIN/mu300-update" || exit 1
 D=$R/$UPK_DIR
 ORPH=$R/$UPK_ORPH
+APKS=$R/$UPK_APKS
 LOG=$D/log
 TRIES=${MU300_PKG_TRIES:-12}
 DELAY=${MU300_PKG_DELAY:-300}
@@ -81,6 +86,65 @@ pm_add() {
 pm_has() {
     if [ "$KIND" = openwrt ]; then apk info -e "$1" >/dev/null 2>&1
     else [ "$(dpkg-query -W -f='${Status}' "$1" 2>/dev/null)" = "install ok installed" ]; fi
+}
+
+# ---- packages the feeds do not have, kept from their file ------------------------------------------------------
+# A package installed from a file (OpenClash from a release's .apk, say) is not in the feeds: an update takes its
+# programs away, and `apk add NAME` at the first boot fails for good. A copy of its file kept here is installed from
+# instead. The store is /etc/mu300/user-apks (under /etc, which an update carries over), its index a line
+# "NAME VERSION FILE" per package; the update writes the package's settings down as it does for any other (upk_record).
+# apk_meta FILE: "NAME VERSION" from the package file (apk adbdump's info block), when it reads them there
+apk_meta() {
+    _km=$(apk adbdump "$1" 2>/dev/null) || return 1
+    _kn=$(printf '%s\n' "$_km" | sed -n 's/^[[:space:]]*name:[[:space:]]*//p' | head -n 1)
+    _kv=$(printf '%s\n' "$_km" | sed -n 's/^[[:space:]]*version:[[:space:]]*//p' | head -n 1)
+    [ -n "$_kn" ] && [ -n "$_kv" ] || return 1
+    printf '%s %s\n' "$_kn" "$_kv"
+}
+# kept_file NAME: the file kept for NAME, relative to /etc/mu300/user-apks (the index may still name one that is gone)
+kept_file() {
+    _kf=$(awk -v n="$1" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
+    [ -n "$_kf" ] && [ -f "$APKS/$_kf" ] && echo "$_kf"
+}
+# kept_list: the packages kept from their file, a line each (status, and keep with no argument)
+kept_list() {
+    printf 'kept .apk files (installed again when the feeds do not have them):\n'
+    while read -r _klp _klv _klf; do
+        printf '  %s %s /%s/%s\n' "$_klp" "$_klv" "$UPK_APKS" "$_klf"
+    done < "$APKS/index"
+}
+# keep_file FILE: one package file into the store, and "NAME VERSION FILE" into the index, replacing the line and the
+# file of an older version of the same package (the file says both: the name is not guessed from the file name)
+keep_file() {
+    _km=$(apk_meta "$1") || { echo "keep: $1: not a package file (apk adbdump does not read its name and version)" >&2; return 1; }
+    _kn=${_km%% *} _kv=${_km#* } _kd=$_kn-$_kv.apk
+    case $_kd in */*) echo "keep: $1: its name and version cannot be a file name" >&2; return 1 ;; esac
+    [ "$1" = "$APKS/$_kd" ] || cp -f "$1" "$APKS/$_kd" || { echo "keep: $1: cannot be copied to /$UPK_APKS/$_kd" >&2; return 1; }
+    _ko=$(awk -v n="$_kn" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
+    { awk -v n="$_kn" '$1 != n' "$APKS/index" 2>/dev/null; printf '%s %s %s\n' "$_kn" "$_kv" "$_kd"; } > "$APKS/index.new" &&
+        mv -f "$APKS/index.new" "$APKS/index" || { echo "keep: /$UPK_APKS/index cannot be written" >&2; return 1; }
+    [ -z "$_ko" ] || [ "$_ko" = "$_kd" ] || rm -f "$APKS/$_ko"
+    log "$_kn $_kv: kept, /$UPK_APKS/$_kd (installed from it when the feeds do not have it)"
+}
+# keep_files FILE...: each file kept; one that cannot be read changes nothing, the others are kept all the same
+keep_files() {
+    _kfr=0
+    for _kfa in "$@"; do
+        [ -f "$_kfa" ] || { echo "keep: $_kfa: no such file" >&2; _kfr=1; continue; }
+        keep_file "$_kfa" || _kfr=1
+    done
+    [ "$_kfr" != 0 ] ||
+        echo "kept; an update installs it again from the file when the feeds do not have it (mu300-user-packages keep: what is kept)"
+    return "$_kfr"
+}
+# keep_forget NAME: no longer kept: its file goes, and an update gets it from the feeds again
+keep_forget() {
+    _kf=$(awk -v n="$1" '$1 == n { print $3; exit }' "$APKS/index" 2>/dev/null)
+    [ -n "$_kf" ] || { echo "nothing kept for $1" >&2; return 1; }
+    rm -f "$APKS/$_kf"
+    awk -v n="$1" '$1 != n' "$APKS/index" 2>/dev/null > "$APKS/index.new" &&
+        mv -f "$APKS/index.new" "$APKS/index" || return 1
+    log "$1: not kept any more (/$UPK_APKS/$_kf is gone: the feeds install it again)"
 }
 
 # ---- what an absent package left behind ------------------------------------------------------------------------
@@ -353,6 +417,12 @@ apt_sources_check() {
 }
 
 # ---- the run ---------------------------------------------------------------------------------------------------
+# pm_why OUTPUT: the line of apk's or apt's output that says why (for the failed list)
+pm_why() {
+    _pw=$(printf '%s\n' "$1" | grep -i 'error\|unable\|unsatisfiable\|not found\|no such\|locate' | head -n 2 | tr '\n' ' ')
+    [ -n "$_pw" ] || _pw=$(printf '%s\n' "$1" | tail -n 1)
+    printf '%s\n' "$_pw"
+}
 # install PKG...: all at once, else one by one (apk and apt give up on the whole set for one they cannot find)
 install_all() {
     _o=$(pm_add "$@" 2>&1)
@@ -364,11 +434,25 @@ install_all() {
         if _o=$(pm_add "$_p" 2>&1); then
             echo "$_p" >> "$D/done"; log "$_p: installed again"; restore "$_p"
         else
-            _why=$(printf '%s\n' "$_o" | grep -i 'error\|unable\|unsatisfiable\|not found\|no such\|locate' | head -n 2 | tr '\n' ' ')
-            [ -n "$_why" ] || _why=$(printf '%s\n' "$_o" | tail -n 1)
-            echo "$_p $_why" >> "$D/failed"
-            log "$_p: could not be installed again: $_why"
-            printf '%s\n' "$_o" | tail -n 20 >> "$LOG"
+            _why=$(pm_why "$_o")
+            # not in the feeds: a file kept before the update has it, and apk installs just that one (its signature
+            # is not the project's to check it against: --allow-untrusted)
+            _kf= _ko= _ok=
+            if [ "$KIND" = openwrt ]; then _kf=$(kept_file "$_p") || _kf=; fi
+            if [ -n "$_kf" ] && _ko=$(pm_add --allow-untrusted "$APKS/$_kf" 2>&1); then _ok=1; fi
+            if [ -n "$_ok" ]; then
+                echo "$_p" >> "$D/done"
+                log "$_p: installed again from its kept file (/$UPK_APKS/$_kf)"
+                restore "$_p"
+            else
+                if [ -n "$_kf" ]; then
+                    _why="$_why; from its kept file (/$UPK_APKS/$_kf): $(pm_why "$_ko")"
+                    printf '%s\n' "$_ko" | tail -n 20 >> "$LOG"
+                fi
+                echo "$_p $_why" >> "$D/failed"
+                log "$_p: could not be installed again: $_why"
+                printf '%s\n' "$_o" | tail -n 20 >> "$LOG"
+            fi
         fi
     done
 }
@@ -474,6 +558,7 @@ status() {
             sed 's/^/  /' "$D/failed"
         fi
     fi
+    if [ -s "$APKS/index" ]; then printf '\n'; kept_list; fi
     if [ -d "$ORPH" ] && [ -n "$(cd "$ORPH" && find . -type f 2>/dev/null)" ]; then
         printf '\nset aside in /%s (to use the settings of a package again once it is installed):\n' "$UPK_ORPH"
         (cd "$ORPH" && find . -type f | sed 's|^\./||' | sort) | while read -r _f; do
@@ -498,7 +583,7 @@ status() {
 [ -z "${MU300_PKG_LIB:-}" ] || return 0
 
 case ${1:-status} in
-    run|retry|skip|repair-dns) [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; } ;;
+    run|retry|skip|repair-dns|keep) [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; } ;;
 esac
 case ${1:-status} in
     run) run ;;
@@ -514,6 +599,17 @@ case ${1:-status} in
         # pending only with something to install: with everything back already it is done (was: pending for good)
         if [ -n "$(upk_pending "$D")" ]; then set_state pending; else set_state done; fi
         run "$_how"; dns_bridge_end; status ;;
+    keep)
+        [ "$KIND" = openwrt ] || { echo "keep is for OpenWrt's apk: an Ubuntu package file is installed with apt-get install ./FILE" >&2; exit 2; }
+        shift
+        case ${1:-} in
+            '') if [ -s "$APKS/index" ]; then kept_list; else echo "no .apk files kept (mu300-user-packages keep FILE.apk ...)"; fi ;;
+            --forget)
+                [ $# = 2 ] || { echo "usage: mu300-user-packages keep --forget NAME" >&2; exit 2; }
+                mkdir -p "$D" && keep_forget "$2" ;;
+            -*) echo "usage: mu300-user-packages keep [FILE.apk ...|--forget NAME]" >&2; exit 2 ;;
+            *) mkdir -p "$APKS" "$D" && keep_files "$@" ;;
+        esac ;;
     skip)
         [ -s "$D/wanted" ] || { echo "nothing to skip"; exit 0; }
         set_state skipped; note
@@ -524,6 +620,6 @@ case ${1:-status} in
     dismiss) rm -f "$D/note" "$APT_NOTE" "$MOTD"; echo "the note is gone (mu300-user-packages status still shows everything)" ;;
     status) status ;;
     brief) summary ;;
-    -h|--help|help) sed -n '2,13s/^# \{0,1\}//p' "$0" ;;
-    *) echo "usage: mu300-user-packages status|retry [--dns]|skip|repair-dns|dismiss|run|brief" >&2; exit 2 ;;
+    -h|--help|help) sed -n '2,15s/^# \{0,1\}//p' "$0" ;;
+    *) echo "usage: mu300-user-packages status|retry [--dns]|keep [FILE.apk ...|--forget NAME]|skip|repair-dns|dismiss|run|brief" >&2; exit 2 ;;
 esac

@@ -995,8 +995,10 @@ image. `apply` lists them before the switch, sets their OpenWrt settings (`/etc/
 `/etc/mu300/orphaned-config/` until they are back, and the new system installs them again at its first boot once it
 is online, with their settings and their services' enabled/disabled state put back. Ubuntu keeps the apt sources you
 added (a PPA, with its key); one that makes `apt-get update` fail on the new release is turned off and said so. The
-panel shows it all under System -> Packages after an update. A package the feeds do not have (installed from a file) stays out, with its
-settings aside: `mu300-user-packages status` says what came back and how to restore the rest. If such a proxy
+panel shows it all under System -> Packages after an update. A package the feeds do not have (installed from a file)
+is installed again from a copy kept on the device, `mu300-user-packages keep FILE.apk` under
+`/etc/mu300/user-apks/`; without one it stays out, with its settings aside, and `mu300-user-packages status` says what
+came back and how to restore the rest. If such a proxy
 (OpenClash) had pointed dnsmasq at itself, the device reports it and never falls back to the connection's resolvers by
 itself: `mu300-user-packages repair-dns` does that on request. `mu300-update apply --no-reinstall` (or
 `MU300_KEEP_PACKAGES=0`) skips the reinstall. The installers' **update** does the same.
