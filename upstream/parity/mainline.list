@@ -32,6 +32,7 @@ cfg FIXED_PHY 6.18 7.2 7.3
 cfg FUEL_GAUGE_SC27XX 6.18 7.2 7.3
 cfg HW_RANDOM_SPRD 6.18 7.2 7.3
 cfg I2C_CHARDEV 6.18 7.2 7.3
+cfg INPUT_SC27XX_VIBRA 6.18 7.2 7.3
 cfg IPV6 6.18 7.2 7.3
 cfg LEDS_SC27XX_KPLED 6.18 7.2 7.3
 cfg LEDS_ZTE_LDO 6.18 7.2 7.3
@@ -42,12 +43,16 @@ cfg NF_TABLES 6.18 7.2 7.3
 cfg PCIE_SPRD 6.18 7.2 7.3
 cfg POWER_SUPPLY 6.18 7.2 7.3
 cfg REGULATOR 6.18 7.2 7.3
+cfg REGULATOR_UMP9621 6.18 7.2 7.3
 cfg SERIAL_CORE 6.18 7.2 7.3
 cfg SPI_SPRD_ADI 6.18 7.2 7.3
+cfg SPRD_7SRESET 6.18 7.2 7.3
 cfg SPRD_BC1P2 6.18 7.2 7.3
+cfg SPRD_PMIC_SYSCON 6.18 7.2 7.3
 cfg SPRD_SOC_ID 6.18 7.2 7.3
 cfg SPRD_THERMAL_R5P0 6.18 7.2 7.3
 cfg SPRD_TIMER 6.18 7.2 7.3
+cfg SPRD_UMP96XX_TSENSOR 6.18 7.2 7.3
 cfg SPRD_UMS9620_IPA_PD 6.18 7.2 7.3
 cfg TYPEC_SC27XX 6.18 7.2 7.3
 cfg TYPEC_TCPM 6.18 7.2 7.3
@@ -514,6 +519,7 @@ ko sbuf_bridge 6.18 7.2 7.3
 ko sc27xx_adc 6.18 7.2 7.3
 ko sc27xx_fuel_gauge 6.18 7.2 7.3
 ko sc27xx_typec 6.18 7.2 7.3
+ko sc27xx_vibra 6.18 7.2 7.3
 ko sch_cake 6.18 7.2 7.3
 ko sch_fq_codel 6.18 7.2 7.3
 ko sch_htb 6.18 7.2 7.3
@@ -555,9 +561,11 @@ ko spi_sprd_adi 6.18 7.2 7.3
 ko spidev 6.18 7.2 7.3
 ko spipe 6.18 7.2 7.3
 ko spool 6.18 7.2 7.3
+ko sprd_7sreset 6.18 7.2 7.3
 ko sprd_bc1p2 6.18 7.2 7.3
 ko sprd_hwspinlock 6.18 7.2 7.3
 ko sprd_modem_loader 6.18 7.2 7.3
+ko sprd_pmic_syscon 6.18 7.2 7.3
 ko sprd_pmic_wdt 6.18 7.2 7.3
 ko sprd_power_manager 6.18 7.2 7.3
 ko sprd_serial 6.18 7.2 7.3
@@ -570,6 +578,7 @@ ko sprd_thermal_r5p0 6.18 7.2 7.3
 ko sprd_time_sync 6.18 7.2 7.3
 ko sprd_time_sync_cp 6.18 7.2 7.3
 ko sprd_trng 6.18 7.2 7.3
+ko sprd_ump96xx_tsensor 6.18 7.2 7.3
 ko sprd_wlan_combo 6.18 7.2 7.3
 ko sprdbt_tty 6.18 7.2 7.3
 ko squashfs 6.18 7.2 7.3
@@ -609,6 +618,7 @@ ko uhid 6.18 7.2 7.3
 ko uinput 6.18 7.2 7.3
 ko uio 6.18 7.2 7.3
 ko ump9620_regulator 6.18 7.2 7.3
+ko ump9621_regulator 6.18 7.2 7.3
 ko ums9620_clk 6.18 7.2 7.3
 ko unisoc_mailbox 6.18 7.2 7.3
 ko unix_diag 6.18 7.2 7.3
