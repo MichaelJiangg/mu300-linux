@@ -2,7 +2,7 @@
 
 ## Current stage
 
-The `v1.0.0-r13` source and release candidate is prepared locally for the existing public `MichaelJiangg/mu300-linux` fork, in a separate `speedtest-v1.0.0-r13` branch under `speedtest-release/`. That branch does not exist yet, so the one-line download command is not live. No device installation was performed by this candidate.
+The `v1.0.0-r13` source and installer are published in the existing public `MichaelJiangg/mu300-linux` fork, in a separate `speedtest-v1.0.0-r13` branch under `speedtest-release/`. The one-line command's public downloads and hashes have been verified. This GitHub installer path has not been run on a device.
 
 ## Verified
 
@@ -11,13 +11,13 @@ The `v1.0.0-r13` source and release candidate is prepared locally for the existi
 - `setup.sh` pins the release URL and APK digest, checks the MU300 LuCI environment, rejects a newer installed version, verifies the installed version before registering the retained APK, and avoids network package indexes during unsigned APK installation.
 - `sh -n` passed for the setup and package scripts. JavaScript syntax checks passed for the page and engine files. The release `SHA256SUMS` verifies `setup.sh`, the APK and `COPYING`. The README's setup digest matches the candidate script.
 - Invoking the script with an unexpected argument or on this non-root macOS host exits before download or installation. A targeted credential and device-identifier scan found no matches in the public candidate.
+- Anonymous HTTPS downloads of `setup.sh`, the r13 APK and `COPYING` returned the same SHA-256 values as the local release manifest. GitHub file reads matched the local setup script, README, manifest and license text; the APK base64 content matched. The upstream PR #489 head remained unchanged.
 
 ## Pending
 
-- Owner confirmation for creating the `speedtest-v1.0.0-r13` branch in the existing public fork and uploading the matching source, setup script, APK, licenses, and checksums under `speedtest-release/`.
-- After publication, verify anonymous downloads and hashes from the actual GitHub URLs, then test the one-line flow on an authorized U30 Air. The r13 APK was previously tested on a U30 Air, but this GitHub installer path has not been run on the device.
+- Test the one-line flow on an authorized U30 Air. The r13 APK was previously tested on a U30 Air, but this GitHub installer path has not been run on the device.
 - Firmware-version upgrade restoration has been registered on the test device but has not been validated across an actual firmware upgrade.
 
 ## Latest validation
 
-2026-11-05：本地源码、脚本语法、页面 JavaScript、发行校验清单和脚本拒绝路径已核对。GitHub 发布、公开下载及真实设备一键安装仍待确认与验证。
+2026-11-05：本地源码、脚本语法、页面 JavaScript、发行校验清单和脚本拒绝路径已核对；GitHub 独立分支已发布，公开下载的脚本、APK、许可证哈希一致。真实设备一键安装仍待验证。
