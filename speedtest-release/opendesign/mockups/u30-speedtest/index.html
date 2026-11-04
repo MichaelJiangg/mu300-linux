@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN" data-mode="preview">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>网络测试</title>
+  <link rel="stylesheet" href="speedtest.css">
+  <script src="node-selection.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="page-width hero-inner">
+        <div class="hero-title">
+          <h1 id="page-title">SpeedTest</h1>
+          <a class="hero-credit" href="https://www.xiaohongshu.com/user/profile/6956712700000000190372ea" target="_blank" rel="noopener noreferrer">Powered by UULinker</a>
+          <span class="mode-badge" id="mode-badge" hidden>演示数据</span>
+        </div>
+        <div class="language-control">
+          <select id="language-select" aria-label="语言" data-i18n-label="languageLabel">
+            <option value="zh" lang="zh-CN">中文</option>
+            <option value="en" lang="en">English</option>
+          </select>
+        </div>
+        <button type="button" id="start-test">开始测速</button>
+        <div class="hero-sidebar">
+          <section class="connection-card" aria-labelledby="connection-title">
+            <h2 id="connection-title" data-i18n="connectionLabel">当前网络</h2>
+            <dl class="connection-readings">
+              <div>
+                <dt data-i18n="ipLabel">公网 IP</dt>
+                <dd id="connection-ip">正在识别…</dd>
+              </div>
+              <div>
+                <dt data-i18n="currentCarrierLabel">蜂窝运营商</dt>
+                <dd id="connection-carrier">正在识别…</dd>
+              </div>
+            </dl>
+          </section>
+          <details class="server-settings" id="server-settings">
+            <summary>
+              <span class="server-label" data-i18n="serverLabel">测速服务器</span>
+              <strong id="server-name">正在匹配服务器…</strong>
+              <span id="server-description"></span>
+            </summary>
+            <div class="server-fields">
+              <div class="auto-location" id="auto-location">
+                <div>
+                  <label for="city-select" data-i18n="cityLabel">城市</label>
+                  <div class="auto-field-control">
+                    <select id="city-select">
+                      <option value="">自动识别城市</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label for="carrier-select" data-i18n="carrierLabel">运营商</label>
+                  <div class="auto-field-control">
+                    <select id="carrier-select">
+                      <option value="">自动识别运营商</option>
+                      <option value="telecom">中国电信</option>
+                      <option value="unicom">中国联通</option>
+                      <option value="mobile">中国移动</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label for="node-select" data-i18n="nodeLabel">指定服务器</label>
+                <div class="select-wrap">
+                  <select id="node-select" aria-describedby="server-description">
+                    <option value="">按城市和运营商匹配</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <div class="page-width">
+      <section class="results" aria-labelledby="results-title">
+        <div class="section-heading">
+          <div class="results-heading">
+            <h2 id="results-title" data-i18n="resultsTitle">测速结果</h2>
+            <span class="measurement-status" id="test-status" role="status">准备就绪</span>
+          </div>
+          <div class="unit-control">
+            <span class="visually-hidden" id="unit-label" data-i18n="unitLabel">速率单位</span>
+            <div class="unit-toggle" id="unit-select" role="group" aria-labelledby="unit-label">
+              <button type="button" data-unit="MB/s" aria-pressed="true">MB/s</button>
+              <button type="button" data-unit="Mbps" aria-pressed="false">Mbps</button>
+            </div>
+          </div>
+        </div>
+
+        <dl class="metrics">
+          <div class="metric metric-ping">
+            <dt data-i18n="ping">Ping 延迟</dt>
+            <dd hidden><span id="ping-value"></span><span class="metric-unit">ms</span></dd>
+          </div>
+          <div class="metric metric-gauge">
+            <dt>
+              <span data-i18n="download">下载</span>
+              <svg class="gauge-arc" viewBox="8 0 128 99" aria-hidden="true" focusable="false">
+                <path class="gauge-track" d="M20.64 81.69A54 54 0 1 1 123.36 81.69"></path>
+                <path class="gauge-fill" id="download-gauge" d="M20.64 81.69A54 54 0 1 1 123.36 81.69" pathLength="100" stroke-dasharray="0 100"></path>
+              </svg>
+            </dt>
+            <dd hidden><span id="download-value"></span><span class="speed-unit metric-unit">MB/s</span></dd>
+          </div>
+          <div class="metric metric-gauge">
+            <dt>
+              <span data-i18n="upload">上传</span>
+              <svg class="gauge-arc" viewBox="8 0 128 99" aria-hidden="true" focusable="false">
+                <path class="gauge-track" d="M20.64 81.69A54 54 0 1 1 123.36 81.69"></path>
+                <path class="gauge-fill" id="upload-gauge" d="M20.64 81.69A54 54 0 1 1 123.36 81.69" pathLength="100" stroke-dasharray="0 100"></path>
+              </svg>
+            </dt>
+            <dd hidden><span id="upload-value"></span><span class="speed-unit metric-unit">MB/s</span></dd>
+          </div>
+        </dl>
+
+        <section class="equivalent" aria-labelledby="tier-title">
+          <h3 id="tier-title" data-i18n="equivalentLabel">等效宽带</h3>
+          <div class="equivalent-main" id="plan-main" hidden>
+            <p class="equivalent-headline"><span data-i18n="equivalentPrefix">约</span> <strong id="plan-download"></strong> <span data-i18n="equivalentSuffix">宽带</span></p>
+            <p class="equivalent-upload"><span data-i18n="uploadEquivalent">上传约当</span> <strong id="plan-upload"></strong></p>
+          </div>
+          <p id="plan-detail" class="equivalent-detail" hidden></p>
+        </section>
+      </section>
+
+      <section class="history" aria-labelledby="history-title">
+        <div class="section-heading">
+          <h2 id="history-title" data-i18n="historyTitle">最近 10 次测速</h2>
+          <span id="history-count" class="history-count" aria-label="已记录 0 次">0 / 10</span>
+        </div>
+        <table class="history-table" role="table" aria-label="测速历史" data-i18n-label="historyLabel">
+          <thead role="rowgroup">
+            <tr role="row">
+              <th scope="col" data-i18n="time">时间</th>
+              <th scope="col" data-i18n="node">节点</th>
+              <th scope="col"><span data-i18n="ping">Ping 延迟</span> <span>ms</span></th>
+              <th scope="col"><span data-i18n="download">下载</span> <span class="speed-unit">MB/s</span></th>
+              <th scope="col"><span data-i18n="upload">上传</span> <span class="speed-unit">MB/s</span></th>
+              <th scope="col" data-i18n="equivalentLabel">等效宽带</th>
+            </tr>
+          </thead>
+          <tbody id="history-body" role="rowgroup"></tbody>
+        </table>
+        <p id="history-empty" class="history-empty" data-i18n="historyEmpty">完成第一次测速后，结果会显示在这里。</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

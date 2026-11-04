@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.env.*
+.build/
+node_modules/
+build/
+DerivedData/
+.idea/
+.vscode/
+.claude/
+.codex/
+.agents/
+*.swp
+*.swo

@@ -1,0 +1,20 @@
+--- speedtest_worker.js
++++ speedtest_worker.js
+@@ -482,7 +482,7 @@
+ 						};
+ 						xhr[i].open("POST", settings.url_ul + url_sep(settings.url_ul) + (settings.mpot ? "cors=true&" : "") + "r=" + Math.random(), true); // random string to prevent caching
+ 						try {
+-							xhr[i].setRequestHeader("Content-Encoding", "identity"); // disable compression (some browsers may refuse it, but data is incompressible anyway)
++							if (settings.url_ul !== "https://www.speedtest.hk/speedtest/upload.php") xhr[i].setRequestHeader("Content-Encoding", "identity"); // disable compression (some browsers may refuse it, but data is incompressible anyway)
+ 						} catch (e) {}
+ 						//No Content-Type header in MPOT branch because it triggers bugs in some browsers
+ 						xhr[i].send(reqsmall);
+@@ -518,7 +518,7 @@
+ 						// send xhr
+ 						xhr[i].open("POST", settings.url_ul + url_sep(settings.url_ul) + (settings.mpot ? "cors=true&" : "") + "r=" + Math.random(), true); // random string to prevent caching
+ 						try {
+-							xhr[i].setRequestHeader("Content-Encoding", "identity"); // disable compression (some browsers may refuse it, but data is incompressible anyway)
++							if (settings.url_ul !== "https://www.speedtest.hk/speedtest/upload.php") xhr[i].setRequestHeader("Content-Encoding", "identity"); // disable compression (some browsers may refuse it, but data is incompressible anyway)
+ 						} catch (e) {}
+ 						//No Content-Type header in MPOT branch because it triggers bugs in some browsers
+ 						xhr[i].send(req);
